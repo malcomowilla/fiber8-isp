@@ -25,7 +25,7 @@ const {   errorData
 return  <p key={index}>{error}</p>
 })} */}
 
-<p>Oops! {errorData['password']}</p>
+<p>{errorData['password']}</p>
       </AlertDescription>
     </Alert>
 

@@ -10,12 +10,12 @@ import {useNavigate} from 'react-router-dom'
 // } from "@/components/ui/input-otp"
 
 import Loader from '../loader/Loader'
-import { useContext, useState} from 'react'
+import { useContext, useState, useEffect} from 'react'
 
 
 export function InputOTPWithSeparator() {
 
-const {user, setCurrentUser, handleThemeSwitch   
+const { setCurrentUser, handleThemeSwitch   
 } = useContext(ApplicationContext);
   
 const navigate = useNavigate()
@@ -29,6 +29,9 @@ const [icon, setIcon] = useState()
   const [error, setError] = useState('')
   const [offlineError, setOfflineError] = useState(false)
 
+
+
+
 const formData = {
   email: email,
   password: isPassword
@@ -40,20 +43,20 @@ const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), 9000);
 
 const handleSignIn = async (e) => {
-  setShowErrors(false)
-  setOfflineError(false)
+  
 
 
   e.preventDefault()
-  setloading(true)
-
   // const response = await fetch('/api/csrf_token');
   // const { csrf_token } = await response.json();
 
   // console.log("CSRF Token:", csrf_token);
 
   try {
-    
+    setShowErrors(false)
+  setOfflineError(false)
+  setloading(true)
+
   const users = await fetch('/api/sign_in', {
     method: "POST",
     headers: {
@@ -82,6 +85,7 @@ const handleSignIn = async (e) => {
   setOfflineError(false)
 
   let  actualUserDataInJson = await users.json()
+
   if (users.status === 401) {
     setOfflineError(false)
 
@@ -91,10 +95,12 @@ const handleSignIn = async (e) => {
     setPassword('')
     setShowErrors(false)
     setloading(false)
-   setCurrentUser(actualUserDataInJson)
-   console.log(actualUserDataInJson)
+   setCurrentUser(actualUserDataInJson.user)
+   document.cookie = "authenticated=true; path=/";
+   console.log('user1:',actualUserDataInJson)
    navigate('/layout/admin-dashboard')
    setOfflineError(false)
+
 
     // console.log(actualUserDataInJson)
   } else {
@@ -102,7 +108,7 @@ const handleSignIn = async (e) => {
    
 
     setShowErrors(true)
-  setCurrentUser(false)
+  setCurrentUser([])
   setloading(false)
 
     console.log(actualUserDataInJson)
@@ -115,10 +121,6 @@ const handleSignIn = async (e) => {
   }
 
 }
-
-
-
-
 
 
 

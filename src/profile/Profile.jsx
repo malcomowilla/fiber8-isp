@@ -51,6 +51,7 @@ const handleLogout = async () => {
 
           setCurrentUser(null)
           navigate('/signin');
+          
 console.log(user)
         } else {
           throw new Error('Logout failed');

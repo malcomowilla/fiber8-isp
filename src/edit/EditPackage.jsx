@@ -46,11 +46,11 @@ const EditPackage = () => {
       
 
       <div className='grid grid-cols-1'>
-      <label className="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold">Validity</label>
+      <label className="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold">Validity Period</label>
 
       <input type='number' 
       className="py-2 px-3 rounded-lg border-2 border-red-300 mt-1 focus:outline-none
-       focus:ring-2 focus:ring-red-600 focus:border-transparent" placeholder="Another Input" />
+       focus:ring-2 focus:ring-red-600 focus:border-transparent" placeholder="" />
 
 
       </div>
@@ -69,7 +69,7 @@ const EditPackage = () => {
     </div>
 
     <div className="grid grid-cols-1 mt-5 mx-7">
-      <label className="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold">Price</label>
+      <label className="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold">Bundle Price</label>
       <input type='number' 
       className="py-2 px-3 rounded-lg border-2 border-red-300 mt-1 focus:outline-none
        focus:ring-2 focus:ring-red-600 focus:border-transparent" placeholder="Another Input" />

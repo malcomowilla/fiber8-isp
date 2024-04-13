@@ -4,7 +4,6 @@ import {
   RouterProvider,
   createRoutesFromElements,
   Route,
- 
 } from "react-router-dom";
 import {ResetPassword} from './Auth/ResetPassword'
 import {useState, useEffect} from 'react'
@@ -22,7 +21,9 @@ import PPPOEsubscribers from './subscribers/PPPOEsubscribers'
 import FixedPayments from './payments/FixedPayments'
 import PPPOEsubscriptions from './subscriptions/PPPOEsubscriptions'
 import {DatePicker} from './date-picker/Date'
-
+import LocalizeDate from './date-picker/LocalizeDate'
+import ProtectAuth from './Auth/ProtectAuth'
+import HotspotPayments from './payments/HotspotPayments'
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -35,7 +36,10 @@ const router = createBrowserRouter(
 </PrivateRoutes>}>
 </Route> */}
 
-<Route  path='/layout'  element={<div className=''><Layout/></div>}>
+{/* <ProtectAuth> <Layout/> </ProtectAuth> */}
+<Route  path='/layout'  element={ 
+      <Layout/> 
+}>
 
   
 <Route path='/layout/date' element={<DatePicker/>}/>
@@ -49,8 +53,11 @@ const router = createBrowserRouter(
 <Route path='/layout/fixed-payments' element={<FixedPayments/>}/>
 <Route path='/layout/edit-package' element={<EditPackage/>}/>
 <Route path='/layout/pppoe-subscriptions' element={<PPPOEsubscriptions/>}/>
+<Route path='/layout/hotspot-payments' element={<HotspotPayments/>}/>
 
 </Route>
+
+
 
       <Route  path='/signin' element={<InputOTPWithSeparator/>}/>
       
@@ -73,14 +80,17 @@ const [errorData, setErroraData] = useState([])
 const [loading, setloading] = useState(false)
 const [seeSidebar, setSeeSideBar] = useState(false)
 const [logout, setLogout] = useState('') 
-const [user, setCurrentUser] = useState()
+const [user, setCurrentUser] = useState('')
 const [theme, setTheme] = useState('light')
 const [offlineError, setOfflineError] = useState(false)
+const [open, setOpen] = useState(false)
+const [username, setUsername] = useState('')
 
 const formData = {
   password_confirmation: passwordConfirmation,
     email: email,
-    password: isPassword
+    password: isPassword,
+    username: username
 }
 
 const [isExpanded, setIsExpanded] = useState(false)
@@ -90,6 +100,7 @@ const [isExpanded3, setIsExpanded3] = useState(false)
 const [isExpanded4, setIsExpanded4] = useState(false)
 const [isExpanded5, setIsExpanded5] = useState(false)
 
+const isLogedIn = window.localStorage.getItem('user')
 // const [formData, setFormData] = useState({
 //   passwordConfirmation: '',
 //   email: '',
@@ -110,7 +121,6 @@ useEffect(() => {
   setTheme('light')
  }
 }, []);
-
 
 
 
@@ -145,14 +155,18 @@ const handleLogout = async () => {
 
 
 
+const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), 9000);
 
 const handleSignUp = async (e) => {
-  setShowErrors(false)
  
 
   e.preventDefault()
-  setloading(true)
   
+try {
+  setShowErrors(false)
+  setOfflineError(false)
+  setloading(true)
 
   const users = await fetch('api/sign_up', {
     method: "POST",
@@ -161,6 +175,8 @@ const handleSignUp = async (e) => {
       "Content-Type": "application/json",
     }, 
     credentials: 'include', // Include cookies in the request
+    signal: controller.signal,  
+
 
     body: JSON.stringify(formData),
 
@@ -169,14 +185,19 @@ const handleSignUp = async (e) => {
 
 
   )
-
-
-  setShowErrors(false)
+  clearTimeout(id);
 
   setloading(false)
 
+  setShowErrors(false)
+
+
   let  actualUserDataInJson = await users.json()
 
+  if (users.status === 401) {
+    setOfflineError(false)
+
+  }
   if (users.ok) {
     // const actualUserDataInJson = await users.json
     setEmail('')
@@ -184,14 +205,25 @@ const handleSignUp = async (e) => {
     setPasswordConfirmation('')
     setShowErrors(false)
     setloading(false)
+    setOfflineError(false)
+    setUsername('')
+
     // localStorage.setItem("jwt", actualUserDataInJson.jwt);
-    console.log(actualUserDataInJson)
+    // console.log(actualUserDataInJson)
 
   } else {
     setErroraData(actualUserDataInJson.errors)
     setShowErrors(true)
+    setloading(false)
 
   }
+} catch (error) {
+  console.log(error.name === 'AbortError');
+  setloading(false);
+
+  setOfflineError(true)
+
+}
 }
 
 
@@ -203,16 +235,18 @@ const handleSignUp = async (e) => {
 
   return (
     <main>
+      < LocalizeDate  >
  <ApplicationContext.Provider value={{isSeen, setIsSeen,isPassword, setPassword,
    email, setEmail, passwordConfirmation, setPasswordConfirmation, errorData, showErrors, handleSignUp, loading,
    isExpanded, setIsExpanded, isExpanded1, setIsExpanded1, isExpanded2, setIsExpanded2,
    isExpanded3, setIsExpanded3, isExpanded4, setIsExpanded4, isExpanded5, setIsExpanded5, seeSidebar, setSeeSideBar,
-   logout,handleLogout , user, setCurrentUser, theme, setTheme,  handleThemeSwitch}}>
+   logout,handleLogout , user, setCurrentUser, theme, setTheme,  handleThemeSwitch
+   , setOfflineError, offlineError, open, setOpen, username, setUsername}}>
 
 
 <RouterProvider router={router} />
 </ApplicationContext.Provider>
-
+</ LocalizeDate  >
     </main>
   )
 }

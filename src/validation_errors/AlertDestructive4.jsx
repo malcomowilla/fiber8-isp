@@ -5,7 +5,7 @@ import {
   AlertDescription,
 } from "@/components/ui/alert"
 
-export function AlertDestructive3() {
+export function AlertDestructive4() {
 
   const {   errorData
   } = useContext(ApplicationContext);
@@ -20,7 +20,7 @@ export function AlertDestructive3() {
 {errorData.map ((error, index)=> {
 return  <p key={index}>{error}</p>
 })} */}
-<p> {errorData['email']}</p>
+<p> {errorData['username']}</p>
       </AlertDescription>
     </Alert>
 

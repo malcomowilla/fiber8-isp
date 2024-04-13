@@ -20,6 +20,7 @@ const {  handleThemeSwitch
 
 useEffect( () => {
 
+  
   const fetchUserData = async () => {
     const response = await fetch('/api/me', {
       method: 'GET',
@@ -32,7 +33,7 @@ useEffect( () => {
     })
 const data = await response.json()
 if (response.ok) {
-setUser(data['email']) 
+setUser(data['username']) 
 }
   }
 
@@ -43,7 +44,7 @@ setUser(data['email'])
 
 
 
-const {seeSidebar, setSeeSideBar, setTheme, theme
+const {seeSidebar, setSeeSideBar
 
 
 } = useContext(ApplicationContext); 
@@ -52,7 +53,7 @@ const {seeSidebar, setSeeSideBar, setTheme, theme
         <ion-icon  onClick={()=> setSeeSideBar(!seeSidebar)} className='menu-black'  name="menu"></ion-icon>
 
 
-
+<p> Hello {user}</p>
 <div className='flex flex-row gap-4'>
 
 <div onClick={handleThemeSwitch}>

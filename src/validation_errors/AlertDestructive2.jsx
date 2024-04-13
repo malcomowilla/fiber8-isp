@@ -17,7 +17,7 @@ export function AlertDestructive2() {
       <AlertDescription>
         
      
-<p>Oops! {errorData['password_confirmation']}</p>
+<p> {errorData['password_confirmation']}</p>
 
       </AlertDescription>
     </Alert>

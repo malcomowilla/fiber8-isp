@@ -82,7 +82,22 @@
 
 @layer components {
 
+.MuiInputBase-input .MuiOutlinedInput-input .MuiInputBase-inputAdornedEnd 
+.Mui-readOnly .MuiInputBase-readOnly .css-nxo287-MuiInputBase-input-MuiOutlinedInput-input{
+  color: white; 
 
+
+  
+
+}
+
+.dark-text-white .MuiInputBase-input { 
+  color: white; 
+}
+.MuiOutlinedInput-notchedOutline .css-1d3z3hw-MuiOutlinedInput-notchedOutline{
+  color: white; 
+
+ }
 
 
   .dotted-font {

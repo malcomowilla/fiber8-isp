@@ -1,26 +1,18 @@
 
 
 import MaterialTable from 'material-table'
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
 import { ThemeProvider, createTheme } from '@mui/material';
 
 
+import EditIcon from '@mui/icons-material/Edit';
+
+import { IconButton } from '@mui/material';
 
 
-const columns = [
-  {title: 'Name', field: 'Name', headerClassName: 'dark:text-black ', defaultSort: 'asc'},
-  {title: 'RefNo', field: 'RefNo',  headerClassName: 'dark:text-black' ,  sorting: true, defaultSort: 'asc'},
 
-  {title: 'Phone', field: 'Phone',  headerClassName: 'dark:text-black'},
-  {title: 'Package', field: 'Package', type: 'numeric', headerClassName: 'dark:text-black'},
-  {title: 'Last Renewed', field:'Last Renewed',  headerClassName: 'dark:text-black'},
-  {title: 'Expires', field:'Expires',  headerClassName: 'dark:text-black'},
-
-  {title: 'Online', field:'Online',  headerClassName: 'dark:text-black'},
-  {title: 'Action', field:'Action',  headerClassName: 'dark:text-black'}
-
-]
 
 const rows = [
   {  Speed: '4M/4M', Name: 'Makena', Price: 1500, Validity: 30 },
@@ -39,6 +31,45 @@ const rows = [
 
 
 const PPPOEsubscribers = () => {
+
+
+  const columns = [
+    {title: 'Name', field: 'Name', headerClassName: 'dark:text-black ', defaultSort: 'asc'},
+    {title: 'RefNo', field: 'RefNo',  headerClassName: 'dark:text-black' ,  sorting: true, defaultSort: 'asc'},
+  
+    {title: 'Phone', field: 'Phone',  headerClassName: 'dark:text-black'},
+    {title: 'Package', field: 'Package', type: 'numeric', headerClassName: 'dark:text-black'},
+    {title: 'Last Renewed', field:'Last Renewed',  headerClassName: 'dark:text-black'},
+    {title: 'Expires', field:'Expires',  headerClassName: 'dark:text-black'},
+  
+    {title: 'Online', field:'Online',  headerClassName: 'dark:text-black'},
+    {title: 'Action', field:'Action',  headerClassName: 'dark:text-black',
+    render: (params) =>  
+    
+    <>
+     
+      <DeleteButton {...params} />
+      <EditButton {...params}/>
+     
+      </>
+  
+  
+  }
+  
+  ]
+
+
+
+  const DeleteButton = ({ id }) => (
+    <IconButton style={{ color: '#8B0000' }}>
+      <DeleteIcon />
+    </IconButton>
+  );
+  const EditButton = ({ id }) => (
+    <IconButton style={{color: 'black'}} >
+      <EditIcon />
+    </IconButton>
+  );
   const defaultMaterialTheme = createTheme({
     palette: {
       primary: {

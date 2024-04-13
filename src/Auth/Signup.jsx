@@ -1,9 +1,13 @@
 import {Button} from '../components/ui/button'
+
 import { useContext} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
+
 import {AlertDestructive} from '../validation_errors/AlertDestructive'
 import {AlertDestructive2} from '../validation_errors/AlertDestructive2'
 import {AlertDestructive3} from '../validation_errors/AlertDestructive3'
+import {AlertDestructive4} from '../validation_errors/AlertDestructive4'
+
 import {useState} from 'react'
 import {Link} from 'react-router-dom'
 
@@ -13,7 +17,7 @@ const Signup = () => {
   const [icon, setIcon] = useState()
 
 const {isSeen, setIsSeen,isPassword, setPassword, email, setEmail, passwordConfirmation, setPasswordConfirmation,
-   showErrors, handleSignUp, loading,handleThemeSwitch   
+   showErrors, handleSignUp, loading,handleThemeSwitch, setOfflineError, offlineError,username, setUsername
 } = useContext(ApplicationContext);
    
 
@@ -44,6 +48,16 @@ const {isSeen, setIsSeen,isPassword, setPassword, email, setEmail, passwordConfi
 
  </div>
 
+
+
+<div className=''>
+  {offlineError && <p className='dark:text-red-600'>Something Went Wrong Please Try Again Later
+
+
+   <span onClick={()=> setOfflineError(false)}  className='text-red-700 cursor-pointer '>      x</span></p>}
+</div>
+
+
     <main className='lg:grid grid-cols-2 '>
 
     <section className="bg-gray-100 dark:bg-gray-900">
@@ -60,6 +74,8 @@ const {isSeen, setIsSeen,isPassword, setPassword, email, setEmail, passwordConfi
 
           </h2>
           <form className="mt-4 space-y-4 lg:mt-5 md:space-y-5"   onSubmit={handleSignUp}>
+
+
               <div className=' flex  flex-col  relative '>
                 <div className=''>
                 <label  className="  text-sm font-mono text-gray-900 dark:text-white ">Your email</label>
@@ -79,6 +95,47 @@ const {isSeen, setIsSeen,isPassword, setPassword, email, setEmail, passwordConfi
                       {showErrors &&     <AlertDestructive3/>
  }
               </div>
+
+
+
+
+
+              <div className=' flex  flex-col  relative '>
+                <div className=''>
+                <label  className="  text-sm font-mono text-gray-900 dark:text-white ">Your Username</label>
+
+                </div>
+                 
+                <div className='self-end  absolute p-8'>
+                <ion-icon name="person-outline"></ion-icon>
+                  </div>
+                  <input value={username}  type="text" name="username" id="username" onChange={(e)=> setUsername(e.target.value)}  
+                   className="bg-gray-50 border
+                   border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
+                    block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
+                     dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="" />
+                      {showErrors &&     <AlertDestructive4/>
+ }
+              </div>
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
               <div className='flex flex-col relative'>
                   <label  className="block mb-2 text-sm font-mono text-gray-900 dark:text-white"> Password</label>
                   <div className='absolute max-sm:self-end p-9 lg:self-end' onClick={()=>setIsSeen(!isSeen)}>
