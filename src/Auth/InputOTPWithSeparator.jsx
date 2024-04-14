@@ -13,7 +13,7 @@ import Loader from '../loader/Loader'
 import { useContext, useState, useEffect} from 'react'
 
 
-export function InputOTPWithSeparator() {
+ function InputOTPWithSeparator() {
 
 const { setCurrentUser, handleThemeSwitch   
 } = useContext(ApplicationContext);
@@ -278,3 +278,4 @@ setPassword(e.target.value)
     </>
   )
 }
+export default  InputOTPWithSeparator

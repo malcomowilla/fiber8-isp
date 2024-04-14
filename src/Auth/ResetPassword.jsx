@@ -13,7 +13,7 @@ import Loader from '../loader/Loader'
 import {useState,useEffect} from 'react'
 
 
-export function ResetPassword() {
+ function ResetPassword() {
 
   const [isSeen, setIsSeen] = useState(true)
   const [email, setEmail] = useState('')
@@ -187,3 +187,6 @@ useEffect(() => {
     </>
   )
 }
+
+
+export default ResetPassword

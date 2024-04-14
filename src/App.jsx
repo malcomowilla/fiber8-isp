@@ -5,25 +5,63 @@ import {
   createRoutesFromElements,
   Route,
 } from "react-router-dom";
-import {ResetPassword} from './Auth/ResetPassword'
-import {useState, useEffect} from 'react'
+// import {ResetPassword} from './Auth/ResetPassword'
+import {useState, useEffect, lazy, Suspense} from 'react'
 import {ApplicationContext} from './context/ApplicationContext'
-import Signup from './Auth/Signup'
-import NotFound from './404/NotFound'
-import {InputOTPWithSeparator} from './Auth/InputOTPWithSeparator'
+import UiLoader from './uiloader/UiLoader'
+// import Signup from './Auth/Signup'
+// import NotFound from './404/NotFound'
+// import {InputOTPWithSeparator} from './Auth/InputOTPWithSeparator'
 // import PrivateRoutes  from './private_routes/PrivateRoutes'
-import AdminDashboard from './admindashboard/AdminDashboard'
-import Sidebar from './sidebar/Sidebar'
-import Layout from './layout/Layout'
- import PPPOEpackages from './packages/PPPOEpackages'
-import EditPackage from './edit/EditPackage'
-import PPPOEsubscribers from './subscribers/PPPOEsubscribers'
-import FixedPayments from './payments/FixedPayments'
-import PPPOEsubscriptions from './subscriptions/PPPOEsubscriptions'
+// import AdminDashboard from './admindashboard/AdminDashboard'
+// import Sidebar from './sidebar/Sidebar'
+// import Layout from './layout/Layout'
+//  import PPPOEpackages from './packages/PPPOEpackages'
+// import EditPackage from './edit/EditPackage'
+// import PPPOEsubscribers from './subscribers/PPPOEsubscribers'
+// import FixedPayments from './payments/FixedPayments'
+// import PPPOEsubscriptions from './subscriptions/PPPOEsubscriptions'
 import {DatePicker} from './date-picker/Date'
 import LocalizeDate from './date-picker/LocalizeDate'
 import ProtectAuth from './Auth/ProtectAuth'
-import HotspotPayments from './payments/HotspotPayments'
+// import HotspotPayments from './payments/HotspotPayments'
+
+const ResetPassword = lazy(()=> import('./Auth/ResetPassword')
+) 
+
+
+const Signup = lazy(()=> import('./Auth/Signup')
+)
+
+const InputOTPWithSeparator = lazy(()=> import('./Auth/InputOTPWithSeparator')
+)
+
+const NotFound = lazy(()=> import('./404/NotFound')
+)
+
+const Layout = lazy(()=>  import('./layout/Layout')
+)
+
+const AdminDashboard = lazy(()=> import ('./admindashboard/AdminDashboard')
+)
+const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
+)
+const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
+)
+
+const PPPOEsubscribers = lazy(()=> import('./subscribers/PPPOEsubscribers')
+)
+
+const FixedPayments = lazy(()=> import('./payments/FixedPayments')
+)
+
+const  PPPOEsubscriptions = lazy(()=> import('./subscriptions/PPPOEsubscriptions')
+)
+
+const EditPackage = lazy(()=> import('./edit/EditPackage'))
+const HotspotPayments = lazy(()=> import('./payments/HotspotPayments')
+)
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -85,6 +123,7 @@ const [theme, setTheme] = useState('light')
 const [offlineError, setOfflineError] = useState(false)
 const [open, setOpen] = useState(false)
 const [username, setUsername] = useState('')
+const [showLoader, setShowLoader] = useState(true);
 
 const formData = {
   password_confirmation: passwordConfirmation,
@@ -124,7 +163,14 @@ useEffect(() => {
 
 
 
+useEffect(() => {
+  const intervalId = setTimeout(() => {
+    setShowLoader(false); // Hide the loader after the interval
+  }, 20);
 
+  // Clear the interval when the component unmounts
+  return () => clearInterval(intervalId);
+}, []);
 
 
 useEffect(() => {
@@ -235,6 +281,7 @@ try {
 
   return (
     <main>
+      <Suspense fallback={<div className='flex justify-center items-center '>{showLoader ? <UiLoader/> : null}</div>}>
       < LocalizeDate  >
  <ApplicationContext.Provider value={{isSeen, setIsSeen,isPassword, setPassword,
    email, setEmail, passwordConfirmation, setPasswordConfirmation, errorData, showErrors, handleSignUp, loading,
@@ -247,6 +294,7 @@ try {
 <RouterProvider router={router} />
 </ApplicationContext.Provider>
 </ LocalizeDate  >
+</Suspense>
     </main>
   )
 }
