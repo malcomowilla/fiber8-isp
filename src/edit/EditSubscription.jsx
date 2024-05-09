@@ -1,234 +1,236 @@
 import * as React from "react"
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 
-import { Button } from "@/components/ui/button"
+import Button from '@mui/material/Button';
 
 
-import {DatePicker}  from '../date-picker/Date'
+import TextField from '@mui/material/TextField';
 
 import EditIcon from '@mui/icons-material/Edit';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { MobileTimePicker } from '@mui/x-date-pickers/MobileTimePicker';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
-import { IconButton } from '@mui/material';
-import { FormControl } from '@mui/base';
-import PropTypes from 'prop-types';
-import clsx from 'clsx';
-import { styled, css } from '@mui/system';
-import { Modal as BaseModal } from '@mui/base/Modal';
+import Stack from '@mui/material/Stack';
+
+import Box from '@mui/material/Box';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import { DemoContainer  } from '@mui/x-date-pickers/internals/demo';
 import dayjs from 'dayjs';
 
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
-// <IconButton style={{color: 'black'}} >
-// <EditIcon />
-// </IconButton>
-export function EditSubscription() {
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () =>  setOpen(false);
-  const [value, setValue] = React.useState(dayjs(''));
-const [see, setSee] = useState(true)
+import {
+  renderDigitalClockTimeView,
+  renderTimeViewClock,
+} from '@mui/x-date-pickers/timeViewRenderers';
+function  EditSubscription({open,  handleClose}) {
+  const [fullWidth, setFullWidth] = React.useState(true);
+  const [maxWidth, setMaxWidth] = React.useState('lg');
+ 
 
-const handleCancel = (e) => {
-  setSee(false)
-}
-
+  const [age, setAge] = React.useState('');
+const [dateTimeValue, setDateTimeValue] = useState(dayjs(new Date()))
+const [newDate, setNewDate] = React.useState(null)
+  const handleChange = (event) => {
+    setAge(event.target.value);
+  };
+  useEffect(() => {
+    // Calculate the date and time 30 days from the current date and time
+    const thirtyDaysFromNow = dayjs(new Date()).add(30, 'day');
+    setNewDate(thirtyDaysFromNow);
+  }, []);
   return (
-
-    <div>
-
- <IconButton style={{color: 'black'}}  onClick={handleOpen}>
- <EditIcon />
- </IconButton>
- { see &&
-
-      <Modal
-        aria-labelledby="unstyled-modal-title"
-        aria-describedby="unstyled-modal-description"
+    <React.Fragment>
+   
+      <Dialog
+        fullWidth={fullWidth}
+        maxWidth={maxWidth}
         open={open}
         onClose={handleClose}
-        slots={{ backdrop: StyledBackdrop }}
       >
+        <DialogTitle>Add Subscription</DialogTitle>
+        <DialogContent>
 
-        <ModalContent sx={{ width: 800}} className='dark:bg-black'>
-          <section className='bg-white dark:bg-gray-900'>
-        <div className="py-8 px-4 mx-auto max-w-2xl lg:py-16  ">
-      <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">Add Subscription</h2>
-
-      <form className=''>
-          <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-
-
-          <div>
-                  <label htmlFor="category" className="block mb-2 text-sm font-medium dark:text-white ">Subscriber</label>
-                  <select id="category" className="bg-gray-50 border
-                   border-gray-300  text-sm rounded-lg focus:ring-primary-500 
-                   focus:border-primary-500 block w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-400
-                    dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 dark:bg-black">
-                      <option value="TV">TV/Monitors</option>
-                      <option value="PC">PC</option>
-                      <option value="GA">Gaming/Console</option>
-                      <option value="PH">Phones</option>
-                  </select>
-              </div>
-              <div className="sm:col-span-2 ">
-                 
-
- <DemoContainer components={['DateTimePicker', 'DateTimePicker']} >
-
-                   <DateTimePicker
-          label="Date Subscribed"
-          value={value}
-          onChange={(newValue) => setValue(newValue)}
-          className='dark:text-white'
-        /> 
-
-<DateTimePicker
-          label="Valid Until"
-          value={value}
-          onChange={(newValue) => setValue(newValue)}
-        /> 
-       </DemoContainer >
-
-              </div>
-              <div className="w-full">
-                 
-          <div>
-                  <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900
-                   dark:text-white">Status</label>
-                  <select id="category" className="bg-gray-50 border
-                   border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 
-                   focus:border-primary-500 block w-full p-2.5 
-                    dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                      <option value="TV">TV/Monitors</option>
-                      <option value="PC">PC</option>
-                      <option value="GA">Gaming/Console</option>
-                      <option value="PH">Phones</option>
-                  </select>
-              </div>
-              </div>
-              <div className="w-full">
-                 
-          <div>
-                  <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900
-                   dark:text-white">Package</label>
-                  <select id="category" className="bg-gray-50 border
-                   border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 
-                   focus:border-primary-500 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400
-                    dark:text-black dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                      <option value="TV">TV/Monitors</option>
-                      <option value="PC">PC</option>
-                      <option value="GA">Gaming/Console</option>
-                      <option value="PH">Phones</option>
-                  </select>
-              </div>
-              </div>
-            
-             
-             
-          </div>
-
-          <div className='mt-4 space-x-3'>
-          <Button type='submit'>Save</Button>
-          <Button type='submit' onClick={ handleCancel}>Cancel</Button>
-          </div>
-
+          <div className=''>
         
-
-      </form>
-  </div>
-  </section>
-        </ModalContent>
-
-      </Modal>
-}
-    </div>
-  );
+<FormControl  sx={{ m: 1, minWidth:520 , 
+  '& label.Mui-focused': {
+    color: 'black'
+    },
+'& .MuiOutlinedInput-root': {
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+ '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
 
   }
+},}} >
+        <InputLabel id="demo-simple-select-autowidth-label">Subscriber</InputLabel>
+        <Select
+          labelId="demo-simple-select-autowidth-label"
+          id="demo-simple-select-autowidth"
+          autoWidth
+          label="User Group"
+        >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          <MenuItem value={'ACTIVE'}>ACTIVE</MenuItem>
+          <MenuItem value={'STANDBY'}>STANNBY</MenuItem>
+          <MenuItem value={'EXPIRED'}>EXPIRED</MenuItem>
+        </Select>
+      </FormControl>
+
+   
+<FormControl  sx={{ m: 1, minWidth:520 , 
+  '& label.Mui-focused': {
+    color: 'black',
+    fontSize: '20px'
+    },
+'& .MuiOutlinedInput-root': {
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+ '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
+
+  }
+},}}>
+        <InputLabel id="demo-simple-select-autowidth-label">Package</InputLabel>
+        <Select
+          labelId="demo-simple-select-autowidth-label"
+          id="demo-simple-select-autowidth"
+          autoWidth
+          label="User Group"
+        >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          <MenuItem value={'ACTIVE'}>ACTIVE</MenuItem>
+          <MenuItem value={'STANDBY'}>STANNBY</MenuItem>
+          <MenuItem value={'EXPIRED'}>EXPIRED</MenuItem>
+        </Select>
+      </FormControl>
+          </div>
+     
 
 
+<div className='flex justify-between'>
 
-  const Backdrop = React.forwardRef((props, ref) => {
-    const { open, className, ...other } = props;
-    return (
-      <div
-        className={clsx({ 'base-Backdrop-open': open }, className)}
-        ref={ref}
-        {...other}
-      />
-    );
-  });
-  
-  Backdrop.displayName = 'Backdrop';
+<FormControl  sx={{ m: 1, width:'40ch',
+  '& label.Mui-focused': {
+    color: 'black',
+    fontSize: '23px'
+    },
+'& .MuiOutlinedInput-root': {
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+ '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
 
-  Backdrop.propTypes = {
-    className: PropTypes.string.isRequired,
-    open: PropTypes.bool,
-  };
-  
-  
-  const grey = {
-    50: '#F3F6F9',
-    100: '#E5EAF2',
-    200: '#DAE2ED',
-    300: '#C7D0DD',
-    400: '#B0B8C4',
-    500: '#9DA8B7',
-    600: '#6B7A90',
-    700: '#434D5B',
-    800: '#303740',
-    900: '#1C2025',
-  };
-  
-  const Modal = styled(BaseModal)`
-    position: fixed;
-    z-index: 1300;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  `;
-  
-  const StyledBackdrop = styled(Backdrop)`
-    z-index: -1;
-    position: fixed;
-    inset: 0;
-    background-color: rgb(0 0 0 / 0.5);
-    -webkit-tap-highlight-color: transparent;
-  `;
-  
-  const ModalContent = styled('div')(
-    ({ theme }) => css`
-      font-family: 'IBM Plex Sans', sans-serif;
-      font-weight: 500;
-      text-align: start;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      overflow: hidden;
-      background-color: ${theme.palette.mode === 'dark' ? grey[900] : '#fff'};
-      border-radius: 8px;
-      border: 1px solid ${theme.palette.mode === 'dark' ? grey[700] : grey[200]};
-      box-shadow: 0 4px 12px
-        ${theme.palette.mode === 'dark' ? 'rgb(0 0 0 / 0.5)' : 'rgb(0 0 0 / 0.2)'};
-      padding: 24px;
-      color: ${theme.palette.mode === 'dark' ? grey[50] : grey[900]};
-  
-      & .modal-title {
-        margin: 0;
-        line-height: 1.5rem;
-        margin-bottom: 8px;
-      }
-  
-      & .modal-description {
-        margin: 0;
-        line-height: 1.5rem;
-        font-weight: 400;
-        color: ${theme.palette.mode === 'dark' ? grey[400] : grey[800]};
-        margin-bottom: 4px;
-      }
-    `,
+  }
+}, }}>
+        <InputLabel id="demo-simple-select-autowidth-label">Status</InputLabel>
+        <Select
+          labelId="demo-simple-select-autowidth-label"
+          id="demo-simple-select-autowidth"
+          autoWidth
+          label="User Group"
+        >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          <MenuItem value={'ACTIVE'}>ACTIVE</MenuItem>
+          <MenuItem value={'STANDBY'}>STANNBY</MenuItem>
+          <MenuItem value={'EXPIRED'}>EXPIRED</MenuItem>
+        </Select>
+      </FormControl>
+
+
+      <DemoContainer  sx={{
+
+  '& label.Mui-focused': {
+    color: 'black'
+    },
+'& .MuiOutlinedInput-root': {
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+ '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
+
+  }
+},
+      }}  components={['TimePicker', 'TimePicker']}>
+        <DateTimePicker className='myTextField'
+          label="Date Subscribed"
+          value={dateTimeValue}
+         minDate={dayjs(new Date())}
+           maxDate={dayjs(new Date())} 
+
+          onChange={(newValue)=>  {
+            setDateTimeValue(newValue)
+
+          }   
+          
+          
+          
+         }
+          viewRenderers={{
+            hours: renderTimeViewClock,
+            minutes: renderTimeViewClock,
+            seconds: renderTimeViewClock,
+          }}
+        
+
+        />
+        <DateTimePicker  className='myTextField'
+          label="Valid Until"
+value={newDate}
+disabled
+          // minDate={dayjs(new Date())}
+          // maxDate={dayjs(new Date(new Date().getTime() + (30 * 24 * 60 * 60 * 1000)))} // 30 days from today
+          // onChange={(newValue) => {
+          //   setDateTimeValue(newValue)
+          // }   }
+
+          viewRenderers={{
+            hours:  renderTimeViewClock,
+            minutes:  renderTimeViewClock,
+            seconds: renderTimeViewClock,
+          }}
+
+
+         
+        />
+      </DemoContainer>
+
+</div>
+
+
+        </DialogContent>
+        <DialogActions>
+        
+          <Button   color='error' variant='outlined'     onClick={handleClose}>Cancel</Button>
+          <Button     color='success' variant='outlined'  loading={true} >Save</Button>
+
+        </DialogActions>
+      </Dialog>
+    </React.Fragment>
   );
-  
+}
+export default EditSubscription

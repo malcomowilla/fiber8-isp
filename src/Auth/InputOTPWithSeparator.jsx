@@ -2,6 +2,7 @@ import {Button} from '../components/ui/button'
 import {Link} from 'react-router-dom'
 import {ApplicationContext} from '../context/ApplicationContext'
 import {useNavigate} from 'react-router-dom'
+
 // import {
 //   InputOTP,
 //   InputOTPGroup,
@@ -10,7 +11,7 @@ import {useNavigate} from 'react-router-dom'
 // } from "@/components/ui/input-otp"
 
 import Loader from '../loader/Loader'
-import { useContext, useState, useEffect} from 'react'
+import { useContext, useState} from 'react'
 
 
  function InputOTPWithSeparator() {
@@ -96,13 +97,11 @@ const handleSignIn = async (e) => {
     setShowErrors(false)
     setloading(false)
    setCurrentUser(actualUserDataInJson.user)
-   document.cookie = "authenticated=true; path=/";
-   console.log('user1:',actualUserDataInJson)
-   navigate('/layout/admin-dashboard')
+
+   navigate('/admin/admin-dashboard')
    setOfflineError(false)
 
 
-    // console.log(actualUserDataInJson)
   } else {
     setError(actualUserDataInJson.message);
    
@@ -121,7 +120,9 @@ const handleSignIn = async (e) => {
   }
 
 }
-
+setTimeout(() => {
+  setOfflineError(false)
+}, 7000);
 
 
   return (
@@ -175,10 +176,10 @@ const handleSignIn = async (e) => {
 
 
 <div className=''>
-  {offlineError && <p className='text-red-300'>Something Went Wrong Please Try Again Later
+  {offlineError && <p className='text-red-700'>Something Went Wrong Please Try Again Later!!
 
 
-   <span onClick={()=> setOfflineError(false)}  className='text-red-700 cursor-pointer '>      x</span></p>}
+   </p>}
 </div>
 
 
@@ -219,13 +220,13 @@ const handleSignIn = async (e) => {
                    className="bg-gray-50 border
                    border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
                     block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
-                     dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                     dark:placeholder-gray-400 dark:text-white dark:focus:ring-red-500 dark:focus:border-red-500"
                       placeholder="" />
  
               </div>
               <div className='flex flex-col relative'>
                   <label  className="block mb-2 text-sm font-mono text-gray-900 dark:text-white"> Password</label>
-                  <div className='absolute self-end p-9' onClick={()=>setIsSeen(!isSeen)}>
+                  <div className='absolute self-end p-9 dark:text-black' onClick={()=>setIsSeen(!isSeen)}>
                        <ion-icon name={isSeen ? "eye-outline" : "eye-off-outline"}></ion-icon>
 
                        </div>
@@ -236,7 +237,7 @@ setPassword(e.target.value)
                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm
                      rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5
                       dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
-                       dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      dark:focus:ring-red-500 dark:focus:border-red-500"
                        
                        
                        />

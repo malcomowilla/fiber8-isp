@@ -1,37 +1,25 @@
 
 
-import React from 'react'
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton } from '@mui/material';
 // import {useState} from 'react'
 // import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
-import  {EditPayment} from '../edit/EditPayment'
+import  EditPayment from '../edit/EditPayment'
 
 import {Link} from 'react-router-dom'
-import {useState} from 'react'
-import { useContext} from 'react'
+import {useState, useContext} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 
+import AddIcon from '@mui/icons-material/Add';
+
+import GetAppIcon from '@mui/icons-material/GetApp';
 
 import MaterialTable from 'material-table'
 
 
-import { ThemeProvider, createTheme } from '@mui/material';
 
-
-const rows = [
-  {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-  {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-  {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-  {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-  {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-  {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-  {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-  {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-  // Add more rows as needed
-];
 
 
 
@@ -39,6 +27,15 @@ const rows = [
 
 const FixedPayments = () => {
 
+  const [open, setOpen] = useState(false);
+ 
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
   const DeleteButton = ({ id }) => (
         <IconButton style={{ color: '#8B0000' }}>
           <DeleteIcon />
@@ -46,16 +43,16 @@ const FixedPayments = () => {
       );
 
 
-  const EditButton = ({ id }) => (
-    <IconButton style={{color: 'black'}} >
+  const EditButton = ( ) => (
+    <IconButton onClick={handleClickOpen} style={{color: 'black'}} >
       <EditIcon />
     </IconButton>
   );
 const columns = [
   {title: 'Confirmation Code', field: 'Confirmation Code',   },
   {title: 'Paybill', field: 'Paybill',  },
-  {title: 'Ref No', field: 'Ref No', type:'numeric',  defaultSort: 'asc'},
-  {title: 'Phone', field: 'Phone', type: 'numeric', align: 'left'},
+  {title: 'Ref No', field: 'Ref No', type:'numeric',  defaultSort: 'asc', align: 'left'},
+  {title: 'Phone', field: 'Phone', type: 'numeric',align: 'left' },
   {title: 'Name', field: 'Name', defaultSort: 'asc'  },
   {title: 'Amount', field: 'Amount', defaultSort: 'asc', type: 'numeric', align: 'left'  },
   {title: 'Redeemed', field: 'Redeemed',   },
@@ -71,7 +68,7 @@ const columns = [
        <DeleteButton {...params} />
 
 
-       <EditPayment/>
+       <EditButton    onClick={handleClickOpen} {...params}/>
        </>
 
 
@@ -79,35 +76,45 @@ const columns = [
 
 
 ]
-  const defaultMaterialTheme = createTheme({
-    palette: {
-      primary: {
-        main: '#000',
-      },
-      secondary: {
-        main: '#000',
-      },
-    },
-  });
+
+
 
   return (
+    <>
     <div className=''>
-                      <ThemeProvider theme={defaultMaterialTheme}>
-
+    <EditPayment open={open} handleClose={handleClose}/>
+            
+    <div className='text-end '>
+  <input type="search"  className='bg-transparent border-y-[-2]    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
+   focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search......'/>
+</div>
       <MaterialTable columns={columns}
       
       title='Mpesa Payments'
       
-      data={rows}
+      // data={rows}
 
       
     
 
+      actions={[
+        {
+          icon: () => <AddIcon  onClick={handleClickOpen }/>,
+          isFreeAction: true, // This makes the action always visible
+          tooltip: 'Edit Payment',
+        },
+        {
+          icon: () => <GetAppIcon />,
+          isFreeAction: true, // This makes the action always visible
+      
+          tooltip: 'Import',
+        },
+      ]}
 
 options={{
        pageSizeOptions:[5, 10, 20, 25, 50, 100],
        pageSize: 20,
-       search: true,
+       search: false,
 searchFieldStyle: {
   borderColor: 'red'
 },
@@ -118,14 +125,22 @@ searchAutoFocus: true,
 selection: true,
 
 
-rowStyle:{
-  backgroundColor: 'grey'
-},
-
-paginationPosition: 'top',
+paginationPosition: 'bottom',
 exportButton: true,
 exportAllData: true,
+showSelectAllCheckbox: false,
+showTextRowsSelected: false,
 
+headerStyle:{
+  fontFamily: 'bold',
+  textTransform: 'uppercase'
+  } ,
+  
+  rowStyle:(data, index)=> index % 2 === 0 ? {
+  background: 'gray'
+  }: null,
+  
+  fontFamily: 'mono'
 }}     
       
       
@@ -133,8 +148,8 @@ exportAllData: true,
       
       />
 
-</ThemeProvider>
     </div>
+    </>
   )
 }
 
@@ -144,174 +159,3 @@ export default FixedPayments
 
 
 
-
-
-
-
-
-// // import DeleteIcon from '@mui/icons-material/Delete';
-// // import { IconButton } from '@mui/material';
-// // import {useState} from 'react'
-// // import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-// // import EditIcon from '@mui/icons-material/Edit';
-
-// import { useContext} from 'react'
-// import {ApplicationContext} from '../context/ApplicationContext'
-
-// import {EditPayment} from '../edit/EditPayment'
-// const rows = [
-//   { id: 1, Speed: 'Snow', Name: 'Jon', Price: 35, Validity: 30   },
-//   { id: 2, Speed: 'Lannister', Name: 'Cersei', Price: 42,Validity: 20, },
-//   { id: 3, Speed: 'Lannister', Name: 'Jaime', Price: 45,Validity: 20  },
-//   { id: 4, Speed: 'Stark', Name: 'Arya', Price: 16,Validity: 20, },
-//   { id: 5, Speed: 'Targaryen', Name: 'Daenerys', Price: 13,Validity: 20, },
-//   { id: 6, Speed: 'Melisandre', Name: null, Price: 150 ,Validity: 20 },
-//   { id: 7, Speed: 'Clifford', Name: 'Ferrara', Price: 44, Validity: 20,},
-//   { id: 8, Speed: 'Frances', Name: 'Rossini', Price: 36 ,Validity: 20,},
-//   { id: 9, Speed: 'Roxie', Name: 'Harvey', Price: 65 ,Validity: 20,},
-
-
-
-// ];
-
-
-
-// const FixedPayments = () => {
-//   const [data, setData] = useState(rows);
-
-
-//   const { theme
-
-
-//   } = useContext(ApplicationContext);
-    
-//   const handleDelete = (id) => {
-//     const updatedRows = data.filter((row) => row.id !== id);
-//     setData(updatedRows);
-//   };
-
-//   // const DeleteButton = ({ id }) => (
-//   //   <IconButton onClick={() => handleDelete(id)} style={{ color: 'red' }}>
-//   //     <DeleteIcon />
-//   //   </IconButton>
-//   // );
-
-
-
-//   // const EditButton = ({ id }) => (
-//   //   <IconButton style={{color: 'green'}} >
-//   //     <EditIcon />
-//   //   </IconButton>
-//   // );
-//   const columns = [
-//     { field: 'id', headerName: 'id', width: 70 , color: 'black', headerClassName: 'dark:text-black font-mono' },
-//     { field: 'Confirmation Code ', headerName: 'Confirmation Code', width: 130 , headerClassName: 'dark:text-black font-mono' },
-//     { field: 'Paybill', headerName: 'Paybill', width: 130 ,  headerClassName:  'dark:text-black font-mono' },
-//     {
-//       field: 'Phone Number',
-//       headerName: 'Phone Number',
-//       type: 'number',
-//       width: 90,
-//       headerClassName: 'dark:text-black font-mono' 
-//     },
-   
-//     {
-//         field: 'Amount',
-//         headerName: 'Amount',
-//         type: 'number',
-//         width: 90,
-//         headerClassName: 'dark:text-black font-mono' 
-//       },
-//     {
-//       field: 'Name',
-//       headerName: 'Name',
-//       width: 90,
-//       editable: true,
-//       headerClassName: 'dark:text-black font-mono' 
-//     },
-
-
-
-//     {
-//         field: 'Redeemed',
-//         headerName: 'Redeemed',
-//         width: 90,
-//         editable: true,
-//         headerClassName:  'dark:text-black font-mono' 
-//       },
-
-
-
-//       {
-//         field: 'Trans Time',
-//         headerName: 'Trans Time',
-//         width: 90,
-//         editable: true,
-//         headerClassName:  'dark:text-black font-mono' 
-//       },
-
-//     { field: 'Action',
-//     headerClassName:  'dark:text-black font-mono' ,
-//     headerName: 'Action', sortable: false, width: 160, renderCell: (params) =>  
-    
-//     <>
-    
-//     <DeleteButton {...params} />
-
-// {/* 
-// <EditButton   {...params} 
-// >
-
-
-
-//     </EditButton> */}
-
-//     <EditPayment>
-//     </EditPayment>
-
-
-
-
-
-    
-//     </>
-//      },
- 
-//   ];
-
-  
-//   return (
-// <div className=''>
-
-//  <div className={` w-auto h-auto
-//  ${theme ? 'dark:text-black' : ''}
- 
- 
-//  `}>
-        
-//  <DataGrid
-
-//  className={`dark:text-white font-mono `}
-//         rows={rows}
-//         columns={columns}
-//         initialState={{
-//           pagination: {
-//             paginationModel: { page: 0, pageSize: 5},
-//           },
-//         }}
-//         pageSizeOptions={[5, 10, 20, 30]}
-//         checkboxSelection
-//         components={{
-//           Toolbar: GridToolbar,
-//         }}
-//       />
-      
-   
-//       </div>
-//       </div>
-
-   
-//   )
-// }
-
-// export default FixedPayments

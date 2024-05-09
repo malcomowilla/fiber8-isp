@@ -90,7 +90,7 @@ const {isSeen, setIsSeen,isPassword, setPassword, email, setEmail, passwordConfi
                    className="bg-gray-50 border
                    border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
                     block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
-                     dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                     dark:placeholder-gray-400 dark:text-white dark:focus:ring-red-500 dark:focus:border-red-700"
                       placeholder="" />
                       {showErrors &&     <AlertDestructive3/>
  }
@@ -113,7 +113,7 @@ const {isSeen, setIsSeen,isPassword, setPassword, email, setEmail, passwordConfi
                    className="bg-gray-50 border
                    border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
                     block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
-                     dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                     dark:placeholder-gray-400 dark:text-white dark:focus:ring-red-500 dark:focus:border-red-700"
                       placeholder="" />
                       {showErrors &&     <AlertDestructive4/>
  }
@@ -146,10 +146,10 @@ const {isSeen, setIsSeen,isPassword, setPassword, email, setEmail, passwordConfi
 setPassword(e.target.value)
                   }}
                    
-                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm
+                    className="dark:bg-gray-700 border border-gray-300 text-gray-900 sm:text-sm
                      rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5
-                      dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
-                       dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                       dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
+                       dark:focus:ring-red-500 dark:focus:border-red-700"
                        
                        
                        />
@@ -161,10 +161,10 @@ setPassword(e.target.value)
 
                   <label  className="block mt-8 text-sm font-mono text-gray-900 dark:text-white">Confirm password</label>
                   <input value={passwordConfirmation} type="password" name="confirm-password" id="confirm-password"
-                   onChange={(e)=> setPasswordConfirmation(e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm
+                   onChange={(e)=> setPasswordConfirmation(e.target.value)} className=" border border-gray-300 text-gray-900 sm:text-sm
                     rounded-lg focus:ring-primary-600 focus:border-primary-600 block 
                     w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
-                     dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500  " />
+                     dark:text-white dark:focus:ring-red-500 dark:focus:border-red-700 " />
               </div>
               <div className="flex items-start">
                   <div className="flex items-center h-5">

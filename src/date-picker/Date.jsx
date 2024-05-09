@@ -4,7 +4,7 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
-export const DatePicker = () => {
+ export const DatePicker = () => {
   const [value, setValue] = React.useState(dayjs(''));
 
   return (
@@ -35,6 +35,12 @@ export const DatePicker = () => {
  <DemoContainer components={['DateTimePicker', 'DateTimePicker']}>
 
                    <DateTimePicker
+          label="Controlled picker"
+          value={value}
+          onChange={(newValue) => setValue(newValue)}
+        /> 
+
+<DateTimePicker
           label="Controlled picker"
           value={value}
           onChange={(newValue) => setValue(newValue)}
@@ -95,3 +101,6 @@ export const DatePicker = () => {
       // </DemoContainer>
   );
 }
+
+
+

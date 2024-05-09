@@ -29,6 +29,7 @@ import {
 
   import { useContext} from 'react'
   import {ApplicationContext} from '../context/ApplicationContext'
+  import {Link} from 'react-router-dom'
   export function Profile() {
 
     const navigate = useNavigate()
@@ -90,7 +91,7 @@ console.log(user)
             
             <DropdownMenuItem>
               <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
+              <Link to='/layout/settings'><span >Settings</span></Link>
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>
            

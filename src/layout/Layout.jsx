@@ -27,9 +27,10 @@ const {seeSidebar, theme
 <>
     <Header/>
 
-    <div className={`h-screen  overflow-y-scroll p-4 transition-all duration-500 ease-in-out ${seeSidebar ? '' : 'sm:ml-64'} `}>
+    <div className={`h-screen  overflow-y-scroll p-4 transition-all duration-500   overflow-x-hidden
+     ease-in-out ${seeSidebar ? '' : 'sm:ml-64'} `}>
 
-<div className={`p-4 border-2 border-dashed border-gray-800 h-screen`}>
+<div className={`p-4 border-2 border-dashed border-gray-800 h-[1800px]`}>
       {/* <div className='flex flex-row w-screen'>
     
       </div> */}

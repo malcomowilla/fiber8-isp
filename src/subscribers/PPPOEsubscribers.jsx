@@ -4,15 +4,15 @@ import MaterialTable from 'material-table'
 import DeleteIcon from '@mui/icons-material/Delete';
 
 
-import { ThemeProvider, createTheme } from '@mui/material';
 
 
 import EditIcon from '@mui/icons-material/Edit';
 
 import { IconButton } from '@mui/material';
 
-
-
+import AddIcon from '@mui/icons-material/Add';
+import {useState} from'react'
+import EditSubscriber from '../edit/EditSubscriber'
 
 const rows = [
   {  Speed: '4M/4M', Name: 'Makena', Price: 1500, Validity: 30 },
@@ -32,7 +32,15 @@ const rows = [
 
 const PPPOEsubscribers = () => {
 
+  const [open, setOpen] =useState(false);
 
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
   const columns = [
     {title: 'Name', field: 'Name', headerClassName: 'dark:text-black ', defaultSort: 'asc'},
     {title: 'RefNo', field: 'RefNo',  headerClassName: 'dark:text-black' ,  sorting: true, defaultSort: 'asc'},
@@ -66,52 +74,68 @@ const PPPOEsubscribers = () => {
     </IconButton>
   );
   const EditButton = ({ id }) => (
-    <IconButton style={{color: 'black'}} >
+    <IconButton style={{color: 'black'}} onClick={handleClickOpen} >
       <EditIcon />
     </IconButton>
-  );
-  const defaultMaterialTheme = createTheme({
-    palette: {
-      primary: {
-        main: '#000',
-      },
-      secondary: {
-        main: '#000',
-      },
-    },
-  });
+  )
 
   return (
     <div>
-           <ThemeProvider theme={defaultMaterialTheme}>
-
+<EditSubscriber open={open} handleClose={handleClose} 
+        
+            />
+             
+<div className='text-end '>
+  <input type="search"  className='bg-transparent border-y-[-2]    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
+   focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search......'/>
+</div>
 <MaterialTable columns={columns}
 
 title='PPPoe Subcribers'
 
-data={rows}
 
+icons={{
+  Add: () => <AddIcon onClick={handleClickOpen} />,
+}}
+actions={[
+  {
+    icon: () => <AddIcon onClick={handleClickOpen} />,
+    isFreeAction: true, // This makes the action always visible
+    tooltip: 'Add Subscribers',
+  },
+  
+]}
 
 options={{
   sorting: true,
-  filtering: true,
   pageSizeOptions:[2, 5, 10, 20, 25, 50, 100],
-  pageSize: 20,
-  paginationPosition: 'top',
+  pageSize: 10,
+  paginationPosition: 'bottom',
 exportButton: true,
 exportAllData: true,
 selection: true,
+search:false,
+searchAutoFocus: true,
+showSelectAllCheckbox: false,
+showTextRowsSelected: false,
 
-rowStyle:{
-  backgroundColor: 'grey'
-}
+headerStyle:{
+  fontFamily: 'bold',
+  textTransform: 'uppercase'
+  } ,
+  
+  rowStyle:(data, index)=> index % 2 === 0 ? {
+  background: 'gray'
+  
+  }: null,
+  
+  fontFamily: 'mono'
 }}
 
 
 
 />
 
-</ThemeProvider>
     </div>
   )
 }

@@ -18,33 +18,33 @@ const {  handleThemeSwitch
 
   // const token = localStorage.getItem("jwt");
 
-useEffect( () => {
+// useEffect( () => {
 
   
-  const fetchUserData = async () => {
-    const response = await fetch('/api/me', {
-      method: 'GET',
-      // headers: {
-      //   Authorization: `Bearer ${token}`,
+//   const fetchUserData = async () => {
+//     const response = await fetch('/api/me', {
+//       method: 'GET',
+//       // headers: {
+//       //   Authorization: `Bearer ${token}`,
 
-      // },
-      credentials: 'include', // Include cookies in the request
+//       // },
+//       credentials: 'include', // Include cookies in the request
 
-    })
-const data = await response.json()
-if (response.ok) {
-setUser(data['username']) 
-}
-  }
+//     })
+// const data = await response.json()
+// if (response.ok) {
+// setUser(data['username']) 
+// }
+//   }
 
-  fetchUserData()
+//   fetchUserData()
   
-}, []);
+// }, []);
 
 
 
 
-const {seeSidebar, setSeeSideBar
+const {seeSidebar, setSeeSideBar, setPreferDarkMode, preferDarkMode
 
 
 } = useContext(ApplicationContext); 
@@ -53,13 +53,13 @@ const {seeSidebar, setSeeSideBar
         <ion-icon  onClick={()=> setSeeSideBar(!seeSidebar)} className='menu-black'  name="menu"></ion-icon>
 
 
-<p> Hello {user}</p>
+{/* <p> Hello {user}</p> */}
 <div className='flex flex-row gap-4'>
-
+<div onClick={()=> setPreferDarkMode(!preferDarkMode)}>
 <div onClick={handleThemeSwitch}>
 <ion-icon onClick={()=>setIcon(!icon)}  name={icon ? 'moon-outline' : 'sunny'} size='small'></ion-icon>
 </div>
-
+</div>
 
       <div>
       <Profile/>

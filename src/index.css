@@ -70,47 +70,42 @@
   * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box
+    box-sizing: border-box;
+
   }
+  
+  input:focus {
+    outline: none;
+  }
+  
   body {
     @apply bg-background text-foreground;
   }
+  
 
 }
+
 
 
 
 @layer components {
 
-.MuiInputBase-input .MuiOutlinedInput-input .MuiInputBase-inputAdornedEnd 
-.Mui-readOnly .MuiInputBase-readOnly .css-nxo287-MuiInputBase-input-MuiOutlinedInput-input{
-  color: white; 
-
-
-  
-
-}
-
-.dark-text-white .MuiInputBase-input { 
-  color: white; 
-}
-.MuiOutlinedInput-notchedOutline .css-1d3z3hw-MuiOutlinedInput-notchedOutline{
-  color: white; 
-
- }
-
-
+/*  
+.css-1t8l2tu-MuiInputBase-input-MuiOutlinedInput-input:focus {
+  --tw-ring-color: #eff2f7;
+  outline: 2px solid red;
+} */
   .dotted-font {
     font-family: "Mogra", system-ui;
     font-weight: 400;
     font-style: normal;
   }
+    .myTextField .MuiOutlinedInput-input:focus{
+      /* border: 2px solid rgb(230, 13, 13); */
+      --tw-ring-color: 'transparent';
+      border-color: 'transparent';
 
+    }
   
-  @media (min-width: 1024px) {
-    
-  ion-icon{
-  }
-}
 }
 

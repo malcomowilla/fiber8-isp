@@ -13,18 +13,33 @@ import UiLoader from './uiloader/UiLoader'
 // import NotFound from './404/NotFound'
 // import {InputOTPWithSeparator} from './Auth/InputOTPWithSeparator'
 // import PrivateRoutes  from './private_routes/PrivateRoutes'
-// import AdminDashboard from './admindashboard/AdminDashboard'
+import AdminDashboard from './admindashboard/AdminDashboard'
 // import Sidebar from './sidebar/Sidebar'
 // import Layout from './layout/Layout'
-//  import PPPOEpackages from './packages/PPPOEpackages'
-// import EditPackage from './edit/EditPackage'
-// import PPPOEsubscribers from './subscribers/PPPOEsubscribers'
-// import FixedPayments from './payments/FixedPayments'
-// import PPPOEsubscriptions from './subscriptions/PPPOEsubscriptions'
+import {CableProvider} from './context/CableContext'
+import { redirect } from "react-router-dom";
+
+ import PPPOEpackages from './packages/PPPOEpackages'
+ import HotspotPackage from './packages/HotspotPackage'
+ import HotspotSubscriptions from './subscriptions/HotspotSubscriptions'
+import EditPackage from './edit/EditPackage'
+import PPPOEsubscribers from './subscribers/PPPOEsubscribers'
+import FixedPayments from './payments/FixedPayments'
+import PPPOEsubscriptions from './subscriptions/PPPOEsubscriptions'
+import Zones from './zones/Zones'
+import Nodes from './Node/Nodes'
+import User from './user/User'
+import UserGroup from './user/UserGroup'
+import Nas from './NAS_IDENTIFIER/Nas'
+import Analytics from './analytics/Analytics'
+import Settings from './settings/Settings'
 import {DatePicker} from './date-picker/Date'
 import LocalizeDate from './date-picker/LocalizeDate'
+import Sms from './sms/Sms'
 import ProtectAuth from './Auth/ProtectAuth'
-// import HotspotPayments from './payments/HotspotPayments'
+import HotspotPayments from './payments/HotspotPayments'
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
 
 const ResetPassword = lazy(()=> import('./Auth/ResetPassword')
 ) 
@@ -42,25 +57,28 @@ const NotFound = lazy(()=> import('./404/NotFound')
 const Layout = lazy(()=>  import('./layout/Layout')
 )
 
-const AdminDashboard = lazy(()=> import ('./admindashboard/AdminDashboard')
-)
+
+// const AdminDashboard = lazy(()=> import ('./admindashboard/AdminDashboard')
+// )
 const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
-)
-const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
-)
+ )
+// const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
+// )
 
-const PPPOEsubscribers = lazy(()=> import('./subscribers/PPPOEsubscribers')
-)
+// const PPPOEsubscribers = lazy(()=> import('./subscribers/PPPOEsubscribers')
+// )
 
-const FixedPayments = lazy(()=> import('./payments/FixedPayments')
-)
+// const FixedPayments = lazy(()=> import('./payments/FixedPayments')
+// )
 
-const  PPPOEsubscriptions = lazy(()=> import('./subscriptions/PPPOEsubscriptions')
-)
+// const  PPPOEsubscriptions = lazy(()=> import('./subscriptions/PPPOEsubscriptions')
+// )
 
-const EditPackage = lazy(()=> import('./edit/EditPackage'))
-const HotspotPayments = lazy(()=> import('./payments/HotspotPayments')
-)
+// const EditPackage = lazy(()=> import('./edit/EditPackage'))
+
+
+// const HotspotPayments = lazy(()=> import('./payments/HotspotPayments')
+// )
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -75,24 +93,34 @@ const router = createBrowserRouter(
 </Route> */}
 
 {/* <ProtectAuth> <Layout/> </ProtectAuth> */}
-<Route  path='/layout'  element={ 
+<Route  path='/admin'  element={ 
       <Layout/> 
 }>
 
   
-<Route path='/layout/date' element={<DatePicker/>}/>
+<Route path='/admin/date' element={<DatePicker/>}/>
 <Route 
- path='/layout/admin-dashboard' element={  <AdminDashboard/>
+ path='/admin/admin-dashboard' element={  <AdminDashboard/>
 }/>
 <Route/>
-<Route path='/layout/side-bar' element={<Sidebar/>}/> 
-<Route path='/layout/pppoe-packages' element={< PPPOEpackages/>}/>
-<Route path='/layout/pppoe-subscribers' element={< PPPOEsubscribers/>}/>
-<Route path='/layout/fixed-payments' element={<FixedPayments/>}/>
-<Route path='/layout/edit-package' element={<EditPackage/>}/>
-<Route path='/layout/pppoe-subscriptions' element={<PPPOEsubscriptions/>}/>
-<Route path='/layout/hotspot-payments' element={<HotspotPayments/>}/>
-
+<Route path='/admin/side-bar' element={<Sidebar/>}/> 
+<Route path='/admin/pppoe-packages' element={< PPPOEpackages/>}/>
+<Route path='/admin/pppoe-subscribers' element={< PPPOEsubscribers/>}/>
+<Route path='/admin/fixed-payments' element={<FixedPayments/>}/>
+<Route path='/admin/edit-package' element={<EditPackage/>}/>
+<Route path='/admin/pppoe-subscriptions' element={<PPPOEsubscriptions/>}/>
+<Route path='/admin/hotspot-payments' element={<HotspotPayments/>}/>
+<Route  path='/admin/hotspot-package' element={<HotspotPackage/>}/>
+<Route  path='/admin/hotspot-subscriptions' element={<HotspotSubscriptions/>}/>
+<Route path='/admin/sms' element={<Sms/>}/>
+<Route path='/admin/zones' element={<Zones/>}/>
+<Route path='/admin/nodes' element={<Nodes/>}/>
+<Route path='/admin/user' element={<User/>}/>
+<Route path='/admin/user-group' element={<UserGroup/>}/>
+<Route path='/admin/analytics' element={<Analytics/>}/>
+<Route path='/admin/settings' element={<Settings/>}/>
+<Route path='/admin/date' element={<DatePicker/>}></Route>
+<Route path='/admin/nas' element={<Nas/>}/>
 </Route>
 
 
@@ -107,7 +135,7 @@ const router = createBrowserRouter(
   )
 )
 
-const App = () => {
+const App = ({client}) => {
 
   const [isSeen, setIsSeen] = useState(true)
   const [showErrors, setShowErrors] = useState(false)
@@ -123,7 +151,8 @@ const [theme, setTheme] = useState('light')
 const [offlineError, setOfflineError] = useState(false)
 const [open, setOpen] = useState(false)
 const [username, setUsername] = useState('')
-const [showLoader, setShowLoader] = useState(true);
+const [preferDarkMode, setPreferDarkMode] = useState(true)
+
 
 const formData = {
   password_confirmation: passwordConfirmation,
@@ -131,7 +160,32 @@ const formData = {
     password: isPassword,
     username: username
 }
+const defaultMaterialTheme = createTheme({
+  props: {
+    MuiInputLabel: {
+        shrink: true
+     }
+},
+  palette: {
+  
+    
+    mode: preferDarkMode ? 'dark' : 'light' ,
+    primary: {
+      light: '#757ce8',
+      main: '#3f50b5',
+      dark: '000000',
+      contrastText: '#fff',
+    },
+    secondary: {
+      light: '#ff7961',
+      main: '#f44336',
+      dark: '#ba000d',
+      contrastText: '#000',
+    },
 
+  },
+
+});
 const [isExpanded, setIsExpanded] = useState(false)
 const [isExpanded1, setIsExpanded1] = useState(false)
 const [isExpanded2, setIsExpanded2] = useState(false)
@@ -139,7 +193,11 @@ const [isExpanded3, setIsExpanded3] = useState(false)
 const [isExpanded4, setIsExpanded4] = useState(false)
 const [isExpanded5, setIsExpanded5] = useState(false)
 
-const isLogedIn = window.localStorage.getItem('user')
+const [isExpanded6, setIsExpanded6] = useState(false)
+const [isExpanded7, setIsExpanded7] = useState(false)
+const [isExpanded8, setIsExpanded8] = useState(false)
+
+// const isLogedIn = window.localStorage.getItem('user')
 // const [formData, setFormData] = useState({
 //   passwordConfirmation: '',
 //   email: '',
@@ -163,14 +221,14 @@ useEffect(() => {
 
 
 
-useEffect(() => {
-  const intervalId = setTimeout(() => {
-    setShowLoader(false); // Hide the loader after the interval
-  }, 20);
+// useEffect(() => {
+//   const intervalId = setTimeout(() => {
+//     setShowLoader(false); // Hide the loader after the interval
+//   }, 5);
 
-  // Clear the interval when the component unmounts
-  return () => clearInterval(intervalId);
-}, []);
+//   // Clear the interval when the component unmounts
+//   return () => clearInterval(intervalId);
+// }, []);
 
 
 useEffect(() => {
@@ -253,7 +311,7 @@ try {
     setloading(false)
     setOfflineError(false)
     setUsername('')
-
+return redirect('/signin')
     // localStorage.setItem("jwt", actualUserDataInJson.jwt);
     // console.log(actualUserDataInJson)
 
@@ -273,28 +331,30 @@ try {
 }
 
 
-
-
-
-
-
-
   return (
     <main>
-      <Suspense fallback={<div className='flex justify-center items-center '>{showLoader ? <UiLoader/> : null}</div>}>
+
+          <ThemeProvider theme={ defaultMaterialTheme}>
+
+      <Suspense fallback={<div className='flex justify-center items-center '>{ <UiLoader/> }</div>}>
       < LocalizeDate  >
+      <CableProvider>
+
  <ApplicationContext.Provider value={{isSeen, setIsSeen,isPassword, setPassword,
    email, setEmail, passwordConfirmation, setPasswordConfirmation, errorData, showErrors, handleSignUp, loading,
    isExpanded, setIsExpanded, isExpanded1, setIsExpanded1, isExpanded2, setIsExpanded2,
    isExpanded3, setIsExpanded3, isExpanded4, setIsExpanded4, isExpanded5, setIsExpanded5, seeSidebar, setSeeSideBar,
    logout,handleLogout , user, setCurrentUser, theme, setTheme,  handleThemeSwitch
-   , setOfflineError, offlineError, open, setOpen, username, setUsername}}>
+   , setOfflineError, offlineError, open, setOpen, username, setUsername, setPreferDarkMode , preferDarkMode,
+   isExpanded6, setIsExpanded6, isExpanded7, setIsExpanded7, isExpanded8, setIsExpanded8, client}}>
 
 
 <RouterProvider router={router} />
 </ApplicationContext.Provider>
+      </CableProvider>
 </ LocalizeDate  >
 </Suspense>
+</ThemeProvider>
     </main>
   )
 }

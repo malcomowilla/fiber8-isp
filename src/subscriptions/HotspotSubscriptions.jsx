@@ -1,19 +1,19 @@
 
 import MaterialTable from 'material-table'
 
+import AddIcon from '@mui/icons-material/Add';
 
 
 
 import EditIcon from '@mui/icons-material/Edit';
-import AddIcon from '@mui/icons-material/Add';
 
 
 
 import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import EditSubscription from '../edit/EditSubscription'
-import {useState} from 'react'
+// import EditSubscription from '../edit/EditSubscription'
+
 
 
 // const rows = [
@@ -31,28 +31,17 @@ import {useState} from 'react'
 
 
 
-const PPPOEsubscriptions = () => {
-  const [open, setOpen] = useState(false);
-  
+const HotspotSubscriptions = () => {
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
     const columns = [
-        {title: 'Name', field: 'Name', defaultSort: 'asc'},
-        {title: 'RefNo', field: 'RefNo',    },
+        {title: 'Name', field: 'Name', headerClassName: 'dark:text-black ', defaultSort: 'asc'},
       
-        {title: 'Phone', field: 'Phone',  },
-        {title: 'Package', field: 'Package', },
-        {title: 'Last Subscribed', field:'Last Subscribed',  },
-        {title: 'Expiry', field:'Expiry',  },
+        {title: 'Phone', field: 'Phone',  headerClassName: 'dark:text-black'},
+        {title: 'Package', field: 'Package', type: 'numeric', headerClassName: 'dark:text-black'},
+        {title: 'Expiry', field:'Expiry',  headerClassName: 'dark:text-black'},
       
-        {title: 'Status', field:'Status',  },
-        {title: 'Action', field:'Action',  
+        {title: 'Status', field:'Status',  headerClassName: 'dark:text-black'},
+        {title: 'Action', field:'Action',  headerClassName: 'dark:text-black', 
     
     
   render: (params) =>  
@@ -60,7 +49,6 @@ const PPPOEsubscriptions = () => {
   <>
    
    <DeleteButton {...params} />
-   <EditButton  {...params}/>
 
     </>
 
@@ -76,66 +64,51 @@ const PPPOEsubscriptions = () => {
   );
 
 
-  const EditButton = () => (
-
- <IconButton style={{color: 'black'}} onClick={handleClickOpen} >
- <EditIcon />
- </IconButton>
-  )
-
 
   return (
     <>
 
     
     <div>
-<EditSubscription open={open}  handleClose={handleClose}/>
- 
-<div className='text-end '>
+            
+    <div className='text-end '>
   <input type="search"  className='bg-transparent border-y-[-2]    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
    focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search......'/>
 </div>
 <MaterialTable columns={columns}
 
-title='PPPoe Subcriptions'
+title='Hotspot Subscriptions'
 
 // data={rows}
 
-icons={{
-  Add: () => <AddIcon onClick={handleClickOpen} />,
-}}
 actions={[
-  {
-    icon: () => <AddIcon onClick={handleClickOpen} />,
-    isFreeAction: true, // This makes the action always visible
-    tooltip: 'Add Subscription',
-  },
- 
+ {
+  icon: ()=> <AddIcon/>,
+    isFreeAction: true,
+    tooltip: 'Add Subscription'
+  
+  
+
+
+ }
 ]}
-
-
 options={{
-  paging: true,
-  pageSizeOptions:[5, 10, 20, 25, 50, 100],
-  pageSize: 10,
-  search: false,
-  searchFieldAlignment:'right',
-
-
+  sorting: true,
+  pageSizeOptions:[2, 5, 10, 20, 25, 50, 100],
+  pageSize: 20,
+  paginationPosition: 'bottom',
+exportButton: true,
+exportAllData: true,
+selection: true,
+search: false,
+searchAutoFocus: true,
 showSelectAllCheckbox: false,
 showTextRowsSelected: false,
+
 hover: true, 
-selection: true,
 paginationType: 'stepped',
 
 
-paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-exportFileName: 'PPPOE subscriptions',
-
-  sorting: true,
-  
 
 headerStyle:{
   fontFamily: 'bold',
@@ -147,7 +120,6 @@ headerStyle:{
   }: null,
   
   fontFamily: 'mono'
-
 }}
 
 
@@ -159,7 +131,7 @@ headerStyle:{
   )
 }
 
-export default PPPOEsubscriptions
+export default HotspotSubscriptions
 
 
 
