@@ -15,6 +15,8 @@ import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import LoadingButton from '@mui/lab/LoadingButton';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import CloseIcon from '@mui/icons-material/Close';
 function EditNas ({open, handleClose, handleSubmit, formData, setFormData, isloading}) {
 const {name, username, ip_address, password} = formData
   const [fullWidth, setFullWidth] = React.useState(true);
@@ -67,7 +69,9 @@ setFormData({...formData, [e.target.id]: e.target.value})
                         borderWidth: '3px'
                         },
                 }
-            }} className='myTextField'  label='Ip Adress' id='ip_address'  value={ip_address} onChange={(e=> onChange(e))}></TextField>
+            }} className='myTextField'  label='Ip Adress' id='ip_address'  value={ip_address} onChange={e=> onChange(e)}>
+              
+            </TextField>
             <TextField   sx={{
                 '& label.Mui-focused': {
                     color: 'black',
@@ -81,8 +85,8 @@ setFormData({...formData, [e.target.id]: e.target.value})
                         borderWidth: '3px'
                         },
                 }
-            }}className='myTextField'  id='name' value={name} label='Name'></TextField>
-            <TextField  onChange={(e=> onChange(e))} sx={{
+            }}className='myTextField'  id='name' value={name}  onChange={e => onChange(e)}   label='Name'></TextField>
+            <TextField  onChange={e => onChange(e)} sx={{
                 '& label.Mui-focused': {
                     color: 'black',
                     fontSize: '18px'
@@ -95,7 +99,7 @@ setFormData({...formData, [e.target.id]: e.target.value})
                         borderWidth: '3px'
                         },
                 }
-            }} className='myTextField' id='password'  value={password} label='Password'></TextField>
+            }} className='myTextField' id='password' type='password' value={password} label='Password'></TextField>
 
           </Stack>
         
@@ -107,7 +111,7 @@ setFormData({...formData, [e.target.id]: e.target.value})
                           width: '40ch',
 
           }}>
-          <TextField  onChange={(e=> onChange(e))} sx={{
+          <TextField  onChange={e=> onChange(e)} sx={{
                 '& label.Mui-focused': {
                     color: 'black',
                     fontSize: '18px'
@@ -128,9 +132,9 @@ setFormData({...formData, [e.target.id]: e.target.value})
                 </div>
 
         <DialogActions>
-        <Button  onClick={handleClose}   variant='outlined' color='error'>Cancel</Button>
+        <Button  onClick={handleClose} startIcon={<CloseIcon/>}     variant='outlined' color='error'>Cancel</Button>
 
-            <LoadingButton  type='submit' variant='outlined' loading={isloading} color='success'>Save</LoadingButton>
+            <LoadingButton  type='submit' variant='outlined'  startIcon={<AutorenewIcon/>} loading={isloading} color='success'>Save</LoadingButton>
         </DialogActions>
 
         </form>

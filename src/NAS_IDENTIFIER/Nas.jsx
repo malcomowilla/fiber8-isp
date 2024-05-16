@@ -7,14 +7,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import {Link} from 'react-router-dom'
-import {  useState} from 'react'
+import {  useState, useEffect, useMemo} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 import EditNas from '../edit/EditNas' 
 import AddIcon from '@mui/icons-material/Add';
 
 import MaterialTable from 'material-table'
 
-
+import DeleteRouter from '../delete/DeleteRouter'
 
 
 
@@ -24,12 +24,26 @@ const Nas = () => {
 const initialValue={
 username:'',
 password: '',
-ip_address:''
+ip_address:'',
+name: ''
 }
   const [open, setOpen] = useState(false);
 const  [formData, setFormData] = useState(initialValue)
 const [tableData, setTableData] = useState([])
 const [loading, setloading] = useState(false)
+const [offlineerror, setofflineerror] = useState(false)
+const [openDelete, setOpenDelete] = useState(false);
+
+
+
+
+const handleClickOpenDelete = () => {
+  setOpenDelete(true);
+};
+
+const handleCloseDelete = () => {
+  setOpenDelete(false);
+};
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -39,19 +53,112 @@ const [loading, setloading] = useState(false)
 
   const handleClose = () => {
     setOpen(false);
+    setFormData(initialValue)
   };
 
 
+
+
+// const updateRouter = async(id, e) => {
+
+//   e.preventDefault()
+
+//   try {
+//       setloading(true)
+
+//       const res = await fetch('/api/router', {
+//           method: 'POST',
+//           headers: {
+//               'Content-Type': 'application/json'
+//           },
+//           signal: controller.signal,
+//           body: JSON.stringify(formData),
+//       })
+
+//         clearTimeout(id)
+      
+//       const newData = await res.json()
+//       if (res.ok) {
+//           setTableData((tableData)=>[...tableData, newData])
+//           setloading(false)
+
+
+//       } else {
+//           setloading(false)
+
+//       }
+//   } catch (error) {
+//     console.log(error.name === 'AbortError');
+
+//       setloading(false);
+
+//   }
+// }
+
+
+
+
+
+
+
+
+  const deleteRouter = async (id) =>  {
+    const response = await fetch(`/api/delete_router/${id}`, {
+      method: "DELETE",
+    })
+    
+    
+    
+    if (response.ok) {
+      setTableData((tableData)=> tableData.filter(item => item.id !== id))
+    } else {
+      console.log('failed to delete')
+    }
+  }
   const handleRowClick = (event, rowData) => {
     setFormData(rowData);
-    console.log('this is rowdata', rowData)
+    console.log('router row data', rowData)
   
     // Add your custom logic here, such as opening a modal or updating state
   };
 
 
+  const fetchRouters = useMemo(() => async ()=> {
+  
+  try {
+    const response = await fetch('/api/routers'
+  
+  
+  )
+  
+    const newData = await response.json()
+  if (response.ok) {
+   setTableData(newData)
+
+  } else {
+    console.log('failed to fetch routers')
+
+  }
+  
+  } catch (error) {
+    
+    console.log(error)
+  
+  }
+  
+  
+  }, [])
+  
+  useEffect(() => {
+    
+    fetchRouters()
+  }, [fetchRouters]);
+
+
+
   const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), 8000);
+  const id = setTimeout(() => controller.abort(), 6000);
+
 const handleSubmit = async (e)=> {
 
     e.preventDefault()
@@ -64,23 +171,25 @@ const handleSubmit = async (e)=> {
             headers: {
                 'Content-Type': 'application/json'
             },
+            signal: controller.signal,
             body: JSON.stringify(formData),
-            signal: controller.signal
         })
-        clearTimeout(id);
 
-        const newData = await res.json
+          clearTimeout(id)
+        
+        const newData = await res.json()
         if (res.ok) {
             setTableData((tableData)=>[...tableData, newData])
             setloading(false)
 
 
         } else {
-            setloading(true)
+            setloading(false)
 
         }
     } catch (error) {
-        console.log(error)
+      console.log(error.name === 'AbortError');
+
         setloading(false);
 
     }
@@ -88,22 +197,20 @@ const handleSubmit = async (e)=> {
 
     }
 
-  const DeleteButton = ({ id }) => (
-        <IconButton style={{ color: '#8B0000' }}>
+  const DeleteButton = () => (
+        <IconButton style={{ color: '#8B0000' }}  onClick={ handleClickOpenDelete}>
           <DeleteIcon />
         </IconButton>
       );
 
 
   const EditButton = () => (
-    <Link >
-    <IconButton style={{color: 'black'}} >
+    <IconButton style={{color: 'black'}}   onClick={handleClickOpen}>
       <EditIcon />
     </IconButton>
-    </Link>
   );
 const columns = [
-    {title: 'Name', field: 'Name',  },
+    {title: 'name', field: 'name',  },
 
   {title: 'ip_address', field: 'ip_address', },
   {title: 'username', field: 'username', },
@@ -111,15 +218,14 @@ const columns = [
 
   {title: 'Action', field:'Action',
 
-  render: (params) =>  
+  render: (rowData) =>  
     
      <>
       
-       <DeleteButton {...params} />
-       <EditButton {...params}/>
+       <DeleteButton  id={rowData.id} />
+       <EditButton />
       
        </>
-
 
 }
 
@@ -131,17 +237,19 @@ const columns = [
             
             <div className='text-end '>
   <input type="search"  className='bg-transparent border-y-[-2]    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
-   focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search......'/>
+   focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search....'/>
 </div>
 <EditNas open={open} handleClose={handleClose} tableData={tableData} handleSubmit={handleSubmit}   formData={formData}
  setFormData={setFormData}  isloading={loading}/>
 
+
+<DeleteRouter  deleteRouter={deleteRouter} id={formData.id}  handleCloseDelete ={handleCloseDelete}  openDelete={openDelete}/>
       <MaterialTable columns={columns}
       
-      title='NAS (Mikrotik Routers with PPPoE/Hotspot)
-      '
+      title='NAS (Mikrotik Routers with PPPoE/Hotspot)'
       
-    //   data={rows}
+      
+      data={tableData}
 
     onRowClick={handleRowClick}
     actions={[

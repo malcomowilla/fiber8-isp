@@ -17,7 +17,9 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import InputBase from "@material-ui/core/InputBase";
 import { makeStyles } from "@material-ui/core/styles";
-
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import LoadingButton from '@mui/lab/LoadingButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 const useStyles = makeStyles({
@@ -273,7 +275,9 @@ color: 'black'
          
         </DialogContent>
         <DialogActions>
-          <Button variant='outlined'  color='error' onClick={handleClose}>Close</Button>
+          <LoadingButton startIcon={<AutorenewIcon/>} loading={false}  variant='outlined' color='success'> Save </LoadingButton>
+
+          <Button variant='outlined' startIcon={<CloseIcon/>} color='error' onClick={handleClose}>Close</Button>
         </DialogActions>
       </Dialog>
     </React.Fragment>

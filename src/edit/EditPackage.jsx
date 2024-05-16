@@ -3,7 +3,7 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
-import {useState, useRef,} from 'react'
+import {useState, useRef, useMemo, useEffect} from 'react'
 import * as React from 'react';
 
 import {
@@ -30,19 +30,73 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import PackageNotification  from '.././notification/PackageNotification'
 import LoadingButton from '@mui/lab/LoadingButton';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import CloseIcon from '@mui/icons-material/Close';
+import Autocomplete from '@mui/material/Autocomplete';
+import { useDebounce } from 'use-debounce';
 
 const EditPackage = ({open, handleClose, formData, loading, setFormData, showNotification
-  ,createPackage,offlineerror,isloading,
-  setofflineerror }) => {
+  ,createPackage,offlineerror,isloading, 
+   }) => {
 
 const [error, setError] = useState('')
 const [message, setMessage] = useState('')
-
+const [routers, setRouters]= useState ([])
 const [formComplete, setFormComplete] = useState(false);
 const [submitting, setSubmitting] = useState(false);
 
 // const {price, download_limit, upload_limit, validity, name, upload_burst_limit, download_burst_limit,
 //   validity_period_units, tx_rate_limit, rx_rate_limit} = formData
+
+const [routerName] = useDebounce(formData.router_name, 1000)
+
+console.log(routerName)
+
+
+const fetchRouters = useMemo(() => async ()=> {
+  
+
+
+  try {
+    const response = await fetch('/api/routers',{
+  
+    }
+  
+  
+  )
+  
+    const newData = await response.json()
+  if (response.ok) {
+    console.log('router',newData)
+    setRouters(newData)
+
+  } else {
+    console.log('failed to fetch routers')
+
+  }
+  
+  } catch (error) {
+    
+    console.log(error)
+  
+  }
+  
+  
+  }, [])
+  
+
+
+
+  useEffect(() => {
+    
+    fetchRouters()
+  }, [ fetchRouters, routerName]);
+
+
+
+
+
+
 
 const onChange = (e) =>{
   console.log('formData,',formData)
@@ -52,7 +106,7 @@ const onChange = (e) =>{
 //   const isComplete = name && price && upload_limit && download_limit && validity && validity_period_units && upload_burst_speed
 //  && download_burst_speed ;
 const isComplete = formData.name && formData.validity && formData.upload_limit && formData.download_limit && formData.price 
-&& formData.upload_burst_limit &&formData.download_burst_limit
+&& formData.upload_burst_limit && formData.download_burst_limit && formData.router_name
 
 
 
@@ -121,14 +175,14 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
          
         }}   id='name'  className='myTextField' value={formData.name} onChange={(e)=> onChange(e) } 
          error={!formData.name}    helperText={!formData.name ? 'required' : ''}
-             placeholder='enter name...' label='package-name' fullWidth  ></TextField>
+             placeholder='enter name...' label='package-name' fullWidth   ></TextField>
 
             </Box>
 
 
 
             <div className='flex  gap-3 mt-4'>
-          <TextField label='bundle-price' required  sx={{
+          <TextField label='bundle-price'   sx={{
 
 '& label.Mui-focused': {
   color: 'black',
@@ -233,7 +287,8 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
          
         }}   label='download-burst-speed(mbps)'    onChange={e =>onChange(e)}
 
-         value={formData.download_burst_limit}     error={!formData.download_burst_limit}    helperText={!formData.download_burst_limit ? 'required' : ''}   type='number' className='myTextField'  id='download_burst_limit'
+         value={formData.download_burst_limit}     error={!formData.download_burst_limit}  
+           helperText={!formData.download_burst_limit ? 'required' : ''}   type='number' className='myTextField'  id='download_burst_limit'
            fullWidth></TextField>
             <TextField label='burst-period(s)'   sx={{
 
@@ -269,40 +324,8 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
 },
          
         }}    placeholder='burst-threshhold(mbps)...'   className='myTextField'  fullWidth></TextField>
-            <TextField  onChange={e =>onChange(e)}  sx={{
-
-'& label.Mui-focused': {
-  color: 'black'
-  },
-'& .MuiOutlinedInput-root': {
-"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-  borderColor: "black",
-  borderWidth: '3px'
-  },
-'&.Mui-focused fieldset':  {
-  borderColor: 'black', // Set border color to transparent when focused
-
-}
-},
-         
-        }}   label='Rx RateLimit'  id='rx_rate_limit'   value={formData.rx_rate_limit}  className='myTextField'  ></TextField>
-            <TextField  onChange={e =>onChange(e)} sx={{
-
-'& label.Mui-focused': {
-  color: 'black'
-  },
-'& .MuiOutlinedInput-root': {
-"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-  borderColor: "black",
-  borderWidth: '3px'
-  },
-'&.Mui-focused fieldset':  {
-  borderColor: 'black', // Set border color to transparent when focused
-
-}
-},
-         
-        }}   label='Tx RateLimit' id='tx_rate_limit'  value={formData.tx_rate_limit} className='myTextField' ></TextField>
+           
+          
 
 </Box> 
 
@@ -415,7 +438,8 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
 }
 },
          
-        }}    className='myTextField' value={formData.validity}     error={!formData.validity}    helperText={!formData.validity ? 'required' : ''}   id='validity' 
+        }}    className='myTextField' value={formData.validity}   
+          error={!formData.validity}    helperText={!formData.validity ? 'required' : ''}   id='validity' 
         onChange={e =>onChange(e)}   placeholder='validity-period...' type='number' ></TextField>
 
 </Box>
@@ -443,8 +467,8 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
 }
 },
          
-        }}  >
-        <InputLabel id="validity_period_units">Validity-period-units</InputLabel>
+        }}   >
+        <InputLabel id="validity_period_units">Validity period units</InputLabel>
         <Select
           id="validity_period_units"
           label="Validity-period-units"
@@ -458,11 +482,60 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
         </Select>
       </FormControl>
             </div>
+              <Autocomplete
+                      
+  sx={{
 
+    '& label.Mui-focused': {
+      color: 'black',
+      fontSize:'16px'
+      },
+    '& .MuiOutlinedInput-root': {
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "black",
+      borderWidth: '3px'
+      },
+    '&.Mui-focused fieldset':  {
+      borderColor: 'black', // Set border color to transparent when focused
+    
+    }
+    },
+             
+            }} fullWidth
+
+            
+                  getOptionLabel={(router) => router.name}
+
+        options={routers}
+        
+                renderInput={(params) => (
+                  <TextField
+                  id="router_name"
+
+                  className='myTextField'
+                    {...params}
+                    label="Select Router"
+                    error={!formData.router_name}
+                    helperText={!formData.router_name ? 'required' : ''}
+                    // value={routers.map((router) => router.name === formData.router_name) }
+                                     value={formData.router_name}
+
+                    // onChange={e=> setFormData({...formData, router_name: e.target.value})}
+                   
+                  />
+                )}
+              
+                onChange={(event, newValue) => {
+                  setFormData({...formData, router_name: newValue ? newValue.name : '' });
+                }}
+                
+
+              />
+              
            
             <DialogActions>
 
-<Button color='error' variant='outlined' onClick={handleClose}  >Cancel</Button>
+<Button color='error'  startIcon={<CloseIcon/>}  variant='outlined' onClick={handleClose}  >Cancel</Button>
 
 
 {/* 
@@ -477,19 +550,14 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
 </Button>  */}
 
 
-<LoadingButton  type='submit' disabled={Object.values(formData)?.includes("")} loading={isloading} color='success'
+<LoadingButton  loadingPosition= 'start' startIcon={<AutorenewIcon/>} type='submit' disabled={Object.values(formData  )?.includes("")}
+ loading={isloading} color='success'
     variant='outlined'   >
 
 
   save
 </LoadingButton>
-{/* 
-<Button  type='submit'  
-color='success'
-variant='outlined'
->
-Save
-</Button> */}
+
 
 
 

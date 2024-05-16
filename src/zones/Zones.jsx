@@ -10,31 +10,130 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import {Link} from 'react-router-dom'
 import {  useState} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
-
+import EditZone from '../edit/EditZone'
 
 import MaterialTable from 'material-table'
+import {  useEffect, useMemo, useRef} from 'react'
 
-
-
-
-// const rows = [
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   // Add more rows as needed
-// ];
-
-
+import { useDebounce } from 'use-debounce';
+import PackageNotification  from '.././notification/PackageNotification'
 
 
 
 const Zones = () => {
+const initialValue={
+  name:'',
+  zone_code: ''
+}
+  const [open, setOpen] = useState(false);
+  const [tableData, setTableData] = useState([])
+  const [formData, setFormData] = useState(initialValue) 
+  const [loading, setloading] = useState(false)
+  const [showNotification, setShowNotification] = useState(false)
+const [renderCode, setRenderCode] = useState([{
+  zoneCode: ''
+}])
 
+
+const [search, setSearch] = useState('')
+const [searchchInput] = useDebounce(search, 1000)
+setTimeout(() => {
+  setShowNotification(false)
+
+}, 29000);
+
+const handleRowClick =(rowData)=>{
+  setFormData(rowData)
+  }
+  
+
+  const handleClickOpen = () => {
+    setOpen(true);
+    setFormData(initialValue)
+
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+
+const handleRenderCode = ()=> {
+  setRenderCode([...renderCode, {zoneCode: ''}])
+}
+
+
+  const handleCreateZone = async(e)=> {
+  e.preventDefault()
+  
+  const url = formData.id ? `/api/update_zone/${formData.id}` : 'api/zone'
+  const method = formData.id ? 'PATCH' : 'POST'
+    try {
+      setloading(true);
+
+      const response = await fetch(url, {
+        method, 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      })
+      const newData = await response.json()
+     if (response.ok) {
+      // setOpen(false); 
+      setloading(false);
+      setShowNotification(true)
+      handleRenderCode()
+
+      if (formData.id) {
+        setTableData(tableData.map(item => (item.id === formData.id ? newData : item)));
+
+      } else {
+        setTableData([...tableData, newData])
+      }
+     } else {
+      setloading(false);
+
+     }
+    } catch (error) {
+      setloading(false);
+
+      console.log(error)
+    }
+  }
+
+
+
+const fetchZones = useMemo(() => async ()=> {
+
+try {
+  const response = await fetch('/api/zones',{
+
+  }
+
+
+)
+
+  const newData = await response.json()
+
+  if (response.ok) {
+    setTableData(newData.filter((poe_package)=> {
+      return search.toLowerCase() === ''? poe_package : poe_package.name.toLowerCase().includes(search)
+    }))
+  }
+
+} catch (error) {
+  console.log(error)
+
+}
+
+
+}, [searchchInput])
+
+useEffect(() => {
+  
+  fetchZones()
+}, [fetchZones]);
 
   const DeleteButton = ({ id }) => (
         <IconButton style={{ color: '#8B0000' }}>
@@ -43,15 +142,15 @@ const Zones = () => {
       );
 
 
-  const EditButton = ({ id }) => (
-    <IconButton style={{color: 'black'}} >
+  const EditButton = () => (
+    <IconButton style={{color: 'black'}}  onClick={handleClickOpen}>
       <EditIcon />
     </IconButton>
   );
 const columns = [
-    {title: 'Name', field: 'Name',  },
+    {title: 'name', field: 'name',  },
 
-  {title: 'Zone Code', field: 'Zone Code',    },
+  {title: 'zone_code', field: 'zone_code',    },
   
   {title: 'Action', field:'Action', align: 'right',
 
@@ -71,28 +170,33 @@ const columns = [
 ]
 
   return (
+    <>
     <div className=''>
-         
+         <EditZone open={open} handleClose={handleClose} isloading={loading}  renderCode={renderCode}  formData={formData} 
+         setFormData={setFormData}
+           handleCreateZone={handleCreateZone}/>
          <div className='text-end '>
-  <input type="search"  className='bg-transparent border-y-[-2]    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
+  <input type="search"   value={search} onChange={(e)=> setSearch(e.target.value)}  className='bg-transparent border-y-[-2]    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
    focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search......'/>
 </div>
+
+
       <MaterialTable columns={columns}
       
       title='Zones'
       
-    //   data={rows}
+      data={tableData}
 
       
     actions={[
         {
-          icon:()=><AddIcon/>,
+          icon:()=><AddIcon  onClick={handleClickOpen }/>,
           tooltip: 'Add Zone',
           isFreeAction: true
         }
     ]}
 
-
+onRowClick={handleRowClick}
 options={{
         paging: true,
        pageSizeOptions:[5, 10, 20, 25, 50, 100],
@@ -124,6 +228,13 @@ exportFileName: 'Zones'
       />
 
     </div>
+
+    <div>
+    {showNotification &&   <PackageNotification/>}
+
+    </div>
+
+    </>
   )
 }
 

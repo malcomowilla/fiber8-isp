@@ -14,24 +14,16 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 // import {  useState} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 
-import  secureLocalStorage  from  "react-secure-storage";
-
+import DeletePackage from '../delete/DeletePackage'
 import MaterialTable from 'material-table'
 import EditPackage from '../edit/EditPackage'
 import { useContext, useState, useEffect, useMemo, useRef} from 'react'
 import {CableContext} from '../context/CableContext'
-const initialValue = {
-  name: '',
-  validity: '',
-  download_limit: '',
-  upload_limit: '',
-  price:  '',
-  upload_burst_limit: '',
-  download_burst_limit: '',
-  validity_period_units: '',
-  rx_rate_limit:'',
-  tx_rate_limit: ''
-}
+import PackageNotification  from '.././notification/PackageNotification'
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import Stack from '@mui/material/Stack';
+import { useDebounce } from 'use-debounce';
 
 const useStyles = makeStyles({
   customSearchFieldFocus: {
@@ -52,15 +44,38 @@ const PPPOEpackages = () => {
   const [loading, setloading] = useState(false)
   const [tableData, setTableData] = useState([])
   
+  
+  const [openDelete, setOpenDelete] = useState(false);
+
   const [showNotification, setShowNotification] = useState(false)
+  const [routerName, setRouterName] = useState('');
+const [creationError, setCreationError] = useState(false)
+const [error, setError] = useState([])
+
+
+const initialValue = {
+  name: '',
+  validity: '',
+  download_limit: '',
+  upload_limit: '',
+  price:  '',
+  upload_burst_limit: '',
+  download_burst_limit: '',
+  validity_period_units: '',
+ 
+  router_name: ''
+}
 const [formData, setFormData] = useState(initialValue
 )
 const [offlineerror, setofflineerror] = useState(false)
+
+
 const [search, setSearch] = useState('')
+const [searchchInput] = useDebounce(search, 1000)
+
 
 const handleRowClick = (event, rowData) => {
   setFormData(rowData);
-  console.log('this is rowdata', rowData)
 
   // Add your custom logic here, such as opening a modal or updating state
 };
@@ -71,10 +86,13 @@ const handleRowClick = (event, rowData) => {
 
 
 
+const handleClickOpenDelete = () => {
+  setOpenDelete(true);
+};
 
-
-
-
+const handleCloseDelete = () => {
+  setOpenDelete(false);
+};
 
 
 
@@ -82,81 +100,73 @@ const handleRowClick = (event, rowData) => {
 
 const handleClickOpen = () => {
   setOpen(true);
-  
+  setFormData(initialValue)
+
 };
 
 const handleClose = () => {
   setOpen(false);
+
 };
-console.log('this data', tableData)
+
 setTimeout(() => {
   setShowNotification(false)
 
-}, 5000);
+}, 29000);
 
 
 
+setTimeout(() => {
+  setCreationError(false)
+
+}, 29000);
 
 setTimeout(() => {
   setofflineerror(false)
 
-}, 5000);
+}, 25000);
 
 const controller = new AbortController();
-const id = setTimeout(() => controller.abort(), 8000);
-
-
+const id = setTimeout(() => controller.abort(), 9000);
 
 
 
 const createPackage = async (e) => {
-  e.preventDefault()
-  try {
-    setofflineerror(true)
-    setloading(true)
-    const response = await fetch ('/api/create_package', {
-      method: "POST",
-      headers: {
-  
-        "Content-Type": "application/json",
-      }, 
-      signal: controller.signal,  
+  e.preventDefault();
+    try {
+      setloading(true);
+      const url = formData.id ? `/api/update_package/${formData.id}` : '/api/create_package';
+      const method = formData.id ? 'PATCH' : 'POST';
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-      body: JSON.stringify(formData),
-  
-    })
-  
-    clearTimeout(id);
-
-    setofflineerror(false)
-    let newData = await response.json();
-  
-  
-  
-    if (response.ok) {
-      // const data =  await response.json()
-      // console.log("Newly created package data:", data); // Log the newly created data
-  setloading(false)
-  setShowNotification(true)
-  setofflineerror(false)    
-  // return newData
-  
-  setTableData( (tableData) => [...tableData, newData])
-  // setFormData(initialValue)
-  // setFormData(formData)
-  
-     } else {
-      setloading(false)
-  
-  
-     }
-  } catch (error) {
-    console.log(error.name === 'AbortError');
-  
-    setloading(false);
-    setofflineerror(false);
-  
-  }
+      const newData = await response.json();
+      if (response.ok) {
+        setOpen(false); // Close the form modal
+        setloading(false);
+        setShowNotification(true);
+        setofflineerror(false);
+        if (formData.id) {
+          // Update existing package in tableData
+          setTableData(tableData.map(item => (item.id === formData.id ? newData : item)));
+        } else {
+          // Add newly created package to tableData
+          setTableData([...tableData, newData]);
+        }
+      } else {
+        setloading(false);
+        setCreationError(true);
+        setError(newData.error);
+      }
+    } catch (error) {
+      setloading(false);
+      setofflineerror(true);
+    }
 }
 
 
@@ -188,7 +198,7 @@ clearTimeout(id);
 }
 
 
-}, [search])
+}, [searchchInput])
 
 useEffect(() => {
   
@@ -303,10 +313,11 @@ useEffect(() => {
 // }, []);
 
 
-
 const deletePackage = async (id) => {
 const response = await fetch(`/api/package/${id}`, {
   method: "DELETE",
+  
+
 })
 
 
@@ -319,7 +330,7 @@ if (response.ok) {
 }
 
 const DeleteButton = ({ id }) => (
-  <IconButton style={{ color: '#8B0000' }}  onClick={()=>deletePackage(id)} >
+  <IconButton style={{ color: '#8B0000' }}  onClick={handleClickOpenDelete} >
     <DeleteIcon />
   </IconButton>
 );
@@ -334,10 +345,9 @@ const columns = [
   {title: 'price', field: 'price',  },
 
 
-  {title: 'validity', field: 'validity', },
-  {title: 'upload_limit', field: 'upload_limit'},
+  {title: 'validity', field: 'valid', },
+  {title: 'speed(Up/Down)', field: 'speed'},
 
-  {title: 'download_limit', field: 'download_limit'},
   {title: 'Action', field:'Action',
 
   render: (rowData) =>  
@@ -359,10 +369,15 @@ const columns = [
 
 
 <>
+
     <div className='overflow-hidden'>
-      <EditPackage open={open} handleClose={handleClose} formData={formData}       isloading={loading} 
+
+      <EditPackage open={open} handleClose={handleClose} formData={formData}      isloading={loading} 
         createPackage={createPackage}   offlineerror={offlineerror} 
-       showNotification={showNotification}   setofflineerror={setofflineerror}  setFormData={setFormData} tableData={tableData}/>
+       showNotification={showNotification}   setofflineerror={setofflineerror}  setFormData={setFormData} 
+       tableData={tableData} routerName={routerName} setRouterName={setRouterName}/>
+    <DeletePackage  openDelete={openDelete} handleCloseDelete={handleCloseDelete} deletePackage={deletePackage} id={formData.id}/>
+
 {/* 
 
       <div className=' relative sm:left-[400px] max-md:left-[380px] max-sm:left-[210px]  z-50 top-9'>
@@ -371,7 +386,8 @@ const columns = [
 
 
 <div className='text-end '>
-  <input type="search" value={search} onChange={(e)=> setSearch(e.target.value)} className='bg-transparent border-y-[-2]    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
+  <input type="search" value={search} onChange={(e)=> setSearch(e.target.value)} className='bg-transparent border-y-[-2]  
+    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
    focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search......'/>
 </div>
 
@@ -414,7 +430,7 @@ actions={[
 
 
 
-    onRowClick={handleRowClick} // Attach the event handler
+    onRowClick={handleRowClick} 
   
 options={{
         paging: true,
@@ -452,11 +468,47 @@ fontFamily: 'mono'
       
       
       />
+      <div className=''>
+      {showNotification &&   <PackageNotification/>}
+      { creationError     &&   
+<Stack sx={{ width: '50%' }} spacing={1}>
+     
+
+     
+      <Alert severity="error">
+        <AlertTitle>Package Error</AlertTitle>
+        <p className='font-extrabold  font-mono text-red-500  text-2xl'>{error}</p>
+      </Alert>
+    
+    </Stack>}
+
+      </div>
+
+
+
+      <div className=''>
+
+      {offlineerror  && 
+        <Stack sx={{ width: '50%', marginTop: 3 }}  >
+     
+
+     
+     <Alert severity="error">
+       <AlertTitle>Offline </AlertTitle>
+       <p className='text-red-500 font-mono font-extrabold text-2xl'>Something went wrong please try again later</p>
+     </Alert>
+   
+   </Stack>
+     
+          
+          }
+                </div>
 
     </div>
 
-{offlineerror   && <p className='text-red-500 font-mono font-extrabold text-2xl'>Something went wrong please try again later
-          </p>}
+
+
+
     </>
   )
 }

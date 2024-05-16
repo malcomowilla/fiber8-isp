@@ -80,13 +80,13 @@ const EditSubscriber = ({handleClose, open}) => {
           </TabList>
         </Box>
         <TabPanel value="1"><SubscriberDetails handleClose={handleClose}/></TabPanel>
-        <TabPanel value="2"><Address/></TabPanel>
-        <TabPanel value="3"><Devices/></TabPanel>
-        <TabPanel value="4"><Invoice/></TabPanel>
-        <TabPanel value="5"><Receipt/></TabPanel>
+        <TabPanel value="2"  handleClose={handleClose}><Address/></TabPanel>
+        <TabPanel value="3"  handleClose={handleClose}><Devices/></TabPanel>
+        <TabPanel value="4"  handleClose={handleClose}><Invoice/></TabPanel>
+        <TabPanel value="5"  handleClose={handleClose}><Receipt/></TabPanel>
 
-        <TabPanel value="6"><Stats/></TabPanel>
-        <TabPanel value="7"><Subscriptions/></TabPanel>
+        <TabPanel value="6" handleClose={handleClose}><Stats/></TabPanel>
+        <TabPanel value="7"  handleClose={handleClose}><Subscriptions/></TabPanel>
         </TabContext>
 
     </Box>

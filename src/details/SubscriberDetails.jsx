@@ -9,6 +9,10 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import LoadingButton from '@mui/lab/LoadingButton';
+import CloseIcon from '@mui/icons-material/Close';
+
 
 const SubscriberDetails = ({handleClose}) => {
   return (
@@ -351,8 +355,15 @@ const SubscriberDetails = ({handleClose}) => {
     </Box>
                         </div>
         <div className='flex gap-x-7 mt-3'>
-        <Button color='error' variant='outlined' onClick={handleClose} >Cancel</Button>
-        <Button  type='submit'  color='success'  variant='outlined'   >Save</Button>
+        <Button color='error'   startIcon={<CloseIcon/>} variant='outlined' onClick={handleClose} >Cancel</Button>
+
+<LoadingButton  loadingPosition= 'start' startIcon={<AutorenewIcon/>} type='submit'
+ loading={false}  color='success'
+    variant='outlined'   >
+
+
+  save
+</LoadingButton>
         </div> 
 
     </div>

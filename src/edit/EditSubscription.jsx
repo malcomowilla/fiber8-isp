@@ -24,7 +24,9 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { DemoContainer  } from '@mui/x-date-pickers/internals/demo';
 import dayjs from 'dayjs';
-
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import LoadingButton from '@mui/lab/LoadingButton';
+import CloseIcon from '@mui/icons-material/Close';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import {
@@ -225,9 +227,15 @@ disabled
         </DialogContent>
         <DialogActions>
         
-          <Button   color='error' variant='outlined'     onClick={handleClose}>Cancel</Button>
-          <Button     color='success' variant='outlined'  loading={true} >Save</Button>
+          <Button   color='error' variant='outlined' startIcon={<CloseIcon/>}    onClick={handleClose}>Cancel</Button>
 
+          <LoadingButton  loadingPosition= 'start' startIcon={<AutorenewIcon/>} type='submit' 
+ loading={false} color='success'
+    variant='outlined'   >
+
+
+  save
+</LoadingButton>
         </DialogActions>
       </Dialog>
     </React.Fragment>
