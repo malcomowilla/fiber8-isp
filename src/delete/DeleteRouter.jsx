@@ -27,10 +27,12 @@ const handleDelete=()=> {
         open={openDelete}
         onClose={handleCloseDelete}
       >
-        <DialogTitle>Delete Package</DialogTitle>
+        <DialogTitle sx={{
+            fontWeight: 'bold'
+        }}>Delete Package</DialogTitle>
         <DialogContent>
          
-        <p>Are you sure want to delete this router</p>
+        <p className='font-mono'>Are you sure want to delete this router</p>
         </DialogContent>
         <DialogActions>
         <Stack direction={{ xs: 'column', sm: 'row'}}  spacing={{xs: 1, sm: 2, md: 4}}>

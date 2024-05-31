@@ -14,10 +14,10 @@ import EditZone from '../edit/EditZone'
 
 import MaterialTable from 'material-table'
 import {  useEffect, useMemo, useRef} from 'react'
-
+import DeleteZone from '../delete/DeleteZone'
 import { useDebounce } from 'use-debounce';
 import PackageNotification  from '.././notification/PackageNotification'
-
+import ZoneNotification from '.././notification/ZoneNotification'
 
 
 const Zones = () => {
@@ -30,26 +30,26 @@ const initialValue={
   const [formData, setFormData] = useState(initialValue) 
   const [loading, setloading] = useState(false)
   const [showNotification, setShowNotification] = useState(false)
-const [renderCode, setRenderCode] = useState([{
-  zoneCode: ''
-}])
+  const [renderCode, setRenderCode] = useState(false)
 
+  const [openDelete, setOpenDelete] = useState(false);
 
 const [search, setSearch] = useState('')
 const [searchchInput] = useDebounce(search, 1000)
-setTimeout(() => {
-  setShowNotification(false)
 
-}, 29000);
 
-const handleRowClick =(rowData)=>{
+const handleRowClick =(event,rowData)=>{
   setFormData(rowData)
+  setRenderCode(true)
+  console.log('this is rowdata in zones', rowData)
   }
   
 
   const handleClickOpen = () => {
     setOpen(true);
     setFormData(initialValue)
+    setRenderCode(false)
+
 
   };
 
@@ -58,15 +58,34 @@ const handleRowClick =(rowData)=>{
   };
 
 
-const handleRenderCode = ()=> {
-  setRenderCode([...renderCode, {zoneCode: ''}])
-}
+
+
+
+
+
+
+
+  const handleClickOpenDelete = () => {
+    setOpenDelete(true);
+
+
+  };
+
+  const handleCloseDelete = () => {
+    setOpenDelete(false);
+  };
+
+
+// const handleRenderCode = ()=> {
+//       setRenderCode([...renderCode, { zoneCode: '' }]);
+
+// }
 
 
   const handleCreateZone = async(e)=> {
   e.preventDefault()
   
-  const url = formData.id ? `/api/update_zone/${formData.id}` : 'api/zone'
+  const url = formData.id ? `/api/update_zone/${formData.id}` : '/api/zone'
   const method = formData.id ? 'PATCH' : 'POST'
     try {
       setloading(true);
@@ -80,10 +99,17 @@ const handleRenderCode = ()=> {
       })
       const newData = await response.json()
      if (response.ok) {
-      // setOpen(false); 
+      setOpen(false); 
       setloading(false);
       setShowNotification(true)
-      handleRenderCode()
+
+setTimeout(() => {
+  setShowNotification(false)
+
+}, 10000);
+      // handleRenderCode()
+      setRenderCode(true);
+
 
       if (formData.id) {
         setTableData(tableData.map(item => (item.id === formData.id ? newData : item)));
@@ -135,8 +161,27 @@ useEffect(() => {
   fetchZones()
 }, [fetchZones]);
 
+
+
+
+const deleteZone = async (id) => {
+  const response = await fetch(`/api/delete_zone/${id}`, {
+    method: "DELETE",
+    
+  
+  })
+  
+  
+  
+  if (response.ok) {
+    setTableData((tableData)=> tableData.filter(item => item.id !== id))
+  } else {
+    console.log('failed to delete')
+  }
+  }
+
   const DeleteButton = ({ id }) => (
-        <IconButton style={{ color: '#8B0000' }}>
+        <IconButton style={{ color: '#8B0000' }} onClick={handleClickOpenDelete}>
           <DeleteIcon />
         </IconButton>
       );
@@ -154,12 +199,12 @@ const columns = [
   
   {title: 'Action', field:'Action', align: 'right',
 
-  render: (params) =>  
+  render: (rowData) =>  
     
      <>
       
-       <DeleteButton {...params} />
-       <EditButton {...params}/>
+       <DeleteButton id={rowData.id} />
+       <EditButton />
       
        </>
 
@@ -172,9 +217,11 @@ const columns = [
   return (
     <>
     <div className=''>
-         <EditZone open={open} handleClose={handleClose} isloading={loading}  renderCode={renderCode}  formData={formData} 
+         <EditZone open={open} handleClose={handleClose}        isloading={loading}  renderCode={renderCode}  formData={formData} 
          setFormData={setFormData}
            handleCreateZone={handleCreateZone}/>
+
+           <DeleteZone deleteZone={deleteZone} id={formData.id}  openDelete={openDelete}  handleCloseDelete={handleCloseDelete}/>
          <div className='text-end '>
   <input type="search"   value={search} onChange={(e)=> setSearch(e.target.value)}  className='bg-transparent border-y-[-2]    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
    focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search......'/>
@@ -196,30 +243,39 @@ const columns = [
         }
     ]}
 
-onRowClick={handleRowClick}
+
+    onRowClick={handleRowClick} 
+
 options={{
-        paging: true,
-       pageSizeOptions:[5, 10, 20, 25, 50, 100],
-       pageSize: 20,
-       search: false,
-searchFieldStyle: {
-  borderColor: 'red'
-},
-searchAutoFocus: true,
+  pageSizeOptions:[5, 10, 20, 25, 50, 100],
+  pageSize: 10,
+  search: false,
+  searchFieldAlignment:'right',
+
+
 showSelectAllCheckbox: false,
 showTextRowsSelected: false,
-
+hover: true, 
 selection: true,
 paginationType: 'stepped',
 
-// rowStyle:{
-//   backgroundColor: 'dark'
-// },
 
 paginationPosition: 'bottom',
 exportButton: true,
 exportAllData: true,
-exportFileName: 'Zones'
+exportFileName: 'PPPOE packages',
+
+headerStyle:{
+fontFamily: 'bold',
+textTransform: 'uppercase'
+} ,
+
+rowStyle:(data, index)=> index % 2 === 0 ? {
+background: 'gray'
+}: null,
+
+fontFamily: 'mono'
+
 }}     
       
       
@@ -230,7 +286,7 @@ exportFileName: 'Zones'
     </div>
 
     <div>
-    {showNotification &&   <PackageNotification/>}
+    {showNotification &&   <ZoneNotification/>}
 
     </div>
 

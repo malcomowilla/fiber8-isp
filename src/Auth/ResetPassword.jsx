@@ -11,6 +11,7 @@ import {Link} from 'react-router-dom'
 
 import Loader from '../loader/Loader'
 import {useState,useEffect} from 'react'
+import { ReloadIcon } from "@radix-ui/react-icons"
 
 
  function ResetPassword() {
@@ -114,13 +115,6 @@ useEffect(() => {
 
  
 
- <div className='flex flex-row'>
-  {loading ? <Loader/> : null
-
-
- }
-
- </div>
 
     <main className='lg:grid grid-cols-2'>
 
@@ -170,8 +164,10 @@ useEffect(() => {
                 
                   
               <div className='flex items-center justify-center'>
-            <Button><button className='dotted-font' type="submit">Reset Password!!</button></Button>
+              <Button variant='outline'  type='submit' className='dotted-font p-5' >Reset Password
+            <ReloadIcon className={`ml-2 h-4 w-4  ${loading ? 'animate-spin' : 'hidden'}  `} />
 
+            </Button>
               </div>
 
           </form>

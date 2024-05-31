@@ -11,43 +11,168 @@ import EditIcon from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
 
 import AddIcon from '@mui/icons-material/Add';
-import {useState} from'react'
+import {useState, useMemo,useEffect} from'react'
 import EditSubscriber from '../edit/EditSubscriber'
+import dayjs from 'dayjs';
+import SubscriberNotification from '../notification/SubscriberNotification'
 
-const rows = [
-  {  Speed: '4M/4M', Name: 'Makena', Price: 1500, Validity: 30 },
-  {  Speed: '10M/10M', Name: 'Jane', Price: 4000, Validity: 30 },
-  {  Speed: '4M/4M', Name: 'Andrew', Price: 1500, Validity: 30 },
-  {  Speed: '10M/10M', Name: 'Jemo', Price: 4000, Validity: 30 },
-  {  Speed: '4M/4M', Name: 'James', Price: 1500, Validity: 30 },
-  {  Speed: '10M/10M', Name: 'Jeane', Price: 4000, Validity: 30 },
-  {  Speed: '4M/4M', Name: 'Oscar', Price: 1500, Validity: 30 },
-  {  Speed: '10M/10M', Name: 'Silky', Price: 4000, Validity: 30 },
-  // Add more rows as needed
-];
+import { useApplicationSettings } from '../settings/ApplicationSettings';
 
-
+import Autocomplete from '@mui/material/Autocomplete';
 
 
 
 const PPPOEsubscribers = () => {
+  const { settingsformData } = useApplicationSettings();
 
+  const intialValue = {
+    name: '',
+    phone_number: '',
+    ppoe_username: '',
+    ppoe_password: '',
+    ref_no: '',
+    package_name: '',
+    installation_fee: '',
+    subscriber_discount: '',
+    second_phone_number: '',
+    date_registered: dayjs(),
+    email: '',
+    router_name: '',
+    check_update_username: settingsformData.check_update_username,
+    check_update_password: settingsformData.check_update_password
+    
+
+  }
   const [open, setOpen] =useState(false);
+const [formData,  setFormData] = useState(intialValue)
+const [tableData, setTableData] = useState([])
+const [loading, setloading] = useState(false)
+const [savedNotification, setSavedNotification] = useState(false)
 
   const handleClickOpen = () => {
     setOpen(true);
+    setFormData(intialValue)
+
   };
 
   const handleClose = () => {
     setOpen(false);
 
   };
-  const columns = [
-    {title: 'Name', field: 'Name', headerClassName: 'dark:text-black ', defaultSort: 'asc'},
-    {title: 'RefNo', field: 'RefNo',  headerClassName: 'dark:text-black' ,  sorting: true, defaultSort: 'asc'},
+
+
+  const handleChange = (e)=> {
+
+    const {id, value} = e.target
+    setFormData({...formData, [id]: value})
+  }
+
+
+  const handleRowClick = (event, rowData) => {
+    console.log('subscribers',rowData)
+   
+
+setFormData({
+  ...rowData,
+  date_registered: dayjs(rowData.date_registered), 
+
+  // Ensure date_registered is a Dayjs object
+  // package_name: rowData.package_name // Include package_name in formData
+   // Ensure date_registered is a Dayjs object
+});
+
+
+  }
+
+
+  const fetchSubscribers = useMemo(() => async ()=> {
   
-    {title: 'Phone', field: 'Phone',  headerClassName: 'dark:text-black'},
-    {title: 'Package', field: 'Package', type: 'numeric', headerClassName: 'dark:text-black', align: 'left'},
+
+
+    try {
+      const response = await fetch('/api/subscribers',{
+    
+      }
+    
+    
+    )
+    
+      const newData = await response.json()
+    if (response.ok) {
+      setTableData(newData)
+  
+    } else {
+      console.log('failed to fetch routers')
+  
+    }
+    
+    } catch (error) {
+      
+      console.log(error)
+    
+    }
+    
+    
+    }, [])
+    
+  
+  
+  
+    useEffect(() => {
+      
+      fetchSubscribers()
+    }, [fetchSubscribers]);
+  
+  
+
+
+
+  const createSubscriber = async (e) => {
+e.preventDefault()
+    try {
+      setloading(true)
+      const url = '/api/subscriber'
+      const method = 'POST'
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+"Content-Type" : "application/json"
+        },
+        body: JSON.stringify(formData)
+      }
+    )
+
+
+    const newData = await response.json()
+
+
+if (response.ok) {
+  setOpen(false)
+  setTableData([...tableData, newData])
+  setloading(false)
+  setSavedNotification(true)
+  setTimeout(() => {
+    setSavedNotification(false)
+
+  }, 10000);
+  
+} else {
+  console.log('failed to fetch')
+  setloading(false)
+}
+    } catch (error) {
+      console.log(error)
+      setloading(false)
+    }
+
+  }
+  const columns = [
+    {title: 'name', field: 'name', headerClassName: 'dark:text-black ', defaultSort: 'asc'},
+    {title: 'ref_no', field: 'ref_no',  headerClassName: 'dark:text-black' ,  sorting: true, defaultSort: 'asc'},
+  
+    {title: 'phone_number', field: 'phone_number',  headerClassName: 'dark:text-black'},
+    {title: 'package_name', field: 'package_name', type: 'numeric', headerClassName: 'dark:text-black', align: 'left'},
     {title: 'Last Renewed', field:'Last Renewed',  headerClassName: 'dark:text-black'},
     {title: 'Expires', field:'Expires',  headerClassName: 'dark:text-black'},
   
@@ -74,7 +199,7 @@ const PPPOEsubscribers = () => {
       <DeleteIcon />
     </IconButton>
   );
-  const EditButton = ({ id }) => (
+  const EditButton = () => (
     <IconButton style={{color: 'black'}} onClick={handleClickOpen} >
       <EditIcon />
     </IconButton>
@@ -82,7 +207,9 @@ const PPPOEsubscribers = () => {
 
   return (
     <div>
-<EditSubscriber open={open} handleClose={handleClose} 
+<EditSubscriber  isloading={loading}   packageName={formData.package_name} 
+  open={open} handleClose={handleClose}  formData={formData}  setFormData={setFormData}  createSubscriber={createSubscriber} 
+handleChangeForm={handleChange}
         
             />
              
@@ -91,9 +218,10 @@ const PPPOEsubscribers = () => {
    focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search......'/>
 </div>
 <MaterialTable columns={columns}
-
+data={tableData}
 title='PPPoe Subcribers'
 
+onRowClick={(event, rowData)=>handleRowClick(event, rowData)}
 
 icons={{
   Add: () => <AddIcon onClick={handleClickOpen} />,
@@ -137,6 +265,7 @@ headerStyle:{
 
 />
 
+<div>{savedNotification && <SubscriberNotification/>}</div>
     </div>
   )
 }

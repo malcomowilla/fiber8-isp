@@ -14,9 +14,12 @@ export default function MaxWidthDialog({open, handleClose, renderCode,  handleCr
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState('lg');
   const {name, zone_code} = formData
+
+
   const onChange = (e)=> {
-setFormData( {...formData, [e.target.id]: e.target.value})
-  }
+    setFormData( {...formData, [e.target.id]:  e.target.value})
+      }
+    
 
 
 
@@ -49,11 +52,12 @@ setFormData( {...formData, [e.target.id]: e.target.value})
 }
 },}} >
 
-      <TextField  className='myTextField'  label='Name' id='name' value={name}  sx={{ width: '60%' , }}  onChange={e => onChange(e)}> </TextField>
-      {renderCode.map((myZoneCode, index) =>{
-      <TextField   key={index} className='myTextField' label='Code' id='zone_code'  onChange={e => onChange(e)}  value={zone_code} > </TextField>
+      <TextField  className='myTextField'  label='Name' id='name' value={formData.name}  sx={{ width: '60%' , }} 
+       onChange={(e)=> onChange(e) } > </TextField>
 
-      })}
+       {renderCode &&       <TextField   className='myTextField  uppercase' label='Code' id='zone_code'  onChange={e => onChange(e)}  value={zone_code} > </TextField>
+ }
+     
 
         </Stack>
         <TextField    className='myTextField' label='Zone Subdmain' fullWidth sx={{marginTop: 10, 

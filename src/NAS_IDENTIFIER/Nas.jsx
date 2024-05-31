@@ -15,26 +15,21 @@ import AddIcon from '@mui/icons-material/Add';
 import MaterialTable from 'material-table'
 
 import DeleteRouter from '../delete/DeleteRouter'
-
+import {useApplicationSettings} from '../settings/ApplicationSettings'
 
 
 
 
 const Nas = () => {
-const initialValue={
-username:'',
-password: '',
-ip_address:'',
-name: ''
-}
+
+
   const [open, setOpen] = useState(false);
-const  [formData, setFormData] = useState(initialValue)
 const [tableData, setTableData] = useState([])
 const [loading, setloading] = useState(false)
 const [offlineerror, setofflineerror] = useState(false)
 const [openDelete, setOpenDelete] = useState(false);
-
-
+const { nasformData, setnasFormData,initialValueNas} =  useApplicationSettings() 
+console.log('nas formData', nasformData)
 
 
 const handleClickOpenDelete = () => {
@@ -47,13 +42,14 @@ const handleCloseDelete = () => {
 
   const handleClickOpen = () => {
     setOpen(true);
+    setnasFormData(initialValueNas)
+
   };
 
 
 
   const handleClose = () => {
     setOpen(false);
-    setFormData(initialValue)
   };
 
 
@@ -116,7 +112,7 @@ const handleCloseDelete = () => {
     }
   }
   const handleRowClick = (event, rowData) => {
-    setFormData(rowData);
+    setnasFormData(rowData);
     console.log('router row data', rowData)
   
     // Add your custom logic here, such as opening a modal or updating state
@@ -134,6 +130,11 @@ const handleCloseDelete = () => {
     const newData = await response.json()
   if (response.ok) {
    setTableData(newData)
+   const ip_address = newData.ip_address
+   const username = newData.username
+   const password = newData.password
+   setnasFormData({...nasformData,password, username, ip_address })
+
 
   } else {
     console.log('failed to fetch routers')
@@ -172,7 +173,7 @@ const handleSubmit = async (e)=> {
                 'Content-Type': 'application/json'
             },
             signal: controller.signal,
-            body: JSON.stringify(formData),
+            body: JSON.stringify(nasformData),
         })
 
           clearTimeout(id)
@@ -181,7 +182,7 @@ const handleSubmit = async (e)=> {
         if (res.ok) {
             setTableData((tableData)=>[...tableData, newData])
             setloading(false)
-
+          handleClose()
 
         } else {
             setloading(false)
@@ -239,11 +240,11 @@ const columns = [
   <input type="search"  className='bg-transparent border-y-[-2]    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
    focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search....'/>
 </div>
-<EditNas open={open} handleClose={handleClose} tableData={tableData} handleSubmit={handleSubmit}   formData={formData}
- setFormData={setFormData}  isloading={loading}/>
+<EditNas open={open} handleClose={handleClose} tableData={tableData} handleSubmit={handleSubmit}   nasformData={nasformData}
+ setnasFormData={setnasFormData}  isloading={loading}/>
 
 
-<DeleteRouter  deleteRouter={deleteRouter} id={formData.id}  handleCloseDelete ={handleCloseDelete}  openDelete={openDelete}/>
+<DeleteRouter  deleteRouter={deleteRouter} id={nasformData.id}  handleCloseDelete ={handleCloseDelete}  openDelete={openDelete}/>
       <MaterialTable columns={columns}
       
       title='NAS (Mikrotik Routers with PPPoE/Hotspot)'

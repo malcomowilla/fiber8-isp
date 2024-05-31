@@ -20,10 +20,12 @@ import EditPackage from '../edit/EditPackage'
 import { useContext, useState, useEffect, useMemo, useRef} from 'react'
 import {CableContext} from '../context/CableContext'
 import PackageNotification  from '.././notification/PackageNotification'
+import DeletePackageNotification from '.././notification/DeletePackageNotification'
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Stack from '@mui/material/Stack';
 import { useDebounce } from 'use-debounce';
+import {useApplicationSettings} from '../settings/ApplicationSettings'
 
 const useStyles = makeStyles({
   customSearchFieldFocus: {
@@ -43,7 +45,8 @@ const PPPOEpackages = () => {
   const [open, setOpen] = useState(false);
   const [loading, setloading] = useState(false)
   const [tableData, setTableData] = useState([])
-  
+  const { nasformData} =  useApplicationSettings() 
+
   
   const [openDelete, setOpenDelete] = useState(false);
 
@@ -51,7 +54,7 @@ const PPPOEpackages = () => {
   const [routerName, setRouterName] = useState('');
 const [creationError, setCreationError] = useState(false)
 const [error, setError] = useState([])
-
+const [deleteNotification, setDeleteNotification] = useState(false)
 
 const initialValue = {
   name: '',
@@ -62,17 +65,21 @@ const initialValue = {
   upload_burst_limit: '',
   download_burst_limit: '',
   validity_period_units: '',
- 
-  router_name: ''
+  router_name: '',
+  ip_address:  nasformData.ip_address,
+  username:  nasformData.username,
+  password:  nasformData.password
+
 }
-const [formData, setFormData] = useState(initialValue
-)
+
+const [formData, setFormData] = useState(initialValue)
+
 const [offlineerror, setofflineerror] = useState(false)
 
 
 const [search, setSearch] = useState('')
 const [searchchInput] = useDebounce(search, 1000)
-
+console.log('info from nas',formData)
 
 const handleRowClick = (event, rowData) => {
   setFormData(rowData);
@@ -109,22 +116,18 @@ const handleClose = () => {
 
 };
 
-setTimeout(() => {
-  setShowNotification(false)
-
-}, 29000);
-
-
-
-setTimeout(() => {
-  setCreationError(false)
-
-}, 29000);
-
+useEffect(() => {
+  
 setTimeout(() => {
   setofflineerror(false)
 
-}, 25000);
+}, 8000);
+ 
+}, [offlineerror]);
+
+
+
+
 
 const controller = new AbortController();
 const id = setTimeout(() => controller.abort(), 9000);
@@ -150,6 +153,11 @@ const createPackage = async (e) => {
         setOpen(false); // Close the form modal
         setloading(false);
         setShowNotification(true);
+
+setTimeout(() => {
+  setShowNotification(false)
+
+}, 10000);
         setofflineerror(false);
         if (formData.id) {
           // Update existing package in tableData
@@ -161,13 +169,23 @@ const createPackage = async (e) => {
       } else {
         setloading(false);
         setCreationError(true);
+
+
+setTimeout(() => {
+  setCreationError(false)
+
+}, 10000);
         setError(newData.error);
       }
     } catch (error) {
       setloading(false);
       setofflineerror(true);
-    }
 }
+}
+
+
+
+
 
 
 const fetchPackages = useMemo(() => async ()=> {
@@ -321,11 +339,19 @@ const response = await fetch(`/api/package/${id}`, {
 })
 
 
-
 if (response.ok) {
   setTableData((tableData)=> tableData.filter(item => item.id !== id))
+  setDeleteNotification(true)
+
+setTimeout(() => {
+  setDeleteNotification(false)
+
+}, 10000);
+
 } else {
   console.log('failed to delete')
+
+
 }
 }
 
@@ -334,8 +360,8 @@ const DeleteButton = ({ id }) => (
     <DeleteIcon />
   </IconButton>
 );
-  const EditButton = () => (
-    <IconButton  onClick={handleClickOpen} style={{color: 'black'}} >
+  const EditButton = ({rowData}) => (
+    <IconButton  onClick={() => handleClickOpen(rowData)} style={{color: 'black'}} >
     <EditIcon />
   </IconButton>
       );
@@ -372,7 +398,7 @@ const columns = [
 
     <div className='overflow-hidden'>
 
-      <EditPackage open={open} handleClose={handleClose} formData={formData}      isloading={loading} 
+      <EditPackage open={open} handleClose={handleClose} formData={formData}   isloading={loading} 
         createPackage={createPackage}   offlineerror={offlineerror} 
        showNotification={showNotification}   setofflineerror={setofflineerror}  setFormData={setFormData} 
        tableData={tableData} routerName={routerName} setRouterName={setRouterName}/>
@@ -468,8 +494,15 @@ fontFamily: 'mono'
       
       
       />
+
+
+      <div>
+
+        
+      </div>
       <div className=''>
       {showNotification &&   <PackageNotification/>}
+      {deleteNotification  &&  <DeletePackageNotification/>}
       { creationError     &&   
 <Stack sx={{ width: '50%' }} spacing={1}>
      

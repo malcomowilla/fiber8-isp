@@ -39,7 +39,7 @@ import Sms from './sms/Sms'
 import ProtectAuth from './Auth/ProtectAuth'
 import HotspotPayments from './payments/HotspotPayments'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
+import  ApplicationSettings from './settings/ApplicationSettings'
 
 const ResetPassword = lazy(()=> import('./Auth/ResetPassword')
 ) 
@@ -326,7 +326,12 @@ return redirect('/signin')
   setloading(false);
 
   setOfflineError(true)
+  setOfflineError(true);
 
+
+  setTimeout(() => {
+    setOfflineError(false)
+  }, 8000);
 }
 }
 
@@ -339,7 +344,7 @@ return redirect('/signin')
       <Suspense fallback={<div className='flex justify-center items-center '>{ <UiLoader/> }</div>}>
       < LocalizeDate  >
       <CableProvider>
-
+      <ApplicationSettings>
  <ApplicationContext.Provider value={{isSeen, setIsSeen,isPassword, setPassword,
    email, setEmail, passwordConfirmation, setPasswordConfirmation, errorData, showErrors, handleSignUp, loading,
    isExpanded, setIsExpanded, isExpanded1, setIsExpanded1, isExpanded2, setIsExpanded2,
@@ -351,6 +356,7 @@ return redirect('/signin')
 
 <RouterProvider router={router} />
 </ApplicationContext.Provider>
+</ ApplicationSettings>
       </CableProvider>
 </ LocalizeDate  >
 </Suspense>

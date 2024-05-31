@@ -2,6 +2,7 @@ import {Button} from '../components/ui/button'
 import {Link} from 'react-router-dom'
 import {ApplicationContext} from '../context/ApplicationContext'
 import {useNavigate} from 'react-router-dom'
+import { ReloadIcon } from "@radix-ui/react-icons"
 
 // import {
 //   InputOTP,
@@ -13,6 +14,8 @@ import {useNavigate} from 'react-router-dom'
 import Loader from '../loader/Loader'
 import { useContext, useState} from 'react'
 
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
 
  function InputOTPWithSeparator() {
 
@@ -117,13 +120,15 @@ const handleSignIn = async (e) => {
     console.log(error.name === 'AbortError');
     setloading(false);
     setOfflineError(true);
+
+
+setTimeout(() => {
+  setOfflineError(false)
+}, 8000);
+
   }
 
 }
-setTimeout(() => {
-  setOfflineError(false)
-}, 7000);
-
 
   return (
 <>
@@ -167,19 +172,15 @@ setTimeout(() => {
  
 
  <div className='flex flex-row'>
-  {loading ? <Loader/> : null
-
-
- }
+  
 
  </div>
 
 
 <div className=''>
-  {offlineError && <p className='text-red-700'>Something Went Wrong Please Try Again Later!!
-
-
-   </p>}
+  {offlineError &&    <Stack sx={{ width: '20%',   }} >
+      <Alert sx={{backgroundColor: 'rgb(255, 0, 0)'}} severity="error">Something Went Wrong Please Try Again Later.</Alert>
+    </Stack>}
 </div>
 
 
@@ -262,8 +263,10 @@ setPassword(e.target.value)
                   </div>
               </div>
               <div className='flex items-center justify-center'>
-            <Button><button className='dotted-font' type="submit">Sign In</button></Button>
+              <Button variant='outline'  type='submit' className='dotted-font p-5' >Sign In
+            <ReloadIcon className={`ml-2 h-4 w-4  ${loading ? 'animate-spin' : 'hidden'}  `} />
 
+            </Button>
               </div>
 
           </form>

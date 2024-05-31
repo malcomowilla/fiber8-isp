@@ -4,17 +4,24 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+
+import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
-
+import LoadingButton from '@mui/lab/LoadingButton';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 import CloseIcon from '@mui/icons-material/Close';
-
- function DeletePackage({openDelete, handleCloseDelete, deletePackage, id}) {
+export default function MaxWidthDialog({ handleCloseDelete, openDelete, deleteZone, id}) {
   const [fullWidth, setFullWidth] = React.useState(true);
-  const [maxWidth, setMaxWidth] = React.useState('xs');
+  const [maxWidth, setMaxWidth] = React.useState('lg');
 
-const handleDelete=()=> {
-  deletePackage(id)
-  handleCloseDelete()
+
+
+
+const handleDelete = () =>{
+    deleteZone(id)
+
+    handleCloseDelete()
+
 }
 
 
@@ -29,11 +36,10 @@ const handleDelete=()=> {
       >
         <DialogTitle sx={{
             fontWeight: 'bold'
-        }}>Delete Package</DialogTitle>
+        }}>Delete Zone</DialogTitle>
         <DialogContent>
-         
-        <p className='font-mono'>Are you sure want to delete this package</p>
-        </DialogContent>
+        <p className='font-mono'>Are you sure want to delete this zone</p>
+
         <DialogActions>
           <Stack direction={{ xs: 'column', sm: 'row'}}  spacing={{xs: 1, sm: 2, md: 4}}>
 
@@ -42,8 +48,9 @@ const handleDelete=()=> {
           </Stack>
        
         </DialogActions>
+        </DialogContent>
+       
       </Dialog>
     </React.Fragment>
   );
 }
-export default DeletePackage

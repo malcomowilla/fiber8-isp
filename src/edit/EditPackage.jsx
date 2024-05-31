@@ -13,7 +13,7 @@ import {
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
 import Loader from '../loader/Loader'
-import Button from '@mui/material/Button';
+
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -29,9 +29,13 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import PackageNotification  from '.././notification/PackageNotification'
+
+import Button from '@mui/material/Button';
+
 import LoadingButton from '@mui/lab/LoadingButton';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import CloseIcon from '@mui/icons-material/Close';
+
 import Autocomplete from '@mui/material/Autocomplete';
 import { useDebounce } from 'use-debounce';
 
@@ -44,11 +48,21 @@ const [message, setMessage] = useState('')
 const [routers, setRouters]= useState ([])
 const [formComplete, setFormComplete] = useState(false);
 const [submitting, setSubmitting] = useState(false);
+const [mikrotik_router, setRouter] = useState(null)
 
+const {router_name} = formData
+
+
+useEffect(() => {
+  
+  setRouter(router_name)
+  console.log('router_name',router_name )
+
+}, [router_name]);
 // const {price, download_limit, upload_limit, validity, name, upload_burst_limit, download_burst_limit,
 //   validity_period_units, tx_rate_limit, rx_rate_limit} = formData
 
-const [routerName] = useDebounce(formData.router_name, 1000)
+const [routerName] = useDebounce(router_name, 1000)
 
 console.log(routerName)
 
@@ -124,7 +138,6 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm', 'lg', 'md'));
 
  
-  // const formRef = useRef(null)
 
 
   return (
@@ -482,8 +495,12 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
         </Select>
       </FormControl>
             </div>
+
+
+
               <Autocomplete
-                      
+                      value={routers.find((router)=> router.name === mikrotik_router)|| null}
+
   sx={{
 
     '& label.Mui-focused': {
@@ -511,25 +528,47 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
                 renderInput={(params) => (
                   <TextField
                   id="router_name"
+                  getOptionValue={(option) => option.id}   // Function to extract the value from the option object
 
                   className='myTextField'
                     {...params}
                     label="Select Router"
                     error={!formData.router_name}
                     helperText={!formData.router_name ? 'required' : ''}
-                    // value={routers.map((router) => router.name === formData.router_name) }
-                                     value={formData.router_name}
 
-                    // onChange={e=> setFormData({...formData, router_name: e.target.value})}
                    
                   />
                 )}
               
                 onChange={(event, newValue) => {
+                  console.log("Selected Router:", newValue);
+
                   setFormData({...formData, router_name: newValue ? newValue.name : '' });
                 }}
-                
 
+                renderOption={(props, routerName) => (
+                  <Stack
+                    direction='row'
+                    spacing={2}
+                    sx={{
+                      width: '100%',
+                      padding: 1,
+                      '&:hover': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                        display: 'flex',
+                        flexDirection: 'start'
+                      }
+                    }}
+                    {...props}
+                  >
+                   <img  className='w-[60px] h-[50px]' src="/images/icons8-router-80.png" alt="router" />
+                    <Stack direction='column'>
+                    <span>{routerName.name}</span>
+                    </Stack>
+                  
+                  </Stack>
+                  
+                )}
               />
               
            

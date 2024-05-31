@@ -7,7 +7,10 @@ import {AlertDestructive} from '../validation_errors/AlertDestructive'
 import {AlertDestructive2} from '../validation_errors/AlertDestructive2'
 import {AlertDestructive3} from '../validation_errors/AlertDestructive3'
 import {AlertDestructive4} from '../validation_errors/AlertDestructive4'
+import { ReloadIcon } from "@radix-ui/react-icons"
 
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
 import {useState} from 'react'
 import {Link} from 'react-router-dom'
 
@@ -41,20 +44,20 @@ const {isSeen, setIsSeen,isPassword, setPassword, email, setEmail, passwordConfi
  
 
  <div className='flex flex-row'>
+{/*   
   {loading ? <Loader/> : null
 
 
- }
+ } */}
 
  </div>
 
 
 
-<div className=''>
-  {offlineError && <p className='dark:text-red-600'>Something Went Wrong Please Try Again Later
-
-
-   <span onClick={()=> setOfflineError(false)}  className='text-red-700 cursor-pointer '>      x</span></p>}
+ <div className=''>
+  {offlineError &&    <Stack sx={{ width: '20%',   }} >
+      <Alert sx={{backgroundColor: 'rgb(255, 0, 0)'}} severity="error">Something Went Wrong Please Try Again Later.</Alert>
+    </Stack>}
 </div>
 
 
@@ -185,7 +188,10 @@ setPassword(e.target.value)
               </div>
             
               <div className='flex items-center justify-center'>
-            <Button><button className='dotted-font' type="submit">Sign Up</button></Button>
+            <Button variant='outline'  type='submit' className='dotted-font p-5' >Sign Up
+            <ReloadIcon className={`ml-2 h-4 w-4   ${loading ? 'animate-spin' : 'hidden'}  `} />
+
+            </Button>
 
               </div>
 

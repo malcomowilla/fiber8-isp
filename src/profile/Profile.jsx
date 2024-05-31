@@ -77,7 +77,6 @@ console.log(user)
         <DropdownMenuTrigger asChild>
 
         <ion-icon name="people-outline" size='small'></ion-icon>
-
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
@@ -91,7 +90,7 @@ console.log(user)
             
             <DropdownMenuItem>
               <Settings className="mr-2 h-4 w-4" />
-              <Link to='/layout/settings'><span >Settings</span></Link>
+              <Link to='/admin/settings'><span >Settings</span></Link>
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>
            
@@ -129,10 +128,7 @@ console.log(user)
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <Github className="mr-2 h-4 w-4" />
-            <span>GitHub</span>
-          </DropdownMenuItem>
+        
           
          
           <DropdownMenuSeparator />

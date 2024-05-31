@@ -17,15 +17,15 @@ import Stack from '@mui/material/Stack';
 import LoadingButton from '@mui/lab/LoadingButton';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import CloseIcon from '@mui/icons-material/Close';
-function EditNas ({open, handleClose, handleSubmit, formData, setFormData, isloading}) {
-const {name, username, ip_address, password} = formData
+function EditNas ({open, handleClose, handleSubmit, nasformData, setnasFormData, isloading}) {
+const {name, username, ip_address, password} = nasformData
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState('lg');
 
 
 
 const onChange=(e)=> {
-setFormData({...formData, [e.target.id]: e.target.value})
+setnasFormData({...nasformData, [e.target.id]: e.target.value})
 }
 
 

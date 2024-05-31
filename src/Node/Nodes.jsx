@@ -11,24 +11,10 @@ import AddIcon from '@mui/icons-material/Add';
 import {Link} from 'react-router-dom'
 import {  useState} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
-
-
+import EditNode from '../edit/EditNode'
 import MaterialTable from 'material-table'
 
 
-
-
-// const rows = [
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   // Add more rows as needed
-// ];
 
 
 
@@ -36,6 +22,17 @@ import MaterialTable from 'material-table'
 
 const Nodes = () => {
 
+  const [open, setOpen] = useState(false);
+
+
+
+  const handleClickOpen = () => {
+      setOpen(true);
+    };
+    
+    const handleClose = () => {
+      setOpen(false);
+    };
 
   const DeleteButton = ({ id }) => (
         <IconButton style={{ color: '#8B0000' }}>
@@ -44,8 +41,8 @@ const Nodes = () => {
       );
 
 
-  const EditButton = ({ id }) => (
-    <IconButton style={{color: 'black'}} >
+  const EditButton = () => (
+    <IconButton style={{color: 'black'}} onClick={handleClickOpen} >
       <EditIcon />
     </IconButton>
   );
@@ -58,12 +55,12 @@ const columns = [
 
   {title: 'Action', field:'Action', align: 'right',
 
-  render: (params) =>  
+  render: (rowData) =>  
     
      <>
       
-       <DeleteButton {...params} />
-       <EditButton {...params}/>
+       <DeleteButton id={rowData.id} />
+       <EditButton />
       
        </>
 
@@ -74,8 +71,9 @@ const columns = [
 ]
 
   return (
+    <>
     <div className=''>
-         
+         <EditNode  open={open} handleClose={handleClose}/>
          <div className='text-end '>
   <input type="search"  className='bg-transparent border-y-[-2]    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
    focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search......'/>
@@ -88,9 +86,15 @@ const columns = [
 
       
     actions={[
+
+      {
+        icon: () => <AddIcon onClick={handleClickOpen} />,
+        isFreeAction: true, // This makes the action always visible
+        tooltip: <p className='text-sm'>Add Node</p>
+      },
         {
           icon:()=><GetAppIcon/>,
-          tooltip: 'Add Node',
+          tooltip: <p className='text-sm'>Import</p>,
           isFreeAction: true
         }
     ]}
@@ -127,6 +131,7 @@ exportFileName: 'Nodes'
       />
 
     </div>
+    </>
   )
 }
 

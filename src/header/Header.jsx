@@ -49,8 +49,8 @@ const {seeSidebar, setSeeSideBar, setPreferDarkMode, preferDarkMode
 
 } = useContext(ApplicationContext); 
   return (
-    <div className='flex text-gray-200   bg-stone-600 w-screen  p-10 h-20 justify-between'>
-        <ion-icon  onClick={()=> setSeeSideBar(!seeSidebar)} className='menu-black'  name="menu"></ion-icon>
+    <div className='flex  dark:text-white text-black  w-screen  p-10 h-20 justify-between'>
+        <ion-icon  onClick={()=> setSeeSideBar(!seeSidebar)} className='menu-black'  name="menu" size='large'></ion-icon>
 
 
 {/* <p> Hello {user}</p> */}
