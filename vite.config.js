@@ -6,11 +6,30 @@ import path from "path"
 export default defineConfig({
   plugins: [react()],
   server: {
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://localhost:4000',
+    //     changeOrigin: true,
+    //     rewrite: (path) => path.replace(/^\/api/, ''),
+    //   },
+    // },
+
+    
+
+
+    
+
     proxy: {
       '/api': {
+        // target: 'http://192.168.1.69:4000',
         target: 'http://localhost:4000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq, req, res, options) => {
+            proxyReq.setHeader('X-Original-Host', req.headers.host);
+          });
+        },
       },
     },
   },

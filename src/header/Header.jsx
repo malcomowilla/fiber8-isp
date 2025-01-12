@@ -3,6 +3,11 @@ import { useContext} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 import {Profile} from '../profile/Profile'
 import {useState, useEffect} from 'react'
+import ArrowBackSharpIcon from '@mui/icons-material/ArrowBackSharp';
+import EastSharpIcon from '@mui/icons-material/EastSharp';
+
+
+
 
 
 // handleThemeSwitch
@@ -42,22 +47,41 @@ const {  handleThemeSwitch
 // }, []);
 
 
-
-
 const {seeSidebar, setSeeSideBar, setPreferDarkMode, preferDarkMode
 
 
 } = useContext(ApplicationContext); 
   return (
-    <div className='flex  dark:text-white text-black  w-screen  p-10 h-20 justify-between'>
-        <ion-icon  onClick={()=> setSeeSideBar(!seeSidebar)} className='menu-black'  name="menu" size='large'></ion-icon>
+    <div className={`flex  dark:text-white text-black cursor-pointer  w-full  p-10 h-20   
+    
+    justify-between`}>
+      {/* <div className='hidden'>
+      <ion-icon  onClick={()=> setSeeSideBar(!seeSidebar)} className='menu-black'  name="menu" size='large'></ion-icon>
+
+      </div> */}
+
+
+      <div   style={{ cursor: 'pointer',}}  onClick={()=> setSeeSideBar(!seeSidebar)} className='transition-all 
+      duration-500    '>
+        
+      {seeSidebar ?   <EastSharpIcon />  : <ArrowBackSharpIcon  />}
+
+</div>
+
+
+
+
+
+
+
 
 
 {/* <p> Hello {user}</p> */}
-<div className='flex flex-row gap-4'>
+<div className='flex flex-row gap-x-4 justify-between'>
+ 
 <div onClick={()=> setPreferDarkMode(!preferDarkMode)}>
 <div onClick={handleThemeSwitch}>
-<ion-icon onClick={()=>setIcon(!icon)}  name={icon ? 'moon-outline' : 'sunny'} size='small'></ion-icon>
+<ion-icon onClick={()=>setIcon(!icon)}  name={icon ? 'moon-outline' : 'sunny'} size='large'></ion-icon>
 </div>
 </div>
 

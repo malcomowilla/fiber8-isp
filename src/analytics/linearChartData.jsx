@@ -11,27 +11,34 @@ export const linearChartData = {
 
     datasets: [
         {
-            label: "Registrations",
-            data: [10, 60, 200, 300, 7, 1, 20],
+            label: "Purchases",
+            data: [5, 60, 200, 300, 7, 10, 20],
+            backgroundColor: [
+                '#65eeb7',
+                '#00bbf0',
+            '#f78536',
+            '#ffb480',
+            "#0e2431",
+            "#77024d",
+            '#91bd3a'
+        ],
 
-            borderColor: [
-                'rgb(255, 99, 132)',
-                
-              ],
+
+
+
+        borderColor: [
+            '#65eeb7',
+            '#00bbf0',
+        '#f78536',
+        '#ffb480',
+        "#0e2431",
+        "#77024d",
+        '#91bd3a'
+            
+          ],
               borderWidth: 2
         },
-        {
-            label: "Purchases",
-            data: [12, 5000, 1500, 1000, 4500, 10, 300],
-
-            borderColor: [
-                'rgb(255, 159, 64)',
-                
-              ],
-              borderWidth: 2,
-              hoverOffSet: 4
-
-        },
+   
        
     ]
 

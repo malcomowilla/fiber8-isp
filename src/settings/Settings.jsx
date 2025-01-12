@@ -17,21 +17,24 @@ const Settings = () => {
   return (
     <div className= ' w-full h-screen'>
 
-        <div className='flex sm:flex-row   h-20 border p-2 overflow-x-scroll font-mono gap-x-20 cursor-pointer '>
-        <p  onClick={()=>      selectTab('GENERAL')} className='hover:dark:bg-gray-600 p-2 h-10 rounded-lg hover:bg-gray-300
+        <div className='flex sm:flex-row  text-white bg-black h-20 border p-2 overflow-x-scroll font-mono gap-x-20 cursor-pointer '>
+        <p  onClick={()=>      selectTab('GENERAL')} className='hover:dark:bg-g
+        ray-600 p-2 h-10 hover:text-black rounded-lg hover:bg-blue-300
+
          transition-all duration-300'>GENERAL</p>
-      <p   onClick={()=> selectTab('SMS')} className='hover:dark:bg-gray-600 p-2 h-10 rounded-lg hover:bg-gray-300 
-      transition-all duration-300'>SMS</p>
+      <p   onClick={()=> selectTab('SMS')} className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300
+      transition-all duration-300 hover:text-black '>SMS</p>
 
       
-      <p   onClick={()=> selectTab('MPESA')} className='hover:dark:bg-gray-600 p-2 h-10 rounded-lg hover:bg-gray-300
-       transition-all duration-300'>MPESA</p>
-      <p className='hover:dark:bg-gray-600 p-2 h-10 rounded-lg hover:bg-gray-300 transition-all duration-300'>WEBSITE</p>
-      <p className='hover:dark:bg-gray-600 p-2 h-10 rounded-lg hover:bg-gray-300 transition-all duration-300'>SUPPORT</p>
-      <p    onClick={()=> selectTab('EMAIL')} className='hover:dark:bg-gray-600 p-2 h-10 rounded-lg
-       hover:bg-gray-300 transition-all duration-300'>EMAIL</p>
-      <p className='hover:dark:bg-gray-600 p-2 h-10 rounded-lg hover:bg-gray-300 transition-all duration-300'>PAYMENT</p>
-      <p className='hover:dark:bg-gray-600 p-2 h-10 rounded-lg hover:bg-gray-300 transition-all duration-300'>NOTIFICATION</p>
+      <p   onClick={()=> selectTab('MPESA')} className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300
+       transition-all duration-300 hover:text-black'>MPESA</p>
+      <p className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300 transition-all
+       duration-300 hover:text-black'>WEBSITE</p>
+      <p className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300 transition-all duration-300 hover:text-black'>SUPPORT</p>
+      <p    onClick={()=> selectTab('EMAIL')} className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg
+       hover:bg-blue-300 transition-all duration-300 hover:text-black'>EMAIL</p>
+      <p className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300 transition-all duration-300 hover:text-black'>PAYMENT</p>
+      <p className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300 transition-all duration-300 hover:text-black'>NOTIFICATION</p>
         </div>
   
 {selectedTab === 'GENERAL' && <GeneralSettings/>}

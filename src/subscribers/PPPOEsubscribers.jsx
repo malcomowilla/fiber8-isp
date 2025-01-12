@@ -76,9 +76,6 @@ setFormData({
   ...rowData,
   date_registered: dayjs(rowData.date_registered), 
 
-  // Ensure date_registered is a Dayjs object
-  // package_name: rowData.package_name // Include package_name in formData
-   // Ensure date_registered is a Dayjs object
 });
 
 

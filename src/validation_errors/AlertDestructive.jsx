@@ -25,7 +25,7 @@ const {   errorData
 return  <p key={index}>{error}</p>
 })} */}
 
-<p>{errorData['password']}</p>
+<p  className='text-red-600 text-lg font-mono'>{errorData['password']}</p>
       </AlertDescription>
     </Alert>
 

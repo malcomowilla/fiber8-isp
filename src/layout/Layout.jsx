@@ -2,8 +2,10 @@ import {Outlet} from 'react-router-dom'
 import Sidebar from '../sidebar/Sidebar'
 import Header from '../header/Header'
 
-import { useContext} from 'react'
+import { useContext, useState, useEffect} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
+import { Button } from "@/components/ui/button"
+import { ReloadIcon } from "@radix-ui/react-icons"
 
 
 
@@ -22,7 +24,16 @@ const {seeSidebar, theme
 
 
 } = useContext(ApplicationContext);
-  
+  const [seeButton, setSeeButton] = useState(false)
+const [loading, setloading] = useState(false)
+
+  const refreshPage = ()=> {
+    window.location.reload(false);
+    setloading(true)
+  }
+  useEffect(() => {
+   setSeeButton(true)
+  }, [seeButton]);
   return (
 <>
     <Header/>
@@ -32,11 +43,16 @@ const {seeSidebar, theme
 
 <div className={`p-4  h-[1000px]  `}>
      
+{seeButton && <Button onClick={refreshPage}>Reload Page
+
+</Button>}
+
+
 
 <div className='flex flex-col p-4 font-mono  '>
 <Sidebar/>
-
 </div>
+
   
       <div className=''>
 <Outlet/>

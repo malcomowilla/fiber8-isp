@@ -7,8 +7,10 @@ import ActionCable from 'actioncable';
 import { makeStyles } from '@mui/styles';
 
 import { IconButton } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+
+
+import AddIcon from '@mui/icons-material/Add';
 
 import GetAppIcon from '@mui/icons-material/GetApp';
 // import {  useState} from 'react'
@@ -17,7 +19,7 @@ import {ApplicationContext} from '../context/ApplicationContext'
 import DeletePackage from '../delete/DeletePackage'
 import MaterialTable from 'material-table'
 import EditPackage from '../edit/EditPackage'
-import { useContext, useState, useEffect, useMemo, useRef} from 'react'
+import { useContext, useState, useEffect, useMemo, useRef, useCallback} from 'react'
 import {CableContext} from '../context/CableContext'
 import PackageNotification  from '.././notification/PackageNotification'
 import DeletePackageNotification from '.././notification/DeletePackageNotification'
@@ -45,9 +47,8 @@ const PPPOEpackages = () => {
   const [open, setOpen] = useState(false);
   const [loading, setloading] = useState(false)
   const [tableData, setTableData] = useState([])
-  const { nasformData} =  useApplicationSettings() 
-
-  
+  const { settingsformData, materialuitheme} =  useApplicationSettings() 
+  const [openLoad, setOpenLoad] = useState(true);
   const [openDelete, setOpenDelete] = useState(false);
 
   const [showNotification, setShowNotification] = useState(false)
@@ -65,21 +66,26 @@ const initialValue = {
   upload_burst_limit: '',
   download_burst_limit: '',
   validity_period_units: '',
-  router_name: '',
-  ip_address:  nasformData.ip_address,
-  username:  nasformData.username,
-  password:  nasformData.password
+router_name: settingsformData.router_name
 
 }
 
+console.log('router_nameee',settingsformData.router_name)
 const [formData, setFormData] = useState(initialValue)
 
 const [offlineerror, setofflineerror] = useState(false)
+const [nameError, setNameError] = useState(false)
+const [priceError, setPriceError] = useState(false)
+const [uploadLimitError, setUploadLimitError] = useState(false)
+const [downloadLimitError, setDownloadLimitError] = useState(false)
+const [validityError, setValidityError]= useState(false)
+const [uploadBurstSpeedError, setUploadBurstSpeedError] = useState(false)
+const [downloadBurstSpeedError, setDownloadBurstSpeedError] = useState(false)
+const [validityPeriodUnitError, setUnitsError] = useState(false)
 
 
 const [search, setSearch] = useState('')
 const [searchchInput] = useDebounce(search, 1000)
-console.log('info from nas',formData)
 
 const handleRowClick = (event, rowData) => {
   setFormData(rowData);
@@ -136,7 +142,74 @@ const id = setTimeout(() => controller.abort(), 9000);
 
 const createPackage = async (e) => {
   e.preventDefault();
+
+ 
     try {
+      setNameError(false);
+      setPriceError(false);
+      setUploadLimitError(false);
+      setDownloadLimitError(false);
+      setValidityError(false);
+      setUploadBurstSpeedError(false)
+      setDownloadBurstSpeedError(false)
+      setUnitsError(false)
+     // Perform validations
+     let hasError = false;
+
+
+      if (formData.name === '') {
+        setNameError(true)
+        hasError = true;
+
+      }
+
+    
+    if (formData.upload_burst_limit === '') {
+      setUploadBurstSpeedError(true)
+      hasError = true
+    }
+
+
+    if (formData.download_burst_limit === '') {
+      setDownloadBurstSpeedError(true)
+      hasError = true
+    }
+    
+      if (formData.price === '') {
+        setPriceError(true)
+        hasError = true;
+
+      }
+    
+    
+    if (formData.validity_period_units) {
+     setUnitsError(true)
+    }
+
+
+      if (formData.upload_limit === '') {
+        setUploadLimitError(true)
+        hasError = true;
+
+      }
+    
+      if (formData.download_limit === '') {
+        setDownloadLimitError(true)
+        hasError = true;
+
+      }
+    
+    
+      if (formData.validity === '') {
+        setValidityError(true)
+        hasError = true;
+
+      }
+
+      if (hasError) {
+        return; 
+      }
+
       setloading(true);
       const url = formData.id ? `/api/update_package/${formData.id}` : '/api/create_package';
       const method = formData.id ? 'PATCH' : 'POST';
@@ -188,7 +261,7 @@ setTimeout(() => {
 
 
 
-const fetchPackages = useMemo(() => async ()=> {
+const fetchPackages = useCallback(() => async ()=> {
   setofflineerror(false)
 
 try {
@@ -360,6 +433,7 @@ const DeleteButton = ({ id }) => (
     <DeleteIcon />
   </IconButton>
 );
+
   const EditButton = ({rowData}) => (
     <IconButton  onClick={() => handleClickOpen(rowData)} style={{color: 'black'}} >
     <EditIcon />
@@ -398,7 +472,9 @@ const columns = [
 
     <div className='overflow-hidden'>
 
-      <EditPackage open={open} handleClose={handleClose} formData={formData}   isloading={loading} 
+      <EditPackage open={open} uploadBurstSpeedError={uploadBurstSpeedError} downloadBurstSpeedError={downloadBurstSpeedError}               handleClose={handleClose} formData={formData} validityError={validityError}
+       nameError={nameError}   uploadLimitError={uploadLimitError}    downloadLimitError={downloadLimitError}        
+          isloading={loading} priceError={priceError}  validityPeriodUnitError={validityPeriodUnitError}
         createPackage={createPackage}   offlineerror={offlineerror} 
        showNotification={showNotification}   setofflineerror={setofflineerror}  setFormData={setFormData} 
        tableData={tableData} routerName={routerName} setRouterName={setRouterName}/>

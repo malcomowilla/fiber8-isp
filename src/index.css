@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -66,6 +65,36 @@
   }
 }
  
+.nanum-gothic-coding-regular {
+  font-family: "Nanum Gothic Coding", monospace , sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+}
+
+/* 
+
+.edu-tas-beginner- {
+  font-family: "Edu TAS Beginner", cursive;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+} */
+.mogra-regular {
+  font-family: "Mogra", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.raleway-dots-regular {
+  font-optical-sizing: auto;
+  /* font-family: "Edu TAS Beginner", cursive; */
+
+  font-family: "Raleway Dots", sans-serif;
+  font-weight: 100px;
+  font-style: normal;
+  font-size: 40px;
+}
 @layer base {
   * {
     margin: 0;

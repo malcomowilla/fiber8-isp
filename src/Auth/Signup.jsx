@@ -13,14 +13,15 @@ import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
 import {useState} from 'react'
 import {Link} from 'react-router-dom'
-
+import SignupNotification from '../notification/SignupNotification'
 import Loader from '../loader/Loader'
 
 const Signup = () => {
   const [icon, setIcon] = useState()
 
 const {isSeen, setIsSeen,isPassword, setPassword, email, setEmail, passwordConfirmation, setPasswordConfirmation,
-   showErrors, handleSignUp, loading,handleThemeSwitch, setOfflineError, offlineError,username, setUsername
+   showErrors, handleSignUp, loading,handleThemeSwitch, setOfflineError,
+    offlineError,username, setUsername, signupNotification
 } = useContext(ApplicationContext);
    
 
@@ -28,13 +29,12 @@ const {isSeen, setIsSeen,isPassword, setPassword, email, setEmail, passwordConfi
   return (
     <>
 
-
 <div onClick={handleThemeSwitch} className='dark:text-white flex justify-center'>
-<ion-icon onClick={()=>setIcon(!icon)}  name={icon ? 'moon-outline' : 'sunny'} className='' size='small'></ion-icon>
+<ion-icon onClick={()=>setIcon(!icon)}  name={icon ? 'moon-outline' : 'sunny'} className='' size='large'></ion-icon>
 </div>
 
-<div className='text-center'>
-<p className='dark:text-white mt-8 font-bold text-2xl font-mono'>Welcome To <span className='text-red-700'>Fiber 8</span> </p>
+<div className='text-center dotted-font '>
+<p className='dark:text-white mt-8 font-bold text-2xl  '>Welcome To <span className='text-red-700'>Fiber 8</span> </p>
 
 
     </div>
@@ -61,18 +61,18 @@ const {isSeen, setIsSeen,isPassword, setPassword, email, setEmail, passwordConfi
 </div>
 
 
-    <main className='lg:grid grid-cols-2 '>
+    <main className=''>
 
-    <section className="bg-gray-100 dark:bg-gray-900">
-  <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 dark:bg-black">
+    <section className=" ">
+  <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 ">
       <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-          <img className="w-40 h-40 mr-2" src="/images/fiber8logo1.png" alt="logo"/>
+          <img className="w-40 h-40 mr-2 rounded-full" src="/images/fiber8logo1.png" alt="logo"/>
           
       </a>
       <div className="w-full p-6 bg-white rounded-lg shadow dark:border
        md:mt-0 sm:max-w-md dark:bg-gray-800 dark:border-gray-700 sm:p-8">
           <h2 className="mb-1 text-xl  leading-tight tracking-tight text-gray-900 md:text-2xl dotted-font  dark:text-white">
-          Sign-In to your account and start managing your  business 
+           Start managing your  network today!!
 
 
           </h2>
@@ -200,9 +200,7 @@ setPassword(e.target.value)
       </div>
   </div>
 </section>
-<div className='max-sm:hidden'>
-<img src="/images/fiber8logo1.png" alt="" />
-</div>
+
 
 </main>
 

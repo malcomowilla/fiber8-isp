@@ -30,7 +30,6 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import PackageNotification  from '.././notification/PackageNotification'
 
-import Button from '@mui/material/Button';
 
 import LoadingButton from '@mui/lab/LoadingButton';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
@@ -38,9 +37,13 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import { useDebounce } from 'use-debounce';
+import {Button} from '../components/ui/button'
+import { ReloadIcon } from "@radix-ui/react-icons"
 
-const EditPackage = ({open, handleClose, formData, loading, setFormData, showNotification
-  ,createPackage,offlineerror,isloading, 
+const EditPackage = ({open, handleClose, formData, loading, setFormData, showNotification, nameError, validityError,
+  uploadBurstSpeedError, downloadBurstSpeedError,
+  priceError, uploadLimitError, downloadLimitError,
+  createPackage,offlineerror,isloading, validityPeriodUnitError
    }) => {
 
 const [error, setError] = useState('')
@@ -154,7 +157,7 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
         aria-describedby="alert-dialog-description"
         fullScreen={fullScreen}
         fullWidth={true}
-        maxWidth={'xl'}
+        maxWidth={'lg'}
       >
         
         <DialogContent >
@@ -186,8 +189,7 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
 }
 },
          
-        }}   id='name'  className='myTextField' value={formData.name} onChange={(e)=> onChange(e) } 
-         error={!formData.name}    helperText={!formData.name ? 'required' : ''}
+        }}   id='name'  className='myTextField' error={nameError}     helperText={nameError ? 'required' : ''}    value={formData.name} onChange={(e)=> onChange(e) } 
              placeholder='enter name...' label='package-name' fullWidth   ></TextField>
 
             </Box>
@@ -213,7 +215,7 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
 }
 },
          
-        }}   value={formData.price} className='myTextField'    error={!formData.price}    helperText={!formData.price? 'required' : ''} id='price'
+        }}   value={formData.price} className='myTextField' error={priceError}     helperText={priceError? 'required' : ''} id='price'
             onChange={e =>onChange(e)  }  type='number' fullWidth></TextField>
 
             <TextField label='upload-speed-limit(mbps)' id='upload_limit'  sx={{
@@ -232,7 +234,7 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
 }
 },
          
-        }}   value={formData.upload_limit}    error={!formData.upload_limit}    helperText={!formData.upload_limit ? 'required' : ''}  className='myTextField' onChange={e =>onChange(e)} 
+        }}   value={formData.upload_limit}    error={uploadLimitError}    helperText={uploadLimitError ? 'required' : ''}  className='myTextField' onChange={e =>onChange(e)} 
             type='number' placeholder='upload-speed-limit(mbps)...' fullWidth></TextField>
             <TextField  label='download-speed-limit(mbps)'   id='download_limit'   sx={{
 
@@ -250,8 +252,8 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
 }
 },
          
-        }}   className='myTextField' value={formData.download_limit}     error={!formData.download_limit}  
-          helperText={!formData.download_limit ? 'required' : ''}  onChange={e =>onChange(e)} type='number' 
+        }}   className='myTextField' value={formData.download_limit}     error={downloadLimitError}  
+          helperText={downloadLimitError ? 'required' : ''}  onChange={e =>onChange(e)} type='number' 
       fullWidth></TextField>
             </div>
            
@@ -263,8 +265,9 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
       }}>
 
            <TextField  label='upload-burst-speed(mbps)' 
-           onChange={e =>onChange(e)}
-             value={formData.upload_burst_limit}    error={!formData.upload_burst_limit}    helperText={!formData.upload_burst_limit ? 'required' : ''}  sx={{
+           onChange={e => onChange(e)}
+             value={formData.upload_burst_limit}    error={uploadBurstSpeedError} 
+                helperText={uploadBurstSpeedError && 'required' }  sx={{
 
 '& label.Mui-focused': {
   color: 'black'
@@ -300,9 +303,12 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
          
         }}   label='download-burst-speed(mbps)'    onChange={e =>onChange(e)}
 
-         value={formData.download_burst_limit}     error={!formData.download_burst_limit}  
-           helperText={!formData.download_burst_limit ? 'required' : ''}   type='number' className='myTextField'  id='download_burst_limit'
+         value={formData.download_burst_limit}     error={downloadBurstSpeedError}  
+           helperText={downloadBurstSpeedError ? 'required' : ''}   type='number' className='myTextField'  id='download_burst_limit'
            fullWidth></TextField>
+
+
+           
             <TextField label='burst-period(s)'   sx={{
 
 '& label.Mui-focused': {
@@ -452,7 +458,7 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
 },
          
         }}    className='myTextField' value={formData.validity}   
-          error={!formData.validity}    helperText={!formData.validity ? 'required' : ''}   id='validity' 
+          error={validityError}    helperText={validityError ? 'required' : ''}   id='validity' 
         onChange={e =>onChange(e)}   placeholder='validity-period...' type='number' ></TextField>
 
 </Box>
@@ -485,7 +491,7 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
         <Select
           id="validity_period_units"
           label="Validity-period-units"
-          error={!formData.validity_period_units}    helperText={!formData.validity_period_units ? 'required' : ''}
+          error={validityPeriodUnitError}    helperText={validityPeriodUnitError ? 'required' : ''}
           value={formData.validity_period_units}
           onChange={e=> setFormData({...formData, validity_period_units: e.target.value})}
 
@@ -498,83 +504,10 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
 
 
 
-              <Autocomplete
-                      value={routers.find((router)=> router.name === mikrotik_router)|| null}
-
-  sx={{
-
-    '& label.Mui-focused': {
-      color: 'black',
-      fontSize:'16px'
-      },
-    '& .MuiOutlinedInput-root': {
-    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-      borderColor: "black",
-      borderWidth: '3px'
-      },
-    '&.Mui-focused fieldset':  {
-      borderColor: 'black', // Set border color to transparent when focused
-    
-    }
-    },
-             
-            }} fullWidth
-
-            
-                  getOptionLabel={(router) => router.name}
-
-        options={routers}
-        
-                renderInput={(params) => (
-                  <TextField
-                  id="router_name"
-                  getOptionValue={(option) => option.id}   // Function to extract the value from the option object
-
-                  className='myTextField'
-                    {...params}
-                    label="Select Router"
-                    error={!formData.router_name}
-                    helperText={!formData.router_name ? 'required' : ''}
-
-                   
-                  />
-                )}
-              
-                onChange={(event, newValue) => {
-                  console.log("Selected Router:", newValue);
-
-                  setFormData({...formData, router_name: newValue ? newValue.name : '' });
-                }}
-
-                renderOption={(props, routerName) => (
-                  <Stack
-                    direction='row'
-                    spacing={2}
-                    sx={{
-                      width: '100%',
-                      padding: 1,
-                      '&:hover': {
-                        backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                        display: 'flex',
-                        flexDirection: 'start'
-                      }
-                    }}
-                    {...props}
-                  >
-                   <img  className='w-[60px] h-[50px]' src="/images/icons8-router-80.png" alt="router" />
-                    <Stack direction='column'>
-                    <span>{routerName.name}</span>
-                    </Stack>
-                  
-                  </Stack>
-                  
-                )}
-              />
-              
            
             <DialogActions>
 
-<Button color='error'  startIcon={<CloseIcon/>}  variant='outlined' onClick={handleClose}  >Cancel</Button>
+<Button  className='dotted-font p-5'    variant='outlined' onClick={handleClose}  >Cancel</Button>
 
 
 {/* 
@@ -589,16 +522,13 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
 </Button>  */}
 
 
-<LoadingButton  loadingPosition= 'start' startIcon={<AutorenewIcon/>} type='submit' disabled={Object.values(formData  )?.includes("")}
- loading={isloading} color='success'
-    variant='outlined'   >
-
-
-  save
-</LoadingButton>
 
 
 
+<Button variant='outline'  type='submit' className='dotted-font p-5' >Save
+            <ReloadIcon className={`ml-2 h-4 w-4  ${isloading ? 'animate-spin' : 'hidden'}  `} />
+
+            </Button>
 
 </DialogActions>
             </form>

@@ -55,6 +55,8 @@ const SubscriberDetails = ({handleClose,
         console.log('package_name', )
       }, [package_name, router_name ]);
     
+
+      
 const capitalizeName = (name)=> {
   if (name.startsWith('')) {
     return name.toUpperCase()
@@ -582,7 +584,7 @@ direction={{
             className='myTextField'
             {...params}
             label="Select Package"
-            getOptionValue={(option) => option.id}   // Function to extract the value from the option object
+            getOptionValue={(option) => option.id}  
 
           />
         )}
@@ -643,7 +645,9 @@ direction={{
         
         }
         },  }} components={['DatePicker']}>
-        <DatePicker  className='myTextField' onChange={(date)=> handleChangeDate(date)}  value={date_registered}  label="Date Registered" />
+        <DatePicker  className='myTextField' onChange={(date)=> handleChangeDate(date)} 
+         value={date_registered}  label="Date Registered" />
+
       </DemoContainer>
                 </div>
 

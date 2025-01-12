@@ -20,7 +20,7 @@ export function AlertDestructive3() {
 {errorData.map ((error, index)=> {
 return  <p key={index}>{error}</p>
 })} */}
-<p> {errorData['email']}</p>
+<p className='text-red-600 text-lg font-mono'  > {errorData['email']}</p>
       </AlertDescription>
     </Alert>
 

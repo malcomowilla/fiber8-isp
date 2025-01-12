@@ -10,19 +10,27 @@ import Checkbox from '@mui/material/Checkbox';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-
+import Backdrop from '../backdrop/Backdrop'
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
 import AlertTitle from '@mui/material/AlertTitle';
+import Autocomplete from '@mui/material/Autocomplete';
+import { useDebounce } from 'use-debounce';
 
-import Button from '@mui/material/Button';
+import { Button } from "@/components/ui/button"
 
 import LoadingButton from '@mui/lab/LoadingButton';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import CloseIcon from '@mui/icons-material/Close';
-import {useState, useEffect,  useCallback, useMemo} from 'react'
+
+import {useState, useEffect,  useCallback, useMemo,
+  createContext, useContext
+} from 'react'
 import { useApplicationSettings } from './ApplicationSettings';
 import { makeStyles } from '@material-ui/core/styles';
+import SettingsNotification from '../notification/SettingsNotification'
+import toast, { Toaster } from 'react-hot-toast';
+
 
 
 const useStyles = makeStyles(theme => ({
@@ -34,24 +42,116 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const GeneralSettings = () => {
-  const { handleChange, settingsformData, isloading, setisloading, setFormData } = useApplicationSettings();
+
+
+const GeneralContext = createContext(null)
+
+
+const GeneralSettings = ({children}) => {
+  const { handleChange, settingsformData, isloading, setisloading, setFormData} = useApplicationSettings();
+  const [ routerName] = useDebounce( settingsformData.router_name, 1000)
 
 const [checkedData,  setCheckedData] = useState('')
-       
+const [open, setOpen] = useState(false);
+const [openNotifactionSettings, setOpenSettings] = useState(false)
+const [routers, setRouters]= useState ([])
+const [mikrotik_router, setRouter] = useState(null)
 console.log('checked data', checkedData)
 
 const classes = useStyles();
 
+// useEffect(() => {
+//   if (settingsformData.router_name) {
+//     setRouter(routers.find(router => router.name === settingsformData.router_name));
+//   }
+// }, [settingsformData.router_name, routers]);
+
+const fetchRouters = useMemo(() => async ()=> {
+  
+  try {
+    const response = await fetch('/api/routers',{
+  
+    }
+  
+  
+  )
+  
+    const newData = await response.json()
+  if (response.ok) {
+    console.log('router',newData)
+    setRouters(newData)
+
+  } else {
+    console.log('failed to fetch routers')
+
+  }
+  
+  } catch (error) {
+    
+    console.log(error)
+  
+  }
+  
+  
+  }, [])
+  
 
 
+
+  useEffect(() => {
+    
+    fetchRouters()
+  }, [ fetchRouters, routerName]);
+
+
+
+
+
+
+
+useEffect(() => {
+  setRouter(settingsformData.router_name)
+
+  console.log('package_name', )
+}, [ settingsformData.router_name ]);
+
+
+useEffect(() => {
+  const fetchRouters =  async() => {
+
+
+    try {
+      const response = await fetch('/api/router_settings')
+const newData = await response.json()
+      if (response) {
+        console.log('fetched router settings', newData)
+        const {router_name} = newData[0]
+        setFormData({...settingsformData, router_name})
+        setRouter(router_name)
+      } else {
+        toast.error('failed to fetch router settings', {
+          duration: 7000,
+          position: "top-center",
+        });
+      }
+    } catch (error) {
+      toast.error('failed to fetch router settings', {
+        duration: 7000,
+        position: "top-center",
+      });
+      
+    }
+  }
+  fetchRouters()
+}, []);
 
        const handleUpdateSettings = async(e)=> {
         e.preventDefault()
 
         try {
           setisloading(true)
-          const url =  '/api/update_general_settings' 
+          setOpen(true)
+          const url =  '/api/router_settings' 
          const method =   'POST' 
 
          const response = await fetch(url, {
@@ -73,24 +173,66 @@ const classes = useStyles();
 
         if (response.ok) {
           // const {prefix, minimum_digits, check_update_username, check_update_password } = newData[0]
+
+          
 const prefix = newData1.prefix
 const minimum_digits = newData1.minimum_digits
 const check_update_username = newData1.check_update_username
 const check_update_password  = newData1.check_update_password 
+const welcome_back_message = newData1.welcome_back_message
+const router_name = newData1.router_name
 // setCheckedData(newData1)
-          localStorage.setItem("checkedtrueData2", JSON.stringify({check_update_username,  check_update_password}))
-          setFormData({...settingsformData, prefix,  minimum_digits, check_update_username, check_update_password })
+          localStorage.setItem("checkedtrueData2", JSON.stringify({check_update_username,  check_update_password,
+            welcome_back_message, router_name
+          }))
+          setFormData({...settingsformData, prefix,  minimum_digits, router_name, check_update_username,
+             check_update_password,
+             welcome_back_message
+           })
+toast.success('settings updated successfully', {
+  position: "top-center",
+  duration: 7000,
+  
+})
           setisloading(false)
+          setOpen(false)
+          setOpenSettings(true)
+          setRouter(routers.find(router => router.name === settingsformData.router_name));
 
         } else {
+          setOpen(false)
+          toast.error('failed to update settings', {
+            position: "top-center",
+            duration: 7000,
+            
+          })
           console.log('not created')
           setisloading(false)
+          setOpenSettings(false)
         }
         } catch (error) {
+          toast.error(
+            'Failed to update settings something went wrong',
+            {
+              position: "top-center",
+              duration: 7000,
+              
+            }
+          )
           console.log(error)
           setisloading(false)
+          setOpenSettings(false)
         }
        }
+
+       const handleClose = () => {
+         setOpen(false);
+       };
+   
+       
+       const handleCloseNotifaction = () => {
+        setOpenSettings(false);
+      };
 
       //  useEffect(() => {
       //   const storedData = JSON.parse(localStorage.getItem("checkedtrueData1"));
@@ -107,53 +249,15 @@ const check_update_password  = newData1.check_update_password
 
 
 
-       const fetchSubscriberUpdatedSettings = useCallback(async () => {
-        const storedData = JSON.parse(localStorage.getItem("checkedtrueData2"));
-//         const check_password =  checkedData.check_update_password
-// const check_username = checkedData.check_update_username
-  const requestParams = {
-    check_update_password:storedData.check_update_password ,
-    check_update_username: storedData.check_update_username
-  };
-
-  try {
-    const response = await fetch(`/api/get_general_settings?${new URLSearchParams(requestParams)}`, {
-      method: 'GET',
-      headers: {
-        "Content-Type"  : 'application/json'
-      },
-
-     
-    })
-    const newData = await response.json()
-    if (response.ok) {
-
-      // const check_password =  checkedData.check_update_password
-      // const check_username = checkedData.check_update_username
-      // console.log('check username', check_username)
-      const {prefix, minimum_digits, check_update_password, check_update_username} = newData[0]
-      setFormData({...settingsformData, prefix,  minimum_digits, check_update_password, check_update_username})
-
-    } else {
-      console.log('failed to fetch')
-    }
-  } catch (error) {
-    console.log(error)
-
-  }
-}, []) 
-      
-
-
-
-       useEffect(() => {
-        
-        fetchSubscriberUpdatedSettings()
-       }, [fetchSubscriberUpdatedSettings, setFormData]);
-
   return (
 
     <>
+     {children}
+    <GeneralContext.Provider >
+    <Toaster />
+<Backdrop  handleClose={handleClose}  open={open}/>
+<SettingsNotification open={openNotifactionSettings} handleClose={ handleCloseNotifaction }/>
+<form onSubmit={handleUpdateSettings}>
 
    
      <Accordion  sx={{
@@ -210,11 +314,141 @@ type='number'
 
         </Box>
         <FormControlLabel  control={<Checkbox color="default"/>} label="Send Welcome Message After Registration(SMS)" />
-
+        <FormControlLabel  control={<Checkbox color="default"  onChange={handleChange} 
+        checked={settingsformData.welcome_back_message}/>}   name='welcome_back_message' label="Show Welcome Back Message After First Time Login" />
 
           </Typography>
+
+
+          <Button className='mt-7'  type='submit'>Update General Settings</Button>
+
         </AccordionDetails>
       </Accordion>
+</form>
+
+<form onSubmit={handleUpdateSettings}>
+
+<Accordion  sx={{
+            backgroundColor: 'transparent',
+          }}>
+        <AccordionSummary
+          expandIcon={<ArrowDownwardIcon />}
+          aria-controls="panel1-content"
+          id="panel1-header"
+         
+        >
+          <Typography>Router Management</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+
+          <Typography>
+          
+
+          <Autocomplete
+                      value={routers.find((router)=> router.name === settingsformData.router_name)|| null}
+
+  sx={{
+width:{
+  xs: '55%'
+},
+    '& label.Mui-focused': {
+      color: 'black',
+      fontSize:'16px'
+      },
+    '& .MuiOutlinedInput-root': {
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "black",
+      borderWidth: '3px'
+      },
+    '&.Mui-focused fieldset':  {
+      borderColor: 'black', // Set border color to transparent when focused
+    
+    }
+    },
+             
+            }} 
+
+            
+                  getOptionLabel={(router) => router.name}
+
+        options={routers}
+        
+                renderInput={(params) => (
+                  <TextField
+                  id="router_name"
+                  getOptionValue={(option) => option.id}   // Function to extract the value from the option object
+
+                  className='myTextField'
+                    {...params}
+                    label="Select Router"
+                 
+
+                   
+                  />
+                  
+                )}
+              
+                onChange={(event, newValue) => {
+                  console.log("Selected Router:", newValue);
+
+                  setFormData({...settingsformData, router_name: newValue ? newValue.name : '' });
+                }}
+
+                renderOption={(props, routerName) => (
+                  <Stack
+                    direction='row'
+                    spacing={2}
+                    sx={{
+                      width: '100%',
+                      padding: 1,
+                      '&:hover': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                        display: 'flex',
+                        flexDirection: 'start'
+                      }
+                    }}
+                    {...props}
+                  >
+                   <img  className='w-[60px] h-[50px]' src="/images/icons8-router-80.png" alt="router" />
+                    <Stack direction='column'>
+                    <span>{routerName.name}</span>
+                    </Stack>
+                  
+                  </Stack>
+                  
+                )}
+              />
+
+          </Typography>
+
+
+          <Button className='mt-7'  type='submit'>Update General Settings</Button>
+
+        </AccordionDetails>
+      </Accordion>
+
+      </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
       <form onSubmit={handleUpdateSettings}>
@@ -257,7 +491,7 @@ Show only the subscription packages to a particular area/zone. Feature is only a
             </span></p>} enterDelay={500} leaveDelay={200}>
  
           <Stack sx={{ width: 0 , display: 'flex', justifyContent: 'center'}} spacing={2}>
-      <Alert severity="info"></Alert>
+      <Alert sx={{background: 'transparent'}}  severity="info"></Alert>
      
     </Stack>
     </Tooltip>
@@ -287,7 +521,7 @@ Show only the subscription packages to a particular area/zone. Feature is only a
 to be automatically emailed</span></p>} enterDelay={500} leaveDelay={200}>
  
           <Stack sx={{ width: 0 , display: 'flex', justifyContent: 'center'}} spacing={2}>
-      <Alert severity="info"></Alert>
+      <Alert sx={{background: 'transparent'}} severity="info"></Alert>
      
     </Stack>
     </Tooltip>
@@ -461,17 +695,21 @@ xs: '30ch'
 
           <Stack direction='row'>
 
-            <LoadingButton type='submit'  loading={isloading} startIcon={<AutorenewIcon/>}
-             variant='outlined' color='primary'>Update Settings</LoadingButton>
+            <Button  className='mt-7'type='submit'  loading={isloading} startIcon={<AutorenewIcon/>}
+              >Update General Settings</Button>
           </Stack>
 
           </Typography>
         </AccordionDetails>
       </Accordion>
       </form>
+      </GeneralContext.Provider >
+     
       </>
    
   )
 }
 
 export default GeneralSettings
+export const useSettings = (()=> useContext(GeneralContext ))
+

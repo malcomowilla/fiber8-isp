@@ -99,7 +99,7 @@ setnasFormData({...nasformData, [e.target.id]: e.target.value})
                         borderWidth: '3px'
                         },
                 }
-            }} className='myTextField' id='password' type='password' value={password} label='Password'></TextField>
+            }} className='myTextField' id='password'  value={password} label='Password'></TextField>
 
           </Stack>
         
@@ -124,7 +124,7 @@ setnasFormData({...nasformData, [e.target.id]: e.target.value})
                         borderWidth: '3px'
                         },
                 }
-            }}className='myTextField' id='username' value={username} label='Userame'></TextField>
+            }}className='myTextField' id='username' value={username} label='Username'></TextField>
 
 
           </Box>

@@ -5,7 +5,7 @@ const AdminDashboard = () => {
    
    
    
-<div className='grid grid-auto-fit gap-y-5 gap-x-4 '>
+<div className='grid grid-auto-fit gap-y-5 gap-x-4 nanum-gothic-coding-regular '>
 <div className="w-full max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 
  dark:border-gray-700">
     <div className="flex items-center justify-between mb-4">

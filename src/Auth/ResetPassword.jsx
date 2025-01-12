@@ -12,7 +12,7 @@ import {Link} from 'react-router-dom'
 import Loader from '../loader/Loader'
 import {useState,useEffect} from 'react'
 import { ReloadIcon } from "@radix-ui/react-icons"
-
+import ResetNotification from '../notification/ResetNotification'
 
  function ResetPassword() {
 
@@ -21,11 +21,18 @@ import { ReloadIcon } from "@radix-ui/react-icons"
   const [loading, setloading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('');
-
+  const [open, setOpen] = useState(false);
+  const handleClose = () => {
+    setOpen(false);
+  };
 
 const formData = {
   email: email,
 }
+
+
+console.log('message:', message)
+
 
 const handleSignIn = async (e) => {
  
@@ -62,14 +69,25 @@ const handleSignIn = async (e) => {
     // const actualUserDataInJson = await users.json
     setEmail('')
     setloading(false)
-    setMessage(actualUserDataInJson.message );
+    setOpen(true)
+ setMessage(actualUserDataInJson.message );
 
-    console.log(actualUserDataInJson.message)
+ setError('');
+
+
+// setTimeout(() => {
+//   setMessage(actualUserDataInJson.message )
+// }, 15000);
+
   } else {
     setError(actualUserDataInJson.error);
+    setMessage('')
+    setOpen(true)
+
 
   }
 }
+
 
 
 
@@ -108,7 +126,8 @@ useEffect(() => {
 
     </div> */}
 <div className='text-center'>
-    <p className='text-red-800 mt-8 font-bold text-2xl'>Fiber 8 your isp of choice</p>
+    <p className='text-red-800 mt-8 font-bold text-2xl dotted-font '>Fiber 8 <span className='dark:text-white text-black'> 
+     your isp of choice</span></p>
     </div>
     
 
@@ -116,12 +135,12 @@ useEffect(() => {
  
 
 
-    <main className='lg:grid grid-cols-2'>
-
-    <section className="bg-gray-100 dark:bg-gray-900">
-  <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 bg-white">
+    <main className=''>
+    <ResetNotification handleClose={handleClose} open={open} message={message} error={error}/>
+    <section className=" ">
+  <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 ">
       <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-          <img className="w-40 h-40 mr-2" src="/images/fiber8logo1.png" alt="logo"/>
+          <img className="w-40 h-40 mr-2 rounded-full" src="/images/fiber8logo1.png"  alt="logo"/>
           
       </a>
 
@@ -130,8 +149,6 @@ useEffect(() => {
          
          
 
-          <p className="text-green-600 font-mono">{message}</p>
-           <div className="text-red-600 font-mono">{error}</div>
 
           <form className="mt-4 space-y-4 lg:mt-5 md:space-y-5"   onSubmit={handleSignIn }>
               <div className=' flex  flex-col  relative '>
@@ -139,12 +156,9 @@ useEffect(() => {
                 <label  className="  text-sm font-mono text-gray-900 dark:text-white ">Your email</label>
 
                 </div>
-                 <div className='self-end  absolute p-8'>
-                  <img src="/images/gmail.png" className=' ' alt="gmail" />
+                
 
-                  </div> 
-
-                  <input value={email}  type="email" name="email" id="email" onChange={(e)=> setEmail(e.target.value)}  
+                  <input value={email} required type="email" name="email" id="email" onChange={(e)=> setEmail(e.target.value)}  
                    className="bg-gray-50 border
                    border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
                     block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
@@ -175,9 +189,6 @@ useEffect(() => {
       </div>
   </div>
 </section>
-<div className='max-sm:hidden'>
-<img src="/images/fiber8logo1.png" alt="" />
-</div>
 
 </main>
     </>

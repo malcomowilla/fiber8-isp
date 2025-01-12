@@ -5,6 +5,8 @@ import {
   createRoutesFromElements,
   Route,
 } from "react-router-dom";
+
+
 // import {ResetPassword} from './Auth/ResetPassword'
 import {useState, useEffect, lazy, Suspense} from 'react'
 import {ApplicationContext} from './context/ApplicationContext'
@@ -32,6 +34,7 @@ import User from './user/User'
 import UserGroup from './user/UserGroup'
 import Nas from './NAS_IDENTIFIER/Nas'
 import Analytics from './analytics/Analytics'
+import Hotspotanalytics from './analytics/HotspotAnalytics'
 import Settings from './settings/Settings'
 import {DatePicker} from './date-picker/Date'
 import LocalizeDate from './date-picker/LocalizeDate'
@@ -40,6 +43,11 @@ import ProtectAuth from './Auth/ProtectAuth'
 import HotspotPayments from './payments/HotspotPayments'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import  ApplicationSettings from './settings/ApplicationSettings'
+import SignupNotification from './notification/SignupNotification'
+import GeneralSettings from './settings/GeneralSettings'
+import HotspotLogin from './hotspot_page/HotspotLogin'
+
+
 
 const ResetPassword = lazy(()=> import('./Auth/ResetPassword')
 ) 
@@ -56,12 +64,15 @@ const NotFound = lazy(()=> import('./404/NotFound')
 
 const Layout = lazy(()=>  import('./layout/Layout')
 )
+const HotspotPage = lazy(() => import('./hotspot_page/HotspotPage'))
 
 
 // const AdminDashboard = lazy(()=> import ('./admindashboard/AdminDashboard')
 // )
 const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
  )
+
+
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
 
@@ -85,6 +96,8 @@ const router = createBrowserRouter(
     <>
       <Route index path='/'  element={<Signup/>}/>
       <Route  path='/reset-password' element={<ResetPassword/>}/>
+      <Route  path='/hotspot-page' element={<HotspotPage/>}/>
+      <Route  path='/hotspot-login' element={<HotspotLogin/>}/>
 
 {/* 
 <Route path='/admin-dashboard' element={<PrivateRoutes>
@@ -118,6 +131,7 @@ const router = createBrowserRouter(
 <Route path='/admin/user' element={<User/>}/>
 <Route path='/admin/user-group' element={<UserGroup/>}/>
 <Route path='/admin/analytics' element={<Analytics/>}/>
+<Route path='/admin/hotspot_anlytics' element={<Hotspotanalytics/>}/>
 <Route path='/admin/settings' element={<Settings/>}/>
 <Route path='/admin/date' element={<DatePicker/>}></Route>
 <Route path='/admin/nas' element={<Nas/>}/>
@@ -152,6 +166,14 @@ const [offlineError, setOfflineError] = useState(false)
 const [open, setOpen] = useState(false)
 const [username, setUsername] = useState('')
 const [preferDarkMode, setPreferDarkMode] = useState(true)
+const [openSignupNotification, setOpenNotification] = useState(false);
+
+
+const handleClose = () => {
+  setOpenNotification(false);
+};
+
+
 
 
 const formData = {
@@ -160,6 +182,9 @@ const formData = {
     password: isPassword,
     username: username
 }
+
+
+
 const defaultMaterialTheme = createTheme({
   props: {
     MuiInputLabel: {
@@ -186,6 +211,8 @@ const defaultMaterialTheme = createTheme({
   },
 
 });
+const [materialuitheme, setMaterialuiTheme] = 
+useState(createTheme(defaultMaterialTheme));
 const [isExpanded, setIsExpanded] = useState(false)
 const [isExpanded1, setIsExpanded1] = useState(false)
 const [isExpanded2, setIsExpanded2] = useState(false)
@@ -212,11 +239,19 @@ const [isExpanded8, setIsExpanded8] = useState(false)
 // }
 
 useEffect(() => {
+  const theme = localStorage.getItem('theme') 
  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-  setTheme('dark')
- } else {
-  setTheme('light')
- }
+  if (theme === 'dark') {
+    setTheme('dark')
+    setMaterialuiTheme(darkTheme)
+  } else{
+    if (theme === 'light') {
+      setTheme('light')
+      setMaterialuiTheme(lightTheme)
+    }
+  }
+
+ } 
 }, []);
 
 
@@ -242,7 +277,9 @@ if (theme === 'dark') {
 
 
 const handleThemeSwitch = () => {
+  localStorage.setItem('theme', theme === 'dark' ? 'light' : 'dark');
   setTheme(theme === 'dark' ? 'light' : 'dark')
+  setMaterialuiTheme(theme === 'dark' ? lightTheme : darkTheme);
 }
 
 const handleLogout = async () => {
@@ -271,6 +308,7 @@ try {
   setShowErrors(false)
   setOfflineError(false)
   setloading(true)
+
 
   const users = await fetch('api/sign_up', {
     method: "POST",
@@ -304,14 +342,14 @@ try {
   }
   if (users.ok) {
     // const actualUserDataInJson = await users.json
-    setEmail('')
-    setPassword('')
-    setPasswordConfirmation('')
+  
     setShowErrors(false)
+    setOpenNotification(true);
+
     setloading(false)
     setOfflineError(false)
-    setUsername('')
-return redirect('/signin')
+
+// return redirect('/signin')
     // localStorage.setItem("jwt", actualUserDataInJson.jwt);
     // console.log(actualUserDataInJson)
 
@@ -319,11 +357,13 @@ return redirect('/signin')
     setErroraData(actualUserDataInJson.errors)
     setShowErrors(true)
     setloading(false)
+    setOpenNotification(false);
 
   }
 } catch (error) {
   console.log(error.name === 'AbortError');
   setloading(false);
+  setOpenNotification(false);
 
   setOfflineError(true)
   setOfflineError(true);
@@ -336,14 +376,87 @@ return redirect('/signin')
 }
 
 
+
+
+
+
+
+
+
+
+const lightTheme = createTheme({
+  palette: {
+    mode: 'light',
+  },
+  components: {
+    MuiTable: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'white',  // Background color for the entire DataGrid
+          color: 'black',  // Text color for the entire DataGrid
+        },
+        columnHeaders: {
+          backgroundColor: 'lightgray',  // Background color for the header
+          color: 'black',  // Text color for the header
+        },
+        cell: {
+          backgroundColor: 'white',  // Background color for the cells
+          color: 'black',  // Text color for the cells
+        },
+        footerContainer: {
+          backgroundColor: 'white',  // Background color for the footer
+          color: 'black',  // Text color for the footer
+        },
+      },
+    },
+  },
+});
+
+
+
+
+const darkTheme = createTheme({
+  palette: {
+      mode: 'dark',
+    },
+    components: {
+      MuiTable: {
+        styleOverrides: {
+          root: {
+            backgroundColor:'black',  // Background color for the entire DataGrid
+            color: 'white',  // Text color for the entire DataGrid
+          },
+          columnHeaders: {
+            backgroundColor: 'black',  // Background color for the header
+            color: 'white',  // Text color for the header
+          },
+          cell: {
+            backgroundColor: 'black',  // Background color for the cells
+            color: 'white',  // Text color for the cells
+          },
+          footerContainer: {
+            backgroundColor: 'white',  // Background color for the footer
+            color: 'white',  // Text color for the footer
+          },
+        },
+      },
+    },
+ 
+});
+
+
+
+
   return (
     <main>
-
-          <ThemeProvider theme={ defaultMaterialTheme}>
+<SignupNotification  openSignupNotification={ openSignupNotification} handleClose={handleClose} />
+          <ThemeProvider theme={materialuitheme}>
 
       <Suspense fallback={<div className='flex justify-center items-center '>{ <UiLoader/> }</div>}>
       < LocalizeDate  >
       <CableProvider>
+        
+        
       <ApplicationSettings>
  <ApplicationContext.Provider value={{isSeen, setIsSeen,isPassword, setPassword,
    email, setEmail, passwordConfirmation, setPasswordConfirmation, errorData, showErrors, handleSignUp, loading,
@@ -351,12 +464,16 @@ return redirect('/signin')
    isExpanded3, setIsExpanded3, isExpanded4, setIsExpanded4, isExpanded5, setIsExpanded5, seeSidebar, setSeeSideBar,
    logout,handleLogout , user, setCurrentUser, theme, setTheme,  handleThemeSwitch
    , setOfflineError, offlineError, open, setOpen, username, setUsername, setPreferDarkMode , preferDarkMode,
-   isExpanded6, setIsExpanded6, isExpanded7, setIsExpanded7, isExpanded8, setIsExpanded8, client}}>
+   isExpanded6, setIsExpanded6, isExpanded7, setIsExpanded7, isExpanded8, setIsExpanded8, client,
+   materialuitheme, setMaterialuiTheme
+    }}>
 
-
+{/* <GeneralSettings> */}
 <RouterProvider router={router} />
+{/* </GeneralSettings> */}
 </ApplicationContext.Provider>
 </ ApplicationSettings>
+
       </CableProvider>
 </ LocalizeDate  >
 </Suspense>

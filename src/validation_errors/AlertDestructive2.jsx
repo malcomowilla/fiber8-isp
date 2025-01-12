@@ -17,7 +17,7 @@ export function AlertDestructive2() {
       <AlertDescription>
         
      
-<p> {errorData['password_confirmation']}</p>
+<p className='text-red-600 text-lg font-mono'> {errorData['password_confirmation']}</p>
 
       </AlertDescription>
     </Alert>

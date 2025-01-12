@@ -85,7 +85,8 @@ const columns = [
     <div className=''>
                     
 <div className='text-end '>
-  <input type="search"  className='bg-transparent border-y-[-2]    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
+  <input type="search"  className='bg-transparent border-y-[-2]    dark:focus:border-gray-400
+   focus:border-black focus:border-[3px] focus:shadow 
    focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search......'/>
 </div>
       <MaterialTable columns={columns}

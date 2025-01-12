@@ -76,9 +76,9 @@ console.log(user)
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
 
-        <ion-icon name="people-outline" size='small'></ion-icon>
+        <ion-icon name="people-outline" size='large'></ion-icon>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56">
+        <DropdownMenuContent className="w-64 mr-20">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
