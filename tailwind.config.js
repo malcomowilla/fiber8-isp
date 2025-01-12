@@ -1,4 +1,8 @@
 /** @type {import('tailwindcss').Config} */
+import tailwindcssAnimate from 'tailwindcss-animate';
+import flowbitePlugin from 'flowbite/plugin';
+import tailwindGridAutoFit from '@shrutibalasa/tailwind-grid-auto-fit';
+
 export default {
   darkMode: ["class"],
   content: [
@@ -78,12 +82,17 @@ export default {
       },
     },
   },
+  // plugins: [
+  //   require("tailwindcss-animate"),
+  //   require('flowbite/plugin'),
+  //   require('@shrutibalasa/tailwind-grid-auto-fit'),
+
+  // ],
+
+
   plugins: [
-    require("tailwindcss-animate"),
-    require('flowbite/plugin'),
-    require('@shrutibalasa/tailwind-grid-auto-fit'),
-
-
-
+    tailwindcssAnimate,
+    flowbitePlugin,
+    tailwindGridAutoFit,
   ],
 }
