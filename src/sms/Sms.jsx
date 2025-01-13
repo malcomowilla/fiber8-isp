@@ -6,12 +6,15 @@ import { IconButton } from '@mui/material';
 // import {useState} from 'react'
 // import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
-import  EditPayment from '../edit/EditPayment'
+// import  EditPayment from '../edit/EditPayment'
+const EditPayment = lazy(() => import('../edit/EditPayment'))
 
-import {Link} from 'react-router-dom'
-import {useState} from 'react'
-import { useContext} from 'react'
-import {ApplicationContext} from '../context/ApplicationContext'
+// import {Link} from 'react-router-dom'
+import {useState, lazy, Suspense} from 'react'
+import UiLoader from '../uiloader/UiLoader'
+
+// import { useContext} from 'react'
+// import {ApplicationContext} from '../context/ApplicationContext'
 
 
 import MaterialTable from 'material-table'
@@ -86,6 +89,8 @@ const columns = [
 
 
   return (
+    <Suspense fallback={<div className='flex justify-center items-center '>{ <UiLoader/> }</div>}>
+
     <div className=''>
 
       <MaterialTable columns={columns}
@@ -135,6 +140,8 @@ headerStyle:{
       />
 
     </div>
+    
+    </Suspense>
   )
 }
 

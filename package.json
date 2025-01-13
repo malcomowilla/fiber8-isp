@@ -12,6 +12,8 @@
     "@custom-react-hooks/all": "^1.4.19",
     "@custom-react-hooks/use-media-query": "^1.4.19",
     "@date-io/dayjs": "^3.0.0",
+    "@dicebear/collection": "^9.2.2",
+    "@dicebear/core": "^9.2.2",
     "@emotion/react": "^11.11.4",
     "@hookform/resolvers": "^3.3.4",
     "@material-ui/core": "^4.12.4",

@@ -1,4 +1,4 @@
-import {Link} from 'react-router-dom'
+// import {Link} from 'react-router-dom'
 import {Button} from '../components/ui/button'
 import {useNavigate} from 'react-router-dom'
 import NotFoundAnimation from '../loader/not_found_animation.json'
@@ -24,21 +24,27 @@ const defaultOptions = {
   const navigate = useNavigate()
   return (
     <>
-    <div className='text-center 
+<div className='flex flex-col items-center justify-center min-h-screen'>
+    <div className=' 
     text-red text-6xl 
-    font-light text-blue-700 tracking-wider mt-[300px]'>
+    font-light text-blue-700 tracking-wider  animate-bounce'>
+
        PAGE NOT FOUND
       
         </div>
-<div className='flex items-center justify-center mt-10'>
+        
+<div className='flex flex-col'>
+
+<Lottie className='' options={defaultOptions} height={400} width={400} />
+
 <Button onClick ={()=> navigate(-1)}>Go Back
 </Button>
-
 </div>
-
-<Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
+</div>
 </>
   )
 }
 
 export default NotFound
+
+

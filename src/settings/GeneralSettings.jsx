@@ -19,17 +19,19 @@ import { useDebounce } from 'use-debounce';
 
 import { Button } from "@/components/ui/button"
 
-import LoadingButton from '@mui/lab/LoadingButton';
+// import LoadingButton from '@mui/lab/LoadingButton';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
-import CloseIcon from '@mui/icons-material/Close';
+// import CloseIcon from '@mui/icons-material/Close';
 
 import {useState, useEffect,  useCallback, useMemo,
-  createContext, useContext
+  createContext, useContext,Suspense, lazy
 } from 'react'
 import { useApplicationSettings } from './ApplicationSettings';
 import { makeStyles } from '@material-ui/core/styles';
-import SettingsNotification from '../notification/SettingsNotification'
+const SettingsNotification = lazy(() => import('../notification/SettingsNotification'))
+
 import toast, { Toaster } from 'react-hot-toast';
+import UiLoader from '../uiloader/UiLoader'
 
 
 
@@ -252,7 +254,8 @@ toast.success('settings updated successfully', {
   return (
 
     <>
-     {children}
+     {/* {children} */}
+     <Suspense fallback={<div className='flex justify-center items-center '>{ <UiLoader/> }</div>}>
     <GeneralContext.Provider >
     <Toaster />
 <Backdrop  handleClose={handleClose}  open={open}/>
@@ -704,6 +707,7 @@ xs: '30ch'
       </Accordion>
       </form>
       </GeneralContext.Provider >
+      </Suspense >
      
       </>
    

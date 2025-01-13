@@ -5,7 +5,7 @@ import Header from '../header/Header'
 import { useContext, useState, useEffect} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 import { Button } from "@/components/ui/button"
-import { ReloadIcon } from "@radix-ui/react-icons"
+// import { ReloadIcon } from "@radix-ui/react-icons"
 
 
 
@@ -48,15 +48,16 @@ const [loading, setloading] = useState(false)
 </Button>}
 
 
+<div>
+<Outlet/>
+
+</div>
 
 <div className='flex flex-col p-4 font-mono  '>
 <Sidebar/>
 </div>
 
   
-      <div className=''>
-<Outlet/>
-      </div>
       </div>
       </div>
       </>

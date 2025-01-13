@@ -83,9 +83,13 @@ console.log(user)
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem>
+              
               <User className="mr-2 h-4 w-4" />
+              <Link to='/admin/profile'>
               <span>Profile</span>
+              </Link>
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+             
             </DropdownMenuItem>
             
             <DropdownMenuItem>

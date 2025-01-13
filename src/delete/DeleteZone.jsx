@@ -5,10 +5,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 
-import TextField from '@mui/material/TextField';
+// import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
-import LoadingButton from '@mui/lab/LoadingButton';
-import AutorenewIcon from '@mui/icons-material/Autorenew';
+// import LoadingButton from '@mui/lab/LoadingButton';
+// import AutorenewIcon from '@mui/icons-material/Autorenew';
 import CloseIcon from '@mui/icons-material/Close';
 export default function MaxWidthDialog({ handleCloseDelete, openDelete, deleteZone, id}) {
   const [fullWidth, setFullWidth] = React.useState(true);

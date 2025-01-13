@@ -13,8 +13,8 @@ import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
 import {useState} from 'react'
 import {Link} from 'react-router-dom'
-import SignupNotification from '../notification/SignupNotification'
-import Loader from '../loader/Loader'
+// import SignupNotification from '../notification/SignupNotification'
+// import Loader from '../loader/Loader'
 
 const Signup = () => {
   const [icon, setIcon] = useState()

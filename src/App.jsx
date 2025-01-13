@@ -8,9 +8,10 @@ import {
 
 
 // import {ResetPassword} from './Auth/ResetPassword'
+import UiLoader from './uiloader/UiLoader'
+
 import {useState, useEffect, lazy, Suspense} from 'react'
 import {ApplicationContext} from './context/ApplicationContext'
-import UiLoader from './uiloader/UiLoader'
 // import Signup from './Auth/Signup'
 // import NotFound from './404/NotFound'
 // import {InputOTPWithSeparator} from './Auth/InputOTPWithSeparator'
@@ -27,6 +28,7 @@ import { redirect } from "react-router-dom";
 const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages'))
 //  import HotspotPackage from './packages/HotspotPackage'
 const HotspotPackage = lazy(()=> import('./packages/HotspotPackage'))
+const AdminProfile = lazy(() => import('./profile/AdminProfile.jsx'))
  
 //  import HotspotSubscriptions from './subscriptions/HotspotSubscriptions'
 
@@ -134,7 +136,7 @@ const router = createBrowserRouter(
   <AdminDashboard/>
 </PrivateRoutes>}>
 </Route> */}
-
+<Route element={<ProtectAuth />}>
 {/* <ProtectAuth> <Layout/> </ProtectAuth> */}
 <Route  path='/admin'  element={ 
       <Layout/> 
@@ -147,6 +149,7 @@ const router = createBrowserRouter(
 }/>
 <Route/>
 <Route path='/admin/side-bar' element={<Sidebar/>}/> 
+<Route path='/admin/profile' element={<AdminProfile/>}/>
 <Route path='/admin/pppoe-packages' element={< PPPOEpackages/>}/>
 <Route path='/admin/pppoe-subscribers' element={< PPPOEsubscribers/>}/>
 <Route path='/admin/fixed-payments' element={<FixedPayments/>}/>
@@ -167,7 +170,7 @@ const router = createBrowserRouter(
 <Route path='/admin/nas' element={<Nas/>}/>
 </Route>
 
-
+</Route >
 
       <Route  path='/signin' element={<InputOTPWithSeparator/>}/>
       

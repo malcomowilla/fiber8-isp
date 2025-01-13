@@ -1,13 +1,13 @@
-import React from 'react'
+// import React from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 import { FaWifi, FaLock, FaCheckCircle } from 'react-icons/fa'
-import { FaPhone } from "react-icons/fa6";
-import toast, { Toaster } from 'react-hot-toast';
-import { useEffect, useState } from 'react';
+// import { FaPhone } from "react-icons/fa6";
+// import toast, { Toaster } from 'react-hot-toast';
+// import { useEffect, useState } from 'react';
 import { TiArrowBackOutline } from "react-icons/ti";
-import { SlNotebook } from "react-icons/sl";
-import { HiMiniArrowLeftEndOnRectangle } from "react-icons/hi2";
+// import { SlNotebook } from "react-icons/sl";
+// import { HiMiniArrowLeftEndOnRectangle } from "react-icons/hi2";
 import { useNavigate } from 'react-router-dom';
 import { FaPerson } from "react-icons/fa6";
 import { FaKey } from "react-icons/fa";
@@ -55,6 +55,7 @@ const navigate = useNavigate()
  initial="hidden"
  animate="visible"
 >
+    
  <div className="text-center mb-6">
    <FaWifi className="text-orange-500 w-12 h-12 mx-auto mb-4" />
    <h1 className="text-3xl  text-gray-900  dotted-font font-thin">Welcome to Fiber8 Hotspot</h1>

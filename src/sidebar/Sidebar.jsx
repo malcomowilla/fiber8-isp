@@ -4,11 +4,11 @@ import {ApplicationContext} from '../context/ApplicationContext'
 
 import {Link} from  'react-router-dom'
 import WifiIcon from '@mui/icons-material/Wifi';
-import RssFeedIcon from '@mui/icons-material/RssFeed';
+// import RssFeedIcon from '@mui/icons-material/RssFeed';
 import RouterIcon from '@mui/icons-material/Router';
 import SensorsIcon from '@mui/icons-material/Sensors';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+// import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import CellTowerIcon from '@mui/icons-material/CellTower';
@@ -17,7 +17,7 @@ import MessageIcon from '@mui/icons-material/Message';
 import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
 import PaymentIcon from '@mui/icons-material/Payment';
 import ReceiptIcon from '@mui/icons-material/Receipt';
-import MoneyOffIcon from '@mui/icons-material/MoneyOff';
+// import MoneyOffIcon from '@mui/icons-material/MoneyOff';
 import WavesIcon from '@mui/icons-material/Waves';
 import Groups2Icon from '@mui/icons-material/Groups2';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
@@ -34,7 +34,7 @@ const Sidebar = () => {
 const {isExpanded, setIsExpanded, isExpanded1, setIsExpanded1 , isExpanded2, setIsExpanded2,
   
   isExpanded3, setIsExpanded3, isExpanded4, setIsExpanded4, isExpanded5, setIsExpanded5, seeSidebar, 
-  setSeeSideBar, isExpanded6, setIsExpanded6, isExpanded7, setIsExpanded7,isExpanded8, setIsExpanded8 
+  setSeeSideBar, isExpanded6, setIsExpanded6, isExpanded7, setIsExpanded7,
 
 
 } = useContext(ApplicationContext);
@@ -67,9 +67,9 @@ const {isExpanded, setIsExpanded, isExpanded1, setIsExpanded1 , isExpanded2, set
 
 
          <button   onClick={()=> setIsExpanded5(!isExpanded5)} type="button" className="flex 
-         flex-row mt-[50px]  hover:bg-black dark:bg-white dark:hover:text-black
+         flex-row mt-[50px]  hover:bg-black transition-colors dark:bg-white dark:hover:text-black
           items-center w-full p-2 text-base  
-             text-white transition duration-700  rounded-lg group hover:
+             text-white  duration-700  rounded-lg group hover:
               dark:text-black " aria-controls="dropdown-example"
                data-collapse-toggle="dropdown-example">
                      <BarChartIcon/>
@@ -83,7 +83,7 @@ const {isExpanded, setIsExpanded, isExpanded1, setIsExpanded1 , isExpanded2, set
             </button>
 
 
-         <ul id="dropdown-example" className={` transition-all  duration-700 ease-in-out   py-1 space-y-1
+         <ul id="dropdown-example" className={` transition-colors  duration-700 ease-in-out   py-1 space-y-1
             
             
             ${isExpanded5 ? 'max-h-[200px] opacity-[1]  overflow-hidden' : 'max-h-2     overflow-hidden '}
@@ -129,7 +129,7 @@ const {isExpanded, setIsExpanded, isExpanded1, setIsExpanded1 , isExpanded2, set
 
             <button   onClick={()=> setIsExpanded(!isExpanded)} type="button" className="flex items-center w-full p-2 
             text-base  dark:hover:bg-white dark:hover:text-black hover:bg-black
-                        
+                  transition-colors duration-700      
               rounded-lg group 
               dark:text-white  text-white" aria-controls="dropdown-example"
                data-collapse-toggle="dropdown-example">
@@ -198,7 +198,8 @@ const {isExpanded, setIsExpanded, isExpanded1, setIsExpanded1 , isExpanded2, set
 
 
 
-         <button   onClick={()=> setIsExpanded4(!isExpanded4)} type="button" className="flex items-center w-full p-2 text-base
+         <button   onClick={()=> setIsExpanded4(!isExpanded4)} type="button" className="flex items-center w-full p-2
+          text-base transition-colors duration-700
              text-white  rounded-lg group dark:hover:bg-white dark:hover:text-black hover:bg-black
               dark:text-white " aria-controls="dropdown-example"
                data-collapse-toggle="dropdown-example">

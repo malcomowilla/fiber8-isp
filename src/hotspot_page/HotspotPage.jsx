@@ -1,4 +1,4 @@
-import React from 'react'
+// import React from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { FaWifi, FaLock, FaCheckCircle } from 'react-icons/fa'
@@ -82,8 +82,12 @@ useEffect(() => {
 
   
   return (
+
+    <>
+    <Toaster/>
     <div className="min-h-screen   relative  z-0 flex items-center justify-center
-     bg-gradient-to-r from-blue-500 to-indigo-600 p-4">
+     bg-gradient-to-r from-blue-500 to-indigo-600 p-4 
+     transition-colors duration-300 ">
 
 
 
@@ -206,6 +210,8 @@ useEffect(() => {
 
 
         {/* Packages Section */}
+
+{/*         
 {seePackages  ? (
   <motion.div className="max-w-md w-full mx-auto text-center">
   <h2 className="text-2xl  text-white mb-4 dotted-font font-thin">Choose Your Plan</h2>
@@ -240,12 +246,44 @@ useEffect(() => {
 
  
 </motion.div>
-) : null}
+) : null} */}
       
 
+      {seePackages && (
+  <motion.div className="max-w-md w-full mx-auto text-center mt-[320px]">
+    <h2 className="text-2xl text-white mb-4 dotted-font font-thin">Choose Your Plan</h2>
+    <div className="h-96 overflow-y-auto grid grid-cols-1 gap-6">
+      {packages.map((pkg, index) => (
+        <motion.div
+          key={index}
+          className="bg-white p-4 rounded-lg shadow-lg"
+          variants={packageVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <h3 className="text-xl font-bold text-gray-900">{pkg.name}</h3>
+          {/* <p className="text-gray-600">Speed: {pkg?.speed}</p> */}
+          <p className="text-gray-600">Valid For {pkg.valid}</p>
+          <p className="text-blue-500 font-bold mt-2"> Price: Ksh{pkg.price}</p>
+          <button
+            onClick={() => {
+              setSeePackages(false);
+              setSeeForm(true);
+              setSeeInstructions(false);
+            }}
+            className="p-2 bg-blue-500 mt-2 rounded-md cursor-pointer dotted-font font-thin"
+          >
+            Subscribe
+          </button>
+        </motion.div>
+      ))}
+    </div>
+  </motion.div>
+)}
 
 
     </div>
+    </>
   );
 };
 

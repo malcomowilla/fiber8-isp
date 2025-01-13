@@ -28,6 +28,9 @@ const ApplicationSettings = ({children}) => {
 const [welcome, setWelcome] = useState(false)
       const [settingsformData, setFormData]= useState(initialValue)
       const [tableDataNas, setTableData] = useState([])
+      const [currentUser, setCurrentUser] = useState('')
+      const [currentEmail, setCurentEmail] = useState('')
+      const [currentUsername, setCurrentUsername] = useState('')
 
       // const [settingsformData, setFormData] = useState(() => {
       //   const storedFormData =   localStorage.setItem("checkedtrueData", JSON.stringify(initialValue.check_update_password));
@@ -90,6 +93,57 @@ console.log(error)
 }, []) 
 
 
+
+const fetchCurrentUser = useCallback(
+  async() => {
+    try {
+      const response = await fetch('/api/currently_logged_in_user')
+      const newData = await response.json()
+      if (response) {
+        console.log('fetched current user', newData)
+        const {username, email, id, created_at, updated_at} = newData
+        setCurrentUser(email)
+        setCurrentUsername(username)
+        setCurentEmail(email)
+        console.log('current user', newData)
+      }
+    } catch (error) {
+      
+    }
+  },
+  [],
+)
+
+
+
+useEffect(() => {
+  fetchCurrentUser()
+}, [fetchCurrentUser]);
+
+
+// useEffect(() => {
+  
+//  const fetchCurrentUser = async() => {
+//   try {
+//     const response = await fetch('/api/currently_logged_in_user')
+//     const newData = await response.json()
+//     if (response) {
+//       console.log('fetched current user', newData)
+//       const {username, email, id, created_at, updated_at} = newData
+//       setCurrentUser(email)
+//       setCurrentUsername(username)
+//       setCurentEmail(email)
+//       console.log('current user', newData)
+//     }
+//   } catch (error) {
+    
+//   }
+//  }
+//  fetchCurrentUser()
+// }, []);
+
+
+
 useEffect(() => {
   const fetchRouters =  async() => {
 
@@ -112,6 +166,16 @@ const newData = await response.json()
 }, []);
 
 
+
+
+
+
+
+
+
+
+
+
  useEffect(() => {
   
   fetchSubscriberUpdatedSettings()
@@ -124,9 +188,29 @@ const handleChange = (e) => {
     [name]: type === "checkbox" ? checked : value,
   }));
 };
+
+
+// const fetchCurrentUser = async() => {
+//   try {
+//     const response = await fetch('/api/currently_logged_in_user')
+//     const newData = await response.json()
+//     if (response) {
+//       console.log('fetched current user', newData)
+//       const {username, email} = newData
+//       setCurrentUser(newData)
+//       setCurrentUsername(username)
+//       setCurentEmail(email)
+//       console.log('current user', newData)
+//     }
+//   } catch (error) {
+    
+//   }
+//  }
   return (
     <GeneralSettingsContext.Provider  value={{settingsformData, handleChange, setFormData, isloading, setisloading,
-     nasformData, setnasFormData,initialValueNas, welcomeMessage, setWelcomeMessage, welcome, setWelcome, tableDataNas, setTableData}}  >
+     nasformData, setnasFormData,initialValueNas, welcomeMessage, setWelcomeMessage, welcome, 
+     setWelcome, tableDataNas, setTableData,currentUser, setCurrentUser,
+     currentUsername, currentEmail, fetchCurrentUser}}  >
     {children}
    </GeneralSettingsContext.Provider>
   )

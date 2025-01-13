@@ -1,8 +1,16 @@
-import {useState, useTransition} from 'react'
-import GeneralSettings from './GeneralSettings'
-import MpesaSettings from './MpesaSettings'
+import {useState, useTransition, lazy, Suspense} from 'react'
+
+
+// import GeneralSettings from './GeneralSettings'
+
+const GeneralSettings = lazy(() => import('./GeneralSettings'))
+// import MpesaSettings from './MpesaSettings'
+const MpesaSettings = lazy(() => import('./MpesaSettings'))
 import EmailSettings from './EmailSettings'
-import SmsSettings from './SmsSettings'
+// import SmsSettings from './SmsSettings'
+const SmsSettings = lazy(() => import('./SmsSettings'))
+
+import UiLoader from '../uiloader/UiLoader'
 
 const Settings = () => {
     const [selectedTab, setSelectedTab] = useState('GENERAL')
@@ -15,6 +23,7 @@ const Settings = () => {
       })
     }
   return (
+    <Suspense fallback={<div className='flex justify-center items-center '>{ <UiLoader/> }</div>}>
     <div className= ' w-full h-screen'>
 
         <div className='flex sm:flex-row  text-white bg-black h-20 border p-2 overflow-x-scroll font-mono gap-x-20 cursor-pointer '>
@@ -56,6 +65,7 @@ const Settings = () => {
 
 
     </div>
+    </Suspense>
   )
 }
 
