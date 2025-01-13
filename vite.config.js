@@ -6,8 +6,8 @@ import path from "path"
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: '0.0.0.0',
-    port: 3000,
+    // host: '0.0.0.0',
+    // port: 3000,
     // proxy: {
     //   '/api': {
     //     target: 'http://localhost:4000',
@@ -38,6 +38,25 @@ export default defineConfig({
       },
     },
   },
+
+
+
+  build: {
+    outDir: 'dist', // This is the build output directory
+    assetsDir: 'assets', // Directory for assets inside outDir
+    emptyOutDir: true, // Empty the output directory before building
+    commonjsOptions: {
+      include: [/node_modules/],
+      transformMixedEsModules: true
+    }
+  },
+  optimizeDeps: {
+    include: ['react-lottie'],
+    esbuildOptions: {
+      target: 'es2020'
+    }
+  },
+  base: './',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
