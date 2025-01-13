@@ -123,64 +123,64 @@ const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
 // const HotspotPayments = lazy(()=> import('./payments/HotspotPayments')
 // )
 
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <>
-      <Route index path='/'  element={<Signup/>}/>
-      <Route  path='/reset-password' element={<ResetPassword/>}/>
-      <Route  path='/hotspot-page' element={<HotspotPage/>}/>
-      <Route  path='/hotspot-login' element={<HotspotLogin/>}/>
+// const router = createBrowserRouter(
+//   createRoutesFromElements(
+//     <>
+//       <Route index path='/'  element={<Signup/>}/>
+//       <Route  path='/reset-password' element={<ResetPassword/>}/>
+//       <Route  path='/hotspot-page' element={<HotspotPage/>}/>
+//       <Route  path='/hotspot-login' element={<HotspotLogin/>}/>
 
-{/* 
-<Route path='/admin-dashboard' element={<PrivateRoutes>
-  <AdminDashboard/>
-</PrivateRoutes>}>
-</Route> */}
-<Route element={<ProtectAuth />}>
-{/* <ProtectAuth> <Layout/> </ProtectAuth> */}
-<Route  path='/admin'  element={ 
-      <Layout/> 
-}>
+// {/* 
+// <Route path='/admin-dashboard' element={<PrivateRoutes>
+//   <AdminDashboard/>
+// </PrivateRoutes>}>
+// </Route> */}
+// <Route element={<ProtectAuth />}>
+// {/* <ProtectAuth> <Layout/> </ProtectAuth> */}
+// <Route  path='/admin'  element={ 
+//       <Layout/> 
+// }>
 
   
-<Route path='/admin/date' element={<DatePicker/>}/>
-<Route 
- path='/admin/admin-dashboard' element={  <AdminDashboard/>
-}/>
-<Route/>
-<Route path='/admin/side-bar' element={<Sidebar/>}/> 
-<Route path='/admin/profile' element={<AdminProfile/>}/>
-<Route path='/admin/pppoe-packages' element={< PPPOEpackages/>}/>
-<Route path='/admin/pppoe-subscribers' element={< PPPOEsubscribers/>}/>
-<Route path='/admin/fixed-payments' element={<FixedPayments/>}/>
-<Route path='/admin/edit-package' element={<EditPackage/>}/>
-<Route path='/admin/pppoe-subscriptions' element={<PPPOEsubscriptions/>}/>
-<Route path='/admin/hotspot-payments' element={<HotspotPayments/>}/>
-<Route  path='/admin/hotspot-package' element={<HotspotPackage/>}/>
-<Route  path='/admin/hotspot-subscriptions' element={<HotspotSubscriptions/>}/>
-<Route path='/admin/sms' element={<Sms/>}/>
-<Route path='/admin/zones' element={<Zones/>}/>
-<Route path='/admin/nodes' element={<Nodes/>}/>
-<Route path='/admin/user' element={<User/>}/>
-<Route path='/admin/user-group' element={<UserGroup/>}/>
-<Route path='/admin/analytics' element={<Analytics/>}/>
-<Route path='/admin/hotspot_anlytics' element={<Hotspotanalytics/>}/>
-<Route path='/admin/settings' element={<Settings/>}/>
-<Route path='/admin/date' element={<DatePicker/>}></Route>
-<Route path='/admin/nas' element={<Nas/>}/>
-</Route>
+// <Route path='/admin/date' element={<DatePicker/>}/>
+// <Route 
+//  path='/admin/admin-dashboard' element={  <AdminDashboard/>
+// }/>
+// <Route/>
+// <Route path='/admin/side-bar' element={<Sidebar/>}/> 
+// <Route path='/admin/profile' element={<AdminProfile/>}/>
+// <Route path='/admin/pppoe-packages' element={< PPPOEpackages/>}/>
+// <Route path='/admin/pppoe-subscribers' element={< PPPOEsubscribers/>}/>
+// <Route path='/admin/fixed-payments' element={<FixedPayments/>}/>
+// <Route path='/admin/edit-package' element={<EditPackage/>}/>
+// <Route path='/admin/pppoe-subscriptions' element={<PPPOEsubscriptions/>}/>
+// <Route path='/admin/hotspot-payments' element={<HotspotPayments/>}/>
+// <Route  path='/admin/hotspot-package' element={<HotspotPackage/>}/>
+// <Route  path='/admin/hotspot-subscriptions' element={<HotspotSubscriptions/>}/>
+// <Route path='/admin/sms' element={<Sms/>}/>
+// <Route path='/admin/zones' element={<Zones/>}/>
+// <Route path='/admin/nodes' element={<Nodes/>}/>
+// <Route path='/admin/user' element={<User/>}/>
+// <Route path='/admin/user-group' element={<UserGroup/>}/>
+// <Route path='/admin/analytics' element={<Analytics/>}/>
+// <Route path='/admin/hotspot_anlytics' element={<Hotspotanalytics/>}/>
+// <Route path='/admin/settings' element={<Settings/>}/>
+// <Route path='/admin/date' element={<DatePicker/>}></Route>
+// <Route path='/admin/nas' element={<Nas/>}/>
+// </Route>
 
-</Route >
+// </Route >
 
-      <Route  path='/signin' element={<InputOTPWithSeparator/>}/>
+//       <Route  path='/signin' element={<InputOTPWithSeparator/>}/>
       
-     <Route path="*" element={<NotFound />}/>
+//      <Route path="*" element={<NotFound />}/>
 
-      </>
+//       </>
       
 
-  )
-)
+//   )
+// )
 
 const App = ({client}) => {
 
@@ -502,7 +502,8 @@ const darkTheme = createTheme({
     }}>
 
 {/* <GeneralSettings> */}
-<RouterProvider router={router} />
+{/* 
+<RouterProvider router={router} /> */}
 {/* </GeneralSettings> */}
 </ApplicationContext.Provider>
 </ ApplicationSettings>
