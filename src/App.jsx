@@ -17,7 +17,7 @@ import {ApplicationContext} from './context/ApplicationContext'
 // import {InputOTPWithSeparator} from './Auth/InputOTPWithSeparator'
 // import PrivateRoutes  from './private_routes/PrivateRoutes'
 // import AdminDashboard from './admindashboard/AdminDashboard'
-const AdminDashboard = lazy(()=> import ('./admindashboard/AdminDashboard'))
+// const AdminDashboard = lazy(()=> import ('./admindashboard/AdminDashboard'))
 // import Sidebar from './sidebar/Sidebar'
 // import Layout from './layout/Layout'
 import {CableProvider} from './context/CableContext'
@@ -25,58 +25,58 @@ import { redirect } from "react-router-dom";
 
 //  import PPPOEpackages from './packages/PPPOEpackages'
 
-const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages'))
+// const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages'))
 //  import HotspotPackage from './packages/HotspotPackage'
-const HotspotPackage = lazy(()=> import('./packages/HotspotPackage'))
-const AdminProfile = lazy(() => import('./profile/AdminProfile.jsx'))
+// const HotspotPackage = lazy(()=> import('./packages/HotspotPackage'))
+// const AdminProfile = lazy(() => import('./profile/AdminProfile.jsx'))
  
 //  import HotspotSubscriptions from './subscriptions/HotspotSubscriptions'
 
-const HotspotSubscriptions = lazy(()=> import('./subscriptions/HotspotSubscriptions'))
+// const HotspotSubscriptions = lazy(()=> import('./subscriptions/HotspotSubscriptions'))
 // import EditPackage from './edit/EditPackage'
 
-const EditPackage = lazy(()=> import('./edit/EditPackage'))
+// const EditPackage = lazy(()=> import('./edit/EditPackage'))
 // import PPPOEsubscribers from './subscribers/PPPOEsubscribers'
-const PPPOEsubscribers = lazy(()=> import('./subscribers/PPPOEsubscribers'))
+// const PPPOEsubscribers = lazy(()=> import('./subscribers/PPPOEsubscribers'))
 
 // import FixedPayments from './payments/FixedPayments'
-const FixedPayments = lazy(()=> import('./payments/FixedPayments'))
+// const FixedPayments = lazy(()=> import('./payments/FixedPayments'))
 
 // import PPPOEsubscriptions from './subscriptions/PPPOEsubscriptions'
-const PPPOEsubscriptions = lazy(()=> import('./subscriptions/PPPOEsubscriptions'))
+// const PPPOEsubscriptions = lazy(()=> import('./subscriptions/PPPOEsubscriptions'))
 
 // import Zones from './zones/Zones'
-const Zones = lazy(()=> import('./zones/Zones'))
+// const Zones = lazy(()=> import('./zones/Zones'))
 
 // import Nodes from './Node/Nodes'
-const Nodes = lazy(()=> import('./Node/Nodes'))
+// const Nodes = lazy(()=> import('./Node/Nodes'))
 
 // import User from './user/User'
-const User = lazy(()=> import('./user/User'))
+// const User = lazy(()=> import('./user/User'))
 
 // import UserGroup from './user/UserGroup'
-const UserGroup = lazy(()=> import('./user/UserGroup'))
+// const UserGroup = lazy(()=> import('./user/UserGroup'))
 // import Nas from './NAS_IDENTIFIER/Nas'
-const Nas = lazy(()=> import('./NAS_IDENTIFIER/Nas'))
+// const Nas = lazy(()=> import('./NAS_IDENTIFIER/Nas'))
 
 // import Analytics from './analytics/Analytics'
 
-const Analytics = lazy(()=> import('./analytics/Analytics'))
+// const Analytics = lazy(()=> import('./analytics/Analytics'))
 // import Hotspotanalytics from './analytics/HotspotAnalytics'
-const Hotspotanalytics = lazy(()=> import('./analytics/HotspotAnalytics'))
+// const Hotspotanalytics = lazy(()=> import('./analytics/HotspotAnalytics'))
 // import Settings from './settings/Settings'
-const Settings = lazy(()=> import('./settings/Settings'))
+// const Settings = lazy(()=> import('./settings/Settings'))
 import {DatePicker} from './date-picker/Date'
 import LocalizeDate from './date-picker/LocalizeDate'
 // import Sms from './sms/Sms'
-const Sms = lazy(()=> import('./sms/Sms'))
-import ProtectAuth from './Auth/ProtectAuth'
-import HotspotPayments from './payments/HotspotPayments'
+// const Sms = lazy(()=> import('./sms/Sms'))
+// import ProtectAuth from './Auth/ProtectAuth'
+// import HotspotPayments from './payments/HotspotPayments'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import  ApplicationSettings from './settings/ApplicationSettings'
 // import SignupNotification from './notification/SignupNotification'
 const SignupNotification = lazy(()=> import('./notification/SignupNotification'))
-import GeneralSettings from './settings/GeneralSettings'
+// import GeneralSettings from './settings/GeneralSettings'
 // import HotspotLogin from './hotspot_page/HotspotLogin'
 const HotspotLogin = lazy(()=> import('./hotspot_page/HotspotLogin'))
 
@@ -85,24 +85,25 @@ const ResetPassword = lazy(()=> import('./Auth/ResetPassword')
 ) 
 
 
-const Signup = lazy(()=> import('./Auth/Signup')
-)
+// const Signup = lazy(()=> import('./Auth/Signup')
+// )
 
-const InputOTPWithSeparator = lazy(()=> import('./Auth/InputOTPWithSeparator')
-)
+// const InputOTPWithSeparator = lazy(()=> import('./Auth/InputOTPWithSeparator')
+// )
 
-const NotFound = lazy(()=> import('./404/NotFound')
-)
+// const NotFound = lazy(()=> import('./404/NotFound')
+// )
 
-const Layout = lazy(()=>  import('./layout/Layout')
-)
-const HotspotPage = lazy(() => import('./hotspot_page/HotspotPage'))
+// const Layout = lazy(()=>  import('./layout/Layout')
+// )
+// const HotspotPage = lazy(() => import('./hotspot_page/HotspotPage'))
 
 
 // const AdminDashboard = lazy(()=> import ('./admindashboard/AdminDashboard')
 // )
-const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
- )
+
+// const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
+//  )
 
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
