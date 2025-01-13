@@ -1,22 +1,103 @@
-13
-# Build and Release Folders
-bin-debug/
-bin-release/
-[Oo]bj/
-[Bb]in/
+# 13
+# # Build and Release Folders
+# bin-debug/
+# bin-release/
+# [Oo]bj/
+# [Bb]in/
 
-# Other files and folders
-.settings/
+# # Other files and folders
+# .settings/
 
-# Executables
-*.swf
-*.air
-*.ipa
-*.apk
+# # Executables
+# *.swf
+# *.air
+# *.ipa
+# *.apk
 
-# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
-# should NOT be excluded as they contain compiler settings and other important
-# information for Eclipse / Flash Builder.
+# # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
+# # should NOT be excluded as they contain compiler settings and other important
+# # information for Eclipse / Flash Builder.
+
+# # Logs
+# logs
+# *.log
+# npm-debug.log*
+# yarn-debug.log*
+# yarn-error.log*
+# pnpm-debug.log*
+# lerna-debug.log*
+
+# node_modules
+# dist
+# dist-ssr
+# *.local
+
+# # Editor directories and files
+# .vscode/*
+# !.vscode/extensions.json
+# .idea
+# .DS_Store
+# *.suo
+# *.ntvs*
+# *.njsproj
+# *.sln
+# *.sw?
+#  d1e7b53 (billing system project)
+
+
+
+
+# http://www.gnu.org/software/automake
+
+Makefile.in
+/ar-lib
+/mdate-sh
+/py-compile
+/test-driver
+/ylwrap
+.deps/
+.dirstamp
+
+# http://www.gnu.org/software/autoconf
+
+autom4te.cache
+/autoscan.log
+/autoscan-*.log
+/aclocal.m4
+/compile
+/config.cache
+/config.guess
+/config.h.in
+/config.log
+/config.status
+/config.sub
+/configure
+/configure.scan
+/depcomp
+/install-sh
+/missing
+/stamp-h1
+
+# https://www.gnu.org/software/libtool/
+
+/ltmain.sh
+
+# http://www.gnu.org/software/texinfo
+
+/texinfo.tex
+
+# http://www.gnu.org/software/m4/
+
+m4/libtool.m4
+m4/ltoptions.m4
+m4/ltsugar.m4
+m4/ltversion.m4
+m4/lt~obsolete.m4
+
+# Generated Makefile
+# (meta build system like autotools,
+# can automatically generate from config.status script
+# (which is called by configure script))
 
 # Logs
 logs
@@ -42,4 +123,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
- d1e7b53 (billing system project)
+
+
+
+/.env*
+
