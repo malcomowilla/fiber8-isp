@@ -250,9 +250,11 @@ useEffect(() => {
       
 
       {seePackages && (
-  <motion.div className="max-w-md w-full mx-auto text-center mt-[320px]">
+  <motion.div className="max-w-md w-full mx-auto text-center mt-[320px] sm:mt-0">
     <h2 className="text-2xl text-white mb-4 dotted-font font-thin">Choose Your Plan</h2>
-    <div className="h-96 overflow-y-auto grid grid-cols-1 gap-6">
+    <div className="h-96 overflow-y-auto  sm:overflow-visible 
+
+    grid grid-cols-1 gap-6">
       {packages.map((pkg, index) => (
         <motion.div
           key={index}

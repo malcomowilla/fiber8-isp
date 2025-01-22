@@ -193,12 +193,14 @@ const {name, validity, download_limit, upload_limit, price, upload_burst_limit, 
       fullWidth></TextField>
             </div>
            
-           <div className='flex   '>
+           {/* <div className='flex   '>
 
            <Box
       sx={{
         '& > :not(style)': { m: 1, width: '40ch' },
       }}>
+
+      
 
            <TextField  label='upload-burst-speed(mbps)' 
           
@@ -221,6 +223,12 @@ const {name, validity, download_limit, upload_limit, price, upload_burst_limit, 
          
         }}  
              type='number'  fullWidth id='upload_burst_limit' className='myTextField'></TextField>
+
+
+
+
+
+             
             <TextField    sx={{
 
 '& label.Mui-focused': {
@@ -266,10 +274,10 @@ const {name, validity, download_limit, upload_limit, price, upload_burst_limit, 
 
 </Box> 
 
-           </div>
+           </div> */}
          
 
-           <Stack sx={{ width: '100%' }} spacing={2}>
+           {/* <Stack sx={{ width: '100%' }} spacing={2}>
       
       <Alert severity="info">
         <AlertTitle>Speed Boost</AlertTitle>
@@ -278,9 +286,11 @@ const {name, validity, download_limit, upload_limit, price, upload_burst_limit, 
       </Alert>
       
     
-    </Stack>
+    </Stack> */}
 
-              <div className='flex gap-3 mt-2 justify-center'>
+
+
+              {/* <div className='flex gap-3 mt-2 justify-center'>
 
              
 
@@ -318,8 +328,11 @@ const {name, validity, download_limit, upload_limit, price, upload_burst_limit, 
 
 
     </DemoContainer>
-              </div>
+              </div> */}
        
+
+
+
 
             <div className='mt-4 flex  flex-wrap'>
             <Box

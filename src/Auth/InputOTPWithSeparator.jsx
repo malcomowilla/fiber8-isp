@@ -17,6 +17,13 @@ import { useContext, useState, useEffect} from 'react'
 
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
+import toast, { Toaster } from 'react-hot-toast';
+import { IoKeyOutline } from "react-icons/io5";
+
+
+
+
+
 
  function InputOTPWithSeparator() {
 
@@ -102,25 +109,29 @@ const handleSignIn = async (e) => {
   // }
 
   
-  if (users.ok) {
+  if (users.ok || users.status === 202) {
+    navigate('/admin/analytics')
+
     setEmail('')
     setPassword('')
-    setShowErrors(false)
+    // setShowErrors(false)
     setloading(false)
    
 
-    setWelcomeMessage(actualUserDataInJson.welcome_back)
+    // setWelcomeMessage(actualUserDataInJson.welcome_back)
    
     
-   setCurrentUser(actualUserDataInJson.user)
+  //  setCurrentUser(actualUserDataInJson.user)
 
-   navigate('/admin/analytics')
-   setOfflineError(false)
+  //  setOfflineError(false)
 
 
   } else {
     setError(actualUserDataInJson.error);
-   
+   toast.error(actualUserDataInJson.error,{
+    position: "top-right",
+    duration: 7000,
+   })
 
     setShowErrors(true)
   setCurrentUser([])
@@ -129,14 +140,14 @@ const handleSignIn = async (e) => {
 
   }
   } catch (error) {
-    console.log(error.name === 'AbortError');
+    // console.log(error.name === 'AbortError');
     setloading(false);
     setOfflineError(true);
 
 
-setTimeout(() => {
-  setOfflineError(false)
-}, 8000);
+// setTimeout(() => {
+//   setOfflineError(false)
+// }, 8000);
 
   }
 
@@ -144,11 +155,14 @@ setTimeout(() => {
 
 
     
-setTimeout(() => {
-  setWelcome(false)
+// setTimeout(() => {
+//   setWelcome(false)
 
-}, 9000);
+// }, 9000);
 
+
+
+// passkey-signin
   return (
 <>
     {/* <div className='flex justify-center items-center w-full '>
@@ -175,16 +189,8 @@ setTimeout(() => {
     <p>Enter Your One Time Password</p>
 
     </div> */}
+ <Toaster />
 
-
-<div onClick={handleThemeSwitch} className='dark:text-white flex justify-center'>
-<ion-icon onClick={()=>setIcon(!icon)}  name={icon ? 'moon-outline' : 'sunny'} className='' size='large'></ion-icon>
-</div>
-
-
-<div className='text-center dotted-font'>
-    <p className='dark:text-white mt-8 font-bold text-2xl '>Welcome To <span className='text-red-700'>Fiber 8</span> </p>
-    </div>
     
 
 
@@ -194,42 +200,58 @@ setTimeout(() => {
   
 
  </div> */}
-
+{/* 
 
 <div className=''>
   {offlineError &&    <Stack sx={{ width: '20%',   }} >
       <Alert sx={{backgroundColor: 'rgb(255, 0, 0)'}} severity="error">Something Went Wrong Please Try Again Later.</Alert>
     </Stack>}
-</div>
+</div> */}
 
 
     <main className=''>
 
+    <div onClick={handleThemeSwitch} className='dark:text-white flex justify-center cursor-pointer'>
+<ion-icon onClick={()=>setIcon(!icon)}  name={icon ? 'moon-outline' : 'sunny'} className='' size='large'></ion-icon>
+</div>
+
+
+<div className='text-center dotted-font'>
+    <p className='dark:text-white mt-8 font-bold text-2xl '>Welcome To <span className='text-red-700'>Fiber 8</span> </p>
+    </div>
     <section className="flex justify-center items-center">
-  <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen lg:py-0 ">
-      <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-          <img className="w-40 h-40 mr-2 rounded-full" src="/images/fiber8logo1.png" alt="logo"  />
+
+  <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen lg:py-0
+  
+  ">
+      <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900
+       dark:text-white ">
+          <img className="w-40 h-40 mr-2 rounded-full mt-20" src="/images/fiber8logo1.png" alt="logo"  />
           
       </a>
 
       <div className="w-full p-6 bg-white rounded-lg shadow dark:border
        md:mt-0 sm:max-w-md dark:bg-gray-800 dark:border-gray-700 sm:p-8">
-          <h2 className="mb-1 text-xl  leading-tight tracking-tight text-gray-900 md:text-2xl dotted-font  dark:text-white">
+          <h2 className="mb-1 text-xl  leading-tight tracking-tight text-gray-900 
+          md:text-2xl dotted-font 
+           dark:text-white">
           Sign-In to your account and start managing your  network
 
           </h2>
           <div className='flex flex-row'>
-          <p>Don't have an account? <Link to='/'><span className='underline'>Sign Up</span></Link> </p>
+          <p className='font-montserat-light'>Don't have an account? <Link to='/'><span className='underline
+          font-montserat
+          '>Sign Up</span></Link> </p>
 
           </div>
 
-          {showErrors && <p className="text-red-600">{error}</p>}
+          {/* {showErrors && <p className="text-red-600">{error}</p>} */}
 
           <form className="mt-4 space-y-4 lg:mt-5 md:space-y-5"   onSubmit={handleSignIn }>
               <div className=' flex  flex-col  relative '>
                 <div className=''>
                 <label  className="  text-sm font-mono text-gray-900 dark:text-white ">Your email</label>
-{error}
+{/* {error} */}
                 </div>
                  <div className='self-end  absolute p-8'>
                   <img src="/images/gmail.png" className=' ' alt="gmail" />
@@ -268,17 +290,24 @@ setPassword(e.target.value)
 
                 
               </div>
-              <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input id="newsletter" aria-describedby="newsletter" type="checkbox" className="w-4 h-4 border
-                     border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700
-                      dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" />
+              <div className="flex flex-row  justify-between ">
+
+              {/* passkey-signin */}
+
+<Link to='/passkey-signin' className='flex flex-row gap-2 cursor-pointer'>
+                <IoKeyOutline className='w-5 h-5' />
+                <p className='font-montserat-light'>passkey</p>
+</Link>
+
+                
  
-                  </div>
-                  <div className="ml-3 text-sm flex justify-evenly flex-wrap lg:gap-20 max-md:gap-40 sm:gap-20 max-sm:gap-10 "> 
-                    <label className="font-mono text-gray-500 dark:text-gray-300">
-                      Remeber Me</label>
-                 <Link to='/reset-password'> <p className='text-sm underline'>Forgot your password?</p></Link>
+                 
+                  <div className="ml-3 text-sm 
+                  flex justify-evenly flex-wrap lg:gap-20 max-md:gap-40 sm:gap-20 max-sm:gap-10 "> 
+                   
+
+
+                 <Link to='/reset-password'> <p className='text-sm  font-montserat-light'>Forgot your password?</p></Link>
                   </div>
               </div>
               <div className='flex items-center justify-center'>

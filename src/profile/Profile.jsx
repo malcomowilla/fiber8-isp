@@ -30,6 +30,11 @@ import {
   import { useContext} from 'react'
   import {ApplicationContext} from '../context/ApplicationContext'
   import {Link} from 'react-router-dom'
+  import { GoPasskeyFill } from "react-icons/go";
+
+
+
+
   export function Profile() {
 
     const navigate = useNavigate()
@@ -82,16 +87,31 @@ console.log(user)
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
+
             <DropdownMenuItem>
               
               <User className="mr-2 h-4 w-4" />
               <Link to='/admin/profile'>
               <span>Profile</span>
               </Link>
+
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
              
             </DropdownMenuItem>
             
+
+            <DropdownMenuItem className='cursor-pointer'>
+              
+              <GoPasskeyFill className="mr-2 h-4 w-4" />
+              <Link to='/admin/passkeys'>
+              <span>PassKey</span>
+              </Link>
+
+              <DropdownMenuShortcut>⇧⌘PK</DropdownMenuShortcut>
+             
+            </DropdownMenuItem>
+
+
             <DropdownMenuItem>
               <Settings className="mr-2 h-4 w-4" />
               <Link to='/admin/settings'><span >Settings</span></Link>
@@ -136,11 +156,15 @@ console.log(user)
           
          
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <LogOut className="mr-2 h-4 w-4" />
-            <span onClick={handleLogout} >Log out</span>
+
+          <DropdownMenuItem className='cursor-pointer' onClick={handleLogout}>
+            <LogOut   className="mr-2 h-4 w-4 " />
+            <span  >Log out</span>
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+
           </DropdownMenuItem>
+
+
         </DropdownMenuContent>
       </DropdownMenu>
     )

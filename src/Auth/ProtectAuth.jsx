@@ -81,7 +81,7 @@ const ProtectAuth = ({children}) => {
     const {   user
     } = useContext(ApplicationContext);
      
-    const isAuthenticated = currentUser 
+    const isAuthenticated = currentUser !== null; 
 
   if (loading) {
     return <>

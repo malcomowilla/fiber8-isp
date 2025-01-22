@@ -8,7 +8,8 @@ import { createAvatar } from '@dicebear/core';
 import Lottie from 'react-lottie';
 
 import Backdrop from '@mui/material/Backdrop';
-
+import { FiKey, FiShield, FiCheck } from 'react-icons/fi';
+import { Tooltip } from '@mui/material';
 
 
 
@@ -25,6 +26,9 @@ const [loading, setLoading] = useState(false)
 const [openLoad, setOpenLoad] = useState(false)
 
 const {email, password, username, phone_number} = formData
+const [hasPasskey, setHasPasskey] = useState(false);
+const [isRegistering, setIsRegistering] = useState(false);
+const [registrationStatus, setRegistrationStatus] = useState('');
 
 
 
@@ -147,6 +151,177 @@ const defaultOptions = {
   }
 };
 
+
+
+
+
+function arrayBufferToBase64Url(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary).replace(/\//g, '_').replace(/\+/g, '-').replace(/=+$/, '');
+}
+
+async function startPasskeyRegistration(e) {
+  setIsRegistering(true);
+  setRegistrationStatus('starting');
+  
+  e.preventDefault();
+
+  const response = await fetch('/api/webauthn/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({  email:currentEmail })
+  });
+
+  const options = await response.json();
+  setRegistrationStatus('authenticating');
+  const challenge = options.challenge;
+
+try {
+if (response.ok) {
+  setRegistrationStatus('authenticating');
+  setTimeout(()=> {
+    setIsRegistering(false)
+  }, 3000);
+  setOpenLoad(false);
+  
+  
+} else {
+  setOpenLoad(false);
+  toast.error(options.error, {
+    position: "top-center",
+    duration: 7000,
+  });
+ 
+
+  setRegistrationStatus('error');
+  setTimeout(() => {
+    setIsRegistering(false)
+  }, 3000);
+  
+  
+}
+} catch (error) {
+
+  toast.error('something went wrong please try again', {
+    position: "top-center",
+    duration: 7000,
+  });
+setTimeout(() => {
+  setIsRegistering(false)
+}, 3000);
+
+setTimeout(() => {
+  setRegistrationStatus('starting');
+}, 5000);
+
+
+setRegistrationStatus('error');
+  setOpenLoad(false);
+}
+
+
+
+
+
+
+
+  function base64UrlToBase64(base64Url) {
+    return base64Url.replace(/_/g, '/').replace(/-/g, '+');
+  }
+
+  if (typeof options.user.id === 'string') {
+    options.user.id = Uint8Array.from(atob(base64UrlToBase64(options.user.id)), c => c.charCodeAt(0));
+  }
+
+  if (typeof options.challenge === 'string') {
+    options.challenge = Uint8Array.from(atob(base64UrlToBase64(options.challenge)), c => c.charCodeAt(0));
+  }
+
+  console.log('options.challenge:',options.challenge )
+
+  try {
+    const credential = await navigator.credentials.create({ publicKey: options });
+
+
+    // Prepare the credential response
+    const credentialJson = {
+      id: credential.id,
+      rp: {
+        name: "fiber8",
+      },
+      // origin: 'http://localhost:5173',
+      // origin: 'https://aitechs-sas-garbage-solution.onrender.com',
+      rawId: arrayBufferToBase64Url(credential.rawId),
+      type: credential.type,
+      response: {
+        attestationObject: arrayBufferToBase64Url(credential.response.attestationObject),
+        clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON)
+      },
+      challenge: challenge
+
+    };
+
+
+    
+
+    const createResponse = await fetch('/api/webauthn/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: credentialJson, email: currentEmail})
+    });
+
+    const createResponseJson = await createResponse.json();
+
+
+    if (createResponse.ok) {
+     toast.success('passkey created successfully', {
+        position: "top-center",
+        duration: 7000,
+      });
+      console.log('signup success');
+      // setsignupFormData('')
+      setOpenLoad(false);
+      // setisloading(false);
+      setLoading(false)
+      setHasPasskey(true);
+      setTimeout(() => {
+        setIsRegistering(false)
+      }, 3000);
+      setRegistrationStatus('success');
+     
+
+      
+    } else {
+      // setisloading(false);
+      setLoading(false)
+      toast.error(options.error, {
+        position: "top-center",
+        duration: 7000,
+      });
+      console.log('signup failed');
+      // setOpen(false);
+      // setRegistrationError(options.errors);
+      setOpenLoad(false);
+    }
+  } catch (err) {
+    // setisloading(false);
+    setLoading(false)
+
+    toast.error('something went wrong please try again', {
+      position: "top-center",
+      duration: 7000,
+    });
+    // setOpen(false);
+    setOpenLoad(false);
+    console.error('Error during WebAuthn credential creation:', err);
+  }
+}
+
+
   return (
 
 <>
@@ -171,7 +346,7 @@ const defaultOptions = {
                   alt={`${currentUsername.toString()}'s avatar`}
                 />
 
-              <h1 className="text-gray-600 dark:text-white">{currentUsername}</h1>
+              <h1 className="text-gray-600 dark:text-white font-montserat">{currentUsername}</h1>
             </div>
           </div>
         </div>
@@ -179,10 +354,10 @@ const defaultOptions = {
         <div className="bg-white dark:bg-black space-y-6">
         <form onSubmit={updateProfile}>
 
-          <div className="md:inline-flex space-y-4 md:space-y-0 w-full p-4 text-gray-500 dark:text-white items-center">
-            <h2 className="md:w-1/3 max-w-sm mx-auto">Account</h2>
+          <div className="md:inline-flex space-y-4 md:space-y-0 w-full p-4  dark:text-white items-center">
+            <h2 className="md:w-1/3 max-w-sm mx-auto  font-montserat">Account</h2>
             <div className="md:w-2/3 max-w-sm mx-auto">
-              <label className="text-sm text-gray-400 dark:text-white">{currentEmail}</label>
+              <label className="text-sm  dark:text-white font-montserat-light text-gray-700">{currentEmail}</label>
               <div className="w-full inline-flex border">
                 <div className="pt-2 w-1/12 bg-gray-100 bg-opacity-50">
                   <svg
@@ -212,13 +387,13 @@ const defaultOptions = {
           </div>
 
           <hr />
-          <div className="md:inline-flex  space-y-4 md:space-y-0  w-full p-4 text-gray-500
+          <div className="md:inline-flex  space-y-4 md:space-y-0  w-full p-4 
           dark:text-white
           items-center">
-            <h2 className="md:w-1/3 mx-auto max-w-sm">Personal info</h2>
+            <h2 className="md:w-1/3 mx-auto max-w-sm font-montserat">Personal info</h2>
             <div className="md:w-2/3 mx-auto max-w-sm space-y-5">
               <div>
-                <label className="text-sm text-gray-400 dark:text-white">Full name</label>
+                <label className="text-sm  dark:text-white font-montserat-light text-gray-700">Full name</label>
                 <div className="w-full inline-flex border">
                   <div className="w-1/12 pt-2 bg-gray-100">
                     <svg
@@ -248,7 +423,7 @@ const defaultOptions = {
                 </div>
               </div>
               <div>
-                <label className="text-sm text-gray-400 dark:text-black">Phone number</label>
+                <label className="text-sm font-montserat-light text-gray-700 dark:text-white">Phone number</label>
                 <div className="w-full inline-flex border">
                   <div className="pt-2 w-1/12 bg-gray-100">
                     <svg
@@ -273,7 +448,6 @@ const defaultOptions = {
                     className="w-11/12 focus:outline-none focus:text-gray-600 
                     dark:text-black
                     p-2"
-                    placeholder="12341234"
                   />
                 </div>
               </div>
@@ -281,9 +455,9 @@ const defaultOptions = {
           </div>
 
           <hr />
-          <div className="md:inline-flex w-full space-y-4 md:space-y-0 p-8 text-gray-500
+          <div className="md:inline-flex w-full space-y-4 md:space-y-0 p-8 
            items-center dark:text-white">
-            <h2 className="md:w-4/12 max-w-sm mx-auto">Change password</h2>
+            <h2 className="md:w-4/12 max-w-sm mx-auto font-montserat">Change password</h2>
 
             <div className="md:w-5/12 w-full md:pl-9 max-w-sm mx-auto space-y-5 md:inline-flex pl-2">
               <div className="w-full inline-flex border-b">
@@ -312,11 +486,16 @@ const defaultOptions = {
                 />
               </div>
             </div>
+            <hr />
 
-            <div className="md:w-3/12 text-center md:pl-6">
+
+
+
+
+            <div className="px-4 text-center md:pl-6">
               <button type='submit' className="text-white w-full mx-auto max-w-sm rounded-md 
               text-center bg-indigo-600 py-2 px-4 inline-flex items-center 
-              focus:outline-none md:float-right">
+              focus:outline-none  md:float-right font-montserat-regular">
                 <svg
                   fill="none"
                   className="w-4 text-white mr-2"
@@ -331,12 +510,77 @@ const defaultOptions = {
                     0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                   />
                 </svg>
-                Update
+                <p  className='font-montserat-light '>Update</p> 
               </button>
             </div>
           </div>
 
 
+          <div className="md:inline-flex space-y-4 md:space-y-0 w-full p-4 text-black items-center">
+                      <h2 className="md:w-1/3 max-w-sm mx-auto flex items-center">
+                        <FiShield className="mr-2 text-xl" /> <p className='text-xl dark:text-white
+                         text-black font-montserat'>Security Key</p> 
+                      </h2>
+                      <div className="md:w-2/3 max-w-sm mx-auto">
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center space-x-2">
+                              <FiKey className={hasPasskey ? "text-emerald-500" : "text-black "} />
+                              <span className="font-medium text-black text-2xl font-montserat-regular">Passkey Status</span>
+                            </div>
+                            {hasPasskey && (
+                              <span className="flex items-center text-emerald-500">
+                                <FiCheck className="mr-1" /> <p className='dark:text-white text-black'>Registered</p>
+                              </span>
+                            )}
+                          </div>
+                          
+                          <p className="text-xl text-black mb-4">
+                            {hasPasskey 
+                              ? <p className=' text-black'>Your account is secured with a passkey. You can use it to sign in quickly and securely</p>
+                              : <p className=' text-black font-montserat-light'>Enhance your account security by registering a passkey for passwordless authentication</p>}
+                          </p>
+
+                          <Tooltip title={
+                            hasPasskey 
+                              ?    <p className="text-xl dark:text-white text-black">You already have a registered passkey </p> 
+                              :  <p className="text-xl dark:text-white text-black"> Register a new passkey for secure access</p>
+                          }>
+                            <div>
+                              <button
+                                type="button"
+                                onClick={startPasskeyRegistration}
+                                disabled={hasPasskey || isRegistering}
+                                className={`w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-md 
+                                  ${hasPasskey 
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                                    : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                                  } transition-colors duration-200`}
+                              >
+                                {isRegistering ? (
+                                  <>
+                                    <span className="animate-spin rounded-full h-4 w-4 border-b-2
+                                     border-emerald-700"></span>
+                                    <span>{
+                                      registrationStatus === 'starting' ? 'Initializing...' :
+                                      registrationStatus === 'authenticating' ? 'Verify on your device...' :
+                                      registrationStatus === 'success' ? 'Successfully registered!' :
+                                      registrationStatus === 'error' ? 'Registration failed' :
+                                      'Processing...'
+                                    }</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <FiKey />
+                                    <span>{hasPasskey ? 'Passkey Registered' : 'Register Passkey'}</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          </Tooltip>
+                        </div>
+                      </div>
+                    </div>
 </form>
           <hr />
           <div className="w-full p-4 text-right text-gray-500">

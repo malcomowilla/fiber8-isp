@@ -86,6 +86,31 @@
   font-style: normal;
 }
 
+
+
+.font-montserat {
+  font-family: "Montserrat", serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.font-montserat-light{
+  font-family: "Montserrat", serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+}
+
+
+
+.font-montserat-regular{
+  font-family: "Montserrat", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
 .raleway-dots-regular {
   font-optical-sizing: auto;
   /* font-family: "Edu TAS Beginner", cursive; */

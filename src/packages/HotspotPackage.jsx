@@ -97,7 +97,16 @@ const columns = [
     // {title: 'Size', field: 'Size',  type: 'numeric', align: 'left'},
     {title: 'price', field: 'price',  },
 
-  {title: 'Speed(Up/Down)', field: 'speed',   defaultSort: 'asc', },
+  {title: 'Speed(Up/Down)', field: 'speed',   defaultSort: 'asc',
+
+
+    render: (rowData) => 
+      <>
+        {rowData.speed === null ||  rowData.speed === 'null' || rowData.speed === '' 
+          ? <p>unlimited </p>
+          : rowData.speed }
+      </>
+   },
 
   // {title: 'Validity', field: 'Validity', type: 'numeric',  align: 'right'},
   {title: 'validity', field: 'valid', },

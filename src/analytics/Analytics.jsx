@@ -41,7 +41,8 @@ const Analytics = () => {
   }
   
   const {welcomeMessage, welcome, setFormData, settingsformData} = useApplicationSettings()
-const [date, setDate] = useState(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }))
+const [date, setDate] = useState(new Date().toLocaleTimeString('en-US', { hour: 'numeric', 
+  minute: 'numeric', second: 'numeric', hour12: true }))
 const [datetime, setdateTime] = useState(true)
 
 // useEffect(() => {

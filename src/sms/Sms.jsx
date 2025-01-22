@@ -1,16 +1,15 @@
 
-
-
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton } from '@mui/material';
 // import {useState} from 'react'
 // import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
 // import  EditPayment from '../edit/EditPayment'
+import {useState, lazy, Suspense} from 'react'
+
 const EditPayment = lazy(() => import('../edit/EditPayment'))
 
 // import {Link} from 'react-router-dom'
-import {useState, lazy, Suspense} from 'react'
 import UiLoader from '../uiloader/UiLoader'
 
 // import { useContext} from 'react'
@@ -18,9 +17,6 @@ import UiLoader from '../uiloader/UiLoader'
 
 
 import MaterialTable from 'material-table'
-
-
-
 
 // const rows = [
 //   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
@@ -33,13 +29,6 @@ import MaterialTable from 'material-table'
 //   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
 //   // Add more rows as needed
 // ];
-
-
-
-
-
-
-
 
 
 

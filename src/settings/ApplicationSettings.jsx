@@ -17,12 +17,14 @@ const ApplicationSettings = ({children}) => {
       }
 
 
-      const initialValueNas={
+      const initialValueNas = {
         username:'',
         password: '',
         ip_address:'',
         name: ''
         }
+
+
         const  [nasformData, setnasFormData] = useState(initialValueNas)
         const [welcomeMessage, setWelcomeMessage] =  useState('')
 const [welcome, setWelcome] = useState(false)
@@ -102,7 +104,7 @@ const fetchCurrentUser = useCallback(
       if (response) {
         console.log('fetched current user', newData)
         const {username, email, id, created_at, updated_at} = newData
-        setCurrentUser(email)
+        setCurrentUser(newData)
         setCurrentUsername(username)
         setCurentEmail(email)
         console.log('current user', newData)

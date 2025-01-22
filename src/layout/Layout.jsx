@@ -42,10 +42,16 @@ const [loading, setloading] = useState(false)
      ease-in-out ${seeSidebar ? '' : 'sm:ml-64'} `}>
 
 <div className={`p-4  h-[1000px]  `}>
-     
-{seeButton && <Button onClick={refreshPage}>Reload Page
+  <div className='p-2'>
+
+
+  {seeButton && <Button onClick={refreshPage}>Reload Page
 
 </Button>}
+ 
+    
+    </div>   
+
 
 
 <div>
