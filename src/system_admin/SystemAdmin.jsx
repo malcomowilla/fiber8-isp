@@ -15,18 +15,17 @@ import { MdOutlinePhonePaused } from "react-icons/md";
 const SystemAdminLogin = () => {
   const [loading, setloading] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [formData, setFormData] = useState({
-    password: '',
-    phone_number: '',
-  })
+  
   const [phoneNumberVerified, setPhoneNumberVerified] = useState(false)
   const [emailVerified, setEmailVerified] = useState(false)
+
+  const {formData, setFormDataSystemAdmin} = useApplicationSettings()
 
   const navigate = useNavigate()
 
   const {password, phone_number} = formData
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+    setFormDataSystemAdmin({ ...formData, [e.target.name]: e.target.value })
   }
 
 
@@ -35,7 +34,9 @@ const SystemAdminLogin = () => {
 
   const isPhoneNumberVerified = useCallback(
     async(phone_number) => {
-      const response = await fetch(`/api/phone_number_verified?phone_number=${phone_number}`)
+      const phone_number2 = localStorage.getItem('phone_number')
+
+      const response = await fetch(`/api/phone_number_verified?phone_number=${phone_number} &phone_number2=${phone_number2}`)
   
       try {
         if (response.ok) {
@@ -89,6 +90,7 @@ const systemAdminLogin = async(e) => {
     if (response.ok) {
       setSuccess(true)
       setloading(false)
+      localStorage.setItem('phone_number', phone_number);
       isPhoneNumberVerified(phone_number)
       if (phoneNumberVerified) {
         navigate('/system-admin-dashboard')

@@ -80,7 +80,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
     if (response.ok) {
       toast.success("Logged out successfully!", { transition: Slide });
       setTimeout(() => {
-        window.location.href = '/login-system-admin';
+        window.location.href = '/system-admin-login';
       }, 1000);
     } else {
       toast.error("Logout failed. Please try again.", { transition: Slide });

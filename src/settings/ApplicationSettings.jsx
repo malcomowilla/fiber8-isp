@@ -46,6 +46,12 @@ const [welcome, setWelcome] = useState(false)
 
       })
 
+
+      const [formData, setFormDataSystemAdmin] = useState({
+        password: '',
+        phone_number: '',
+      })
+
       // const [settingsformData, setFormData] = useState(() => {
       //   const storedFormData =   localStorage.setItem("checkedtrueData", JSON.stringify(initialValue.check_update_password));
         
@@ -259,7 +265,7 @@ const handleChange = (e) => {
      nasformData, setnasFormData,initialValueNas, welcomeMessage, setWelcomeMessage, welcome, 
      setWelcome, tableDataNas, setTableData,currentUser, setCurrentUser,
      currentUsername, currentEmail, fetchCurrentUser,setCurrentSystemAdmin,
-     currentSystemAdmin, fetchCurrentSystemAdmin,
+     currentSystemAdmin, fetchCurrentSystemAdmin,formData, setFormDataSystemAdmin,
      
      companySettings, setCompanySettings}}  >
     {children}

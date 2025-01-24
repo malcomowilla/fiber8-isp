@@ -30,7 +30,7 @@ const SmsSent = () => {
 
 
     const {
-      companySettings
+      companySettings,formData
      } = useApplicationSettings()
    
     
@@ -62,10 +62,9 @@ const SmsSent = () => {
       
             "Content-Type": "application/json",
           }, 
-          credentials: 'include', // Include cookies in the request
       
       
-          body: JSON.stringify({...signinFormData, otp, phone}),
+          body: JSON.stringify({...formData, otp,}),
       
         },
       
@@ -81,14 +80,14 @@ const SmsSent = () => {
           // const actualUserDataInJson = await users.json
           setloading(false)
         console.log(actualUserDataInJson)
-        localStorage.setItem('acha umbwakni', true);
-        setTimeout(() => {
-          setDone(true);
-          setloading(false);
-          setTimeout(() => {
-            navigate('/admin/dashboard')
-          }, 1000);
-        }, 1900);
+        navigate('/system-admin-dashboard')
+        // setTimeout(() => {
+        //   setDone(true);
+        //   setloading(false);
+        //   setTimeout(() => {
+        //     navigate('/admin/analytics')
+        //   }, 1000);
+        // }, 1900);
     
     
     
@@ -101,13 +100,19 @@ const SmsSent = () => {
             setloading(false)
             console.log('sigup  failed')
             // setopenOtpInvalid(true)
-            if (navigator.onLine) {
-              toaster.error('invalid one time password,try again')
-            }
+              toaster.error('invalid one time password,try again', {
+                duration: 6000,
+                position: 'top-center',
+              })
+            
          
         }   
     
       } catch (error) {
+        toaster.error('internal server error', {
+          duration: 6000,
+          position: 'top-center',
+        })
         console.error(error);
         setloading(false)
       }
@@ -132,7 +137,7 @@ const SmsSent = () => {
 
     <>
 
-
+<Toaster/>
 
 
 {loading &&    <Backdrop open={openLoad} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
