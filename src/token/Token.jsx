@@ -10,7 +10,6 @@
 //         if (!response.ok) {
 //           throw new Error('Failed to fetch CSRF token');
 //         }
-//         const { csrf_token } = await response.json();
 //         setCsrfToken(csrf_token);
 //         console.log(csrf_token)
 //       } catch (error) {
