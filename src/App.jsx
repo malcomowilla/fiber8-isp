@@ -134,7 +134,7 @@ const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      {/* <Route index path='/'  element={<Signup/>}/> */}
+      <Route index path='/'  element={<Signup/>}/>
       <Route  path='/reset-password' element={<ResetPassword/>}/>
       <Route  path='/hotspot-page' element={<HotspotPage/>}/>
       <Route  path='/hotspot-login' element={<HotspotLogin/>}/>

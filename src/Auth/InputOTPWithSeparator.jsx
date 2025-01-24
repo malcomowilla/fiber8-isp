@@ -377,6 +377,12 @@ setPassword(e.target.value)
             </Button>
               </div>
 
+
+
+<div>
+
+  <p className='text-sm font-montserrat'>New on our platform? Reach us on 0791568852 for a free trial!</p>
+</div>
           </form>
 
       </div>

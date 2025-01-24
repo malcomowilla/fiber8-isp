@@ -1,246 +1,87 @@
-import {Button} from '../components/ui/button'
-
-import { useContext} from 'react'
-import {ApplicationContext} from '../context/ApplicationContext'
-
-import {AlertDestructive} from '../validation_errors/AlertDestructive'
-import {AlertDestructive2} from '../validation_errors/AlertDestructive2'
-import {AlertDestructive3} from '../validation_errors/AlertDestructive3'
-import {AlertDestructive4} from '../validation_errors/AlertDestructive4'
-import { ReloadIcon } from "@radix-ui/react-icons"
-
-import Alert from '@mui/material/Alert';
-import Stack from '@mui/material/Stack';
-import {useState} from 'react'
-import {Link} from 'react-router-dom'
-// import SignupNotification from '../notification/SignupNotification'
-// import Loader from '../loader/Loader'
+import React, { useContext, useState } from 'react';
+import { ApplicationContext } from '../context/ApplicationContext';
+import { motion } from 'framer-motion';
+import { Button, Alert } from '@mui/material';
 
 const Signup = () => {
-  const [icon, setIcon] = useState()
-
-const {isSeen, setIsSeen,isPassword, setPassword, email, setEmail, passwordConfirmation, setPasswordConfirmation,
-   showErrors, handleSignUp, loading,handleThemeSwitch, setOfflineError,
-    offlineError,username, setUsername, signupNotification
-} = useContext(ApplicationContext);
-   
-
+  const { email, setEmail, username, setUsername, password, setPassword,
+     handleSignUp, offlineError } = useContext(ApplicationContext);
 
   return (
     <>
+     <div className="font-sans bg-gray-950 text-white">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-blue-900 via-gray-900 to-gray-950 h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://via.placeholder.com/1920x800')] bg-cover bg-center opacity-20"></div>
+        <div className="relative z-10 text-center max-w-4xl px-6 animate-fade-in">
+          <h1 className="text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+            Revolutionize Your Internet Experience
+          </h1>
+          <p className="text-xl text-gray-300 mb-8">
+            Empower your business with our cutting-edge SaaS platform for seamless internet management. Fast, reliable, and scalable.
+          </p>
+          <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-8 rounded-lg hover:scale-105 transition-transform duration-300">
+            Get Started
+          </button>
+        </div>
+      </section>
 
-<div onClick={handleThemeSwitch} className='dark:text-white flex justify-center'>
-<ion-icon onClick={()=>setIcon(!icon)}  name={icon ? 'moon-outline' : 'sunny'} className='' size='large'></ion-icon>
-</div>
+      {/* Features Section */}
+      <section className="py-20 px-6 bg-gray-950">
+        <h2 className="text-4xl font-bold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 animate-slide-in">
+          Why Choose Us?
+        </h2>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-purple-500 transition-all duration-300 hover:scale-105 animate-fade-in-up">
+            <div className="text-4xl mb-4 text-purple-500">🚀</div>
+            <h3 className="text-2xl font-bold mb-4">Blazing Fast Speeds</h3>
+            <p className="text-gray-400">Experience ultra-fast internet with speeds up to 10Gbps.</p>
+          </div>
+          <div className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-blue-500 transition-all duration-300 hover:scale-105 animate-fade-in-up delay-200">
+            <div className="text-4xl mb-4 text-blue-500">🔒</div>
+            <h3 className="text-2xl font-bold mb-4">99.99% Uptime</h3>
+            <p className="text-gray-400">Our network ensures maximum reliability with 99.99% uptime.</p>
+          </div>
+          <div className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-purple-500 transition-all duration-300 hover:scale-105 animate-fade-in-up delay-400">
+            <div className="text-4xl mb-4 text-purple-500">🛠️</div>
+            <h3 className="text-2xl font-bold mb-4">24/7 Expert Support</h3>
+            <p className="text-gray-400">Our team is available round the clock to assist you.</p>
+          </div>
+        </div>
+      </section>
 
-<div className='text-center dotted-font '>
-<p className='dark:text-white mt-8 font-bold text-2xl  '>Welcome To <span className='text-red-700'>Fiber 8</span> </p>
+      {/* Testimonials Section */}
+      <section className="py-20 px-6 bg-gradient-to-br from-gray-900 to-gray-950">
+        <h2 className="text-4xl font-bold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 animate-slide-in">
+          What Our Customers Say
+        </h2>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-purple-500 transition-all duration-300 hover:scale-105 animate-fade-in-left">
+            <p className="text-gray-400 italic">"The best internet service we've ever used. Highly recommended!"</p>
+            <p className="mt-4 font-semibold text-purple-500">- Jane Doe, CEO of SaaS Corp</p>
+          </div>
+          <div className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-blue-500 transition-all duration-300 hover:scale-105 animate-fade-in-right">
+            <p className="text-gray-400 italic">"Reliable and fast. Perfect for our growing business needs."</p>
+            <p className="mt-4 font-semibold text-blue-500">- John Smith, CTO of Tech Solutions</p>
+          </div>
+        </div>
+      </section>
 
-
+      {/* Call to Action Section */}
+      <section className="py-20 px-6 bg-gradient-to-br from-blue-900 to-purple-900 text-white text-center">
+        <h2 className="text-4xl font-bold mb-6 animate-slide-in">
+          Ready to Transform Your Business?
+        </h2>
+        <p className="text-xl mb-8 text-gray-300">
+          Join thousands of satisfied customers and experience the difference.
+        </p>
+        <button className="bg-white text-blue-900 font-semibold py-3 px-8 rounded-lg hover:scale-105 transition-transform duration-300">
+          Sign Up Now
+        </button>
+      </section>
     </div>
-    
-
-
- 
-
- <div className='flex flex-row'>
-{/*   
-  {loading ? <Loader/> : null
-
-
- } */}
-
- </div>
-
-
-
- <div className=''>
-  {offlineError &&    <Stack sx={{ width: '20%',   }} >
-      <Alert sx={{backgroundColor: 'rgb(255, 0, 0)'}} severity="error">Something Went Wrong Please Try Again Later.</Alert>
-    </Stack>}
-</div>
-
-
-    <main className=''>
-
-    <section className=" ">
-  <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 ">
-      <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-          <img className="w-40 h-40 mr-2 rounded-full" src="/images/fiber8logo1.png" alt="logo"/>
-          
-      </a>
-      <div className="w-full p-6 bg-white rounded-lg shadow dark:border
-       md:mt-0 sm:max-w-md dark:bg-gray-800 dark:border-gray-700 sm:p-8">
-          <h2 className="mb-1 text-xl  leading-tight tracking-tight text-gray-900 md:text-2xl dotted-font  dark:text-white">
-           Start managing your  network today!!
-
-
-          </h2>
-          <form className="mt-4 space-y-4 lg:mt-5 md:space-y-5"   onSubmit={handleSignUp}>
-
-
-              <div className=' flex  flex-col  relative '>
-                <div className=''>
-                <label  className="  text-sm font-mono text-gray-900 dark:text-white ">Your email</label>
-
-                </div>
-                 <div className='self-end  absolute p-8'>
-                  <img src="/images/gmail.png" className=' ' alt="gmail" />
-
-                  </div> 
-
-                  <input value={email}  type="email" name="email" id="email" onChange={(e)=> setEmail(e.target.value)}  
-                   className="bg-gray-50 border
-                   border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
-                    block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
-                     dark:placeholder-gray-400 dark:text-white dark:focus:ring-red-500 dark:focus:border-red-700"
-                      placeholder="" />
-                      {showErrors &&     <AlertDestructive3/>
- }
-              </div>
-
-
-
-
-
-              <div className=' flex  flex-col  relative '>
-                <div className=''>
-                <label  className="  text-sm font-mono text-gray-900 dark:text-white ">Your Username</label>
-
-                </div>
-                 
-                <div className='self-end  absolute p-8'>
-                <ion-icon name="person-outline"></ion-icon>
-                  </div>
-                  <input value={username}  type="text" name="username" id="username" onChange={(e)=> setUsername(e.target.value)}  
-                   className="bg-gray-50 border
-                   border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600
-                    block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
-                     dark:placeholder-gray-400 dark:text-white dark:focus:ring-red-500 dark:focus:border-red-700"
-                      placeholder="" />
-                      {showErrors &&     <AlertDestructive4/>
- }
-              </div>
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-              <div className='flex flex-col relative'>
-                  <label  className="block mb-2 text-sm font-mono text-gray-900 dark:text-white"> Password</label>
-                  <div className='absolute max-sm:self-end p-9 lg:self-end' onClick={()=>setIsSeen(!isSeen)}>
-                       <ion-icon name={isSeen ? "eye-outline" : "eye-off-outline"}></ion-icon>
-
-                       </div>
-                  <input value={isPassword} type={isSeen ? 'password' : 'text'} name="password" id="password"   onChange={(e)=> {
-setPassword(e.target.value)
-                  }}
-                   
-                    className="dark:bg-gray-700 border border-gray-300 text-gray-900 sm:text-sm
-                     rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5
-                       dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
-                       dark:focus:ring-red-500 dark:focus:border-red-700"
-                       
-                       
-                       />
-                      
-                      {showErrors &&     <AlertDestructive/>
- }
-              </div>
-              <div>
-
-                  <label  className="block mt-8 text-sm font-mono text-gray-900 dark:text-white">Confirm password</label>
-                  <input value={passwordConfirmation} type="password" name="confirm-password" id="confirm-password"
-                   onChange={(e)=> setPasswordConfirmation(e.target.value)} className=" border border-gray-300 text-gray-900 sm:text-sm
-                    rounded-lg focus:ring-primary-600 focus:border-primary-600 block 
-                    w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
-                     dark:text-white dark:focus:ring-red-500 dark:focus:border-red-700 " />
-              </div>
-              <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    
-                        {showErrors &&     <AlertDestructive2/>
- }
-                  </div>
-                 
-              </div>
-
-
-<div className='flex'>
-  <p className='font-mono'>Already have an account?   <Link to='/signin'><span className='underline font-mono'>  Log in</span></Link></p>
-</div>
-              <div className=''>
-                <p className='font-mono text-sm text-wrap'>New on Our Platform Reach us on  
-                    <span className='font-extrabold'>  0791568852</span> for further asssitance </p>
-              </div>
-            
-              <div className='flex items-center justify-center'>
-            <Button variant='outline'  type='submit' className='dotted-font p-5' >Sign Up
-            <ReloadIcon className={`ml-2 h-4 w-4   ${loading ? 'animate-spin' : 'hidden'}  `} />
-
-            </Button>
-
-              </div>
-
-          </form>
-
-      </div>
-  </div>
-</section>
-
-
-</main>
-
-</>
-  )
+    </>
+  );
 }
 
-export default Signup
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default Signup;

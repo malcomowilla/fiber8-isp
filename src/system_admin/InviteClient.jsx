@@ -61,6 +61,10 @@ const InviteClient = () => {
   const [fetchingClients, setFetchingClients] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false)
 const [row_data, setRowData] = useState({})
+
+
+
+
   const fetchClients = async () => {
     setFetchingClients(true);
     try {
