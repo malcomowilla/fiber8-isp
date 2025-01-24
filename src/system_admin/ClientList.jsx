@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { fetchClients, blockClient } from './api';
+// import { fetchClients, blockClient } from './api';
 import { motion } from 'framer-motion';
 import { Box, Card, CardContent, Typography, Button, TextField, InputAdornment } from '@mui/material';
 import { IoPeople } from "react-icons/io5";
@@ -14,22 +14,24 @@ const ClientList = () => {
   const [clients, setClients] = useState([]);
   const [search, setSearch] = useState('');
 
-  useEffect(() => {
-    const getClients = async () => {
-      const data = await fetchClients();
-      setClients(data);
-    };
-    getClients();
-  }, []);
+//   useEffect(() => {
+//     const getClients = async () => {
+//       const data = await fetchClients();
+//       setClients(data);
+//     };
+//     getClients();
+//   }, []);
 
-  const handleBlock = async (clientId) => {
-    await blockClient(clientId);
-    setClients(clients.filter(client => client.id !== clientId));
-  };
+//   const handleBlock = async (clientId) => {
+//     await blockClient(clientId);
+//     setClients(clients.filter(client => client.id !== clientId));
+//   };
 
-  const filteredClients = clients.filter(client => 
-    client.company_name.toLowerCase().includes(search.toLowerCase())
-  );
+
+
+//   const filteredClients = clients.filter(client => 
+//     client.company_name.toLowerCase().includes(search.toLowerCase())
+//   );
 
   return (
     <motion.div
