@@ -227,7 +227,7 @@ const [preferDarkMode, setPreferDarkMode] = useState(true)
 const [openSignupNotification, setOpenNotification] = useState(false);
 
 
-const subdomain = window.location.hostname.split('.')[0]
+const subdomain = window.location.hostname.split('.')[1]
 console.log('subdomain',subdomain)
 const handleClose = () => {
   setOpenNotification(false);
@@ -533,7 +533,7 @@ const darkTheme = createTheme({
 {/* </GeneralSettings> */}
 
 <Routes>
-{subdomain === 'fiber8'  ?  (
+{subdomain === 'aitechs'  ?  (
   <Route index path='/'  element={<Signup/>}/>
 ): null}
 
