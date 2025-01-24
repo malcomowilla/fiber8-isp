@@ -12,13 +12,13 @@ import dayjs from 'dayjs';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { ImSpinner9 } from "react-icons/im";
-import AccessDenied from '../access_denied/AccessDenied'
+// import AccessDenied from './AccessDenied'
 // import { requestPermission } from '../firebase/firebasePermission';
 import {useNavigate} from 'react-router-dom'
 
 import { ToastContainer, toast,Bounce, Slide, Zoom, } from 'react-toastify';
 
-import QuestionMarkAnimation from '../animation/question_mark.json'
+import QuestionMarkAnimation from '../loader/question_mark.json'
 import Lottie from 'react-lottie';
 import LoadingAnimation from '../animation/loading_animation.json'
 import Backdrop from '@mui/material/Backdrop';
