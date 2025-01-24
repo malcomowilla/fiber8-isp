@@ -28,8 +28,8 @@ import InviteClient from './InviteClient';
 import Settings from './Settings';
 import { ToastContainer, toast, Slide } from 'react-toastify';
 import LogoutIcon from '@mui/icons-material/Logout';
-import ResetPassword from '../components/ResetPassword';
-import ResetPasswordSystemAdmin from '../components/ResetPasswordSystemAdmin'
+import ResetPassword from './ResetPassword';
+import ResetPasswordSystemAdmin from './ResetPasswordSystemAdmin'
 import UptimeDisplay from './UptimeDisplay';
 import UptimeStats from './UptimeStats';
 import SystemAdminProfile from './SystemAdminProfile';

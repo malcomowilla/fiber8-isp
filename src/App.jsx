@@ -140,12 +140,12 @@ const router = createBrowserRouter(
       <Route  path='/hotspot-login' element={<HotspotLogin/>}/>
     <Route path='/system-admin-login' element={<SystemAdminLogin/>}/>
     <Route path='/sms-sent' element={<SmsSent/>}/>   
-
+{/* 
 <Route element={<ProtectAuthSystemAdmin  />}>
     <Route path='/system-admin-dashboard' element={<DashboardSytemAdmin/>}/> 
 
 
-    </Route>  
+    </Route>   */}
 
   
 {/* 
