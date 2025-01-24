@@ -13,7 +13,6 @@ import { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import Lottie from 'react-lottie';
 import LoadingAnimation from '../loader/loading_animation.json';
-import {useAppSettings} from '../settings/AppSettings';
 
 
 const SystemAdminProfile = () => {
@@ -25,113 +24,115 @@ const SystemAdminProfile = () => {
     const [openLoad, setOpenLoad] = useState(false);
     const [loading, setLoading] = useState(false);
     const [passkeyCreated, setPasskeyCreated] = useState(false); // Track if passkey is created
-const {loginWithPasskey, setLoginWithPasskey} = useAppSettings()
-
-
-  const profileImage = 'https://example.com/profile.jpg'; // Replace with actual profile image URL
-
-
-  function handleChange() {
-    // setLoginWithPasskey(e.target.checked);
-    setLoginWithPasskey(!loginWithPasskey);
- }
 
 
 
- useEffect(() => {
- const getLoginWithPasskey = async () => {
-  try {
-    const response = await fetch('/api/get_login_with_passkey');
-    const data = await response.json();
-    if (response.ok) {
-      const { login_with_passkey } = data[0]
-      setLoginWithPasskey(login_with_passkey);
-    }
-  } catch (error) {
-    console.error('Error fetching login with passkey:', error);
-  }
-};
-getLoginWithPasskey() 
- }, []);
 
-const changeLoginWithPasskey = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setOpenLoad(true);
-  // setLoginWithPasskey(!loginWithPasskey);
-  const response = await fetch('/api/login_with_passkey', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ login_with_passkey: loginWithPasskey }),
-  });
+//   function handleChange() {
+//     // setLoginWithPasskey(e.target.checked);
+//     setLoginWithPasskey(!loginWithPasskey);
+//  }
 
-  try {
-    if (response.ok) {
-      setLoading(false);
-      setOpenLoad(false);
-      toast.success('Login with passkey has been updated successfully', {
-        duration: 7000,
-        position: "top-center",
-      });
-    } else {
-      setLoading(false);
-      setOpenLoad(false);
-      toast.error('Failed to update login with passkey', {
-        duration: 7000,
-        position: "top-center",
-      });
-    }
-  } catch (error) {
-    setLoading(false);
-      setOpenLoad(false);
-      toast.error('Failed to update login with passkey', {
-        duration: 7000,
-        position: "top-center",
-        style: {
-          background: "linear-gradient(to right, #ff6384, #36a2eb)",
-          color: "white",
-          borderRadius: "5px",
-          padding: "10px",
-          boxShadow: "0 2px 10px 0 rgba(0, 0, 0, 0.1)",
-        },
-      });
-  }
+
+
+//  useEffect(() => {
+//  const getLoginWithPasskey = async () => {
+//   try {
+//     const response = await fetch('/api/get_login_with_passkey');
+//     const data = await response.json();
+//     if (response.ok) {
+//       const { login_with_passkey } = data[0]
+//       setLoginWithPasskey(login_with_passkey);
+//     }
+//   } catch (error) {
+//     console.error('Error fetching login with passkey:', error);
+//   }
+// };
+// getLoginWithPasskey() 
+//  }, []);
+
+// const changeLoginWithPasskey = async (e) => {
+//   e.preventDefault();
+//   setLoading(true);
+//   setOpenLoad(true);
+//   // setLoginWithPasskey(!loginWithPasskey);
+//   const response = await fetch('/api/login_with_passkey', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify({ login_with_passkey: loginWithPasskey }),
+//   });
+
+//   try {
+//     if (response.ok) {
+//       setLoading(false);
+//       setOpenLoad(false);
+//       toast.success('Login with passkey has been updated successfully', {
+//         duration: 7000,
+//         position: "top-center",
+//       });
+//     } else {
+//       setLoading(false);
+//       setOpenLoad(false);
+//       toast.error('Failed to update login with passkey', {
+//         duration: 7000,
+//         position: "top-center",
+//       });
+//     }
+//   } catch (error) {
+//     setLoading(false);
+//       setOpenLoad(false);
+//       toast.error('Failed to update login with passkey', {
+//         duration: 7000,
+//         position: "top-center",
+//         style: {
+//           background: "linear-gradient(to right, #ff6384, #36a2eb)",
+//           color: "white",
+//           borderRadius: "5px",
+//           padding: "10px",
+//           boxShadow: "0 2px 10px 0 rgba(0, 0, 0, 0.1)",
+//         },
+//       });
+//   }
  
-};
+// };
 
-  useEffect(() => {
-    const checkPasskeyStatus = async () => {
-      const response = await fetch(`api/check_passkey_status?email=${systemAdminEmail}`, {
-        method: 'GET',
+
+
+
+
+//   useEffect(() => {
+//     const checkPasskeyStatus = async () => {
+//       const response = await fetch(`api/check_passkey_status?email=${systemAdminEmail}`, {
+//         method: 'GET',
        
-        // body: JSON.stringify({ email: systemAdminEmail })
-      });
+//         // body: JSON.stringify({ email: systemAdminEmail })
+//       });
 
-      const data = await response.json();
-      if (response.ok) {
+//       const data = await response.json();
+//       if (response.ok) {
         
-        setPasskeyCreated(data.passkeyExists); // Set state based on response
-      }
-    };
+//         setPasskeyCreated(data.passkeyExists); // Set state based on response
+//       }
+//     };
 
-      checkPasskeyStatus();
+//       checkPasskeyStatus();
     
-  }, [systemAdminEmail]);
+//   }, [systemAdminEmail]);
 
-  function generateAvatar(name) {
-    const avatar = createAvatar(lorelei, {
-      seed: name, // Use the customer's name as the seed
-      // Customize options for the lorelei style
-      backgroundColor: ['b6e3f4', 'c0aede', 'd1d4f9'], // Example: random background colors
-      radius: 50, // Rounded corners
-      size: 64, // Size of the avatar
-    });
+//   function generateAvatar(name) {
+//     const avatar = createAvatar(lorelei, {
+//       seed: name, // Use the customer's name as the seed
+//       // Customize options for the lorelei style
+//       backgroundColor: ['b6e3f4', 'c0aede', 'd1d4f9'], // Example: random background colors
+//       radius: 50, // Rounded corners
+//       size: 64, // Size of the avatar
+//     });
   
-    // Generate the SVG as a data URL
-    return `data:image/svg+xml;utf8,${encodeURIComponent(avatar.toString())}`;
-  }
+//     // Generate the SVG as a data URL
+//     return `data:image/svg+xml;utf8,${encodeURIComponent(avatar.toString())}`;
+//   }
 
 
 
@@ -322,10 +323,10 @@ const changeLoginWithPasskey = async (e) => {
         mt: 5,
       }}
     >
-      <Avatar
+      {/* <Avatar
         src={generateAvatar(systemAdminEmail)} alt={`${systemAdminEmail}'s avatar`}
         sx={{ width: 100, height: 100, mb: 2 }}
-      />
+      /> */}
       {/* <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
         Admin Name
       </Typography> */}
@@ -423,7 +424,7 @@ const changeLoginWithPasskey = async (e) => {
 
 
 <label className="inline-flex items-center me-5 cursor-pointer">
-  <input  onChange={handleChange}  type="checkbox"  className="sr-only peer" checked={loginWithPasskey}/>
+  <input    type="checkbox"  className="sr-only peer" />
   <div className="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4
    peer-focus:ring-yellow-300 dark:peer-focus:ring-yellow-800 peer-checked:after:translate-x-full 
    rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-['']
@@ -434,7 +435,7 @@ const changeLoginWithPasskey = async (e) => {
 </label>
 
 
-<form onSubmit={changeLoginWithPasskey}>
+<form >
       <Box mt={3} display="flex" gap={2}>
         <Button variant="contained" color="primary" type="submit">
           Save
