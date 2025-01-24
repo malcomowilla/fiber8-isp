@@ -37,7 +37,7 @@ import { createAvatar } from '@dicebear/core';
 import { lorelei } from '@dicebear/collection';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { FaPerson } from "react-icons/fa6";
-import ClientRequests from '../dashboard_system_admin/ClientRequests'
+import ClientRequests from './ClientRequests'
 
 
 
