@@ -20,7 +20,7 @@ import { ToastContainer, toast,Bounce, Slide, Zoom, } from 'react-toastify';
 
 import QuestionMarkAnimation from '../loader/question_mark.json'
 import Lottie from 'react-lottie';
-import LoadingAnimation from '../animation/loading_animation.json'
+import LoadingAnimation from '../loader/loading_animation.json'
 import Backdrop from '@mui/material/Backdrop';
 import { createConsumer } from '@rails/actioncable';
 import { useDebounce } from 'use-debounce';
