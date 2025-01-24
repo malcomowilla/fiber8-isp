@@ -6,14 +6,14 @@ import { Button, Box } from '@mui/material';
 import {useState, useCallback, useEffect,} from 'react'
 import AddIcon from '@mui/icons-material/Add';
 import GetAppIcon from '@mui/icons-material/GetApp';
-import CustomerRegistrationForm from '../registration/CustomerRegitrationForm'
+// import CustomerRegistrationForm from '../registration/CustomerRegitrationForm'
 import dayjs from 'dayjs';
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { ImSpinner9 } from "react-icons/im";
 import AccessDenied from '../access_denied/AccessDenied'
-import { requestPermission } from '../firebase/firebasePermission';
+// import { requestPermission } from '../firebase/firebasePermission';
 import {useNavigate} from 'react-router-dom'
 
 import { ToastContainer, toast,Bounce, Slide, Zoom, } from 'react-toastify';
