@@ -58,6 +58,7 @@ const User = lazy(()=> import('./user/User'))
 const UserGroup = lazy(()=> import('./user/UserGroup'))
 // import Nas from './NAS_IDENTIFIER/Nas'
 const Nas = lazy(()=> import('./NAS_IDENTIFIER/Nas'))
+const HotspotPricing = lazy(()=> import('./pricing/HotspotPricing.jsx'))
 
 // import Analytics from './analytics/Analytics'
 
@@ -226,8 +227,12 @@ const [username, setUsername] = useState('')
 const [preferDarkMode, setPreferDarkMode] = useState(true)
 const [openSignupNotification, setOpenNotification] = useState(false);
 
+// const mysubdomain = 'fiber8.aitechs.co.ke'
+// const s = mysubdomain.split('.')[0]
 
 const subdomain = window.location.hostname.split('.')[1]
+
+const domain = window.location.hostname.split('.')[0]
 console.log('subdomain',subdomain)
 const handleClose = () => {
   setOpenNotification(false);
@@ -533,7 +538,7 @@ const darkTheme = createTheme({
 {/* </GeneralSettings> */}
 
 <Routes>
-{subdomain === 'aitechs'  ?  (
+{domain === 'aitechs'  ?  (
   <Route index path='/'  element={<Signup/>}/>
 ): null}
 
@@ -543,6 +548,7 @@ const darkTheme = createTheme({
       <Route  path='/reset-password' element={<ResetPassword/>}/>
       <Route  path='/hotspot-page' element={<HotspotPage/>}/>
       <Route  path='/hotspot-login' element={<HotspotLogin/>}/>
+      <Route  path='/hotspot-pricing' element={< HotspotPricing />}/>
     <Route path='/system-admin-login' element={<SystemAdminLogin/>}/>
     <Route path='/sms-sent' element={<SmsSent/>}/>   
 
