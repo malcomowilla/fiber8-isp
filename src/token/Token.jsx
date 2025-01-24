@@ -14,7 +14,6 @@
 //         setCsrfToken(csrf_token);
 //         console.log(csrf_token)
 //       } catch (error) {
-//         console.error('Error fetching CSRF token:', error);
 //       }
 //     }
 
