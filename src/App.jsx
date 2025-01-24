@@ -79,6 +79,7 @@ import GeneralSettings from './settings/GeneralSettings'
 // import HotspotLogin from './hotspot_page/HotspotLogin'
 const HotspotLogin = lazy(()=> import('./hotspot_page/HotspotLogin'))
 const PasskeySignin = lazy(()=> import('./Auth/PasskeySignin'))
+const DashboardSytemAdmin = lazy(()=> import('./system_admin/DashBoardSystemAdmin'))
 
 
 const ResetPassword = lazy(()=> import('./Auth/ResetPassword')
@@ -106,7 +107,11 @@ const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
 
  const PasskeyList = lazy(()=> import ('./Auth/PasskeyList')
  )
+ const SystemAdminLogin = lazy(()=> import ('./system_admin/SystemAdmin'))
 
+ const ProtectAuthSystemAdmin = lazy(()=> import('./Auth/ProtectAuthSystemAdmin'))
+
+ const SmsSent = lazy(()=> import('./system_admin/SmsSent'))
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -133,7 +138,16 @@ const router = createBrowserRouter(
       <Route  path='/reset-password' element={<ResetPassword/>}/>
       <Route  path='/hotspot-page' element={<HotspotPage/>}/>
       <Route  path='/hotspot-login' element={<HotspotLogin/>}/>
+    <Route path='/system-admin-login' element={<SystemAdminLogin/>}/>
+    <Route path='/sms-sent' element={<SmsSent/>}/>   
 
+<Route element={<ProtectAuthSystemAdmin  />}>
+    <Route path='/system-admin-dashboard' element={<DashboardSytemAdmin/>}/> 
+
+
+    </Route>  
+
+  
 {/* 
 <Route path='/admin-dashboard' element={<PrivateRoutes>
   <AdminDashboard/>

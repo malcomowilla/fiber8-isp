@@ -1,3 +1,6 @@
+
+import {Link} from 'react-router-dom'
+
 const AdminDashboard = () => {
   return (
    <>
@@ -13,9 +16,9 @@ const AdminDashboard = () => {
       <ion-icon name="person-outline"></ion-icon>
         <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white">Subscribers</h5>
         </div>
-        <a href="#" className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
+        <Link  to='/admin/pppoe-subscribers' className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
             View all
-        </a>
+        </Link>
    </div>
    <div className="flow-root">
         <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-700">

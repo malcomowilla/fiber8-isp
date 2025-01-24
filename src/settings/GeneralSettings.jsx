@@ -50,7 +50,17 @@ const GeneralContext = createContext(null)
 
 
 const GeneralSettings = ({children}) => {
-  const { handleChange, settingsformData, isloading, setisloading, setFormData} = useApplicationSettings();
+  const { handleChange, settingsformData, isloading, setisloading,
+     setFormData, companySettings, setCompanySettings} = useApplicationSettings();
+
+
+     const {contact_info, company_name, email_info, logo_url,
+      agent_email,customer_support_email,customer_support_phone_number  ,
+      
+     } =
+     companySettings;
+
+
   const [ routerName] = useDebounce( settingsformData.router_name, 1000)
 
 const [checkedData,  setCheckedData] = useState('')
@@ -67,6 +77,68 @@ const classes = useStyles();
 //     setRouter(routers.find(router => router.name === settingsformData.router_name));
 //   }
 // }, [settingsformData.router_name, routers]);
+
+
+
+
+
+
+const handleGetCompanySettings = useCallback(
+  async() => {
+    try {
+      const response = await fetch('/api/get_company_settings', {
+      })
+      const newData = await response.json()
+      if (response.ok) {
+        // setcompanySettings(newData)
+        const { contact_info, company_name, email_info, logo_url,
+          customer_support_phone_number,agent_email ,customer_support_email
+         } = newData
+        setCompanySettings((prevData)=> ({...prevData, 
+          contact_info, company_name, email_info,
+          customer_support_phone_number,agent_email ,customer_support_email,
+        
+          logo_preview: logo_url
+        }))
+
+        console.log('company settings fetched', newData)
+      }else{
+        console.log('failed to fetch company settings')
+      }
+    } catch (error) {
+      toast.error('internal servere error  while fetching company settings')
+    
+    }
+  },
+  [setCompanySettings],
+)
+
+useEffect(() => {
+  
+  handleGetCompanySettings()
+  
+}, [handleGetCompanySettings])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const fetchRouters = useMemo(() => async ()=> {
   
@@ -236,21 +308,106 @@ toast.success('settings updated successfully', {
         setOpenSettings(false);
       };
 
-      //  useEffect(() => {
-      //   const storedData = JSON.parse(localStorage.getItem("checkedtrueData1"));
-      //   if (storedData) {
-      //     setFormData({
-      //       ...settingsformData,
-      //       check_update_username: storedData.check_update_username,
-      //       check_update_password: storedData.check_update_password,
+    
 
-            
-      //     });
-      //   }
-      // }, [setFormData, settingsformData.check_update_password, settingsformData ]);
+
+const handleFormDataChangeForCompany = (e) => {
+  setCompanySettings((prevData)=> ({...prevData, [e.target.name]: e.target.value}))
+}
 
 
 
+
+
+
+const handleImageChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    setCompanySettings(prevData => ({
+      ...prevData,
+      logo: file,
+      logo_preview: URL.createObjectURL(file)
+    }));
+  }
+};
+
+
+
+
+
+const handleCreateCompanySettings = async (e) => {
+  e.preventDefault()
+try {
+  setisloading(true)
+  const formData = new FormData();
+  formData.append('company_name', companySettings.company_name);
+  formData.append('contact_info', companySettings.contact_info);
+  formData.append('email_info', companySettings.email_info);
+  formData.append('agent_email', companySettings.agent_email);
+  formData.append('customer_support_phone_number', companySettings.customer_support_phone_number);
+  formData.append('customer_support_email', companySettings.customer_support_email);
+
+
+
+
+  if (companySettings.logo) {
+    formData.append('logo', companySettings.logo);
+  }
+  const response = await fetch('/api/company_settings', {
+    method: 'POST',
+   
+    body: formData
+  })
+
+
+  const newData = await response.json()
+  if (response.ok) {
+    console.log('company settings created', newData)
+    const { contact_info, company_name, email_info, logo_url,
+      agent_email,customer_support_email,customer_support_phone_number  ,
+      
+     } =
+     newData;
+
+
+    setisloading(false)
+
+toast.success("company settings updated successfully", {
+  position: "top-center",
+  duration: 7000,
+})
+    setCompanySettings(prevData => ({
+      ...prevData, 
+      contact_info, 
+      company_name, 
+      customer_support_phone_number,
+      customer_support_email,
+      agent_email,
+      email_info,
+      logo_preview: logo_url
+    }));
+  } else {
+    toast.error('failed to create company settings', {
+      position: "top-center",
+      duration: 7000,
+    })
+    setisloading({...isloading, loading8: false})
+
+
+    console.log('failed to create company settings')
+  }
+
+} catch (error) {
+  console.log('error creating company settings',error)
+  toast.error('internal server error', {
+      position: "top-center",
+      duration: 7000,
+    })
+
+  
+  setisloading(false)
+}
+}
   return (
 
     <>
@@ -328,6 +485,8 @@ type='number'
         </AccordionDetails>
       </Accordion>
 </form>
+
+
 
 <form onSubmit={handleUpdateSettings}>
 
@@ -706,6 +865,162 @@ xs: '30ch'
         </AccordionDetails>
       </Accordion>
       </form>
+
+
+
+
+
+
+      <form onSubmit={handleCreateCompanySettings}>
+
+<Accordion  sx={{
+            backgroundColor: 'transparent',
+          }}>
+        <AccordionSummary
+          expandIcon={<ArrowDownwardIcon />}
+          aria-controls="panel1-content"
+          id="panel1-header"
+         
+        >
+          <Typography>Company Settings</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+
+          <Typography>
+          
+          <Stack direction='column' className='myTextField' sx={{
+          '& .MuiTextField-root': { 
+            m: 1, 
+            width: '90ch',  
+            marginTop: '30px',  
+            '& label.Mui-focused': {
+              color: 'black',
+              fontSize: '16px'
+            },
+            '& .MuiOutlinedInput-root': {
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "black",
+                borderWidth: '3px'
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: 'black',
+              }
+            } 
+          },
+        }} spacing={{xs: 1, sm: 2}}>
+
+          {/* Existing text fields */}
+          <TextField  
+            name='company_name'
+            value={company_name}
+            onChange={handleFormDataChangeForCompany}
+            label='Company Name' 
+            type='text'
+          />
+
+          <TextField  
+            onChange={handleFormDataChangeForCompany}
+            name='email_info'
+            value={email_info}
+            label='Email Info' 
+            type='text'
+          />
+
+          <TextField  
+            onChange={handleFormDataChangeForCompany}
+            name='contact_info'
+            value={contact_info}
+            label='Company Contact Info' 
+            type='text'
+          />
+
+
+<TextField  
+            onChange={handleFormDataChangeForCompany}
+            name='agent_email'
+            value={agent_email}
+            label='Agent Email' 
+            type='text'
+          />
+
+
+<TextField  
+            onChange={handleFormDataChangeForCompany}
+            name='customer_support_phone_number'
+            value={customer_support_phone_number} 
+            label='Customer Support Phone Number'
+            type='text'
+          />
+
+
+
+
+<TextField  
+            onChange={handleFormDataChangeForCompany}
+            name='customer_support_email'
+            value={customer_support_email} 
+            label='Customer Support Email'  
+            type='text'
+          />
+
+          {/* Add the new image upload section */}
+          <div className="flex flex-col gap-4 p-4">
+            <label className="text-lg font-medium  dark:text-white text-black">Company Logo</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+              id="logo-upload"
+            />
+            
+            <label 
+              htmlFor="logo-upload"
+              className="flex items-center justify-center p-4 border-2
+               border-dashed border-gray-300 rounded-lg cursor-pointer
+                hover:border-gray-400"
+            >
+              {companySettings.logo_preview ? (
+                <div className="relative">
+                  <img 
+                    src={companySettings.logo_preview}
+                    alt="Logo preview" 
+                    className="max-w-xs max-h-48 object-contain"
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCompanySettings(prev => ({...prev, logo: null, logo_preview: null}));
+                    }}
+                    className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <div className="text-gray-500">
+                  <p className='dark:text-white text-black'>Click to upload company logo</p>
+                  <p className="text-sm dark:text-white text-black">PNG, JPG up to 5MB</p>
+                </div>
+              )}
+            </label>
+          </div>
+
+        </Stack>
+
+         
+
+          </Typography>
+
+
+          <Button className='mt-7'  type='submit'>Update General Settings</Button>
+
+        </AccordionDetails>
+      </Accordion>
+
+      </form>
+
+
       </GeneralContext.Provider >
       </Suspense >
      

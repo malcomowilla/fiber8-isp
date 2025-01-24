@@ -1,5 +1,5 @@
 
-import { useContext} from 'react'
+import { useContext, useCallback, useEffect} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 
 import {Link} from  'react-router-dom'
@@ -28,6 +28,8 @@ import WifiSharpIcon from '@mui/icons-material/WifiSharp';
 import KeyboardArrowUpSharpIcon from '@mui/icons-material/KeyboardArrowUpSharp';
 import KeyboardArrowDownSharpIcon from '@mui/icons-material/KeyboardArrowDownSharp';
 import PaymentsSharpIcon from '@mui/icons-material/PaymentsSharp';
+import {useApplicationSettings} from '../settings/ApplicationSettings';
+import toast,{Toaster} from 'react-hot-toast';
 const Sidebar = () => {
 
 
@@ -38,7 +40,55 @@ const {isExpanded, setIsExpanded, isExpanded1, setIsExpanded1 , isExpanded2, set
 
 
 } = useContext(ApplicationContext);
+
+const {companySettings, setCompanySettings} = useApplicationSettings()
   
+const {company_name, contact_info, email_info, logo_preview} = companySettings
+
+
+
+
+
+
+
+const handleGetCompanySettings = useCallback(
+   async() => {
+     try {
+       const response = await fetch('/api/allow_get_company_settings', {
+       })
+       const newData = await response.json()
+       if (response.ok) {
+         // setcompanySettings(newData)
+         const { contact_info, company_name, email_info, logo_url,
+           customer_support_phone_number,agent_email ,customer_support_email
+          } = newData
+         setCompanySettings((prevData)=> ({...prevData, 
+           contact_info, company_name, email_info,
+           customer_support_phone_number,agent_email ,customer_support_email,
+         
+           logo_preview: logo_url
+         }))
+ 
+         console.log('company settings fetched', newData)
+       }else{
+         console.log('failed to fetch company settings')
+       }
+     } catch (error) {
+       toast.error('internal servere error  while fetching company settings')
+     
+     }
+   },
+   [setCompanySettings],
+ )
+ 
+ useEffect(() => {
+   
+   handleGetCompanySettings()
+   
+ }, [handleGetCompanySettings])
+ 
+ 
+
   return (
 
 
@@ -54,8 +104,8 @@ const {isExpanded, setIsExpanded, isExpanded1, setIsExpanded1 , isExpanded2, set
    
    `}>
    <div className='flex justify-between   text-white'>
-   <img  className='h-[80px] w-[80px] rounded-full'  src="/images/fiber8logo1.png" alt="fiber8-logo" />
-      <p className='font-extrabold dotted-font lg:text-xl'>Fiber 8</p>
+   <img  className='h-[80px] w-[80px] rounded-full'  src={logo_preview} alt="fiber8-logo" />
+      <p className='font-extrabold dotted-font lg:text-xl'>{company_name}</p>
       <ArrowBackSharpIcon onClick={()=> setSeeSideBar(!seeSidebar)}/>
    {/* <ion-icon  onClick={()=> setSeeSideBar(!seeSidebar)}  className='menu-black' size='large' name="menu"></ion-icon> */}
 

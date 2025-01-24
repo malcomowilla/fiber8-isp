@@ -112,8 +112,8 @@ console.log(user)
             </DropdownMenuItem>
 
 
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
+            <DropdownMenuItem className='cursor-pointer'>
+              <Settings className="mr-2 h-4 w-4 cursor-pointer" />
               <Link to='/admin/settings'><span >Settings</span></Link>
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>

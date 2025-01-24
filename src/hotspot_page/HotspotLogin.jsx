@@ -11,6 +11,10 @@ import { TiArrowBackOutline } from "react-icons/ti";
 import { useNavigate } from 'react-router-dom';
 import { FaPerson } from "react-icons/fa6";
 import { FaKey } from "react-icons/fa";
+import { useApplicationSettings } from '../settings/ApplicationSettings';
+import toast, { Toaster } from 'react-hot-toast';
+
+import { useEffect, useState, useCallback } from 'react';
 
 
 
@@ -43,7 +47,58 @@ const navigate = useNavigate()
 
 
 
+
+const {companySettings, setCompanySettings} = useApplicationSettings()
+
+const {company_name, contact_info, email_info, logo_preview} = companySettings
+
+
+
+
+
+
+
+const handleGetCompanySettings = useCallback(
+  async() => {
+    try {
+      const response = await fetch('/api/allow_get_company_settings', {
+      })
+      const newData = await response.json()
+      if (response.ok) {
+        // setcompanySettings(newData)
+        const { contact_info, company_name, email_info, logo_url,
+          customer_support_phone_number,agent_email ,customer_support_email
+         } = newData
+        setCompanySettings((prevData)=> ({...prevData, 
+          contact_info, company_name, email_info,
+          customer_support_phone_number,agent_email ,customer_support_email,
+        
+          logo_preview: logo_url
+        }))
+
+        console.log('company settings fetched', newData)
+      }else{
+        console.log('failed to fetch company settings')
+      }
+    } catch (error) {
+      toast.error('internal servere error  while fetching company settings')
+    
+    }
+  },
+  [setCompanySettings],
+)
+
+useEffect(() => {
+  
+  handleGetCompanySettings()
+  
+}, [handleGetCompanySettings])
+
+
   return (
+
+    <>
+    <Toaster/>
     <div className='min-h-screen   relative  z-0 flex items-center justify-center
      bg-gradient-to-r from-orange-500 to-yellow-500 p-4'>
 
@@ -120,6 +175,7 @@ const navigate = useNavigate()
 </motion.div>
 
     </div>
+    </>
   )
 }
 

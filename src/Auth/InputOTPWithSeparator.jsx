@@ -13,7 +13,7 @@ import { useApplicationSettings } from '../settings/ApplicationSettings';
 // } from "@/components/ui/input-otp"
 
 import Loader from '../loader/Loader'
-import { useContext, useState, useEffect} from 'react'
+import { useContext, useState, useEffect, useCallback} from 'react'
 
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
@@ -31,7 +31,9 @@ const { setCurrentUser, handleThemeSwitch
 } = useContext(ApplicationContext);
 
 
-  const {settingsformData, setWelcomeMessage,  setWelcome}  = useApplicationSettings()
+  const {settingsformData, setWelcomeMessage,  setWelcome,
+    companySettings,setCompanySettings
+  }  = useApplicationSettings()
 const navigate = useNavigate()
 const [icon, setIcon] = useState()
 
@@ -44,6 +46,7 @@ const [icon, setIcon] = useState()
   const [offlineError, setOfflineError] = useState(false)
 
 
+  const {company_name, contact_info, email_info, logo_preview} = companySettings
 
 
 const formData = {
@@ -51,11 +54,56 @@ const formData = {
   password: isPassword,
   welcome_back_message: settingsformData.welcome_back_message
 }
-const token = localStorage.getItem("jwt");
+// const token = localStorage.getItem("jwt");
 
 
 const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), 9000);
+
+
+
+
+
+  const handleGetCompanySettings = useCallback(
+    async() => {
+      try {
+        const response = await fetch('/api/allow_get_company_settings', {
+        })
+        const newData = await response.json()
+        if (response.ok) {
+          // setcompanySettings(newData)
+          const { contact_info, company_name, email_info, logo_url,
+            customer_support_phone_number,agent_email ,customer_support_email
+           } = newData
+          setCompanySettings((prevData)=> ({...prevData, 
+            contact_info, company_name, email_info,
+            customer_support_phone_number,agent_email ,customer_support_email,
+          
+            logo_preview: logo_url
+          }))
+  
+          console.log('company settings fetched', newData)
+        }else{
+          console.log('failed to fetch company settings')
+        }
+      } catch (error) {
+        toast.error('internal servere error  while fetching company settings')
+      
+      }
+    },
+    [setCompanySettings],
+  )
+  
+  useEffect(() => {
+    
+    handleGetCompanySettings()
+    
+  }, [handleGetCompanySettings])
+
+
+
+
+
 
 
 
@@ -140,6 +188,10 @@ const handleSignIn = async (e) => {
 
   }
   } catch (error) {
+    toast.error('something went wrong internalserver eror', {
+      position: "top-right",
+      duration: 7000,
+    })
     // console.log(error.name === 'AbortError');
     setloading(false);
     setOfflineError(true);
@@ -211,22 +263,30 @@ const handleSignIn = async (e) => {
 
     <main className=''>
 
-    <div onClick={handleThemeSwitch} className='dark:text-white flex justify-center cursor-pointer'>
-<ion-icon onClick={()=>setIcon(!icon)}  name={icon ? 'moon-outline' : 'sunny'} className='' size='large'></ion-icon>
-</div>
 
 
-<div className='text-center dotted-font'>
-    <p className='dark:text-white mt-8 font-bold text-2xl '>Welcome To <span className='text-red-700'>Fiber 8</span> </p>
-    </div>
+
+
+
     <section className="flex justify-center items-center">
 
   <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen lg:py-0
   
   ">
+
+
+
+
+<div onClick={handleThemeSwitch} className='dark:text-white flex justify-center cursor-pointer'>
+<ion-icon onClick={()=>setIcon(!icon)}  name={icon ? 'moon-outline' : 'sunny'} className='' size='large'></ion-icon>
+</div>
+<div className='text-center dotted-font'>
+    <p className='dark:text-white mt-8 font-bold text-2xl '>Welcome To <span className='text-red-700'>Fiber 8</span> </p>
+    </div>
+
       <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900
        dark:text-white ">
-          <img className="w-40 h-40 mr-2 rounded-full mt-20" src="/images/fiber8logo1.png" alt="logo"  />
+          <img className="w-40 h-40 mr-2 rounded-full mt-20" src={logo_preview} alt="logo"  />
           
       </a>
 

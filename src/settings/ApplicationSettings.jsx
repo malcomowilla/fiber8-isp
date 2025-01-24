@@ -32,7 +32,19 @@ const [welcome, setWelcome] = useState(false)
       const [tableDataNas, setTableData] = useState([])
       const [currentUser, setCurrentUser] = useState('')
       const [currentEmail, setCurentEmail] = useState('')
+      const [currentSystemAdmin, setCurrentSystemAdmin] = useState('')
       const [currentUsername, setCurrentUsername] = useState('')
+      const [companySettings, setCompanySettings] = useState({
+        company_name: '',
+  contact_info: '',
+  email_info: '',
+  logo: null, 
+  logo_preview: null ,
+  agent_email: '',
+  customer_support_email: '',
+  customer_support_phone_number: '',
+
+      })
 
       // const [settingsformData, setFormData] = useState(() => {
       //   const storedFormData =   localStorage.setItem("checkedtrueData", JSON.stringify(initialValue.check_update_password));
@@ -123,6 +135,39 @@ useEffect(() => {
 }, [fetchCurrentUser]);
 
 
+
+
+
+
+
+
+
+
+
+
+const fetchCurrentSystemAdmin = useCallback(
+  async() => {
+    try {
+      const response = await fetch('/api/current_system_admin')
+      const newData = await response.json()
+      if (response) {
+        console.log('fetched current user', newData)
+        const {user_name, email, id, created_at, updated_at, phone_number} = newData
+        setCurrentSystemAdmin(newData)
+        console.log('current user', newData)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  [],
+)
+
+
+
+useEffect(() => {
+  fetchCurrentSystemAdmin()
+}, [fetchCurrentSystemAdmin]);
 // useEffect(() => {
   
 //  const fetchCurrentUser = async() => {
@@ -209,10 +254,14 @@ const handleChange = (e) => {
 //   }
 //  }
   return (
-    <GeneralSettingsContext.Provider  value={{settingsformData, handleChange, setFormData, isloading, setisloading,
+    <GeneralSettingsContext.Provider  value={{settingsformData, handleChange, setFormData, isloading,
+       setisloading,
      nasformData, setnasFormData,initialValueNas, welcomeMessage, setWelcomeMessage, welcome, 
      setWelcome, tableDataNas, setTableData,currentUser, setCurrentUser,
-     currentUsername, currentEmail, fetchCurrentUser}}  >
+     currentUsername, currentEmail, fetchCurrentUser,setCurrentSystemAdmin,
+     currentSystemAdmin, fetchCurrentSystemAdmin,
+     
+     companySettings, setCompanySettings}}  >
     {children}
    </GeneralSettingsContext.Provider>
   )

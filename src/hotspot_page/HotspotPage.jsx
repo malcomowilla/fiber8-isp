@@ -4,13 +4,11 @@ import { Link } from 'react-router-dom'
 import { FaWifi, FaLock, FaCheckCircle } from 'react-icons/fa'
 import { FaPhone } from "react-icons/fa6";
 import toast, { Toaster } from 'react-hot-toast';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { TiArrowBackOutline } from "react-icons/ti";
 import { SlNotebook } from "react-icons/sl";
 import { HiMiniArrowLeftEndOnRectangle } from "react-icons/hi2";
-
-
-
+import { useApplicationSettings } from '../settings/ApplicationSettings';
 
 
 
@@ -19,6 +17,60 @@ const HotspotPage = () => {
  const [seeForm, setSeeForm] = useState(false)
  const [seePackages, setSeePackages] = useState(true)
  const [seeInstructions, setSeeInstructions] = useState(true)
+
+const {companySettings, setCompanySettings} = useApplicationSettings()
+
+ const {company_name, contact_info, email_info, logo_preview} = companySettings
+
+
+
+
+
+
+
+ const handleGetCompanySettings = useCallback(
+  async() => {
+    try {
+      const response = await fetch('/api/allow_get_company_settings', {
+      })
+      const newData = await response.json()
+      if (response.ok) {
+        // setcompanySettings(newData)
+        const { contact_info, company_name, email_info, logo_url,
+          customer_support_phone_number,agent_email ,customer_support_email
+         } = newData
+        setCompanySettings((prevData)=> ({...prevData, 
+          contact_info, company_name, email_info,
+          customer_support_phone_number,agent_email ,customer_support_email,
+        
+          logo_preview: logo_url
+        }))
+
+        console.log('company settings fetched', newData)
+      }else{
+        console.log('failed to fetch company settings')
+      }
+    } catch (error) {
+      toast.error('internal servere error  while fetching company settings')
+    
+    }
+  },
+  [setCompanySettings],
+)
+
+useEffect(() => {
+  
+  handleGetCompanySettings()
+  
+}, [handleGetCompanySettings])
+
+
+
+
+
+
+
+
 
     // const packages = [
     //     { name: 'Basic Package', speed: '5 Mbps', data: '10 GB', price: 'ksh20' },
@@ -153,7 +205,7 @@ useEffect(() => {
 >
  <div className="text-center mb-6">
    <FaWifi className="text-blue-500 w-12 h-12 mx-auto mb-4" />
-   <h1 className="text-3xl  text-gray-900  dotted-font font-thin">Welcome to Fiber8 Hotspot</h1>
+   <h1 className="text-3xl  text-gray-900  dotted-font font-thin">Welcome to {company_name} Hotspot</h1>
    <p className="text-gray-600 dotted-font ">Connect and enjoy fast browsing.</p>
  </div>
 
