@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
+import {useApplicationSettings} from '../settings/ApplicationSettings'
+import toast, { Toaster } from 'react-hot-toast';
 
 
 const HotspotTrial = () => {
   const [timeLeft, setTimeLeft] = useState(60); // 10 minutes in seconds
-
+  const {settingsformData} = useApplicationSettings()
+//   settingsformData.router_name
   useEffect(() => {
     if (timeLeft === 0) return;
 
@@ -21,9 +24,49 @@ const HotspotTrial = () => {
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  
+
+
+  const hotspotTrial  = async() => {
+const response = await fetch('/api/hotspot_trial', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({router_name: settingsformData.router_name}),
+  });
+
+
+  try {
+    if (response.ok) {
+      setTimeLeft(0)
+      toast.sucess('conected sucesfully,enjoy the free wi-fi',{
+        duration: 7000,
+        position: "top-center",
+      })
+    } else {
+        toast.error(
+            'Failed to start trial',
+            {
+              duration: 7000,
+              position: "top-center",
+            }
+        )
+      throw new Error('Failed to start trial');
+    }
+  } catch (error) {
+    toast.error(
+        'Failed to start trial',
+        {
+          duration: 7000,
+          position: "top-center",
+        }
+    )
+  }
+  }
 
   return (
+    <>
+     <Toaster />
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-6">
       <div className="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full text-center animate-fade-in">
         <h1 className="text-4xl font-bold text-gray-800 mb-4 animate-slide-up">
@@ -42,7 +85,7 @@ const HotspotTrial = () => {
         {/* Call-to-Action Button */}
         <button
           className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-8 rounded-lg hover:scale-105 transition-transform duration-300 animate-slide-up delay-300"
-          onClick={() => alert("Trial started! Enjoy your free Wi-Fi.")}
+          onClick={hotspotTrial}
         >
           Start Free Trial
         </button>
@@ -57,6 +100,8 @@ const HotspotTrial = () => {
         </p>
       </div>
     </div>
+
+    </>
   );
 };
 

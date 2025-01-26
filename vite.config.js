@@ -48,7 +48,7 @@ export default defineConfig({
       proxy: {
         '/api': {
           // target: 'http://192.168.1.69:4000',
-          target: 'http://localhost:4000',
+          target: 'https://fiber8.aitechs.co.ke',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
           configure: (proxy) => {
