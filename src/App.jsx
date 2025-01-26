@@ -114,6 +114,7 @@ const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
  const ProtectAuthSystemAdmin = lazy(()=> import('./Auth/ProtectAuthSystemAdmin'))
 
  const SmsSent = lazy(()=> import('./system_admin/SmsSent'))
+ const HotspotTrial = lazy(()=> import('./hotspot_page/HotspotTrial'))
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -548,6 +549,7 @@ const darkTheme = createTheme({
       <Route  path='/reset-password' element={<ResetPassword/>}/>
       <Route  path='/hotspot-page' element={<HotspotPage/>}/>
       <Route  path='/hotspot-login' element={<HotspotLogin/>}/>
+      <Route  path='/hotspot-trial' element={< HotspotTrial />}/>
       <Route  path='/hotspot-pricing' element={< HotspotPricing />}/>
     <Route path='/system-admin-login' element={<SystemAdminLogin/>}/>
     <Route path='/sms-sent' element={<SmsSent/>}/>   

@@ -298,12 +298,12 @@ const handleSignIn = async (e) => {
           Sign-In to your account and start managing your  network
 
           </h2>
-          <div className='flex flex-row'>
+          {/* <div className='flex flex-row'>
           <p className='font-montserat-light'>Don't have an account? <Link to='/'><span className='underline
           font-montserat
           '>Sign Up</span></Link> </p>
 
-          </div>
+          </div> */}
 
           {/* {showErrors && <p className="text-red-600">{error}</p>} */}
 
