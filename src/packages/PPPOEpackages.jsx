@@ -138,7 +138,7 @@ setTimeout(() => {
 const controller = new AbortController();
 const id = setTimeout(() => controller.abort(), 9000);
 
-
+const subdomain = window.location.hostname.split('.')[0]
 
 const createPackage = async (e) => {
   e.preventDefault();
@@ -217,6 +217,8 @@ const createPackage = async (e) => {
         method,
         headers: {
           'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+
         },
         body: JSON.stringify(formData),
       });
@@ -260,13 +262,15 @@ setTimeout(() => {
 
 
 
-
 const fetchPackages = useCallback(() => async ()=> {
   setofflineerror(false)
 
 try {
   const response = await fetch('/api/get_package',{
     signal: controller.signal,  
+    headers: {
+      'X-Subdomain': subdomain,
+    },
 
   }
 
@@ -403,10 +407,12 @@ useEffect(() => {
 
 // }, []);
 
-
 const deletePackage = async (id) => {
 const response = await fetch(`/api/package/${id}`, {
   method: "DELETE",
+  headers: {
+    'X-Subdomain': subdomain,
+  },
   
 
 })

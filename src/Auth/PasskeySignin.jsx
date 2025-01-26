@@ -126,7 +126,7 @@ function base64UrlToUint8Array(base64Url) {
 
 
 
-
+const subdomain = window.location.hostname.split('.')[0]; 
 
 async function authenticateWebAuthn(e) {
   e.preventDefault();
@@ -137,6 +137,7 @@ async function authenticateWebAuthn(e) {
   try {
     const response = await fetch('/api/webauthn/authenticate', {
       method: 'POST',
+      'X-Subdomain': subdomain,
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,  
       body: JSON.stringify({  my_user_name, email, user_name, phone_number})
@@ -211,6 +212,7 @@ setSeeError(false)
 
     const createResponse = await fetch('/api/webauthn/verify', {
       method: 'POST',
+      'X-Subdomain': subdomain,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ credential:credentialJson,
         my_user_name,email,user_name,

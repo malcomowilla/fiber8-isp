@@ -68,6 +68,7 @@ const controller = new AbortController();
     async() => {
       try {
         const response = await fetch('/api/allow_get_company_settings', {
+          'X-Subdomain': subdomain
         })
         const newData = await response.json()
         if (response.ok) {
@@ -106,7 +107,7 @@ const controller = new AbortController();
 
 
 
-
+  const subdomain = window.location.hostname.split('.')[0]
 
 const handleSignIn = async (e) => {
   
@@ -125,6 +126,7 @@ const handleSignIn = async (e) => {
 
   const users = await fetch('/api/sign_in', {
     method: "POST",
+    'X-Subdomain': subdomain,
     headers: {
 
       "Content-Type": "application/json",

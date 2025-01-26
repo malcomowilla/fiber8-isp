@@ -33,7 +33,7 @@ const formData = {
 
 console.log('message:', message)
 
-
+const subdomain = window.location.hostname.split('.')[0]
 const handleSignIn = async (e) => {
  
 
@@ -44,8 +44,9 @@ const handleSignIn = async (e) => {
 
   const users = await fetch('api/password/reset', {
     method: "POST",
+    
     headers: {
-
+      'X-Subdomain': subdomain,
       "Content-Type": "application/json"
     }, 
     body: JSON.stringify(formData),

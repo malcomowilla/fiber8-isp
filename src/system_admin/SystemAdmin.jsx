@@ -29,14 +29,19 @@ const SystemAdminLogin = () => {
   }
 
 
-
+  const subdomain = window.location.hostname.split('.')[0]; // 
 
 
   const isPhoneNumberVerified = useCallback(
     async(phone_number) => {
       const phone_number2 = localStorage.getItem('phone_number')
 
-      const response = await fetch(`/api/phone_number_verified?phone_number=${phone_number} &phone_number2=${phone_number2}`)
+      const response = await fetch(`/api/phone_number_verified?phone_number=${phone_number} &phone_number2=${phone_number2}`, {
+        method: 'GET',
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
   
       try {
         if (response.ok) {
@@ -80,6 +85,7 @@ const systemAdminLogin = async(e) => {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'X-Subdomain': subdomain,
       },
       body: JSON.stringify({
         password: password,

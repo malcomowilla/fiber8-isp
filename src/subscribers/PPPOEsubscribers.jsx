@@ -77,7 +77,7 @@ setFormData({
 
 
   }
-
+  const subdomain = window.location.hostname.split('.')[0]; 
 
   const fetchSubscribers = useMemo(() => async ()=> {
   
@@ -85,6 +85,9 @@ setFormData({
 
     try {
       const response = await fetch('/api/subscribers',{
+        headers: {
+          'X-Subdomain': subdomain,
+        },
     
       }
     
@@ -131,7 +134,8 @@ e.preventDefault()
       const response = await fetch(url, {
         method,
         headers: {
-"Content-Type" : "application/json"
+"Content-Type" : "application/json",
+        'X-Subdomain': subdomain,
         },
         body: JSON.stringify(formData)
       }

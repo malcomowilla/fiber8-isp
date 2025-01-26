@@ -45,7 +45,7 @@ const SmsSent = () => {
 
 
       
-
+      const subdomain = window.location.hostname.split('.')[0]
 
      const handleVerifyOtp = async (e) => {
  
@@ -61,6 +61,7 @@ const SmsSent = () => {
           headers: {
       
             "Content-Type": "application/json",
+            'X-Subdomain': subdomain,
           }, 
       
       

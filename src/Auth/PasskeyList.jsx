@@ -28,11 +28,14 @@ const generateAvatar = (name) => {
 
 
     
-
+const subdomain = window.location.hostname.split('.')[0];
 const getPasskeys = useCallback(
   async() => {
     const response = await fetch('/api/get_passkey_credentials', {
         method: 'GET',
+        headers: {
+          'X-Subdomain': subdomain,
+        },
     })
 const newData = await response.json()
     try {
@@ -62,7 +65,10 @@ useEffect(() => {
 
 const deletePassKey = async(id) => {
   const response = await fetch(`/api/delete_passkey?id=${id}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: {
+      'X-Subdomain': subdomain,
+    },
   })
 
 

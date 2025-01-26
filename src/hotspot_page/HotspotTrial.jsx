@@ -24,13 +24,14 @@ const HotspotTrial = () => {
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-
+  const subdomain = window.location.hostname.split('.')[0];
 
   const hotspotTrial  = async() => {
 const response = await fetch('/api/hotspot_trial', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'X-Subdomain': subdomain,
     },
     body: JSON.stringify({router_name: settingsformData.router_name}),
   });

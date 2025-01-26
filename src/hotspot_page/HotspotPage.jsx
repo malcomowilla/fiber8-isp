@@ -26,12 +26,15 @@ const {companySettings, setCompanySettings} = useApplicationSettings()
 
 
 
-
+ const subdomain = window.location.hostname.split('.')[0]
 
  const handleGetCompanySettings = useCallback(
   async() => {
     try {
       const response = await fetch('/api/allow_get_company_settings', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
       })
       const newData = await response.json()
       if (response.ok) {
@@ -107,7 +110,11 @@ useEffect(() => {
   
   const fetchHotspotPackages = async() => {
     try {
-      const response = await fetch('/api/hotspot_packages')
+      const response = await fetch('/api/hotspot_packages', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
       const newData = await response.json()
       if (response.ok) {
         // setPackages(newData)

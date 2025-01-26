@@ -69,7 +69,7 @@ const [welcome, setWelcome] = useState(false)
  
 //    }
 
-
+const subdomain = window.location.hostname.split('.')[0];
 const fetchSubscriberUpdatedSettings = useCallback(async () => {
   const storedData = JSON.parse(localStorage.getItem("checkedtrueData2"));
 
@@ -84,7 +84,8 @@ try {
 const response = await fetch(`/api/get_general_settings?${new URLSearchParams(requestParams)}`, {
 method: 'GET',
 headers: {
-  "Content-Type"  : 'application/json'
+  "Content-Type"  : 'application/json',
+  'X-Subdomain': subdomain,
 },
 
 
@@ -117,7 +118,11 @@ console.log(error)
 const fetchCurrentUser = useCallback(
   async() => {
     try {
-      const response = await fetch('/api/currently_logged_in_user')
+      const response = await fetch('/api/currently_logged_in_user', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
       const newData = await response.json()
       if (response) {
         console.log('fetched current user', newData)
@@ -154,7 +159,11 @@ useEffect(() => {
 const fetchCurrentSystemAdmin = useCallback(
   async() => {
     try {
-      const response = await fetch('/api/current_system_admin')
+      const response = await fetch('/api/current_system_admin', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
       const newData = await response.json()
       if (response) {
         console.log('fetched current user', newData)
@@ -202,7 +211,11 @@ useEffect(() => {
 
 
     try {
-      const response = await fetch('/api/router_settings')
+      const response = await fetch('/api/router_settings', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
 const newData = await response.json()
       if (response) {
         console.log('fetched router settings', newData)

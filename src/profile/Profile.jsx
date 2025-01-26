@@ -33,7 +33,7 @@ import {
   import { GoPasskeyFill } from "react-icons/go";
 
 
-
+  const subdomain = window.location.hostname.split('.')[0]
 
   export function Profile() {
 
@@ -47,6 +47,9 @@ const handleLogout = async () => {
         const response = await fetch('/api/logout', {
           method: "DELETE",
           credentials: 'include', // Include cookies in the request
+          headers: {
+            'X-Subdomain': subdomain,
+          },
 
         },
         

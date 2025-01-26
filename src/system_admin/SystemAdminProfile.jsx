@@ -159,7 +159,7 @@ const SystemAdminProfile = () => {
   }
 
 
-
+  const subdomain = window.location.hostname.split('.')[0]
   
   async function signupWithWebAuthn(e) {
 
@@ -170,7 +170,9 @@ const SystemAdminProfile = () => {
     setLoading(true);
     const response = await fetch('/api/webauthn/register_system_admin', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', {
+        'X-Subdomain': subdomain,
+      } },
       body: JSON.stringify({  email: systemAdminEmail })
     });
   
@@ -249,7 +251,9 @@ const SystemAdminProfile = () => {
   
       const createResponse = await fetch('/api/webauthn/create_register_system_admin', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', {
+           'X-Subdomain': subdomain,
+        } },
         body: JSON.stringify({ credential: credentialJson,
             email:systemAdminEmail, })
       });

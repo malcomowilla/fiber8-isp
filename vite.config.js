@@ -5,15 +5,16 @@ import path from "path"
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
     // host: '0.0.0.0',
     // port: 3000,
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://localhost:4000',
-    //     changeOrigin: true,
-    //     rewrite: (path) => path.replace(/^\/api/, ''),
-    //   },
-    // },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
 
     
 
@@ -25,8 +26,8 @@ export default defineConfig({
 
     // proxy: {
     //   '/api': {
-    //     target: 'http://localhost:4000',
-    //     // target: 'https://fiber8.aitechs.co.ke',
+    //     // target: 'http://192.168.1.69:4000',
+    //     target: 'https://fiber8.aitechs.co.ke',
     //     changeOrigin: true,
     //     rewrite: (path) => path.replace(/^\/api/, ''),
     //     configure: (proxy) => {
@@ -38,28 +39,7 @@ export default defineConfig({
     
     
     // },
-
-    server: {
-      host: 'fiber8.aitechs.co.ke',
-      proxy: {
-        '/api': {
-          target: 'https://fiber8.aitechs.co.ke',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, ''),
-          configure: (proxy) => {
-            proxy.on('proxyReq', (proxyReq, req, res, options) => {
-              // Extract the subdomain from the original host
-              const originalHost = req.headers.host;
-              const subdomain = originalHost.split('.')[0]; // Assumes subdomain is the first part of the host
-    
-              // Set a custom header with the subdomain
-              proxyReq.setHeader('X-Subdomain', subdomain);
-            });
-          },
-        },
-      },
-    },
-
+  },
 
 
 

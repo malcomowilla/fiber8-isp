@@ -34,13 +34,17 @@ const [registrationStatus, setRegistrationStatus] = useState('');
 
 
 
-
+const subdomain = window.location.hostname.split('.')[0]
 
 useEffect(() => {
   
   const fetchCurrentUser = async() => {
    try {
-     const response = await fetch('/api/currently_logged_in_user')
+     const response = await fetch('/api/currently_logged_in_user', {
+      headers: {
+        'X-Subdomain': subdomain,
+      },
+     })
      const newData = await response.json()
      if (response) {
        console.log('fetched current user', newData)
@@ -82,6 +86,7 @@ const handleChangeFormData = (e) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        'X-Subdomain': subdomain,
       },
       credentials: 'include', // Include cookies in the request
       body: JSON.stringify(formData),
@@ -172,7 +177,9 @@ async function startPasskeyRegistration(e) {
 
   const response = await fetch('/api/webauthn/register', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json',
+      'X-Subdomain': subdomain,
+     },
     body: JSON.stringify({  email:currentEmail })
   });
 
@@ -270,7 +277,9 @@ setRegistrationStatus('error');
 
     const createResponse = await fetch('/api/webauthn/create', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 
+        'X-Subdomain': subdomain,
+       },
       body: JSON.stringify({ credential: credentialJson, email: currentEmail})
     });
 

@@ -81,12 +81,15 @@ const classes = useStyles();
 
 
 
-
+const subdomain = window.location.hostname.split('.')[0]
 
 const handleGetCompanySettings = useCallback(
   async() => {
     try {
       const response = await fetch('/api/get_company_settings', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
       })
       const newData = await response.json()
       if (response.ok) {
@@ -134,16 +137,13 @@ useEffect(() => {
 
 
 
-
-
-
-
-
-
 const fetchRouters = useMemo(() => async ()=> {
   
   try {
     const response = await fetch('/api/routers',{
+      headers: {
+        'X-Subdomain': subdomain,
+      },
   
     }
   
@@ -195,7 +195,11 @@ useEffect(() => {
 
 
     try {
-      const response = await fetch('/api/router_settings')
+      const response = await fetch('/api/router_settings', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
 const newData = await response.json()
       if (response) {
         console.log('fetched router settings', newData)
@@ -231,7 +235,8 @@ const newData = await response.json()
          const response = await fetch(url, {
           method,
           headers: {
-            "Content-Type"  : 'application/json'
+            "Content-Type"  : 'application/json',
+            'X-Subdomain': subdomain,
           },
 
           body: JSON.stringify(
@@ -355,6 +360,9 @@ try {
   }
   const response = await fetch('/api/company_settings', {
     method: 'POST',
+    headers: {
+      'X-Subdomain': subdomain,
+    },
    
     body: formData
   })

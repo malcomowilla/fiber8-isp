@@ -70,11 +70,14 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
 
 
 
-
+  const subdomain = window.location.hostname.split('.')[0];
 
   const handleLogout = async () => {
     const response = await fetch('/api/logout_system_admin', {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'X-Subdomain': subdomain,
+      },
     });
   
     if (response.ok) {

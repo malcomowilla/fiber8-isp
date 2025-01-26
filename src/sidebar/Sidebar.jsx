@@ -49,12 +49,16 @@ const {company_name, contact_info, email_info, logo_preview} = companySettings
 
 
 
-
+const subdomain = window.location.hostname.split('.')[0]; 
 
 const handleGetCompanySettings = useCallback(
    async() => {
      try {
        const response = await fetch('/api/allow_get_company_settings', {
+         method: 'GET',
+         headers: {
+           'X-Subdomain': subdomain,
+         },
        })
        const newData = await response.json()
        if (response.ok) {
