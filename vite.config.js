@@ -40,6 +40,7 @@ export default defineConfig({
     // },
 
     server: {
+      host: 'fiber8.aitechs.co.ke',
       proxy: {
         '/api': {
           target: 'https://fiber8.aitechs.co.ke',
