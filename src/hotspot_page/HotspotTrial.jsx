@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import toast, { Toaster } from 'react-hot-toast';
@@ -6,7 +6,7 @@ import toast, { Toaster } from 'react-hot-toast';
 
 const HotspotTrial = () => {
   const [timeLeft, setTimeLeft] = useState(60); // 10 minutes in seconds
-  const {settingsformData} = useApplicationSettings()
+  const {settingsformData, setFormData} = useApplicationSettings()
 //   settingsformData.router_name
   useEffect(() => {
     if (timeLeft === 0) return;
@@ -25,6 +25,49 @@ const HotspotTrial = () => {
   };
 
   const subdomain = window.location.hostname.split('.')[0];
+
+
+const fetchRouters = useCallback(
+  async() => {
+    try {
+      const response = await fetch('/api/allow_get_router_settings', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
+const newData = await response.json()
+      if (response) {
+        console.log('fetched router settings', newData)
+        const {router_name} = newData[0]
+        setFormData({...settingsformData, router_name})
+      } else {
+        console.log('failed to fetch router settings')
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  [],
+)
+
+
+
+  useEffect(() => {
+   
+    fetchRouters()
+  }, [fetchRouters]);
+  
+  
+
+
+
+
+
+
+
+
+
+
 
   const hotspotTrial  = async() => {
 const response = await fetch('/api/hotspot_trial', {
@@ -64,6 +107,11 @@ const response = await fetch('/api/hotspot_trial', {
     )
   }
   }
+
+
+
+
+  
 
   return (
     <>

@@ -54,7 +54,6 @@ const formData = {
   password: isPassword,
   welcome_back_message: settingsformData.welcome_back_message
 }
-// const token = localStorage.getItem("jwt");
 
 
 const controller = new AbortController();
@@ -63,12 +62,16 @@ const controller = new AbortController();
 
 
 
+  const subdomain = window.location.hostname.split('.')[0];
+
 
   const handleGetCompanySettings = useCallback(
     async() => {
       try {
         const response = await fetch('/api/allow_get_company_settings', {
-          'X-Subdomain': subdomain
+          headers: {
+            'X-Subdomain': subdomain,
+          },
         })
         const newData = await response.json()
         if (response.ok) {
@@ -107,7 +110,6 @@ const controller = new AbortController();
 
 
 
-  const subdomain = window.location.hostname.split('.')[0]
 
 const handleSignIn = async (e) => {
   
@@ -126,8 +128,9 @@ const handleSignIn = async (e) => {
 
   const users = await fetch('/api/sign_in', {
     method: "POST",
-    'X-Subdomain': subdomain,
+    
     headers: {
+      'X-Subdomain': subdomain,
 
       "Content-Type": "application/json",
 

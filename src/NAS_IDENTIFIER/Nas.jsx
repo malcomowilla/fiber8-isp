@@ -101,7 +101,7 @@ const handleCloseDelete = () => {
 
 
 
-
+const subdomain = window.location.hostname.split('.')[0];
 
 
 
@@ -109,6 +109,11 @@ const handleCloseDelete = () => {
     setloading(true)
     const response = await fetch(`/api/delete_router/${id}`, {
       method: "DELETE",
+      headers: {
+        'X-Subdomain': subdomain,
+      },
+
+
     })
     
     
@@ -144,7 +149,12 @@ const handleCloseDelete = () => {
   const fetchRouters = useMemo(() => async ()=> {
   
   try {
-    const response = await fetch('/api/routers'
+    const response = await fetch('/api/routers',
+      {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      }
   
   
   )
@@ -192,7 +202,9 @@ const handleSubmit = async (e)=> {
         const res = await fetch(url, {
             method: method,
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-Subdomain': subdomain,
+                
             },
             signal: controller.signal,
             body: JSON.stringify(nasformData),

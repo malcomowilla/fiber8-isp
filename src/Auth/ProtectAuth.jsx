@@ -69,7 +69,7 @@ const ProtectAuth = ({children}) => {
 
   useEffect(() => {
     const loadUser = async () => {
-      // await fetchCurrentUser();
+      await fetchCurrentUser();
       setLoading(false);
     };
 
@@ -81,7 +81,7 @@ const ProtectAuth = ({children}) => {
     const {   user
     } = useContext(ApplicationContext);
      
-    const isAuthenticated = currentUser !== null; 
+    const isAuthenticated = currentUser && currentUser.id;
 
   if (loading) {
     return <>

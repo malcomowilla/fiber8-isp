@@ -131,9 +131,11 @@ const fetchCurrentUser = useCallback(
         setCurrentUsername(username)
         setCurentEmail(email)
         console.log('current user', newData)
+      }else{
+        setCurrentUser(null) 
       }
     } catch (error) {
-      
+      setCurrentUser(null) 
     }
   },
   [],
