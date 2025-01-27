@@ -58,7 +58,7 @@ export default defineConfig({
       target: 'es2020'
     }
   },
-  base: './',
+  base: '/',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
