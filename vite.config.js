@@ -10,7 +10,8 @@ export default defineConfig({
     // port: 3000,
     proxy: {
       '/api': {
-        target: 'https://fiber8.aitechs.co.ke',
+        target: 'http://localhost:4000',
+        // target: 'https://fiber8.aitechs.co.ke',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },

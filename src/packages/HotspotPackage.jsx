@@ -145,13 +145,17 @@ const handleRowClick = (event, rowData) => {
   // Add your custom logic here, such as opening a modal or updating state
 };
 
-
+const subdomain = window.location.hostname.split('.')[0]
 
 useEffect(() => {
   
   const fetchHotspotPackages = async() => {
     try {
-      const response = await fetch('/api/hotspot_packages')
+      const response = await fetch('/api/hotspot_packages', {
+        headers: {
+          'X-Original-Host': subdomain
+        }
+      })
       const newData = await response.json()
       if (response.ok) {
         setPackages(newData)
@@ -192,6 +196,7 @@ const createHotspotPackage = async (e) => {
       method,
       headers: {
         'Content-Type': 'application/json',
+        'X-Original-Host': subdomain
       },
       body: JSON.stringify({...hotspotPackage, router_name: settingsformData.router_name}),
     });
@@ -258,6 +263,9 @@ setTimeout(() => {
 const deleteHotspotPackage = async (id) => {
   const response = await fetch(`/api/hotspot_packages/${id}?router_name=${settingsformData.router_name}`, {
     method: "DELETE",
+    headers: {
+      'X-Subdomain': subdomain,
+    },
     
   
   })
