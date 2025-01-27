@@ -143,7 +143,7 @@ const {name, validity, download_limit, upload_limit, price, upload_burst_limit, 
 
 
 
-
+{/* 
             <TextField label='upload-speed-limit(mbps)'   
             
             value={upload_limit}
@@ -167,10 +167,10 @@ const {name, validity, download_limit, upload_limit, price, upload_burst_limit, 
 },
          
         }}     className='myTextField'  
-            type='number' placeholder='upload-speed-limit(mbps)...' fullWidth></TextField>
+            type='number' placeholder='upload-speed-limit(mbps)...' fullWidth></TextField> */}
 
 
-
+{/* 
             <TextField    value={download_limit}  onChange={handleChangeHotspotPackage} 
             label='download-speed-limit(mbps)'   id='download_limit'   sx={{
 
@@ -190,7 +190,7 @@ const {name, validity, download_limit, upload_limit, price, upload_burst_limit, 
          
         }}   className='myTextField'       
           type='number' 
-      fullWidth></TextField>
+      fullWidth></TextField> */}
             </div>
            
            {/* <div className='flex   '>
