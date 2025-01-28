@@ -48,6 +48,7 @@ const InviteClient = () => {
     smtpUsername: ''
 
   });
+  const subdomain = window.location.hostname.split('.')[0]; 
 
   const [errors, setErrors] = useState({
     email: '',
@@ -68,7 +69,12 @@ const [row_data, setRowData] = useState({})
   const fetchClients = async () => {
     setFetchingClients(true);
     try {
-      const response = await fetch('/api/get_all_clients');
+      const response = await fetch('/api/get_all_clients', {
+        method: 'GET',
+        headers: {
+          'X-Subdomain': subdomain,
+        },  
+      });
       if (response.ok) {
         const data = await response.json();
         setClients(data);
@@ -162,7 +168,9 @@ const [row_data, setRowData] = useState({})
       const response = await fetch('/api/invite_client', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+          
         },
         body: JSON.stringify({
           email: formData.email,
@@ -266,7 +274,9 @@ const deleteClient = async (id)=> {
     setLoading(true)
 
 const response = await fetch(`/api/delete_client/${id}`, {
-  method: 'DELETE'
+  method: 'DELETE',
+  headers: {      
+    'X-Subdomain': subdomain,
   })
   
   if (response.ok) {
