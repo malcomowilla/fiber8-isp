@@ -196,9 +196,7 @@ const createHotspotPackage = async (e) => {
       method,
       headers: {
         'Content-Type': 'application/json',
-        headers: {
-          'X-Subdomain': subdomain,
-        }
+        'X-Subdomain': subdomain,
       },
       body: JSON.stringify({...hotspotPackage, router_name: settingsformData.router_name}),
     });
