@@ -80,7 +80,6 @@ const classes = useStyles();
 
 
 
-
 const subdomain = window.location.hostname.split('.')[0]
 
 const handleGetCompanySettings = useCallback(
@@ -97,6 +96,8 @@ const handleGetCompanySettings = useCallback(
         const { contact_info, company_name, email_info, logo_url,
           customer_support_phone_number,agent_email ,customer_support_email
          } = newData
+         console.log(logo_url)
+
         setCompanySettings((prevData)=> ({...prevData, 
           contact_info, company_name, email_info,
           customer_support_phone_number,agent_email ,customer_support_email,
