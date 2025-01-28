@@ -275,9 +275,10 @@ const deleteClient = async (id)=> {
 
 const response = await fetch(`/api/delete_client/${id}`, {
   method: 'DELETE',
-  headers: {      
+  headers: {
     'X-Subdomain': subdomain,
-  })
+  }
+})
   
   if (response.ok) {
     setIsOpenDelete(false)
