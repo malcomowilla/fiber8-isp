@@ -153,7 +153,7 @@ useEffect(() => {
     try {
       const response = await fetch('/api/hotspot_packages', {
         headers: {
-          'X-Original-Host': subdomain
+          'X-Subdomain': subdomain,
         }
       })
       const newData = await response.json()
@@ -196,7 +196,9 @@ const createHotspotPackage = async (e) => {
       method,
       headers: {
         'Content-Type': 'application/json',
-        'X-Original-Host': subdomain
+        headers: {
+          'X-Subdomain': subdomain,
+        }
       },
       body: JSON.stringify({...hotspotPackage, router_name: settingsformData.router_name}),
     });
