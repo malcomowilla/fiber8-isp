@@ -50,6 +50,7 @@ const [welcome, setWelcome] = useState(false)
       const [formData, setFormDataSystemAdmin] = useState({
         password: '',
         phone_number: '',
+        email: ''
       })
 
       // const [settingsformData, setFormData] = useState(() => {
@@ -60,7 +61,9 @@ const [welcome, setWelcome] = useState(false)
 
     const [isloading, setisloading] = useState(false)
     
-
+const [loginWithPasskey, setLoginWithPasskey] = useState(false)
+const [useEmailAuthentication, setUseEmailAuthentication] = useState(false)
+const [usePhoneNumberAuthentication, setUsePhoneNumberAuthentication] = useState(false)
 
 //   const handleChange = (e) => {
 //     const {type, name, checked, value} = e.target
@@ -281,6 +284,8 @@ const handleChange = (e) => {
      setWelcome, tableDataNas, setTableData,currentUser, setCurrentUser,
      currentUsername, currentEmail, fetchCurrentUser,setCurrentSystemAdmin,
      currentSystemAdmin, fetchCurrentSystemAdmin,formData, setFormDataSystemAdmin,
+     useEmailAuthentication, setUseEmailAuthentication, usePhoneNumberAuthentication, setUsePhoneNumberAuthentication,
+     loginWithPasskey, setLoginWithPasskey,
      
      companySettings, setCompanySettings}}  >
     {children}

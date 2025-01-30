@@ -16,7 +16,9 @@ import LoadingAnimation from '../loader/loading_animation.json';
 
 
 const SystemAdminProfile = () => {
-    const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
+    const {currentSystemAdmin, systemAdminEmail, loginWithPasskey, setLoginWithPasskey,
+      useEmailAuthentication, setUseEmailAuthentication, usePhoneNumberAuthentication, setUsePhoneNumberAuthentication,
+    } = useApplicationSettings()
     const [hasPasskey, setHasPasskey] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
     const [registrationStatus, setRegistrationStatus] = useState('');
@@ -26,7 +28,31 @@ const SystemAdminProfile = () => {
     const [passkeyCreated, setPasskeyCreated] = useState(false); // Track if passkey is created
 
 
+    function handleChangePasskey() {
+      // setLoginWithPasskey(e.target.checked);
+      setLoginWithPasskey(!loginWithPasskey);
+      setUseEmailAuthentication(false);
+      setUsePhoneNumberAuthentication(false);
+   }
 
+
+   function handleChangeEmailAuth() {
+    // setLoginWithPasskey(e.target.checked);
+    setUseEmailAuthentication(!useEmailAuthentication);
+
+    setUsePhoneNumberAuthentication(false)
+    setLoginWithPasskey(false);
+ }
+
+   function handleChangePhoneNumberAuth() {
+    // setLoginWithPasskey(e.target.checked);
+    setUsePhoneNumberAuthentication(!usePhoneNumberAuthentication);
+    setUseEmailAuthentication(false)
+    setLoginWithPasskey(false);
+ }
+    // setLoginWithPasskey(e.target.checked);
+    
+ 
 
 //   function handleChange() {
 //     // setLoginWithPasskey(e.target.checked);
@@ -283,16 +309,90 @@ const SystemAdminProfile = () => {
   }
   
   
+  // create_system_admin_settings  
+
+
+
+ 
+  const changeSystemAdminSettings = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setOpenLoad(true);
+    // setLoginWithPasskey(!loginWithPasskey);
+    const response = await fetch('/api/create_system_admin_settings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ login_with_passkey: loginWithPasskey,
+        use_email_authentication: useEmailAuthentication,
+        use_sms_authentication: usePhoneNumberAuthentication,
+       }),
+    });
   
+    try {
+      if (response.ok) {
+        setLoading(false);
+        setOpenLoad(false);
+        toast.success('Login with passkey has been updated successfully', {
+          duration: 7000,
+          position: "top-center",
+        });
+      } else {
+        setLoading(false);
+        setOpenLoad(false);
+        toast.error('Failed to update login with passkey', {
+          duration: 7000,
+          position: "top-center",
+        });
+      }
+    } catch (error) {
+      setLoading(false);
+        setOpenLoad(false);
+        toast.error('Failed to update login with passkey', {
+          duration: 7000,
+          position: "top-center",
+          style: {
+            background: "linear-gradient(to right, #ff6384, #36a2eb)",
+            color: "white",
+            borderRadius: "5px",
+            padding: "10px",
+            boxShadow: "0 2px 10px 0 rgba(0, 0, 0, 0.1)",
+          },
+        });
+    }
+   
+  };
 
 
+
+
+
+
+  useEffect(() => {
+    const getSystemAdminSettings = async () => {
+     try {
+       const response = await fetch('/api/get_system_admin_settings');
+       const data = await response.json();
+       if (response.ok) {
+         const { login_with_passkey } = data[0]
+         setLoginWithPasskey(login_with_passkey);
+
+       setUseEmailAuthentication(data[0].use_email_authentication)
+        setUsePhoneNumberAuthentication(data[0].use_sms_authentication)
+       }
+     } catch (error) {
+       console.error('Error fetching login with passkey:', error);
+     }
+   };
+   getSystemAdminSettings() 
+    }, []);
   
   
 
 
 
   return (
-
     <>
     <Toaster />
 
@@ -426,7 +526,7 @@ const SystemAdminProfile = () => {
 
 
 <label className="inline-flex items-center me-5 cursor-pointer">
-  <input    type="checkbox"  className="sr-only peer" />
+  <input onChange={handleChangePasskey} type="checkbox" checked={loginWithPasskey} className="sr-only peer" />
   <div className="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4
    peer-focus:ring-yellow-300 dark:peer-focus:ring-yellow-800 peer-checked:after:translate-x-full 
    rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-['']
@@ -437,7 +537,41 @@ const SystemAdminProfile = () => {
 </label>
 
 
-<form >
+
+
+<div className='p-3'>
+<label className="inline-flex items-center me-5 cursor-pointer">
+  <input  onChange={handleChangePhoneNumberAuth} type="checkbox" checked={usePhoneNumberAuthentication} className="sr-only peer" />
+  <div className="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4
+   peer-focus:ring-yellow-300 dark:peer-focus:ring-yellow-800 peer-checked:after:translate-x-full 
+   rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-['']
+    after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300
+     after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600
+      peer-checked:bg-yellow-400"></div>
+  <span className="ms-3 text-sm text-black">SMS authentication?</span>
+</label>
+</div>
+
+
+
+
+
+<div className='p-3'>
+<label className="inline-flex items-center me-5 cursor-pointer">
+  <input  onChange={handleChangeEmailAuth} type="checkbox" checked={useEmailAuthentication} className="sr-only peer" />
+  <div className="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4
+   peer-focus:ring-yellow-300 dark:peer-focus:ring-yellow-800 peer-checked:after:translate-x-full 
+   rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-['']
+    after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300
+     after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600
+      peer-checked:bg-yellow-400"></div>
+  <span className="ms-3 text-sm text-black">Email authentication?</span>
+</label>
+</div>  
+
+
+
+<form onSubmit={changeSystemAdminSettings}>
       <Box mt={3} display="flex" gap={2}>
         <Button variant="contained" color="primary" type="submit">
           Save
@@ -447,6 +581,7 @@ const SystemAdminProfile = () => {
         </Button>
       </Box>
       </form>
+      
     </Box>
     
     </>

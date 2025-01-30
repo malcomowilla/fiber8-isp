@@ -19,11 +19,14 @@ const SystemAdminLogin = () => {
   const [phoneNumberVerified, setPhoneNumberVerified] = useState(false)
   const [emailVerified, setEmailVerified] = useState(false)
 
-  const {formData, setFormDataSystemAdmin} = useApplicationSettings()
+  const {formData, setFormDataSystemAdmin, setLoginWithPasskey, setUseEmailAuthentication,
+     setUsePhoneNumberAuthentication, useEmailAuthentication, usePhoneNumberAuthentication,
+     loginWithPasskey
+    } = useApplicationSettings()
 
   const navigate = useNavigate()
 
-  const {password, phone_number} = formData
+  const {password, phone_number, email} = formData
   const handleChange = (e) => {
     setFormDataSystemAdmin({ ...formData, [e.target.name]: e.target.value })
   }
@@ -31,6 +34,49 @@ const SystemAdminLogin = () => {
 
   const subdomain = window.location.hostname.split('.')[0]; // 
 
+
+
+  // email_verified
+
+const isEmailVerified = useCallback(
+  async(email) => {
+    // const my_email = localStorage.getItem('phone_number')
+    const response = await fetch(`/api/email_verified?email=${email}`, {
+      method: 'GET',
+      headers: {
+        'X-Subdomain': subdomain,
+      },
+      
+    })
+
+
+    const newData = await response.json()
+    try {
+      if (response.ok){
+
+        setEmailVerified(newData.email_verified)
+      }else{
+        toast.error('Something went wrong with geting email verification status', {
+          duration: 7000,
+          position: 'top-center',
+        })
+      }
+      
+    } catch (error) {
+      toast.error('internal server error something went wrong with geting email verification status', {
+        duration: 7000,
+        position: 'top-center',
+      })
+    }
+  },
+  [],
+)
+ 
+
+
+useEffect(() => {
+  isEmailVerified()
+}, []);
 
   const isPhoneNumberVerified = useCallback(
     async(phone_number) => {
@@ -48,13 +94,13 @@ const SystemAdminLogin = () => {
           const newData = await response.json()
           setPhoneNumberVerified(newData.sms_verified)
         } else {
-          toast.error('Something went wrong', {
+          toast.error('Something went wrong with geting phone number verification status', {
             duration: 7000,
             position: 'top-center',
           })
         }
       } catch (error) {
-        toast.error('internal server error something went wrong', {
+        toast.error('internal server error something went wrong with geting phone number verification status', {
           duration: 7000,
           position: 'top-center',
         })
@@ -90,6 +136,8 @@ const systemAdminLogin = async(e) => {
       body: JSON.stringify({
         password: password,
         phone_number: phone_number,
+        email: email
+        
       }),
     })
 
@@ -97,12 +145,25 @@ const systemAdminLogin = async(e) => {
       setSuccess(true)
       setloading(false)
       localStorage.setItem('phone_number', phone_number);
+      localStorage.setItem('email', email);
       isPhoneNumberVerified(phone_number)
+      isEmailVerified(email)
+
+      if  (usePhoneNumberAuthentication){
+
+    
       if (phoneNumberVerified) {
         navigate('/system-admin-dashboard')
       } else {
         navigate('/sms-sent')
       }
+    }else if(useEmailAuthentication == true || useEmailAuthentication == 'true'){
+      // email-sent
+      navigate('/email-sent')
+      // navigate('/system-admin-dashboard')
+    }else{
+      navigate('/system-admin-dashboard')
+    }
       
     } else {
       setloading(false)
@@ -126,6 +187,27 @@ const newData = await response.json()
     })
   }
 }
+
+
+
+useEffect(() => {
+  const getSystemAdminSettings = async () => {
+   try {
+     const response = await fetch('/api/get_system_admin_settings');
+     const data = await response.json();
+     if (response.ok) {
+       const { login_with_passkey } = data[0]
+       setLoginWithPasskey(login_with_passkey);
+
+     setUseEmailAuthentication(data[0].use_email_authentication)
+      setUsePhoneNumberAuthentication(data[0].use_sms_authentication)
+     }
+   } catch (error) {
+     console.error('Error fetching login with passkey:', error);
+   }
+ };
+ getSystemAdminSettings() 
+  }, []);
 
 
   return (
@@ -164,9 +246,49 @@ const newData = await response.json()
                       transition duration-150 ease-in-out"
                     placeholder="Enter Phone Number"
                   />
+
+
+
+                  
                 </div>
+
+
+                
               </div>
   
+
+
+
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 
+                dark:text-gray-200 mb-2 ">
+                Email
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <MdOutlineMarkEmailRead className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="email"
+                    name="email"
+                    value={email}
+                    onChange={handleChange}
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl 
+                      focus:ring-2 focus:ring-green-500 focus:border-green-500
+                      dark:bg-gray-700 dark:border-gray-600 dark:text-white
+                      transition duration-150 ease-in-out"
+                    placeholder="Enter Email"
+                  />
+
+
+
+                  
+                </div>
+
+
+                
+              </div>
   
      <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
