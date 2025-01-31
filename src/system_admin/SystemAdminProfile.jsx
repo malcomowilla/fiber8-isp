@@ -9,7 +9,7 @@ import { createAvatar } from '@dicebear/core';
 import { lorelei } from '@dicebear/collection';
 import { FiKey, FiShield, FiCheck } from 'react-icons/fi';
 import { Tooltip, Backdrop } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import Lottie from 'react-lottie';
 import LoadingAnimation from '../loader/loading_animation.json';
@@ -18,6 +18,7 @@ import LoadingAnimation from '../loader/loading_animation.json';
 const SystemAdminProfile = () => {
     const {currentSystemAdmin, systemAdminEmail, loginWithPasskey, setLoginWithPasskey,
       useEmailAuthentication, setUseEmailAuthentication, usePhoneNumberAuthentication, setUsePhoneNumberAuthentication,
+    fetchCurrentSystemAdmin
     } = useApplicationSettings()
     const [hasPasskey, setHasPasskey] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
@@ -35,7 +36,6 @@ const SystemAdminProfile = () => {
       setUsePhoneNumberAuthentication(false);
    }
 
-
    function handleChangeEmailAuth() {
     // setLoginWithPasskey(e.target.checked);
     setUseEmailAuthentication(!useEmailAuthentication);
@@ -50,15 +50,13 @@ const SystemAdminProfile = () => {
     setUseEmailAuthentication(false)
     setLoginWithPasskey(false);
  }
-    // setLoginWithPasskey(e.target.checked);
-    
+
+
+ useEffect(() => {
+  fetchCurrentSystemAdmin()
  
-
-//   function handleChange() {
-//     // setLoginWithPasskey(e.target.checked);
-//     setLoginWithPasskey(!loginWithPasskey);
-//  }
-
+ }, [fetchCurrentSystemAdmin]);
+  
 
 
 //  useEffect(() => {
@@ -171,10 +169,14 @@ const SystemAdminProfile = () => {
     },
   };
 
+  // /webauthn/authenticate_webauthn_login_system_admin
+  // /webauthn/verify_webauthn_login_system_admin
 
 
+  const subdomain = window.location.hostname.split('.')[0]
 
-
+  const subdomain_aitechs = window.location.host
+console.log('subdomain_aitechs', subdomain_aitechs)
   function arrayBufferToBase64Url(buffer) {
     const bytes = new Uint8Array(buffer);
     let binary = '';
@@ -185,19 +187,23 @@ const SystemAdminProfile = () => {
   }
 
 
-  const subdomain = window.location.hostname.split('.')[0]
   
   async function signupWithWebAuthn(e) {
 
+    
     e.preventDefault();
     setOpenLoad(true);
     setIsRegistering(true);
     setRegistrationStatus('starting');
     setLoading(true);
-    const response = await fetch('/api/webauthn/register_system_admin', {
+    const response = await fetch('/api/webauthn/register_webauthn_system_admin', {
       method: 'POST',
-      headers: { 'X-Subdomain': subdomain },
-      body: JSON.stringify({  email: systemAdminEmail })
+      headers: { 'X-Subdomain': subdomain,
+        'X-Subdomain-Aitechs': subdomain_aitechs
+       },
+      body: JSON.stringify({  email: currentSystemAdmin.email,
+        phone_number: currentSystemAdmin.phone_number
+       })
     });
   
     const options = await response.json();
@@ -269,17 +275,15 @@ const SystemAdminProfile = () => {
         challenge: challenge
   
       };
-  
-  
-      
-  
-      const createResponse = await fetch('/api/webauthn/create_register_system_admin', {
+     
+      const createResponse = await fetch('/api/webauthn/create_webauthn_system_admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 
             'X-Subdomain': subdomain,
+            'X-Subdomain-Aitechs': subdomain_aitechs
          },
         body: JSON.stringify({ credential: credentialJson,
-            email:systemAdminEmail, })
+            email:currentSystemAdmin.email, phone_number: currentSystemAdmin.phone_number})
       });
   
       const data = await createResponse.json();

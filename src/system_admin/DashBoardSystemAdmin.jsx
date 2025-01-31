@@ -38,6 +38,9 @@ import { lorelei } from '@dicebear/collection';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { FaPerson } from "react-icons/fa6";
 import ClientRequests from './ClientRequests'
+import PasskeyList from './PasskeyList'
+import { IoMdKey } from "react-icons/io";
+
 
 
 
@@ -94,12 +97,13 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
     if (showResetPassword) return "Reset Password Client";
     switch (value) {
       case 0: return "System Statistics";
-      case 1: return "Client Management";
+      case 1: return "Client Management"; 
       case 2: return "Settings";
       case 3: return "Invite Client";
       case 4: return "Profile";
       case 5: return "Reset Password Admin";
       case 6: return "Client Requests";
+      case 7: return "Passkeys";
       default: return "Dashboard";
     }
   };
@@ -115,6 +119,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
     alt={`${systemAdminEmail}'s avatar`} />), value: 4 },
     { label: "Reset Password Admin", icon: <LockResetIcon />, value: 5 },
     { label: "Client Requests", icon: <FaPerson  className='w-6 h-6 rounded-full'/>, value: 6 },
+    { label: "Passkeys", icon: <IoMdKey  className='w-6 h-6 rounded-full'/>, value: 7 },
   ];
 
   const pageTransitionVariants = {
@@ -333,6 +338,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
                   {value === 4 && <SystemAdminProfile />}
                   {value === 5 && <ResetPasswordSystemAdmin />}
                   {value === 6 && <ClientRequests />}
+                  {value === 7 && <PasskeyList />}
 
                 </motion.div>
               )}  

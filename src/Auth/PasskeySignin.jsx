@@ -95,6 +95,17 @@ const defaultOptions = {
 
 
 
+const controller = new AbortController();
+const timeoutDuration = 12000; // 12 seconds
+const timeoutId = setTimeout(() => {
+  controller.abort();
+  setOpenLoad(false);
+ 
+}, timeoutDuration);
+const subdomain = window.location.hostname.split('.')[0]; 
+
+
+
 function arrayBufferToBase64Url(buffer) {
   const bytes = new Uint8Array(buffer);
   let binary = '';
@@ -105,13 +116,8 @@ function arrayBufferToBase64Url(buffer) {
 }
 
 
-const controller = new AbortController();
-const timeoutDuration = 12000; // 12 seconds
-const timeoutId = setTimeout(() => {
-  controller.abort();
-  setOpenLoad(false);
- 
-}, timeoutDuration);
+
+
 
 function base64UrlToUint8Array(base64Url) {
   const padding = '='.repeat((4 - base64Url.length % 4) % 4);
@@ -126,7 +132,6 @@ function base64UrlToUint8Array(base64Url) {
 
 
 
-const subdomain = window.location.hostname.split('.')[0]; 
 
 async function authenticateWebAuthn(e) {
   e.preventDefault();

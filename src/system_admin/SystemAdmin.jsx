@@ -24,7 +24,12 @@ const SystemAdminLogin = () => {
      loginWithPasskey
     } = useApplicationSettings()
 
+
+    const [openLoad, setOpenLoad] = useState(false);
+    
   const navigate = useNavigate()
+
+
 
   const {password, phone_number, email} = formData
   const handleChange = (e) => {
@@ -36,7 +41,180 @@ const SystemAdminLogin = () => {
 
 
 
-  // email_verified
+
+
+
+  function arrayBufferToBase64Url(buffer) {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary).replace(/\//g, '_').replace(/\+/g, '-').replace(/=+$/, '');
+  }
+  
+  
+  
+  
+  
+  function base64UrlToUint8Array(base64Url) {
+    const padding = '='.repeat((4 - base64Url.length % 4) % 4);
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/') + padding;
+    const rawData = atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
+  
+  
+  const subdomain_aitechs = window.location.host
+
+  
+  // /webauthn/register_system_admin
+  // /webauthn/verify-system-admin
+  
+  async function authenticateWebAuthn(email, phone_number) {
+    // e.preventDefault();
+    setOpenLoad(true);
+  
+    try {
+      const response = await fetch('/api/webauthn/authenticate_webauthn_login_system_admin', {
+        method: 'POST',
+        
+
+        headers: { 'Content-Type': 'application/json' ,
+          'X-Subdomain': subdomain, 
+        'X-Subdomain-Aitechs': subdomain_aitechs,
+        },
+        body: JSON.stringify({email,phone_number})
+      });
+  
+      const options = await response.json();
+      const challenge = options.challenge;
+  
+  try {
+    if (response.ok) {
+      setOpenLoad(false)
+  
+  
+  
+  
+  } else {
+      
+        setOpenLoad(false)
+  }
+  } catch (error) {
+    toast.error('something went wrong', {
+      duration: 8000,
+      position: "top-center",
+    })
+  }
+  
+     
+  
+  
+   
+  
+  
+    const publicKey = {
+      ...options,
+      challenge: base64UrlToUint8Array(options.challenge),
+      allowCredentials: options.allowCredentials.map(cred => ({
+        ...cred,
+        id: base64UrlToUint8Array(cred.id)
+      }))
+    };
+  
+  
+    try {
+      // const credentialSignin = await navigator.credentials.get({ publicKey: options });
+      const credential = await navigator.credentials.get({ publicKey: publicKey });
+  
+  
+      // Prepare the credential response
+      const credentialJson = {
+        id: credential.id,
+        rawId: arrayBufferToBase64Url(credential.rawId),
+        challenge: challenge,
+        type: credential.type,
+        response: {
+          clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON),
+          authenticatorData: arrayBufferToBase64Url(credential.response.authenticatorData),
+          signature: arrayBufferToBase64Url(credential.response.signature),
+          userHandle: arrayBufferToBase64Url(credential.response.userHandle)
+        }
+  
+  
+      };
+  
+  
+  
+  
+      const createResponse = await fetch('/api/webauthn/verify_webauthn_login_system_admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' ,
+          'X-Subdomain': subdomain, 
+          'X-Subdomain-Aitechs': subdomain_aitechs,
+        },
+        body: JSON.stringify({ credential:credentialJson,
+          email,phone_number,
+            })
+      });
+  
+  const newData = await createResponse.json()
+  
+      if (createResponse.ok ) {
+        setOpenLoad(false);
+        
+      navigate('/system-admin-dashboard')
+     
+  
+        // setTimeout(() => {
+        //   // setDone(true);
+        //   // setloading(false);
+        //   setTimeout(() => {
+        //     navigate('/admin/location')
+        //   }, 1000);
+        // }, 2500);
+      } else {
+        toast.error('something went wrong', {
+          duration: 8000,
+          position: "top-center",
+        })
+        // setRegistrationError(options.errors);
+        setOpenLoad(false);
+  toast.error(newData.error, {
+    duration: 6000,
+    position: "top-center",
+  })
+        console.log(`passkey error =>${newData.error}`)
+      }
+    } catch (err) {
+      toast.error('something went wrong', {
+        duration: 8000,
+        position: "top-center",
+      })
+      setOpenLoad(false);
+      console.error('Error during WebAuthn credential creation:', err);
+    }
+  }catch (err) {
+      toast.error('something went wrong', {
+        duration: 8000,
+        position: "top-center",
+      })
+      setOpenLoad(false);
+      console.error('Error during WebAuthn credential creation:', err);
+    }
+  }
+
+
+
+
+
+
+
 
 const isEmailVerified = useCallback(
   async(email) => {
@@ -74,9 +252,9 @@ const isEmailVerified = useCallback(
  
 
 
-useEffect(() => {
-  isEmailVerified()
-}, []);
+// useEffect(() => {
+//   isEmailVerified()
+// }, [isEmailVerified]);
 
   const isPhoneNumberVerified = useCallback(
     async(phone_number) => {
@@ -95,13 +273,13 @@ useEffect(() => {
           setPhoneNumberVerified(newData.sms_verified)
         } else {
           toast.error('Something went wrong with geting phone number verification status', {
-            duration: 7000,
+            duration: 4000,
             position: 'top-center',
           })
         }
       } catch (error) {
         toast.error('internal server error something went wrong with geting phone number verification status', {
-          duration: 7000,
+          duration: 4000,
           position: 'top-center',
         })
       }
@@ -111,9 +289,9 @@ useEffect(() => {
   )
   
   
-  useEffect(() => {
-    isPhoneNumberVerified()
-  }, []);
+  // useEffect(() => {
+  //   isPhoneNumberVerified()
+  // }, [isPhoneNumberVerified]);
   
 
 
@@ -149,6 +327,11 @@ const systemAdminLogin = async(e) => {
       isPhoneNumberVerified(phone_number)
       isEmailVerified(email)
 
+      if(loginWithPasskey){
+        authenticateWebAuthn(email, phone_number)
+
+      }
+
       if  (usePhoneNumberAuthentication){
 
     
@@ -168,21 +351,21 @@ const systemAdminLogin = async(e) => {
     } else {
       setloading(false)
       toast.error('Something went wrong', {
-        duration: 5000,
+        duration: 3000,
         position: 'top-center',
       })
 
 
 const newData = await response.json()
       toast.error(newData.error, {
-        duration: 5000,
+        duration: 3000,
         position: 'top-center',
       })
     }
   } catch (error) {
     setloading(false)
     toast.error('internal server error something went wrong', {
-      duration: 5000,
+      duration: 3000,
       position: 'top-center',
     })
   }
