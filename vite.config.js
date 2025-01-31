@@ -10,9 +10,10 @@ export default defineConfig({
     // port: 3000,
     proxy: {
       '/api': {
-        target: 'https://38d6-102-221-35-116.ngrok-free.app',
+        // target: 'https://38d6-102-221-35-116.ngrok-free.app',
         // target: 'http://localhost:4000',
         // target: 'https://fiber8.aitechs.co.ke',
+        target: 'http://0.0.0.0:3000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
