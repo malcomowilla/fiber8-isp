@@ -30,6 +30,17 @@ import KeyboardArrowDownSharpIcon from '@mui/icons-material/KeyboardArrowDownSha
 import PaymentsSharpIcon from '@mui/icons-material/PaymentsSharp';
 import {useApplicationSettings} from '../settings/ApplicationSettings';
 import toast,{Toaster} from 'react-hot-toast';
+import { motion, AnimatePresence } from "framer-motion";
+import { LuTicketsPlane } from "react-icons/lu";
+import { FcOnlineSupport } from "react-icons/fc";
+import { FaUpload } from "react-icons/fa6";
+import { BsHddNetwork } from "react-icons/bs";
+
+
+
+
+
+
 const Sidebar = () => {
 
 
@@ -82,7 +93,7 @@ const handleGetCompanySettings = useCallback(
      
      }
    },
-   [setCompanySettings],
+   [],
  )
  
  useEffect(() => {
@@ -137,41 +148,59 @@ const handleGetCompanySettings = useCallback(
             </button>
 
 
-         <ul id="dropdown-example" className={` transition-colors  duration-700 ease-in-out   py-1 space-y-1
-            
-            
-            ${isExpanded5 ? 'max-h-[200px] opacity-[1]  overflow-hidden' : 'max-h-2     overflow-hidden '}
-            
-            `}>
+         <motion.ul id="dropdown-example"
+        className="py-1 space-y-1"
+        initial={{ opacity: 0, height: 0 }}
+        animate={{
+          opacity: isExpanded5 ? 1 : 0,
+          height: isExpanded5 ? "auto" : 0,
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}>
 
 
 
 
-                <li>
-                     <Link to='/admin/admin-dashboard' className="flex items-center gap-x-4 w-full p-2  transition
-                      duration-75 rounded-lg pl-11 group 
-                       dark:text-white text-white space-x-2"> 
-                          <ManageAccountsOutlinedIcon/>
-                        Management
-                        </Link>
-                  </li>
-                 
-                 
+<AnimatePresence>
+          {isExpanded5 && (
+            <>
+              <motion.li
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Link
+                  to="/admin/admin-dashboard"
+                  className="flex items-center gap-x-4 w-full p-2 transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700"
+                >
+                  <ManageAccountsOutlinedIcon />
+                  Management
+                </Link>
+              </motion.li>
 
-
-                <li>
-                     <Link to='/admin/analytics' className="flex items-center  gap-x-4  w-full p-2  transition
-                      duration-75 rounded-lg pl-11 group 
-                       dark:text-white text-white space-x-2"> 
-                       <img src="/images/icons8-increase.gif" className='rounded-full w-8 h-8' alt="" />
-                        Analytics
-                       </Link>
-                  </li>
-
-
-
-                  
-            </ul>
+              <motion.li
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2, delay: 0.1 }}
+              >
+                <Link
+                  to="/admin/analytics"
+                  className="flex items-center gap-x-4 w-full p-2 transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700"
+                >
+                  <img
+                    src="/images/icons8-increase.gif"
+                    className="rounded-full w-8 h-8"
+                    alt="Analytics"
+                  />
+                  Analytics
+                </Link>
+              </motion.li>
+            </>
+          )}
+        </AnimatePresence>
+     
+            </motion.ul>
 
 
 
@@ -197,17 +226,27 @@ const handleGetCompanySettings = useCallback(
             </button>
 
 
-            <ul id="dropdown-example" className={` transition-all py-1 space-y-1  duration-700 ease-in-out   overflow-hidden
-            
-            
-            ${isExpanded ? 'max-h-[200px] opacity-[1]  overflow-hidden ' : 'max-h-2     overflow-hidden '}
-            
-            `}>
+            <motion.ul id="dropdown-example"
+        className="py-1 space-y-1"
+        initial={{ opacity: 0, height: 0 }}
+        animate={{
+          opacity: isExpanded ? 1 : 0,
+          height: isExpanded ? "auto" : 0,
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}>
 
 
-            
+<AnimatePresence>
+{isExpanded &&  (
+   <>
 
-                  <li   className="flex items-center  w-full p-2 text-white transition
+<motion.li 
+
+initial={{ opacity: 0, x: -20 }}
+animate={{ opacity: 1, x: 0 }}
+exit={{ opacity: 0, x: -20 }}
+transition={{ duration: 0.2, delay: 0.1 }}
+className="flex items-center  w-full p-2 text-white transition
                       duration-75 rounded-lg  space-x-4 group 
                        dark:text-white ">
                               {/* <WifiIcon className='w-[500px]'/>    */}
@@ -218,11 +257,17 @@ const handleGetCompanySettings = useCallback(
                      <Link to='/admin/pppoe-packages'>
                        PPOE packages                 
                        </Link>
-                  </li>
+                  </motion.li>
 
 
+                  
 
-                  <li  className="flex items-center w-full p-2 text-white transition
+                  <motion.li 
+                   initial={{ opacity: 0, x: -20 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   exit={{ opacity: 0, x: -20 }}
+                   transition={{ duration: 0.2 , delay: 0.2 }}
+                  className="flex items-center w-full p-2 text-white transition
                       duration-75 text-nowrap  space-x-4 group 
                        dark:text-white">
             <img src="/images/icons8-person.gif " className='rounded-full w-10  h-10' alt="" />
@@ -230,24 +275,61 @@ const handleGetCompanySettings = useCallback(
                      <Link to='/admin/pppoe-subscribers' >                  
                       PPOE subscribers                 
                   </Link>
-                  </li>
+                  </motion.li>
+
+
+
+                  
 
 
 
 
-                  <li className="flex items-center w-full p-2 text-white transition
+
+                  <motion.li
+                  
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 , delay: 0.3 }}
+                  className="flex items-center w-full p-2 text-white transition
                       duration-75   space-x-4 group 
                        dark:text-white">
-                                 <WifiIcon className='w-[500px]'/>   
+                                 <WifiIcon className='w-6 h-6 text-blue-500'/>   
 
 
                      <Link to='/admin/pppoe-subscriptions' >                 
                       PPOE subscriptions                  
                       </Link>
-                  </li>
+                  </motion.li>
 
 
-            </ul>
+                  <motion.li
+                  
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 , delay: 0.3 }}
+                  className="flex items-center w-full p-2 text-white transition
+                      duration-75   space-x-4 group 
+                       dark:text-white">
+                                 <FaUpload className='w-6 h-6 text-yellow-600'/>   
+
+
+                     <Link to='/admin/upload-subscriber' >                 
+                      upload subscribers                  
+                      </Link>
+                  </motion.li>
+
+                  
+
+   </>
+)}
+
+                
+
+                  </AnimatePresence>
+
+            </motion.ul>
 
 
 
@@ -265,64 +347,119 @@ const handleGetCompanySettings = useCallback(
                   < KeyboardArrowDownSharpIcon/>
                    }
             </button>
-            <ul id="dropdown-example" className={`transition-all py-2 space-y-2  duration-700 ease-in-out   overflow-hidden
-            
-            
-            ${isExpanded4 ? 'max-h-[300px] opacity-[1] overflow-hidden ' : 'max-h-2     overflow-hidden '}
-            
-            `}>
 
 
+            <motion.ul id="dropdown-example"
+        className="py-1 space-y-1"
+        initial={{ opacity: 0, height: 0 }}
+        animate={{
+          opacity: isExpanded4 ? 1 : 0,
+          height: isExpanded4 ? "auto" : 0,
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}>
 
-                  <li>
-                  
-                  
+
+<AnimatePresence>
+
+   {isExpanded4 && (
+      <>
+   <motion.li
+   initial={{ opacity: 0, x: -20 }}
+   animate={{ opacity: 1, x: 0 }}
+   exit={{ opacity: 0, x: -20 }}
+   transition={{ duration: 0.2 , delay: 0.1 }}
+   >
                      <Link to='/admin/nodes' className="flex items-center w-full p-2 text-white transition
                       duration-75 rounded-lg  group 
                        dark:text-white  gap-x-3">
                         <img src="/images/icons8-map-pin.gif " className='w-8 h-8 rounded-full' alt="" />
                         Nodes</Link>
-                  </li>
+                  </motion.li>
 
 
 
-                  <li>
+                  <motion.li
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 , delay: 0.2 }}
+                  >
                      <Link to='/admin/zones' className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg group  dark:text-white
                        gap-x-3">
                               <img src="/images/icons8-map.gif" className='rounded-full h-8 w-8' alt="" />
                         Zones</Link>
-                  </li>
-                  <li>
+                  </motion.li>
+
+                  <motion.li
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 , delay: 0.3 }}
+                  >
                      <Link  className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg  group 
                       dark:text-white  gap-x-3">
                         <img src="/images/icons8-map (1).gif" className='w-8 h-8 rounded-full' alt="" />
                         Map</Link>
-                  </li>
+                  </motion.li>
 
-                  <li>
+
+
+                  <motion.li
+                  
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 , delay: 0.3 }}
+                  className="flex items-center w-full p-2 text-white transition
+                      duration-75   space-x-4 group 
+                       dark:text-white">
+                                 <BsHddNetwork className='w-6 h-6 text-red-500'/>   
+
+
+                     <Link to='/admin/ip-pool-table' >                 
+                      ip pool               
+                      </Link>
+                  </motion.li>
+
+                     <motion.li
+                     initial={{ opacity: 0, x: -20 }}
+                     animate={{ opacity: 1, x: 0 }}
+                     exit={{ opacity: 0, x: -20 }}
+                     transition={{ duration: 0.2 , delay: 0.4 }}
+                     >
                      <Link  className="flex items-center w-full p-2 text-white 
                      transition duration-75 rounded-lg  group 
                       dark:text-white  gap-x-3">
                         < GroupSharpIcon/>
                         User Group</Link>
-                  </li>
+                  </motion.li>
 
 
-                        <li>
+                        <motion.li
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.2 , delay: 0.5 }}
+                        >
                            <Link to='/admin/nas' className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg  group 
                       dark:text-white  gap-x-3">
                            <RouterIcon/>
                            Mikrotik
                            </Link>
-                        </li>
+                        </motion.li>
+
+      </>
+   )}
+               
 
 
 
+                        </AnimatePresence>
 
-            </ul>
+            </motion.ul>
 
 
 
@@ -349,49 +486,67 @@ const handleGetCompanySettings = useCallback(
                   }
             </button>
 
-            <ul id="dropdown-example" className={` transition-all duration-700 ease-in-out  py-1 space-y-1
-            
-            
-            ${isExpanded1 ? 'max-h-[200px] opacity-[1]  overflow-hidden' : 'max-h-2     overflow-hidden '}
-            
-            `}>
+            <motion.ul id="dropdown-example"
+        className="py-1 space-y-1"
+        initial={{ opacity: 0, height: 0 }}
+        animate={{
+          opacity: isExpanded1 ? 1 : 0,
+          height: isExpanded1 ? "auto" : 0,
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}>
 
 
+<AnimatePresence>
+{isExpanded1 && (
+   <>
 
+<motion.li
 
-                 <li>
-                     <Link   to='/admin/fixed-payments'className="flex items-center w-full p-2 text-white transition
+initial={{ opacity: 0, x: -20 }}
+animate={{ opacity: 1, x: 0 }}
+exit={{ opacity: 0, x: -20 }}
+transition={{ duration: 0.2, delay: 0.1 }}
+>
+                     <Link   to='/admin/fixed-payments'  className="flex items-center w-full p-2 text-white transition
                       duration-75 rounded-lg  group gap-x-3
                        dark:text-white ">
                         <PaymentIcon />
                          PPOE payments  
                        </Link>
-                  </li>
+                  </motion.li>
 
 
 
 
-                  
+                  <motion.li
+                   initial={{ opacity: 0, x: -20 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   exit={{ opacity: 0, x: -20 }}
+                   transition={{ duration: 0.2, delay: 0.2 }}
+                  >
                      <Link to='/admin/hotspot-payments'  className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg  group text-nowrap dark:text-white gap-x-3
                       ">
                          <PaymentsSharpIcon/>
                       Hotspot Payments                  
                       </Link>
-
+                      </motion.li>
+   </>
+)}
+                
                       
-  
+                      </AnimatePresence>
                  
-            </ul>
+            </motion.ul>
          </li>
 
 
 
 
 
+
+
          <li>
-
-
          <button   onClick={()=> setIsExpanded2(!isExpanded2)} type="button" className="flex items-center w-full p-2 text-base
              text-white transition duration-75 rounded-lg group dark:hover:bg-white dark:hover:text-black hover:bg-black
               dark:text-white  " aria-controls="dropdown-example"
@@ -405,38 +560,65 @@ const handleGetCompanySettings = useCallback(
                   < KeyboardArrowDownSharpIcon/>
                    }
             </button>
-            <ul id="dropdown-example" className={` transition-all duration-700 ease-in-out  py-1 space-y-1
+            <motion.ul
             
-            
-            ${isExpanded2 ? 'max-h-[200px] opacity-[1] overflow-hidden ' : 'max-h-3      overflow-hidden '}
-            
-            `}>
+            id="dropdown-example"
+        className="py-1 space-y-1"
+        initial={{ opacity: 0, height: 0 }}
+        animate={{
+          opacity: isExpanded2 ? 1 : 0,
+          height: isExpanded2 ? "auto" : 0,
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}>
 
 
 
-
-                  <li className="flex items-center w-full p-2 gap-x-4 text-white transition
+<AnimatePresence>
+   {isExpanded2 && (
+      <>
+ <motion.li
+  initial={{ opacity: 0, x: -20 }}
+  animate={{ opacity: 1, x: 0 }}
+  exit={{ opacity: 0, x: -20 }}
+  transition={{ duration: 0.2, delay: 0.1 }}
+ className="flex items-center w-full p-2 gap-x-4 text-white transition
                       duration-75 rounded-lg pl-11 group 
                        dark:text-white "> 
                        <MailOutlineIcon/>
                    Email
-                  </li>
+                  </motion.li>
 
-                  <li className="flex items-center w-full p-2 text-white
+                  <motion.li
+                   initial={{ opacity: 0, x: -20 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   exit={{ opacity: 0, x: -20 }}
+                   transition={{ duration: 0.2 , delay: 0.2 }}
+                  className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg pl-11 group  dark:text-white gap-x-4
                       " >
                         <TextsmsSharpIcon/>
                     SMS
-                  </li>
+                  </motion.li>
 
 
-                  <li  className="flex items-center w-full p-2 text-white
+                  <motion.li  
+                   initial={{ opacity: 0, x: -20 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   exit={{ opacity: 0, x: -20 }}
+                   transition={{ duration: 0.2, delay: 0.3 }}
+                  className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg pl-11 group gap-x-4
                       dark:text-white ">
                         <img src="/images/logo-whatsapp.svg" className='sm:w-[30px] max-sm:w-[30px]' alt="" />
                      Whatsap
-                  </li>
-            </ul>
+                  </motion.li>
+
+      </>
+   )}
+                 
+
+                  </AnimatePresence>
+            </motion.ul>
          </li>
          <li>
 
@@ -456,87 +638,147 @@ const handleGetCompanySettings = useCallback(
                   < KeyboardArrowDownSharpIcon/>
                    }
             </button>
-            <ul id="dropdown-example" className={`transition-all text-nowrap mr-0  duration-700 ease-in-out  py-2 space-y-2
-             
-         9
-            ${isExpanded3 ?  'max-h-[800px] opacity-[1]  overflow-hidden' : 'max-h-3  overflow-hidden     '}
+
+            <motion.ul id="dropdown-example"
             
-            `}>
+            className={`py-1 space-y-1 `}
+        initial={{ opacity: 0, height: 0 }}
+        animate={{
+          opacity: isExpanded3 ? 1 : 0,
+          height: isExpanded3 ? "auto" : 0,
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}>
+<AnimatePresence>
+
+{isExpanded3 && (
+   <>
 
 
-
-
-                  <li>
+                  <motion.li
+                   initial={{ opacity: 0, x: -20 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   exit={{ opacity: 0, x: -20 }}
+                   transition={{ duration: 0.2 , delay: 0.1 }}
+                  >
                      <Link  to='/admin/hotspot-package' className="flex items-center w-full p-2 text-white transition
                       duration-75 rounded-lg  group gap-x-3 text-nowrap 
                        dark:text-white "> 
                         <WavesIcon/>
                       Hotspot  Package</Link>
-                  </li>
+                  </motion.li>
 
 
-                  <li className="flex  w-full p-2 text-white
+                  <motion.li 
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 , delay: 0.2 }}
+                  className="flex  w-full p-2 text-white
                      transition duration-75  rounded-lg  group  gap-x-3  dark:text-white
                       ">
                         <Groups2Icon/>
                         Hotspot  Subscribers
-                  </li>
+                  </motion.li>
 
 
-                  <li>
+                  <motion.li 
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 , delay: 0.3 }}
+                  >
                      <Link to='/admin/hotspot-subscriptions' className="flex items-center w-full p-2 text-white 
                      transition duration-75 rounded-lg group 
                       dark:text-white gap-x-3  ">
                         <WifiIcon/>
                       Vouchers</Link>
-                  </li>
+                  </motion.li>
 
 
 
 
 
-                  <li>
+                  <motion.li
+                   initial={{ opacity: 0, x: -20 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   exit={{ opacity: 0, x: -20 }}
+                   transition={{ duration: 0.2 , delay: 0.4 }}
+                  >
                      <Link to='/admin/hotspot_anlytics'  className="flex items-center w-full p-2 text-white 
                      transition duration-75 rounded-lg  group 
                       dark:text-white gap-x-3  ">
                         <WifiIcon/>
                         Hotspot     Overview</Link>
-                  </li>
-            </ul>
+                  </ motion.li>
+
+   </>
+) }
+
+</AnimatePresence>
+
+            </motion.ul>
          </li>
 
 
 
-         <li  onClick={()=> setIsExpanded6(!isExpanded6)} className="flex items-center hover:cursor-pointer >
-             p-2 text-white rounded-lg dark:text-white dark:hover:bg-white dark:hover:text-black hover:bg-black  group">
-                  <MessageIcon/>
-               <span className="flex-1 ms-3 whitespace-nowrap">Messages</span>
-               <span className="inline-flex items-center justify-center px-2 ms-3 text-sm font-medium
-                  dark:text-gray-300">
-                     {isExpanded6 ?     < KeyboardArrowUpSharpIcon/> : 
+      
+
+
+
+         <button   onClick={()=> setIsExpanded6(!isExpanded6)} type="button" className="flex items-center w-full p-2 text-base
+             text-white transition duration-75 rounded-lg group 
+              dark:text-white dark:hover:bg-white dark:hover:text-black hover:bg-black " aria-controls="dropdown-example"
+               data-collapse-toggle="dropdown-example">
+   < FcOnlineSupport className='w-5 h-5'/>
+
+                  <span className="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Support</span>
+                  {isExpanded6 ?     < KeyboardArrowUpSharpIcon/> : 
                   
                   
                   < KeyboardArrowDownSharpIcon/>
                    }
-                </span>
-         </li>
+            </button>
 
-
-               <ul     className={`transition-all duration-700 ease-in-out  py-1 space-y-1
-             
+               <motion.ul   
+              id="dropdown-example"
             
-             ${isExpanded6 ? 'max-h-[200px] opacity-[1] overflow-hidden ' : 'max-h-0     overflow-hidden '}
-             
-             `}>
-                  <li className='  space-x-2 
+              className={`py-1 space-y-1 `}
+          initial={{ opacity: 0, height: 0 }}
+          animate={{
+            opacity: isExpanded6 ? 1 : 0,
+            height: isExpanded6 ? "60px" : 0,
+          }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}  
+             >
+
+
+<AnimatePresence>
+              {isExpanded6 && (
+                <>
+
+<motion.li 
+                   initial={{ opacity: 0, x: -20 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   exit={{ opacity: 0, x: -20 }}
+                   transition={{ duration: 0.2 , delay: 0.1 }}
+                  className='  space-x-2 
                    text-white  rounded-lg p-2 ms-3 text-lg font-medium' >
-                  <ion-icon name="logo-twitch" ></ion-icon>
+                  {/* <ion-icon name="logo-twitch" ></ion-icon> */}
+
+<LuTicketsPlane className='w-5 h-5 text-teal-600'/>
+
 
                      <Link to='/admin/sms'>
-                     sms
+                     Tickets
                      </Link>
-                  </li>
-               </ul>
+                  </motion.li>
+                </>
+              )}
+
+</AnimatePresence>
+
+                 
+               </motion.ul>
 
         
 
@@ -564,31 +806,53 @@ const handleGetCompanySettings = useCallback(
          </li>
 
 
-<ul  className={`transition-all duration-700 ease-in-out  py-2 space-y-2
-             
-            
-             ${isExpanded7 ? 'max-h-[200px] opacity-[1]  overflow-hidden' : 'max-h-0     overflow-hidden '}
-             
-             `} >
-   <li className=' rounded-lg  space-x-2  text-white p-2 flex'>
+<motion.ul   id="dropdown-example"
+        className="py-1 space-y-1"
+        initial={{ opacity: 0, height: 0 }}
+        animate={{
+          opacity: isExpanded7 ? 1 : 0,
+          height: isExpanded7 ? "auto" : 0,
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }} >
+  
+
+
+      <AnimatePresence>
+{isExpanded7 && (
+   <>
+
+<motion.li 
+ initial={{ opacity: 0, x: -20 }}
+ animate={{ opacity: 1, x: 0 }}
+ exit={{ opacity: 0, x: -20 }}
+ transition={{ duration: 0.2, delay: 0.1 }}
+className=' rounded-lg  space-x-2  text-white p-2 flex'>
 <img src="/images/icons8-male-user.gif" className='rounded-full w-8 h-8' alt="user" />
      <Link to='/admin/user'> User </Link>
 
-      </li>
+      </motion.li>
 
 
-
-   <li className=' rounded-lg  text-white  space-x-3  p-2 flex'>
+      <motion.li
+       initial={{ opacity: 0, x: -20 }}
+       animate={{ opacity: 1, x: 0 }}
+       exit={{ opacity: 0, x: -20 }}
+       transition={{ duration: 0.2, delay: 0.2 }}
+      className=' rounded-lg  text-white  space-x-3  p-2 flex'>
       <img src="/images/icons8-people.gif" className='rounded-full w-8 h-8' alt="" />
    <Link to='/admin/user-group'>
       User Group
       </Link>
-       </li>
+       </motion.li>
+   </>
+)}
+  
 
+       </AnimatePresence>
 
        
 
-</ul>
+</motion.ul>
 
         
 

@@ -1,3 +1,5 @@
+
+
 // import * as React from 'react';
 // import Button from '@mui/material/Button';
 // import Dialog from '@mui/material/Dialog';
@@ -80,14 +82,19 @@ const Transition = forwardRef(function Transition(props, ref) {
 });
 
 
- function DeletePackage({openDelete, handleCloseDelete, deletePackage, id, loading}) {
+ function DeleteSubscriber({openDelete,handleCloseDelete, deleteSubscriber, id, loading}) {
+
+
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState('xs');
 
+
 const handleDelete=()=> {
-  deletePackage(id)
+  deleteSubscriber(id)
   handleCloseDelete()
 }
+
+
 
 const theme = useTheme();
 const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -188,7 +195,7 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
               <WarningIcon color="error" sx={{ fontSize: 32 }} />
             </Box>
             <Typography variant="h5" component="span" fontWeight="bold">
-              Delete Wifi Package
+              Delete Subscriber
             </Typography>
           </Box>
         </DialogTitle>
@@ -207,7 +214,7 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
             align="center"
             sx={{ mb: 2, fontWeight: 500 }}
           >
-            Are you sure you want to delete this package   </Typography>
+            Are you sure you want to delete this subscribber   </Typography>
           <Typography
             variant="body2"
             color="text.secondary"
@@ -270,4 +277,13 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
     </React.Fragment>
   );
 }
-export default DeletePackage
+export default DeleteSubscriber;
+
+
+
+
+
+
+
+
+

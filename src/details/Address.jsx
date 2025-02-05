@@ -209,15 +209,29 @@ const Address = ({handleClose}) => {
 
     <Stack sx={{ marginTop: 5,}} direction={{ xs: 'column', sm: 'row'}}  spacing={{xs: 1, sm: 2, md: 4}}>
 
-    <Button color='error'   startIcon={<CloseIcon/>} variant='outlined'  onClick={handleClose}>Cancel</Button>
+    {/* <Button color='error'   startIcon={<CloseIcon/>} variant='outlined'  onClick={handleClose}>Cancel</Button> */}
+    <button   onClick={handleClose} className='bg-red-600 text-white rounded-3xl px-4 py-2
+          transform hover:scale-110 transition duration-500 hover:bg-red-200  
+          text-lg ' >
 
+            Cancel
+          </button>
+
+
+          <button className='bg-black text-white rounded-3xl px-4 py-2
+          transform hover:scale-110 transition duration-500 hover:bg-green-500
+          text-lg' type="submit">
+
+            Save
+          </button>
+{/*           
 <LoadingButton  loadingPosition= 'start' startIcon={<AutorenewIcon/>} type='submit'
  loading={false}  color='success'
     variant='outlined'   >
 
 
   save
-</LoadingButton>
+</LoadingButton> */}
 </Stack>
 
     </div>

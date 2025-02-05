@@ -37,11 +37,15 @@
 import { useContext, useEffect, useState} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 import { Navigate, Outlet } from "react-router-dom";
-import LoadingAnimation from '../loader/loading_animation.json'
-import Lottie from 'react-lottie';
+
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 
+
+import LoadingAnimation from '../loader/loading_animation.json'
+import Lottie from 'react-lottie';
 import Backdrop from '@mui/material/Backdrop';
+
+
 
 
 

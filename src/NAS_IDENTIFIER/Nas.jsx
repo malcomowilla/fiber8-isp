@@ -376,9 +376,9 @@ headerStyle:{
   textTransform: 'uppercase'
   } ,
   
-  rowStyle:(data, index)=> index % 2 === 0 ? {
-  background: 'gray'
-  }: null,
+  // rowStyle:(data, index)=> index % 2 === 0 ? {
+  // background: 'gray'
+  // }: null,
   
   fontFamily: 'mono'
 }}     

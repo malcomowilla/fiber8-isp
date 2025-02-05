@@ -28,6 +28,9 @@ import AlertTitle from '@mui/material/AlertTitle';
 import Stack from '@mui/material/Stack';
 import { useDebounce } from 'use-debounce';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
+import { FaWifi } from "react-icons/fa6";
+import toast, { Toaster } from 'react-hot-toast';
+
 
 const useStyles = makeStyles({
   customSearchFieldFocus: {
@@ -66,7 +69,8 @@ const initialValue = {
   upload_burst_limit: '',
   download_burst_limit: '',
   validity_period_units: '',
-router_name: settingsformData.router_name
+router_name: settingsformData.router_name,
+ip_pool: ''
 
 }
 
@@ -86,9 +90,9 @@ const [validityPeriodUnitError, setUnitsError] = useState(false)
 
 const [search, setSearch] = useState('')
 const [searchchInput] = useDebounce(search, 1000)
-
 const handleRowClick = (event, rowData) => {
   setFormData(rowData);
+  console.log('ip pool', rowData)
 
   // Add your custom logic here, such as opening a modal or updating state
 };
@@ -135,9 +139,6 @@ setTimeout(() => {
 
 
 
-const controller = new AbortController();
-const id = setTimeout(() => controller.abort(), 9000);
-
 const subdomain = window.location.hostname.split('.')[0]
 
 const createPackage = async (e) => {
@@ -149,9 +150,9 @@ const createPackage = async (e) => {
       setPriceError(false);
       setUploadLimitError(false);
       setDownloadLimitError(false);
-      setValidityError(false);
-      setUploadBurstSpeedError(false)
-      setDownloadBurstSpeedError(false)
+      // setValidityError(false);
+      // setUploadBurstSpeedError(false)
+      // setDownloadBurstSpeedError(false)
       setUnitsError(false)
      // Perform validations
      let hasError = false;
@@ -164,16 +165,16 @@ const createPackage = async (e) => {
       }
 
     
-    if (formData.upload_burst_limit === '') {
-      setUploadBurstSpeedError(true)
-      hasError = true
-    }
+    // if (formData.upload_burst_limit === '') {
+    //   setUploadBurstSpeedError(true)
+    //   hasError = true
+    // }
 
 
-    if (formData.download_burst_limit === '') {
-      setDownloadBurstSpeedError(true)
-      hasError = true
-    }
+    // if (formData.download_burst_limit === '') {
+    //   setDownloadBurstSpeedError(true)
+    //   hasError = true
+    // }
     
       if (formData.price === '') {
         setPriceError(true)
@@ -220,7 +221,9 @@ const createPackage = async (e) => {
           'X-Subdomain': subdomain,
 
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({...formData, router_name: settingsformData.router_name,
+          use_radius: settingsformData.use_radius,
+        }),
       });
 
       const newData = await response.json();
@@ -235,39 +238,56 @@ setTimeout(() => {
 }, 10000);
         setofflineerror(false);
         if (formData.id) {
-          // Update existing package in tableData
           setTableData(tableData.map(item => (item.id === formData.id ? newData : item)));
+
+          toast.success('package updated successfully', {
+            position: "top-center",
+            duration: 4000,
+          })
+          // Update existing package in tableData
         } else {
           // Add newly created package to tableData
           setTableData([...tableData, newData]);
+          toast.success('package created successfully', {
+            position: "top-center",
+            duration: 4000,
+          })
         }
       } else {
+        setOpen(false)
         setloading(false);
-        setCreationError(true);
+        toast.error(newData.error, {
+          position: "top-center",
+          duration: 3000,
+        })
+       
+        // setCreationError(true);
 
+// setTimeout(() => {
+//   setCreationError(false)
 
-setTimeout(() => {
-  setCreationError(false)
-
-}, 10000);
+// }, 10000);
         setError(newData.error);
       }
     } catch (error) {
+      setOpen(false); // Close the form modal
       setloading(false);
       setofflineerror(true);
+      toast.error('failed to update package server error', {
+        position: "top-center",
+        duration: 4000,
+      })
 }
 }
 
 
 
 
-
-const fetchPackages = useCallback(() => async ()=> {
-  setofflineerror(false)
-
+const fetchPackages = useCallback(
+  async() => {
+    
 try {
   const response = await fetch('/api/get_package',{
-    signal: controller.signal,  
     headers: {
       'X-Subdomain': subdomain,
     },
@@ -276,7 +296,6 @@ try {
 
 
 )
-clearTimeout(id);
 
   const newData = await response.json()
 
@@ -284,6 +303,18 @@ clearTimeout(id);
     setTableData(newData.filter((poe_package)=> {
       return search.toLowerCase() === ''? poe_package : poe_package.name.toLowerCase().includes(search)
     }))
+
+
+
+    // setTableData(newData)
+  }else{
+    toast.error(
+      'Failed to get packages',
+      {
+        position: 'top-center',
+        duration: 4000,
+      }
+    )
   }
 
 } catch (error) {
@@ -291,9 +322,11 @@ clearTimeout(id);
   setofflineerror(true)
 
 }
+  },
+  [],
+)
 
 
-}, [searchchInput])
 
 useEffect(() => {
   
@@ -408,7 +441,12 @@ useEffect(() => {
 // }, []);
 
 const deletePackage = async (id) => {
-const response = await fetch(`/api/package/${id}`, {
+
+
+
+try {
+  
+const response = await fetch(`/api/package/${id}?router_name=${settingsformData.router_name}`, {
   method: "DELETE",
   headers: {
     'X-Subdomain': subdomain,
@@ -416,22 +454,42 @@ const response = await fetch(`/api/package/${id}`, {
   
 
 })
-
-
 if (response.ok) {
   setTableData((tableData)=> tableData.filter(item => item.id !== id))
-  setDeleteNotification(true)
+  toast.success('package deleted successfully', {
+    position: "top-center",
+    duration: 4000,
+  })
+ 
+  // setDeleteNotification(true)
 
-setTimeout(() => {
-  setDeleteNotification(false)
+// setTimeout(() => {
+//   setDeleteNotification(false)
 
-}, 10000);
+// }, 10000);
 
 } else {
+  const newData = await response.json()
+
+  toast.error(
+    newData.error,
+    {
+      position: 'top-center',
+      duration: 4000,
+    }
+  )
   console.log('failed to delete')
 
-
 }
+} catch (error) {
+  // setTableData((tableData)=> tableData.filter(item => item.id !== id))
+  toast.error(`failed to delete package, server error`)
+}
+
+
+
+
+
 }
 
 const DeleteButton = ({ id }) => (
@@ -475,7 +533,7 @@ const columns = [
 
 
 <>
-
+<Toaster />
     <div className='overflow-hidden'>
 
       <EditPackage open={open} uploadBurstSpeedError={uploadBurstSpeedError} downloadBurstSpeedError={downloadBurstSpeedError}               handleClose={handleClose} formData={formData} validityError={validityError}
@@ -484,7 +542,8 @@ const columns = [
         createPackage={createPackage}   offlineerror={offlineerror} 
        showNotification={showNotification}   setofflineerror={setofflineerror}  setFormData={setFormData} 
        tableData={tableData} routerName={routerName} setRouterName={setRouterName}/>
-    <DeletePackage  openDelete={openDelete} handleCloseDelete={handleCloseDelete} deletePackage={deletePackage} id={formData.id}/>
+    <DeletePackage  openDelete={openDelete} handleCloseDelete={handleCloseDelete} 
+    deletePackage={deletePackage} id={formData.id} loading={loading}/>
 
 {/* 
 
@@ -493,10 +552,37 @@ const columns = [
       </div>  */}
 
 
-<div className='text-end '>
-  <input type="search" value={search} onChange={(e)=> setSearch(e.target.value)} className='bg-transparent border-y-[-2]  
-    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
-   focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search......'/>
+<div className="flex items-center max-w-sm mx-auto p-3">  
+     
+    <label htmlFor="simple-search" className="sr-only">Search</label>
+    <div className="relative w-full">
+        <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            {/* <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+             xmlns="http://www.w3.org/2000/svg"
+             fill="none" viewBox="0 0 18 20">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
+                 strokeWidth="2" d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"/>
+            </svg> */}
+            <FaWifi className='text-black'/>
+            
+        </div>
+
+
+        <input type="text" value={search} onChange={(e)=> setSearch(e.target.value)}
+         className="bg-gray-50 border border-gray-300 text-gray-900 
+        text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full ps-10 p-2.5 
+          dark:border-gray-600 dark:placeholder-gray-400 dark:text-black
+          dark:focus:ring-green-500 dark:focus:border-green-500" placeholder="Search for wifi packages..."  />
+    </div>
+    <button type="" className="p-2.5 ms-2 text-sm font-medium text-white bg-green-700 
+    rounded-lg border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
+     focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+        <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
+             strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+        </svg>
+        <span className="sr-only">Search</span>
+    </button>
 </div>
 
       <MaterialTable columns={columns}
@@ -565,9 +651,7 @@ fontFamily: 'bold',
 textTransform: 'uppercase'
 } ,
 
-rowStyle:(data, index)=> index % 2 === 0 ? {
-background: 'gray'
-}: null,
+
 
 fontFamily: 'mono'
 

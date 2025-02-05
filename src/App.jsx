@@ -82,7 +82,7 @@ import GeneralSettings from './settings/GeneralSettings'
 const HotspotLogin = lazy(()=> import('./hotspot_page/HotspotLogin'))
 const PasskeySignin = lazy(()=> import('./Auth/PasskeySignin'))
 const DashboardSytemAdmin = lazy(()=> import('./system_admin/DashBoardSystemAdmin'))
-
+const IpPoolTable = lazy(() => import('./ip_pool/IpPoolTable'))
 
 const ResetPassword = lazy(()=> import('./Auth/ResetPassword')
 ) 
@@ -116,6 +116,11 @@ const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
  const SmsSent = lazy(()=> import('./system_admin/SmsSent'))
  const HotspotTrial = lazy(()=> import('./hotspot_page/HotspotTrial'))
  const EmailSent = lazy(()=> import('./system_admin/EmailSent'))
+ const HowDidYouHear = lazy(()=> import('./how/HowDidYouHear'))
+
+ const UploadSubscriber = lazy(() => import('./upload_subscriber/UploadSubscriber') )
+ const IpPool = lazy(() => import('./ip_pool/IpPool') )
+ const PPPoEPackages = lazy(() => import('./wifi_page/PPPoEPackages') )
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -539,10 +544,19 @@ const darkTheme = createTheme({
 {/* <RouterProvider router={router} /> */}
 {/* </GeneralSettings> */}
 
+
+
 <Routes>
-{domain === 'aitechs'  ?  (
+
+{/* <Route index path='/' element={<PPPoEPackages/>}/> */}
+
+
+  
+{domain === 'localhost'  ?  (
   <Route index path='/'  element={<Signup/>}/>
-): null}
+): null}  
+
+
 
 {/* <Route index path='/'  element={<Signup/>}/> */}
 
@@ -555,6 +569,7 @@ const darkTheme = createTheme({
     <Route path='/system-admin-login' element={<SystemAdminLogin/>}/>
     <Route path='/sms-sent' element={<SmsSent/>}/>
     <Route path='/email-sent' element={<EmailSent/>}/>
+    <Route path='/how-did-you-hear' element={<HowDidYouHear/>}/>
 
 <Route element={<ProtectAuthSystemAdmin  />}>
     <Route path='/system-admin-dashboard' element={<DashboardSytemAdmin/>}/> 
@@ -591,6 +606,7 @@ const darkTheme = createTheme({
 <Route  path='/admin/hotspot-package' element={<HotspotPackage/>}/>
 <Route  path='/admin/hotspot-subscriptions' element={<HotspotSubscriptions/>}/>
 <Route path='/admin/sms' element={<Sms/>}/>
+<Route path='/admin/upload-subscriber' element={<UploadSubscriber />}/>
 <Route path='/admin/zones' element={<Zones/>}/>
 <Route path='/admin/nodes' element={<Nodes/>}/>
 <Route path='/admin/user' element={<User/>}/>
@@ -601,6 +617,8 @@ const darkTheme = createTheme({
 <Route path='/admin/date' element={<DatePicker/>}></Route>
 <Route path='/admin/nas' element={<Nas/>}/>
 <Route path='/admin/passkeys' element={<PasskeyList/>}/>
+<Route path='/admin/ip-pool' element={<IpPool/>}/>
+<Route path='/admin/ip-pool-table' element={<IpPoolTable/>}/>
 </Route>
 
 </Route >

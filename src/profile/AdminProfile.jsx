@@ -351,8 +351,8 @@ setRegistrationStatus('error');
              
 <img
                   className="w-12 h-12 rounded-full"
-                  src={generateAvatar(currentUsername.toString())}
-                  alt={`${currentUsername.toString()}'s avatar`}
+                  src={generateAvatar(currentUsername?.toString())}
+                  alt={`${currentUsername?.toString()}'s avatar`}
                 />
 
               <h1 className="text-gray-600 dark:text-white font-montserat">{currentUsername}</h1>

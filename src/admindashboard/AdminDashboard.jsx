@@ -1,7 +1,14 @@
 
 import {Link} from 'react-router-dom'
+import {motion } from 'framer-motion'
 
 const AdminDashboard = () => {
+
+
+const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
   return (
    <>
    
@@ -9,14 +16,27 @@ const AdminDashboard = () => {
    
    
 <div className='grid grid-auto-fit gap-y-5 gap-x-4 nanum-gothic-coding-regular '>
-<div className="w-full max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 
+
+
+<motion.div 
+
+variants={cardVariants}
+initial="hidden"
+animate="visible"
+transition={{ duration: 0.5, delay: 0.1 }}
+className="w-full max-w-md p-4 bg-white border border-gray-200 
+
+bg-gradient-to-r from-blue-500 to-blue-600  rounded-lgshadow sm:p-8 dark:bg-gray-800 
  dark:border-gray-700">
     <div className="flex items-center justify-between mb-4">
       <div className='flex flex-row gap-x-3'>
       <ion-icon name="person-outline"></ion-icon>
-        <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white">Subscribers</h5>
+        <h5 className="text-xl font-bold leading-none
+        
+        text-gray-900 dark:text-white">Subscribers</h5>
         </div>
-        <Link  to='/admin/pppoe-subscribers' className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
+        <Link  to='/admin/pppoe-subscribers' className="text-sm font-medium text-black
+         hover:underline dark:text-white">
             View all
         </Link>
    </div>
@@ -302,7 +322,7 @@ const AdminDashboard = () => {
             </li>
         </ul>
    </div>
-</div>
+</motion.div>
 
    
    
@@ -311,7 +331,13 @@ const AdminDashboard = () => {
 
 
 
-<div className="w-full max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8
+<motion.div
+ variants={cardVariants}
+ initial="hidden"
+ animate="visible"
+ transition={{ duration: 0.5, delay: 0.4 }}
+className="w-full max-w-md p-4 bg-white 
+bg-gradient-to-r from-teal-500 to-blue-600 border border-gray-200 rounded-lg  shadow sm:p-8
  dark:bg-gray-800 dark:border-gray-700  max-h-[400px]">
 
     <div className="flex items-center justify-between mb-4">
@@ -380,7 +406,7 @@ const AdminDashboard = () => {
             </li>
         </ul>
    </div>
-</div>
+</motion.div>
 
    
    
@@ -391,7 +417,14 @@ const AdminDashboard = () => {
 
 
 
-<div className="w-full max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8
+<motion.div 
+ variants={cardVariants}
+ initial="hidden"
+ animate="visible"
+ transition={{ duration: 0.5, delay: 0.5 }}
+className="w-full max-w-md p-4 bg-white 
+
+bg-gradient-to-r from-yellow-500 to-red-600 border border-gray-200 rounded-lg shadow sm:p-8
  dark:bg-gray-800 dark:border-gray-700  max-h-[400px]">
 
     <div className="flex items-center justify-between mb-4">
@@ -484,7 +517,7 @@ const AdminDashboard = () => {
             </li>
         </ul>
    </div>
-</div>
+</motion.div>
 
 
 
@@ -493,7 +526,14 @@ const AdminDashboard = () => {
 
 
  
-<div className="w-full max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8
+<motion.div 
+ variants={cardVariants}
+ initial="hidden"
+ animate="visible"
+ transition={{ duration: 0.5, delay: 0.6 }}
+className="w-full max-w-md p-4 bg-white bg-gradient-to-r from-stone-500 to-stone-800 border
+
+border-gray-200 rounded-lg shadow sm:p-8
  dark:bg-gray-800 dark:border-gray-700  max-h-[400px]">
 
     <div className="flex items-center justify-between mb-4">
@@ -586,7 +626,9 @@ const AdminDashboard = () => {
             </li>
         </ul>
    </div>
-</div>  
+
+   
+</motion.div>  
    
    
 

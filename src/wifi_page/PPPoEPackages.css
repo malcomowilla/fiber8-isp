@@ -1,0 +1,66 @@
+/* Container for the packages */
+.pppoe-packages-container {
+    padding: 20px;
+    text-align: center;
+    /* background: linear-gradient(135deg, green, teal); */
+    color: white;
+    min-height: 100vh;
+  }
+  
+  /* Grid layout for packages */
+  /* .packages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  } */
+  
+  /* Individual package card */
+  .package-card {
+    background: white;
+    color: #333;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+  
+  /* Package name */
+  .package-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  /* Package description */
+  .package-card p {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+  
+  /* Package price */
+  .package-card .price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: green;
+  }
+  
+  /* Select button */
+  .select-button {
+    background: green;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  /* Loading spinner */
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 1.5rem;
+    color: white;
+  }
