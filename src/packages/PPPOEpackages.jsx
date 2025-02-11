@@ -158,11 +158,11 @@ const createPackage = async (e) => {
      let hasError = false;
 
 
-      if (formData.name === '') {
-        setNameError(true)
-        hasError = true;
+      // if (formData.name === '') {
+      //   setNameError(true)
+      //   hasError = true;
 
-      }
+      // }
 
     
     // if (formData.upload_burst_limit === '') {
@@ -176,36 +176,36 @@ const createPackage = async (e) => {
     //   hasError = true
     // }
     
-      if (formData.price === '') {
-        setPriceError(true)
-        hasError = true;
+      // if (formData.price === '') {
+      //   setPriceError(true)
+      //   hasError = true;
 
-      }
+      // }
     
     
-    if (formData.validity_period_units) {
-     setUnitsError(true)
-    }
+    // if (formData.validity_period_units) {
+    //  setUnitsError(true)
+    // }
 
 
-      if (formData.upload_limit === '') {
-        setUploadLimitError(true)
-        hasError = true;
+      // if (formData.upload_limit === '') {
+      //   setUploadLimitError(true)
+      //   hasError = true;
 
-      }
+      // }
     
-      if (formData.download_limit === '') {
-        setDownloadLimitError(true)
-        hasError = true;
+      // if (formData.download_limit === '') {
+      //   setDownloadLimitError(true)
+      //   hasError = true;
 
-      }
+      // }
     
     
-      if (formData.validity === '') {
-        setValidityError(true)
-        hasError = true;
+      // if (formData.validity === '') {
+      //   setValidityError(true)
+      //   hasError = true;
 
-      }
+      // }
 
       if (hasError) {
         return; 
@@ -254,11 +254,11 @@ setTimeout(() => {
           })
         }
       } else {
-        setOpen(false)
+        setOpen(true)
         setloading(false);
         toast.error(newData.error, {
           position: "top-center",
-          duration: 3000,
+          duration: 8000,
         })
        
         // setCreationError(true);
@@ -308,6 +308,12 @@ try {
 
     // setTableData(newData)
   }else{
+
+
+    toast.error(newData.error, {
+      position: 'top-center',
+      duration: 5000,
+    })
     toast.error(
       'Failed to get packages',
       {
@@ -499,7 +505,7 @@ const DeleteButton = ({ id }) => (
 );
 
   const EditButton = ({rowData}) => (
-    <IconButton  onClick={() => handleClickOpen(rowData)} style={{color: 'black'}} >
+    <IconButton     style={{color: 'green'}} onClick={() => handleClickOpen(rowData)}  >
     <EditIcon />
   </IconButton>
       );

@@ -169,7 +169,16 @@ const subdomain = window.location.hostname.split('.')[0];
 
   } else {
     console.log('failed to fetch routers')
+toast.error(newData.error,{
+position: 'top-center',
+duration: 5000,
+})
 
+toast.error('failed to fetch routers', {
+position: 'top-center',
+duration: 4000,
+})
+   
   }
   
   } catch (error) {

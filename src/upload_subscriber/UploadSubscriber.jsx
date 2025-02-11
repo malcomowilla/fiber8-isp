@@ -77,7 +77,7 @@ const UploadSubscriber = () => {
     
     <div>
       <Toaster />
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-400 to-green-500">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r ">
       <form onSubmit={handleFileUpload}>
       <motion.div
         className="bg-white p-8 rounded-lg shadow-lg text-center w-full max-w-md"

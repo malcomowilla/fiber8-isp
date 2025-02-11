@@ -71,8 +71,19 @@
   font-style: normal;
   font-stretch: normal;
 }
+input[type="text"]:focus ~ .input-text,
+input[type="text"]:not(:placeholder-shown) ~ .input-text {
+  outline: none;
+  @apply border-teal-600 transform -translate-y-[34px] -translate-x-[-10px] bg-white   ;
+}
 
 
+
+input[type="text"]:focus ~ .input-text2,
+input[type="text"]:not(:placeholder-shown) ~ .input-text2 {
+  outline: none;
+  @apply border-teal-600 transform -translate-y-[18px] -translate-x-[-10px] bg-white   ;
+}
 
 @keyframes fadeIn {
   from {

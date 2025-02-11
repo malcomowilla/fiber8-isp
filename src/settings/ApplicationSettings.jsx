@@ -18,6 +18,19 @@ const ApplicationSettings = ({children}) => {
       }
 
 
+      const initialValueAdminSettings = {
+        enable_2fa_for_admin_email: false,
+        enable_2fa_for_admin_sms: false,
+        send_password_via_sms: false,
+        send_password_via_email: false,
+        enable_2fa_for_admin_passkeys: false,
+        check_is_inactive: false,
+        checkinactiveminutes: '',
+        checkinactivehrs: '',
+        checkinactivedays: ''
+      }
+
+
       const initialValueNas = {
         username:'',
         password: '',
@@ -48,6 +61,7 @@ const [welcome, setWelcome] = useState(false)
       const [currentSystemAdmin, setCurrentSystemAdmin] = useState('')
       const [currentUsername, setCurrentUsername] = useState('')
       const [subscriberSettings, setSubscriberSettings] = useState(subscriber_settings)
+      const [adminSettings, setAdminSettings] = useState(initialValueAdminSettings)
       const [companySettings, setCompanySettings] = useState({
         company_name: '',
   contact_info: '',
@@ -88,6 +102,18 @@ const [welcome, setWelcome] = useState(false)
 
 
       }
+
+      const handleChangeAdminSettings = (e) => {
+        const { type, name, checked, value } = e.target;
+
+        // const captlalName = value.charAt(0).toUpperCase() + value.slice(1)
+        const capitalizedName = value.toUpperCase()
+        setAdminSettings((prevFormData) => ({
+          ...prevFormData,
+          [name]: type === "checkbox" ? checked : capitalizedName,
+        }));
+      }
+
     const [isloading, setisloading] = useState(false)
     
 const [loginWithPasskey, setLoginWithPasskey] = useState(false)
@@ -316,6 +342,7 @@ const handleChange = (e) => {
      useEmailAuthentication, setUseEmailAuthentication, usePhoneNumberAuthentication, setUsePhoneNumberAuthentication,
      loginWithPasskey, setLoginWithPasskey,handleChangeSubscriberSettings,
      subscriberSettings,setSubscriberSettings,
+     handleChangeAdminSettings, adminSettings, setAdminSettings,
      
      companySettings, setCompanySettings}}  >
     {children}

@@ -110,10 +110,22 @@ const IpPool = ({ isOpen, setIsOpen , ipPoolFormData, setIpPoolFormData, handleC
 
       const newData = await response.json();
       if (response.ok) {
+       
 if (ipPoolFormData.id) {
-    setIpPools(ipPools.map(item => (item.id === ipPoolFormData.id ? {...ipPoolFormData} : item)));  
+  setIpPools(ipPools.map(item => (item.id === ipPoolFormData.id ? newData : item)));
+  toast.success('pool updated successfully', {
+    position: "top-center",
+    duration: 4000,
+    
+  })
+     
 }else{
     setIpPools([...ipPools,  newData ]);
+    toast.success('pool created successfully', {
+      position: "top-center",
+      duration: 4000,
+      
+    })
 }
       } else {
         toast.error(

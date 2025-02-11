@@ -11,16 +11,14 @@ import toast, { Toaster } from 'react-hot-toast';
 
 // import {Link} from 'react-router-dom'
 import UiLoader from '../uiloader/UiLoader'
-
-// import { useContext} from 'react'
-// import {ApplicationContext} from '../context/ApplicationContext'
+import {useApplicationSettings} from '../settings/ApplicationSettings'
 
 import { BsHddNetwork } from "react-icons/bs";
 
 import MaterialTable from 'material-table'
 import AddIcon from '@mui/icons-material/Add';
 import IpPool from './IpPool'
-
+import DeletePool from '../delete/DeletePool'
 
 
 
@@ -37,7 +35,19 @@ const [ipPoolFormData, setIpPoolFormData] = useState({
 })
 
 
+const [isOpenDelete, setIsOpenDelete] = useState(false);
 const subdomain = window.location.hostname.split('.')[0];
+const [loading, setLoading] = useState(false);
+const {settingsformData} = useApplicationSettings()
+
+
+
+
+const handleCloseDelete = ()=> {
+  setIsOpenDelete(false);
+}
+
+
 
 const handleChange = (e) => {
   const {name, value} = e.target
@@ -51,14 +61,14 @@ const handleRowClick = (event, rowData) => {
     // Add your custom logic here, such as opening a modal or updating state
   };    
   const DeleteButton = ({ id }) => (
-        <IconButton style={{ color: '#8B0000' }}>
+        <IconButton style={{ color: '#8B0000' }} onClick={() => setIsOpenDelete(true)}>
           <DeleteIcon />
         </IconButton>
       );
 
 
   const EditButton = ({ id }) => (
-    <IconButton style={{color: 'black'}} >
+    <IconButton style={{color: 'black'}}  onClick={()=> setIsOpen(true)}>
       <EditIcon />
     </IconButton>
   );
@@ -79,7 +89,7 @@ const columns = [
      <>
       
        <DeleteButton {...params} />
-
+  <EditButton  {...params}/> 
 
        </>
 }
@@ -105,6 +115,11 @@ try {
 
   
     }else{
+
+      toast.error(newData.error, {
+        position: 'top-center',
+        duration: 5000,
+      })
 toast.error(
     'Failed to get ip pools',
     {
@@ -131,10 +146,65 @@ useEffect(() => {
    fecthIpPools()
 }, [fecthIpPools]);
 
+const deletePool = async(id)=> {
+
+  try {
+    setLoading(true)
+    const response = await fetch(`/api/ip_pools/${id}?router_name=${settingsformData.router_name}`, {
+      method: 'DELETE',
+      headers: {
+        'X-Subdomain': subdomain,
+      },
+    })
+const newData = response.status !== 204 ? await response.json() : {};
+
+console.log("Response status:", response.status);
+    if (response.ok || response.status === 204) {
+      setLoading(false)
+      setIpPools(ipPools.filter((pool) => pool.id !== id))
+      toast.success(
+        'Ip pool deleted successfully',
+        {
+          position: 'top-center',
+          duration: 4000,
+        }
+      )
+    } else {
+
+      setLoading(false)
+      toast.error(
+        newData.error,
+        {
+          position: 'top-center',
+        }
+      )
+      toast.error(
+        'Failed to delete ip pool',
+        {
+          position: 'top-center',
+        }
+      )
+    }
+  } catch (error) {
+    setLoading(false)
+    toast.error(
+      'Failed to delete ip pool',
+      
+      {
+        position: 'top-center',
+        duration: 4000
+      }
+    )
+  }
+}
+
+
+
   return (
 
     <>
-
+<DeletePool openDelete={isOpenDelete} handleCloseDelete={handleCloseDelete} deletePool={deletePool} 
+id={ipPoolFormData.id}  loading={loading}/>
     <IpPool isOpen={isOpen} setIsOpen={setIsOpen} ipPoolFormData={ipPoolFormData}
     setIpPoolFormData={setIpPoolFormData} handleChange={handleChange}
 

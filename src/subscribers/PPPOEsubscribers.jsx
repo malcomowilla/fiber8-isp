@@ -113,6 +113,8 @@ setFormData({
 
 
   }
+
+
   const subdomain = window.location.hostname.split('.')[0]; 
 
     
@@ -136,6 +138,11 @@ setFormData({
   
     } else {
       console.log('failed to fetch routers')
+
+      toast.error(newData.error, {
+        position: 'top-center',
+        duration: 5000,
+      })
   toast.error(
     'Failed to get subscribers',
     {
@@ -329,7 +336,7 @@ toast.error('failed to delete subscriber', {
     </IconButton>
   );
   const EditButton = () => (
-    <IconButton style={{color: 'black'}} onClick={handleClickOpen} >
+    <IconButton style={{color: 'green'}} onClick={handleClickOpen} >
       <EditIcon />
     </IconButton>
   )

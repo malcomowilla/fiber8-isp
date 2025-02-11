@@ -373,24 +373,34 @@ const newData = await response.json()
 
 
 
-useEffect(() => {
-  const getSystemAdminSettings = async () => {
-   try {
-     const response = await fetch('/api/get_system_admin_settings');
-     const data = await response.json();
-     if (response.ok) {
-       const { login_with_passkey } = data[0]
-       setLoginWithPasskey(login_with_passkey);
 
-     setUseEmailAuthentication(data[0].use_email_authentication)
-      setUsePhoneNumberAuthentication(data[0].use_sms_authentication)
-     }
-   } catch (error) {
-     console.error('Error fetching login with passkey:', error);
-   }
- };
- getSystemAdminSettings() 
-  }, []);
+
+
+  const getSystemAdminSettings = useCallback(
+    async() => {
+      try {
+        const response = await fetch('/api/get_system_admin_settings');
+        const data = await response.json();
+        if (response.ok) {
+          const { login_with_passkey } = data[0]
+          setLoginWithPasskey(login_with_passkey);
+   
+        setUseEmailAuthentication(data[0].use_email_authentication)
+         setUsePhoneNumberAuthentication(data[0].use_sms_authentication)
+        }
+      } catch (error) {
+        console.error('Error fetching login with passkey:', error);
+      }
+    },
+    [],
+  )
+  
+
+
+
+useEffect(() => {
+  getSystemAdminSettings()
+}, [getSystemAdminSettings]);
 
 
   return (

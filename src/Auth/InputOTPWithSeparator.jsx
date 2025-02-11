@@ -156,11 +156,20 @@ const handleSignIn = async (e) => {
 
   let  actualUserDataInJson = await users.json()
 
+
+  if (users.status === 423) {
+   setTimeout(() => {
+    navigate('/account-locked')
+   }, 1800); 
+  }
   // if (users.status === 401) {
   //   setOfflineError(false)
 
   // }
 
+  if (actualUserDataInJson.redirect) {
+    window.location.href = actualUserDataInJson.redirect; // Redirect manually
+  }
   
   if (users.ok || users.status === 202) {
     navigate('/admin/analytics')

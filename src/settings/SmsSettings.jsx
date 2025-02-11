@@ -28,6 +28,7 @@ import { useDebounce } from 'use-debounce';
 import UiLoader from '../uiloader/UiLoader'
 
 
+
 const SettingsNotification = lazy(() => import('../notification/SettingsNotification'))
 
 
@@ -62,6 +63,13 @@ const {api_key, api_secret, sender_id, short_code,} = smsSettingsForm
           },
         })
         const newData = await response.json()
+
+        if (response.status === 403) {
+          toast.error('acess denied for sms balance', {
+            duration: 5000,
+            position: 'top-center',
+          })
+        }
         if(response.ok){
 console.log('sms balance', newData)
 setSmsBalance(newData.message)
@@ -161,6 +169,10 @@ const fetchSmsSettings = useCallback(
 
 
       }else{
+        toast.error(newData.error, {
+          duration: 5000,
+          position: 'top-center',
+        })
         console.log('failed to fetch sms settings')
         toast.error('failed to fetch sms settings', {
           duration: 3000,

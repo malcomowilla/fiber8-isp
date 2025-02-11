@@ -82,6 +82,10 @@ const getEmailSettings = useCallback(
            smtp_port})
  
       } else {
+        toast.error(newData.error, {
+          duration: 5000,
+          position: 'top-center',
+        })
         toast.error('failed to fetch email settings', {
           duration: 3000,
           position: 'top-center',

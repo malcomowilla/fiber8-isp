@@ -165,7 +165,7 @@ const [row_data, setRowData] = useState({})
       //   company_domain_or_subdomain: formData.domainSubdomain,
       // });
 
-      const response = await fetch('/api/invite_client', {
+      const response = await fetch('/api/invite_client_super_admins', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -244,7 +244,7 @@ const [row_data, setRowData] = useState({})
 
 
   const flattenedData = clients && clients.flatMap(client =>
-    client.admins.map(admin => ({
+    client.users.map(admin => ({
       ...admin,
       subdomain: client.subdomain, // Include subdomain in each admin record
     }))

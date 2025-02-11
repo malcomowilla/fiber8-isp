@@ -120,7 +120,11 @@ const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
 
  const UploadSubscriber = lazy(() => import('./upload_subscriber/UploadSubscriber') )
  const IpPool = lazy(() => import('./ip_pool/IpPool') )
- const PPPoEPackages = lazy(() => import('./wifi_page/PPPoEPackages') )
+
+const CustomerTickets = lazy(() => import('./tickets/CustomerTickets') )
+const AccountLocked = lazy(()=> import('./account_locked/AccountLocked'))
+
+//  const PPPoEPackages = lazy(() => import('./wifi_page/PPPoEPackages') )
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -570,6 +574,7 @@ const darkTheme = createTheme({
     <Route path='/sms-sent' element={<SmsSent/>}/>
     <Route path='/email-sent' element={<EmailSent/>}/>
     <Route path='/how-did-you-hear' element={<HowDidYouHear/>}/>
+    <Route path='/account-locked' element={<AccountLocked/>}/>
 
 <Route element={<ProtectAuthSystemAdmin  />}>
     <Route path='/system-admin-dashboard' element={<DashboardSytemAdmin/>}/> 
@@ -618,6 +623,7 @@ const darkTheme = createTheme({
 <Route path='/admin/nas' element={<Nas/>}/>
 <Route path='/admin/passkeys' element={<PasskeyList/>}/>
 <Route path='/admin/ip-pool' element={<IpPool/>}/>
+<Route path='/admin/customer-tickets' element={<CustomerTickets/>}/>
 <Route path='/admin/ip-pool-table' element={<IpPoolTable/>}/>
 </Route>
 

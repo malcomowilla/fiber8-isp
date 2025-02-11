@@ -57,6 +57,18 @@ const {companySettings, setCompanySettings} = useApplicationSettings()
 const {company_name, contact_info, email_info, logo_preview} = companySettings
 
 
+useEffect(() => {
+  const handleResize = () => {
+    setSeeSideBar(window.innerWidth < 850);
+  };
+
+  // Call once to set the correct initial state
+  handleResize();
+
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
+
 
 
 
@@ -121,7 +133,7 @@ const handleGetCompanySettings = useCallback(
    <div className='flex justify-between   text-white'>
    <img  className='h-[80px] w-[80px] rounded-full'  src={logo_preview} alt="fiber8-logo" />
       <p className='font-extrabold dotted-font lg:text-xl'>{company_name}</p>
-      <ArrowBackSharpIcon onClick={()=> setSeeSideBar(!seeSidebar)}/>
+      <ArrowBackSharpIcon className='cursor-pointer' onClick={()=> setSeeSideBar(!seeSidebar)}/>
    {/* <ion-icon  onClick={()=> setSeeSideBar(!seeSidebar)}  className='menu-black' size='large' name="menu"></ion-icon> */}
 
 
@@ -164,6 +176,11 @@ const handleGetCompanySettings = useCallback(
           {isExpanded5 && (
             <>
               <motion.li
+              onClick={() => {
+                if (window.innerWidth < 962) {
+                  setSeeSideBar(true);
+                }
+              }}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -179,6 +196,11 @@ const handleGetCompanySettings = useCallback(
               </motion.li>
 
               <motion.li
+              onClick={() => {
+                if (window.innerWidth < 962) {
+                  setSeeSideBar(true);
+                }
+              }}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -241,7 +263,11 @@ const handleGetCompanySettings = useCallback(
    <>
 
 <motion.li 
-
+onClick={() => {
+  if (window.innerWidth < 962) {
+    setSeeSideBar(true);
+  }
+}}
 initial={{ opacity: 0, x: -20 }}
 animate={{ opacity: 1, x: 0 }}
 exit={{ opacity: 0, x: -20 }}
@@ -263,6 +289,11 @@ className="flex items-center  w-full p-2 text-white transition
                   
 
                   <motion.li 
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
                    initial={{ opacity: 0, x: -20 }}
                    animate={{ opacity: 1, x: 0 }}
                    exit={{ opacity: 0, x: -20 }}
@@ -286,7 +317,11 @@ className="flex items-center  w-full p-2 text-white transition
 
 
                   <motion.li
-                  
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -304,7 +339,11 @@ className="flex items-center  w-full p-2 text-white transition
 
 
                   <motion.li
-                  
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -364,6 +403,11 @@ className="flex items-center  w-full p-2 text-white transition
    {isExpanded4 && (
       <>
    <motion.li
+   onClick={() => {
+    if (window.innerWidth < 962) {
+      setSeeSideBar(true);
+    }
+  }}
    initial={{ opacity: 0, x: -20 }}
    animate={{ opacity: 1, x: 0 }}
    exit={{ opacity: 0, x: -20 }}
@@ -379,6 +423,11 @@ className="flex items-center  w-full p-2 text-white transition
 
 
                   <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -392,6 +441,11 @@ className="flex items-center  w-full p-2 text-white transition
                   </motion.li>
 
                   <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -407,7 +461,11 @@ className="flex items-center  w-full p-2 text-white transition
 
 
                   <motion.li
-                  
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -423,7 +481,14 @@ className="flex items-center  w-full p-2 text-white transition
                       </Link>
                   </motion.li>
 
+
+
                      <motion.li
+                     onClick={() => {
+                      if (window.innerWidth < 962) {
+                        setSeeSideBar(true);
+                      }
+                    }}
                      initial={{ opacity: 0, x: -20 }}
                      animate={{ opacity: 1, x: 0 }}
                      exit={{ opacity: 0, x: -20 }}
@@ -438,6 +503,11 @@ className="flex items-center  w-full p-2 text-white transition
 
 
                         <motion.li
+                        onClick={() => {
+                          if (window.innerWidth < 962) {
+                            setSeeSideBar(true);
+                          }
+                        }}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
@@ -501,7 +571,11 @@ className="flex items-center  w-full p-2 text-white transition
    <>
 
 <motion.li
-
+onClick={() => {
+  if (window.innerWidth < 962) {
+    setSeeSideBar(true);
+  }
+}}
 initial={{ opacity: 0, x: -20 }}
 animate={{ opacity: 1, x: 0 }}
 exit={{ opacity: 0, x: -20 }}
@@ -519,6 +593,11 @@ transition={{ duration: 0.2, delay: 0.1 }}
 
 
                   <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
                    initial={{ opacity: 0, x: -20 }}
                    animate={{ opacity: 1, x: 0 }}
                    exit={{ opacity: 0, x: -20 }}
@@ -577,6 +656,11 @@ transition={{ duration: 0.2, delay: 0.1 }}
    {isExpanded2 && (
       <>
  <motion.li
+ onClick={() => {
+  if (window.innerWidth < 962) {
+    setSeeSideBar(true);
+  }
+}}
   initial={{ opacity: 0, x: -20 }}
   animate={{ opacity: 1, x: 0 }}
   exit={{ opacity: 0, x: -20 }}
@@ -589,6 +673,11 @@ transition={{ duration: 0.2, delay: 0.1 }}
                   </motion.li>
 
                   <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
                    initial={{ opacity: 0, x: -20 }}
                    animate={{ opacity: 1, x: 0 }}
                    exit={{ opacity: 0, x: -20 }}
@@ -601,7 +690,12 @@ transition={{ duration: 0.2, delay: 0.1 }}
                   </motion.li>
 
 
-                  <motion.li  
+                  <motion.li 
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }} 
                    initial={{ opacity: 0, x: -20 }}
                    animate={{ opacity: 1, x: 0 }}
                    exit={{ opacity: 0, x: -20 }}
@@ -655,6 +749,11 @@ transition={{ duration: 0.2, delay: 0.1 }}
 
 
                   <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
                    initial={{ opacity: 0, x: -20 }}
                    animate={{ opacity: 1, x: 0 }}
                    exit={{ opacity: 0, x: -20 }}
@@ -669,6 +768,11 @@ transition={{ duration: 0.2, delay: 0.1 }}
 
 
                   <motion.li 
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -681,7 +785,13 @@ transition={{ duration: 0.2, delay: 0.1 }}
                   </motion.li>
 
 
+
                   <motion.li 
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -699,6 +809,11 @@ transition={{ duration: 0.2, delay: 0.1 }}
 
 
                   <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
                    initial={{ opacity: 0, x: -20 }}
                    animate={{ opacity: 1, x: 0 }}
                    exit={{ opacity: 0, x: -20 }}
@@ -757,6 +872,11 @@ transition={{ duration: 0.2, delay: 0.1 }}
                 <>
 
 <motion.li 
+onClick={() => {
+  if (window.innerWidth < 962) {
+    setSeeSideBar(true);
+  }
+}}
                    initial={{ opacity: 0, x: -20 }}
                    animate={{ opacity: 1, x: 0 }}
                    exit={{ opacity: 0, x: -20 }}
@@ -765,10 +885,11 @@ transition={{ duration: 0.2, delay: 0.1 }}
                    text-white  rounded-lg p-2 ms-3 text-lg font-medium' >
                   {/* <ion-icon name="logo-twitch" ></ion-icon> */}
 
-<LuTicketsPlane className='w-5 h-5 text-teal-600'/>
 
 
-                     <Link to='/admin/sms'>
+                     <Link to='/admin/customer-tickets' className='flex items-center gap-x-2 text-white'>
+                     <LuTicketsPlane className='w-5 h-5 text-red-600'/>
+
                      Tickets
                      </Link>
                   </motion.li>
@@ -822,6 +943,11 @@ transition={{ duration: 0.2, delay: 0.1 }}
    <>
 
 <motion.li 
+onClick={() => {
+  if (window.innerWidth < 962) {
+    setSeeSideBar(true);
+  }
+}}
  initial={{ opacity: 0, x: -20 }}
  animate={{ opacity: 1, x: 0 }}
  exit={{ opacity: 0, x: -20 }}
@@ -834,6 +960,11 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
 
 
       <motion.li
+      onClick={() => {
+        if (window.innerWidth < 962) {
+          setSeeSideBar(true);
+        }
+      }}
        initial={{ opacity: 0, x: -20 }}
        animate={{ opacity: 1, x: 0 }}
        exit={{ opacity: 0, x: -20 }}
@@ -874,7 +1005,13 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
 
 
 
-         <li className='dark:hover:bg-white  p-2  flex items-center 
+         <li
+         onClick={() => {
+          if (window.innerWidth < 962) {
+            setSeeSideBar(true);
+          }
+        }}
+         className='dark:hover:bg-white  p-2  flex items-center 
              text-white rounded-lg dark:text-white   group dark:hover:text-black hover:bg-black'>
             <Link  to='/admin/settings' >
                   <PermDataSettingIcon/>

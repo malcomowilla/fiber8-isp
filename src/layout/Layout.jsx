@@ -104,7 +104,7 @@ useEffect(() => {
 <>
     <Header/>
 {/* <ShortCuts /> */}
-    <div className={`h-screen  overflow-y-scroll p-4 transition-ml duration-500   overflow-x-hidden
+    <div className={`h-screen  overflow-y-scroll p-4 transition-all duration-500   overflow-x-hidden
      ease-in-out ${seeSidebar ? '' : 'sm:ml-64'} `}>
 
 <div className={`p-4  h-[1000px]  `}>
@@ -124,7 +124,7 @@ useEffect(() => {
     <ShortCuts />
 
 
-<div>
+<div className='mt-8'>
 <Outlet/>
 
 </div>
