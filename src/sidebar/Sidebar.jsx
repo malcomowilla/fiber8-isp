@@ -123,7 +123,8 @@ const handleGetCompanySettings = useCallback(
     
 
 <aside  className={`fixed top-0 left-0 z-50  w-64 h-screen transition-all duration-300 ease-in-out 
-  bg-gray-800    sm:bg-gray-800   mogra-regular shadow-xl   lg:block ${seeSidebar ? 'w-[0rem] opacity-0 ' : 'w-[250px] '}    
+  bg-gray-800    sm:bg-gray-800   mogra-regular shadow-xl   
+  lg:block ${seeSidebar ? 'w-[0rem] opacity-0 ' : 'w-[250px] '}    
 `}aria-label="Sidebar">
    <div className={`h-full px-3 py-4   overflow-y-hidden
       dark:bg-gray-800
@@ -131,7 +132,7 @@ const handleGetCompanySettings = useCallback(
    
    `}>
    <div className='flex justify-between   text-white'>
-   <img  className='h-[80px] w-[80px] rounded-full'  src={logo_preview} alt="fiber8-logo" />
+   <img  className='h-[80px] w-[80px] rounded-full'  src={logo_preview} alt="company-logo" />
       <p className='font-extrabold dotted-font lg:text-xl'>{company_name}</p>
       <ArrowBackSharpIcon className='cursor-pointer' onClick={()=> setSeeSideBar(!seeSidebar)}/>
    {/* <ion-icon  onClick={()=> setSeeSideBar(!seeSidebar)}  className='menu-black' size='large' name="menu"></ion-icon> */}
