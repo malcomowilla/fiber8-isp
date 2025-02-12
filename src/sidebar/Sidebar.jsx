@@ -59,7 +59,7 @@ const {company_name, contact_info, email_info, logo_preview} = companySettings
 
 useEffect(() => {
   const handleResize = () => {
-    setSeeSideBar(window.innerWidth < 850);
+    setSeeSideBar(window.innerWidth < 1080);
   };
 
   // Call once to set the correct initial state
