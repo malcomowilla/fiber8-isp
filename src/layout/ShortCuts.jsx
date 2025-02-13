@@ -1,5 +1,6 @@
 import React from "react";
 import { FiCreditCard, FiMail, FiUser, FiUsers } from "react-icons/fi";
+import {Link} from "react-router-dom";
 
 const ShortCuts = () => {
   return (
@@ -7,13 +8,14 @@ const ShortCuts = () => {
       <p className="text-xl font-semibold mb-2">Settings</p>
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <Card
+        to='/admin/profile'
           title="Account"
           subtitle="Manage profile"
           href="#"
           Icon={FiUser}
         />
         <Card title="Email" subtitle="Manage email" href="#" Icon={FiMail} />
-        <Card title="Team" subtitle="Manage team" href="#" Icon={FiUsers} />
+        <Card title="Team" to='/admin/user' subtitle="Manage team" href="#" Icon={FiUsers} />
         <Card
           title="Billing"
           subtitle="Manage cards"
@@ -25,9 +27,10 @@ const ShortCuts = () => {
   );
 };
 
-const Card = ({ title, subtitle, Icon, href }) => {
+const Card = ({ title, subtitle, Icon, href, to }) => {
   return (
-    <a
+    <Link
+      to={to}
       href={href}
       className="w-full  p-4 rounded-lg border-[1px] border-slate-300 relative 
       overflow-hidden group bg-white"
@@ -45,7 +48,7 @@ const Card = ({ title, subtitle, Icon, href }) => {
       relative z-10 duration-300 font-montserat-light">
         {subtitle}
       </p>
-    </a>
+    </Link>
   );
 };
 
