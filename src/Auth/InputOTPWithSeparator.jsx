@@ -88,7 +88,7 @@ useEffect(() => {
       }))
     })
     .catch(error => console.error("Image fetch error:", error));
-}, []);
+}, [setCompanySettings, subdomain]);
 
 
 
