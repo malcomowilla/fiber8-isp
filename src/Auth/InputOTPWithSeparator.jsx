@@ -32,7 +32,8 @@ const { setCurrentUser, handleThemeSwitch
 
 
   const {settingsformData, setWelcomeMessage,  setWelcome,
-    companySettings,setCompanySettings
+    companySettings,setCompanySettings,
+    adminSettings, setAdminSettings,
   }  = useApplicationSettings()
 const navigate = useNavigate()
 const [icon, setIcon] = useState()
@@ -44,9 +45,29 @@ const [icon, setIcon] = useState()
   const [loading, setloading] = useState(false)
   const [error, setError] = useState('')
   const [offlineError, setOfflineError] = useState(false)
+  const [done, setDone] = useState(false)
+  const [seeError, setSeeError] = useState(false)
+  const [openLoad, setOpenLoad] = useState(false);
+  
+
+  const [registrationError,  setRegistrationError] = useState('')
+
+const [errorMessage, setErrorMessage] = useState(null)
+const [seeErrorMessage, setSeeErrorMessage] = useState(false)
+  
+
+
 
 
   const {company_name, contact_info, email_info, logo_preview} = companySettings
+
+
+
+  const { enable_2fa_for_admin_email, enable_2fa_for_admin_sms, send_password_via_sms,
+    send_password_via_email, check_is_inactive,
+    checkinactiveminutes, checkinactivehrs,checkinactivedays,
+    enable_2fa_for_admin_passkeys
+   }= adminSettings;
 
 
 const formData = {
@@ -119,6 +140,233 @@ const [logoUrl, setLogoUrl] = useState('')
 
 
 
+const getAdminSettings = useCallback(
+  async() => {
+    
+    try {
+      const response = await fetch('/api/allow_get_admin_settings', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
+      const newData = await response.json()
+      if (response.ok) {
+        console.log('admin settings fetched', newData)
+        const {enable_2fa_for_admin_email, enable_2fa_for_admin_sms, send_password_via_sms,
+          send_password_via_email, check_is_inactive,
+          enable_2fa_for_admin_passkeys,
+          checkinactiveminutes, checkinactivehrs,checkinactivedays} = newData[0]
+        setAdminSettings(prevData => ({
+          ...prevData, 
+          enable_2fa_for_admin_email, enable_2fa_for_admin_sms, send_password_via_sms,
+          enable_2fa_for_admin_passkeys,
+          send_password_via_email, check_is_inactive,
+          checkinactiveminutes, checkinactivehrs,checkinactivedays
+        }));
+        console.log('admin settings fetched', newData)
+      }else{
+
+// toast.error(newData.error, {
+// position: "top-center",
+// duration: 5000,
+// })
+
+        // toast.error('failed to fetch admin settings', {
+        //   position: "top-center",
+        //   duration: 6000,
+        // })
+      }
+    } catch (error) {
+      // toast.error(`failed to fetch admin settings server error${error}`, {
+      //   position: "top-center",
+      //   duration: 4000,
+      // })
+    }
+  },
+  [setAdminSettings, subdomain],
+)
+
+
+
+useEffect(() => {
+  getAdminSettings()
+  
+}, [getAdminSettings]);
+
+
+
+function arrayBufferToBase64Url(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary).replace(/\//g, '_').replace(/\+/g, '-').replace(/=+$/, '');
+}
+
+
+
+
+
+function base64UrlToUint8Array(base64Url) {
+  const padding = '='.repeat((4 - base64Url.length % 4) % 4);
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/') + padding;
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+
+
+
+
+
+
+async function authenticateWebAuthn(email) {
+  setOpenLoad(true);
+  setDone(false);
+  setSeeError(false);
+
+  try {
+    const response = await fetch('/api/webauthn/authenticate', {
+      method: 'POST',
+      
+      headers: { 'Content-Type': 'application/json',
+        'X-Subdomain': subdomain,
+       },
+      // signal: controller.signal,  
+      body: JSON.stringify({   email})
+    });
+
+    const options = await response.json();
+    const challenge = options.challenge;
+
+try {
+  if (response.ok) {
+    setOpenLoad(false)
+    setSeeError(false)
+setDone(false)
+
+
+
+
+setSeeError(false)
+} else {
+      setRegistrationError(options.error)
+      setSeeError(true)
+      setOpenLoad(false)
+      setDone(false);
+}
+} catch (error) {
+  toast.error('something went wrong', {
+    duration: 8000,
+    position: "top-center",
+  })
+}
+
+   
+
+
+ 
+
+
+  const publicKey = {
+    ...options,
+    challenge: base64UrlToUint8Array(options.challenge),
+    allowCredentials: options.allowCredentials.map(cred => ({
+      ...cred,
+      id: base64UrlToUint8Array(cred.id)
+    }))
+  };
+
+
+  try {
+    // const credentialSignin = await navigator.credentials.get({ publicKey: options });
+    const credential = await navigator.credentials.get({ publicKey: publicKey });
+
+
+    // Prepare the credential response
+    const credentialJson = {
+      id: credential.id,
+      rawId: arrayBufferToBase64Url(credential.rawId),
+      challenge: challenge,
+      type: credential.type,
+      response: {
+        clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON),
+        authenticatorData: arrayBufferToBase64Url(credential.response.authenticatorData),
+        signature: arrayBufferToBase64Url(credential.response.signature),
+        userHandle: arrayBufferToBase64Url(credential.response.userHandle)
+      }
+
+
+    };
+
+
+
+
+    const createResponse = await fetch('/api/webauthn/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json',
+        'X-Subdomain': subdomain,
+       },
+      body: JSON.stringify({ credential:credentialJson,
+        email
+          })
+    });
+
+const newData = await createResponse.json()
+
+    if (createResponse.ok ) {
+      setSeeError(false);
+      setOpenLoad(false);
+      
+    navigate('/admin/analytics')
+   
+
+      // setTimeout(() => {
+      //   // setDone(true);
+      //   // setloading(false);
+      //   setTimeout(() => {
+      //     navigate('/admin/location')
+      //   }, 1000);
+      // }, 2500);
+    } else {
+      toast.error('something went wrong', {
+        duration: 8000,
+        position: "top-center",
+      })
+      // setRegistrationError(options.errors);
+      setSeeError(true);
+      setOpenLoad(false);
+toast.error(newData.error, {
+  duration: 6000,
+  position: "top-center",
+})
+      console.log(`passkey error =>${newData.error}`)
+    }
+  } catch (err) {
+    setSeeError(true);
+    toast.error('something went wrong', {
+      duration: 8000,
+      position: "top-center",
+    })
+    setOpenLoad(false);
+    console.error('Error during WebAuthn credential creation:', err);
+  }
+}catch (err) {
+    setSeeError(true);
+    toast.error('something went wrong', {
+      duration: 8000,
+      position: "top-center",
+    })
+    setOpenLoad(false);
+    setErrorMessage(err.message)
+    console.error('Error during WebAuthn credential creation:', err);
+  }
+}
 
 
 const handleSignIn = async (e) => {
@@ -182,10 +430,20 @@ const handleSignIn = async (e) => {
   }
   
   if (users.ok || users.status === 202) {
-    navigate('/admin/analytics')
+    
+    // enable_2fa_for_admin_passkeys
 
-    setEmail('')
-    setPassword('')
+
+if (enable_2fa_for_admin_passkeys) {
+  authenticateWebAuthn(email)
+} else {
+  navigate('/admin/analytics')
+  setEmail('')
+  setPassword('')
+}
+
+    
+  
     // setShowErrors(false)
     setloading(false)
    
