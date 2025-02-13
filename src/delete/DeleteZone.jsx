@@ -38,7 +38,7 @@ const handleDelete = () =>{
             fontWeight: 'bold'
         }}>Delete Zone</DialogTitle>
         <DialogContent>
-        <p className='font-mono'>Are you sure want to delete this zone</p>
+        <p className='font-mono'>Are you sure want to delete this zone?</p>
 
         <DialogActions>
           <Stack direction={{ xs: 'column', sm: 'row'}}  spacing={{xs: 1, sm: 2, md: 4}}>

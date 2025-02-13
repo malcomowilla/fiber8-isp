@@ -155,7 +155,7 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
             align="center"
             sx={{ mb: 2, fontWeight: 500 }}
           >
-            Are you sure you want to delete this router   </Typography>
+            Are you sure you want to delete this router?   </Typography>
           <Typography
             variant="body2"
             color="text.secondary"

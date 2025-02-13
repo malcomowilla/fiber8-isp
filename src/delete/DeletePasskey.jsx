@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -28,12 +29,13 @@ const Transition = forwardRef(function Transition(props, ref) {
 });
 
 
- function DeletePool({openDelete, handleCloseDelete, deletePool, id, loading}) {
+
+ function DeletePasskey({openDelete, handleCloseDelete, deletePasskey, id, loading}) {
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState('xs');
 
 const handleDelete=()=> {
-  deletePool(id)
+    deletePasskey(id)
   handleCloseDelete()
 }
 
@@ -136,7 +138,7 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
               <WarningIcon color="error" sx={{ fontSize: 32 }} />
             </Box>
             <Typography variant="h5" component="span" fontWeight="bold">
-              Delete IP Pool
+              Delete Passkey
             </Typography>
           </Box>
         </DialogTitle>
@@ -155,7 +157,7 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
             align="center"
             sx={{ mb: 2, fontWeight: 500 }}
           >
-            Are you sure you want to delete this pool?   </Typography>
+            Are you sure you want to delete this passkey?   </Typography>
           <Typography
             variant="body2"
             color="text.secondary"
@@ -218,4 +220,5 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
     </React.Fragment>
   );
 }
-export default DeletePool
+export default DeletePasskey
+
