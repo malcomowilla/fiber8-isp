@@ -97,7 +97,7 @@ const [logoUrl, setLogoUrl] = useState('')
       
       }
     },
-    [setCompanySettings],
+    [setCompanySettings, subdomain],
   )
   
   useEffect(() => {
