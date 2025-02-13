@@ -69,9 +69,11 @@ const [logoUrl, setLogoUrl] = useState('')
 
 useEffect(() => {
   fetch("/api/allow_get_company_settings", {
-    headers: {
-                 'X-Subdomain': subdomain,
-               },
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Subdomain": subdomain,
+      },
   })
     .then(response => response.json())
     .then(data => {
