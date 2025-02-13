@@ -85,7 +85,7 @@ const [logoUrl, setLogoUrl] = useState('')
             contact_info, company_name, email_info,
             customer_support_phone_number,agent_email ,customer_support_email,
           
-            logo_url
+            logo_preview: logo_url
           }))
   
           console.log('company settings fetched', newData)
