@@ -65,46 +65,69 @@ const controller = new AbortController();
   const subdomain = window.location.hostname.split('.')[0];
 const [logoUrl, setLogoUrl] = useState('')
 
-  const handleGetCompanySettings = useCallback(
-    async() => {
-      try {
-        const response = await fetch('/api/allow_get_company_settings', {
-          headers: {
-            'X-Subdomain': subdomain,
-          },
-        })
-        const newData = await response.json()
-        if (response.ok) {
-          // setcompanySettings(newData)
-          const { contact_info, company_name, email_info, logo_url,
-            customer_support_phone_number,agent_email ,customer_support_email
-           } = newData
 
-           setLogoUrl(logo_url)
-          setCompanySettings((prevData)=> ({...prevData, 
-            contact_info, company_name, email_info,
-            customer_support_phone_number,agent_email ,customer_support_email,
-          
-            logo_preview: logo_url
-          }))
-  
-          console.log('company settings fetched', newData)
-        }else{
-          console.log('failed to fetch company settings')
-        }
-      } catch (error) {
-        toast.error('internal servere error  while fetching company settings')
+
+useEffect(() => {
+  fetch("/api/allow_get_company_settings")
+    .then(response => response.json())
+    .then(data => {
+      const {  contact_info, company_name, email_info,
+        customer_support_phone_number,agent_email ,customer_support_email,} = data
+      console.log("Fetched Image URL:", data.profile_image_url);
+      setCompanySettings((prevData)=> ({...prevData, 
+        contact_info, company_name, email_info,
+        customer_support_phone_number,agent_email ,customer_support_email,
       
-      }
-    },
-    [setCompanySettings, subdomain],
-  )
+        logo_preview: data.logo_url
+      }))
+    })
+    .catch(error => console.error("Image fetch error:", error));
+}, []);
+
+
+
+
+
+  // const handleGetCompanySettings = useCallback(
+  //   async() => {
+  //     try {
+  //       const response = await fetch('/api/allow_get_company_settings', {
+  //         headers: {
+  //           'X-Subdomain': subdomain,
+  //         },
+  //       })
+  //       const newData = await response.json()
+  //       if (response.ok) {
+  //         // setcompanySettings(newData)
+  //         const { contact_info, company_name, email_info, logo_url,
+  //           customer_support_phone_number,agent_email ,customer_support_email
+  //          } = newData
+
+  //          setLogoUrl(logo_url)
+  //         setCompanySettings((prevData)=> ({...prevData, 
+  //           contact_info, company_name, email_info,
+  //           customer_support_phone_number,agent_email ,customer_support_email,
+          
+  //           logo_preview: logo_url
+  //         }))
   
-  useEffect(() => {
+  //         console.log('company settings fetched', newData)
+  //       }else{
+  //         console.log('failed to fetch company settings')
+  //       }
+  //     } catch (error) {
+  //       toast.error('internal servere error  while fetching company settings')
+      
+  //     }
+  //   },
+  //   [setCompanySettings, subdomain],
+  // )
+  
+  // useEffect(() => {
     
-    handleGetCompanySettings()
+  //   handleGetCompanySettings()
     
-  }, [handleGetCompanySettings])
+  // }, [handleGetCompanySettings])
 
 
 
