@@ -210,13 +210,14 @@ const Analytics = () => {
               className="p-6 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg text-white"
               whileHover={{ scale: 1.05 }}
             >
-              <h3 className="text-xl font-semibold mb-4">Board Details</h3>
-              <p>Board Name: {board_name}</p>
-              <p>Version: {version}</p>
-              <p>Uptime: {uptime}</p>
-              <p>CPU Load: {cpu_load}</p>
-              <p>Memory Usage: {memory_usage?.used} / {memory_usage?.total}</p>
-              <p>Disk Usage: {disk_usage?.used} / {disk_usage?.total}</p>
+              <h3 className="text-2xl font-bold mb-4">Board Details</h3>
+              <p className='font-light'>Board Name: <b className='font-bold'>{board_name}</b> </p>
+              <p>Version: <b className=''>{version}</b> </p>
+              <p>Uptime: <b className=''>{uptime}</b> </p>
+              <p>CPU Load: <b className=''>{cpu_load}</b> </p>
+              <p>Memory Usage: <b className=''>{memory_usage?.used} / {memory_usage?.total}</b> </p>
+              <p>Disk Usage: <b className=''>{disk_usage?.used} / {disk_usage?.total}</b> </p>
+              
             </motion.div>
 
             {/* Traffic Graph */}
