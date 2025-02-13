@@ -9,7 +9,7 @@ import {
 
 
 // import {ResetPassword} from './Auth/ResetPassword'
-import {useState, useEffect, lazy, Suspense} from 'react'
+import {useState, useEffect, lazy, Suspense, useCallback} from 'react'
 import {ApplicationContext} from './context/ApplicationContext'
 import UiLoader from './uiloader/UiLoader'
 // import Signup from './Auth/Signup'
@@ -22,6 +22,7 @@ const AdminDashboard = lazy(()=> import ('./admindashboard/AdminDashboard'))
 // import Layout from './layout/Layout'
 import {CableProvider} from './context/CableContext'
 import { redirect } from "react-router-dom";
+import toast, { Toaster } from 'react-hot-toast';
 
 //  import PPPOEpackages from './packages/PPPOEpackages'
 
@@ -123,6 +124,9 @@ const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
 
 const CustomerTickets = lazy(() => import('./tickets/CustomerTickets') )
 const AccountLocked = lazy(()=> import('./account_locked/AccountLocked'))
+import {Helmet} from "react-helmet";
+import {useApplicationSettings} from './settings/ApplicationSettings'
+
 
 //  const PPPoEPackages = lazy(() => import('./wifi_page/PPPoEPackages') )
 
@@ -244,6 +248,10 @@ const [openSignupNotification, setOpenNotification] = useState(false);
 const subdomain = window.location.hostname.split('.')[1]
 
 const domain = window.location.hostname.split('.')[0]
+
+
+const {companySettings, setCompanySettings} = useApplicationSettings()
+const {logo_preview} = companySettings
 console.log('subdomain',subdomain)
 const handleClose = () => {
   setOpenNotification(false);
@@ -523,8 +531,63 @@ const darkTheme = createTheme({
 
 
 
+
+
+const handleGetCompanySettings = useCallback(
+  async() => {
+    try {
+      const response = await fetch('/api/get_company_settings', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
+      const newData = await response.json()
+      if (response.ok) {
+        // setcompanySettings(newData)
+        const { contact_info, company_name, email_info, logo_url,
+          customer_support_phone_number,agent_email ,customer_support_email
+         } = newData
+         console.log(logo_url)
+
+        setCompanySettings((prevData)=> ({...prevData, 
+          contact_info, company_name, email_info,
+          customer_support_phone_number,agent_email ,customer_support_email,
+        
+          logo_preview: logo_url
+        }))
+
+        console.log('company settings fetched', newData)
+      }else{
+        console.log('failed to fetch company settings')
+      }
+    } catch (error) {
+      toast.error('internal servere error  while fetching company settings')
+    
+    }
+  },
+  [setCompanySettings],
+)
+
+useEffect(() => {
+  
+  handleGetCompanySettings()
+  
+}, [handleGetCompanySettings])
+
+
+
   return (
     <main>
+
+<Helmet>
+                <meta charSet="utf-8" />
+                {/* <title>My Title</title> */}
+                <link rel="icon" type="image/svg+xml" href={logo_preview} />
+
+            </Helmet>
+
+
+
 <SignupNotification  openSignupNotification={ openSignupNotification} handleClose={handleClose} />
           <ThemeProvider theme={materialuitheme}>
 
@@ -533,7 +596,6 @@ const darkTheme = createTheme({
       <CableProvider>
         
         
-      <ApplicationSettings>
  <ApplicationContext.Provider value={{isSeen, setIsSeen,isPassword, setPassword,
    email, setEmail, passwordConfirmation, setPasswordConfirmation, errorData, showErrors, handleSignUp, loading,
    isExpanded, setIsExpanded, isExpanded1, setIsExpanded1, isExpanded2, setIsExpanded2,
@@ -636,7 +698,6 @@ const darkTheme = createTheme({
 </Routes>
 
 </ApplicationContext.Provider>
-</ ApplicationSettings>
 
       </CableProvider>
 </ LocalizeDate  >

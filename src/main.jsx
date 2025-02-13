@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { persistQueryClient } from '@tanstack/react-query-persist-client'
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
 import { BrowserRouter as Router } from 'react-router-dom';
-
+import ApplicationSettings from './settings/ApplicationSettings'
 
 
 
@@ -37,11 +37,13 @@ persistQueryClient({
 ReactDOM.createRoot(document.getElementById('root')).render(
 
   <React.StrictMode>
+    <ApplicationSettings>
     < Router >
       <QueryClientProvider   client={queryClient} contextSharing={true}>
 
       <App client={queryClient}/>
       </QueryClientProvider>
 </Router>
+</ApplicationSettings>
   </React.StrictMode>,
 )
