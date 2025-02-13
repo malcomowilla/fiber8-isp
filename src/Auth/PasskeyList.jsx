@@ -8,11 +8,22 @@ import { FiUserX } from 'react-icons/fi';
 import {useCallback, useEffect, useState} from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 import { GoKey } from "react-icons/go";
+import DeletePasskey from '../delete/DeletePasskey'
 
 
 
 const PasskeyList = () => {
 const [passkeys, setPasskeys] = useState([])
+const [openDelete, setOpenDelete] = useState(false)
+const [loading, setLoading] = useState(false)
+const [passkeyId, setPasskeyId] = useState('')
+
+
+
+const  handleCloseDelete = () => {
+  setOpenDelete(false);
+};
+
 const generateAvatar = (name) => {
   const avatar = createAvatar(lorelei, {
     seed: name, // Use the customer's name as the seed
@@ -57,13 +68,14 @@ const newData = await response.json()
 
 useEffect(() => {
     getPasskeys()
-}, []);
+}, [getPasskeys]);
 
 
 
 
 
 const deletePassKey = async(id) => {
+  setLoading(true)
   const response = await fetch(`/api/delete_passkey?id=${id}`, {
     method: 'DELETE',
     headers: {
@@ -80,11 +92,13 @@ const deletePassKey = async(id) => {
         position: "top-center",
         duration: 7000,
       })
+      setLoading(false)
     } else {
       toast.error('failed to delete passkey', {
         position: "top-center",
         duration: 7000,
       })
+      setLoading(false)
     }
     
   } catch (error) {
@@ -92,15 +106,75 @@ const deletePassKey = async(id) => {
       position: "top-center",
       duration: 7000,
     })
+    setLoading(false)
   }
  
 }
 
 
+
+
+
+// const deletePassKey = async (id) => {
+//   setLoading(true);
+
+//   try {
+//     // Signal the unknown credential before deletion
+//     if (window.PublicKeyCredential && PublicKeyCredential.signalUnknownCredential) {
+//       await PublicKeyCredential.signalUnknownCredential({
+//         rpId: window.location.hostname, // Relying Party ID (e.g., "example.com")
+//         credentialId: id, // Ensure this is base64url encoded
+//       });
+//       console.log("Credential signaled for removal:", id);
+//     } else {
+//       console.warn("signalUnknownCredential is not supported in this browser.");
+//     }
+//   } catch (error) {
+//     console.error("Error signaling unknown credential:", error);
+//   }
+
+//   // Proceed with API deletion
+//   try {
+//     const response = await fetch(`/api/delete_passkey?id=${id}`, {
+//       method: "DELETE",
+//       headers: {
+//         "X-Subdomain": subdomain,
+//       },
+//     });
+
+//     if (response.ok) {
+//       setPasskeys((prev) => prev.filter((cred) => cred.id !== id));
+//       toast.success("Passkey deleted successfully", {
+//         position: "top-center",
+//         duration: 7000,
+//       });
+//     } else {
+//       toast.error("Failed to delete passkey", {
+//         position: "top-center",
+//         duration: 7000,
+//       });
+//     }
+//   } catch (error) {
+//     toast.error("Failed to delete passkey. Something went wrong.", {
+//       position: "top-center",
+//       duration: 7000,
+//     });
+//   } finally {
+//     setLoading(false);
+//   }
+// };
+
 return(
 
   <>
   <Toaster />
+
+<DeletePasskey  openDelete={openDelete} handleCloseDelete={handleCloseDelete}
+ deletePasskey={deletePassKey} id={passkeyId} loading={loading} 
+ 
+ 
+ />
+
 
   <div className='flex flex-row gap-x-3 p-3'>
 
@@ -112,7 +186,9 @@ return(
   </div>
 <div className="space-y-4 p-4 cursor-pointer" >
       {passkeys.map((passkey) => (
+        
         <motion.ul
+        
           key={passkey.id}
           className="bg-white shadow-md flex justify-between rounded-lg overflow-hidden"
           initial={{ opacity: 0, y: 20 }}
@@ -141,10 +217,15 @@ return(
               </div>
             </div>
           </li>
+          
 
+          {/* onClick={() => deletePassKey(passkey.id)} */}
           <div className='flex flex-row gap-x-3 p-3'>
 
-          <AiOutlineDelete className='text-red-600 text-2xl ' onClick={() => deletePassKey(passkey.id)}/>
+          <AiOutlineDelete className='text-red-600 text-2xl ' onClick={() =>   {
+            setPasskeyId(passkey.id)
+            setOpenDelete(true)
+          } }/>
 
           </div>
         </motion.ul>
