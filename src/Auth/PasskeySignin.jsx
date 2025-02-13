@@ -22,7 +22,8 @@ import LoadingAnimation from '../loader/loading_animation.json'
 const PasskeySignin = () => {
 
   const { setPhone, phone, isloading,
-    
+    settingsformData, setWelcomeMessage,  setWelcome,
+    companySettings,setCompanySettings
  
     } = useApplicationSettings()
 
@@ -95,6 +96,7 @@ const defaultOptions = {
 
 
 
+
 const controller = new AbortController();
 const timeoutDuration = 12000; // 12 seconds
 const timeoutId = setTimeout(() => {
@@ -104,6 +106,7 @@ const timeoutId = setTimeout(() => {
 }, timeoutDuration);
 const subdomain = window.location.hostname.split('.')[0]; 
 
+const {company_name, contact_info, email_info, logo_preview} = companySettings
 
 
 function arrayBufferToBase64Url(buffer) {
@@ -130,6 +133,48 @@ function base64UrlToUint8Array(base64Url) {
   return outputArray;
 }
 
+
+
+
+const handleGetCompanySettings = useCallback(
+  async() => {
+    try {
+      const response = await fetch('/api/allow_get_company_settings', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
+      const newData = await response.json()
+      if (response.ok) {
+        // setcompanySettings(newData)
+        const { contact_info, company_name, email_info, logo_url,
+          customer_support_phone_number,agent_email ,customer_support_email
+         } = newData
+
+        setCompanySettings((prevData)=> ({...prevData, 
+          contact_info, company_name, email_info,
+          customer_support_phone_number,agent_email ,customer_support_email,
+        
+          logo_preview: logo_url
+        }))
+
+        console.log('company settings fetched', newData)
+      }else{
+        console.log('failed to fetch company settings')
+      }
+    } catch (error) {
+      toast.error('internal servere error  while fetching company settings')
+    
+    }
+  },
+  [setCompanySettings, subdomain],
+)
+
+useEffect(() => {
+  
+  handleGetCompanySettings()
+  
+}, [handleGetCompanySettings])
 
 
 
@@ -358,8 +403,8 @@ toast.error(newData.error, {
 
       <div className='flex justify-center items-center w-full  '>
       <a href="#" className="flex items-center  text-2xl font-semibold text-gray-900 dark:text-white">
-          <img className="w-40 h-40 rounded-full p-3" src="/images/fiber8logo1.png" alt="logo"  />
-          
+      <img className="w-40 h-40 mr-2 rounded-full mt-20" src={logo_preview} alt="logo"  />
+
       </a>
       </div>
           <motion.div 

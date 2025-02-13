@@ -173,8 +173,12 @@ console.log(error)
 
 
 
+
+
 const fetchCurrentUser = useCallback(
   async() => {
+    document.title = subdomain
+
     try {
       const response = await fetch('/api/currently_logged_in_user', {
         headers: {
