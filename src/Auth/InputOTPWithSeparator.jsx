@@ -63,7 +63,7 @@ const controller = new AbortController();
 
 
   const subdomain = window.location.hostname.split('.')[0];
-
+const [logoUrl, setLogoUrl] = useState('')
 
   const handleGetCompanySettings = useCallback(
     async() => {
@@ -79,11 +79,13 @@ const controller = new AbortController();
           const { contact_info, company_name, email_info, logo_url,
             customer_support_phone_number,agent_email ,customer_support_email
            } = newData
+
+           setLogoUrl(logo_url)
           setCompanySettings((prevData)=> ({...prevData, 
             contact_info, company_name, email_info,
             customer_support_phone_number,agent_email ,customer_support_email,
           
-            logo_preview: logo_url
+            logo_url
           }))
   
           console.log('company settings fetched', newData)
@@ -226,6 +228,7 @@ const handleSignIn = async (e) => {
 
 // }, 9000);
 
+console.log("Logo Preview URL:", logo_preview);
 
 
 // passkey-signin
@@ -301,7 +304,8 @@ const handleSignIn = async (e) => {
       <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900
        dark:text-white ">
           <img className="w-40 h-40 mr-2 rounded-full mt-20" src={logo_preview} alt="logo"  />
-          
+          {/* <img className="w-40 h-40 mr-2 rounded-full mt-20" src='https://8209-102-221-35-92.ngrok-free.app/rails/active_storage/disk/eyJfcmFpbHMiOnsiZGF0YSI6eyJrZXkiOiJsNDBwbWN1YXc1NDJsMG1jZGhmbzBsZm42ODVpIiwiZGlzcG9zaXRpb24iOiJpbmxpbmU7IGZpbGVuYW1lPVwiZmliZXI4bG9nbzEucG5nXCI7IGZpbGVuYW1lKj1VVEYtOCcnZmliZXI4bG9nbzEucG5nIiwiY29udGVudF90eXBlIjoiaW1hZ2UvcG5nIiwic2VydmljZV9uYW1lIjoibG9jYWwifSwicHVyIjoiYmxvYl9rZXkifX0=--1bc68299b8711907c6cbf55859a4e1f68804c6dd/fiber8logo1.png' alt="logo"  /> */}
+
       </a>
 
       <div className="w-full p-6 bg-white rounded-lg shadow dark:border
