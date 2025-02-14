@@ -128,7 +128,7 @@ import {Helmet} from "react-helmet";
 import {useApplicationSettings} from './settings/ApplicationSettings'
 
 
-//  const PPPoEPackages = lazy(() => import('./wifi_page/PPPoEPackages') )
+ const PPPoEPackages = lazy(() => import('./wifi_page/PPPoEPackages') )
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -574,7 +574,7 @@ useEffect(() => {
   
 }, [handleGetCompanySettings])
 
-
+const hostname = window.location.hostname;
 
   return (
     <main>
@@ -613,16 +613,20 @@ useEffect(() => {
 
 
 <Routes>
-
-{/* <Route index path='/' element={<PPPoEPackages/>}/> */}
+{/* 
+<Route index path='/' element={<PPPoEPackages/>}/>
 
 
   
 {domain === 'localhost'  ?  (
   <Route index path='/'  element={<Signup/>}/>
-): null}  
+): null}    */}
 
-
+{hostname === 'aitechs.co.ke' ? (
+      <Route index path="/" element={<Signup />} />
+    ) : hostname.endsWith('.aitechs.co.ke') ? (
+      <Route index path="/" element={<PPPoEPackages />} />
+    ) : null}
 
 {/* <Route index path='/'  element={<Signup/>}/> */}
 
