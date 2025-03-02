@@ -41,9 +41,12 @@ function  EditSubscription({open,  handleClose}) {
   const [age, setAge] = React.useState('');
 const [dateTimeValue, setDateTimeValue] = useState(dayjs(new Date()))
 const [newDate, setNewDate] = React.useState(null)
+
   const handleChange = (event) => {
     setAge(event.target.value);
   };
+
+
   useEffect(() => {
     // Calculate the date and time 30 days from the current date and time
     const thirtyDaysFromNow = dayjs(new Date()).add(30, 'day');
@@ -210,6 +213,8 @@ disabled
           //   setDateTimeValue(newValue)
           // }   }
 
+
+          
           viewRenderers={{
             hours:  renderTimeViewClock,
             minutes:  renderTimeViewClock,
@@ -220,6 +225,8 @@ disabled
          
         />
       </DemoContainer>
+
+      
 
 </div>
 

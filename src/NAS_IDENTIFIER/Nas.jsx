@@ -9,7 +9,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { IconButton,  Checkbox } from '@mui/material';
 import GetAppIcon from '@mui/icons-material/GetApp';
 // import {Link} from 'react-router-dom'
-import {  useState, useEffect, useMemo} from 'react'
+import {  useState, useEffect, useMemo, useCallback} from 'react'
 // import {ApplicationContext} from '../context/ApplicationContext'
 import EditNas from '../edit/EditNas' 
 import AddIcon from '@mui/icons-material/Add';
@@ -32,12 +32,14 @@ const Nas = () => {
 const [loading, setloading] = useState(false)
 const [offlineerror, setofflineerror] = useState(false)
 const [openDelete, setOpenDelete] = useState(false);
-const { nasformData, setnasFormData,initialValueNas, tableDataNas, setTableData } =  useApplicationSettings() 
+const { nasformData, setnasFormData,initialValueNas, setTableData } =  useApplicationSettings() 
 const [selectedRouter, setSelectedRouter] = useState(null);
 const [selectedRouterInfo, setSelectedRouterInfo] = useState(null);
 const [search ,setSearch] = useState('')
 
 
+const [tableDataNas, setTableDataNas] = useState([]); // Stores routers
+const [pingStatus, setPingStatus] = useState([]); // Stores ping statuses
 
 const [selectedRouterId, setSelectedRouterId] = useState(() => {
   const savedRouterId = localStorage.getItem('selectedCheckedRouter');
@@ -151,6 +153,39 @@ const subdomain = window.location.hostname.split('.')[0];
   };
 
 
+  
+// const fetchPingStatus = useCallback(
+//   async() => {
+    
+// const response = await fetch('/api/router_ping_response', {
+//     headers: {
+//       'X-Subdomain': subdomain,
+//     },
+
+
+// })
+
+// const newData = await response.json()
+// if (response.ok) {
+//   setTableData(newData)
+//   console.log('router ping status', newData)
+  
+// }else{
+//   console.log('failed to fetch ping status')
+// }
+//   },
+//   [],
+// )
+
+
+
+// useEffect(() => {
+  
+//   fetchPingStatus()
+// }, [fetchPingStatus]);
+
+
+
   const fetchRouters = useMemo(() => async ()=> {
   
   try {
@@ -166,7 +201,8 @@ const subdomain = window.location.hostname.split('.')[0];
   
     const newData = await response.json()
   if (response.ok) {
-   setTableData(newData)
+  //  setTableData(newData)
+   setTableDataNas(newData)
    const ip_address = newData[0].ip_address
    const username = newData[0].username
    const password = newData[0].password
@@ -235,9 +271,9 @@ const handleSubmit = async (e)=> {
               position: "top-center",
               duration: 7000,
             })
-            setTableData(tableDataNas.map(item => (item.id === nasformData.id ? newData : item)));
+            setTableDataNas(tableDataNas.map(item => (item.id === nasformData.id ? newData : item)));
           }else{
-            setTableData((tableData)=>[...tableData, newData])
+            setTableDataNas((tableData)=>[...tableData, newData])
             toast.success('router added successfully', {
               position: "top-center",
               duration: 7000,
@@ -292,6 +328,88 @@ const handleSubmit = async (e)=> {
     };
         console.log('selected rowdata', selectedRouter)
 
+
+
+
+
+        const getPingStatus = useCallback(
+          async() => {
+            
+
+            const response = await fetch('/api/router_ping_response',{
+              headers: {
+                'X-Subdomain': subdomain,
+              },
+            })
+            const newData = await response.json()
+            if (response.ok) {
+              setPingStatus(newData)
+              console.log('router ping status fetch', newData)
+              // setTableData((prevData) => ({
+              //   ...prevData, 
+              //   ...newData // This will overwrite existing keys if they exist
+              // }));
+              console.log('router ping status', newData)
+            
+            }else{
+              toast.error('failed to get router ping status something went wrong', {
+                position: "top-center",
+                duration: 5000,
+              })
+            }
+          },
+          [],
+        )
+        
+
+
+
+        useEffect(() => {
+          getPingStatus(); // Initial fetch
+        
+           const intervalId = setInterval(() => {
+            getPingStatus();
+          }, 60000); // Fetch every 60 seconds
+          return () => clearInterval(intervalId);
+        
+        }, [getPingStatus]); 
+        
+
+
+
+
+
+
+// const mergedTableData = tableDataNas.map((router) => {
+//   const response = router.ping_status?.router_status?.response || "";
+//   const pingTimeMatch = response.match(/time (\d+ms)/); // Extracts "time XXXXms"
+//   const pingTime = pingTimeMatch ? pingTimeMatch[1] : "N/A"; // Default if no match
+//   console.log('router ping status',(router.ping_status?.router_status?.response))
+
+//   return {
+//     ...router,
+//     ping: pingTime, // Extracted ping time
+//     reachable: router.ping_status?.router_status?.reachable ? "Reachable" : "Not Reachable",
+//   };
+// });
+// pingStatus]
+
+
+
+const mergedTableData = tableDataNas.map((router) => {
+  console.log('router', router)
+  const response = pingStatus.router_status?.response || "";
+  const pingTimeMatch = response.match(/time (\d+ms)/); // Extracts "time XXXXms"
+  const pingTime = pingTimeMatch ? pingTimeMatch[1] : "N/A"; // Default if no match
+  const ip_adress_router = pingStatus?.router_status?.ip
+
+  return {
+    ...router,
+    ping: pingTime || "N/A", // Extracted ping time
+    reachable: router.ping_status?.router_status?.reachable ? "reachable" : "not reachable",
+    ip_adress_router
+  };
+});
   const DeleteButton = () => (
         <IconButton style={{ color: '#8B0000' }}  onClick={ handleClickOpenDelete}>
           <DeleteIcon />
@@ -300,14 +418,49 @@ const handleSubmit = async (e)=> {
 
 
   const EditButton = () => (
-    <IconButton style={{color: 'black'}}   onClick={handleClickOpen}>
+    <IconButton style={{color: 'green'}}   onClick={handleClickOpen}>
       <EditIcon />
     </IconButton>
   );
 const columns = [
     {title: 'name', field: 'name',  },
+  // {title: 'ping', field: 'ping'},
 
-  {title: 'ip_address', field: 'ip_address', },
+
+  {
+    title: 'ping',
+    field: 'ping',
+    render: rowData => (
+      <span style={{ 
+        // color: pingStatus.router_status?.response ? 'green' : 'red', 
+        // color: rowData.ping_status?.router_status?.reachable === true ? 'green' : 'red', 
+        color: pingStatus?.router_status?.reachable === true ? 'green' : 'red', 
+        fontWeight: 'bold' 
+      }}>
+{rowData.ip_adress_router
+ === rowData.ip_address ? rowData.ping : ''}
+      </span>
+    )
+  },
+  
+  // {title: 'status', field: 'reachable'},
+  {
+    title: 'Status',
+    field: 'reachable',
+    render: rowData => (
+      <span style={{ 
+        color: pingStatus.router_status?.reachable === true ? 'green' : 'red', 
+        fontWeight: 'bold' 
+      }}>
+        {rowData.ip_adress_router
+ === rowData.ip_address ? pingStatus.router_status?.reachable === true ? 'reachable' : 'not reachable' : ''}
+      </span>
+    )
+  },
+  {title: 'ip_address', field: 'ip_address',
+
+
+   },
   {title: 'username', field: 'username', },
   {title: 'password', field: 'password', },
 
@@ -319,9 +472,7 @@ const columns = [
       
        <DeleteButton  id={rowData.id} />
        <EditButton />
-     <Checkbox                onChange={(event) => handleCheckboxChange(event, rowData)}
-    checked={selectedRouter === rowData.id}
-/>
+   
        </>
 
 }
@@ -375,7 +526,7 @@ const columns = [
       title='NAS (Mikrotik Routers with PPPoE/Hotspot)'
       
       
-      data={tableDataNas}
+      data={mergedTableData}
 
     onRowClick={handleRowClick}
     actions={[
