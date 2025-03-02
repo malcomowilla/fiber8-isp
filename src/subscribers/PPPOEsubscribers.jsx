@@ -48,7 +48,7 @@ const PPPOEsubscribers = () => {
     
 
   }
-  const [open, setOpen] =useState(false);
+  const [open, setOpen] = useState(false);
 const [formData,  setFormData] = useState(intialValue)
 const [tableData, setTableData] = useState([])
 const [loading, setloading] = useState(false)
@@ -301,8 +301,6 @@ toast.error('failed to delete subscriber', {
 
 
 
-
-
   const columns = [
     {title: 'name', field: 'name', headerClassName: 'dark:text-black ', defaultSort: 'asc'},
     {title: 'ref_no', field: 'ref_no',  headerClassName: 'dark:text-black' ,  sorting: true, defaultSort: 'asc'},
@@ -393,6 +391,8 @@ handleChangeForm={handleChange}
         <span className="sr-only">Search</span>
     </button>
 </div>
+
+
 <MaterialTable columns={columns}
 data={tableData}
 title='PPPoe Subcribers'

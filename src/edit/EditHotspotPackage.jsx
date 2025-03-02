@@ -14,6 +14,7 @@ import {
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
 // import Loader from '../loader/Loader'
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -29,6 +30,9 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import dayjs from 'dayjs';
+import {useApplicationSettings} from '../settings/ApplicationSettings'
+
 // import PackageNotification  from '.././notification/PackageNotification'
 
 
@@ -43,7 +47,8 @@ import { ReloadIcon } from "@radix-ui/react-icons"
 
 
 const EditHotspotPackage =  ({handleClose, loading, open, hotspotPackage, setHotspotPackage,
-  createHotspotPackage
+  createHotspotPackage,
+  handleChangeTimeFrom, handleChangeTimeUntil,handleWeekdayChange
  }) => {
  
    
@@ -65,6 +70,18 @@ const {name, validity, download_limit, upload_limit, price, upload_burst_limit, 
    setHotspotPackage({...hotspotPackage, [id]: value})
 }
 
+
+// const [dateTimeValue, setDateTimeValue] = useState(dayjs(new Date()))
+
+const {dateTimeValue, newDate, setNewDate, setDateTimeValue} =  useApplicationSettings()
+
+
+// const [dateTimeValue, setDateTimeValue] = useState(null)
+
+// const [newDate, setNewDate] = React.useState(null)
+console.log('newDate', newDate)
+
+console.log('dateTimeValue', dateTimeValue)
 
   return (
     <React.Fragment>
@@ -143,7 +160,7 @@ const {name, validity, download_limit, upload_limit, price, upload_burst_limit, 
 
 
 
-{/* 
+
             <TextField label='upload-speed-limit(mbps)'   
             
             value={upload_limit}
@@ -167,10 +184,10 @@ const {name, validity, download_limit, upload_limit, price, upload_burst_limit, 
 },
          
         }}     className='myTextField'  
-            type='number' placeholder='upload-speed-limit(mbps)...' fullWidth></TextField> */}
+            type='number' placeholder='upload-speed-limit(mbps)...' fullWidth></TextField> 
 
 
-{/* 
+
             <TextField    value={download_limit}  onChange={handleChangeHotspotPackage} 
             label='download-speed-limit(mbps)'   id='download_limit'   sx={{
 
@@ -190,7 +207,7 @@ const {name, validity, download_limit, upload_limit, price, upload_burst_limit, 
          
         }}   className='myTextField'       
           type='number' 
-      fullWidth></TextField> */}
+      fullWidth></TextField> 
             </div>
            
            {/* <div className='flex   '>
@@ -366,6 +383,83 @@ const {name, validity, download_limit, upload_limit, price, upload_burst_limit, 
 </Box>
 
 
+<DemoContainer  sx={{
+
+'& label.Mui-focused': {
+  color: 'black'
+  },
+'& .MuiOutlinedInput-root': {
+"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+  borderColor: "black",
+  borderWidth: '3px'
+  },
+'&.Mui-focused fieldset':  {
+  borderColor: 'black', // Set border color to transparent when focused
+
+}
+},
+    }}  components={['TimePicker', 'TimePicker']}>
+      <TimePicker className='myTextField'
+        label="Valid From"
+        value={hotspotPackage.valid_from}
+      //  minDate={dayjs(new Date())}
+      //    maxDate={dayjs(new Date())} 
+onChange ={(date) => handleChangeTimeFrom(date)}
+        viewRenderers={{
+          hours: renderTimeViewClock,
+          minutes: renderTimeViewClock,
+          seconds: renderTimeViewClock,
+        }}
+      
+
+      />
+      <TimePicker  className='myTextField'
+        label="Valid Until" value={hotspotPackage.valid_until}
+        onChange ={(date) => handleChangeTimeUntil(date)}
+
+        // minDate={dayjs(new Date())}
+        // maxDate={dayjs(new Date(new Date().getTime() + (30 * 24 * 60 * 60 * 1000)))} // 30 days from today
+        // onChange={(newValue) => {
+        //   setDateTimeValue(newValue)
+        // }   }
+
+        viewRenderers={{
+          hours:  renderTimeViewClock,
+          minutes:  renderTimeViewClock,
+          seconds: renderTimeViewClock,
+        }}
+
+
+       
+      />
+    </DemoContainer>
+
+
+    <div className="flex justify-center items-center flex-col space-y-4">
+  <p className="text-xl font-thin text-green-600 mb-4">Valid Days</p>
+
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
+    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
+      <label
+        key={day}
+        className="flex items-center space-x-2 p-4 bg-white rounded-xl shadow-lg cursor-pointer hover:shadow-xl transition-shadow duration-300"
+      >
+        
+        <input
+         type="checkbox"
+         className="form-checkbox h-5 w-5 text-green-600 rounded border-2 border-green-500 focus:ring-green-500"
+         checked={hotspotPackage.weekdays?.includes(day)}
+ // Check if the day is in state
+         onChange={() => handleWeekdayChange(day)} // Handle chang
+          // value={day}
+          // checked={templateStates[day]}
+          // onChange={(e) => handleCheckboxChange(e)}
+        />
+        <span className="text-gray-700 font-medium">{day}</span>
+      </label>
+    ))}
+  </div>
+</div>
 
 <FormControl  
 
@@ -400,6 +494,9 @@ const {name, validity, download_limit, upload_limit, price, upload_burst_limit, 
         
 
         >
+           <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
           <MenuItem value={'days'}>days</MenuItem>
           <MenuItem value={'hours'}>hours</MenuItem>
           <MenuItem value={'minutes'}>minutes</MenuItem>

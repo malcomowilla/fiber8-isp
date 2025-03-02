@@ -80,7 +80,19 @@ const [welcome, setWelcome] = useState(false)
         phone_number: '',
         email: ''
       })
+      const [templateStates, setTemplateStates] = useState({
+        clean: false,
+        default_template: false,
+        sleekspot: false,
+        attractive: false,
+        flat: false,
+        minimal: false,
+        simple: false,
+        default: false,
+        sleek: false, 
+      });
 
+      
       // const [settingsformData, setFormData] = useState(() => {
       //   const storedFormData =   localStorage.setItem("checkedtrueData", JSON.stringify(initialValue.check_update_password));
         
@@ -156,7 +168,8 @@ if (response.ok) {
 // console.log('check username', check_username)
 // const welcome_back_message = storedData.welcome_back_message
 
-const {prefix, minimum_digits, check_update_password, check_update_username,welcome_back_message, router_name} = newData[0]
+const {prefix, minimum_digits, check_update_password, check_update_username,
+  welcome_back_message, router_name} = newData[0]
 setFormData({...settingsformData, prefix,  minimum_digits, check_update_password, check_update_username, 
    welcome_back_message,
 router_name
@@ -347,6 +360,7 @@ const handleChange = (e) => {
      loginWithPasskey, setLoginWithPasskey,handleChangeSubscriberSettings,
      subscriberSettings,setSubscriberSettings,
      handleChangeAdminSettings, adminSettings, setAdminSettings,
+     templateStates, setTemplateStates,
      
      companySettings, setCompanySettings}}  >
     {children}

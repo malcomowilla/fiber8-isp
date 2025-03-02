@@ -20,6 +20,9 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
 import DeleteHotspotPackage from '../delete/DeleteHotspotPackage'
 import {useApplicationSettings} from '../settings/ApplicationSettings'
+import { RiHotspotLine } from "react-icons/ri";
+
+import dayjs from 'dayjs';
 
 
 
@@ -51,6 +54,7 @@ const [packages, setPackages] = useState([])
 const [isOpenDelete, setisOpenDelete] = useState(false)
 
 const {settingsformData} = useApplicationSettings()
+const [search, setSearch] = useState('')
 const [hotspotPackage, setHotspotPackage] = useState({
   name: '',
   validity: '',
@@ -58,10 +62,26 @@ const [hotspotPackage, setHotspotPackage] = useState({
   upload_limit: '',
   price:  '',
   upload_burst_limit: '',
+  valid_from: dayjs(),
+  valid_until: dayjs(),
   download_burst_limit: '',
   validity_period_units: '',
+  weekdays: [] // <-- Add weekdays array
+
 })
 
+
+
+const handleWeekdayChange = (day) => {
+  console.log('day', day);
+  setHotspotPackage((prev) => {
+    const updatedWeekdays = prev.weekdays?.includes(day)
+      ? prev.weekdays?.filter((d) => d !== day) // Remove day if already selected
+      : [...(prev.weekdays || []), day]; // Add day if not selected
+
+    return { ...prev, weekdays: updatedWeekdays };
+  });
+};
 
 const handleClickOpen = (rowData) => {
   setOpen(true);
@@ -72,6 +92,18 @@ const handleClickOpen = (rowData) => {
   const handleClose = () => {
     setOpen(false);
   };
+
+
+const handleChangeTimeFrom = (date)=> {  
+  setHotspotPackage({...hotspotPackage, valid_from: date})
+}
+
+
+
+const handleChangeTimeUntil = (date)=> {  
+  setHotspotPackage({...hotspotPackage, valid_until: date})
+}
+
 
 
 
@@ -85,7 +117,7 @@ const handleClickOpen = (rowData) => {
 
 
   const EditButton = ({rowData}) => (
-    <IconButton style={{color: 'black'}}  onClick={() => handleClickOpen(rowData)}>
+    <IconButton style={{color: 'green'}}  onClick={() => handleClickOpen(rowData)}>
       <EditIcon />
     </IconButton>
   );
@@ -96,6 +128,11 @@ const columns = [
 
     // {title: 'Size', field: 'Size',  type: 'numeric', align: 'left'},
     {title: 'price', field: 'price',  },
+    // {title: 'Valid From', field: 'valid_from', 
+    //   render: rowData => rowData.valid_from ? dayjs(rowData.valid_from).format('hh:mm A')
+    //   : 'N/A'
+    //  },
+     
 
   {title: 'Speed(Up/Down)', field: 'speed',   defaultSort: 'asc',
 
@@ -141,6 +178,21 @@ const defaultOptions = {
 
 const handleRowClick = (event, rowData) => {
   setHotspotPackage(rowData);
+  console.log('hotspot package ',rowData )
+console.log('hotspot package row data', rowData.valid_from)
+setHotspotPackage({
+  ...rowData,
+  valid_from: rowData.valid_from ? dayjs(rowData.valid_from, 'hh:mm A') : dayjs(),
+  valid_until: rowData.valid_until ? dayjs(rowData.valid_until, 'hh:mm A') : dayjs(),
+});
+
+// setHotspotPackage((prevData) => ({
+//   ...prevData,
+//   valid_from: rowData.valid_from ? dayjs(rowData.valid_from).format('hh:mm A') : dayjs(rowData.valid_from).format('hh:mm A'),
+//   valid_until: rowData.valid_until ? dayjs(rowData.valid_until).format('HH:mm:ss') : dayjs(new Date()).format('HH:mm:ss'),
+// }));
+
+
 
   // Add your custom logic here, such as opening a modal or updating state
 };
@@ -235,7 +287,18 @@ setTimeout(() => {
           duration: 7000,
           position: "top-center",
         });
+
+
+        toast.error(newData.error, {
+          duration: 7000,
+          position: "top-center",
+        });
       }else{
+
+        toast.error(newData.error, {
+          duration: 7000,
+          position: "top-center",
+        });
         toast.error('Failed to create package', {
           duration: 7000,
           position: "top-center",
@@ -285,6 +348,12 @@ const deleteHotspotPackage = async (id) => {
             duration: 7000,
             position: "top-center",
           });
+
+
+          toast.error('failed to delete package', {
+            duration: 7000,
+            position: "top-center",
+          });
       console.log('failed to delete')
     
     
@@ -307,9 +376,10 @@ const deleteHotspotPackage = async (id) => {
     deleteHotspotPackage={deleteHotspotPackage} loading={loading} id={hotspotPackage.id}
     />
     <EditHotspotPackage open={open} handleClose={handleClose}
-    
+    handleChangeTimeFrom={handleChangeTimeFrom} handleChangeTimeUntil={handleChangeTimeUntil}
     loading={loading} hotspotPackage={hotspotPackage} setHotspotPackage={setHotspotPackage}
     createHotspotPackage={createHotspotPackage}
+    handleWeekdayChange={handleWeekdayChange}
     />
 
 
@@ -324,10 +394,44 @@ const deleteHotspotPackage = async (id) => {
     <div className=''>
 
             
-            <div className='text-end '>
-  <input type="search"  className='bg-transparent border-y-[-2]    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
-   focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search......'/>
-</div>
+          
+
+
+
+    <div className="flex items-center max-w-sm mx-auto p-3">  
+     
+     <label htmlFor="simple-search" className="sr-only">Search</label>
+     <div className="relative w-full">
+         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+             {/* <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none" viewBox="0 0 18 20">
+                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
+                  strokeWidth="2" d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"/>
+             </svg> */}
+             <RiHotspotLine className='text-black'/>
+             
+         </div>
+ 
+ 
+         <input type="text" value={search} onChange={(e)=> setSearch(e.target.value)}
+          className="bg-gray-50 border border-gray-300 text-gray-900 
+         text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full ps-10 p-2.5 
+           dark:border-gray-600 dark:placeholder-gray-400 dark:text-black
+           dark:focus:ring-green-500 dark:focus:border-green-500"
+            placeholder="Search for hotspot packages..."  />
+     </div>
+     <button type="" className="p-2.5 ms-2 text-sm font-medium text-white bg-green-700 
+     rounded-lg border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
+      focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+         <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
+              strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+         </svg>
+         <span className="sr-only">Search</span>
+     </button>
+ </div>
+
       <MaterialTable columns={columns}
       onRowClick={handleRowClick}
       title='Hotspot Packages'
@@ -353,8 +457,8 @@ const deleteHotspotPackage = async (id) => {
 
 options={{
         paging: true,
-       pageSizeOptions:[5, 10, 20, 25, 50, 100],
-       pageSize: 20,
+       pageSizeOptions:[5, 10],
+      //  pageSize: 20,
        search: false,
 searchFieldStyle: {
   borderColor: 'red'
@@ -373,16 +477,14 @@ paginationType: 'stepped',
 paginationPosition: 'bottom',
 exportButton: true,
 exportAllData: true,
-exportFileName: 'PPPOE packages',
+exportFileName: 'Hotspot packages',
 
 headerStyle:{
   fontFamily: 'bold',
   textTransform: 'uppercase'
   } ,
   
-  rowStyle:(data, index)=> index % 2 === 0 ? {
-  background: 'gray'
-  }: null,
+  
   
   fontFamily: 'mono'
 }}     
