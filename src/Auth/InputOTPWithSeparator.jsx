@@ -144,7 +144,7 @@ const getAdminSettings = useCallback(
   async() => {
     
     try {
-      const response = await fetch('/http:/allow_get_admin_settings', {
+      const response = await fetch('/api/allow_get_admin_settings', {
         headers: {
           'X-Subdomain': subdomain,
         },
