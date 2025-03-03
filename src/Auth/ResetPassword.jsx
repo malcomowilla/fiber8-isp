@@ -13,6 +13,10 @@ import Loader from '../loader/Loader'
 import {useState,useEffect} from 'react'
 import { ReloadIcon } from "@radix-ui/react-icons"
 import ResetNotification from '../notification/ResetNotification'
+import { useApplicationSettings } from '../settings/ApplicationSettings';
+
+
+
 
  function ResetPassword() {
 
@@ -21,10 +25,19 @@ import ResetNotification from '../notification/ResetNotification'
   const [loading, setloading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('');
+
+
+  const {settingsformData, setWelcomeMessage,  setWelcome,
+    companySettings,setCompanySettings,
+    adminSettings, setAdminSettings,
+  }  = useApplicationSettings()
   const [open, setOpen] = useState(false);
   const handleClose = () => {
     setOpen(false);
   };
+
+  const {company_name, contact_info, email_info, logo_preview} = companySettings
+
 
 const formData = {
   email: email,
@@ -127,7 +140,8 @@ useEffect(() => {
 
     </div> */}
 <div className='text-center'>
-    <p className='text-red-800 mt-8 font-bold text-2xl dotted-font '>Fiber 8 <span className='dark:text-white text-black'> 
+    <p className='text-red-800 mt-8 font-bold text-2xl dotted-font '>{company_name}
+       <span className='dark:text-white text-black'> 
      your isp of choice</span></p>
     </div>
     
@@ -141,7 +155,8 @@ useEffect(() => {
     <section className=" ">
   <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 ">
       <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-          <img className="w-40 h-40 mr-2 rounded-full" src="/images/fiber8logo1.png"  alt="logo"/>
+          <img className="w-40 h-40 mr-2 rounded-full"
+           src={logo_preview}  alt={company_name}/>
           
       </a>
 
