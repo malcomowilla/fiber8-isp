@@ -11,8 +11,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         // target: 'https://38d6-102-221-35-116.ngrok-free.app',
-        // target: 'http://localhost:3001',
-        target: 'http://102.221.35.92:3001',
+        // target: 'http://localhost:4000',
         // target: 'https://fiber8.aitechs.co.ke',
         // // target: 'http://0.0.0.0:3000',
         // changeOrigin: true,
@@ -20,15 +19,15 @@ export default defineConfig({
 
 
 
-        // target: (req) => {
-        //   const host = req.headers.host; // Get the request hostname
+        target: (req) => {
+          const host = req.headers.host; // Get the request hostname
       
-        //   // Check if the host is "aitechs.co.ke" or any subdomain of it
-        //   if (host === 'aitechs.co.ke' || host.endsWith('.aitechs.co.ke')) {
-        //     return `https://${host}`; // Proxy dynamically based on the request domain
-        //   }
-        //   return 'http://0.0.0.0:3000'; // Default target if not matching
-        // },
+          // Check if the host is "aitechs.co.ke" or any subdomain of it
+          if (host === 'aitechs.co.ke' || host.endsWith('.aitechs.co.ke')) {
+            return `https://${host}`; // Proxy dynamically based on the request domain
+          }
+          return 'http://0.0.0.0:3000'; // Default target if not matching
+        },
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
 
