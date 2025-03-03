@@ -11,7 +11,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         // target: 'https://38d6-102-221-35-116.ngrok-free.app',
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3001',
         // target: 'https://fiber8.aitechs.co.ke',
         // // target: 'http://0.0.0.0:3000',
         // changeOrigin: true,
@@ -28,8 +28,8 @@ export default defineConfig({
         //   }
         //   return 'http://0.0.0.0:3000'; // Default target if not matching
         // },
-        // changeOrigin: true,
-        // rewrite: (path) => path.replace(/^\/api/, ''),
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
 
         
       },
