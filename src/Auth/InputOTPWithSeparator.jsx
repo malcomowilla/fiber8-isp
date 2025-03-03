@@ -564,7 +564,9 @@ console.log("Logo Preview URL:", logo_preview);
 <ion-icon onClick={()=>setIcon(!icon)}  name={icon ? 'moon-outline' : 'sunny'} className='' size='large'></ion-icon>
 </div>
 <div className='text-center dotted-font'>
-    <p className='dark:text-white mt-8 font-bold text-2xl '>Welcome To <span className='text-red-700'>Fiber 8</span> </p>
+    <p className='dark:text-white mt-8 font-bold text-2xl '>Welcome To <span className='text-red-700'>
+    
+    {company_name}</span> </p>
     </div>
 
       <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900
