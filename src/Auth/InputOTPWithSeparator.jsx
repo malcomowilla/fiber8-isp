@@ -97,7 +97,7 @@ const [logoUrl, setLogoUrl] = useState('')
   const handleGetCompanySettings = useCallback(
     async() => {
       try {
-        const response = await fetch('/api/allow_get_company_settings', {
+        const response = await fetch('http://localhost:3000/allow_get_company_settings', {
           headers: {
             'X-Subdomain': subdomain,
           },
@@ -144,7 +144,7 @@ const getAdminSettings = useCallback(
   async() => {
     
     try {
-      const response = await fetch('/api/allow_get_admin_settings', {
+      const response = await fetch('http://localhost:3000/allow_get_admin_settings', {
         headers: {
           'X-Subdomain': subdomain,
         },
@@ -231,7 +231,7 @@ async function authenticateWebAuthn(email) {
   setSeeError(false);
 
   try {
-    const response = await fetch('/api/webauthn/authenticate', {
+    const response = await fetch('http://localhost:3000/webauthn/authenticate', {
       method: 'POST',
       
       headers: { 'Content-Type': 'application/json',
@@ -307,7 +307,7 @@ setSeeError(false)
 
 
 
-    const createResponse = await fetch('/api/webauthn/verify', {
+    const createResponse = await fetch('http://localhost:3000/webauthn/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json',
         'X-Subdomain': subdomain,
@@ -384,7 +384,7 @@ const handleSignIn = async (e) => {
   setOfflineError(false)
   setloading(true)
 
-  const users = await fetch('/api/sign_in', {
+  const users = await fetch('http://localhost:3000/sign_in', {
     method: "POST",
     
     headers: {
