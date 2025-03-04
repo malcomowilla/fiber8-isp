@@ -394,6 +394,10 @@ import {  FaKey } from 'react-icons/fa';
 import { FaPerson } from "react-icons/fa6";
 import { CiBarcode } from "react-icons/ci";
 import { FaArrowAltCircleLeft } from "react-icons/fa";
+import { CiWifiOff } from "react-icons/ci";
+import Backdrop from '@mui/material/Backdrop';
+import { MdOutlineWifi } from "react-icons/md";
+
 
 
 
@@ -405,10 +409,13 @@ const HotspotPage = () => {
  const [seeForm, setSeeForm] = useState(false)
  const [seePackages, setSeePackages] = useState(true)
  const [seeInstructions, setSeeInstructions] = useState(true)
+ const [loading, setLoading] = useState(false)
+ const [success, setsuccess] = useState(false)
 
 const {companySettings, setCompanySettings,
 
-  templateStates, setTemplateStates
+  templateStates, setTemplateStates,
+  settingsformData, setFormData
 } = useApplicationSettings()
 
  const {company_name, contact_info, email_info, logo_preview} = companySettings
@@ -429,8 +436,18 @@ const {companySettings, setCompanySettings,
    buttonColor: 'bg-teal-500',
  };
 
+const [voucher, setVoucher] = useState({
+  vouchers: ''
+})
 
-
+const { vouchers } = voucher
+const handleChange = (e) => {
+  const { value, name } = e.target;
+  setVoucher((prevData) => ({
+    ...prevData,
+    [name]: value
+  }))
+}
 //  allow_get_hotspot_templates 
 
 
@@ -439,6 +456,36 @@ const {companySettings, setCompanySettings,
               
  const subdomain = window.location.hostname.split('.')[0]
 
+ const fetchRouters = useCallback(
+  async() => {
+    try {
+      const response = await fetch('/api/allow_get_router_settings', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
+const newData = await response.json()
+      if (response) {
+        console.log('fetched router settings', newData)
+        const {router_name} = newData[0]
+        setFormData({...settingsformData, router_name})
+      } else {
+        console.log('failed to fetch router settings')
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  [],
+)
+
+
+
+  useEffect(() => {
+   
+    fetchRouters()
+  }, [fetchRouters]);
+  
 
 
 
@@ -587,17 +634,17 @@ useEffect(() => {
         setPackages(newData)
         console.log('hotspot packages fetched', newData)
       } else {
-        toast.error('failed to fetch hotspot packages', {
-          duration: 7000,
-          position: "top-center",
-        });
+        // toast.error('failed to fetch hotspot packages', {
+        //   duration: 7000,
+        //   position: "top-center",
+        // });
         console.log('failed to fetch hotspot packages')
       }
     } catch (error) {
-      toast.error('Something went wrong', {
-        duration: 7000,
-        position: "top-center",
-      });
+      // toast.error('Something went wrong', {
+      //   duration: 7000,
+      //   position: "top-center",
+      // });
       console.log(error)
     }
   }
@@ -606,6 +653,123 @@ useEffect(() => {
 
 
   
+// login_with_hotspot_voucher
+
+const loginWithVoucher = async(e) => {
+
+e.preventDefault()
+
+  try {
+    setLoading(true)
+    const response = await fetch('/api/login_with_hotspot_voucher', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Subdomain': subdomain,
+  
+      },
+
+      body: JSON.stringify({
+        voucher: vouchers,
+        router_name: settingsformData.router_name
+      })
+  
+  
+    });
+  
+  
+    const newData = await response.json();
+    if (response.ok) {
+      setLoading(false)
+      setTimeout(() => {
+        setsuccess(true)
+  
+      }, 2000);
+      
+      // setPackages(newData)
+      toast.success('Voucher verified successfully', {
+        duration: 3000,
+        position: 'top-right',
+      });
+      console.log('company settings fetched', newData)
+    } else {
+      setLoading(false)
+      toast.error('Voucher verification failed', {
+        duration: 3000,
+        position: 'top-right',
+      });
+
+      toast.error(newData.error, {
+        duration: 7000,
+        position: 'top-right',
+      });
+    }
+  } catch (error) {
+    setLoading(false)
+  }
+ 
+}
+
+
+if (success) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: 'spring', stiffness: 50 }}
+        className="bg-white p-8 rounded-lg shadow-lg text-center"
+      >
+        <MdOutlineWifi className="text-green-500 w-12 h-12 mx-auto mb-4" />
+        <motion.h2
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="text-2xl font-bold text-gray-900"
+        >
+          Connected!
+        </motion.h2>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+
+
+
+if (loading) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: 'spring', stiffness: 50 }}
+        className="bg-white p-8 rounded-lg shadow-lg text-center"
+      >
+        <MdOutlineWifi className="text-yellow-500 w-12 h-12 mx-auto animate-pulse mb-4" />
+        <motion.h2
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="text-2xl font-bold text-gray-900"
+        >
+          Connecting...
+        </motion.h2>
+      </motion.div>
+    </motion.div>
+  );
+}
+
   return (
 
     <>
@@ -988,32 +1152,42 @@ placeholder="Enter your voucher code"/>
         >
           <div className="text-center mb-6">
             <FaWifi className={`text-yellow-500 w-12 h-12 mx-auto mb-4`} />
-            <h1 className="text-3xl text-gray-900 dotted-font font-thin">Welcome to Fiber8 Hotspot</h1>
+            <h1 className="text-3xl text-gray-900 dotted-font font-thin">Welcome to {company_name} Hotspot</h1>
             <p className="text-gray-600 dotted-font">Connect and enjoy fast browsing.</p>
           </div>
-
+          <form onSubmit={loginWithVoucher}>
           <motion.div
             className="flex justify-between items-center bg-gray-100 p-4 rounded-lg mb-4"
             whileHover={{ scale: 1.02 }}
           >
             <CiBarcode className={`text-yellow-500 w-8 h-8`} />
+            
             <input
-              type="text"
-              className="w-full text-gray-700 bg-gray-100 rounded-lg p-2 focus:outline-none"
+            onChange={(e) => handleChange(e)}
+            value={vouchers}
+              name="vouchers"
+              className="w-full text-gray-700 bg-gray-100
+              focus:border-transparent focus:outline-none focus:ring-0
+              rounded-lg p-2 "
               placeholder="Voucher Code"
             />
+            
+           
           </motion.div>
+          
 
          
           <motion.button
             variants={buttonVariants}
+            type='submit'
             whileHover="hover"
             className={`w-full py-2 px-4 bg-yellow-500 text-white rounded-full 
               shadow-md focus:outline-none dotted-font font-thin`}
-            onClick={() => toast.success('Connected!')}
+           
           >
             Connect Now
           </motion.button>
+          </form>
 
           <div className="flex justify-center items-center cursor-pointer mt-6" onClick={() => navigate(-1)}>
             <TiArrowBackOutline className="w-8 h-8" />
