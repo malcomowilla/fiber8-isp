@@ -8,6 +8,9 @@ import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { Button } from "@/components/ui/button"
 import Timer from '../timer/Timer'
 import ShortCuts from './ShortCuts'
+import { useLocation } from 'react-router-dom';
+import DashboardStatistics from '../hotspot_page/DashboardStatistics'
+
 // import { ReloadIcon } from "@radix-ui/react-icons"
 
 
@@ -29,10 +32,11 @@ const {seeSidebar, theme
 } = useContext(ApplicationContext);
   const [seeButton, setSeeButton] = useState(false)
 const [loading, setloading] = useState(false)
+const location = useLocation();
 
-const {fetchCurrentUser, currentUser} = useApplicationSettings()
+const {fetchCurrentUser, currentUser, companySettings} = useApplicationSettings()
 
-
+const { company_name, contact_info, email_info, logo_preview} = companySettings
 const [datetime, setdateTime] = useState(true)
 
 const [date, setDate] = useState(new Date().toLocaleTimeString('en-US', { hour: 'numeric', 
@@ -115,15 +119,18 @@ useEffect(() => {
 
 </Button>} */}
   <p className='font-extrabold dark:text-white text-black text-xl welcome-message'>
-    <span>{getTimeBasedGreeting()}, {currentUser?.username || currentUser?.email }</span></p>
+    <span>{getTimeBasedGreeting()}, {company_name}</span></p>
   <p className='dark:text-white text-black text-sm mt-1 welcome-message'>{getWelcomeMessage()}</p>
     
     </div>   
 
     <p className="capitalize mb-10 dark:text-white text-black text-2xl">{date}</p>
-    <ShortCuts />
+    {/* <ShortCuts /> */}
+    {location.pathname !== '/admin/hotspot-dashboard' && <ShortCuts />}
+    {location.pathname == '/admin/hotspot-dashboard' && < DashboardStatistics />
+ }
 
-
+   
 <div className='mt-8'>
 <Outlet/>
 

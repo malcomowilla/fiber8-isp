@@ -415,7 +415,8 @@ const HotspotPage = () => {
 const {companySettings, setCompanySettings,
 
   templateStates, setTemplateStates,
-  settingsformData, setFormData
+  settingsformData, setFormData,
+  handleChangeHotspotVoucher, voucher, setVoucher
 } = useApplicationSettings()
 
  const {company_name, contact_info, email_info, logo_preview} = companySettings
@@ -436,18 +437,10 @@ const {companySettings, setCompanySettings,
    buttonColor: 'bg-teal-500',
  };
 
-const [voucher, setVoucher] = useState({
-  vouchers: ''
-})
-
+ 
 const { vouchers } = voucher
-const handleChange = (e) => {
-  const { value, name } = e.target;
-  setVoucher((prevData) => ({
-    ...prevData,
-    [name]: value
-  }))
-}
+
+
 //  allow_get_hotspot_templates 
 
 
@@ -1062,7 +1055,12 @@ grid grid-cols-1 gap-6">
 <CiBarcode className="text-green-500 w-8 h-8"/>
 
 
-<input type="text" className='w-full text-gray-700 bg-gray-100 rounded-lg p-2 focus:outline-none' 
+<input type="text"
+
+onChange={(e) => handleChangeHotspotVoucher(e)}
+value={vouchers}
+  name="vouchers"
+className='w-full text-gray-700 bg-gray-100 rounded-lg p-2 focus:outline-none' 
 placeholder="Enter your voucher code"/>
 
 <motion.button
@@ -1163,7 +1161,7 @@ placeholder="Enter your voucher code"/>
             <CiBarcode className={`text-yellow-500 w-8 h-8`} />
             
             <input
-            onChange={(e) => handleChange(e)}
+            onChange={(e) => handleChangeHotspotVoucher(e)}
             value={vouchers}
               name="vouchers"
               className="w-full text-gray-700 bg-gray-100
@@ -1260,7 +1258,9 @@ placeholder="Enter your voucher code"/>
  >
    {/* <FaLock className="text-green-500 w-8 h-8" /> */}
    <FaPhone className="text-green-500 w-8 h-8"/>
-   <input type="text" className='w-full text-gray-700 bg-gray-100 rounded-lg p-2 focus:outline-none' 
+   <input type="text"
+   
+   className='w-full text-gray-700 bg-gray-100 rounded-lg p-2 focus:outline-none' 
    placeholder="Enter your phone number"/>
    {/* <p className="text-gray-700">Secure Connection</p> */}
  </motion.div>

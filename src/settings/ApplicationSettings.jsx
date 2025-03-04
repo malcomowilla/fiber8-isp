@@ -75,6 +75,19 @@ const [welcome, setWelcome] = useState(false)
       })
 
 
+const [voucher, setVoucher] = useState({
+  vouchers: ''
+})
+
+// const { vouchers } = voucher
+const handleChangeHotspotVoucher = (e) => {
+  const { value, name } = e.target;
+  setVoucher((prevData) => ({
+    ...prevData,
+    [name]: value
+  }))
+}
+
       const [formData, setFormDataSystemAdmin] = useState({
         password: '',
         phone_number: '',
@@ -361,6 +374,7 @@ const handleChange = (e) => {
      subscriberSettings,setSubscriberSettings,
      handleChangeAdminSettings, adminSettings, setAdminSettings,
      templateStates, setTemplateStates,
+     handleChangeHotspotVoucher, voucher, setVoucher,
      
      companySettings, setCompanySettings}}  >
     {children}

@@ -130,6 +130,9 @@ import {useApplicationSettings} from './settings/ApplicationSettings'
 
  const PPPoEPackages = lazy(() => import('./wifi_page/PPPoEPackages') )
 const HotspotTemplates = lazy(() => import('./hotspot_templates/HotspotTemplates') )
+const HotspotDashboard = lazy(() => import('./hotspot_page/HotspotDashboard.jsx') )
+
+
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
 
@@ -678,6 +681,7 @@ const hostname = window.location.hostname;
 <Route  path='/admin/hotspot-templates' element={<HotspotTemplates/>}/>
 <Route  path='/admin/hotspot-subscriptions' element={<HotspotSubscriptions/>}/>
 <Route path='/admin/sms' element={<Sms/>}/>
+<Route path='/admin/hotspot-dashboard' element={<HotspotDashboard/>}/>
 <Route path='/admin/upload-subscriber' element={<UploadSubscriber />}/>
 <Route path='/admin/zones' element={<Zones/>}/>
 <Route path='/admin/nodes' element={<Nodes/>}/>
