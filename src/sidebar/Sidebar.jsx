@@ -37,6 +37,7 @@ import { FaUpload } from "react-icons/fa6";
 import { BsHddNetwork } from "react-icons/bs";
 import { LuLayoutTemplate } from "react-icons/lu";
 
+import { TfiDashboard } from "react-icons/tfi";
 
 
 
@@ -115,7 +116,7 @@ const handleGetCompanySettings = useCallback(
    
  }, [handleGetCompanySettings])
  
- 
+//  /admin/hotspot-dashboard
 
   return (
 
@@ -748,6 +749,29 @@ transition={{ duration: 0.2, delay: 0.1 }}
 
 {isExpanded3 && (
    <>
+
+
+
+
+
+
+<motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
+                   initial={{ opacity: 0, x: -20 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   exit={{ opacity: 0, x: -20 }}
+                   transition={{ duration: 0.2 , delay: 0.1 }}
+                  >
+                     <Link  to='/admin/hotspot-dashboard' className="flex items-center w-full p-2 text-white transition
+                      duration-75 rounded-lg  group gap-x-3 text-nowrap 
+                       dark:text-white "> 
+                        <TfiDashboard/>
+                      Hotspot  Dashboard</Link>
+                  </motion.li>
 
 
                   <motion.li

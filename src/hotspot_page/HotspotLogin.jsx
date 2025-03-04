@@ -7,6 +7,9 @@ import { FaPerson } from "react-icons/fa6";
 import { TiArrowBackOutline } from 'react-icons/ti';
 import toast, { Toaster } from 'react-hot-toast';
 import { CiBarcode } from "react-icons/ci";
+import { useApplicationSettings } from '../settings/ApplicationSettings';
+
+
 
 
 
@@ -15,6 +18,13 @@ const HotspotLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const selectedTemplate = location.state?.template;
+  const {companySettings, setCompanySettings,
+
+    templateStates, setTemplateStates,
+    settingsformData, setFormData,
+    handleChangeHotspotVoucher, voucher, setVoucher
+  } = useApplicationSettings()
+
 
   // Default template if none is selected
   const template = selectedTemplate || {
@@ -39,6 +49,9 @@ const HotspotLogin = () => {
       boxShadow: '0px 0px 8px rgb(0, 0, 0, 0.2)',
     },
   };
+
+
+  const { vouchers } = voucher
 
   return (
     <>
@@ -94,6 +107,10 @@ const HotspotLogin = () => {
           >
             <CiBarcode className={`${template.iconColor} w-6 h-6`} />
             <input
+
+onChange={(e) => handleChangeHotspotVoucher(e)}
+value={vouchers}
+  name="vouchers"
               // type="password"
               className="w-full text-gray-700 bg-gray-100 rounded-lg p-2 focus:outline-none"
               placeholder="Enter your voucher code"
