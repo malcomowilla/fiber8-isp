@@ -141,10 +141,12 @@ const [logoUrl, setLogoUrl] = useState('')
 
 
 const getAdminSettings = useCallback(
+
   async() => {
     
     try {
-      const response = await fetch('/api/allow_get_admin_settings', {
+      const customer_email = localStorage.getItem('customer_email')
+      const response = await fetch(`/api/allow_get_admin_settings?admin_email=${customer_email}`, {
         headers: {
           'X-Subdomain': subdomain,
         },
@@ -380,6 +382,7 @@ const handleSignIn = async (e) => {
   // console.log("CSRF Token:", csrf_token);
 
   try {
+
     setShowErrors(false)
   setOfflineError(false)
   setloading(true)
@@ -413,6 +416,7 @@ const handleSignIn = async (e) => {
   setOfflineError(false)
 
   let  actualUserDataInJson = await users.json()
+  localStorage.setItem('customer_email', email)
 
 
   if (users.status === 423) {
