@@ -616,7 +616,7 @@ useEffect(() => {
   
   const fetchHotspotPackages = async() => {
     try {
-      const response = await fetch('/api/hotspot_packages', {
+      const response = await fetch('/api/allow_get_hotspot_packages', {
         headers: {
           'X-Subdomain': subdomain,
         },

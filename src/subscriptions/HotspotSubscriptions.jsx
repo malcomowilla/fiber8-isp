@@ -236,6 +236,11 @@ setopenLoad(false)
           position: "top-center",
           duration: 4000,
         })
+
+        toast.error(newData.error, {
+          position: "top-center",
+          duration: 4000,
+        })
       }
 
 
@@ -255,12 +260,14 @@ setopenLoad(false)
   const deleteVoucher = async(id)=> { 
     try {
       
-      const response = await fetch(`/api/hotspot_vouchers/${id}`, {
+      const response = await fetch(`/api/hotspot_vouchers/${id}?router_name=${settingsformData.router_name}&use_radius=${settingsformData.use_radius}`, {
         method: "DELETE",
         headers: {
           'X-Subdomain': subdomain,
         },
       })
+
+      const newData = await response.json()
       if (response.ok) {
         setVouchers((vouchers)=> vouchers.filter(item => item.id !== id))
         toast.success('Voucher deleted successfully', {
@@ -271,6 +278,11 @@ setopenLoad(false)
       }else{
         setOpenDelete(false)
         toast.error('Failed to delete voucher', {
+          position: "top-center",
+          duration: 4000,
+        })
+
+        toast.error(newData.error, {
           position: "top-center",
           duration: 4000,
         })
