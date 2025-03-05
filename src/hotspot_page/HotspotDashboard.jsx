@@ -229,7 +229,7 @@ useEffect(() => {
       ]}
 
 options={{
-       pageSizeOptions:[5, 10, 20,],
+       pageSizeOptions:[5, 10, 20],
     //    pageSize: 20,
        search: false,
 searchFieldStyle: {
