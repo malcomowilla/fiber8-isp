@@ -416,6 +416,7 @@ const HotspotPage = () => {
 
 const {companySettings, setCompanySettings,
 
+
   templateStates, setTemplateStates,
   settingsformData, setFormData,
   loading, setLoading,
@@ -535,8 +536,10 @@ useEffect(() => {
 }, [getHotspotTemplates]);
 
 
+const queryParams = new URLSearchParams(window.location.search);
 
-
+const mac = queryParams.get('mac')
+const ip = queryParams.get('ip')
 
 
  const handleGetCompanySettings = useCallback(
@@ -1169,7 +1172,7 @@ type='submit'
             <CiBarcode className={`text-yellow-500 w-8 h-8`} />
             
             <input
-            onChange={(e) => handleChangeHotspotVoucher(e)}
+            onChange={(e) => handleChangeHotspotVoucher(e, mac, ip)}
             value={vouchers}
               name="vouchers"
               className="w-full text-gray-700 bg-gray-100
