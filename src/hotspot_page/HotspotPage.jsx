@@ -1363,7 +1363,7 @@ placeholder="Enter your voucher code"/>
 
       {seePackages && (
   <motion.div className="max-w-md 
-  
+  absolute top-0
   w-full mx-auto text-center mt-[320px] sm:mt-0">
     <h2 className="text-2xl text-white mb-4 dotted-font font-thin">{company_name}</h2>
 
