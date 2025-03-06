@@ -372,7 +372,7 @@ const handleChange = (e) => {
  
 const storedIp = localStorage.getItem('hotspot_mac')
 const storedMac = localStorage.getItem('hotspot_ip') 
-const loginWithVoucher = async(e, mac, ip, ) => {
+const loginWithVoucher = async(e) => {
 
   e.preventDefault()
   
