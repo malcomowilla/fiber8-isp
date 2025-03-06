@@ -1063,7 +1063,7 @@ grid grid-cols-1 gap-6">
 
 <CiBarcode className="text-green-500 w-8 h-8"/>
 
-<form onSubmit={loginWithVoucher}>
+<form onSubmit={(e)=> loginWithVoucher(e, mac, ip)}>
 <input type="text"
 
 onChange={(e) => handleChangeHotspotVoucher(e)}
@@ -1172,7 +1172,7 @@ type='submit'
             <CiBarcode className={`text-yellow-500 w-8 h-8`} />
             
             <input
-            onChange={(e) => handleChangeHotspotVoucher(e, mac, ip)}
+            onChange={(e) => handleChangeHotspotVoucher(e)}
             value={vouchers}
               name="vouchers"
               className="w-full text-gray-700 bg-gray-100
