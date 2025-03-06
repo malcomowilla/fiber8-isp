@@ -413,7 +413,6 @@ const HotspotPage = () => {
  const [seeForm, setSeeForm] = useState(false)
  const [seePackages, setSeePackages] = useState(true)
  const [seeInstructions, setSeeInstructions] = useState(true)
- 
 
 const {companySettings, setCompanySettings,
 

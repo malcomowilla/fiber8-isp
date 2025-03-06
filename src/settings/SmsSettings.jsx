@@ -58,17 +58,21 @@ const templateData = {
   // customer_confirmation_code_template: '',
   // store_manager_otp_confirmation_template: '',
   // store_manager_manager_number_confirmation_template: '',
-  send_voucher_template: ''
+  send_voucher_template: '',
+  voucher_template: '',
 }
 
 const [smsTemplates, setSmsTemplates] = useState(templateData)
-
+const handleChangeSmsTempalate = (e) => {
+const {name, value} = e.target
+setSmsTemplates((prevData) => ({...prevData, [name]: value}))
+}
 
 const subdomain = window.location.hostname.split('.')[0]
 
 const {api_key, api_secret, sender_id, short_code,} = smsSettingsForm
 
-const {send_voucher_template} = smsTemplates
+const {send_voucher_template, voucher_template} = smsTemplates
 
   const getSmsBalance  = useCallback(
     async(selectedProvider) => {
@@ -292,6 +296,99 @@ const saveSmsSettings = async (e) => {
   const handleCloseNotifaction = () => {
    setOpenSettings(false);
  };
+
+//  sms_templates
+
+
+const getSmsTemplate = useCallback(
+  async() => {
+    try {
+      const response = await fetch('/api/sms_templates')
+      const newData = await response.json()
+      if (response.ok) {
+        setSmsTemplates(newData)
+      } else {
+        toast.error('failed to fetch sms templates', {
+          duration: 3000,
+          position: 'top-center',
+        })
+      }
+    } catch (error) {
+      toast.error('Internal server error: Something went wrong with fetching SMS templates', {
+        duration: 4000,
+        position: 'top-center',
+      });
+    }
+
+
+  },
+  [],
+)
+
+useEffect(() => {
+  getSmsTemplate()
+}, [getSmsTemplate]);
+
+
+ const saveSmsTempalate = async(e) => {
+e.preventDefault()
+
+try {
+  const response = await fetch('/api/sms_templates', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      smsTemplates
+    })
+  })
+
+
+  const newData = await response.json()
+
+
+  if (response.ok) {
+    toast.success('SMS templates saved successfully', {
+      duration: 3000,
+      position: 'top-center',
+      });
+      setSmsTemplates({
+        ...smsTemplates,
+        send_voucher_template: newData.send_voucher_template,
+        voucher_template: newData.voucher_template
+
+
+
+
+      })
+
+
+
+  } else {
+   
+    toast.error('Error Saving SMS Templates', {
+      duration: 4000,
+      position: 'top-center',
+    })
+  }
+} catch (error) {
+  toast.error(
+    'Error Saving SMS Templates server error',
+    {
+      duration: 4000,
+      position: 'top-center',
+    }
+  )
+}
+
+
+
+ }
+
+
+
+
   return (
     <>
 
@@ -315,7 +412,7 @@ const saveSmsSettings = async (e) => {
     </div>
 
 
-
+<form onSubmit={saveSmsTempalate}>
     <Box
         className='myTextField'
      sx={{'& .MuiTextField-root' : {
@@ -338,21 +435,45 @@ const saveSmsSettings = async (e) => {
       }
     }}}
     >
-      <TextField onChange={handleChange} fullWidth label="Customer Confirmation Code"
+      <TextField onChange={(e)=> handleChangeSmsTempalate(e)} fullWidth label="send voucher template"
        name='send_voucher_template' 
        id="fullWidth" multiline 
        rows={4}
-        helperText={<p className='text-black text-sm tracking-wider playwrite-de-grund'>     place  {"{{customer_code}}"}
+        helperText={<p className='text-black text-sm tracking-wider playwrite-de-grund'> 
+            place  {"{{voucher_code}}"}
 
-                    where the customer code should appear in the text and either  {"{{name}}"}, 
-        to include the users name,   <span className='font-extrabold'>Message Sent To Customer To Confirm Customer Code
+                    where the voucher code should appear in the text and either  {"{{phone_number}}"}, 
+        to include the hotspot usesr phone number,   <span className='font-extrabold'>
+          Message Sent To Customer 
+          To Confirm Voucher Code
           </span></p>} value={send_voucher_template}/>
+
+
+
+
+
+
+
+          <TextField onChange={(e)=> handleChangeSmsTempalate(e)} fullWidth label="voucher template"
+       name='voucher_template' 
+       id="fullWidth" multiline 
+       rows={4}
+        helperText={<p className='text-black text-sm tracking-wider playwrite-de-grund'> 
+            place  {"{{voucher_code}}"}
+
+                    where the voucher code should appear in the text and either  {"{{phone_number}}"}, 
+        to include the hotspot usesr phone number,   <span className='font-extrabold'>
+          Message Sent To Customer 
+          To Confirm Voucher Code
+          </span></p>} value={voucher_template}/>
 </Box>
         
+<Button className='mt-2 '  type=''>save settings</Button>
+</form>
 
 
    <form onSubmit={saveSmsSettings}>
-<div className='flex'>
+<div className='flex mt-4'>
 
 <FormControl  sx={{ m: 1, width:'80ch',
   '& label.Mui-focused': {
