@@ -369,7 +369,9 @@ const handleChange = (e) => {
 //  }
 
 
-
+ 
+const storedIp = localStorage.getItem('hotspot_mac')
+const storedMac = localStorage.getItem('hotspot_ip') 
 const loginWithVoucher = async(e) => {
 
   e.preventDefault()
@@ -386,7 +388,9 @@ const loginWithVoucher = async(e) => {
   
         body: JSON.stringify({
           voucher: vouchers,
-          router_name: settingsformData.router_name
+          router_name: settingsformData.router_name,
+          stored_mac: storedMac,
+          stored_ip: storedIp
         })
     
     
