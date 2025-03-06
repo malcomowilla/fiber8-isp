@@ -66,20 +66,20 @@ const columns = [
   {title: 'upload', field: 'upload' },
 
 
-  {title: 'Action', field:'Action', align: 'right',
+//   {title: 'Action', field:'Action', align: 'right',
 
-  render: (params) =>  
+//   render: (params) =>  
     
-     <>
+//      <>
       
-       <DeleteButton {...params} />
+//        <DeleteButton {...params} />
 
 
-       <EditButton    onClick={handleClickOpen} {...params}/>
-       </>
+//        <EditButton    onClick={handleClickOpen} {...params}/>
+//        </>
 
 
-}
+// }
 
 
 ]

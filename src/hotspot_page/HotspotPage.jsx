@@ -397,6 +397,10 @@ import { FaArrowAltCircleLeft } from "react-icons/fa";
 import { CiWifiOff } from "react-icons/ci";
 import Backdrop from '@mui/material/Backdrop';
 import { MdOutlineWifi } from "react-icons/md";
+import { FaShoppingCart } from "react-icons/fa";
+import { BsBoxArrowLeft } from "react-icons/bs";
+
+
 
 
 
@@ -1185,6 +1189,17 @@ placeholder="Enter your voucher code"/>
           >
             Connect Now
           </motion.button>
+
+          {/* 💵 */}
+
+          <div className="flex flex-row gap-2 items-center justify-center mb-4"
+          onClick={() => setSeeInstructions(false)}
+          >
+              <FaShoppingCart className="w-6 h-6 text-yellow-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white dotted-font">
+                Purchase Package
+              </h2>
+            </div>
           </form>
 
           <div className="flex justify-center items-center cursor-pointer mt-6" onClick={() => navigate(-1)}>
@@ -1345,15 +1360,20 @@ placeholder="Enter your voucher code"/>
 </motion.div>
 ) : null} */}
       
-      {seePackages && (
-  <motion.div 
-    className="max-w-md w-full mx-auto text-center p-4 sm:mt-0 min-h-screen"
-  >
-    <h2 className="text-2xl text-white mb-4 dotted-font font-thin">
-      {company_name}
-    </h2>
 
-    <div className="grid grid-cols-1 gap-6">
+      {seePackages && (
+  <motion.div className="max-w-md 
+  
+  w-full mx-auto text-center mt-[320px] sm:mt-0">
+    <h2 className="text-2xl text-white mb-4 dotted-font font-thin">{company_name}</h2>
+
+
+    <div>
+      </div>
+    <div className="h-96 overflow-y-auto  sm:overflow-visible 
+
+    grid grid-cols-1 gap-6 ">
+      
       {packages.map((pkg, index) => (
         <motion.div
           key={index}
@@ -1362,30 +1382,39 @@ placeholder="Enter your voucher code"/>
           initial="hidden"
           animate="visible"
         >
-          <p className="text-yellow-500 dotted-font text-xl">SELECT PACKAGE</p>
-          <div
-            className="border border-white flex flex-col items-center justify-center mx-auto rounded-full w-full max-w-[220px] h-[220px] bg-yellow-500 p-4 mt-4"
+          <p className='text-yellow-500 dotted-font text-xl'>SELECT PACKAGE</p>
+<div className='border border-white
+flex flex-col items-center justify-center mx-auto
+rounded-full w-[220px] h-[220px]
+bg-yellow-500
+p-4 mt-4'>
+          <h3 className="text-sm font-bold text-gray-900">{pkg.name}</h3>
+          {/* <p className="text-gray-600">Speed: {pkg?.speed}</p> */}
+          <p className="text-white">Valid For {pkg.valid}</p>
+          <p className="text-white font-bold mt-2"> Price: Ksh{pkg.price}</p>
+          <button
+            onClick={() => {
+              setSeePackages(false);
+              setSeeForm(true);
+              setSeeInstructions(false);
+            }}
+            className="p-2 bg-yellow-500 mt-2 rounded-md cursor-pointer dotted-font font-thin"
           >
-            <h3 className="text-sm font-bold text-gray-900">{pkg.name}</h3>
-            <p className="text-white">Valid For {pkg.valid}</p>
-            <p className="text-white font-bold mt-2">Price: Ksh{pkg.price}</p>
-            <button
-              onClick={() => {
-                setSeePackages(false);
-                setSeeForm(true);
-                setSeeInstructions(false);
-              }}
-              className="p-2 bg-yellow-500 mt-2 rounded-md cursor-pointer dotted-font font-thin"
-            >
-              Subscribe
-            </button>
+            Subscribe
+          </button>
+          <BsBoxArrowLeft  className='w-6 h-6' onClick={() => {
+            setSeePackages(false);
+            setSeeInstructions(true);
+          }}/>
           </div>
         </motion.div>
       ))}
+    
     </div>
+
+    
   </motion.div>
 )}
-
 
 
     </div>
