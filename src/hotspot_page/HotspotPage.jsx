@@ -422,7 +422,6 @@ const {companySettings, setCompanySettings,
   loading, setLoading,
   success, setsuccess,
   handleChangeHotspotVoucher, voucher, setVoucher,
-  loginWithVoucher
 } = useApplicationSettings()
 
  const {company_name, contact_info, email_info, logo_preview} = companySettings
@@ -541,6 +540,66 @@ const queryParams = new URLSearchParams(window.location.search);
 const mac = queryParams.get('mac')
 const ip = queryParams.get('ip')
 
+const storedIp = localStorage.getItem('hotspot_mac')
+const storedMac = localStorage.getItem('hotspot_ip') 
+const loginWithVoucher = async(e) => {
+
+  e.preventDefault()
+  
+    try {
+      setLoading(true)
+      const response = await fetch('/api/login_with_hotspot_voucher', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+    
+        },
+  
+        body: JSON.stringify({
+          voucher: vouchers,
+          router_name: settingsformData.router_name,
+          stored_mac: storedMac,
+          stored_ip: storedIp, 
+          mac: mac,
+          ip: ip
+        })
+    
+    
+      });
+    
+    
+      const newData = await response.json();
+      if (response.ok) {
+        setLoading(false)
+        setTimeout(() => {
+          setsuccess(true)
+    
+        }, 2000);
+        
+        // setPackages(newData)
+        toast.success('Voucher verified successfully', {
+          duration: 3000,
+          position: 'top-right',
+        });
+        console.log('company settings fetched', newData)
+      } else {
+        setLoading(false)
+        toast.error('Voucher verification failed', {
+          duration: 3000,
+          position: 'top-right',
+        });
+  
+        toast.error(newData.error, {
+          duration: 7000,
+          position: 'top-right',
+        });
+      }
+    } catch (error) {
+      setLoading(false)
+    }
+   
+  }
 
  const handleGetCompanySettings = useCallback(
   async() => {
@@ -1063,7 +1122,7 @@ grid grid-cols-1 gap-6">
 
 <CiBarcode className="text-green-500 w-8 h-8"/>
 
-<form onSubmit={(e)=> loginWithVoucher(e, mac, ip)}>
+<form onSubmit={(e)=> loginWithVoucher(e)}>
 <input type="text"
 
 onChange={(e) => handleChangeHotspotVoucher(e)}
