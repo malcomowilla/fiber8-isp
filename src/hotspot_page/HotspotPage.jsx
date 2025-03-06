@@ -413,14 +413,16 @@ const HotspotPage = () => {
  const [seeForm, setSeeForm] = useState(false)
  const [seePackages, setSeePackages] = useState(true)
  const [seeInstructions, setSeeInstructions] = useState(true)
- const [loading, setLoading] = useState(false)
- const [success, setsuccess] = useState(false)
+ 
 
 const {companySettings, setCompanySettings,
 
   templateStates, setTemplateStates,
   settingsformData, setFormData,
-  handleChangeHotspotVoucher, voucher, setVoucher
+  loading, setLoading,
+  success, setsuccess,
+  handleChangeHotspotVoucher, voucher, setVoucher,
+  loginWithVoucher
 } = useApplicationSettings()
 
  const {company_name, contact_info, email_info, logo_preview} = companySettings
@@ -652,60 +654,60 @@ useEffect(() => {
   
 // login_with_hotspot_voucher
 
-const loginWithVoucher = async(e) => {
+// const loginWithVoucher = async(e) => {
 
-e.preventDefault()
+// e.preventDefault()
 
-  try {
-    setLoading(true)
-    const response = await fetch('/api/login_with_hotspot_voucher', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Subdomain': subdomain,
+//   try {
+//     setLoading(true)
+//     const response = await fetch('/api/login_with_hotspot_voucher', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'X-Subdomain': subdomain,
   
-      },
+//       },
 
-      body: JSON.stringify({
-        voucher: vouchers,
-        router_name: settingsformData.router_name
-      })
+//       body: JSON.stringify({
+//         voucher: vouchers,
+//         router_name: settingsformData.router_name
+//       })
   
   
-    });
+//     });
   
   
-    const newData = await response.json();
-    if (response.ok) {
-      setLoading(false)
-      setTimeout(() => {
-        setsuccess(true)
+//     const newData = await response.json();
+//     if (response.ok) {
+//       setLoading(false)
+//       setTimeout(() => {
+//         setsuccess(true)
   
-      }, 2000);
+//       }, 2000);
       
-      // setPackages(newData)
-      toast.success('Voucher verified successfully', {
-        duration: 3000,
-        position: 'top-right',
-      });
-      console.log('company settings fetched', newData)
-    } else {
-      setLoading(false)
-      toast.error('Voucher verification failed', {
-        duration: 3000,
-        position: 'top-right',
-      });
+//       // setPackages(newData)
+//       toast.success('Voucher verified successfully', {
+//         duration: 3000,
+//         position: 'top-right',
+//       });
+//       console.log('company settings fetched', newData)
+//     } else {
+//       setLoading(false)
+//       toast.error('Voucher verification failed', {
+//         duration: 3000,
+//         position: 'top-right',
+//       });
 
-      toast.error(newData.error, {
-        duration: 7000,
-        position: 'top-right',
-      });
-    }
-  } catch (error) {
-    setLoading(false)
-  }
+//       toast.error(newData.error, {
+//         duration: 7000,
+//         position: 'top-right',
+//       });
+//     }
+//   } catch (error) {
+//     setLoading(false)
+//   }
  
-}
+// }
 
 
 if (success) {
@@ -788,10 +790,11 @@ if (loading) {
 <div className='bg-white dark:bg-gray-800  
 z-50 absolute left-0 top-0
 
+
 flex flex-col items-center justify-center
 text-white p-10 rounded-md cursor-pointer'  >
 
-
+<p className='text-3xl absolute top-0 font-semibold text-gray-900 dark:text-white dotted-font'>{company_name} </p>
 <div className='flex flex-row gap-2 items-center justify-center'>
 <SlNotebook  className='w-5 h-5 text-teal-500'/>
 <h2 className=" text-lg font-semibold text-gray-900 dark:text-white dotted-font">How To Purchase:</h2>
@@ -1058,7 +1061,7 @@ grid grid-cols-1 gap-6">
 
 <CiBarcode className="text-green-500 w-8 h-8"/>
 
-
+<form onSubmit={loginWithVoucher}>
 <input type="text"
 
 onChange={(e) => handleChangeHotspotVoucher(e)}
@@ -1068,14 +1071,16 @@ className='w-full text-gray-700 bg-gray-100 rounded-lg p-2 focus:outline-none'
 placeholder="Enter your voucher code"/>
 
 <motion.button
+type='submit'
                 variants={buttonVariants}
                 whileHover="hover"
                 className="w-full py-3 bg-purple-600 text-white rounded-full shadow-md 
                 focus:outline-none dotted-font font-thin mt-4"
-                onClick={() => alert('Connected!')}
+                // onClick={() => alert('Connected!')}
               >
                 Connect Now
               </motion.button>
+              </form>
               <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Choose Your Plan</h2>
 
 
