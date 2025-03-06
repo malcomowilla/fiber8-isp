@@ -11,9 +11,11 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import dayjs from "dayjs";
 import CloseIcon from "@mui/icons-material/Close";
+import TextField from '@mui/material/TextField';
+
 
 function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
-    createVoucher
+    createVoucher, setVoucherForm
  }) {
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState("lg");
@@ -66,6 +68,7 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
             <FormControl
               fullWidth
               sx={{
+                
                 m: 1,
                 "& label.Mui-focused": {
                   color: "black",
@@ -78,6 +81,7 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
                   },
                   "&.Mui-focused fieldset": {
                     borderColor: "black",
+                    fontSize: "20px",
                   },
                 },
               }}
@@ -101,6 +105,17 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
                   </MenuItem>
                 ))}
               </Select>
+
+              <TextField
+              name='phone'
+               value={voucherForm.phone}
+              onChange={(e)=> setVoucherForm({...voucherForm, phone: e.target.value})}
+              // type='number'
+              className='myTextField' 
+              sx={{
+            mt:2
+              }}
+              label='Phone Number'  fullWidth />
             </FormControl>
           </div>
         </DialogContent>

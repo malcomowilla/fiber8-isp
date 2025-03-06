@@ -47,13 +47,14 @@ import DeleteVoucher from '../delete/DeleteVoucher'
 const HotspotSubscriptions = () => {
 
   const [search, setSearch] = useState('')
-  const { settingsformData } = useApplicationSettings();
+  const { settingsformData, setFormData } = useApplicationSettings();
 
   const [tableData, setTableData] = useState([])
   const [loading, setloading] = useState(false)
   const [open, setOpen] = useState(false);
   const [voucherForm, setVoucherForm] = useState({
     package: '',
+    phone: '',
 
   })
   const [vouchers, setVouchers] = useState([])
@@ -158,6 +159,38 @@ const subdomain = window.location.hostname.split('.')[0]
 
 
 
+
+
+const fetchRouters = useCallback(
+  async() => {
+    try {
+      const response = await fetch('/api/allow_get_router_settings', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
+const newData = await response.json()
+      if (response) {
+        console.log('fetched router settings', newData)
+        const {router_name} = newData[0]
+        setFormData({...settingsformData, router_name})
+      } else {
+        console.log('failed to fetch router settings')
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  [],
+)
+
+
+
+  useEffect(() => {
+   
+    fetchRouters()
+  }, [fetchRouters]);
+  
 
 
 
@@ -311,6 +344,7 @@ deleteVoucher={deleteVoucher} id={voucherForm.id} loading={loading}/>
 
     <EditVoucher open={open} handleClose={handleClose}
     voucherForm={voucherForm} createVoucher={createVoucher}
+    setVoucherForm={setVoucherForm}
     handleChangeVoucher={handleChangeVoucher}
 
     />
