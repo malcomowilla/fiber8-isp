@@ -1223,7 +1223,7 @@ type='submit'
             <h1 className="text-3xl text-gray-900 dotted-font font-thin">Welcome to {company_name} Hotspot</h1>
             <p className="text-gray-600 dotted-font">Connect and enjoy fast browsing.</p>
           </div>
-          <form onSubmit={loginWithVoucher}>
+          <form onSubmit={(e) => loginWithVoucher(e)}>
           <motion.div
             className="flex justify-between items-center bg-gray-100 p-4 rounded-lg mb-4"
             whileHover={{ scale: 1.02 }}
