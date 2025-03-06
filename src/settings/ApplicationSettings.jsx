@@ -1,5 +1,5 @@
 import { useState, createContext, useContext, useEffect, useCallback } from "react"
-
+import toast, { Toaster } from 'react-hot-toast';
 
 const GeneralSettingsContext = createContext(null)
 
@@ -78,6 +78,11 @@ const [welcome, setWelcome] = useState(false)
 const [voucher, setVoucher] = useState({
   vouchers: ''
 })
+
+const [loading, setLoading] = useState(false)
+ const [success, setsuccess] = useState(false)
+
+const {vouchers} = voucher
 
 // const { vouchers } = voucher
 const handleChangeHotspotVoucher = (e) => {
@@ -362,7 +367,66 @@ const handleChange = (e) => {
     
 //   }
 //  }
+
+
+
+const loginWithVoucher = async(e) => {
+
+  e.preventDefault()
+  
+    try {
+      setLoading(true)
+      const response = await fetch('/api/login_with_hotspot_voucher', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+    
+        },
+  
+        body: JSON.stringify({
+          voucher: vouchers,
+          router_name: settingsformData.router_name
+        })
+    
+    
+      });
+    
+    
+      const newData = await response.json();
+      if (response.ok) {
+        setLoading(false)
+        setTimeout(() => {
+          setsuccess(true)
+    
+        }, 2000);
+        
+        // setPackages(newData)
+        toast.success('Voucher verified successfully', {
+          duration: 3000,
+          position: 'top-right',
+        });
+        console.log('company settings fetched', newData)
+      } else {
+        setLoading(false)
+        toast.error('Voucher verification failed', {
+          duration: 3000,
+          position: 'top-right',
+        });
+  
+        toast.error(newData.error, {
+          duration: 7000,
+          position: 'top-right',
+        });
+      }
+    } catch (error) {
+      setLoading(false)
+    }
+   
+  }
   return (
+    <>
+    <Toaster />
     <GeneralSettingsContext.Provider  value={{settingsformData, handleChange, setFormData, isloading,
        setisloading,
      nasformData, setnasFormData,initialValueNas, welcomeMessage, setWelcomeMessage, welcome, 
@@ -375,10 +439,13 @@ const handleChange = (e) => {
      handleChangeAdminSettings, adminSettings, setAdminSettings,
      templateStates, setTemplateStates,
      handleChangeHotspotVoucher, voucher, setVoucher,
+     success, loading,loginWithVoucher,
      
      companySettings, setCompanySettings}}  >
     {children}
    </GeneralSettingsContext.Provider>
+
+   </>
   )
 }
 

@@ -22,7 +22,8 @@ const HotspotLogin = () => {
 
     templateStates, setTemplateStates,
     settingsformData, setFormData,
-    handleChangeHotspotVoucher, voucher, setVoucher
+    handleChangeHotspotVoucher, voucher, setVoucher,
+    loginWithVoucher
   } = useApplicationSettings()
 
 
@@ -99,13 +100,14 @@ const HotspotLogin = () => {
 
 
 
-
+<form onSubmit={loginWithVoucher}>
 
 <motion.div
             className="flex justify-between items-center bg-gray-100 p-4 rounded-lg mb-4"
             whileHover={{ scale: 1.02 }}
           >
             <CiBarcode className={`${template.iconColor} w-6 h-6`} />
+           
             <input
 
 onChange={(e) => handleChangeHotspotVoucher(e)}
@@ -131,15 +133,17 @@ value={vouchers}
             variants={buttonVariants}
             whileHover="hover"
             className={`w-full py-2 px-4 ${template.buttonColor} text-white rounded-full shadow-md focus:outline-none dotted-font font-thin`}
-            onClick={() => toast.success('Connected!')}
           >
             Connect Now
           </motion.button>
+          
 
           <div className="flex justify-center items-center cursor-pointer mt-6" onClick={() => navigate(-1)}>
             <TiArrowBackOutline className="w-8 h-8" />
           </div>
+          </form>
         </motion.div>
+       
       </div>
     </>
   );
