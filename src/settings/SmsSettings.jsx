@@ -48,10 +48,27 @@ const [smsSettingsForm, setSmsSettingsForm] = useState({
 const {isloading, setisloading} = useApplicationSettings()
 const [open, setOpen] = useState(false);
 const [openNotifactionSettings, setOpenSettings] = useState(false)
+const templateData = {
+  // admin_otp_confirmation_template: '' ,
+  // payment_reminder_template: '',
+  // service_provider_otp_confirmation_template: '',
+  // customer_otp_confirmation_template: '',
+  // user_invitation_template: '',
+  // service_provider_confirmation_code_template: '',
+  // customer_confirmation_code_template: '',
+  // store_manager_otp_confirmation_template: '',
+  // store_manager_manager_number_confirmation_template: '',
+  send_voucher_template: ''
+}
+
+const [smsTemplates, setSmsTemplates] = useState(templateData)
+
 
 const subdomain = window.location.hostname.split('.')[0]
 
 const {api_key, api_secret, sender_id, short_code,} = smsSettingsForm
+
+const {send_voucher_template} = smsTemplates
 
   const getSmsBalance  = useCallback(
     async(selectedProvider) => {
@@ -283,8 +300,57 @@ const saveSmsSettings = async (e) => {
     <Toaster  />
     <Suspense fallback={<div className='flex justify-center items-center '>{ <UiLoader/> }</div>}>
 
+
+
+
+    <div className='p-7'>
+            <p className='text-black dark:text-white playwrite-de-grund  text-2xl font-extrabold'>SMS Templates</p>
+        </div>
     <div className='mt-6'>
+        <p className='text-black dark:text-white playwrite-de-grund  text-lg font-bold'>
+        Customize messages sent to customers using sms.Make sure to 
+        include the keywords to correctly include content
+
+        </p>
+    </div>
+
+
+
+    <Box
+        className='myTextField'
+     sx={{'& .MuiTextField-root' : {
+        width: '100%',
+        padding: '8px',
+        m: 1,
+        '& label.Mui-focused': {
+          color: 'black',
+          fontSize: '16px'
+          },
+      '& .MuiOutlinedInput-root': {
+        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+          borderColor: "black",
+          borderWidth: '3px',
+          },
+       '&.Mui-focused fieldset':  {
+          borderColor: 'black', 
+          
+        }
+      }
+    }}}
+    >
+      <TextField onChange={handleChange} fullWidth label="Customer Confirmation Code"
+       name='send_voucher_template' 
+       id="fullWidth" multiline 
+       rows={4}
+        helperText={<p className='text-black text-sm tracking-wider playwrite-de-grund'>     place  {"{{customer_code}}"}
+
+                    where the customer code should appear in the text and either  {"{{name}}"}, 
+        to include the users name,   <span className='font-extrabold'>Message Sent To Customer To Confirm Customer Code
+          </span></p>} value={send_voucher_template}/>
+</Box>
         
+
+
    <form onSubmit={saveSmsSettings}>
 <div className='flex'>
 
@@ -439,7 +505,6 @@ const saveSmsSettings = async (e) => {
    dark:focus:ring-gray-500 dark:focus:border-gray-500" placeholder="..."></textarea>
 
 <p></p>
-        </div>
         </div>
 
         </Suspense>
