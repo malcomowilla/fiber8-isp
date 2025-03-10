@@ -47,14 +47,18 @@ import DeleteVoucher from '../delete/DeleteVoucher'
 const HotspotSubscriptions = () => {
 
   const [search, setSearch] = useState('')
-  const { settingsformData, setFormData } = useApplicationSettings();
+  const { settingsformData, setFormData, selectedProvider, setSelectedProvider, 
+    setSmsSettingsForm
+   } = useApplicationSettings();
 
   const [tableData, setTableData] = useState([])
   const [loading, setloading] = useState(false)
   const [open, setOpen] = useState(false);
   const [voucherForm, setVoucherForm] = useState({
     package: '',
-    phone: '',
+    phone: '',  
+    
+
 
   })
   const [vouchers, setVouchers] = useState([])
@@ -231,6 +235,54 @@ useEffect(() => {
 
 
 
+
+
+const fetchSavedSmsSettings = useCallback(
+  async() => {
+    
+    try {
+      const response = await fetch(`/api/saved_sms_settings`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+        },
+      });
+  
+      const data = await response.json();
+
+      const newData = data.length > 0 
+        ? data.reduce((latest, item) => new Date(item.created_at) > new Date(latest.created_at) ? item : latest, data[0])
+        : null;
+  
+      if (response.ok) {
+        console.log('Fetched SMS settings:', newData);
+        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID } = newData;
+        // setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID });
+        setSelectedProvider(sms_provider);
+        // setSelectedProvider(newData[0].sms_provider);
+      } else {
+        toast.error(newData.error || 'Failed to fetch SMS settings', {
+          duration: 3000,
+          position: 'top-center',
+        });
+      }
+    } catch (error) {
+      toast.error('Internal server error: Something went wrong with fetching SMS settings', {
+        duration: 3000,
+        position: 'top-center',
+      });
+    }
+  },
+  [],
+)
+
+
+useEffect(() => {
+  fetchSavedSmsSettings();
+ 
+}, [fetchSavedSmsSettings]);
+
+
   const createVoucher = async(e) => {
     e.preventDefault()
 setloading(true)
@@ -243,7 +295,8 @@ setopenLoad(true)
           'X-Subdomain': subdomain,
         },
         body: JSON.stringify({...voucherForm, 
-          router_name:settingsformData.router_name, use_radius: settingsformData.use_radius
+          router_name:settingsformData.router_name, use_radius: settingsformData.use_radius,
+          selected_provider: selectedProvider
            
         })
       })

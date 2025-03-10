@@ -79,6 +79,16 @@ const [voucher, setVoucher] = useState({
   vouchers: ''
 })
 
+const [smsSettingsForm, setSmsSettingsForm] = useState({
+  api_key: '',
+  api_secret: '',
+  sender_id: '',
+  short_code: '',
+  partnerID: '',
+  // username: '',
+});
+
+
 const [loading, setLoading] = useState(false)
  const [success, setsuccess] = useState(false)
 
@@ -110,7 +120,7 @@ const handleChangeHotspotVoucher = (e) => {
         sleek: false, 
       });
 
-      
+      const [selectedProvider, setSelectedProvider] = useState('SMS leopard'); // Default value
       // const [settingsformData, setFormData] = useState(() => {
       //   const storedFormData =   localStorage.setItem("checkedtrueData", JSON.stringify(initialValue.check_update_password));
         
@@ -118,6 +128,12 @@ const handleChangeHotspotVoucher = (e) => {
       // });
 
 
+      const [phoneNumber, setPhoneNumber] = useState("");
+      const [email, setEmail] = useState("");
+      const [hotspotName, setHotspotName] = useState("");
+      const [hotspotInfo, setHotspotInfo] = useState("");
+      const [hotspotBanner, setHotspotBanner] = useState(null);
+      const [hotspotBannerPreview, setHotspotBannerPreview] = useState(null); 
 
       const handleChangeSubscriberSettings = (e) => {
         const { type, name, checked, value } = e.target;
@@ -391,8 +407,8 @@ const loginWithVoucher = async(e) => {
           router_name: settingsformData.router_name,
           stored_mac: storedMac,
           stored_ip: storedIp, 
-          mac: mac,
-          ip: ip
+          // mac: mac,
+          // ip: ip
         })
     
     
@@ -446,8 +462,13 @@ const loginWithVoucher = async(e) => {
      templateStates, setTemplateStates,
      handleChangeHotspotVoucher, voucher, setVoucher,
      success, loading,loginWithVoucher,setLoading,
+     selectedProvider, setSelectedProvider,smsSettingsForm, setSmsSettingsForm,
      
-     companySettings, setCompanySettings}}  >
+     companySettings, setCompanySettings,email, setEmail,
+
+     phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setHotspotInfo,
+     hotspotBanner, setHotspotBanner,hotspotBannerPreview, setHotspotBannerPreview
+     }}  >
     {children}
    </GeneralSettingsContext.Provider>
 

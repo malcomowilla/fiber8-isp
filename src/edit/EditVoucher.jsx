@@ -12,6 +12,11 @@ import Select from "@mui/material/Select";
 import dayjs from "dayjs";
 import CloseIcon from "@mui/icons-material/Close";
 import TextField from '@mui/material/TextField';
+import { FaSave, FaPaperPlane } from "react-icons/fa"; // Import icons
+import { motion } from "framer-motion";
+import { FaExclamationTriangle } from "react-icons/fa";
+
+
 
 
 function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
@@ -23,6 +28,19 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
   const [dateTimeValue, setDateTimeValue] = useState(dayjs(new Date()));
   const [newDate, setNewDate] = React.useState(null);
   const [pppoePackages, setPppoePackages] = useState([]); // State to store PPPoE packages
+
+
+  const [isSave, setIsSave] = useState(true);
+
+  // Toggle between "Save" and "Send" every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsSave((prev) => !prev);
+    }, 5000); // Switch every 5 seconds
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
+  }, []);
+
 
   // Fetch PPPoE packages from the backend
   useEffect(() => {
@@ -121,8 +139,12 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
         </DialogContent>
         <DialogActions>
           <button
+
+          
             className="bg-red-300 hover:bg-red-800 rounded-lg
-             hover:scale-105 hover:text-white text-black transition-transform 
+             hover:scale-105 hover:text-white text-black
+             flex flex-row gap-x-2
+             transition-transform 
              duration-200 p-2"
             onClick={ (e) => {
 e.preventDefault()
@@ -131,22 +153,39 @@ e.preventDefault()
               
               }
           >
+             <FaExclamationTriangle />
             Cancel
+
+           
           </button>
 
 
 
 
 
-          <button
-          type='submit'
-            className="bg-green-500
-            cursor-pointer
-            rounded-lg hover:scale-105 hover:text-white
-             text-black transition-transform duration-200 p-2"
-          >
-            Save
-          </button>
+          <motion.button
+      type="submit"
+      className="flex items-center justify-center gap-2 bg-green-500 cursor-pointer rounded-lg hover:scale-105 hover:text-white text-black transition-transform duration-200 p-2"
+      whileHover={{ scale: 1.05 }} // Hover animation
+      whileTap={{ scale: 0.95 }} // Tap animation
+      key={isSave ? "save" : "send"} // Key prop for animation reset
+      initial={{ opacity: 0, y: 10 }} // Initial animation state
+      animate={{ opacity: 1, y: 0 }} // Animate in
+      exit={{ opacity: 0, y: -10 }} // Animate out
+      transition={{ duration: 0.3 }} // Animation duration
+    >
+      {isSave ? (
+        <>
+          <FaSave className="w-5 h-5" /> {/* Save icon */}
+          <span>Save</span>
+        </>
+      ) : (
+        <>
+          <FaPaperPlane className="w-5 h-5" /> {/* Send icon */}
+          <span>Send</span>
+        </>
+      )}
+    </motion.button>
         </DialogActions>
         </form>
 

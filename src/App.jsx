@@ -72,6 +72,7 @@ import {DatePicker} from './date-picker/Date'
 import LocalizeDate from './date-picker/LocalizeDate'
 // import Sms from './sms/Sms'
 const Sms = lazy(()=> import('./sms/Sms'))
+const HotspotSettings = lazy(()=> import('./settings/HotspotSettings'))
 import ProtectAuth from './Auth/ProtectAuth'
 import HotspotPayments from './payments/HotspotPayments'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -694,6 +695,7 @@ const hostname = window.location.hostname;
 <Route path='/admin/nas' element={<Nas/>}/>
 <Route path='/admin/passkeys' element={<PasskeyList/>}/>
 <Route path='/admin/ip-pool' element={<IpPool/>}/>
+<Route path='/admin/hotspot_settings' element={<HotspotSettings/>}/>
 <Route path='/admin/customer-tickets' element={<CustomerTickets/>}/>
 <Route path='/admin/ip-pool-table' element={<IpPoolTable/>}/>
 </Route>

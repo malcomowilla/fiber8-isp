@@ -36,6 +36,7 @@ import { FcOnlineSupport } from "react-icons/fc";
 import { FaUpload } from "react-icons/fa6";
 import { BsHddNetwork } from "react-icons/bs";
 import { LuLayoutTemplate } from "react-icons/lu";
+import { MdSettingsInputAntenna } from "react-icons/md";
 
 import { TfiDashboard } from "react-icons/tfi";
 
@@ -766,7 +767,8 @@ transition={{ duration: 0.2, delay: 0.1 }}
                    exit={{ opacity: 0, x: -20 }}
                    transition={{ duration: 0.2 , delay: 0.1 }}
                   >
-                     <Link  to='/admin/hotspot-dashboard' className="flex items-center w-full p-2 text-white transition
+                     <Link  to='/admin/hotspot-dashboard' className="flex items-center w-full p-2
+                      text-white transition
                       duration-75 rounded-lg  group gap-x-3 text-nowrap 
                        dark:text-white "> 
                         <TfiDashboard/>
@@ -876,6 +878,28 @@ onClick={() => {
                         <WifiIcon/>
                         Hotspot     Overview</Link>
                   </ motion.li>
+
+
+
+                  <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
+                   initial={{ opacity: 0, x: -20 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   exit={{ opacity: 0, x: -20 }}
+                   transition={{ duration: 0.2 , delay: 0.4 }}
+                  >
+                     <Link to='/admin/hotspot_settings'  className="flex items-center w-full p-2 text-white 
+                     transition duration-75 rounded-lg  group 
+                      dark:text-white gap-x-3  ">
+                        <MdSettingsInputAntenna/>
+                        Settings</Link>
+                  </ motion.li>
+
+                 
 
    </>
 ) }
