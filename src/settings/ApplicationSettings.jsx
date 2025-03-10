@@ -461,7 +461,7 @@ const loginWithVoucher = async(e) => {
      handleChangeAdminSettings, adminSettings, setAdminSettings,
      templateStates, setTemplateStates,
      handleChangeHotspotVoucher, voucher, setVoucher,
-     success, loading,loginWithVoucher,setLoading,
+     success, setsuccess, loading,loginWithVoucher,setLoading,
      selectedProvider, setSelectedProvider,smsSettingsForm, setSmsSettingsForm,
      
      companySettings, setCompanySettings,email, setEmail,
