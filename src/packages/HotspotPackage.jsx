@@ -64,6 +64,7 @@ const [hotspotPackage, setHotspotPackage] = useState({
   upload_burst_limit: '',
   valid_from: dayjs(),
   valid_until: dayjs(),
+  shared_users: '',
   download_burst_limit: '',
   validity_period_units: '',
   weekdays: [] // <-- Add weekdays array

@@ -911,7 +911,7 @@ z-50 absolute left-0 top-0
 flex flex-col items-center justify-center
 text-white p-10 rounded-md cursor-pointer'  >
 
-<p className='text-3xl absolute top-0 font-semibold text-gray-900 dark:text-white dotted-font'>{company_name} </p>
+<p className='text-3xl absolute top-0 font-semibold text-gray-900 dark:text-white dotted-font'>{hotspotName} </p>
 <div className='flex flex-row gap-2 items-center justify-center'>
 <SlNotebook  className='w-5 h-5 text-teal-500'/>
 <h2 className=" text-lg font-semibold text-gray-900 dark:text-white dotted-font">How To Purchase:</h2>
@@ -977,7 +977,7 @@ animate="visible"
 >
 <div className="text-center mb-6">
 <FaWifi className="text-blue-500 w-12 h-12 mx-auto mb-4" />
-<h1 className="text-3xl  text-gray-900  dotted-font font-thin">Welcome to {company_name} Hotspot</h1>
+<h1 className="text-3xl  text-gray-900  dotted-font font-thin">Welcome to {hotspotName}</h1>
 <p className="text-gray-600 dotted-font ">Connect and enjoy fast browsing.</p>
 </div>
 
@@ -1128,7 +1128,7 @@ grid grid-cols-1 gap-6">
       <div className={`min-h-screen relative z-0 flex flex-col items-center justify-center bg-green-500 p-4`}>
         {/* Header Section */}
         <div className="w-full text-center mb-8">
-          <h1 className="text-5xl font-bold text-white dotted-font">Welcome to {company_name}</h1>
+          <h1 className="text-5xl font-bold text-white dotted-font">Welcome to {hotspotName}</h1>
           <p className="text-xl text-gray-200 mt-2">Fast and reliable internet access</p>
         </div>
 
@@ -1304,7 +1304,7 @@ type='submit'
         >
           <div className="text-center mb-6">
             <FaWifi className={`text-yellow-500 w-12 h-12 mx-auto mb-4`} />
-            <h1 className="text-3xl text-gray-900 dotted-font font-thin">Welcome to {company_name} Hotspot</h1>
+            <h1 className="text-3xl text-gray-900 dotted-font font-thin">Welcome to {hotspotName}</h1>
             <p className="text-gray-600 dotted-font">Connect and enjoy fast browsing.</p>
           </div>
           <form onSubmit={loginWithVoucher}>
@@ -1428,7 +1428,7 @@ type='submit'
 >
  <div className="text-center mb-6">
    <FaWifi className="text-yellow-500 w-12 h-12 mx-auto mb-4" />
-   <h1 className="text-3xl  text-gray-900  dotted-font font-thin">Welcome to {company_name} Hotspot</h1>
+   <h1 className="text-3xl  text-gray-900  dotted-font font-thin">Welcome to {hotspotName}</h1>
    <p className="text-gray-600 dotted-font ">Connect and enjoy fast browsing.</p>
  </div>
 
@@ -1530,7 +1530,7 @@ type='submit'
   <motion.div className="max-w-md 
   absolute top-0
   w-full mx-auto text-center mt-[320px] sm:mt-0">
-    <h2 className="text-2xl text-white mb-4 dotted-font font-thin">{company_name}</h2>
+    <h2 className="text-2xl text-white mb-4 dotted-font font-thin">{hotspotName}</h2>
 
 
     <div>
