@@ -21,6 +21,8 @@ import Backdrop from '@mui/material/Backdrop';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteVoucher from '../delete/DeleteVoucher'
+import { FaDesktop } from "react-icons/fa"; // Import device icon
+
 
 
 
@@ -57,6 +59,7 @@ const HotspotSubscriptions = () => {
   const [voucherForm, setVoucherForm] = useState({
     package: '',
     phone: '',  
+    shared_users: '',
     
 
 
@@ -103,6 +106,7 @@ setVoucherForm((prevState) => ({
 
 
 
+
   const handleRowClick = (event, rowData) => {
     console.log('vouchers',rowData)
    
@@ -120,6 +124,20 @@ setVoucherForm((prevState) => ({
       
         {title: 'Speed Limit', field:'speed limit',  headerClassName: 'dark:text-black'},
         {title: 'Phone', field:'phone',  headerClassName: 'dark:text-black'},
+        {
+          title: "Device",
+          field: "shared_users",
+          headerClassName: "dark:text-black",
+          render: (rowData) => (
+            <div className="flex items-center">
+              <FaDesktop className="mr-2 text-green-500" /> {/* Device icon */}
+              <span>{rowData.device}</span>
+              {rowData.shared_users && (
+                <span className=" text-sm text-black dark:text-white">({rowData.shared_users})</span>
+              )}
+            </div>
+          ),
+        },
 
         {title: 'Action', field:'Action',  headerClassName: 'dark:text-black', 
     
@@ -308,6 +326,8 @@ setopenLoad(true)
 setopenLoad(false)
         setVoucherForm({
           package: newData.package,
+          phone_number: newData.phone,
+          shared_users: newData.shared_users,
         })
         
         toast.success('Voucher created successfully', {
@@ -480,6 +500,8 @@ headerStyle:{
   
   
   fontFamily: 'mono'
+
+
 }}
 
 

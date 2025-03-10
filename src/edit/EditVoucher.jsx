@@ -15,6 +15,9 @@ import TextField from '@mui/material/TextField';
 import { FaSave, FaPaperPlane } from "react-icons/fa"; // Import icons
 import { motion } from "framer-motion";
 import { FaExclamationTriangle } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa"; // Import user icon
+
+
 
 
 
@@ -82,6 +85,8 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
 
 
         <DialogContent>
+
+       
           <div className="">
             <FormControl
               fullWidth
@@ -136,6 +141,39 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
               label='Phone Number'  fullWidth />
             </FormControl>
           </div>
+
+          <div className="flex gap-3 mt-4">
+              <TextField
+                label="Shared Users"
+                value={voucherForm.shared_users}
+                name='shared_users'
+                onChange={(e)=> setVoucherForm({...voucherForm, shared_users: e.target.value})}
+                id="shared_users"
+                sx={{
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "black",
+                      borderWidth: "3px",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+                className="myTextField"
+                type="number"
+                placeholder="Number of shared users..."
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <FaUsers className="mr-2 text-gray-500" /> // Add user icon
+                  ),
+                }}
+              ></TextField>
+            </div>
         </DialogContent>
         <DialogActions>
           <button
