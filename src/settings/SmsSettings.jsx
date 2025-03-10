@@ -35,19 +35,14 @@ const SettingsNotification = lazy(() => import('../notification/SettingsNotifica
 
 const SmsSettings = () => {
 const [smsBalance, setSmsBalance] = useState(0)
-const [selectedProvider, setSelectedProvider] = useState('SMS leopard'); // Default value
-const [smsSettingsForm, setSmsSettingsForm] = useState({
-  api_key: '',
-  api_secret: '',
-  sender_id: '',
-  short_code: '',
-  // username: '',
-});
 
 
-const {isloading, setisloading} = useApplicationSettings()
+const {isloading, setisloading, selectedProvider, setSelectedProvider,
+  smsSettingsForm, setSmsSettingsForm
+} = useApplicationSettings()
 const [open, setOpen] = useState(false);
 const [openNotifactionSettings, setOpenSettings] = useState(false)
+const [smsSettingId, setSmsSettingId] = useState(null)
 const templateData = {
   // admin_otp_confirmation_template: '' ,
   // payment_reminder_template: '',
@@ -63,14 +58,18 @@ const templateData = {
 }
 
 const [smsTemplates, setSmsTemplates] = useState(templateData)
+
 const handleChangeSmsTempalate = (e) => {
 const {name, value} = e.target
-setSmsTemplates((prevData) => ({...prevData, [name]: value}))
+setSmsTemplates((prevData) => (
+  {...prevData, [name]: value} 
+))
+// console.log(value)
 }
 
 const subdomain = window.location.hostname.split('.')[0]
 
-const {api_key, api_secret, sender_id, short_code,} = smsSettingsForm
+const {api_key, api_secret, sender_id, short_code, partnerID} = smsSettingsForm
 
 const {send_voucher_template, voucher_template} = smsTemplates
 
@@ -113,9 +112,13 @@ setSmsBalance(newData.message)
   )
 
   useEffect(() => {
-    getSmsBalance()
+
+    if (selectedProvider) {
+      getSmsBalance(selectedProvider)
+    }
+    // getSmsBalance()
    
-  }, [getSmsBalance]);
+  }, [getSmsBalance, selectedProvider]);
 
 
 
@@ -175,36 +178,41 @@ setSmsBalance(newData.message)
 //   }
 
 
-const fetchSmsSettings = useCallback(
+const fetchSavedSmsSettings = useCallback(
   async() => {
+    
     try {
-      const response = await fetch('/api/sms_settings')
-      const newData = await response.json()
+      const response = await fetch(`/api/saved_sms_settings`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+        },
+      });
+  
+      const data = await response.json();
+
+      const newData = data.length > 0 
+        ? data.reduce((latest, item) => new Date(item.created_at) > new Date(latest.created_at) ? item : latest, data[0])
+        : null;
+  
       if (response.ok) {
-        
-        console.log('sms settings', newData)
-        const {api_key, api_secret, sender_id, short_code} = newData[0]
-
-        setSmsSettingsForm({...smsSettingsForm, api_key,api_secret,sender_id,short_code})
-          setSelectedProvider(newData[0].sms_provider)
-
-
-      }else{
-        toast.error(newData.error, {
-          duration: 5000,
-          position: 'top-center',
-        })
-        console.log('failed to fetch sms settings')
-        toast.error('failed to fetch sms settings', {
+        console.log('Fetched SMS settings:', newData);
+        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID } = newData;
+        setSmsSettingId(newData.id)
+        setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID });
+        setSelectedProvider(sms_provider);
+        // setSelectedProvider(newData[0].sms_provider);
+      } else {
+        toast.error(newData.error || 'Failed to fetch SMS settings', {
           duration: 3000,
           position: 'top-center',
-        })
+        });
       }
-    } catch (error) { 
-      toast.error('internal server error something went wrong with fetching sms settings', {
+    } catch (error) {
+      toast.error('Internal server error: Something went wrong with fetching SMS settings', {
         duration: 3000,
         position: 'top-center',
-      })
+      });
     }
   },
   [],
@@ -212,9 +220,84 @@ const fetchSmsSettings = useCallback(
 
 
 useEffect(() => {
-  fetchSmsSettings()
-  
-}, [fetchSmsSettings]);
+  fetchSavedSmsSettings();
+ 
+}, [fetchSavedSmsSettings]);
+
+
+
+
+const fetchSmsSettings = useCallback(async () => {
+  try {
+    const response = await fetch(`/api/sms_settings?provider=${selectedProvider}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Subdomain': subdomain,
+      },
+    });
+
+    const newData = await response.json();
+
+    if (response.ok) {
+      
+      if (
+        !newData || // Handles null or undefined
+        newData.length === 0 || // Handles empty array
+        !newData.sms_provider // Handles missing or null provider
+      ) {
+        console.log('No SMS settings found, resetting form.');
+      
+        setSmsSettingsForm({ 
+          api_key: '', 
+          api_secret: '', 
+          sender_id: '', 
+          short_code: '' ,
+          partnerID: ''
+        });
+      
+        // setSelectedProvider('');
+      } else {
+        console.log('Fetched SMS settings:', newData);
+      
+        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID } = newData;
+      
+        setSmsSettingsForm({ 
+          api_key: api_key || '', 
+          api_secret: api_secret || '', 
+          sender_id: sender_id || '', 
+          short_code: short_code || '' ,
+          partnerID: partnerID || ''
+        });
+      
+        // setSelectedProvider(sms_provider || '');
+      }
+    } else {
+      toast.error(newData.error || 'Failed to fetch SMS settings', {
+        duration: 3000,
+        position: 'top-center',
+      });
+    }
+  } catch (error) {
+    toast.error('Internal server error: Something went wrong with fetching SMS settings', {
+      duration: 3000,
+      position: 'top-center',
+    });
+  }
+}, [selectedProvider]);
+
+
+useEffect(() => {
+  if (selectedProvider) {
+    fetchSmsSettings();
+  }
+}, [fetchSmsSettings, selectedProvider]);
+
+
+
+
+
+
+
 
 
 const saveSmsSettings = async (e) => {
@@ -234,10 +317,12 @@ const saveSmsSettings = async (e) => {
       },
       body: JSON.stringify({
         api_key: api_key,
+        sms_setting_id: smsSettingId,
         api_secret: api_secret,
         sender_id: sender_id,
         short_code: short_code,
         sms_provider: selectedProvider,
+        partnerID: partnerID
       }),
     });
 
@@ -245,9 +330,9 @@ const saveSmsSettings = async (e) => {
 
     if (response.ok) {
       setisloading(false);
-      const {api_key, api_secret, sender_id, short_code} = newData
+      const {api_key, api_secret, sender_id, short_code, partnerID} = newData 
       setSelectedProvider(newData.sms_provider)
-      setSmsSettingsForm({...smsSettingsForm, api_key,api_secret,sender_id,short_code})
+      setSmsSettingsForm({...smsSettingsForm, api_key,api_secret,sender_id,short_code, partnerID})
       setOpenSettings(true);
       setOpen(false);
       console.log('SMS settings saved:', newData);
@@ -305,8 +390,14 @@ const getSmsTemplate = useCallback(
     try {
       const response = await fetch('/api/sms_templates')
       const newData = await response.json()
+      const {send_voucher_template, voucher_template} = newData[0]
+      
       if (response.ok) {
-        setSmsTemplates(newData)
+        setSmsTemplates({
+          ...smsTemplates,
+          send_voucher_template: send_voucher_template,
+          voucher_template: voucher_template
+        })
       } else {
         toast.error('failed to fetch sms templates', {
           duration: 3000,
@@ -337,10 +428,12 @@ try {
   const response = await fetch('/api/sms_templates', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-Subdomain': subdomain,
     },
     body: JSON.stringify({
-      smsTemplates
+      send_voucher_template: smsTemplates.send_voucher_template,
+       voucher_template: smsTemplates.voucher_template
     })
   })
 
@@ -387,7 +480,7 @@ try {
  }
 
 
-
+console.log('selected provider',selectedProvider)
 
   return (
     <>
@@ -437,6 +530,7 @@ try {
     >
       <TextField onChange={(e)=> handleChangeSmsTempalate(e)} fullWidth label="send voucher template"
        name='send_voucher_template' 
+       value={send_voucher_template}
        id="fullWidth" multiline 
        rows={4}
         helperText={<p className='text-black text-sm tracking-wider playwrite-de-grund'> 
@@ -446,7 +540,7 @@ try {
         to include the hotspot usesr phone number,   <span className='font-extrabold'>
           Message Sent To Customer 
           To Confirm Voucher Code
-          </span></p>} value={send_voucher_template}/>
+          </span></p>} />
 
 
 
@@ -502,7 +596,7 @@ try {
         >
                    <MenuItem value='SMS leopard' >SMS leopard</MenuItem>
 
-
+                   {/* c1cfc43f3e5c8b4c05d4e1b6f5be8fec */}
           <MenuItem  value='Africastalking'>Africastalking</MenuItem>
           <MenuItem  value='Advanta' >Advanta</MenuItem>
           <MenuItem value='Mobitech Bulk' >Mobitech Bulk</MenuItem>
@@ -510,6 +604,7 @@ try {
           <MenuItem  value='Afrinet'>Afrinet</MenuItem>
           <MenuItem value='EgoSMS' >EgoSMS</MenuItem>
           <MenuItem value='BlessedTexts'>BlessedTexts</MenuItem>
+          <MenuItem value='TextSms'>TextSms</MenuItem>
           <MenuItem  value='Mobiweb'>Mobiweb</MenuItem>
           <MenuItem value='Mobivas'>Mobivas</MenuItem>
           <MenuItem value='MoveSMS' >MoveSMS</MenuItem>
@@ -584,6 +679,12 @@ try {
 
 </TextField>
 
+{selectedProvider === 'TextSms' ?   
+   <TextField label='Partner Id' value={partnerID} onChange={handleChange}  name='partnerID' >
+
+</TextField>:  
+
+<>
 
 <TextField label='API secret' value={api_secret} onChange={handleChange}  name='api_secret'> 
 
@@ -594,6 +695,9 @@ try {
   
 
 </TextField>
+</>
+}
+
 
 
 

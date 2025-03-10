@@ -67,7 +67,7 @@ const GeneralSettings = ({children}) => {
 
 
      const {contact_info, company_name, email_info, logo_url,
-      agent_email,customer_support_email,customer_support_phone_number  ,
+      agent_email,customer_support_email,customer_support_phone_number,
       
      } =
      companySettings;

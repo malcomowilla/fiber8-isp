@@ -422,6 +422,11 @@ const {companySettings, setCompanySettings,
   loading, setLoading,
   success, setsuccess,
   handleChangeHotspotVoucher, voucher, setVoucher,
+
+
+  phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setHotspotInfo,
+  hotspotBanner, setHotspotBanner,hotspotBannerPreview, setHotspotBannerPreview,email,
+  setEmail
 } = useApplicationSettings()
 
  const {company_name, contact_info, email_info, logo_preview} = companySettings
@@ -453,6 +458,56 @@ const { vouchers } = voucher
 
               
  const subdomain = window.location.hostname.split('.')[0]
+
+
+
+
+
+
+
+ const getHotspotSettings = useCallback(
+  async () => {
+    try {
+      const response = await fetch('/api/get_hotspot_settings', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      });
+      const newData = await response.json();
+      if (response.ok) {
+        console.log('hotspot settings fetched', newData);
+        const { phone_number, hotspot_name, hotspot_info, hotspot_banner, email } = newData;
+        setPhoneNumber(phone_number);
+        setHotspotName(hotspot_name);
+        setHotspotInfo(hotspot_info);
+        setEmail(email)
+        // setHotspotBanner(hotspot_banner);
+        // if (hotspot_banner) {
+        //   setHotspotBannerPreview(hotspot_banner); // Set preview URL if banner exists
+        // }
+      } else {
+        console.log('failed to fetch hotspot settings');
+      }
+    } catch (error) {
+      // toast.error('internal server error while fetching hotspot settings', {
+      //   duration: 5000,
+      //   position: "top-right",
+      //   style: {
+      //     background: "#eb5757",
+      //     color: "#fff",
+      //   },
+      // });
+    }
+  },
+  [],
+);
+
+
+useEffect(() => {
+  getHotspotSettings()
+  
+}, [ getHotspotSettings]);
+
 
  const fetchRouters = useCallback(
   async() => {
@@ -571,11 +626,12 @@ const loginWithVoucher = async(e) => {
     
       const newData = await response.json();
       if (response.ok) {
+        setsuccess(true)
         setLoading(false)
-        setTimeout(() => {
-          setsuccess(true)
+        // setTimeout(() => {
+        //   setsuccess(true)
     
-        }, 2000);
+        // }, 2000);
         
         // setPackages(newData)
         toast.success('Voucher verified successfully', {
@@ -882,6 +938,20 @@ text-white p-10 rounded-md cursor-pointer'  >
 </li>
 </ol>
 
+<div className="mt-6 text-center">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white dotted-font">
+          Contact Us
+        </h3>
+        <div className="mt-2 space-y-2">
+          <p className="dotted-font font-thin text-gray-900 dark:text-white">
+              <span className='font-bold'>Email: </span> {email}
+          </p>
+          <p className="dotted-font font-thin text-gray-900 dark:text-white">
+            <span className='font-bold'>Phone Number: </span> {phoneNumber}
+          </p>
+        </div>
+      </div>
+
 <Link to='/hotspot-login' className='flex flex-row items-center justify-center'>
 <div className='flex flex-row items-center justify-center'>
 <HiMiniArrowLeftEndOnRectangle className='w-8 h-8 text-teal-500'/>
@@ -1165,6 +1235,20 @@ type='submit'
               </div>
             </>
           )}
+
+<div className="mt-6 text-center">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white dotted-font">
+          Contact Us
+        </h3>
+        <div className="mt-2 space-y-2">
+          <p className="dotted-font font-thin text-gray-900 dark:text-white">
+              <span className='font-bold'>Email: </span> {email}
+          </p>
+          <p className="dotted-font font-thin text-gray-900 dark:text-white">
+            <span className='font-bold'>Phone Number: </span> {phoneNumber}
+          </p>
+        </div>
+      </div>
         </motion.div>
 
         {/* Instructions Section */}
@@ -1271,6 +1355,21 @@ type='submit'
           <div className="flex justify-center items-center cursor-pointer mt-6" onClick={() => navigate(-1)}>
             <TiArrowBackOutline className="w-8 h-8" />
           </div>
+
+
+<div className=" text-center">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white dotted-font">
+          Contact Us
+        </h3>
+        <div className="mt-2 space-y-2">
+          <p className="dotted-font font-thin text-gray-900 dark:text-white">
+              <span className='font-bold'>Email: </span> {email}
+          </p>
+          <p className="dotted-font font-thin text-gray-900 dark:text-white">
+            <span className='font-bold'>Phone Number: </span> {phoneNumber}
+          </p>
+        </div>
+      </div>
         </motion.div>
 
 
@@ -1472,6 +1571,7 @@ p-4 mt-4'>
             setSeePackages(false);
             setSeeInstructions(true);
           }}/>
+          
           </div>
         </motion.div>
       ))}
