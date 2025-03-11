@@ -351,15 +351,16 @@ setIsOpenDelete={setIsOpenDelete} />
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
-              className='f'
+              className='f text-black'
             >
               <Box sx={{
                 display: 'flex',
+                color: 'black',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 mb: 3
               }}>
-                <h2>Invite New Client</h2>
+                <h2 className='text-black'>Invite New Client</h2>
                 <Tooltip title="Refresh client list">
                   <IconButton 
                     onClick={fetchClients}
@@ -373,11 +374,12 @@ setIsOpenDelete={setIsOpenDelete} />
               
               <Box sx={{
                 display: 'flex',
+                color: 'black',
                 flexDirection: 'column',
                 gap: 2,
                 justifyContent: 'center',
                 justifyItems: 'center',
-                '& label.Mui-focused': { color: 'gray' },
+                '& label.Mui-focused': { color: 'black' },
                 '& .MuiOutlinedInput-root': {
                   "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                     borderColor: "black",
@@ -537,6 +539,7 @@ name='smtpHost'
               <>
                 <Box sx={{
                   display: 'flex',
+                  color:'black',
                   gap: 2
                 }}>
   
@@ -552,7 +555,7 @@ name='smtpHost'
         title="Clients"
         options={{
           paging: true,
-          pageSizeOptions: [5, 10, 20, 25, 50, 100],
+          pageSizeOptions: [5, 10, 20],
           pageSize: 10,
           search: false,
           exportButton: true,
@@ -568,6 +571,8 @@ name='smtpHost'
 };
 
 export default InviteClient;
+
+
 
 
 

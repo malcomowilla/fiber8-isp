@@ -109,17 +109,17 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
   };
 
   const navigationItems = [
-    { label: "Stats", icon: <DashboardIcon />, value: 0 },
+    { label: <p className='text-black'>Stats</p>, icon: <DashboardIcon />, value: 0 },
     // { label: "Clients", icon: <PeopleIcon />, value: 1 },
-    { label: "Settings", icon: <SettingsIcon />, value: 2 },
-    { label: "Reset Password Client", icon: <LockResetIcon />, value: -1 },
+    { label: <p className='text-black'>Settings</p>, icon: <SettingsIcon />, value: 2 },
+    { label: <p className='text-black'>Reset Password Client</p>, icon: <LockResetIcon />, value: -1 },
 
-    { label: "Invite Client", icon: <PeopleIcon />, value: 3 },
-    { label: "Profile", icon:(<Avatar className='w-10 h-10 rounded-full' src={generateAvatar(systemAdminEmail)} 
+    { label: <p className='text-black'>Invite Client</p>, icon: <PeopleIcon />, value: 3 },
+    { label: <p className='text-black'>Profile</p>, icon:(<Avatar className='w-10 h-10 rounded-full' src={generateAvatar(systemAdminEmail)} 
     alt={`${systemAdminEmail}'s avatar`} />), value: 4 },
-    { label: "Reset Password Admin", icon: <LockResetIcon />, value: 5 },
-    { label: "Client Requests", icon: <FaPerson  className='w-6 h-6 rounded-full'/>, value: 6 },
-    { label: "Passkeys", icon: <IoMdKey  className='w-6 h-6 rounded-full'/>, value: 7 },
+    { label: <p className='text-black'>Reset Password Admin</p>, icon: <LockResetIcon />, value: 5 },
+    { label: <p className='text-black'>Client Requests</p>, icon: <FaPerson  className='w-6 h-6 rounded-full'/>, value: 6 },
+    { label: <p className='text-black'>Passkeys</p>, icon: <IoMdKey  className='w-6 h-6 rounded-full'/>, value: 7 },
   ];
 
   const pageTransitionVariants = {

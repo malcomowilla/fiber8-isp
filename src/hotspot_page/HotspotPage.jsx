@@ -944,10 +944,10 @@ text-white p-10 rounded-md cursor-pointer'  >
         </h3>
         <div className="mt-2 space-y-2">
           <p className="dotted-font font-thin text-gray-900 dark:text-white">
-              <span className='font-bold'>Email: </span> {email}
+              <span className='font-bold'>Email: </span> {email === null ? 'Not Available' : email}
           </p>
           <p className="dotted-font font-thin text-gray-900 dark:text-white">
-            <span className='font-bold'>Phone Number: </span> {phoneNumber}
+            <span className='font-bold'>Phone Number: </span> {phoneNumber === null ? 'Not Available' : phoneNumber}
           </p>
         </div>
       </div>
