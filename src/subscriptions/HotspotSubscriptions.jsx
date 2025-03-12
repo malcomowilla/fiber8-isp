@@ -220,7 +220,11 @@ const newData = await response.json()
 const getHotspotVouchers = useCallback(
   async() => {
     try {
-      const response = await fetch('/api/hotspot_vouchers')
+      const response = await fetch('/api/hotspot_vouchers', {
+        headers: {
+          'X-Subdomain': subdomain, 
+          },
+      })
       const newData = await response.json()
       if (response.ok) {
       
