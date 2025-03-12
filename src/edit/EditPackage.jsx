@@ -76,6 +76,7 @@ const [routerName] = useDebounce(router_name, 1000)
 console.log(routerName)
 const subdomain = window.location.hostname.split('.')[0]
 
+
 const fetchRouters = useMemo(() => async ()=> {
   
 

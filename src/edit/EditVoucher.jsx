@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -46,9 +46,12 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
 
 
   const subdomain = window.location.hostname.split('.')[0]
-  // Fetch PPPoE packages from the backend
-  useEffect(() => {
-    const fetchPppoePackages = async () => {
+
+
+
+  const fetchPppoePackages =useCallback(
+    async() => {
+      
       try {
         const response = await fetch("/api/hotspot_packages", {
           method: "GET",
@@ -65,10 +68,20 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
       } catch (error) {
         console.error("Error fetching PPPoE packages:", error);
       }
-    };
+
+    },
+    [],
+  )
+  
+
+
+
+  // Fetch PPPoE packages from the backend
+  useEffect(() => {
+  
 
     fetchPppoePackages();
-  }, []);
+  }, [fetchPppoePackages]);
 
   const handleChange = (event) => {
     setAge(event.target.value);
