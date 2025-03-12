@@ -74,7 +74,7 @@ useEffect(() => {
 const [routerName] = useDebounce(router_name, 1000)
 
 console.log(routerName)
-
+const subdomain = window.location.hostname.split('.')[0]
 
 const fetchRouters = useMemo(() => async ()=> {
   
@@ -82,6 +82,10 @@ const fetchRouters = useMemo(() => async ()=> {
 
   try {
     const response = await fetch('/api/routers',{
+      method: 'GET',
+      headers: {
+        'X-Subdomain': subdomain,
+      },
   
     }
   
@@ -145,7 +149,6 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
   const theme = useTheme();
 
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm', 'lg', 'md'));
-const subdomain = window.location.hostname.split('.')[0]
  
   const fecthIpPools = useCallback(
     async() => {

@@ -69,11 +69,16 @@ setEmailSettingsForm((prevData) => (
 }
 
 
+
 const getEmailSettings = useCallback(
   async() => {
     
     try {
-      const response = await fetch('/api/email_settings')
+      const response = await fetch('/api/email_settings', {
+        headers: {
+            'X-Subdomain': subdomain,
+            },
+      })
       const newData = await response.json()
 
       if (response.ok) {

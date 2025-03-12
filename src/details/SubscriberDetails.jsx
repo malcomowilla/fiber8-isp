@@ -147,8 +147,13 @@ const capitalizeName = (name)=> {
 
     try {
       const response = await fetch('/api/routers',{
+        method: 'GET',
+        headers: {
+          'X-Subdomain': subdomain,
     
       }
+
+    }
     
     
     )
@@ -255,13 +260,16 @@ const handleChangeName = (e) => {
     }
    
 
-
 const fetchPackages = useMemo(() => async ()=> {
   
 
 
   try {
     const response = await fetch('/api/get_package',{
+      method: 'GET',
+      headers: {
+        'X-Subdomain': subdomain,
+      },
   
     }
   

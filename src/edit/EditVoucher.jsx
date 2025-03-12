@@ -45,11 +45,17 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
   }, []);
 
 
+  const subdomain = window.location.hostname.split('.')[0]
   // Fetch PPPoE packages from the backend
   useEffect(() => {
     const fetchPppoePackages = async () => {
       try {
-        const response = await fetch("/api/hotspot_packages"); // Replace with your API endpoint
+        const response = await fetch("/api/hotspot_packages", {
+          method: "GET",
+          headers: {
+            "X-Subdomain": subdomain,
+          },
+        }); // Replace with your API endpoint
         if (response.ok) {
           const data = await response.json();
           setPppoePackages(data); // Set the fetched packages to state
