@@ -145,16 +145,16 @@ const isComplete = formData.name && formData.validity && formData.upload_limit &
   const theme = useTheme();
 
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm', 'lg', 'md'));
-
+const subdomain = window.location.hostname.split('.')[0]
  
   const fecthIpPools = useCallback(
     async() => {
   
   try {
       const response = await fetch('/api/ip_pools', {
-          // headers: {
-          //   'X-Subdomain': subdomain,
-          // },
+          headers: {
+            'X-Subdomain': subdomain,
+          },
       })
   
       const newData = await response.json()
