@@ -363,6 +363,9 @@ const deleteUser = async(id)=> {
   try {
     const response = await fetch(`/api/delete_user/${id}`, {
       method: 'DELETE',
+      headers: {  
+        'X-Subdomain': subdomain,
+      },
     })
 const newData = await response.json()
 
@@ -400,7 +403,11 @@ if (response.status === 403) {
 const fetchAdmins = useCallback(
   async() => {
     try {
-      const response = await fetch('/api/get_all_admins')
+      const response = await fetch('/api/get_all_admins', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },  
+      })
       const newData = await response.json()
       if (response.status === 403) {
         toast.error('permision denied to view user management', {
