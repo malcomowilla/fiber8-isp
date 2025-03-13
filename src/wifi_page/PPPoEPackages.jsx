@@ -60,7 +60,11 @@ const PPPoEPackages = () => {
 
   const fetchPackages = useCallback(async () => {
     try {
-      const response = await fetch('/api/allow_get_packages');
+      const response = await fetch('/api/allow_get_packages', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      });
       const data = await response.json();
       if (response.ok) {
         console.log('package', data);
