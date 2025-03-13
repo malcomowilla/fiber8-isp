@@ -10,6 +10,8 @@ import Timer from '../timer/Timer'
 import ShortCuts from './ShortCuts'
 import { useLocation } from 'react-router-dom';
 import DashboardStatistics from '../hotspot_page/DashboardStatistics'
+import { APP_VERSION, APP_NAME, APP_DESCRIPTION } from '../version';
+
 
 // import { ReloadIcon } from "@radix-ui/react-icons"
 
@@ -105,45 +107,52 @@ useEffect(() => {
     }
   };
   return (
-<>
-    <Header/>
-{/* <ShortCuts /> */}
-    <div className={`h-screen  overflow-y-scroll p-4 transition-all duration-500   overflow-x-hidden
-     ease-in-out ${seeSidebar ? '' : 'sm:ml-64'} `}>
+    <>
+    <Header />
+    <div
+      className={`h-screen flex flex-col overflow-y-scroll transition-all duration-500 ease-in-out ${
+        seeSidebar ? '' : 'sm:ml-64'
+      }`}
+    >
+      <div className="flex-grow p-4 overflow-x-hidden">
+        <div className={`p-4 h-full`}>
+          <div className="p-2">
+            <p className="font-extrabold dark:text-white text-black text-xl welcome-message">
+              <span>{getTimeBasedGreeting()}, {company_name}</span>
+            </p>
+            <p className="dark:text-white text-black text-sm mt-1 welcome-message">
+              {getWelcomeMessage()}
+            </p>
+          </div>
 
-<div className={`p-4  h-[1000px]  `}>
-  <div className='p-2'>
-{/* 
+          <p className="capitalize mb-10 dark:text-white text-black text-2xl">
+            {date}
+          </p>
 
-  {seeButton && <Button onClick={refreshPage}>Reload Page
+          {location.pathname !== '/admin/hotspot-dashboard' && <ShortCuts />}
+          {location.pathname === '/admin/hotspot-dashboard' && <DashboardStatistics />}
 
-</Button>} */}
-  <p className='font-extrabold dark:text-white text-black text-xl welcome-message'>
-    <span>{getTimeBasedGreeting()}, {company_name}</span></p>
-  <p className='dark:text-white text-black text-sm mt-1 welcome-message'>{getWelcomeMessage()}</p>
-    
-    </div>   
-
-    <p className="capitalize mb-10 dark:text-white text-black text-2xl">{date}</p>
-    {/* <ShortCuts /> */}
-    {location.pathname !== '/admin/hotspot-dashboard' && <ShortCuts />}
-    {location.pathname == '/admin/hotspot-dashboard' && < DashboardStatistics />
- }
-
-   
-<div className='mt-8'>
-<Outlet/>
-
-</div>
-
-<div className='flex flex-col p-4 font-mono  '>
-<Sidebar/>
-</div>
-
-  
+          <div className="mt-8">
+            <Outlet />
+          </div>
+        </div>
       </div>
+
+      <div className="flex flex-col p-4 font-mono">
+        <Sidebar />
       </div>
-      </>
+
+<div className='flex justify-center'>
+      <footer className="p-4 fixed bottom-0 font-mono  bg-gray-200 dark:bg-gray-800">
+        <p className="text-black dark:text-white ">
+          {APP_DESCRIPTION} -  <span className='border-2 border-green-600
+          p-2 rounded-lg
+          '>Version {APP_VERSION}  </span>
+        </p>
+      </footer>
+      </div>
+    </div>
+  </>
   )
 }
 
