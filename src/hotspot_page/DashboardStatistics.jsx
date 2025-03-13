@@ -1,6 +1,6 @@
 
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 
 // Statistic Card Component
@@ -34,12 +34,94 @@ const StatCard = ({ title, value, icon, color }) => {
 
 // Main Dashboard Component
 const DashboardStatistics = () => {
+  const [expiredVouchers, setExpiredVouchers] = useState(0)
+  const [activeVouchers, setActiveVouchers] = useState(0)
+const subdomain = window.location.hostname.split('.')[0];
+
+
+
+
+
+
+
+const getActiveVouchers = useCallback(
+  async() => {
+   
+    try {
+      const response = await fetch('api/active_vouchers', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
+      const newData = await response.json()
+      if (response.ok) {
+        setActiveVouchers(newData.active_vouchers)
+      } else {
+        setActiveVouchers(0)
+      }
+    } catch (error) {
+      setActiveVouchers(0)
+    }
+  },
+  [],
+)
+
+
+useEffect(() => {
+  getActiveVouchers()
+  
+}, [getActiveVouchers]);
+
+
+
+
+
+
+
+
+
+
+  const getExpiredVouchers = useCallback(
+    async() => {
+     
+      try {
+        const response = await fetch('api/expired_vouchers', {
+          headers: {
+            'X-Subdomain': subdomain,
+          },
+        })
+        const newData = await response.json()
+        if (response.ok) {
+          setExpiredVouchers(newData.expired_vouchers)
+        } else {
+          setExpiredVouchers(0)
+        }
+      } catch (error) {
+        setExpiredVouchers(0)
+      }
+    },
+    [],
+  )
+  
+
+
+  useEffect(() => {
+    getExpiredVouchers()
+   
+  }, [getExpiredVouchers]);
   const stats = [
     {
       title: "Active Vouchers",
-      value: 120,
+      value: activeVouchers,
       icon: "🎫",
       color: "bg-purple-500",
+    },
+
+    {
+      title: "Expired Vouchers",
+      value: expiredVouchers, // Example value
+      icon: "⛔", // Icon for expired vouchers
+      color: "bg-red-500", // Red color for expired items
     },
     {
       title: "Online Users",
