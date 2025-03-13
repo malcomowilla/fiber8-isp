@@ -91,6 +91,9 @@ const [smsSettingsForm, setSmsSettingsForm] = useState({
 
 const [loading, setLoading] = useState(false)
  const [success, setsuccess] = useState(false)
+const [totalSubscribers, setTotalSubscribers] = useState(0)
+const [subscribersOnline, setSubscribersOnline] = useState(0)
+const [subscribersOffline, setSubscribersOffline] = useState(0)
 
 const {vouchers} = voucher
 
@@ -467,7 +470,9 @@ const loginWithVoucher = async(e) => {
      companySettings, setCompanySettings,email, setEmail,
 
      phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setHotspotInfo,
-     hotspotBanner, setHotspotBanner,hotspotBannerPreview, setHotspotBannerPreview
+     hotspotBanner, setHotspotBanner,hotspotBannerPreview, setHotspotBannerPreview,
+     totalSubscribers, setTotalSubscribers,subscribersOnline, setSubscribersOnline,
+     subscribersOffline, setSubscribersOffline
      }}  >
     {children}
    </GeneralSettingsContext.Provider>
