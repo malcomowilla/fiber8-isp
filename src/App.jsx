@@ -132,6 +132,7 @@ import {useApplicationSettings} from './settings/ApplicationSettings'
  const PPPoEPackages = lazy(() => import('./wifi_page/PPPoEPackages') )
 const HotspotTemplates = lazy(() => import('./hotspot_templates/HotspotTemplates') )
 const HotspotDashboard = lazy(() => import('./hotspot_page/HotspotDashboard.jsx') )
+import { APP_VERSION, APP_NAME, APP_DESCRIPTION } from './version';
 
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
@@ -714,6 +715,9 @@ const hostname = window.location.hostname;
 </ LocalizeDate  >
 </Suspense>
 </ThemeProvider>
+{/* <footer>
+      <p>{APP_DESCRIPTION} - Version {APP_VERSION}</p>
+    </footer> */}
     </main>
   )
 }
