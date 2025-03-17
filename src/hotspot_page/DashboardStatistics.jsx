@@ -133,20 +133,22 @@ useEffect(() => {
 
 
 
+console.log('active vouchers fetched', expiredVouchers)
 
 
 const getActiveVouchers = useCallback(
   async() => {
    
     try {
-      const response = await fetch('/api/active_vouchers', {
+      const response = await fetch('/api/hotspot_vouchers', {
         headers: {
           'X-Subdomain': subdomain,
         },
       })
       const newData = await response.json()
       if (response.ok) {
-        setActiveVouchers(newData.active_voucher)
+        setActiveVouchers(newData.active_voucher.filter(voucher => voucher.status === 'active').length)
+
       } else {
         setActiveVouchers(0)
       }
@@ -176,14 +178,15 @@ useEffect(() => {
     async() => {
      
       try {
-        const response = await fetch('/api/expired_vouchers', {
+        const response = await fetch('/api/hotspot_vouchers', {
           headers: {
             'X-Subdomain': subdomain,
           },
         })
         const newData = await response.json()
         if (response.ok) {
-          setExpiredVouchers(newData.expired_voucher)
+          setExpiredVouchers(newData.active_voucher.filter(voucher => voucher.status === 'expired').length)
+          
         } else {
           setExpiredVouchers(0)
         }
