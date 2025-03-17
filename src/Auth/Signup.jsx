@@ -41,7 +41,7 @@ const scrollIntoViewRefTop = useRef(null)
 
   return (
     <>
-     <div className="font-sans bg-gray-950 text-white overflow-hidden">
+     <div className="font-sans bg-gray-950  text-white overflow-hidden">
       
       {/* Hero Section */}
       <motion.section 
@@ -59,12 +59,12 @@ const scrollIntoViewRefTop = useRef(null)
 
         
       <nav className="bg-white border-gray-200 dark:bg-gray-900
-      absolute top-0 left-0 right-0 z-50">
+      absolute lg:fixed  top-0 left-0 right-0 z-[100]">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           {/* Logo */}
           <a href="https://flowbite.com/" className="flex items-center space-x-3 rtl:space-x-reverse">
             <img
-              src="https://flowbite.com/docs/images/logo.svg"
+              src="/images/aitechs.png"
               className="h-8"
               alt="Flowbite Logo"
             />
