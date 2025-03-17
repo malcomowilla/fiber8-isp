@@ -1,70 +1,132 @@
-
-import React, { useState, useEffect } from 'react';
-// import { inviteClient } from './api';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  TextField, 
-  Button, 
-  Box, 
-  Slide, 
+import {
+  TextField,
+  Button,
+  Box,
+  Slide,
   Backdrop,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   IconButton,
   Tooltip,
-  CircularProgress
+  CircularProgress,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl
 } from '@mui/material';
 import Lottie from 'react-lottie';
 import LoadingAnimation from '../loader/loading_animation.json';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import EmailIcon from '@mui/icons-material/Email';
-import PhoneIcon from '@mui/icons-material/Phone';
 import MaterialTable from "material-table";
-import { IoPeople } from "react-icons/io5";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import DeleteClient from './DeleteClient'
-import toaster, { Toaster } from 'react-hot-toast';
+import toaster,{ Toaster } from 'react-hot-toast';
+import DeleteClient from './DeleteClient';
+import DeleteIcon from '@mui/icons-material/Delete';
+import  EditClient from './EditClient'
+import EditIcon from '@mui/icons-material/Edit';
+
 
 
 
 const InviteClient = () => {
   const [formData, setFormData] = useState({
     email: '',
-    phoneNumber: '',
+    phone_number: '',
     userName: '',
     domainSubdomain: '',
     emailApiKey: '',
     senderEmail: '',
     smtpPassword: '',
     smtpHost: '',
-    smtpUsername: ''
-
+    smtpUsername: '',
+    plan: '' ,// Add planId to formData
+    hotspot_plan: '',
+    password: ''
   });
-  const subdomain = window.location.hostname.split('.')[0]; 
 
   const [errors, setErrors] = useState({
     email: '',
-    phoneNumber: '',
-    userName: ''
+    phone_number: '',
+    username: '',
+    plan: ''
   });
 
   const [loading, setLoading] = useState(false);
   const [openLoad, setOpenLoad] = useState(false);
   const [clients, setClients] = useState([]);
   const [fetchingClients, setFetchingClients] = useState(false);
-  const [isOpenDelete, setIsOpenDelete] = useState(false)
-const [row_data, setRowData] = useState({})
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const [row_data, setRowData] = useState({});
+  const [plans, setPlans] = useState([]); // State to store plans
+  const [hotspot_plans, setHotspotPlans] = useState([]); // State to store hotspot plans
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentHotspotPlan, setCurrentHotspotPlan] = useState(null);
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
+
+  const subdomain = window.location.hostname.split('.')[0];
+
+
+  // hotspot_plans
+  // Fetch plans from the backend
+  const fetchPlans = async () => {
+    try {
+      const response = await fetch('/api/pp_poe_plans', {
+        method: 'GET',
+        // headers: {
+        //   'X-Subdomain': subdomain,
+        // },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPlans(data);
+      } else {
+        toast.error('Failed to fetch plans');
+      }
+    } catch (error) {
+      console.error('Error fetching plans:', error);
+      toast.error('Error loading plans');
+    }
+  };
+
+  useEffect(() => {
+    fetchPlans(); // Fetch plans when the component mounts
+    fetchClients();
+  }, []);
 
 
 
+
+
+
+
+
+
+  const fetchHotspotPlans = async () => {
+    try {
+      const response = await fetch('/api/hotspot_plans', {
+        method: 'GET',
+        // headers: {
+        //   'X-Subdomain': subdomain,
+        // },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setHotspotPlans(data);
+      } else {
+        toast.error('Failed to fetch plans');
+      }
+    } catch (error) {
+      console.error('Error fetching plans:', error);
+      toast.error('Error loading plans');
+    }
+  };
+
+  useEffect(() => {
+    fetchHotspotPlans(); // Fetch plans when the component mounts
+  }, []);
 
   const fetchClients = async () => {
     setFetchingClients(true);
@@ -73,7 +135,7 @@ const [row_data, setRowData] = useState({})
         method: 'GET',
         headers: {
           'X-Subdomain': subdomain,
-        },  
+        },
       });
       if (response.ok) {
         const data = await response.json();
@@ -89,21 +151,31 @@ const [row_data, setRowData] = useState({})
     }
   };
 
-  useEffect(() => {
-    fetchClients();
-  }, []);
+
+  const [currentPlan, setCurrentPlan] = useState(null);
+
+
+  const flattenedData = clients && clients.flatMap(client =>
+    client.users.map(admin => ({
+      ...admin,
+      subdomain: client.subdomain,
+      plan: currentPlan,
+      hotspot_plan: currentHotspotPlan
+    }))
+  );
 
   const validateForm = () => {
     let isValid = true;
     const newErrors = {
       email: '',
-      phoneNumber: '',
-      userName: ''
+      phone_number: '',
+      username: '',
+      plan: ''
     };
 
     // Username validation
-    if (!formData.userName.trim()) {
-      newErrors.userName = 'Username is required';
+    if (!formData.username.trim()) {
+      newErrors.username = 'Username is required';
       isValid = false;
     }
 
@@ -119,11 +191,17 @@ const [row_data, setRowData] = useState({})
 
     // Phone number validation
     const phoneRegex = /^\+?[\d\s-]{10,}$/;
-    if (!formData.phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Phone number is required';
+    if (!formData.phone_number.trim()) {
+      newErrors.phone_number = 'Phone number is required';
       isValid = false;
-    } else if (!phoneRegex.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = 'Please enter a valid phone number';
+    } else if (!phoneRegex.test(formData.phone_number)) {
+      newErrors.phone_number = 'Please enter a valid phone number';
+      isValid = false;
+    }
+
+    // Plan validation
+    if (!formData.plan) {
+      newErrors.plan = 'Plan is required';
       isValid = false;
     }
 
@@ -148,59 +226,73 @@ const [row_data, setRowData] = useState({})
 
   const handleInvite = async (e) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      toast.error('Please fill in all required fields correctly');
-      return;
+
+
+    if (!formData.id) {
+      if (!validateForm()) {
+        toast.error('Please fill in all required fields correctly');
+        return;
+      }
     }
+   
 
     setLoading(true);
     setOpenLoad(true);
 
     try {
-      // const response = await inviteClient({
-      //   email: formData.email,
-      //   phone_number: formData.phoneNumber,
-      //   user_name: formData.userName,
-      //   company_domain_or_subdomain: formData.domainSubdomain,
-      // });
-
-      const response = await fetch('/api/invite_client_super_admins', {
-        method: 'POST',
+      const method = formData.id ? 'PATCH' : 'POST';
+      const url = formData.id ? `/api/update_client/${formData.id}` : '/api/invite_client_super_admins';
+      const response = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
           'X-Subdomain': subdomain,
-          
         },
         body: JSON.stringify({
-          email: formData.email,
-          phone_number: formData.phoneNumber,
-          user_name: formData.userName,
-          company_domain_or_subdomain: formData.domainSubdomain,
-          email_api_key: formData.emailApiKey,
-          sender_email: formData.senderEmail,
-          smtp_password: formData.smtpPassword,
-          smtp_host: formData.smtpHost,
-          smtp_port: formData.smtpPort,
-          smtp_username: formData.smtpUsername,
-
-        })
+          ...formData,
+          plan: formData.plan // Include the selected plan ID
+        }),
       });
 
+      const newData = await response.json();
       if (response.ok) {
-        // toast.success('Client successfully created');
-        toaster.success('Client added successfully', {
-          duration: 5000,
-          icon: '✅'
-        })
+        
+        if (formData.id) {
+          handleCloseModal()
+          toaster.success('Client updated successfully', {
+            duration: 5000,
+            icon: '✅'
+          });
+  
+          setClients((prevClients) =>
+            prevClients.map((client) => ({
+              ...client,
+              users: client.users.map((user) =>
+                user.id === formData.id ? newData : user
+              ),
+            }))
+          );
+        } else {
+          toaster.success('Client added successfully', {
+            duration: 5000,
+            icon: '✅'
+          });
+  
+          fetchClients();
+        }
         setFormData({
           email: '',
-          phoneNumber: '',
-          userName: '',
-          domainSubdomain: ''
+          phone_number: '',
+          user_name: '',
+          domainSubdomain: '',
+          emailApiKey: '',
+          senderEmail: '',
+          smtpPassword: '',
+          smtpHost: '',
+          smtpUsername: '',
+          plan: '' // Reset planId
         });
-        // Refresh client list after successful invitation
-        fetchClients();
+        
       } else {
         toaster.error('Something went wrong, please try again', {
           duration: 5000,
@@ -243,107 +335,167 @@ const [row_data, setRowData] = useState({})
   };
 
 
-  const flattenedData = clients && clients.flatMap(client =>
-    client.users.map(admin => ({
-      ...admin,
-      subdomain: client.subdomain, // Include subdomain in each admin record
-    }))
-);
-  // const flattenedData =  clients.map(admin => ({
-  //   ...admin,
-  //   subdomain: admin.subdomain, // Include subdomain in each admin record
-  // }))
-
   const handleRowClick = (event, rowData) => {
-    setRowData(rowData);
-    console.log('rowData=>', rowData)
-   
-  
+    setFormData(rowData);
+
+    console.log('rowData=>', rowData);
   };
-  
-
-
-  const DeleteButton = ({id}) => (
-    <img src="/images/logo/6217227_bin_fly_garbage_trash_icon.png"  onClick={()=> setIsOpenDelete(true)}  className='w-8 h-8 ' alt="delete" />
-  )
-  
-
-const deleteClient = async (id)=> {
-
-  try {
-    setLoading(true)
-
-const response = await fetch(`/api/delete_client/${id}`, {
-  method: 'DELETE',
-  headers: {
-    'X-Subdomain': subdomain,
-  }
-})
-  
-  if (response.ok) {
-    setIsOpenDelete(false)
-    setClients(flattenedData.filter((client)=> client.id !==  id))
-   
-    setLoading(false)
-    toaster.success('Client deleted successfully', {
-      duration: 5000,
-      icon: '✅'
-    })
 
   
-  } else {
-    setIsOpenDelete(false)
-    console.log('failed to delete')
-    setLoading(false)
-    toaster.error('Failed to delete client', {
-      duration: 5000,
-      position: 'top-center',
-      style: {
-        background: 'linear-gradient(135deg, #FF0000, #36A2EA)',
-        color: '#fff',
-        borderRadius: '5px',
-        padding: '10px',
-        boxShadow: '0 2px 10px 0 rgba(0, 0, 0, 0.1)',
-      },
-    })
+
+  const deleteClient = async (id) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/delete_client/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      });
+      if (response.ok) {
+        setIsOpenDelete(false);
+        setClients(flattenedData.filter((client) => client.id !== id));
+        setLoading(false);
+        toaster.success('Client deleted successfully', {
+          duration: 5000,
+          icon: '✅'
+        });
+      } else {
+        setIsOpenDelete(false);
+        console.log('failed to delete');
+        setLoading(false);
+        toaster.error('Failed to delete client', {
+          duration: 5000,
+          position: 'top-center',
+          style: {
+            background: 'linear-gradient(135deg, #FF0000, #36A2EA)',
+            color: '#fff',
+            borderRadius: '5px',
+            padding: '10px',
+            boxShadow: '0 2px 10px 0 rgba(0, 0, 0, 0.1)',
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      setIsOpenDelete(false);
+      toaster.error('Failed to delete client', {
+        duration: 5000,
+        position: 'top-center',
+        style: {
+          background: 'linear-gradient(135deg, #FF0000, #36A2EA)',
+          color: '#fff',
+          borderRadius: '5px',
+          padding: '10px',
+          boxShadow: '0 2px 10px 0 rgba(0, 0, 0, 0.1)',
+        },
+      });
+      setLoading(false);
+    }
+  };
 
 
+// current_hotspot_plan
+ 
+// setCurrentHotspotPlan
+const getCurreentHotspotPlan = useCallback(
+  async() => {
     
-  }
+    try {
+      const response = await fetch('/api/current_hotspot_plan', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+        }
+      });
+      const data = await response.json();
+     
+
+      if (response.ok) {
+        setCurrentHotspotPlan(data.current_hotspot_plan);
+          console.log('current plan', data.current_hotspot_plan);
+      } else {
+          console.log('Error fetching current plan');
+      }
   } catch (error) {
-    console.log(error)
-    setIsOpenDelete(false)
-    toaster.error('Failed to delete client', {
-      duration: 5000,
-      position: 'top-center',
-      style: {
-        background: 'linear-gradient(135deg, #FF0000, #36A2EA)',
-        color: '#fff',
-        borderRadius: '5px',
-        padding: '10px',
-        boxShadow: '0 2px 10px 0 rgba(0, 0, 0, 0.1)',
-      },
-    })
-    setLoading(false)
-
+      console.log('Error fetching current plan');
   }
+  },
   
-}
+  [],
+)
 
+
+useEffect(() => {
+  
+  getCurreentHotspotPlan();
+ 
+}, [getCurreentHotspotPlan]);
+
+const getCurrentPlan = useCallback(
+  async() => {
+    
+    try {
+        const response = await fetch('/api/current_plan', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Subdomain': subdomain,
+          }
+        });
+        const data = await response.json();
+       
+
+        if (response.ok) {
+            setCurrentPlan(data.current_plan);
+            console.log('current plan', data.current_plan);
+        } else {
+            console.log('Error fetching current plan');
+        }
+    } catch (error) {
+        console.log('Error fetching current plan');
+    }
+  },
+  [],
+)
+
+
+useEffect(() => {
+    getCurrentPlan()
+}, [getCurrentPlan]);
+
+  const DeleteButton = ({ id }) => (
+    <IconButton style={{ color: '#8B0000' }} >
+      <DeleteIcon />
+    </IconButton>
+  );
+
+  const EditButton = ({rowData}) => (
+    <IconButton     style={{color: 'green'}}  onClick={() => handleOpenModal()} >
+    <EditIcon />
+  </IconButton>
+      );
   return (
     <>
-    <Toaster />
-<DeleteClient id={row_data.id}   loading={loading}  deleteClient={deleteClient}  
- isOpenDelete={isOpenDelete} 
-setIsOpenDelete={setIsOpenDelete} />
-
+    <EditClient open={isModalOpen} onClose={handleCloseModal} currentPlan={currentPlan} formData={formData} 
+    handleChange={handleChange} hotspot_plans={hotspot_plans} plans={plans}
+    setFormData={setFormData}  handleInvite={handleInvite}/>
+      <Toaster />
+      <DeleteClient
+        id={row_data.id}
+        loading={loading}
+        deleteClient={deleteClient}
+        isOpenDelete={isOpenDelete}
+        setIsOpenDelete={setIsOpenDelete}
+      />
       <ToastContainer position='top-center' autoClose={3000} hideProgressBar={false} closeOnClick draggable pauseOnHover />
       {loading && (
         <Backdrop open={openLoad} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
           <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
         </Backdrop>
       )}
-      
+
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <form onSubmit={handleInvite}>
           <Slide direction="up" in={true} mountOnEnter unmountOnExit>
@@ -362,7 +514,7 @@ setIsOpenDelete={setIsOpenDelete} />
               }}>
                 <h2 className='text-black'>Invite New Client</h2>
                 <Tooltip title="Refresh client list">
-                  <IconButton 
+                  <IconButton
                     onClick={fetchClients}
                     disabled={fetchingClients}
                     sx={{ color: 'green' }}
@@ -371,7 +523,7 @@ setIsOpenDelete={setIsOpenDelete} />
                   </IconButton>
                 </Tooltip>
               </Box>
-              
+
               <Box sx={{
                 display: 'flex',
                 color: 'black',
@@ -390,12 +542,12 @@ setIsOpenDelete={setIsOpenDelete} />
                 <TextField
                   label="User Name"
                   variant="outlined"
-                  name="userName"
-                  value={formData.userName}
+                  name="username"
+                  value={formData.username}
                   onChange={handleChange}
-                  error={!!errors.userName}
-                  helperText={errors.userName}
-                  required
+                  error={!!errors.username}
+                  helperText={errors.username}
+                  // required
                   sx={{ borderRadius: 2 }}
                 />
                 <TextField
@@ -407,25 +559,83 @@ setIsOpenDelete={setIsOpenDelete} />
                   onChange={handleChange}
                   error={!!errors.email}
                   helperText={errors.email}
-                  required
+                  // required
                   sx={{ borderRadius: 2 }}
                 />
                 <TextField
                   label="Phone Number"
                   variant="outlined"
                   name="phoneNumber"
-                  value={formData.phoneNumber}
+                  value={formData.phone_number}
                   onChange={handleChange}
-                  error={!!errors.phoneNumber}
-                  helperText={errors.phoneNumber}
-                  required
+                  error={!!errors.phone_number}
+                  helperText={errors.phone_number}
+                  // required
                   sx={{ borderRadius: 2 }}
                 />
 
+                {/* Plan Selection */}
+                <FormControl variant="outlined" sx={{ borderRadius: 2 , color: 'black', fontSize: '16px'}}>
+                  <InputLabel>Select Plan</InputLabel>
+                  <Select
+                    sx={{
+                      color: 'black',
+                      fontSize: '16px'
+                    }}
+                    name="plan"
+                    value={formData.plan}
+                    onChange={handleChange}
+                    label="Select Plan"
+                    error={!!errors.plan}
+                    required
+                  >
+                    {plans.map((plan) => (
+                      <MenuItem 
+                      sx={{
+                        color: 'black',
+                        fontSize: '16px'
+                      }}
+                      key={plan.id} value={plan.name}>
+                        {plan.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
 
 
 
-<TextField
+
+
+
+
+
+                <FormControl variant="outlined" sx={{ borderRadius: 2 ,  fontSize: '16px'}}>
+                  <InputLabel>Select Hotspot Plan</InputLabel>
+                  <Select
+                    sx={{
+                      fontSize: '16px',
+
+                    }}
+                    name="hotspot_plan"
+                    value={formData.hotspot_plan}
+                    onChange={handleChange}
+                    label="Select Plan"
+                    error={!!errors.plan}
+                    required
+                  >
+                    {hotspot_plans.map((plan) => (
+                      <MenuItem 
+                      sx={{
+                        fontSize: '16px'
+                      }}
+                      key={plan.id} value={plan.name}>
+                        {plan.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <TextField
                   label="email api key"
                   variant="outlined"
                   name="emailApiKey"
@@ -436,79 +646,29 @@ setIsOpenDelete={setIsOpenDelete} />
                   sx={{ borderRadius: 2 }}
                 />
 
-
-
-
-<TextField
-value={formData.senderEmail}
-onChange={handleChange}
-error={!!errors.senderEmail}
-helperText={errors.senderEmail}
-name='senderEmail'
+                <TextField
+                  value={formData.senderEmail}
+                  onChange={handleChange}
+                  error={!!errors.senderEmail}
+                  helperText={errors.senderEmail}
+                  name='senderEmail'
                   label="sender email"
                   variant="outlined"
-                
                   sx={{ borderRadius: 2 }}
                 />
 
-
-
-
-<TextField
-
-                  label="smtp password"
-                  name="smtpPassword"
-                  value={formData.smtpPassword}
-                  onChange={handleChange}
-                  error={!!errors.smtpPassword}
-                  helperText={errors.smtpPassword}
-                
-                  sx={{ borderRadius: 2 }}
-                />
-
-
-
-
-
-<TextField
-value={formData.smtpHost}
-onChange={handleChange}
-error={!!errors.smtpHost}
-helperText={errors.smtpHost}
-name='smtpHost'
-
-                  label="smtp host"
-                  variant="outlined"
-                
-                  sx={{ borderRadius: 2 }}
-                />
-
-
-
-<TextField
-                  label="smtp username"
-                  name="smtpUsername"
-                  value={formData.smtpUsername}
-                  onChange={handleChange}
-                  error={!!errors.smtpUsername}
-                  helperText={errors.smtpUsername}
-                  variant="outlined"
-                
-                  sx={{ borderRadius: 2 }}
-                />
-
-
-
-<TextField
+                <TextField
                   label="subdomain"
                   name="domainSubdomain"
                   value={formData.domainSubdomain}
                   onChange={handleChange}
                   error={!!errors.domainSubdomain}
                   helperText={errors.domainSubdomain}
-
                   sx={{ borderRadius: 2 }}
                 />
+
+
+
                 <Button
                   type='submit'
                   variant="contained"
@@ -522,57 +682,54 @@ name='smtpHost'
           </Slide>
         </form>
 
+
+
+
+        
+
         <MaterialTable
-        onRowClick={handleRowClick}
-        columns={[
-          { title: "SubDomain", field: "subdomain" },
-          { title: "User Name", field: "user_name" },
-          { title: "Email", field: "email" },
-          { title: "Role", field: "role" },
-          { title: "Phone Number", field: "phone_number" },
-          { title: "Locked Account", field: "locked_account" },
-         
-          {
-            title: "Action",
-            field: "Action",
-            render: (rowData) => 
-              <>
-                <Box sx={{
-                  display: 'flex',
-                  color:'black',
-                  gap: 2
-                }}>
-  
-                <DeleteButton   id={rowData.id}/>
-                </Box>
-              
-  
+          onRowClick={handleRowClick}
+          columns={[
+            { title: "Subdomain", field: "subdomain" },
+            { title: "User Name", field: "username" },
+            { title: "Email", field: "email" },
+            { title: "Plan", field: "plan" },
+            { title: "Hotspot Plan", field: "hotspot_plan" },
+            { title: "Role", field: "role" },
+            { title: "Phone Number", field: "phone_number" },
+            { title: "Locked Account", field: "locked_account" },
+            {title: 'Action', field:'Action',
+
+              render: (rowData) =>  
                 
-                </>
-          }
-        ]}
-        data={flattenedData}
-        title="Clients"
-        options={{
-          paging: true,
-          pageSizeOptions: [5, 10, 20],
-          pageSize: 10,
-          search: false,
-          exportButton: true,
-          headerStyle: {
-            fontFamily: 'bold',
-            textTransform: 'uppercase'
-          },
-        }}
-      />
+                 <>
+                  
+                   <DeleteButton  id={rowData.id} />
+                   <EditButton  />
+                  
+                   </>
+            
+            }
+          ]}
+
+          
+          data={flattenedData}
+          title="Clients"
+          options={{
+            paging: true,
+            pageSizeOptions: [5, 10, 20],
+            pageSize: 10,
+            search: false,
+            exportButton: true,
+            headerStyle: {
+              fontFamily: 'bold',
+              textTransform: 'uppercase'
+            },
+          }}
+        />
       </Box>
     </>
   );
 };
 
 export default InviteClient;
-
-
-
-
-

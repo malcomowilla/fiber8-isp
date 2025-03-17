@@ -2,10 +2,20 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
+import { useApplicationSettings } from '../settings/ApplicationSettings';
+
 
 // Statistic Card Component
 const StatCard = ({ title, value, icon, color }) => {
   const [animatedValue, setAnimatedValue] = useState(0);
+  const {companySettings, setCompanySettings,
+
+    templateStates, setTemplateStates,
+    settingsformData, setFormData,
+    handleChangeHotspotVoucher, voucher, setVoucher
+  } = useApplicationSettings()
+
+
 
   useEffect(() => {
     const animate = setTimeout(() => {
@@ -36,7 +46,88 @@ const StatCard = ({ title, value, icon, color }) => {
 const DashboardStatistics = () => {
   const [expiredVouchers, setExpiredVouchers] = useState(0)
   const [activeVouchers, setActiveVouchers] = useState(0)
+  const [onlineUsers, setOnlineUsers] = useState(0)
+  const {companySettings, setCompanySettings,
+
+    templateStates, setTemplateStates,
+    settingsformData, setFormData,
+    handleChangeHotspotVoucher, voucher, setVoucher
+  } = useApplicationSettings()
+
 const subdomain = window.location.hostname.split('.')[0];
+
+
+
+
+const fetchRouters = useCallback(
+  async() => {
+    try {
+      const response = await fetch('/api/allow_get_router_settings', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
+ const newData = await response.json()
+      if (response) {
+        console.log('fetched router settings', newData)
+        const {router_name} = newData[0]
+        setFormData({...settingsformData, router_name})
+      } else {
+        console.log('failed to fetch router settings')
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  [],
+ )
+ 
+ 
+ 
+  useEffect(() => {
+   
+    fetchRouters()
+  }, [fetchRouters]);
+
+ 
+const getActiveHotspotUsers = useCallback(
+  async() => {
+
+    try {
+      const response = await fetch(`/api/get_active_hotspot_users?router_name=${settingsformData.router_name}`)
+      const newData = await response.json()
+      if (response.ok) {
+        // setPackages(newData)
+        const { hotspot_users } = newData
+        setOnlineUsers(newData.active_user_count)
+        console.log('hotspot users fetched', newData)
+      }else{
+        // toast.error('failed to get active users', {
+        //   position: "top-center",
+        //   duration: '5000'
+          
+        // })
+      }
+    } catch (error) {
+      // toast.error('failed to get active users', {
+      //   position: "top-center",
+      //   duration: '5000'
+        
+      // })
+    }
+  },
+  [],
+)
+
+
+useEffect(() => {
+
+  const interval = setInterval(() => {
+    getActiveHotspotUsers()
+  }, 10000);
+  return () => clearInterval(interval);
+  
+}, [getActiveHotspotUsers]);
 
 
 
@@ -125,7 +216,7 @@ useEffect(() => {
     },
     {
       title: "Online Users",
-      value: 456,
+      value: onlineUsers,
       icon: "👥",
       color: "bg-blue-500",
     },

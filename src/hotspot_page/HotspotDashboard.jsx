@@ -91,6 +91,7 @@ const columns = [
           
 const subdomain = window.location.hostname.split('.')[0]
 
+
 const fetchRouters = useCallback(
  async() => {
    try {
@@ -120,6 +121,8 @@ const newData = await response.json()
   
    fetchRouters()
  }, [fetchRouters]);
+
+
  
 const getActiveHotspotUsers = useCallback(
   async() => {
@@ -130,7 +133,7 @@ const getActiveHotspotUsers = useCallback(
       if (response.ok) {
         // setPackages(newData)
         const { hotspot_users } = newData
-        setStats(newData)
+        setStats(newData.users)
         console.log('hotspot users fetched', newData)
       }else{
         // toast.error('failed to get active users', {

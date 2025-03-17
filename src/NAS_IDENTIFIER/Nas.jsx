@@ -410,6 +410,9 @@ const mergedTableData = tableDataNas.map((router) => {
     ip_adress_router
   };
 });
+
+
+
   const DeleteButton = () => (
         <IconButton style={{ color: '#8B0000' }}  onClick={ handleClickOpenDelete}>
           <DeleteIcon />
