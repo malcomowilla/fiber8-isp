@@ -1,6 +1,5 @@
-import React, { useContext, useState, useRef } from 'react';
+import React, { useContext, useState, useRef, useEffect } from 'react';
 import { ApplicationContext } from '../context/ApplicationContext';
-import { motion } from 'framer-motion';
 import { Button, Alert } from '@mui/material';
 import { FaArrowTrendUp } from "react-icons/fa6";
 import { FaWifi } from "react-icons/fa";
@@ -10,6 +9,14 @@ import { FaTools } from "react-icons/fa";
 import { FaRegArrowAltCircleRight } from "react-icons/fa";
 import {Link} from 'react-router-dom'
 import { FaRegArrowAltCircleUp } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
+import { IoMdCheckmark } from "react-icons/io";
+
+import { MdOutlineMessage } from "react-icons/md";
+import { BsQuestionCircle } from "react-icons/bs";
+import { FaWhatsapp } from "react-icons/fa6";
+
+
 
 
 
@@ -23,11 +30,24 @@ const scrollIntoViewRef = useRef(null);
 const scrollIntoViewRefTop = useRef(null)
 
      const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+     const [currentText, setCurrentText] = useState("Hotspot");
+     const texts = ["Hotspot", "PPoE"]; // Tex
      const toggleMenu = () => {
        setIsMenuOpen(!isMenuOpen);
      };
    
+
+
+
+     useEffect(() => {
+      const interval = setInterval(() => {
+        setCurrentText((prevText) =>
+          prevText === texts[0] ? texts[1] : texts[0]
+        );
+      }, 3000); // Switch every 3 seconds
+  
+      return () => clearInterval(interval); // Cleanup interval on unmount
+    }, []);
 
      const onScroll = () => {
       scrollIntoViewRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -232,25 +252,58 @@ const scrollIntoViewRefTop = useRef(null)
         </div>
       </nav>
 
+      <AnimatePresence mode="wait">
+            <motion.div
+              key={currentText}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.5 }}
+              className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-teal-400"
+            >
+              {currentText}
+            </motion.div>
+          </AnimatePresence>
+
+
+        <div className="relative   max-w-4xl px-6 
+        grid lg:grid-cols-2 grid-cols-1 gap-8
+        animate-fade-in">
 
 
 
 
-        <div className="absolute inset-0 bg-[url('https://via.placeholder.com/1920x800')]
-         bg-cover bg-center opacity-20"></div>
-        <div className="relative z-10 text-center max-w-4xl px-6 animate-fade-in">
-          <h1 className="text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r
+
+<div className=''>
+
+          <h1 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r
            from-green-400 to-teal-400">
             Revolutionize Your Internet Experience
           </h1>
+
+
+        
           <p className="text-xl text-gray-300 mb-8">
             Empower your business with our cutting-edge SaaS platform for seamless internet management. Fast, reliable, and scalable.
           </p>
-          <button className="bg-gradient-to-r from-green-600 to-teal-600
+
+          <button 
+          onClick={() => window.open('https://wa.me/0791568852?text=Hello%20I%20am%20interested%20in%20your%20services', '_blank')}
+
+          className="bg-gradient-to-r from-green-600 to-teal-600
            text-white font-semibold py-3 px-8 rounded-lg hover:scale-105 transition-transform duration-300">
-            Get Started
+            Contact Us
           </button>
 
+          </div>
+         
+          <div className=" ">
+      <img 
+        src="/images/aitechs-image.png" // Replace with your image path
+        alt="Revolutionize Your Internet Experience"
+        className="w-full  rounded-lg shadow-lg"
+      />
+    </div>
         
         </div>
       </motion.section>
@@ -405,131 +458,136 @@ damping: 15,
       </section>
 
 
-      
 
 
-      {/* Testimonials Section */}
-      <section className="py-20 px-6 bg-gradient-to-br from-gray-900 to-gray-950">
+      <section className='py-20 px-6 bg-gradient-to-br
+flex flex-col justify-center items-center
+from-gray-900 to-gray-600'>
 
+    <div className='grid lg:grid-cols-2 grid-cols-1 gap-8'>
 
-        
-        <motion.h2
-        initial={{
-          opacity: 0,
-        }}
-        whileInView={{ opacity: 1,
-          scale: 1.25,
-        transition:{
-duration: 1.5,
-delay: 0.5,
-ease: 'easeOut',
-type: "spring",
-stiffness: 100,  
-damping: 15,  
-        }
-         }}
-         viewport={{ once: true, amount: 0.5 }}
-
-        className="text-4xl font-bold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r
-         from-green-400 to-teal-400 animate-slide-in">
-          What Our We Offer
-        </motion.h2>
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{
-              opacity: 1,
-              
-              scale: 1.05, 
-              transition: {
-               duration: 0.3,
-                type: "spring",
-                stiffness: 120, // Controls how stiff the animation is
-                damping: 15, // Reduces the bounciness
-              },
-            }}
-          className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-purple-500 transition-all duration-300 hover:scale-105 animate-fade-in-up">
-            <div className="text-4xl mb-4 text-purple-500"><FaWifi /></div>
-            <h3 className="text-2xl font-bold mb-4">Wifi Hotspot</h3>
-            <p className="text-gray-400">Deliver seamless internet access with a secure captive portal, customizable user login, and bandwidth control for optimal hotspot management.</p>
-
-          </motion.div>
-
-
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{
-              opacity: 1,
-              
-              scale: 1.05, 
-              transition: {
-               duration: 0.3,
-                type: "spring",
-                stiffness: 120, // Controls how stiff the animation is
-                damping: 15, // Reduces the bounciness
-              },
-            }}
-            viewport={{ once: true, amount: 0.5 }}
-          className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-blue-500 transition-all duration-300 hover:scale-105 animate-fade-in-up">
-    <div className="text-4xl mb-4 text-blue-500"><FaNetworkWired /></div>
-    <h3 className="text-2xl font-bold mb-4">PPPOE</h3>
-    <p className="text-gray-400"> Coming Soon: Reliable broadband access with secure and scalable user authentication.</p>
-  </motion.div>
-
-
-
-  <motion.div 
-    initial={{ opacity: 0, scale: 0.9 }}
-    whileInView={{
-      opacity: 1,
-      
-      scale: 1.05, 
-      transition: {
-       duration: 0.3,
-        type: "spring",
-        stiffness: 120, // Controls how stiff the animation is
-        damping: 15, // Reduces the bounciness
-      },
-    }}
-    viewport={{ once: true, amount: 0.5 }}
-  className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-green-500 transition-all duration-300 hover:scale-105 animate-fade-in-up">
-    <div className="text-4xl mb-4 text-green-500"><FaTicketAlt /></div>
-    <h3 className="text-2xl font-bold mb-4">Ticketing</h3>
-    <p className="text-gray-400">Efficient issue resolution with a user-friendly ticket management system 
-      for managing customer issues.</p>
-  </motion.div>
-
-
-
-
-  <motion.div
-  
-  initial={{ opacity: 0, scale: 0.9 }}
-  whileInView={{
-    opacity: 1,
-    
-    scale: 1.05, 
-    transition: {
-     duration: 0.3,
-      type: "spring",
-      stiffness: 120, // Controls how stiff the animation is
-      damping: 15, // Reduces the bounciness
-    },
-  }}
-  viewport={{ once: true, amount: 0.5 }}
-  className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-orange-500 transition-all duration-300 hover:scale-105 animate-fade-in-up">
-    <div className="text-4xl mb-4 text-orange-500"><FaTools /></div>
-    <h3 className="text-2xl font-bold mb-4">TR-069 Remote Management</h3>
-    <p className="text-gray-400">Coming soon: Seamless remote device configuration and monitoring.</p>
-  </motion.div>
-
-
-
-        
+        {/* SMS */}
+        <div className='flex flex-row gap-2 cursor-pointer'>
+            <div className='bg-blue-400 p-2 rounded-xl h-10 w-10 mx-0 text-center
+                border border-gray-800 hover:border-purple-500 transition-all
+                duration-300 hover:scale-105 animate-fade-in-up'>
+                <MdOutlineMessage className='w-5 h-5' />
+            </div>
+            <div>
+                <p className='font-extrabold text-xl'>SMS</p>
+                <p className='font-thin text-xs'>Integrate with your existing SMS provider</p>
+            </div>
         </div>
-      </section>
+
+        {/* Payments */}
+        <div className='flex flex-row gap-2 cursor-pointer'>
+            <div className='bg-white  p-4 rounded-xl h-10 w-10 flex justify-center items-center
+                border border-gray-800 hover:border-purple-500 transition-all
+                duration-300 hover:scale-105 animate-fade-in-up'>
+                💴
+            </div>
+            <div>
+                <p className='font-extrabold text-xl'>Payments</p>
+                <p className='font-thin text-xs'>Use your M-Pesa Paybill and Till for automated payments</p>
+            </div>
+        </div>
+
+        {/* Billing */}
+        <div className='flex flex-row gap-2 cursor-pointer'>
+            <div className='bg-blue-400  p-4 rounded-xl h-8 w-8 flex justify-center items-center
+                border border-gray-800 hover:border-purple-500 transition-all
+                duration-300 hover:scale-105 animate-fade-in-up'>
+                💳
+            </div>
+            <div>
+                <p className='font-extrabold text-xl'>Billing</p>
+                <p className='font-thin text-xs'>Manage and automate your billing process</p>
+            </div>
+        </div>
+
+        {/* Network */}
+        <div className='flex flex-row gap-2'>
+            <div className='bg-white p-4 rounded-xl h-8 w-8 flex justify-center items-center
+                border border-gray-800 hover:border-purple-500 transition-all
+                duration-300 hover:scale-105 animate-fade-in-up'>
+                🌐
+            </div>
+            <div>
+                <p className='font-extrabold text-xl'>Network</p>
+                <p className='font-thin text-xs'>Monitor and manage your network infrastructure</p>
+            </div>
+        </div>
+
+        {/* Security */}
+        <div className='flex flex-row gap-2'>
+            <div className='bg-blue-400  p-4 rounded-xl h-8 w-8 flex justify-center items-center
+                border border-gray-800 hover:border-purple-500 transition-all
+                duration-300 hover:scale-105 animate-fade-in-up'>
+                🔒
+            </div>
+            <div>
+                <p className='font-extrabold text-xl'>Security</p>
+                <p className='font-thin text-xs'>Ensure data protection with secure authentication</p>
+            </div>
+        </div>
+
+        {/* White Label */}
+        <div className='flex flex-row gap-2'>
+            <div className='bg-blue-400  p-4 rounded-xl h-8 w-8 flex justify-center items-center
+                border border-gray-800 hover:border-purple-500 transition-all
+                duration-300 hover:scale-105 animate-fade-in-up'>
+                🏷️
+            </div>
+            <div>
+                <p className='font-extrabold text-xl'>White Label</p>
+                <p className='font-thin text-xs'>Customize branding to match your business identity</p>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+
+
+
+
+<section  className="py-20 px-6 bg-gradient-to-br from-gray-900 to-gray-950">
+
+<div className='grid lg:grid-cols-2 grid-cols-1 gap-8'> 
+
+<div className='flex flex-col items-center justify-center'>
+<BsQuestionCircle className='w-10 h-10 text-blue-500 hover:scale-110 transition-all duration-300 
+animate-fade-in-up' />
+
+
+<p className='font-bold text-2xl'>Ask Us A Question</p>
+<p className='font-thin'>For demo logins please reachout via whatsap below </p>
+
+
+<div className='flex flex-row gap-2 cursor-pointer
+bg-blue-400 p-4 rounded-xl  mt-4 text-center
+      border border-gray-800 hover:border-purple-500 transition-all
+      duration-300 hover:scale-105 animate-fade-in-up'
+      onClick={() => window.open('https://wa.me/0791568852?text=Hello%20I%20am%20interested%20in%20your%20demo', '_blank')}>
+
+  <FaWhatsapp className='w-5 h-5' />
+  <p className='font-bold'>contact us</p>
+</div>
+</div>
+
+
+
+<div>
+
+</div>
+
+  </div>
+
+
+</section>
+
 
 
 
@@ -850,8 +908,9 @@ damping: 15,
         </div>
         
 <Link to='/hotspot-pricing'>
-        <div className='absolute right-0  top-[10rem] text-white text-2xl
-         p-8 bg-gray-900 rounded-xl cursor-pointer hover:scale-105 transition-all duration-300 animate-fade-in-up'>
+        <div className='absolute right-0  top-[5rem] text-white 
+         p-3 text-xl bg-gray-900 rounded-xl cursor-pointer hover:scale-105
+          transition-all duration-300 animate-fade-in-up'>
 <div>
 <p>
   see also our hotspot pricing
