@@ -16,6 +16,7 @@ const StatCard = ({ title, value, icon, color }) => {
   } = useApplicationSettings()
 
 
+  
 
   useEffect(() => {
     const animate = setTimeout(() => {
@@ -133,7 +134,6 @@ useEffect(() => {
 
 
 
-console.log('active vouchers fetched', expiredVouchers)
 
 
 const getActiveVouchers = useCallback(
@@ -146,11 +146,12 @@ const getActiveVouchers = useCallback(
         },
       })
       const newData = await response.json()
-      if (response.ok) {
-        setActiveVouchers(newData.active_voucher.filter(voucher => voucher.status === 'active').length)
-
+      if (response.ok ) {
+        // Ensure it's an array before filtering
+        const activeCount = newData?.filter(voucher => voucher.status === 'active').length;
+        setActiveVouchers(activeCount);
       } else {
-        setActiveVouchers(0)
+        setActiveVouchers(0);
       }
     } catch (error) {
       setActiveVouchers(0)
@@ -172,30 +173,33 @@ useEffect(() => {
 
 
 
+const getExpiredVouchers = useCallback(async () => {
+  try {
+    console.log("Fetching expired vouchers..."); // <== Check if this appears
 
+    const response = await fetch('/api/hotspot_vouchers', {
+      headers: { 'X-Subdomain': subdomain },
+    });
 
-  const getExpiredVouchers = useCallback(
-    async() => {
-     
-      try {
-        const response = await fetch('/api/hotspot_vouchers', {
-          headers: {
-            'X-Subdomain': subdomain,
-          },
-        })
-        const newData = await response.json()
-        if (response.ok) {
-          setExpiredVouchers(newData.active_voucher.filter(voucher => voucher.status === 'expired').length)
-          
-        } else {
-          setExpiredVouchers(0)
-        }
-      } catch (error) {
-        setExpiredVouchers(0)
-      }
-    },
-    [],
-  )
+    console.log("Response received:", response); // <== Log response object
+
+    const newData = await response.json();
+
+    console.log("Parsed JSON:", newData); // <== Log full response data
+
+    if (response.ok) {
+      console.log("Filtered expired vouchers:", newData?.filter(voucher => voucher.status === "expired").length);
+
+      const expiredCount = newData?.filter(voucher => voucher.status === "expired").length
+      setExpiredVouchers(expiredCount);
+    } else {
+      setExpiredVouchers(0);
+    }
+  } catch (error) {
+    console.error("Error fetching vouchers:", error);
+    setExpiredVouchers(0);
+  }
+}, []);
   
 
 
@@ -203,6 +207,8 @@ useEffect(() => {
     getExpiredVouchers()
    
   }, [getExpiredVouchers]);
+
+
   const stats = [
     {
       title: "Active Vouchers",
