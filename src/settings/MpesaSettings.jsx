@@ -1,415 +1,708 @@
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
+import React from "react";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import { motion } from "framer-motion";
+import {
+  AccountCircle,
+  VpnKey,
+  Payment,
+  Business,
+  Lock,
+  Person,
+} from "@mui/icons-material";
+import { useEffect, useState, useCallback, lazy } from "react";
+import {useApplicationSettings} from '../settings/ApplicationSettings'
+import toast, { Toaster } from 'react-hot-toast';
+const SettingsNotification = lazy(() => import('../notification/SettingsNotification'))
+import Backdrop from '../backdrop/Backdrop'
+
+
+
+
+
+
 const MpesaSettings = () => {
-   
+
+
+  // saved_hotspot_mpesa_settings
+  // hotspot_mpesa_settings
+
+const {selectedAccountTypeHotspot, setSelectedAccountTypeHotspot,
+
+  hotspotMpesaSettings, setHotspotMpesaSettings
+} = useApplicationSettings()
+
+
+const { consumer_key, consumer_secret, passkey, short_code } = hotspotMpesaSettings
+const [open, setOpen] = useState(false);
+const [openNotifactionSettings, setOpenSettings] = useState(false)
+const [isloading, setisloading] = useState(false)
+
+
+const subdomain = window.location.hostname.split('.')[0]
+
+
+
+
+
+
+
+
+
+
+
+
+
+const fetchSavedHotspotMpesaSettings = useCallback(
+  async() => {
+    
+    try {
+      const response = await fetch(`/api/saved_hotspot_mpesa_settings`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+        },
+      });
+  
+      const data = await response.json();
+
+      const newData = data.length > 0 
+        ? data.reduce((latest, item) => new Date(item.created_at) > new Date(latest.created_at) ? item : latest, data[0])
+        : null;
+  
+      if (response.ok) {
+        console.log('Fetched hotspot mpesa settings:', newData);
+        const { consumer_key, consumer_secret, passkey, short_code } = newData;
+        setSelectedAccountTypeHotspot(newData.account_type)
+        setHotspotMpesaSettings({ consumer_key, consumer_secret, passkey, short_code })
+      } else {
+        toast.error(newData.error || 'Failed to fetch hotspot mpesa settings', {
+          duration: 3000,
+          position: 'top-center',
+        });
+      }
+    } catch (error) {
+      toast.error('Internal server error: Something went wrong with fetching hotspot mpesa settings', {
+        duration: 3000,
+        position: 'top-center',
+      });
+    }
+  },
+  [],
+)
+
+
+useEffect(() => {
+  fetchSavedHotspotMpesaSettings();
+ 
+}, [fetchSavedHotspotMpesaSettings]);
+
+
+
+
+
+
+
+
+const fetchHotspotMpesaSettings = useCallback(async () => {
+  try {
+    const response = await fetch(`/api/hotspot_mpesa_settings?account_type=${selectedAccountTypeHotspot}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Subdomain': subdomain,
+      },
+    });
+
+    const newData = await response.json();
+
+    if (response.ok) {
+      
+      if (
+        !newData || // Handles null or undefined
+        newData.length === 0 || // Handles empty array
+        !newData.account_type // Handles missing or null provider
+      ) {
+        console.log('No SMS settings found, resetting form.');
+      
+        setHotspotMpesaSettings({ 
+          consumer_key: '', 
+          consumer_secret: '', 
+          passkey: '', 
+          short_code: '' ,
+        });
+      
+        // setSelectedProvider('');
+      } else {
+        console.log('Fetched hotspot mpesa settings:', newData);
+      
+        const { consumer_key, consumer_secret, passkey, short_code } = newData;
+      
+
+        setHotspotMpesaSettings(prevData => ({
+          ...prevData, 
+          consumer_key, consumer_secret, passkey, short_code
+        }));
+
+
+
+
+      
+
+        // setHotspotMpesaSettings(
+
+        //   {...hotspotMpesaSettings, consumer_key: consumer_key || '', consumer_secret: consumer_secret || '', passkey: passkey || '', short_code: short_code || ''}
+        // );
+      
+      }
+    } else {
+      toast.error(newData.error || 'Failed to fetch SMS settings', {
+        duration: 3000,
+        position: 'top-center',
+      });
+    }
+  } catch (error) {
+    toast.error('Internal server error: Something went wrong with fetching SMS settings', {
+      duration: 3000,
+      position: 'top-center',
+    });
+  }
+}, [selectedAccountTypeHotspot]);
+
+
+useEffect(() => {
+  if (selectedAccountTypeHotspot) {
+    fetchHotspotMpesaSettings();
+  }
+}, [fetchHotspotMpesaSettings, selectedAccountTypeHotspot]);
+
+
+
+
+
+const saveHotspotMpesaSettings = async(e) => {
+e.preventDefault()
+
+  try {
+    setisloading(true)
+    setOpen(true)
+    const response = await fetch('/api/hotspot_mpesa_settings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Subdomain': subdomain,
+      },
+      body: JSON.stringify({
+        consumer_key: consumer_key,
+        consumer_secret: consumer_secret,
+        passkey: passkey,
+        short_code: short_code,
+        account_type: selectedAccountTypeHotspot
+      })
+    })
+
+const newData = await response.json()
+    if (response.ok) {
+      setisloading(false)
+      setOpen(false)
+      setOpenSettings(true)
+      toast.success('Hotspot Mpesa settings saved successfully', {
+        duration: 3000,
+        position: 'top-center',
+      })
+      setHotspotMpesaSettings({
+        ...hotspotMpesaSettings,
+        consumer_key: newData.consumer_key,
+        consumer_secret: newData.consumer_secret,
+        passkey: newData.passkey,
+        short_code: newData.short_code,
+      })
+     
+    } else {
+      
+      setOpen(false)
+      setisloading(false)
+      setOpenSettings(false)
+      toast.error('failed to save hotspot mpesa settings', {
+        duration: 3000,
+        position: 'top-center',
+      })
+    }
+  } catch (error) {
+    setisloading(false)
+    setOpenSettings(false)
+    toast.error('internal server error', {  duration: 3000, position: 'top-center' })
+  }
+
+
+}
+
+
+const handleChangeMPesaHotspotSettings = (e) => {
+  const { type, name, checked, value } = e.target;
+  setHotspotMpesaSettings((prevData) => ({
+    ...prevData,
+    [name]: type === "checkbox" ? checked : value,
+  }));
+};
+
+
+const handleClose = () => {
+  setOpen(false);
+};
+
+
+const handleCloseNotifaction = () => {
+ setOpenSettings(false);
+};
+
   return (
 
-  
-
-   
-    <div className='mt-10 h-screen'>
-        <p>Hotspot</p>
-        <div>
-
-       
-        <FormControl variant='standard' sx={{ m: 1, width: '100%', marginTop: 4,
-
-        '& .MuiOutlinedInput-notchedOutline': {
-            px: 2.5,
-            
-        },
-
-  '& label.Mui-focused': {
-    color: 'black',
-    fontSize: '16px',
-
-    },
-'& .MuiOutlinedInput-root': {
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderColor: "black",
-    borderWidth: '3px',
-    },
- '&.Mui-focused fieldset':  {
-    borderColor: 'black', 
-    
-  }
-},}}  >
-        <InputLabel id="demo-simple-select-autowidth-label">Hotspot Mpesa Account Type</InputLabel>
-        
-        <Select
-          labelId="demo-simple-select-autowidth-label"
-          id="demo-simple-select-autowidth"
-          label="User Group"
-        >
-         
-          <MenuItem value='Till' >Till</MenuItem>
-          <MenuItem value='Paybill' >Paybill</MenuItem>
-        </Select>
-      </FormControl>
+    <>
+    <Toaster />
+    <Backdrop  handleClose={handleClose}  open={open}/>
+<SettingsNotification open={openNotifactionSettings} handleClose={ handleCloseNotifaction }/>
 
 
-
-
-
-
-        <Box className='myTextField'
-      component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '52ch', marginTop: 5,  },
-        '& label.Mui-focused': {
-          color: 'black',
-          fontSize: '16px'
-          },
-      '& .MuiOutlinedInput-root': {
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: "black",
-          borderWidth: '3px',
-          },
-       '&.Mui-focused fieldset':  {
-          borderColor: 'black', 
-          
-        }
-      }
-      }}
-      noValidate
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="mt-10 h-screen p-6"
     >
+      {/* Hotspot Section */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="mb-8"
+      >
+        <p className="text-xl font-semibold mb-4 flex items-center">
+          <Payment className="mr-2" /> Hotspot
+        </p>
 
-
-        <TextField
-          id="outlined-helperText"
-          label="Short Code"
-        />
-
-
-      </Box>
-
-
-
-      <Box
-      component="form"
-      className='myTextField'
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '100%', marginTop: 5,  },
-        '& label.Mui-focused': {
-          color: 'black',
-          fontSize: '16px'
-          },
-      '& .MuiOutlinedInput-root': {
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: "black",
-          borderWidth: '3px',
-          },
-       '&.Mui-focused fieldset':  {
-          borderColor: 'black', 
-          
-        }
-      }
-      }}
-      noValidate
-    >
-
-
-        <TextField
-          id="outlined-helperText"
-          label="Consumer Key"
-        />
-<TextField
-          id="outlined-helperText"
-          label="Consumer Secret"
-        />
-
-
-<TextField
-          id="outlined-helperText"
-          label="Pass Key"
-        />
-      </Box>
-
-
-      <Box
-      component="form"
-      className='myTextField'
-
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '52ch', marginTop: 5,  },
-        '& label.Mui-focused': {
-          color: 'black',
-          fontSize: '16px'
-          },
-      '& .MuiOutlinedInput-root': {
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: "black",
-          borderWidth: '3px',
-          },
-       '&.Mui-focused fieldset':  {
-          borderColor: 'black', 
-          
-        }
-      }
-      }}
-      noValidate
-    >
-
-<div className='flex  '>
-
-        <TextField
-          id="outlined-helperText"
-          label="Initiator Username"
-        />
-
-<TextField
-          id="outlined-helperText"
-          label="Iniator Password"
-        />
-</div>
-
-      </Box>
-
-
-
-
-      <FormControl  sx={{ m: 1, width: '100%',  marginTop: 4,'& label.Mui-focused': {
-          color: 'black',
-          fontSize:'14px'
-        
-          },
-        '& .MuiOutlinedInput-root': {
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: "black",
-          borderWidth: '3px'
-          },
-        '&.Mui-focused fieldset':  {
-          borderColor: 'black', // Set border color to transparent when focused
-        
-        }
-        }, }}>
-        <InputLabel id="demo-simple-select-autowidth-label">API VERSION</InputLabel>
-        <Select
-          labelId="demo-simple-select-autowidth-label"
-          id="demo-simple-select-autowidth"
-          autoWidth
-          label="User Group"
+    <form onSubmit={saveHotspotMpesaSettings}>
+        <FormControl
+          variant="standard"
+          sx={{
+            m: 1,
+            width: "100%",
+            marginTop: 4,
+            "& .MuiOutlinedInput-notchedOutline": {
+              px: 2.5,
+            },
+            "& label.Mui-focused": {
+              color: "black",
+              fontSize: "16px",
+            },
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "black",
+                borderWidth: "3px",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "black",
+              },
+            },
+          }}
         >
-        
-          <MenuItem >V1</MenuItem>
-          <MenuItem >V2</MenuItem>
-        </Select>
-      </FormControl>
+          <InputLabel id="hotspot-account-type-label">
+            Hotspot Mpesa Account Type
+          </InputLabel>
+          <Select
+           value={selectedAccountTypeHotspot}
+           onChange={(e) => setSelectedAccountTypeHotspot(e.target.value)}
+            labelId="hotspot-account-type-label"
+            id="hotspot-account-type"
+            label="Hotspot Mpesa Account Type"
+          >
+            <MenuItem value="Till">Till</MenuItem>
+            <MenuItem value="Paybill">Paybill</MenuItem>
+          </Select>
+        </FormControl>
 
-
-
-        </div>
-
-
-        <div className='mt-4'>
-        <p>Fixed Mpesa</p>
-
-
-        <FormControl variant='standard' sx={{ m: 1, width: '100%',  marginTop: 4,'& label.Mui-focused': {
-          color: 'black',
-          fontSize:'14px'
-        
-          },
-        '& .MuiOutlinedInput-root': {
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: "black",
-          borderWidth: '3px'
-          },
-        '&.Mui-focused fieldset':  {
-          borderColor: 'black', // Set border color to transparent when focused
-        
-        }
-        }, }}>
-        <InputLabel id="demo-simple-select-autowidth-label">Fixed Mesa Account Type</InputLabel>
-        <Select
-          labelId="demo-simple-select-autowidth-label"
-          id="demo-simple-select-autowidth"
-          autoWidth
-          label="User Group"
+        <Box
+          component="form"
+          sx={{
+            "& .MuiTextField-root": { m: 1, width: "52ch", marginTop: 5 },
+            "& label.Mui-focused": {
+              color: "black",
+              fontSize: "16px",
+            },
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "black",
+                borderWidth: "3px",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "black",
+              },
+            },
+          }}
+          noValidate
         >
-        
-          <MenuItem value='Paybill'>Paybill</MenuItem>
-          <MenuItem value='Till Number'>Till Number</MenuItem>
-        </Select>
-      </FormControl>
+          <TextField
+           onChange={handleChangeMPesaHotspotSettings}
+            name="short_code"
+            value={short_code}
+            className='myTextField'
+            label="Short Code"
+            InputProps={{
+              startAdornment: <Business className="mr-2" />,
+            }}
+          />
+        </Box>
 
+        <Box
+          component="form"
+          sx={{
+            "& .MuiTextField-root": { m: 1, width: "100%", marginTop: 5 },
+            "& label.Mui-focused": {
+              color: "black",
+              fontSize: "16px",
+            },
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "black",
+                borderWidth: "3px",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "black",
+              },
+            },
+          }}
+          noValidate
+        >
+          <TextField
+          className='myTextField'
+          onChange={handleChangeMPesaHotspotSettings}
+            name="consumer_key"
+            value={consumer_key}
+            label="Consumer Key"
+            InputProps={{
+              startAdornment: <VpnKey className="mr-2" />,
+            }}
+          />
+          <TextField
+           onChange={handleChangeMPesaHotspotSettings}
+            name="consumer_secret"
+            value={consumer_secret}
+           className='myTextField'
+            label="Consumer Secret"
+            InputProps={{
+              startAdornment: <Lock className="mr-2" />,
+            }}
+          />
+          <TextField
+           onChange={handleChangeMPesaHotspotSettings}
+            name="passkey"
+            value={passkey}
+             className='myTextField'
+            label="Pass Key"
+            InputProps={{
+              startAdornment: <VpnKey className="mr-2" />,
+            }}
+          />
+        </Box>
 
-
-
-<Box       className='myTextField'
-  component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '52ch', marginTop: 2,  },
-        '& label.Mui-focused': {
-          color: 'black',
-          fontSize: '16px'
-          },
-      '& .MuiOutlinedInput-root': {
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: "black",
-          borderWidth: '3px',
-          },
-       '&.Mui-focused fieldset':  {
-          borderColor: 'black', 
-          
-        }
-      }
-      }}
-      noValidate>
-
-        <div className='flex'>
-
-        <TextField
-          id="outlined-helperText"
-          label="Head Office Shortcode"
-        />
-
-
-<TextField
-          id="outlined-helperText"
-          label="Store Shortcode"
-        />
-
-
-
-<TextField
-          id="outlined-helperText"
-          label="Store Till Number"
-        />
-        </div>
-
-
-</Box>
-
-
-
-            <Box        className='myTextField'
- component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '100%', marginTop: 2,   '& label.Mui-focused': {
-          color: 'black',
-          fontSize: '16px'
-          },
-      '& .MuiOutlinedInput-root': {
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: "black",
-          borderWidth: '3px',
-          },
-       '&.Mui-focused fieldset':  {
-          borderColor: 'black', 
-          
-        }
-      }},
-      }}
-      noValidate>
-
-
-<TextField
-          id="outlined-helperText"
-          label="Consumer Secret"
-        />
-
-
-
-<TextField
-          id="outlined-helperText"
-          label="Consumer Key "
-        />
-
-
-
-
-        <TextField
-                id="outlined-helperText"
-                label="Pass Key "
-                />
-            </Box>
-
-
-
-        <Box       className='myTextField'
-   component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '52ch', marginTop: 2, '& label.Mui-focused': {
-          color: 'black',
-          fontSize: '16px'
-          },
-      '& .MuiOutlinedInput-root': {
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: "black",
-          borderWidth: '3px',
-          },
-       '&.Mui-focused fieldset':  {
-          borderColor: 'black', 
-          
-        }
-      }  },
-      }}
-      noValidate>
-            <div className='flex'>
-
-
+        <Box
+          component="form"
+          sx={{
+            "& .MuiTextField-root": { m: 1, width: "52ch", marginTop: 5 },
+            "& label.Mui-focused": {
+              color: "black",
+              fontSize: "16px",
+            },
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "black",
+                borderWidth: "3px",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "black",
+              },
+            },
+          }}
+          noValidate
+        >
+          {/* <div className="flex">
             <TextField
-                id="outlined-helperText"
-                label="Initiator Username "
-                />
+             className='myTextField'
+              id="initiator-username"
+              label="Initiator Username"
+              InputProps={{
+                startAdornment: <Person className="mr-2" />,
+              }}
+            />
+            <TextField
+              id="initiator-password"
+               className='myTextField'
+              label="Initiator Password"
+              InputProps={{
+                startAdornment: <Lock className="mr-2" />,
+              }}
+            />
+          </div> */}
+        </Box>
+
+        <FormControl
+          sx={{
+            m: 1,
+            width: "100%",
+            marginTop: 4,
+            "& label.Mui-focused": {
+              color: "black",
+              fontSize: "14px",
+            },
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "black",
+                borderWidth: "3px",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "black",
+              },
+            },
+          }}
+        >
+            <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
+        className="flex justify-center w-full mt-8"
+      >
+        <button type='submit' className="p-3 border rounded-sm
+         dark:border-teal-500 dark:text-blue-300 text-center w-full border-gray-800 hover:bg-green-500 hover:text-white transition-all duration-300">
+          Save
+        </button>
+      </motion.div>
+        </FormControl>
+</form>
 
 
-<TextField
-                id="outlined-helperText"
-                label="Initiator Password "
-                />
+      </motion.div>
 
-            </div>
 
+
+
+
+      {/* Fixed Mpesa Section */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="mt-8"
+      >
+        <p className="text-xl font-semibold mb-4 flex items-center">
+          <Payment className="mr-2" /> Dial Up
+        </p>
+        <FormControl
+          variant="standard"
+          sx={{
+            m: 1,
+            width: "100%",
+            marginTop: 4,
+            "& label.Mui-focused": {
+              color: "black",
+              fontSize: "14px",
+            },
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "black",
+                borderWidth: "3px",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "black",
+              },
+            },
+          }}
+        >
+          <InputLabel id="fixed-mpesa-account-type-label">
+            Fixed Mpesa Account Type
+          </InputLabel>
+          <Select
+            labelId="fixed-mpesa-account-type-label"
+            id="fixed-mpesa-account-type"
+            autoWidth
+            label="Fixed Mpesa Account Type"
+          >
+            <MenuItem value="Paybill">Paybill</MenuItem>
+            <MenuItem value="Till Number">Till Number</MenuItem>
+          </Select>
+        </FormControl>
+
+        <Box
+          component="form"
+          sx={{
+            "& .MuiTextField-root": { m: 1, width: "52ch", marginTop: 2 },
+            "& label.Mui-focused": {
+              color: "black",
+              fontSize: "16px",
+            },
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "black",
+                borderWidth: "3px",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "black",
+              },
+            },
+          }}
+          noValidate
+        >
+          <div className="flex">
+            <TextField
+              className='myTextField'
+              id="head-office-shortcode"
+              label="Business Shortcode/Till Number"
+              InputProps={{
+                startAdornment: <Business className="mr-2" />,
+              }}
+            />
+           
+           
+          </div>
+        </Box>
+
+        <Box
+          component="form"
+          sx={{
+            "& .MuiTextField-root": { m: 1, width: "100%", marginTop: 2 },
+            "& label.Mui-focused": {
+              color: "black",
+              fontSize: "16px",
+            },
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "black",
+                borderWidth: "3px",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "black",
+              },
+            },
+          }}
+          noValidate
+        >
+          <TextField
+          className='myTextField'
+            id="fixed-consumer-secret"
+            label="Consumer Secret"
+            InputProps={{
+              startAdornment: <Lock className="mr-2" />,
+            }}
+          />
+          <TextField
+          className='myTextField'
+            id="fixed-consumer-key"
+            label="Consumer Key"
+            InputProps={{
+              startAdornment: <VpnKey className="mr-2" />,
+            }}
+          />
+          <TextField
+           className='myTextField'
+            id="fixed-pass-key"
+            label="Pass Key"
+            InputProps={{
+              startAdornment: <VpnKey className="mr-2" />,
+            }}
+          />
+        </Box>
+
+        <Box
+          component="form"
+          sx={{
+            "& .MuiTextField-root": { m: 1, width: "52ch", marginTop: 2 },
+            "& label.Mui-focused": {
+              color: "black",
+              fontSize: "16px",
+            },
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "black",
+                borderWidth: "3px",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "black",
+              },
+            },
+          }}
+          noValidate
+        >
+          {/* <div className="flex">
+            <TextField
+              id="fixed-initiator-username"
+              label="Initiator Username"
+              InputProps={{
+                startAdornment: <Person className="mr-2" />,
+              }}
+            />
+            <TextField
+              id="fixed-initiator-password"
+              label="Initiator Password"
+              InputProps={{
+                startAdornment: <Lock className="mr-2" />,
+              }}
+            />
+          </div> */}
         </Box>
 
 
-
- <FormControl  sx={{ m: 1, width: '100%',  marginTop: 4,'& label.Mui-focused': {
-          color: 'black',
-          fontSize:'14px'
-        
-          },
-        '& .MuiOutlinedInput-root': {
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: "black",
-          borderWidth: '3px'
-          },
-        '&.Mui-focused fieldset':  {
-          borderColor: 'black', // Set border color to transparent when focused
-        
-        }
-        }, }}>
-        <InputLabel id="demo-simple-select-autowidth-label">API VERSION</InputLabel>
-        <Select
-          labelId="demo-simple-select-autowidth-label"
-          id="demo-simple-select-autowidth"
-          autoWidth
-          label="User Group"
+{/* 
+        <FormControl
+          sx={{
+            m: 1,
+            width: "100%",
+            marginTop: 4,
+            "& label.Mui-focused": {
+              color: "black",
+              fontSize: "14px",
+            },
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "black",
+                borderWidth: "3px",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "black",
+              },
+            },
+          }}
         >
-        
-          <MenuItem >V1</MenuItem>
-          <MenuItem >V2</MenuItem>
-        </Select>
-      </FormControl>
+          <InputLabel id="fixed-api-version-label">API VERSION</InputLabel>
+          <Select
+            labelId="fixed-api-version-label"
+            id="fixed-api-version"
+            autoWidth
+            label="API VERSION"
+          >
+            <MenuItem>V1</MenuItem>
+            <MenuItem>V2</MenuItem>
+          </Select>
+        </FormControl> */}
+      </motion.div>
 
+      {/* Save Button */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
+        className="flex justify-center w-full mt-8"
+      >
+        <button className="p-3 border rounded-sm
+         dark:border-teal-500 dark:text-blue-300 text-center w-full border-gray-800 hover:bg-green-500 hover:text-white transition-all duration-300">
+          Save
+        </button>
+      </motion.div>
+    </motion.div>
 
-<div className='flex justify-center w-full mt-8'>
+    </>
+  );
+};
 
-      <button className='p-3 border  rounded-sm dark:border-blue-500 dark:text-blue-300 text-center w-full border-gray-800 '>
-        Save
-      </button>
-      </div>
-
-        </div>
-
-    </div>
-  )
-}
-
-export default MpesaSettings
+export default MpesaSettings;

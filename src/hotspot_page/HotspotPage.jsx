@@ -399,7 +399,11 @@ import Backdrop from '@mui/material/Backdrop';
 import { MdOutlineWifi } from "react-icons/md";
 import { FaShoppingCart } from "react-icons/fa";
 import { BsBoxArrowLeft } from "react-icons/bs";
-
+import CircularProgress from "@mui/material/CircularProgress";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
+import LocalAtmIcon from "@mui/icons-material/LocalAtm";
+import SmartphoneIcon from "@mui/icons-material/Smartphone";
 
 
 
@@ -413,7 +417,11 @@ const HotspotPage = () => {
  const [seeForm, setSeeForm] = useState(false)
  const [seePackages, setSeePackages] = useState(true)
  const [seeInstructions, setSeeInstructions] = useState(true)
+ const [hotspotPackage, setHotspotPackage] = useState(null)
+ const [packageAmount, setPackageAmount] = useState(null)
 
+
+ 
 const {companySettings, setCompanySettings,
 
 
@@ -424,7 +432,7 @@ const {companySettings, setCompanySettings,
   handleChangeHotspotVoucher, voucher, setVoucher,
 
 
-  phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setHotspotInfo,
+  hotspotName, setHotspotName,hotspotInfo, setHotspotInfo,
   hotspotBanner, setHotspotBanner,hotspotBannerPreview, setHotspotBannerPreview,email,
   setEmail
 } = useApplicationSettings()
@@ -434,9 +442,12 @@ const {companySettings, setCompanySettings,
  const {attractive, flat,
   minimal, simple, clean, default_template, sleekspot,} = templateStates
 
-
+  const [error, setError] = useState(false);
  const navigate = useNavigate();
  const location = useLocation();
+ const [isloading, setisloading] = useState(false)
+ const [issuccess, setSuccess] = useState(false);
+ const [phoneNumber, setPhoneNumber] = useState('');
  const selectedTemplate = location.state?.template;
 
 
@@ -459,10 +470,41 @@ const { vouchers } = voucher
               
  const subdomain = window.location.hostname.split('.')[0]
 
+const onChangePhoneNumber = (e) => {
+  setPhoneNumber(e.target.value);
+}
 
+ const makeHotspotPayment = async (e) => {
+  e.preventDefault();
+  setisloading(true);
+  setError(false);
+  setSuccess(false);
 
+  try {
+    const response = await fetch("/api/make_payment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Subdomain": subdomain,
+      },
+      body: JSON.stringify({
+        phone_number: phoneNumber,
+        amount: packageAmount,
+        package: hotspotPackage,
+      }),
+    });
 
-
+    if (response.ok) {
+      setSuccess(true);
+    } else {
+      setError(true);
+    }
+  } catch (error) {
+    setError(true);
+  } finally {
+    setisloading(false);
+  }
+};
 
 
  const getHotspotSettings = useCallback(
@@ -968,7 +1010,7 @@ text-white p-10 rounded-md cursor-pointer'  >
 
   {seeForm  ?  (
 
-
+<form onSubmit={makeHotspotPayment}>
 <motion.div
 className="max-w-md w-full bg-white rounded-xl shadow-lg p-6"
 variants={containerVariants}
@@ -981,6 +1023,7 @@ animate="visible"
 <p className="text-gray-600 dotted-font ">Connect and enjoy fast browsing.</p>
 </div>
 
+
 <motion.div
 className="flex justify-between items-center bg-gray-100 p-4 rounded-lg mb-4"
 whileHover={{ scale: 1.02 }}
@@ -989,7 +1032,10 @@ whileHover={{ scale: 1.02 }}
 <FaPhone className="text-green-500 w-8 h-8"/>
 
 
-<input type="text" className='w-full text-gray-700 bg-gray-100 rounded-lg p-2 focus:outline-none' 
+<input type="text"
+value={phoneNumber}
+onChange={(e) => setPhoneNumber(e.target.value)}
+className='w-full text-gray-700 bg-gray-100 rounded-lg p-2 focus:outline-none' 
 placeholder="Enter your phone number"/>
 
 
@@ -1002,19 +1048,72 @@ placeholder="Enter your phone number"/>
 className="flex justify-between items-center bg-gray-100 p-4 rounded-lg mb-4"
 whileHover={{ scale: 1.02 }}
 >
-{/* <FaCheckCircle className="text-green-500 w-8 h-8" />
-<p className="text-gray-700">Easy Access</p> */}
+
 </motion.div>
 
-<motion.button
-variants={buttonVariants}
-whileHover="hover"
-className="w-full py-2 px-4 bg-blue-500 text-white  rounded-full shadow-md
+
+
+
+
+<motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg shadow-md"
+    >
+      <button
+      type='submit'
+        disabled={loading}
+        className="w-full py-2 px-4 bg-blue-500 text-white  rounded-full shadow-md
 focus:outline-none dotted-font font-thin"
-onClick={() => alert('Connected!')}
->
-Connect Now
-</motion.button>
+      >
+        {loading ? (
+          <CircularProgress size={24} className="text-white" />
+        ) : (
+          <>
+            <LocalAtmIcon className="mr-2" />
+            Pay Now
+          </>
+        )}
+      </button>
+
+      {isloading && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mt-4 text-center text-gray-700 flex items-center"
+        >
+          <SmartphoneIcon className="mr-2" />
+          You will be prompted for M-Pesa PIN on your phone (STK).
+        </motion.div>
+        
+      )}
+
+      {issuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mt-4 text-center text-green-600 flex items-center"
+        >
+          <CheckCircleIcon className="mr-2" />
+          Payment initiated successfully! Check your phone.
+        </motion.div>
+      )}
+
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mt-4 text-center text-red-600 flex items-center"
+        >
+          <ErrorIcon className="mr-2" />
+          Something went wrong. Please try again.
+        </motion.div>
+      )}
+    </motion.div>
 
 <div className='flex justify-center items-center cursor-pointer' onClick={()=>  {
 setSeeForm(false)
@@ -1031,6 +1130,7 @@ setSeeInstructions(true)
 </Link>
 </div> */}
 </motion.div>
+</form>
 
   ): null}
  
@@ -1099,6 +1199,10 @@ grid grid-cols-1 gap-6">
       <p className="text-blue-500 font-bold mt-2"> Price: Ksh{pkg.price}</p>
       <button
         onClick={() => {
+
+
+          setHotspotPackage(pkg.name)
+          setPackageAmount(pkg.price)
           setSeePackages(false);
           setSeeForm(true);
           setSeeInstructions(false);
@@ -1140,7 +1244,9 @@ grid grid-cols-1 gap-6">
           animate="visible"
         >
           {seeForm ? (
+
             <>
+            <form onSubmit={makeHotspotPayment}>
               <div className="text-center mb-6">
                 <FaWifi className="text-purple-600 w-12 h-12 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold text-gray-800">Connect to Hotspot</h2>
@@ -1154,18 +1260,77 @@ grid grid-cols-1 gap-6">
                 <FaPhone className="text-purple-600 w-8 h-8" />
                 <input
                   type="text"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+
                   className="w-full text-gray-700 bg-gray-100 rounded-lg p-2 focus:outline-none"
                   placeholder="Enter your phone number"
                 />
               </motion.div>
-              <motion.button
-                variants={buttonVariants}
-                whileHover="hover"
-                className="w-full py-3 bg-purple-600 text-white rounded-full shadow-md focus:outline-none dotted-font font-thin"
-                onClick={() => alert('Connected!')}
-              >
-                Connect Now
-              </motion.button>
+
+              
+             
+
+
+
+<motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg shadow-md"
+    >
+      <button
+      type='submit'
+        disabled={loading}
+        className="w-full py-3 bg-purple-600 text-white
+                 rounded-full shadow-md focus:outline-none dotted-font font-thin"
+      >
+        {loading ? (
+          <CircularProgress size={24} className="text-white" />
+        ) : (
+          <>
+            <LocalAtmIcon className="mr-2" />
+            Pay Now
+          </>
+        )}
+      </button>
+
+      {isloading && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mt-4 text-center text-gray-700 flex items-center"
+        >
+          <SmartphoneIcon className="mr-2" />
+          You will be prompted for M-Pesa PIN on your phone (STK).
+        </motion.div>
+      )}
+
+      {issuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mt-4 text-center text-green-600 flex items-center"
+        >
+          <CheckCircleIcon className="mr-2" />
+          Payment initiated successfully! Check your phone.
+        </motion.div>
+      )}
+
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mt-4 text-center text-red-600 flex items-center"
+        >
+          <ErrorIcon className="mr-2" />
+          Something went wrong. Please try again.
+        </motion.div>
+      )}
+    </motion.div>
 
               <div className='flex justify-center items-center cursor-pointer mt-6' onClick={()=>  {
                 setSeeForm(false);
@@ -1186,6 +1351,7 @@ grid grid-cols-1 gap-6">
               >
                 {/* <FaArrowLeft className="w-8 h-8 text-purple-600" /> */}
               </div>
+              </form>
             </>
           ) : (
             <>
@@ -1223,6 +1389,8 @@ type='submit'
                     whileHover={{ scale: 1.02 }}
                     onClick={() => {
                       setSeePackages(false);
+                      setHotspotPackage(pkg.name)
+                      setPackageAmount(pkg.price)
                       setSeeForm(true);
                       setSeeInstructions(false);
                     }}
@@ -1419,7 +1587,7 @@ type='submit'
       {seeForm  ?  (
 
 
-
+<form onSubmit={makeHotspotPayment}>
  <motion.div
  className="max-w-md w-full bg-white rounded-xl shadow-lg p-6"
  variants={containerVariants}
@@ -1439,7 +1607,8 @@ type='submit'
    {/* <FaLock className="text-green-500 w-8 h-8" /> */}
    <FaPhone className="text-green-500 w-8 h-8"/>
    <input type="text"
-   
+   value={phoneNumber}
+   onChange={(e) => setPhoneNumber(e.target.value)}
    className='w-full text-gray-700 bg-gray-100 rounded-lg p-2 focus:outline-none' 
    placeholder="Enter your phone number"/>
    {/* <p className="text-gray-700">Secure Connection</p> */}
@@ -1453,15 +1622,63 @@ type='submit'
    <p className="text-gray-700">Easy Access</p> */}
  </motion.div>
 
- <motion.button
-   variants={buttonVariants}
-   whileHover="hover"
-   className="w-full py-2 px-4 bg-yellow-500 text-white  rounded-full shadow-md
-    focus:outline-none dotted-font font-thin"
-   onClick={() => alert('Connected!')}
- >
-   Connect Now
- </motion.button>
+<motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg shadow-md"
+    >
+      <button
+      type='submit'
+        disabled={loading}
+        className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 flex items-center justify-center w-48"
+      >
+        {loading ? (
+          <CircularProgress size={24} className="text-white" />
+        ) : (
+          <>
+            <LocalAtmIcon className="mr-2" />
+            Pay Now
+          </>
+        )}
+      </button>
+
+      {isloading && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mt-4 text-center text-gray-700 flex items-center"
+        >
+          <SmartphoneIcon className="mr-2" />
+          You will be prompted for M-Pesa PIN on your phone (STK).
+        </motion.div>
+      )}
+
+      {issuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mt-4 text-center text-green-600 flex items-center"
+        >
+          <CheckCircleIcon className="mr-2" />
+          Payment initiated successfully! Check your phone.
+        </motion.div>
+      )}
+
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mt-4 text-center text-red-600 flex items-center"
+        >
+          <ErrorIcon className="mr-2" />
+          Something went wrong. Please try again.
+        </motion.div>
+      )}
+    </motion.div>
 
 <div className='flex justify-center items-center cursor-pointer' onClick={()=>  {
   setSeeForm(false)
@@ -1471,13 +1688,9 @@ type='submit'
 <TiArrowBackOutline className="mt-6 text-center w-8 h-8"/>
 
 </div>
-{/* 
- <div className="mt-6 text-center">
-   <Link to="/terms" className="text-blue-500 hover:underline">
-     Terms & Conditions
-   </Link>
- </div> */}
+
 </motion.div>
+</form>
 
       ): null}
      
@@ -1486,45 +1699,8 @@ type='submit'
 
 
 
-        {/* Packages Section */}
-
-{/*         
-{seePackages  ? (
-  <motion.div className="max-w-md w-full mx-auto text-center">
-  <h2 className="text-2xl  text-white mb-4 dotted-font font-thin">Choose Your Plan</h2>
-  <div className="grid grid-cols-1 gap-6">
-    {packages.map((pkg, index) => (
-      <motion.div
-        key={index}
-        className="bg-white p-4 rounded-lg shadow-lg"
-        variants={packageVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <h3 className="text-xl font-bold text-gray-900">{pkg.name}</h3>
-        <p className="text-gray-600">Speed: {pkg?.speed}</p>
-        <p className="text-gray-600">Valid For {pkg.valid}</p>
-        <p className="text-blue-500 font-bold mt-2"> Price: Ksh{pkg.price}</p>
-
-        <button onClick={()=> {
-          setSeePackages(false)
-          setSeeForm(true)
-          setSeeInstructions(false)
-        } } className='p-2 bg-blue-500 mt-2 rounded-md cursor-pointer
-        dotted-font font-thin
-        '>subscribe</button>
-
-      </motion.div>
-    ))}
-
-
-
-  </div>
-
- 
-</motion.div>
-) : null} */}
       
+
 
       {seePackages && (
   <motion.div className="max-w-md 
@@ -1541,6 +1717,7 @@ type='submit'
       
       {packages.map((pkg, index) => (
         <motion.div
+        
           key={index}
           className="bg-gray-800 p-4 rounded-lg shadow-lg"
           variants={packageVariants}
@@ -1561,6 +1738,8 @@ p-4 mt-4'>
             onClick={() => {
               setSeePackages(false);
               setSeeForm(true);
+              setHotspotPackage(pkg.name)
+              setPackageAmount(pkg.price)
               setSeeInstructions(false);
             }}
             className="p-2 bg-yellow-500 mt-2 rounded-md cursor-pointer dotted-font font-thin"

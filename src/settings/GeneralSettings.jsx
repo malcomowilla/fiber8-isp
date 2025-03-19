@@ -85,7 +85,7 @@ const GeneralSettings = ({children}) => {
      }= subscriberSettings;
 
 
-  const [ routerName] = useDebounce( settingsformData.router_name, 1000)
+  const [routerName] = useDebounce( settingsformData.router_name, 1000)
 
 const [checkedData,  setCheckedData] = useState('')
 const [open, setOpen] = useState(false);
@@ -316,6 +316,7 @@ toast.success('settings updated successfully', {
             
           })
           console.log('not created')
+          setOpen(false)
           setisloading(false)
           setOpenSettings(false)
         }
@@ -692,16 +693,16 @@ position: "top-center",
 duration: 5000,
 })
 
-toast.error('failed to fetch subscriber settings', {
-  position: "top-center",
-  duration: 4000,
-})  
+// toast.error('failed to fetch subscriber settings', {
+//   position: "top-center",
+//   duration: 4000,
+// })  
       }
     } catch (error) {
-      toast.error('failed to fetch subscriber settings server error', {
-        position: "top-center",
-        duration: 4000,
-      })  
+      // toast.error('failed to fetch subscriber settings server error', {
+      //   position: "top-center",
+      //   duration: 4000,
+      // })  
     }
   },
   [],

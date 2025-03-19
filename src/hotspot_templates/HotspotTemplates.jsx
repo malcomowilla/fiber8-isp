@@ -308,12 +308,16 @@
 
 
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import ModalImage from './ModalImage';
 import toast, { Toaster } from 'react-hot-toast';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
+const SettingsNotification = lazy(() => import('../notification/SettingsNotification'))
+import Backdrop from '../backdrop/Backdrop'
+
+
 
 const HotspotTemplates = () => {
   const navigate = useNavigate();
@@ -323,6 +327,10 @@ const HotspotTemplates = () => {
   const [imagetitle, setImagetitle] = useState(null);
 
   const {templateStates, setTemplateStates} = useApplicationSettings();
+  const [open, setOpen] = useState(false);
+const [openNotifactionSettings, setOpenSettings] = useState(false)
+const [isloading, setisloading] = useState(false)
+
   
   // State for checkboxes
   // const [templateStates, setTemplateStates] = useState({
@@ -341,6 +349,16 @@ const HotspotTemplates = () => {
     setPreviewImage(image);
     setIsModalOpen(true);
     setImagetitle(title);
+  };
+
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+  
+  
+  const handleCloseNotifaction = () => {
+   setOpenSettings(false);
   };
 
   // Handle template selection
@@ -384,7 +402,7 @@ const HotspotTemplates = () => {
         ...templateStates,
         attractive: false,
         sleekspot: true,
-        default: false,
+        default_template: false,
         flat: false,
         minimal: false,
         simple: false,
@@ -394,7 +412,7 @@ const HotspotTemplates = () => {
       setTemplateStates({
         ...templateStates,
         sleekspot: false,
-        default: false,
+        default_template: false,
         attractive: true,
         flat: false,
         minimal: false,
@@ -455,6 +473,8 @@ const HotspotTemplates = () => {
 e.preventDefault()
 
     try {
+      setisloading(true)
+    setOpen(true)
       const response = await fetch('/api/hotspot_templates', {
         method: 'POST',
         headers: {
@@ -481,6 +501,10 @@ e.preventDefault()
           position: 'bottom-right',
         });
 
+        setisloading(false)
+setOpen(false)
+setOpenSettings(true)
+
         const { attractive, flat,
            minimal, simple, clean, default_template, sleekspot} = newData
 
@@ -501,12 +525,19 @@ e.preventDefault()
           position: 'top-right',
         });
 
+        setisloading(false)
+setOpen(false)
+setOpenSettings(false)
+
         toast.error('Something went wrong', {
           duration: 3000,
           position: 'bottom-right',
         });
       }
     } catch (error) {
+      setisloading(false)
+setOpen(false)
+setOpenSettings(false)
 // toast.error('Something went wrong', {
 //           duration: 3000,
 //           position: 'top-right',
@@ -569,6 +600,10 @@ const newData = await response.json();
 
     
     <Toaster />
+
+    <Backdrop  handleClose={handleClose}  open={open}/>
+<SettingsNotification open={openNotifactionSettings} handleClose={ handleCloseNotifaction }/>
+
       <div className="min-h-screen p-8">
         <h1 className="text-4xl font-thin text-center mb-8
         

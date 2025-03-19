@@ -89,6 +89,15 @@ const [smsSettingsForm, setSmsSettingsForm] = useState({
 });
 
 
+const [hotspotMpesaSettings, setHotspotMpesaSettings] = useState({
+  shortcode: '',
+  consumer_secret: '',
+  consumer_key: '',
+  passkey: '',
+  
+});
+
+
 const [loading, setLoading] = useState(false)
  const [success, setsuccess] = useState(false)
 const [totalSubscribers, setTotalSubscribers] = useState(0)
@@ -124,6 +133,8 @@ const handleChangeHotspotVoucher = (e) => {
       });
 
       const [selectedProvider, setSelectedProvider] = useState('SMS leopard'); // Default value
+      const [selectedAccountTypeHotspot, setSelectedAccountTypeHotspot] = useState('Till'); // Default value
+
       // const [settingsformData, setFormData] = useState(() => {
       //   const storedFormData =   localStorage.setItem("checkedtrueData", JSON.stringify(initialValue.check_update_password));
         
@@ -472,7 +483,8 @@ const loginWithVoucher = async(e) => {
      phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setHotspotInfo,
      hotspotBanner, setHotspotBanner,hotspotBannerPreview, setHotspotBannerPreview,
      totalSubscribers, setTotalSubscribers,subscribersOnline, setSubscribersOnline,
-     subscribersOffline, setSubscribersOffline
+     subscribersOffline, setSubscribersOffline,selectedAccountTypeHotspot, setSelectedAccountTypeHotspot,
+     hotspotMpesaSettings, setHotspotMpesaSettings
      }}  >
     {children}
    </GeneralSettingsContext.Provider>
