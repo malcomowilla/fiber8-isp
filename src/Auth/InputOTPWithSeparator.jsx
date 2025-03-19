@@ -4,6 +4,8 @@ import {Link} from 'react-router-dom'
 import {ApplicationContext} from '../context/ApplicationContext'
 import {useNavigate} from 'react-router-dom'
 import { useApplicationSettings } from '../settings/ApplicationSettings';
+import {  Visibility, VisibilityOff } from "@mui/icons-material";
+
 
 // import {
 //   InputOTP,
@@ -19,7 +21,21 @@ import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
 import toast, { Toaster } from 'react-hot-toast';
 import { IoKeyOutline } from "react-icons/io5";
-
+import {
+  TextField,
+  Box,
+  IconButton,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  CircularProgress,
+  Modal,
+  Typography,
+} from '@mui/material';
+import { motion } from 'framer-motion';
+import { Email, Phone, Person, Business, Lock, Edit, Close } from '@mui/icons-material';
 
 
 
@@ -55,7 +71,7 @@ const [icon, setIcon] = useState()
 const [errorMessage, setErrorMessage] = useState(null)
 const [seeErrorMessage, setSeeErrorMessage] = useState(false)
   
-
+const [showPassword, setShowPassword] = useState(false);
 
 
 
@@ -492,62 +508,20 @@ if (enable_2fa_for_admin_passkeys) {
 }
 
 
-    
-// setTimeout(() => {
-//   setWelcome(false)
-
-// }, 9000);
 
 console.log("Logo Preview URL:", logo_preview);
 
 
-// passkey-signin
   return (
 <>
-    {/* <div className='flex justify-center items-center w-full '>
-    <img src="/images/fiber8logo2.png" alt="fiber8-image" />
-
-    </div>
-    <div className='flex justify-center items-center mt-[500px] w-full h-full'>
-    <InputOTP
-      maxLength={6}
-      render={({ slots }) => (
-        <InputOTPGroup className="gap-10">
-          {slots.map((slot, index) => (
-            <React.Fragment key={index}>
-              <InputOTPSlot className="rounded-md border-4" {...slot} />
-              {index !== slots.length - 1 && <InputOTPSeparator />}
-            </React.Fragment>
-          ))}{" "}
-        </InputOTPGroup>
-        
-      )}
-    />
-    </div>
-    <div className='text-center mt-10 font-extralight'>
-    <p>Enter Your One Time Password</p>
-
-    </div> */}
+    
  <Toaster />
 
     
 
 
-{/*  
 
- <div className='flex flex-row'>
-  
-
- </div> */}
 {/* 
-
-<div className=''>
-  {offlineError &&    <Stack sx={{ width: '20%',   }} >
-      <Alert sx={{backgroundColor: 'rgb(255, 0, 0)'}} severity="error">Something Went Wrong Please Try Again Later.</Alert>
-    </Stack>}
-</div> */}
-
-
     <main className=''>
 
 
@@ -576,7 +550,6 @@ console.log("Logo Preview URL:", logo_preview);
       <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900
        dark:text-white ">
           <img className="w-40 h-40 mr-2 rounded-full mt-20" src={logo_preview || '/images/aitechs.png'} alt="logo"  />
-          {/* <img className="w-40 h-40 mr-2 rounded-full mt-20" src='https://8209-102-221-35-92.ngrok-free.app/rails/active_storage/disk/eyJfcmFpbHMiOnsiZGF0YSI6eyJrZXkiOiJsNDBwbWN1YXc1NDJsMG1jZGhmbzBsZm42ODVpIiwiZGlzcG9zaXRpb24iOiJpbmxpbmU7IGZpbGVuYW1lPVwiZmliZXI4bG9nbzEucG5nXCI7IGZpbGVuYW1lKj1VVEYtOCcnZmliZXI4bG9nbzEucG5nIiwiY29udGVudF90eXBlIjoiaW1hZ2UvcG5nIiwic2VydmljZV9uYW1lIjoibG9jYWwifSwicHVyIjoiYmxvYl9rZXkifX0=--1bc68299b8711907c6cbf55859a4e1f68804c6dd/fiber8logo1.png' alt="logo"  /> */}
 
       </a>
 
@@ -588,20 +561,12 @@ console.log("Logo Preview URL:", logo_preview);
           Sign-In to your account and start managing your  network
 
           </h2>
-          {/* <div className='flex flex-row'>
-          <p className='font-montserat-light'>Don't have an account? <Link to='/'><span className='underline
-          font-montserat
-          '>Sign Up</span></Link> </p>
-
-          </div> */}
-
-          {/* {showErrors && <p className="text-red-600">{error}</p>} */}
+          
 
           <form className="mt-4 space-y-4 lg:mt-5 md:space-y-5"   onSubmit={handleSignIn }>
               <div className=' flex  flex-col  relative '>
                 <div className=''>
                 <label  className="  text-sm font-mono text-gray-900 dark:text-white ">Your email</label>
-{/* {error} */}
                 </div>
                  <div className='self-end  absolute p-8'>
                   <img src="/images/gmail.png" className=' ' alt="gmail" />
@@ -622,7 +587,8 @@ console.log("Logo Preview URL:", logo_preview);
                        <ion-icon name={isSeen ? "eye-outline" : "eye-off-outline"}></ion-icon>
 
                        </div>
-                  <input value={isPassword} type={isSeen ? 'password' : 'text'} name="password" id="password"   onChange={(e)=> {
+                  <input value={isPassword} type={isSeen ? 'password' : 'text'} name="password" id="password" 
+                    onChange={(e)=> {
 setPassword(e.target.value)
                   }}
                    
@@ -642,7 +608,6 @@ setPassword(e.target.value)
               </div>
               <div className="flex flex-row  justify-between ">
 
-              {/* passkey-signin */}
 
 <Link to='/passkey-signin' className='flex flex-row gap-2 cursor-pointer'>
                 <IoKeyOutline className='w-5 h-5' />
@@ -671,7 +636,6 @@ setPassword(e.target.value)
 
 <div>
 
-  {/* <p className='text-sm font-montserrat'>New on our platform? Reach us on 0791568852 for a free trial!</p> */}
 </div>
           </form>
 
@@ -680,7 +644,138 @@ setPassword(e.target.value)
 </section>
 
 
-</main>
+</main> */}
+
+
+
+
+<main className="bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center">
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md p-6"
+      >
+        <div className="text-center">
+          <div onClick={handleThemeSwitch} className="dark:text-white flex justify-center cursor-pointer">
+            <ion-icon
+              name="moon-outline"
+              size="large"
+              className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+            ></ion-icon>
+          </div>
+          <p className="dark:text-white mt-4 font-bold text-2xl">
+            Welcome To <span className="text-red-700"> {company_name || 'Aitechs'}</span>
+          </p>
+        </div>
+
+        <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+          <div className="text-center">
+            <img
+              src={ logo_preview || "/images/aitechs.png"}
+              alt="logo"
+              className="w-24 h-24 mx-auto rounded-full"
+            />
+          </div>
+
+          <h2 className="mt-6 text-xl font-semibold text-gray-900 dark:text-white text-center">
+            Sign in to your account
+          </h2>
+
+          <form onSubmit={handleSignIn} className="mt-6 space-y-6">
+            {/* Email Field */}
+            <TextField
+              fullWidth
+              label="Email"
+              type="email"
+
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email className="text-gray-500" />
+                  </InputAdornment>
+                ),
+              }}
+              className="bg-gray-50 dark:bg-gray-700 rounded-lg myTextField"
+            />
+
+            {/* Password Field */}
+            <TextField
+              fullWidth
+              label="Password"
+              type={isSeen ? "text" : "password"}
+              value={isPassword}
+              onChange={(e) => setPassword(e.target.value)}
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock className="text-gray-500" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setIsSeen(!isSeen)}>
+                      {isSeen ? (
+                        <Visibility className="text-gray-500" />
+                      ) : (
+                        <VisibilityOff className="text-gray-500" />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              className="bg-gray-50 dark:bg-gray-700 rounded-lg myTextField"
+            />
+
+            {/* Forgot Password and Passkey Links */}
+            <div className="flex justify-between items-center">
+              <Link
+                to="/reset-password"
+                className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
+              >
+                Forgot password?
+              </Link>
+              <Link
+                to="/passkey-signin"
+                className="flex items-center text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
+              >
+                <IoKeyOutline className="mr-1" />
+                Passkey
+              </Link>
+            </div>
+
+            {/* Sign In Button */}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-all duration-300"
+              disabled={loading}
+            >
+              {loading ? (
+                <ReloadIcon className="animate-spin" />
+              ) : (
+                "Sign In"
+              )}
+            </Button>
+          </form>
+
+          {/* Additional Info */}
+          <p className="mt-6 text-sm text-center text-gray-600 dark:text-gray-400">
+            New on our platform? Reach us at 0791568852 for a free trial!
+          </p>
+        </div>
+      </motion.section>
+    </main>
+
+
+
+
+
     </>
   )
 }

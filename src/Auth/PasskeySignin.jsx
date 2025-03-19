@@ -13,6 +13,8 @@ import Backdrop from '@mui/material/Backdrop';
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { MdFingerprint } from "react-icons/md";
 import LoadingAnimation from '../loader/loading_animation.json'
+import { TextField, Button, IconButton , InputAdornment,} from "@mui/material";
+import { Email, Phone, Person, Business, Lock, Edit, Close } from '@mui/icons-material';
 
 
 
@@ -358,7 +360,7 @@ toast.error(newData.error, {
 
   return (
     <>
-
+{/* 
 <Toaster position="top-center" />
 
     
@@ -414,25 +416,14 @@ toast.error(newData.error, {
             variants={itemVariants}
             className="w-full max-w-md"
           >
-            {/* Logo Section */}
             <motion.div 
               className="flex flex-col items-center mb-8"
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
-              {/* <img 
-                className="w-40 h-40 rounded-2xl shadow-lg ring-4 ring-emerald-100 
-                  dark:ring-emerald-900/20" 
-                src={logo_preview} 
-                alt={company_name}
-              /> */}
-              {/* <h1 className="mt-4 text-4xl font-bold bg-clip-text text-transparent 
-                bg-gradient-to-r from-emerald-600 to-emerald-800">
-                {company_name}
-              </h1> */}
+            
             </motion.div>
 
-            {/* Passkey Card */}
             <motion.div
               variants={itemVariants}
               className="bg-white dark:bg-gray-800 dark:border-gray-700 backdrop-blur-xl rounded-3xl 
@@ -454,7 +445,6 @@ toast.error(newData.error, {
                   </motion.div>
                 )}
 
-                {/* Username Input */}
                 <div className="space-y-2">
                   <label className="text-2xl font-medium text-white 
                     dark:text-gray-300">
@@ -525,7 +515,6 @@ toast.error(newData.error, {
                   </motion.div>
                 </div>
 
-                {/* Action Buttons */}
 
                 <div className='flex justify-center items-center '>
                 <MdFingerprint className="text-4xl text-gray-600" />
@@ -552,12 +541,7 @@ toast.error(newData.error, {
                           alt="loading" 
                         />
                         <span className='font-montserat-light'>Authenticating...
-                        {/* <DotLottieReact
-      src="https://lottie.host/8eb517c8-777a-4dc8-a5e8-f4fe52fa6708/6LMNWDVsrv.json"
-
-      loop
-      autoplay
-    /> */}
+                      
                         </span>
                       </>
                     ) : (
@@ -582,24 +566,235 @@ toast.error(newData.error, {
                   </motion.button>
                 </div>
 
-                {/* Sign Up Link */}
                 <motion.div 
                   variants={itemVariants}
                   className="text-center pt-4"
                 >
-                  {/* <Link 
-                    to={`/kasspas-key?my_user_name=${user_name}`}
-                    className="text-emerald-600 hover:text-emerald-700 
-                      font-medium transition-colors"
-                  >
-                    Don't have a passkey? Set up now
-                  </Link> */}
+                  
                 </motion.div>
               </form>
             </motion.div>
           </motion.div>
         </div>
-      </motion.section>
+      </motion.section> */}
+
+
+
+
+
+<Toaster position="top-center" />
+
+{/* Loading Backdrop */}
+{isloading && (
+  <Backdrop
+    open={openLoad}
+    sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+  >
+    <Lottie height={400} width={400} />
+  </Backdrop>
+)}
+
+{/* Success Backdrop */}
+{done && (
+  <Backdrop
+    open={openLoad}
+    sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+  >
+    <Lottie options={defaultOptions} height={400} width={400} />
+  </Backdrop>
+)}
+
+{/* Error Message */}
+{seeErrorMessage && (
+  <motion.div
+    initial={{ opacity: 0, y: -10 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="p-3 rounded-lg bg-red-50 text-red-600 text-sm"
+  >
+    {errorMessage}
+  </motion.div>
+)}
+
+{/* Main Section */}
+<motion.section
+  initial="hidden"
+  animate="visible"
+  variants={containerVariants}
+  className="min-h-screen relative"
+>
+  <div className="flex flex-col items-center justify-center min-h-screen px-4">
+    {/* Logo Section */}
+    <div className="flex justify-center items-center w-full">
+      <a href="#" className="flex items-center text-2xl font-semibold text-gray-900 dark:text-white">
+      <img
+               src={ logo_preview || "/images/aitechs.png"}
+              alt="logo"
+              className="w-24 h-24 mx-auto rounded-full"
+            />
+      </a>
+    </div>
+
+    {/* Passkey Card */}
+    <motion.div
+      variants={itemVariants}
+      className="bg-white dark:bg-gray-800 dark:border-gray-700 backdrop-blur-xl rounded-3xl shadow-xl p-8 border border-gray-100 mb-[200px]"
+    >
+      <h2 className="text-2xl font-semibold text-center font-montserat text-black dark:text-white mb-6">
+        Sign in with Passkey
+      </h2>
+
+      <form onSubmit={authenticateWebAuthn} className="space-y-6">
+        {/* Username Input */}
+        <div className="space-y-2">
+          <label className="text-2xl font-medium text-white dark:text-gray-300">
+            Username
+          </label>
+          <motion.div className="relative" whileFocus={{ scale: 1.02 }}>
+            {/* <TextField
+              fullWidth
+              name="user_name"
+              value={user_name}
+              onChange={handleChange}
+              placeholder="Enter username"
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FaRegUser className="text-gray-400" />
+                  </InputAdornment>
+                ),
+                style: { fontSize: "1.5rem" },
+              }}
+              className="bg-white dark:bg-gray-700 rounded-xl"
+            /> */}
+
+
+
+<TextField
+              fullWidth
+              label="Username"
+
+              name="user_name"
+              value={user_name}
+              onChange={handleChange}
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                   <FaRegUser className="text-black" />
+                  </InputAdornment>
+                ),
+              }}
+              className="bg-gray-50 dark:bg-gray-700 rounded-lg myTextField"
+            />
+          </motion.div>
+        </div>
+
+        {/* Divider */}
+        <div className="flex justify-center items-center">
+          <p className="text-2xl dark:text-white font-montserat-light">Or</p>
+        </div>
+
+        {/* Email Input */}
+        <div className="space-y-2">
+          <label className="text-2xl font-medium text-white dark:text-gray-300">
+            Email
+          </label>
+          <motion.div className="relative" whileFocus={{ scale: 1.02 }}>
+            {/* <TextField
+              fullWidth
+              name="email"
+              type="email"
+              value={email}
+              onChange={handleChange}
+              placeholder="Enter email"
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FaRegUser className="text-gray-400" />
+                  </InputAdornment>
+                ),
+                style: { fontSize: "1.5rem" },
+              }}
+              className="bg-white dark:bg-gray-700 rounded-xl myTextField"
+            /> */}
+
+
+
+<TextField
+              fullWidth
+              label="Email"
+              type="email"
+name='email'
+              value={email}
+              onChange={handleChange}
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email className="text-gray-500" />
+                  </InputAdornment>
+                ),
+              }}
+              className="bg-gray-50 dark:bg-gray-700 rounded-lg myTextField"
+            />
+
+          </motion.div>
+        </div>
+
+        {/* Fingerprint Icon */}
+        <div className="flex justify-center items-center">
+          <MdFingerprint className="text-4xl text-gray-600 dark:text-gray-400" />
+        </div>
+
+        {/* Action Buttons */}
+        <div className="space-y-4 pt-4">
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            className="w-full py-3 px-4 bg-blue-500 text-white font-medium 
+            rounded-xl shadow-lg hover:bg-emerald-700 hover:shadow-emerald-500/25 
+            transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 
+            focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center 
+            justify-center space-x-2"
+            disabled={isloading}
+          >
+            {isloading ? (
+              <>
+                <img
+                  src="/images/logo/iconsreload2.png"
+                  className="w-5 h-5 animate-spin"
+                  alt="loading"
+                />
+                <span className="font-montserat-light">Authenticating...</span>
+              </>
+            ) : (
+              <>
+                <span className="text-2xl text-white font-montserat-light">
+                  Continue with Passkey
+                </span>
+              </>
+            )}
+          </motion.button>
+
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            type="button"
+            onClick={handleGoBack}
+            className="w-full flex items-center justify-center space-x-2 py-3 px-4
+             bg-blue-500 dark:text-gray-200 font-medium rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200"
+          >
+            <IoArrowUndoSharp className="w-5 h-5 dark:text-white" />
+            <span className="text-xl dark:text-white font-montserat-light">
+              Go Back
+            </span>
+          </motion.button>
+        </div>
+      </form>
+    </motion.div>
+  </div>
+</motion.section>
     </>
   );
 }
