@@ -135,7 +135,7 @@ const handleGetCompanySettings = useCallback(
    
    `}>
    <div className='flex justify-between   text-white'>
-   <img  className='h-[80px] w-[80px] rounded-full'  src={logo_preview} alt="company-logo" />
+   <img  className='h-[80px] w-[80px] rounded-full'  src={logo_preview || '/images/aitechs.png'}  alt="company-logo" />
       <p className='font-extrabold dotted-font lg:text-xl'>{company_name}</p>
       <ArrowBackSharpIcon className='cursor-pointer' onClick={()=> setSeeSideBar(!seeSidebar)}/>
    {/* <ion-icon  onClick={()=> setSeeSideBar(!seeSidebar)}  className='menu-black' size='large' name="menu"></ion-icon> */}
