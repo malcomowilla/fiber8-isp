@@ -288,7 +288,7 @@ const scrollIntoViewRefTop = useRef(null)
           </p>
 
           <button 
-          onClick={() => window.open('https://wa.me/0791568852?text=Hello%20I%20am%20interested%20in%20your%20services', '_blank')}
+          onClick={() => window.open('https://wa.me/254791568852?text=Hello%20I%20am%20interested%20in%20your%20services', '_blank')}
 
           className="bg-gradient-to-r from-green-600 to-teal-600
            text-white font-semibold py-3 px-8 rounded-lg hover:scale-105 transition-transform duration-300">

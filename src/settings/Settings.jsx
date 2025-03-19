@@ -37,8 +37,12 @@ const Settings = () => {
       transition-all duration-300 hover:text-black '>SMS</p>
 
       
-      <p   onClick={()=> selectTab('MPESA')} className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300
+      <p   onClick={()=> selectTab('MPESA')} className='hover:dark:bg-gray-200 p-2 h-10
+       rounded-lg hover:bg-blue-300
        transition-all duration-300 hover:text-black'>MPESA</p>
+
+
+       
       <p className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300 transition-all
        duration-300 hover:text-black'>WEBSITE</p>
       <p 
