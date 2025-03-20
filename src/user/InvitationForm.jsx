@@ -1,7 +1,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { FiAlertCircle } from "react-icons/fi";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import TextField from '@mui/material/TextField';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import { Accordion } from "flowbite-react";
@@ -231,17 +231,48 @@ const variantDiv = {
   }
 
 
+  const subdomain = window.location.hostname.split('.')[0]
+const [userRoles, setUserRoles] = useState('')
 
+  const getUserGroups = useCallback(
+    async() => {
+      try {
+        const response = await fetch('/api/user_groups', {
+          headers: {
+            'X-Subdomain': subdomain,
+          },
+        })
+  
+        const newData = await response.json()
+        if (response.ok) {
+          // setUserGroups(newData)
+          setUserRoles(newData)
+         
+        } else {
+          console.error(newData)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    [],
+  )
+  
+  
+  useEffect(() => {
+    getUserGroups()
+    
+  }, [getUserGroups]);
 
-  const userRoles = [
-    { label: 'customer_support',  },
-    { label: 'administrator',},
-    { label: 'super_administrator',},
-    { label: "technician",  },
-    { label: "agent",  },
+  // const userRoles = [
+  //   { label: 'customer_support',  },
+  //   { label: 'administrator',},
+  //   { label: 'super_administrator',},
+  //   { label: "technician",  },
+  //   { label: "agent",  },
 
     
-    ]
+  //   ]
 
 
 
@@ -377,15 +408,15 @@ absolute top-[-5px] transition-all duration-300
 // value={userPermisions.user_role}
 
 value={userRoles.find((permission) => {
-  if (permission.label === userPermisions.role) {
-   return permission.label
+  if (permission.name === userPermisions.role) {
+   return permission.name
   } else {
     return null
   }
 })}
 
 
-getOptionLabel={(option) => option.label}
+getOptionLabel={(option) => option.name}
                       
                       sx={{
                         m: 1,width: {
@@ -441,7 +472,7 @@ getOptionLabel={(option) => option.label}
                                       setUserPermisions((prevData) => {
                                         const updatedData = {
                                           ...prevData,
-                                          role: newValue ? newValue.label : '', 
+                                          role: newValue ? newValue.name : '', 
                                         };
                                         console.log('After Update:', updatedData.role);
                                         return updatedData;

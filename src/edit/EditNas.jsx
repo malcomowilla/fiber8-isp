@@ -11,6 +11,23 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import CloseIcon from '@mui/icons-material/Close';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  IconButton,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  CircularProgress,
+  Modal,
+  Typography,
+} from '@mui/material';
+
+import { IoGitNetwork } from "react-icons/io5";
+import { CiUser } from "react-icons/ci";
+import { TbLockPassword } from "react-icons/tb";
+import { FaUserEdit } from "react-icons/fa";
+
 
 function EditNas({ open, handleClose, handleSubmit, nasformData, setnasFormData, isloading }) {
   const { name, username, ip_address, password } = nasformData;
@@ -62,26 +79,35 @@ function EditNas({ open, handleClose, handleSubmit, nasformData, setnasFormData,
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: 0.1 }}
                 >
-                  <TextField
-                    sx={{
-                      '& label.Mui-focused': {
-                        color: '#333',
-                        fontSize: '16px',
-                      },
-                      '& .MuiOutlinedInput-root': {
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#333',
-                          borderWidth: '2px',
-                        },
-                      },
-                    }}
-                    className="myTextField"
-                    label="IP Address"
-                    id="ip_address"
-                    value={ip_address}
-                    onChange={onChange}
-                    fullWidth
-                  />
+
+
+<TextField
+ sx={{
+  '& label.Mui-focused': {
+    color: '#333',
+    fontSize: '16px',
+  },
+  '& .MuiOutlinedInput-root': {
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#333',
+      borderWidth: '2px',
+    },
+  },
+}}
+className="myTextField"
+label= { <p className='dark:text-black text-black'>IP Address</p>}
+id="ip_address"
+value={ip_address}
+onChange={onChange}
+fullWidth
+InputProps={{
+  startAdornment: (
+    <InputAdornment position="start">
+      <IoGitNetwork className="text-black dark:text-black" />
+    </InputAdornment>
+  ),
+}}
+        />
                 </motion.div>
 
                 <motion.div
@@ -102,11 +128,19 @@ function EditNas({ open, handleClose, handleSubmit, nasformData, setnasFormData,
                         },
                       },
                     }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <CiUser className="text-black dark:text-black" />
+                        </InputAdornment>
+                      ),
+                    }}
                     className="myTextField"
                     id="name"
                     value={name}
                     onChange={onChange}
-                    label="Name"
+                    label= { <p className='dark:text-black text-black'>Name</p>}
+
                     fullWidth
                   />
                 </motion.div>
@@ -133,8 +167,15 @@ function EditNas({ open, handleClose, handleSubmit, nasformData, setnasFormData,
                     id="password"
                     value={password}
                     onChange={onChange}
-                    label="Password"
+                    label= { <p className='dark:text-black text-black'>Password</p>}
                     fullWidth
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          < TbLockPassword className="text-black dark:text-black" />
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </motion.div>
               </Stack>
@@ -172,6 +213,13 @@ function EditNas({ open, handleClose, handleSubmit, nasformData, setnasFormData,
                   onChange={onChange}
                   label="Username"
                   fullWidth
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        < FaUserEdit className="text-black dark:text-black" />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Box>
             </motion.div>
@@ -195,9 +243,26 @@ function EditNas({ open, handleClose, handleSubmit, nasformData, setnasFormData,
               </motion.div>
 
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              className='flex gap-2'
+               
               >
+
+<motion.button 
+ whileHover={{ scale: 1.05 }}
+ whileTap={{ scale: 0.95 }}
+className={`px-5 py-3  font-medium 
+         text-gray-700 rounded-2xl transition-all
+             hover:bg-red-500 bg-red-500`}
+             onClick={ (e)=> {
+              e.preventDefault()
+               handleClose()
+             } }>
+        Cancel
+      </motion.button>
+      <motion.div
+       whileHover={{ scale: 1.05 }}
+       whileTap={{ scale: 0.95 }}
+      >
                 <LoadingButton
                   type="submit"
                   variant="contained"
@@ -208,18 +273,13 @@ function EditNas({ open, handleClose, handleSubmit, nasformData, setnasFormData,
                 >
                   Save
                 </LoadingButton>
+                </motion.div>
               </motion.div>
             </DialogActions>
           </form>
 
 
 
-<button   className={`flex-1 px-6 py-3.5 font-medium 
-         text-gray-700 rounded-2xl transition-all
-             hover:bg-red-500 bg-red-500`}
-             onClick={handleClose}>
-        Cancel
-      </button>
         </DialogContent>
       </Dialog>
     </React.Fragment>

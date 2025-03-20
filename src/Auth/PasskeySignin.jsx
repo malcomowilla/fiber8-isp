@@ -626,11 +626,15 @@ toast.error(newData.error, {
     {/* Logo Section */}
     <div className="flex justify-center items-center w-full">
       <a href="#" className="flex items-center text-2xl font-semibold text-gray-900 dark:text-white">
-      <img
-               src={ logo_preview || "/images/aitechs.png"}
-              alt="logo"
-              className="w-24 h-24 mx-auto rounded-full"
-            />
+      
+
+
+<img
+className="w-24 h-24 mx-auto rounded-full"
+  src={logo_preview || "/images/aitechs.png"}
+  alt={company_name || "Aitechs"}
+  onError={(e) => { e.target.src = "/images/aitechs.png"; }}
+/>
       </a>
     </div>
 

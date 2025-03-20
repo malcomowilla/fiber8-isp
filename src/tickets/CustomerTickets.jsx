@@ -28,6 +28,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton } from '@mui/material';
 
 import EditIcon from '@mui/icons-material/Edit';
+import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading animation
 
 
 
@@ -71,8 +72,7 @@ const [ticketForm, setTicketForm] = useState({
  
 const [search, setSearch] = useState('')
 const [searchInput] = useDebounce(search, 1000)
-// const [snackbar, setSnackbar] = useState({ open: false,
-//    message: '', severity: 'success' });
+const [isSearching, setIsSearching] = useState(false); // New state for search loading
 
 
 console.log('customer phone number',agentRole)
@@ -390,6 +390,7 @@ toaster.error('eror creating ticket', {
                 async() => {
               
                   try {
+                    setIsSearching(true)
                     const response = await fetch('/api/get_tickets', {
                     //   signal: controller.signal,  
               
@@ -401,13 +402,14 @@ toaster.error('eror creating ticket', {
                   
                  
                     if (response.ok) {
+                      setIsSearching(false)
                       // setTicket(newData)
                       setTicket(newData.filter((my_ticket)=> {
                         return search.toLowerCase() === '' ? my_ticket : my_ticket.ticket_number.toLowerCase().includes(search)
                       }))
                       console.log('ticket data', newData)
                     } else {
-
+                      setIsSearching(false)
                       toaster.error(newData.error, {
                         position: 'top-right',
                         duration: 5000,
@@ -416,6 +418,7 @@ toaster.error('eror creating ticket', {
               
                     }
                   } catch (error) {
+                    setIsSearching(false)
                     toaster.error('Failed to Search Ticket server error', {
                         position: 'top-right',
                         duration: 4000,
@@ -490,7 +493,9 @@ toaster.error('eror creating ticket', {
         const handleRowClick = (event, rowData)=> {
           const customerData = customers.find(my_customer => my_customer.name === rowData.customer);
           console.log(' row data', rowData) 
-  setPhone(customerData.phone_number)
+  // setPhone(customerData.phone_number)
+    setPhone(rowData.phone_number)
+
           setTicketForm(rowData)
           setName(customerData.name)
           setTicketNo(rowData.ticket_number)
@@ -586,6 +591,36 @@ toaster.error('eror creating ticket', {
 </div>
 
 
+<div style={{ maxWidth: "100%", position: "relative" }}>
+  
+
+  {isSearching ? (
+  
+  <div className="absolute inset-0 flex justify-center cursor-pointer items-center  
+   bg-opacity-70 z-[2] mb-[50rem]">
+      <CircularProgress size={90} color="inherit" className='text-black dark:text-white' /> 
+      
+      </div>
+    
+  ) : (
+    <div className='hidden'>
+    <svg
+      className="w-4 h-4"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 20 20"
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+      />
+    </svg>
+    </div>
+  )} 
 
 
     <div style={{ maxWidth: "100%" }}>
@@ -781,6 +816,7 @@ fontFamily: 'mono'
 
 }} 
     />
+  </div>
   </div>
 
   </>

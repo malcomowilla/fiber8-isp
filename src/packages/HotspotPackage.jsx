@@ -23,7 +23,9 @@ import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { RiHotspotLine } from "react-icons/ri";
 
 import dayjs from 'dayjs';
+import { useDebounce } from 'use-debounce';
 
+import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading animation
 
 
 
@@ -55,6 +57,10 @@ const [isOpenDelete, setisOpenDelete] = useState(false)
 
 const {settingsformData} = useApplicationSettings()
 const [search, setSearch] = useState('')
+
+const [searchInput] = useDebounce(search, 1000)
+const [isSearching, setIsSearching] = useState(false); // New state for search loading
+
 const [hotspotPackage, setHotspotPackage] = useState({
   name: '',
   validity: '',
@@ -204,6 +210,7 @@ useEffect(() => {
   
   const fetchHotspotPackages = async() => {
     try {
+      setIsSearching(true)
       const response = await fetch('/api/hotspot_packages', {
         headers: {
           'X-Subdomain': subdomain,
@@ -211,8 +218,13 @@ useEffect(() => {
       })
       const newData = await response.json()
       if (response.ok) {
-        setPackages(newData)
+        // setPackages(newData)
+        setIsSearching(false)
+        setPackages(newData.filter((package_name)=> {
+          return search.toLowerCase() === '' ? package_name : package_name.name.toLowerCase().includes(search)
+        }))
       } else {
+        setIsSearching(false)
         toast.error('failed to fetch hotspot packages', {
           duration: 7000,
           position: "top-center",
@@ -220,6 +232,7 @@ useEffect(() => {
         console.log('failed to fetch hotspot packages')
       }
     } catch (error) {
+      setIsSearching(false)
       toast.error('Something went wrong', {
         duration: 7000,
         position: "top-center",
@@ -228,7 +241,7 @@ useEffect(() => {
     }
   }
   fetchHotspotPackages()
-}, []);
+}, [searchInput]);
 
 
 
@@ -433,6 +446,39 @@ const deleteHotspotPackage = async (id) => {
      </button>
  </div>
 
+
+
+<div style={{ maxWidth: "100%", position: "relative" }}>
+  
+
+  {isSearching ? (
+  
+  <div className="absolute inset-0 flex justify-center cursor-pointer items-center  
+   bg-opacity-70 z-[2] mb-[50rem]">
+      <CircularProgress size={90} color="inherit" className='text-black dark:text-white' /> 
+      
+      </div>
+    
+  ) : (
+    <div className='hidden'>
+    <svg
+      className="w-4 h-4"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 20 20"
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+      />
+    </svg>
+    </div>
+  )} 
+
       <MaterialTable columns={columns}
       onRowClick={handleRowClick}
       title='Hotspot Packages'
@@ -495,6 +541,7 @@ headerStyle:{
       
       />
 
+    </div>
     </div>
 
     </>
