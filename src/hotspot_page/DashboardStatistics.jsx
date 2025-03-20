@@ -30,7 +30,7 @@ const StatCard = ({ title, value, icon, color }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`p-6 rounded-lg shadow-lg ${color} text-white`}
+      className={`p-6 rounded-lg shadow-2xl ${color} text-white`}
     >
       <div className="flex items-center justify-between">
         <div>
@@ -211,46 +211,46 @@ const getExpiredVouchers = useCallback(async () => {
 
   const stats = [
     {
-      title: "Active Vouchers",
+      title: <p className='font-thin'>Active Vouchers</p>,
       value: activeVouchers,
       icon: "🎫",
       color: "bg-purple-500",
     },
 
     {
-      title: "Expired Vouchers",
-      value: expiredVouchers, // Example value
+      title: <p className='font-thin'>Expired Vouchers</p>,
+      value: <p className='font-thin'>{expiredVouchers}</p>, // Example value
       icon: "⛔", // Icon for expired vouchers
       color: "bg-red-500", // Red color for expired items
     },
     {
-      title: "Online Users",
-      value: onlineUsers,
+      title: <p className='font-light'>Online Users</p>,
+      value: <p className='font-light'> {onlineUsers}</p>,
       icon: "👥",
       color: "bg-blue-500",
     },
     {
-      title: "Payments Today",
-      value: 2300,
+      title: <p className='font-thin text-black'>Payments Today  </p>,
+      value: <p className='font-thin text-black'>2300</p>,
       icon: "💳",
-      color: "bg-green-500",
+      color: "bg-white",
     },
     {
-      title: "Payments This Month",
-      value: 45000,
+      title: <p className='font-light'>Payments This Month</p>,
+      value: <p className='font-light'>45000</p>,
       icon: "💰",
       color: "bg-orange-500",
     },
     {
-      title: "Data Consumed",
-      value: 1200,
+      title: <p className='font-light'>Data Consumed</p>,
+      value: <p className='font-light'>1200</p>,
       icon: "📊",
       color: "bg-pink-500",
     },
   ];
 
   return (
-    <div className="min-h-sm bg-gradient-to-r from-blue-500 to-purple-600 p-8">
+    <div className="min-h-sm bg-gradient-to-r  p-2">
       <h1 className="text-4xl  text-white 
       font-thin
       mb-8">Hotspot Statistics</h1>

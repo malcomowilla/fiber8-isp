@@ -22,6 +22,8 @@ import {useApplicationSettings} from '../settings/ApplicationSettings'
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteVoucher from '../delete/DeleteVoucher'
 import { FaDesktop } from "react-icons/fa"; // Import device icon
+import { useDebounce } from 'use-debounce';
+import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading animation
 
 
 
@@ -49,6 +51,10 @@ import { FaDesktop } from "react-icons/fa"; // Import device icon
 const HotspotSubscriptions = () => {
 
   const [search, setSearch] = useState('')
+  const [searchInput] = useDebounce(search, 1000)
+  const [isSearching, setIsSearching] = useState(false); // New state for search loading
+  
+
   const { settingsformData, setFormData, selectedProvider, setSelectedProvider, 
     setSmsSettingsForm
    } = useApplicationSettings();
@@ -220,6 +226,7 @@ const newData = await response.json()
 const getHotspotVouchers = useCallback(
   async() => {
     try {
+      setIsSearching(true)
       const response = await fetch('/api/hotspot_vouchers', {
         headers: {
           'X-Subdomain': subdomain, 
@@ -227,15 +234,20 @@ const getHotspotVouchers = useCallback(
       })
       const newData = await response.json()
       if (response.ok) {
-      
+        setIsSearching(false)
         setVouchers(newData)
+        setVouchers(newData.filter((voucher)=> {
+          return search.toLowerCase() === '' ? voucher : voucher.status.toLowerCase().includes(search)
+        }))
       } else {
+        setIsSearching(false)
         toast.error('Failed to fetch vouchers', {
           position: "top-center",
           duration: 4000,
         })
       }
     } catch (error) {
+      setIsSearching(false)
       toast.error('Failed to fetch vouchers internal server error', {
         position: "top-center",
         duration: 4000,
@@ -244,7 +256,7 @@ const getHotspotVouchers = useCallback(
 
 
   },
-  [],
+  [searchInput],
 )
 
 
@@ -461,6 +473,38 @@ deleteVoucher={deleteVoucher} id={voucherForm.id} loading={loading}/>
         <span className="sr-only">Search</span>
     </button>
 </div>   
+
+
+<div style={{ maxWidth: "100%", position: "relative" }}>
+  
+
+  {isSearching ? (
+  
+  <div className="absolute inset-0 flex justify-center cursor-pointer items-center  
+   bg-opacity-70 z-[2] mb-[50rem]">
+      <CircularProgress size={90} color="inherit" className='text-black dark:text-white' /> 
+      
+      </div>
+    
+  ) : (
+    <div className='hidden'>
+    <svg
+      className="w-4 h-4"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 20 20"
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+      />
+    </svg>
+    </div>
+  )} 
    
 <MaterialTable columns={columns}
 
@@ -512,6 +556,7 @@ headerStyle:{
 
 />
 
+    </div>
     </div>
     </>
   )
