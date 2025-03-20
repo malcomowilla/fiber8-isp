@@ -671,11 +671,12 @@ setPassword(e.target.value)
 
         <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
           <div className="text-center">
-            <img
-              src={ logo_preview || "/images/aitechs.png"}
-              alt="logo"
-              className="w-24 h-24 mx-auto rounded-full"
-            />
+          <img
+  className="w-[100px] h-[100px] mx-auto rounded-full"
+  src={logo_preview || "/images/aitechs.png"}
+  alt={company_name || "Aitechs"}
+  onError={(e) => { e.target.src = "/images/aitechs.png"; }}
+/>
           </div>
 
           <h2 className="mt-6 text-xl font-semibold text-gray-900 dark:text-white text-center">
@@ -765,9 +766,9 @@ setPassword(e.target.value)
           </form>
 
           {/* Additional Info */}
-          <p className="mt-6 text-sm text-center text-gray-600 dark:text-gray-400">
+          {/* <p className="mt-6 text-sm text-center text-gray-600 dark:text-gray-400">
             New on our platform? Reach us at 0791568852 for a free trial!
-          </p>
+          </p> */}
         </div>
       </motion.section>
     </main>
