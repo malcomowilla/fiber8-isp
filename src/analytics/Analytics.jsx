@@ -97,16 +97,46 @@ const Analytics = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setUbuntuStats({
-          cpuUsage: data.system_metrics.cpu_usage,
-          memoryUsage: data.system_metrics.memory_total,
-          diskUsage: data.system_metrics.disk_total,
-          available_memory: data.system_metrics.memory_free,
-          uptime: data.uptime,
-          available_disk: data.system_metrics.disk_free,
-          memory_used: data.system_metrics.memory_used,
-          disk_used: data.system_metrics.disk_used,
-        });
+
+        if (data.system_metrics && data.system_metrics.length > 0) {
+          const item = data.system_metrics[0]; // Assuming you need the latest entry
+
+          setUbuntuStats({
+            // cpuUsage: item.cpu_usage,
+            // memoryTotal: item.memory_total,
+            // memoryFree: item.memory_free,
+            // memoryUsed: item.memory_used,
+            // diskTotal: item.disk_total,
+            // diskFree: item.disk_free,
+            // diskUsed: item.disk_used,
+            // loadAverage: item.load_average,
+            // uptime: item.uptime,
+
+              cpuUsage: item.cpu_usage,
+          memoryUsage: item.memory_total,
+          diskUsage: item.disk_total,
+          available_memory: item.memory_free,
+          uptime: item.uptime,
+          available_disk: item.disk_free,
+          memory_used: item.memory_used,
+          disk_used: item.disk_used,
+          });
+        }
+        
+        // setUbuntuStats({
+        //   cpuUsage: data.system_metrics.cpu_usage,
+        //   memoryUsage: data.system_metrics.memory_total,
+        //   diskUsage: data.system_metrics.disk_total,
+        //   available_memory: data.system_metrics.memory_free,
+        //   uptime: data.uptime,
+        //   available_disk: data.system_metrics.disk_free,
+        //   memory_used: data.system_metrics.memory_used,
+        //   disk_used: data.system_metrics.disk_used,
+        // });
+        
+
+
+        
       } else {
         console.error("Failed to fetch Ubuntu stats");
       }
