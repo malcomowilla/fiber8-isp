@@ -73,6 +73,57 @@ const Analytics = () => {
   const [routerData, setRouterData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [ubuntuStats, setUbuntuStats] = useState({
+    cpuUsage: 0,
+    memoryUsage: 0,
+    diskUsage: 0,
+    uptime: "0h 0m",
+    available_memory: 0,
+    memory_used: 0,
+    disk_used: 0,
+    available_disk: 0,
+  });
+  const [loadingUbuntuStats, setLoadingUbuntuStats] = useState(true);
+
+
+
+  const fetchUbuntuStats = useCallback(async () => {
+    try {
+      const response = await fetch("/api/system_status", {
+        headers: {
+          'X-Subdomain': subdomain,
+        }
+      }); // Replace with your backend endpoint
+      const data = await response.json();
+
+      if (response.ok) {
+        setUbuntuStats({
+          cpuUsage: data.system_metrics.cpu_usage,
+          memoryUsage: data.system_metrics.memory_total,
+          diskUsage: data.system_metrics.disk_total,
+          available_memory: data.system_metrics.memory_free,
+          uptime: data.uptime,
+          available_disk: data.system_metrics.disk_free,
+          memory_used: data.system_metrics.memory_used,
+          disk_used: data.system_metrics.disk_used,
+        });
+      } else {
+        console.error("Failed to fetch Ubuntu stats");
+      }
+    } catch (error) {
+      console.error("Error fetching Ubuntu stats:", error);
+    } finally {
+      setLoadingUbuntuStats(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUbuntuStats();
+    const intervalId = setInterval(fetchUbuntuStats, 5000); // Refresh every 5 seconds
+    return () => clearInterval(intervalId);
+  }, [fetchUbuntuStats]);
+
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       setdateTime(false);
@@ -187,9 +238,140 @@ useEffect(() => {
       <div className="p-6">
       <div className="grid grid-auto-fit gap-6">
   {/* Total Subscribers Card */}
+
+
+
+
+
+
+  <motion.div
+            className="max-w-sm p-6 bg-gradient-to-r from-purple-500 to-purple-600 border border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform transition-all hover:scale-105 relative overflow-hidden"
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ duration: 0.5, delay: 0.2 }}
+            whileHover={{ scale: 1.05, rotate: 1 }}
+          >
+            <div className="flex items-center mb-4">
+              <GoCpu className="w-10 h-10 mr-3 text-white" />
+              <h3 className="text-2xl font-bold text-white">CPU Usage</h3>
+            </div>
+            <motion.p
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 1, repeat: Infinity }}
+              className="mb-3 font-normal text-white text-3xl"
+            >
+              {ubuntuStats.cpuUsage}
+            </motion.p>
+            <div className="w-full bg-white bg-opacity-20 rounded-full h-3 overflow-hidden relative">
+              <motion.div
+               style={{ width:`${ubuntuStats.cpuUsage}` }}
+                className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full"
+                // animate={{ width: `${ubuntuStats.cpuUsage}%` }}
+                transition={{ duration: 1, ease: "easeOut" }}
+              />
+            </div>
+          </motion.div>
+
+          {/* Ubuntu Memory Usage Card */}
+          <motion.div
+            className="max-w-sm p-6 bg-gradient-to-r from-green-500 to-green-600 border
+             border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform 
+             transition-all hover:scale-105 relative overflow-hidden"
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ duration: 0.5, delay: 0.4 }}
+            whileHover={{ scale: 1.05, rotate: -1 }}
+          >
+            <div className="flex items-center mb-4">
+              <PiMemory className="w-10 h-10 mr-3 text-white" />
+              <h3 className="text-2xl font-bold text-white">RAM Usage</h3>
+            </div>
+            <div className='flex flex-row justify-between  gap-4'>
+            <div className='flex flex-col'>
+            <motion.p
+           
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 1, repeat: Infinity }}
+              className="mb-3 font-normal text-white text-2xl"
+            >
+              {/* {ubuntuStats.memoryUsage} */}
+              <p> <span className='font-light text-lg'>Used </span> {ubuntuStats.memory_used} </p>
+            </motion.p>
+            <p className='text-white font-light'> [available] {ubuntuStats.available_memory} </p>
+            </div>
+
+            <motion.p
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 1, repeat: Infinity }}
+              className="mb-3 font-normal text-white text-lg"
+            >
+               <p> <span>Total </span>{ubuntuStats.memoryUsage}</p>
+               {/* {ubuntuStats.available_memory} */}
+            </motion.p>
+
+            </div>
+            
+          </motion.div>
+
+          {/* Ubuntu Disk Usage Card */}
+          <motion.div
+            className="max-w-sm p-6 bg-gradient-to-r from-red-500 to-red-600 border border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform transition-all hover:scale-105 relative overflow-hidden"
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ duration: 0.5, delay: 0.6 }}
+            whileHover={{ scale: 1.05, rotate: 1 }}
+          >
+            <div className="flex items-center mb-4">
+              <PiFloppyDiskBack className="w-10 h-10 mr-3 text-white" />
+              <h3 className="text-xl font-bold text-white">Disk Usage</h3>
+            </div>
+            <div className='flex flex-row justify-between  gap-4'>
+
+              <div className='flex flex-col'>
+            <motion.p
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 1, repeat: Infinity }}
+              className="mb-3 font-normal text-white text-2xl"
+            >
+              <span className='font-light text-lg'> Used </span>
+              {/* {ubuntuStats.diskUsage}% */}
+              {ubuntuStats.disk_used}
+            </motion.p>
+            <p className='text-white'> [available] {ubuntuStats.available_disk}</p>
+            </div>
+
+            <p className='text-white'><span >Total </span> {ubuntuStats.diskUsage} </p>
+            </div>
+           
+          </motion.div>
+
+          {/* Ubuntu Uptime Card */}
+          <motion.div
+            className="max-w-sm p-6 bg-gradient-to-r from-yellow-500 to-yellow-600 border border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform transition-all hover:scale-105 relative overflow-hidden"
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ duration: 0.5, delay: 0.8 }}
+            whileHover={{ scale: 1.05, rotate: -1 }}
+          >
+            <div className="flex items-center mb-4">
+              <MdOutlineTimer className="w-10 h-10 mr-3 text-white" />
+              <h3 className="text-2xl font-bold text-white">Uptime</h3>
+            </div>
+            <motion.p
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 1, repeat: Infinity }}
+              className="mb-3 font-normal text-white text-3xl"
+            >
+              {ubuntuStats.uptime}
+            </motion.p>
+          </motion.div>
   <motion.div
     className="max-w-sm p-6 bg-gradient-to-r from-blue-500 to-blue-600 border
-     border-gray-200 rounded-lg shadow-lg dark:border-gray-700 transform
+     border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform
       transition-all hover:scale-105 relative overflow-hidden
       gradient-border
       "
@@ -244,7 +426,9 @@ flex justify-center flex-col items-center'>
 
   {/* Subscribers Online Card */}
   <motion.div
-    className="max-w-sm p-6 bg-gradient-to-r from-green-500 to-green-600 border border-gray-200 rounded-lg shadow-lg dark:border-gray-700 transform transition-all hover:scale-105 relative overflow-hidden"
+    className="max-w-sm p-6 bg-gradient-to-r from-green-500 to-green-600 border
+     border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform transition-all
+      hover:scale-105 relative overflow-hidden"
     variants={cardVariants}
     initial="hidden"
     animate="visible"
@@ -277,7 +461,7 @@ flex justify-center flex-col items-center'>
   <motion.div
 
     className="max-w-sm p-6 bg-gradient-to-r from-white to-white border
-     border-gray-200 rounded-lg shadow-lg dark:border-gray-700 transform
+     border-gray-200 shadow-2xl rounded-lg  dark:border-gray-700 transform
       transition-all hover:scale-105 relative overflow-hidden"
     variants={cardVariants}
     initial="hidden"
@@ -407,9 +591,17 @@ flex justify-center flex-col items-center'>
         <div className="flex items-center mb-4">
           <i className="fas fa-memory text-3xl mr-3"></i>
           <PiMemory  className='p-2 w-12 h-12 mr-3' />
-          <h3 className="text-2xl font-bold">RAM Usage</h3>
+          <h3 className="text-xl font-light">RAM Usage</h3>
         </div>
-        <p className='font-light'><b className='font-bold'>{memory_usage?.used} / {memory_usage?.total}</b></p>
+        <div className='flex flex-row justify-between'>
+          <div className='flex flex-col'>
+        <p className='font-light'>Used <b className='font-bold text-3xl'>{memory_usage?.used}</b></p>
+        <p>[Available <span>{memory_usage?.free}</span>]</p>
+</div>
+
+        <p className='font-light'>Total  <b className='font-light text-xl'>{memory_usage?.total}</b></p>
+
+        </div>
       </motion.div>
 
       {/* Disk Usage Card */}
@@ -422,7 +614,18 @@ flex justify-center flex-col items-center'>
           <PiFloppyDiskBack  className='p-2 w-12 h-12 mr-3' />
           <h3 className="text-2xl font-bold">Disk Usage</h3>
         </div>
-        <p className='font-light'><b className='font-bold'>{disk_usage?.used} / {disk_usage?.total}</b></p>
+        <div className='flex flex-row justify-between'>
+          <div className='flex flex-col'>
+        <p className='font-light'><b className='font-bold text-3xl'>{disk_usage?.used}</b></p>
+        <p>[Available <span>{disk_usage?.free}</span>]</p>
+</div>
+
+        <p className='font-light'>Total <b className='font-light text-xl'>{disk_usage?.used}</b></p>
+
+          </div>
+
+
+
       </motion.div>
 
       {/* Uptime Card */}

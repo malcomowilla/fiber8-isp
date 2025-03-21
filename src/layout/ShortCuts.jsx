@@ -35,7 +35,7 @@ const Card = ({ title, subtitle, Icon, href, to }) => {
       to={to}
       href={href}
       className="w-full  p-4 rounded-lg border-[1px] border-slate-300 relative 
-      overflow-hidden group bg-white"
+      overflow-hidden group bg-white shadow-2xl"
     >
       <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-teal-600 
       translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300" />
