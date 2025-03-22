@@ -138,7 +138,8 @@ const [logoUrl, setLogoUrl] = useState('')
           console.log('failed to fetch company settings')
         }
       } catch (error) {
-        toast.error('internal servere error  while fetching company settings')
+        console.log('internal servere error  while fetching company settings')
+        // toast.error('internal servere error  while fetching company settings')
       
       }
     },
