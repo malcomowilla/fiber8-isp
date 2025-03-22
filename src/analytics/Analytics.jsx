@@ -17,6 +17,8 @@ import { PiFloppyDiskBack } from "react-icons/pi";
 import { MdOutlineTimer } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import {Link} from 'react-router-dom'
+import { LuRouter } from "react-icons/lu";
+
 
 
 
@@ -265,7 +267,7 @@ useEffect(() => {
 }, [fetchtotalSubscribers]);
   return (
     <>
-      <div className="p-6">
+      <div className="p-2">
 
 
         <div className='flex justify-between bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 '>
@@ -583,7 +585,32 @@ useEffect(() => {
     </motion.div>
   </motion.div>
 ) : (
-  <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
+  <div className='flex flex-col items-center  m
+  bg-gradient-to-r from-purple-500 to-indigo-600'>
+  {/* Router Icon with Animation */}
+  <div className='relative flex flex-col mt-20 '>
+    <LuRouter className='w-20 h-20 text-red-500 animate-bounce' />
+    <div className='absolute -bottom-8 text-white text-lg font-bold'>
+      Router Not Found
+    </div>
+  </div>
+
+  {/* Lottie Animation */}
+  <div className='mt-1 relative '>
+    <Lottie
+      options={defaultOptions}
+      height={300}
+      width={300}
+      isStopped={false}
+      isPaused={false}
+    />
+  </div>
+
+  {/* Additional Styling */}
+  <p className='mt-1 text-white text-xl font-semibold'>
+    Please check your connection and try again.
+  </p>
+</div>
 )}
     </>
   );
