@@ -74,13 +74,12 @@ const UploadSubscriber = () => {
   
   return (
 
-    
-    <div>
+    <>
       <Toaster />
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r ">
+      <div className="flex relative justify-center  min-h-screen bg-gradient-to-r ">
       <form onSubmit={handleFileUpload}>
       <motion.div
-        className="bg-white p-8 rounded-lg shadow-lg text-center w-full max-w-md"
+        className="bg-white p-8 rounded-lg shadow-2xl text-center w-full max-w-md"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -148,7 +147,7 @@ const UploadSubscriber = () => {
       </motion.div>
       </form>
     </div>
-    </div>
+    </>
   )
 }
 

@@ -370,7 +370,7 @@ const handleSubmit = async (e)=> {
         
            const intervalId = setInterval(() => {
             getPingStatus();
-          }, 60000); // Fetch every 60 seconds
+          }, 35000); // Fetch every 60 seconds
           return () => clearInterval(intervalId);
         
         }, [getPingStatus]); 

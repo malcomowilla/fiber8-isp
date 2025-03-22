@@ -12,6 +12,7 @@ import { useLocation } from 'react-router-dom';
 import DashboardStatistics from '../hotspot_page/DashboardStatistics'
 import { APP_VERSION, APP_NAME, APP_DESCRIPTION } from '../version';
 import TicketStatistics from '../tickets/TicketStatistics'
+import SubscriberStats from '../subscribers/SubscriberStats'
 
 
 // import { ReloadIcon } from "@radix-ui/react-icons"
@@ -129,13 +130,14 @@ useEffect(() => {
           <p className="capitalize mb-10 dark:text-white text-black text-2xl">
             {date}
           </p>
-          {location.pathname !== '/admin/customer-tickets' && location.pathname !== '/admin/hotspot-dashboard' && <ShortCuts />}
+          {location.pathname !== '/admin/customer-tickets' && location.pathname !== '/admin/hotspot-dashboard' && location.pathname !== '/admin/pppoe-subscribers' && <ShortCuts />}
 
           
           {/* {location.pathname !== '/admin/customer-tickets' && <ShortCuts />}
           {location.pathname !== '/admin/hotspot-dashboard' && <ShortCuts />} */}
           {location.pathname === '/admin/hotspot-dashboard' && <DashboardStatistics />}
           {location.pathname === '/admin/customer-tickets' && <TicketStatistics />}
+          {location.pathname === '/admin/pppoe-subscribers' && <SubscriberStats />}
 
           <div className="mt-8">
             <Outlet />
