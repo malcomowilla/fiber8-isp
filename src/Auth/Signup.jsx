@@ -680,7 +680,8 @@ damping: 15,
             },
           }}
           viewport={{ once: true, amount: 0.5 }}
-          className="bg-gray-900 p-8 rounded-xl border border-purple-500 transform scale-105 hover:scale-110 transition-all duration-300 animate-fade-in-up delay-200">
+          className="bg-gray-900 p-8 rounded-xl border border-purple-500 transform 
+          scale-105 hover:scale-110 transition-all duration-300 animate-fade-in-up delay-200">
             <h3 className="text-2xl font-bold mb-4 text-purple-500">Pro</h3>
             <p className="text-gray-400 mb-6">up to 100 ppoe subscribers</p>
             <p className="text-4xl font-bold mb-6">
