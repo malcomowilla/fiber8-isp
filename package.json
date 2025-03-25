@@ -12,6 +12,9 @@
     "postversion": "git push --follow-tags"
   },
   "dependencies": {
+    "@capacitor/android": "^7.1.0",
+    "@capacitor/core": "^7.1.0",
+    "@capacitor/ios": "^7.1.0",
     "@custom-react-hooks/all": "^1.4.19",
     "@custom-react-hooks/use-media-query": "^1.4.19",
     "@date-io/dayjs": "^3.0.0",
@@ -77,6 +80,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.1.0",
     "@shrutibalasa/tailwind-grid-auto-fit": "^1.1.0",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",

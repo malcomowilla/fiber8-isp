@@ -78,7 +78,7 @@ useEffect(() => {
     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
           
   <motion.div
-    className="max-w-sm p-6 bg-gradient-to-r from-blue-500 to-blue-600 border
+    className="w-full max-w-md h-full max-h-min p-2 bg-gradient-to-r from-blue-500 to-blue-600 border
      border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform
       transition-all hover:scale-105 relative overflow-hidden
       gradient-border
@@ -105,20 +105,33 @@ flex justify-center flex-col items-center'>
     >
       <LiaUserSolid className="w-20 h-20 text-white" />
     </motion.div>
+
+    <div className='flex justify-center items-center py-8 '>
+      <div className='flex flex-row'>
     <LiaUserSolid className="w-10 h-10 mb-4 text-white relative z-10" />
+    <div className='flex flex-col justify-center'>
+
     <a href="#">
+
       <h5 className="mb-2 text-xl font-semibold tracking-tight text-white raleway-dots-relative">
         Total Subscribers
       </h5>
     </a>
 
+
+<div className='text-center'>
     <motion.p 
     animate={{ scale: [1, 1.1, 1] }}
     transition={{ duration: 1, repeat: Infinity }}
     className="mb-3 font-normal cursor-pointer
  text-white text-3xl">{totalSubscribers}</motion.p>
+</div>
 
 
+
+ </div>
+</div>
+</div>
     
     {/* Subtle Glow Effect */}
   </motion.div>
@@ -134,9 +147,10 @@ flex justify-center flex-col items-center'>
 
   {/* Subscribers Online Card */}
   <motion.div
-    className="max-w-sm p-6 bg-gradient-to-r from-green-500 to-green-600 border
-     border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform transition-all
-      hover:scale-105 relative overflow-hidden"
+    className="w-full max-w-md h-full max-h-min p-2 bg-gradient-to-r from-green-500 to-teal-600 border
+     border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform
+      transition-all hover:scale-105 relative overflow-hidden
+      gradient-border"
     variants={cardVariants}
     initial="hidden"
     animate="visible"
@@ -144,33 +158,48 @@ flex justify-center flex-col items-center'>
     whileHover={{ scale: 1.05, rotate: -1 }}
   >
     {/* Floating Icons */}
+    <div className='flex justify-center py-[50px]'>
     <motion.div
       className="absolute -top-4 -right-4 opacity-20"
       animate={{ rotate: 360 }}
       transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
     >
+
       <WifiIcon className="w-20 h-20 text-white" />
     </motion.div>
+    
+      <div className='flex flex-col'>
+    <div className='flex flex-row gap-2'>
     <WifiIcon className="w-10 h-10 mb-4 text-white relative z-10 animate-pulse" />
     <a href="#">
       <h5 className="mb-2 text-xl font-semibold tracking-tight text-white raleway-dots-relative">
         Subscribers Online
       </h5>
     </a>
+
+    </div>
     <motion.p
      animate={{ scale: [1, 1.1, 1] }}
      transition={{ duration: 1, repeat: Infinity }}
-    className="mb-3 font-normal text-white text-3xl">{subscribersOnline}</motion.p>
+    className="mb-3 font-normal text-white text-center text-3xl">{subscribersOnline}</motion.p>
+
+</div>
+    </div>
     {/* Subtle Glow Effect */}
     <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-500 opacity-0 hover:opacity-20 transition-opacity duration-300"></div>
   </motion.div>
 
+
+
+
+
   {/* Subscribers Offline Card */}
   <motion.div
 
-    className="max-w-sm p-6 bg-gradient-to-r from-white to-white border
-     border-gray-200 shadow-2xl rounded-lg  dark:border-gray-700 transform
-      transition-all hover:scale-105 relative overflow-hidden"
+    className="w-full max-w-md h-full max-h-min p-2 bg-white border
+     border-gray-900 rounded-lg shadow-2xl dark:border-gray-700 transform
+      transition-all hover:scale-105 relative overflow-hidden
+      "
     variants={cardVariants}
     initial="hidden"
     animate="visible"
@@ -178,6 +207,9 @@ flex justify-center flex-col items-center'>
     whileHover={{ scale: 1.05, rotate: 1 }}
   >
     {/* Floating Icons */}
+
+    <div className='flex justify-center gap-3  py-[50px]'>
+
     <motion.div
       className="absolute -top-4 -right-4 opacity-20"
       animate={{ rotate: 360 }}
@@ -185,20 +217,32 @@ flex justify-center flex-col items-center'>
     >
       <WifiOffIcon className="w-20 h-20 text-red" />
     </motion.div>
+    
+
+
     <WifiOffIcon className="w-10 h-10 mb-4 text-red-600 relative z-10 animate-pulse" />
+
+<div className='flex flex-col '>
     <a href="#">
       <h5 className="mb-2 text-xl font-semibold tracking-tight text-black raleway-dots-relative">
         Subscribers Offline
       </h5>
     </a>
+
+
+
     <motion.p 
      animate={{ scale: [1, 1.1, 1] }}
      transition={{ duration: 1, repeat: Infinity }}
-    className="mb-3 font-normal text-black text-3xl">{subscribersOffline}</motion.p>
+    className="mb-3 font-normal text-black text-center text-3xl">{subscribersOffline}</motion.p>
+</div>
     {/* Subtle Glow Effect */}
     <div className="absolute inset-0 bg-gradient-to-r from-red-400
      to-red-500 opacity-0 hover:opacity-20 transition-opacity duration-300"></div>
+     </div>
   </motion.div>
+
+  
     </div>
   )
 }

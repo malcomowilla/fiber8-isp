@@ -666,7 +666,7 @@ setPassword(e.target.value)
             ></ion-icon>
           </div>
           <p className="dark:text-white mt-4 font-bold text-2xl">
-            Welcome To <span className="text-red-700"> {company_name || 'Aitechs'}</span>
+            Welcome To <span className=""> {company_name || 'Aitechs'}</span>
           </p>
         </div>
 
@@ -734,20 +734,32 @@ setPassword(e.target.value)
             />
 
             {/* Forgot Password and Passkey Links */}
-            <div className="flex justify-between items-center">
+            <div className="flex gap-6 justify-center">
+
+              <span className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400">
               <Link
                 to="/reset-password"
-                className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
+                
               >
                 Forgot password?
               </Link>
+              </span>
+
+              <span className='mx-2 text-gray-400'>|</span>
+
+              <span className="flex items-center text-sm text-blue-600
+               hover:text-blue-500 dark:text-blue-400">
               <Link
                 to="/passkey-signin"
-                className="flex items-center text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
+                
               >
                 <IoKeyOutline className="mr-1" />
                 Passkey
               </Link>
+              </span>
+
+
+
             </div>
 
             {/* Sign In Button */}

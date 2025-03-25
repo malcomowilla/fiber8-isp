@@ -133,6 +133,8 @@ import {useApplicationSettings} from './settings/ApplicationSettings'
 const HotspotTemplates = lazy(() => import('./hotspot_templates/HotspotTemplates') )
 const HotspotDashboard = lazy(() => import('./hotspot_page/HotspotDashboard.jsx') )
 import { APP_VERSION, APP_NAME, APP_DESCRIPTION } from './version';
+import ClientLogin from './client_portal/ClientLogin'
+import ClientPortal from './client_portal/ClientPortal'
 
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
@@ -649,8 +651,6 @@ const hostname = window.location.hostname;
 
 <Route element={<ProtectAuthSystemAdmin  />}>
     <Route path='/system-admin-dashboard' element={<DashboardSytemAdmin/>}/> 
-
-
     </Route>  
 
   
@@ -705,6 +705,8 @@ const hostname = window.location.hostname;
 
       <Route  path='/signin' element={<InputOTPWithSeparator/>}/>
       <Route  path='/passkey-signin' element={<PasskeySignin/>}/>
+      <Route  path='/client-login' element={<ClientLogin/>}/>
+      <Route  path='/client-portal' element={<ClientPortal/>}/>
       
      <Route path="*" element={<NotFound />}/>
 </Routes>
