@@ -31,11 +31,13 @@ import {
   import {ApplicationContext} from '../context/ApplicationContext'
   import {Link} from 'react-router-dom'
   import { GoPasskeyFill } from "react-icons/go";
+  import {useApplicationSettings} from '../settings/ApplicationSettings'
 
 
   const subdomain = window.location.hostname.split('.')[0]
 
   export function Profile() {
+    const {openDropDown, setOpenDropDown} = useApplicationSettings()
 
     const navigate = useNavigate()
 
@@ -81,10 +83,10 @@ console.log(user)
     //     }).then(navigate("/signin"));
   }
     return (
-      <DropdownMenu>
+      <DropdownMenu open={openDropDown} onOpenChange={setOpenDropDown}>
         <DropdownMenuTrigger asChild>
 
-        <ion-icon name="people-outline" size='large'></ion-icon>
+        <ion-icon name="people-outline" size='large' onClick={()=> setOpenDropDown(!openDropDown)}></ion-icon>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-64 mr-20">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
@@ -148,11 +150,7 @@ console.log(user)
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
             </DropdownMenuSub>
-            <DropdownMenuItem>
-              <Plus className="mr-2 h-4 w-4" />
-              <span>New Team</span>
-              <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-            </DropdownMenuItem>
+            
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
         

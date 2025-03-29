@@ -135,6 +135,7 @@ const HotspotDashboard = lazy(() => import('./hotspot_page/HotspotDashboard.jsx'
 import { APP_VERSION, APP_NAME, APP_DESCRIPTION } from './version';
 import ClientLogin from './client_portal/ClientLogin'
 import ClientPortal from './client_portal/ClientPortal'
+import NetworkComponents from './settings/NetworkComponents'
 
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
@@ -629,7 +630,7 @@ const hostname = window.location.hostname;
   <Route index path='/'  element={<Signup/>}/>
 ): null}    */}
 
-{hostname === 'aitechs.co.ke' ? (
+{hostname === 'localhost' ? (
       <Route index path="/" element={<Signup />} />
     ) : hostname.endsWith('.aitechs.co.ke') ? (
       <Route index path="/" element={<PPPoEPackages />} />
@@ -699,6 +700,7 @@ const hostname = window.location.hostname;
 <Route path='/admin/hotspot_settings' element={<HotspotSettings/>}/>
 <Route path='/admin/customer-tickets' element={<CustomerTickets/>}/>
 <Route path='/admin/ip-pool-table' element={<IpPoolTable/>}/>
+<Route path='/admin/network-components' element={<NetworkComponents/>}/>
 </Route>
 
 </Route >

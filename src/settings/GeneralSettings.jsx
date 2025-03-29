@@ -20,6 +20,11 @@ import styled from "styled-components";
 import { motion } from "framer-motion";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { FaRegBuilding } from "react-icons/fa";
+import { FaQuestion } from "react-icons/fa6";
+import { MdOutlineMailOutline } from "react-icons/md";
+import { MdOutlinePhonelinkSetup } from "react-icons/md";
+
+
 
 
 
@@ -42,6 +47,7 @@ import { FiUsers } from "react-icons/fi";
 import { BsRouter } from "react-icons/bs";
 import { CiUser } from "react-icons/ci";
 
+import { FaPhone } from "react-icons/fa";
 
 
 const useStyles = makeStyles(theme => ({
@@ -1233,6 +1239,7 @@ width:{
           </Typography>
 
           <Autocomplete
+         
             value={
               routers.find((router) => router.name === settingsformData.router_name) ||
               null
@@ -1257,6 +1264,9 @@ width:{
             options={routers}
             renderInput={(params) => (
               <TextField
+              InputProps={{
+                StartAdornment: <BsRouter className='mr-2'/>
+              }}
                 id="router_name"
                 className="myTextField"
                 {...params}
@@ -1270,6 +1280,9 @@ width:{
             }}
             renderOption={(props, router) => (
               <Stack
+              InputProps={{
+                StartAdornment: <BsRouter className='mr-2'/>
+              }}
                 direction="row"
                 spacing={2}
                 sx={{
@@ -1736,6 +1749,10 @@ type='submit'
 
           {/* Existing text fields */}
           <TextField  
+          InputProps={{
+            startAdornment: <FaRegBuilding className='mr-2'/>
+
+          }}
             name='company_name'
             value={company_name}
             onChange={handleFormDataChangeForCompany}
@@ -1744,17 +1761,24 @@ type='submit'
           />
 
           <TextField  
+          InputProps={{
+            startAdornment: <MdOutlineMailOutline className='mr-2'/>
+
+          }}
             onChange={handleFormDataChangeForCompany}
             name='email_info'
-            value={email_info}
+            value={email_info === null || email_info === 'null' && '' }
             label='Email Info' 
             type='text'
           />
 
-          <TextField  
+          <TextField 
+          InputProps={{
+            startAdornment: <MdOutlinePhonelinkSetup className='mr-2'/>
+          }} 
             onChange={handleFormDataChangeForCompany}
             name='contact_info'
-            value={contact_info}
+            value={contact_info === null || contact_info === 'null' && '' }
             label='Company Contact Info' 
             type='text'
           />
@@ -1763,16 +1787,23 @@ type='submit'
 <TextField  
             onChange={handleFormDataChangeForCompany}
             name='agent_email'
-            value={agent_email}
+            InputProps={{
+              startAdornment: <MdOutlineMailOutline className='mr-2'/>
+
+            }}
+            value={agent_email === null || agent_email === 'null' && '' }
             label='Agent Email' 
             type='text'
           />
 
 
-<TextField  
+<TextField 
+InputProps={{
+  startAdornment: <FaPhone className='mr-2'/>
+}} 
             onChange={handleFormDataChangeForCompany}
             name='customer_support_phone_number'
-            value={customer_support_phone_number} 
+            value={customer_support_phone_number === null || customer_support_phone_number === 'null' && '' } 
             label='Customer Support Phone Number'
             type='text'
           />
@@ -1783,9 +1814,14 @@ type='submit'
 <TextField  
             onChange={handleFormDataChangeForCompany}
             name='customer_support_email'
-            value={customer_support_email} 
+            value={customer_support_email   === null || customer_support_email === 'null' && '' }
             label='Customer Support Email'  
             type='text'
+            InputProps={{
+              startAdornment: <MdOutlineMailOutline className='mr-2'/>
+
+            }}
+
           />
 
           {/* Add the new image upload section */}

@@ -33,14 +33,16 @@ const Nas = () => {
 const [loading, setloading] = useState(false)
 const [offlineerror, setofflineerror] = useState(false)
 const [openDelete, setOpenDelete] = useState(false);
-const { nasformData, setnasFormData,initialValueNas, setTableData } =  useApplicationSettings() 
+const { nasformData, setnasFormData,initialValueNas, setTableData,
+  pingStatus, setPingStatus
+
+ } =  useApplicationSettings() 
 const [selectedRouter, setSelectedRouter] = useState(null);
 const [selectedRouterInfo, setSelectedRouterInfo] = useState(null);
 const [search ,setSearch] = useState('')
 
 
 const [tableDataNas, setTableDataNas] = useState([]); // Stores routers
-const [pingStatus, setPingStatus] = useState([]); // Stores ping statuses
 
 const [selectedRouterId, setSelectedRouterId] = useState(() => {
   const savedRouterId = localStorage.getItem('selectedCheckedRouter');
@@ -52,8 +54,11 @@ const handleClickOpenDelete = () => {
 };
 
 const handleCloseDelete = () => {
+  
   setOpenDelete(false);
 };
+
+
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -131,7 +136,7 @@ const subdomain = window.location.hostname.split('.')[0];
         position: "top-center",
         duration: 7000,
       })
-      setTableData((tableData)=> tableData.filter(item => item.id !== id))
+      setTableDataNas((prevData) => prevData.filter((router) => router.id !== id));
       setloading(false)
       
     } else {
