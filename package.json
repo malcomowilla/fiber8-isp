@@ -53,6 +53,7 @@
     "flowbite-react": "^0.7.3",
     "framer-motion": "^11.17.0",
     "input-otp": "^1.2.0",
+    "ionicons": "^7.4.0",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
     "lottie-react": "^2.4.1",
