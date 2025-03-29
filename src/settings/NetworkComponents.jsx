@@ -5,17 +5,18 @@ import { SiWireguard, SiOpenvpn } from 'react-icons/si';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import {useEffect, useCallback, useState} from 'react'
 import toast,{Toaster} from 'react-hot-toast'
+import { useLocation } from 'react-router-dom';
 
 const NetworkComponents = () => {
 
 const {pingStatus, setPingStatus} = useApplicationSettings()
 const [serviceStatus, setServiceStatus] = useState({ freeradius: {}, wireguard: {} });
-
+const location = useLocation()
 
 console.log('ping status', pingStatus)
 
 const subdomain = window.location.hostname.split('.')[0];
-
+console.log('subdomain', subdomain)
 
 
 const fetchServiceStatus = async () => {
@@ -37,6 +38,8 @@ useEffect(() => {
 }, []);
   const services = [
     {
+
+
       name: "Free Radius",
       status: serviceStatus?.freeradius?.running,
       lastRestart: serviceStatus?.freeradius?.last_restart || "Unknown",
@@ -193,8 +196,11 @@ useEffect(() => {
 <button className='w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700'> Reboot </button>
                 </div>
 ) : ''}
-            
-            {service.restartable && (
+
+          {!subdomain.startsWith('aitechs') ? (
+            <>
+
+{service.restartable && (
               <button
                 className=" bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700"
                 onClick={() => restartService(service?.service_name)}
@@ -202,6 +208,9 @@ useEffect(() => {
                 Reboot
               </button>
             )}
+            </>
+          ): ''}  
+           
               
               <motion.div
                 animate={{ 

@@ -48,6 +48,9 @@ import { BsRouter } from "react-icons/bs";
 import { CiUser } from "react-icons/ci";
 
 import { FaPhone } from "react-icons/fa";
+import { MdTextsms } from "react-icons/md";
+
+
 
 
 const useStyles = makeStyles(theme => ({
@@ -97,10 +100,20 @@ const [checkedData,  setCheckedData] = useState('')
 const [open, setOpen] = useState(false);
 const [openNotifactionSettings, setOpenSettings] = useState(false)
 const [routers, setRouters]= useState ([])
+const [smsProviders, setSmsProviders] = useState([])
 const [mikrotik_router, setRouter] = useState(null)
+const [sms_provider, setSmsProvider] = useState({
+  sms_provider: ''
+})
 console.log('checked data', checkedData)
 
 const classes = useStyles();
+
+
+const handleChangeSmsProvider = (e) => {
+  const {checked, value, name} = e.target;
+  setSmsProvider({...sms_provider, [name]: value})
+}
 
 // useEffect(() => {
 //   if (settingsformData.router_name) {
@@ -577,6 +590,80 @@ const handleChangeAdminSetting = async(e) => {
 
 
 
+const handleGetSmsProviderSettings = useCallback(
+  async() => {
+    
+
+
+    try {
+      const response = await fetch(`/api/sms_provider_settings`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+        },
+      });
+
+      const newData = await response.json()
+      if (response.ok) {
+        setSmsProvider({...sms_provider, sms_provider: newData[0].sms_provider})
+
+      } else {
+        toast.error('failed to fetch sms provider settings', {
+          duration: 2000,
+          position: 'top-center',
+        })
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  [],
+)
+
+
+useEffect(() => {
+  handleGetSmsProviderSettings()
+  
+}, [handleGetSmsProviderSettings]);
+
+
+const saveSmsProviderSetting = async(e) => {
+  e.preventDefault()
+
+  try {
+    const response = await fetch('/api/sms_provider_settings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Subdomain': subdomain,
+      },
+      body: JSON.stringify({
+        sms_provider_setting: sms_provider
+      })
+    })
+
+    const newData = await response.json()
+    if (response.ok) {
+      toast.success('SMS settings updated successfully', {
+        duration: 4000,
+        position: "top-center",
+      })
+      console.log('updated sms settings', newData)
+      setSmsProvider({...sms_provider, sms_provider: newData.sms_provider})
+    } else {
+      toast.error('failed to update sms settings', {
+        duration: 4000,
+        position: "top-center",
+      })
+    }
+  } catch (error) {
+    toast.error('error updating sms settings', {
+      duration: 4000,
+      position: "top-center",
+    })
+  }
+
+} 
 
 
 
@@ -586,6 +673,43 @@ const handleChangeAdminSetting = async(e) => {
 
 
 
+
+const fetchSavedSmsSettings = useCallback(
+  async() => {
+    
+    try {
+      const response = await fetch(`/api/saved_sms_settings`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+        },
+      });
+  
+      const data = await response.json();
+
+     
+  
+      if (response.ok) {
+      
+        setSmsProviders(data)
+      } else {
+       
+      }
+    } catch (error) {
+      toast.error('Internal server error: Something went wrong with fetching SMS settings', {
+        duration: 3000,
+        position: 'top-center',
+      });
+    }
+  },
+  [],
+)
+
+
+useEffect(() => {
+  fetchSavedSmsSettings();
+ 
+}, [fetchSavedSmsSettings]);
 
 
 
@@ -1183,6 +1307,180 @@ width:{
       </Accordion>
 
       </form> */}
+
+
+
+
+
+
+
+
+<form onSubmit={saveSmsProviderSetting}>
+      <Accordion
+        sx={{
+          backgroundColor: "transparent",
+          boxShadow: "none",
+        }}
+      >
+        <AccordionSummary
+          expandIcon={
+            <ArrowDownwardIcon
+            className='dark:text-white text-black'
+              sx={{  transition: "transform 0.3s" }}
+            />
+          }
+          aria-controls="panel1-content"
+          id="panel1-header"
+          sx={{
+            backgroundColor: "rgba(0, 0, 0, 0.05)",
+            borderRadius: "10px",
+            color: "black",
+          }}
+        >
+          <Typography variant="h6">
+            <div className='flex gap-3'>
+            <MdTextsms className='text-green-500'/>
+            <p className='dark:text-white text-black text-lg'>Sms settings</p>
+              
+            </div>
+            
+            
+            </Typography>
+        </AccordionSummary>
+
+        
+        <AccordionDetails
+          sx={{
+            backgroundColor: "rgba(0, 0, 0, 0.05)",
+            borderRadius: "10px",
+            marginTop: "10px",
+            padding: "20px",
+          }}
+        >
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            <strong>What does this setting do?</strong>
+            <br />
+            This setting allows you to select a user to input systemwide sms settings
+          </Typography>
+
+          <Autocomplete
+         
+            value={
+              smsProviders.find((provider) => provider.sms_provider === sms_provider.sms_provider) ||
+              null
+            }
+            sx={{
+              width: { xs: "100%", sm: "55%" },
+              "& label.Mui-focused": {
+                color: "black",
+                fontSize: "16px",
+              },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "black",
+                  borderWidth: "3px",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "black",
+                },
+              },
+            }}
+            getOptionLabel={(sms_provider) => sms_provider.sms_provider}
+            options={smsProviders}
+            renderInput={(params) => (
+              <TextField
+              InputProps={{
+                StartAdornment: <MdTextsms className='mr-2'/>
+              }}
+                name='sms_provider'
+                className="myTextField"
+                {...params}
+                label="Select Sms Provider"
+              />
+            )}
+            onChange={(event, newValue) => {
+              console.log("Selected Router:", newValue);
+
+              setSmsProvider({...sms_provider, sms_provider: newValue ? newValue.sms_provider : '' });
+            }}
+            renderOption={(props, sms_provider) => (
+              <Stack
+            
+                direction="row"
+                spacing={2}
+                sx={{
+                  width: "100%",
+                  padding: 1,
+                  "&:hover": {
+                    backgroundColor: "rgba(0, 0, 0, 0.1)",
+                  },
+                }}
+                {...props}
+              >
+                <MdTextsms  />
+                <Stack direction="column">
+                  <span>{sms_provider?.sms_provider}</span>
+                </Stack>
+              </Stack>
+            )}
+          />
+
+          {showSuccess && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginTop: "10px",
+                color: "#4CAF50",
+              }}
+            >
+              <CheckCircleIcon sx={{ mr: 1 }} />
+              <Typography variant="body1">
+                sms provider selected successfully! Settings applied system-wide.
+              </Typography>
+            </motion.div>
+          )}
+
+        
+
+          <Tooltip title="Update router settings system-wide">
+            <Button
+              type="submit"
+              sx={{
+                marginTop: "20px",
+                padding: "10px 20px",
+                backgroundColor: "#ff6f61",
+                color: "white",
+                borderRadius: "25px",
+                "&:hover": {
+                  backgroundColor: "#ff4a3d",
+                },
+              }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              component={motion.button}
+            >
+              Update Settings
+            </Button>
+          </Tooltip>
+        </AccordionDetails>
+      </Accordion>
+    </form>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

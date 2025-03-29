@@ -1,5 +1,5 @@
-import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend, ArcElement } from "chart.js";
-import { Bar, Pie } from "react-chartjs-2";
+// import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Title, ArcElement } from "chart.js";
+// import { Bar, Pie } from "react-chartjs-2";
 import { linearChartData } from './linearChartData';
 import { linearChartData2 } from './linearChataData2';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
@@ -18,6 +18,9 @@ import { MdOutlineTimer } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import {Link} from 'react-router-dom'
 import { LuRouter } from "react-icons/lu";
+import { LineChart, Line,BarChart, Bar , XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area ,
+  ResponsiveContainer,
+  AreaChart} from 'recharts';
 
 
 
@@ -26,7 +29,7 @@ import { LuRouter } from "react-icons/lu";
 
 
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend, ArcElement);
+// ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend, ArcElement);
 
 const Analytics = () => {
   const options = {
@@ -230,7 +233,7 @@ const Analytics = () => {
         data: [
           parseFloat(cpu_load?.replace("%", "") || 0),
           parseFloat(memory_usage?.used?.replace(" MB", "") || 0),
-          parseFloat(disk_usage?.used?.replace(" GB", "") || 0) * 1024, // Convert GB to MB
+          parseFloat(disk_usage?.used?.replace(" GB", "") || 0) * 1024, 
         ],
         backgroundColor: ["rgba(255, 99, 132, 0.6)", "rgba(54, 162, 235, 0.6)", "rgba(75, 192, 192, 0.6)"],
       },
@@ -572,32 +575,114 @@ useEffect(() => {
           className="text-2xl font-bold">Uptime</motion.h3>
         </div>
         <motion.p
-         animate={{ scale: [1, 1.1, 1] }}
-         transition={{ duration: 1, repeat: Infinity }}
+        
         className='font-light'><b className='font-bold'>{uptime}</b></motion.p>
       </motion.div>
     </div>
 
     {/* Traffic Graph */}
     <motion.div
-      className="p-6 mt-6 bg-white rounded-lg shadow-lg"
+      className="p-6 mt-6  rounded-lg shadow-lg"
       whileHover={{ scale: 1.05 }}
     >
       <h3 className="text-xl font-semibold mb-4 dark:text-black">Traffic Statistics</h3>
-      <div className="h-[300px]">
-        <Bar
-          data={trafficData}
-          options={{
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-              },
-            },
-          }}
-        />
-      </div>
+     
+
+
+      <div className="h-[300px] w-full">
+  <ResponsiveContainer width="100%" height="100%">
+    <AreaChart
+      data={[
+        { 
+          name: "Current",
+
+
+          // parseFloat(cpu_load?.replace("%", "") || 0),
+          // parseFloat(memory_usage?.used?.replace(" MB", "") || 0),
+          // parseFloat(disk_usage?.used?.replace(" GB", "") || 0) * 1024, 
+
+
+
+          cpuLoad: parseFloat(cpu_load?.replace("%", "") || 0),
+          memoryUsed: parseFloat(memory_usage?.used?.replace(" MB", "") || 0),
+          diskUsed: parseFloat(disk_usage?.used.replace("GB", "") || 0), 
+        }
+      ]}
+      margin={{ top: 10, right: 30, left: 20, bottom: 20 }}
+    >
+      <defs>
+        <linearGradient id="colorCpu" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="5%" stopColor="rgba(255, 99, 132, 0.8)" />
+          <stop offset="95%" stopColor="rgba(255, 99, 132, 0)" />
+        </linearGradient>
+        <linearGradient id="colorMemory" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="5%" stopColor="rgba(54, 162, 235, 0.8)" />
+          <stop offset="95%" stopColor="rgba(54, 162, 235, 0)" />
+        </linearGradient>
+        <linearGradient id="colorDisk" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="5%" stopColor="rgba(75, 192, 192, 0.8)" />
+          <stop offset="95%" stopColor="rgba(75, 192, 192, 0)" />
+        </linearGradient>
+      </defs>
+      
+      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+      <XAxis 
+        dataKey="name"
+        tick={{ fill: '#6b7280' }}
+      />
+      <YAxis 
+        tick={{ fill: '#6b7280' }}
+        tickFormatter={(value) => `${value}${value > 100 ? 'MB' : '%'}`}
+      />
+      
+      <Tooltip 
+        contentStyle={{
+          background: 'rgba(255, 255, 255, 0.95)',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        }}
+        formatter={(value, name) => {
+          let unit = '%';
+          if (name === 'memoryUsed') unit = 'MB';
+          if (name === 'diskUsed') unit = 'GB';
+          return [`${value}${unit}`, 
+            name === 'cpuLoad' ? 'CPU Load' : 
+            name === 'memoryUsed' ? 'Memory Used' : 'Disk Used'];
+        }}
+      />
+      
+      <Legend 
+        formatter={(value) => {
+          return value === 'cpuLoad' ? 'CPU Load' : 
+                 value === 'memoryUsed' ? 'Memory Used' : 'Disk Used';
+        }}
+      />
+      
+      <Area 
+        type="monotone"
+        dataKey="cpuLoad"
+        stroke="rgba(255, 99, 132, 0.6)"
+        fill="url(#colorCpu)"
+        name="cpuLoad"
+      />
+      <Area 
+        type="monotone"
+        dataKey="memoryUsed"
+        stroke="rgba(54, 162, 235, 0.6)"
+        fill="url(#colorMemory)"
+        name="memoryUsed"
+      />
+      <Area 
+        type="monotone"
+        dataKey="diskUsed"
+        stroke="rgba(75, 192, 192, 0.6)"
+        fill="url(#colorDisk)"
+        name="diskUsed"
+      />
+    </AreaChart>
+  </ResponsiveContainer>
+</div>
+
     </motion.div>
   </motion.div>
 ) : (
