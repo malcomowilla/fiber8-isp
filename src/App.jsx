@@ -630,7 +630,7 @@ const hostname = window.location.hostname;
   <Route index path='/'  element={<Signup/>}/>
 ): null}    */}
 
-{hostname === 'localhost' ? (
+{hostname === 'aitechs.co.ke' ? (
       <Route index path="/" element={<Signup />} />
     ) : hostname.endsWith('.aitechs.co.ke') ? (
       <Route index path="/" element={<PPPoEPackages />} />
