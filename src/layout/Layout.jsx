@@ -150,7 +150,7 @@ useEffect(() => {
       </div>
 
 <div className='flex justify-center'>
-      <footer className="p-4 fixed bottom-0 font-mono  bg-gray-200 dark:bg-gray-800">
+      <footer className="p-4  bottom-0 font-mono  bg-gray-200 dark:bg-gray-800">
         <p className="text-black dark:text-white ">
           {APP_DESCRIPTION} -  <span className='border-2 border-green-600
           p-2 rounded-lg
