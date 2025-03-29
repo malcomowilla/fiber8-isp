@@ -32,6 +32,7 @@ import {
   import {Link} from 'react-router-dom'
   import { GoPasskeyFill } from "react-icons/go";
   import {useApplicationSettings} from '../settings/ApplicationSettings'
+  import { IoPersonOutline } from "react-icons/io5";
 
 
   const subdomain = window.location.hostname.split('.')[0]
@@ -87,6 +88,7 @@ console.log(user)
         <DropdownMenuTrigger asChild>
 
         <ion-icon name="people-outline" size='large' onClick={()=> setOpenDropDown(!openDropDown)}></ion-icon>
+        {/* <IoPersonOutline className='w-10 h-10 text-black' onClick={()=> setOpenDropDown(!openDropDown)}/> */}
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-64 mr-20">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
