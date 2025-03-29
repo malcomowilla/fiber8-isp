@@ -14,6 +14,12 @@ const SettingsNotification = lazy(() => import('../notification/SettingsNotifica
 import Backdrop from '../backdrop/Backdrop'
 
 import UiLoader from '../uiloader/UiLoader'
+import { MdAttachEmail } from "react-icons/md";
+import { FaKey } from "react-icons/fa";
+import { TbLockPassword } from "react-icons/tb";
+
+
+
 
 
 
@@ -99,7 +105,7 @@ const getEmailSettings = useCallback(
       
     } catch (error) {
       toast.error('internal server error something went wrong with getting email settings', {
-        duration: 4000,
+        duration: 2000,
         position: 'top-center',
       })
     }
@@ -173,49 +179,59 @@ const handleCloseNotifaction = () => {
 <Backdrop  handleClose={handleClose}  open={open}/>
 <SettingsNotification open={openNotifactionSettings} handleClose={ handleCloseNotifaction }/>
     <Toaster />
-    <Suspense fallback={<div className='flex justify-center items-center '>{ <UiLoader/> }</div>}>
+    <Suspense fallback={<div className=' '>{ <UiLoader/> }</div>}>
 
     <div className='mt-8'>
       <form onSubmit={saveEmailSettings}>  
-      <div className='flex'>
-<Box component="form"
+<Box component=""
  className='myTextField'
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '100%', marginTop: 2,   '& label.Mui-focused': {
-          color: 'black',
-          fontSize: '16px'
-          },
-      '& .MuiOutlinedInput-root': {
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: "black",
-          borderWidth: '3px',
-          },
-       '&.Mui-focused fieldset':  {
-          borderColor: 'black', 
-          
-        }
-      } },
-      }}>
+ sx={{
+  "& .MuiTextField-root": { m: 1, width: "100%", marginTop: 5 },
+  "& label.Mui-focused": {
+    color: "black",
+    fontSize: "16px",
+  },
+  "& .MuiOutlinedInput-root": {
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "black",
+      borderWidth: "3px",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "black",
+    },
+  },
+}}
+     >
 
-<TextField  label='SMTP Host'  onChange={handleChange} name='smtp_host' value={smtp_host}>
+<TextField   label='SMTP Host' 
+
+InputProps={{
+  startAdornment: <MdAttachEmail className='mr-2'/>
+}}
+onChange={handleChange} name='smtp_host' value={smtp_host}/>
 
 
-</TextField>
 
 
 
 
 
-<TextField  label='SMTP Port' onChange={handleChange} name='smtp_port' value={smtp_port}>
+<TextField 
+
+
+InputProps={{
+  startAdornment: <MdAttachEmail className='mr-2'/>
+}}
+label='SMTP Port' onChange={handleChange} name='smtp_port' value={smtp_port}>
 
 
 </TextField>
 </Box>
 
-      </div>
 
 
-      <div className='flex mt-3  gap-6 w-full'>
+
+      <div className=''>
         <Box  className='myTextField'  sx={{'& .MuiTextField-root' : {
             width: '100%',
             m: 1,
@@ -234,7 +250,12 @@ const handleCloseNotifaction = () => {
             }
           }
         }}}>
-<TextField label='SMTP Username' onChange={handleChange} value={smtp_username} name='smtp_username'/>
+<TextField label='SMTP Username' 
+
+InputProps={{
+  startAdornment: <MdAttachEmail className='mr-2'/>
+}}
+onChange={handleChange} value={smtp_username} name='smtp_username'/>
         </Box>
 
 
@@ -256,7 +277,12 @@ const handleCloseNotifaction = () => {
             }
           }
         }}}>
-        <TextField label='SMTP Password'  onChange={handleChange} name='smtp_password' value={smtp_password}/>
+        <TextField 
+        
+InputProps={{
+  startAdornment: <TbLockPassword className='mr-2'/>
+}}
+        label='SMTP Password'  onChange={handleChange} name='smtp_password' value={smtp_password}/>
 
         </Box>
       </div>
@@ -287,7 +313,12 @@ const handleCloseNotifaction = () => {
             }
           }
         }}}>
-<TextField label='Sender Email' onChange={handleChange} name='sender_email' value={sender_email}>
+<TextField label='Sender Email'
+
+InputProps={{
+  startAdornment: <MdAttachEmail className='mr-2'/>
+}}
+onChange={handleChange} name='sender_email' value={sender_email}>
 
 </TextField>
 
@@ -313,10 +344,7 @@ const handleCloseNotifaction = () => {
           }
         }}}>
 
-            <TextField label='Sender Name'>
-
-
-            </TextField>
+           
         </Box>
     </div>
 
@@ -341,7 +369,13 @@ const handleCloseNotifaction = () => {
             }
           }
         }}}>
-      <TextField label='Api Key'  value={api_key} onChange={handleChange} name='api_key'>
+      <TextField label='Api Key' 
+      
+      
+InputProps={{
+  startAdornment: <FaKey className='mr-2'/>
+}}
+      value={api_key} onChange={handleChange} name='api_key'>
 
 
       </TextField>

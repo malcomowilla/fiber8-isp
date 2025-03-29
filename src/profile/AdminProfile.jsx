@@ -10,11 +10,15 @@ import Lottie from 'react-lottie';
 import Backdrop from '@mui/material/Backdrop';
 import { FiKey, FiShield, FiCheck } from 'react-icons/fi';
 import { Tooltip } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 
 
 
 const AdminProfile = () => {
-  const {currentUser, setCurrentUser, currentUsername, currentEmail} = useApplicationSettings()
+  const {currentUser, setCurrentUser, currentUsername, currentEmail, setOpenDropDown} = useApplicationSettings()
+
+  const location = useLocation();
+
 const [formData, setFormData] = useState({
   // password_confirmation: '',
   email: '',
@@ -32,7 +36,10 @@ const [registrationStatus, setRegistrationStatus] = useState('');
 
 
 
-
+// if (location.pathname === '/admin/profile') {
+//   setOpenDropDown(false)
+  
+// }
 
 const subdomain = window.location.hostname.split('.')[0]
 

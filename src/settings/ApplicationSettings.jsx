@@ -103,6 +103,9 @@ const [loading, setLoading] = useState(false)
 const [totalSubscribers, setTotalSubscribers] = useState(0)
 const [subscribersOnline, setSubscribersOnline] = useState(0)
 const [subscribersOffline, setSubscribersOffline] = useState(0)
+const [openDropDown, setOpenDropDown] = useState(false)
+
+const [pingStatus, setPingStatus] = useState([]); // Stores ping statuses
 
 const {vouchers} = voucher
 
@@ -484,7 +487,8 @@ const loginWithVoucher = async(e) => {
      hotspotBanner, setHotspotBanner,hotspotBannerPreview, setHotspotBannerPreview,
      totalSubscribers, setTotalSubscribers,subscribersOnline, setSubscribersOnline,
      subscribersOffline, setSubscribersOffline,selectedAccountTypeHotspot, setSelectedAccountTypeHotspot,
-     hotspotMpesaSettings, setHotspotMpesaSettings
+     hotspotMpesaSettings, setHotspotMpesaSettings,openDropDown, setOpenDropDown,
+     pingStatus, setPingStatus
      }}  >
     {children}
    </GeneralSettingsContext.Provider>

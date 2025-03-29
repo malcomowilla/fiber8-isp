@@ -39,6 +39,7 @@ import { LuLayoutTemplate } from "react-icons/lu";
 import { MdSettingsInputAntenna } from "react-icons/md";
 
 import { TfiDashboard } from "react-icons/tfi";
+import { CgComponents } from "react-icons/cg";
 
 
 
@@ -451,6 +452,32 @@ className="flex items-center  w-full p-2 text-white transition
                         Zones</Link>
                   </motion.li>
 
+
+
+
+
+
+
+
+
+                  <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 , delay: 0.2 }}
+                  >
+                     <Link to='/admin/network-components' className="flex items-center w-full p-2 text-white
+                     transition duration-75 rounded-lg group  dark:text-white
+                       gap-x-3">
+                              <CgComponents className='rounded-full h-8 w-8' />
+                        components</Link>
+                  </motion.li>
+
                   <motion.li
                   onClick={() => {
                     if (window.innerWidth < 962) {
@@ -494,23 +521,7 @@ className="flex items-center  w-full p-2 text-white transition
 
 
 
-                     <motion.li
-                     onClick={() => {
-                      if (window.innerWidth < 962) {
-                        setSeeSideBar(true);
-                      }
-                    }}
-                     initial={{ opacity: 0, x: -20 }}
-                     animate={{ opacity: 1, x: 0 }}
-                     exit={{ opacity: 0, x: -20 }}
-                     transition={{ duration: 0.2 , delay: 0.4 }}
-                     >
-                     <Link  className="flex items-center w-full p-2 text-white 
-                     transition duration-75 rounded-lg  group 
-                      dark:text-white  gap-x-3">
-                        < GroupSharpIcon/>
-                        User Group</Link>
-                  </motion.li>
+                   
 
 
                         <motion.li
