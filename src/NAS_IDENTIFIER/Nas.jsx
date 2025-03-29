@@ -404,10 +404,10 @@ const handleSubmit = async (e)=> {
 
 const mergedTableData = tableDataNas.map((router) => {
   console.log('router', router)
-  const response = pingStatus.router_status?.response || "";
+  const response = pingStatus?.response || "";
   const pingTimeMatch = response.match(/time (\d+ms)/); // Extracts "time XXXXms"
   const pingTime = pingTimeMatch ? pingTimeMatch[1] : "N/A"; // Default if no match
-  const ip_adress_router = pingStatus?.router_status?.ip
+  const ip_adress_router = pingStatus?.ip
 
   return {
     ...router,
@@ -443,7 +443,7 @@ const columns = [
       <span style={{ 
         // color: pingStatus.router_status?.response ? 'green' : 'red', 
         // color: rowData.ping_status?.router_status?.reachable === true ? 'green' : 'red', 
-        color: pingStatus?.router_status?.reachable === true ? 'green' : 'red', 
+        color: pingStatus?.reachable === true ? 'green' : 'red', 
         fontWeight: 'bold' 
       }}>
 {rowData.ip_adress_router
@@ -458,11 +458,11 @@ const columns = [
     field: 'reachable',
     render: rowData => (
       <span style={{ 
-        color: pingStatus.router_status?.reachable === true ? 'green' : 'red', 
+        color: pingStatus?.reachable === true ? 'green' : 'red', 
         fontWeight: 'bold' 
       }}>
         {rowData.ip_adress_router
- === rowData.ip_address ? pingStatus.router_status?.reachable === true ? 'reachable' : 'not reachable' : ''}
+ === rowData.ip_address ? pingStatus?.reachable === true ? 'reachable' : 'not reachable' : ''}
       </span>
     )
   },

@@ -473,7 +473,7 @@ useEffect(() => {
     animate="visible"
     transition={{ duration: 0.5, delay: 0.8 }}
   >
-    <h2 className="text-2xl font-semibold mb-4 dark:text-white font-montserat">Router Information</h2>
+    <h2 className="text-2xl font-semibold mb-4 dark:text-white font-montserat">Router Status</h2>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* CPU Load Card */}
       <motion.div
@@ -484,7 +484,10 @@ useEffect(() => {
     <GoCpu className='p-2 w-12 h-12 mr-3' />
     <h3 className="text-2xl font-bold">CPU Load</h3>
   </div>
-  <p className='font-light  mb-2'><b className='font-bold'>{cpu_load}</b></p>
+  <motion.p
+   animate={{ scale: [1, 1.1, 1] }}
+   transition={{ duration: 1, repeat: Infinity }}
+  className='font-light  mb-2'><b className='font-bold'>{cpu_load}</b></motion.p>
   
   {/* Progress Bar Container */}
   <div className="w-full bg-white   bg-opacity-20 rounded-full h-3 overflow-hidden relative">
@@ -515,7 +518,10 @@ useEffect(() => {
         </div>
         <div className='flex flex-row justify-between'>
           <div className='flex flex-col'>
-        <p className='font-light'>Used <b className='font-bold text-3xl'>{memory_usage?.used}</b></p>
+        <motion.p
+         animate={{ scale: [1, 1.1, 1] }}
+         transition={{ duration: 1, repeat: Infinity }}
+        className='font-light'>Used <b className='font-bold text-3xl'>{memory_usage?.used}</b></motion.p>
         <p>[Available <span>{memory_usage?.free}</span>]</p>
 </div>
 
@@ -536,11 +542,16 @@ useEffect(() => {
         </div>
         <div className='flex flex-row justify-between'>
           <div className='flex flex-col'>
-        <p className='font-light'><b className='font-bold text-3xl'>{disk_usage?.used}</b></p>
+        <motion.p
+         animate={{ scale: [1, 1.1, 1] }}
+         transition={{ duration: 1, repeat: Infinity }}
+        className='font-light'><b className='font-bold text-3xl'><span
+        className='font-light text-lg'
+        >Used </span>  {disk_usage?.used}</b></motion.p>
         <p>[Available <span>{disk_usage?.free}</span>]</p>
 </div>
 
-        <p className='font-light'>Total <b className='font-light text-xl'>{disk_usage?.used}</b></p>
+        <p className='font-light'>Total <b className='font-light text-xl'>{disk_usage?.total}</b></p>
 
           </div>
 
@@ -556,9 +567,14 @@ useEffect(() => {
         <div className="flex items-center mb-4">
           <i className="fas fa-clock text-3xl mr-3"></i>
           <MdOutlineTimer  className='p-2 w-12 h-12 mr-3' />
-          <h3 className="text-2xl font-bold">Uptime</h3>
+          <motion.h3
+          
+          className="text-2xl font-bold">Uptime</motion.h3>
         </div>
-        <p className='font-light'><b className='font-bold'>{uptime}</b></p>
+        <motion.p
+         animate={{ scale: [1, 1.1, 1] }}
+         transition={{ duration: 1, repeat: Infinity }}
+        className='font-light'><b className='font-bold'>{uptime}</b></motion.p>
       </motion.div>
     </div>
 
