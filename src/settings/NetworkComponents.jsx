@@ -15,7 +15,7 @@ console.log('ping status', pingStatus)
     {
       name: "Free Radius",
       status: "online",
-      icon: <img src='/public/images/free_radius.svg' className="w-6 h-6" />,
+      icon: <img src='/images/free_radius.svg' className="w-6 h-6" />,
       description: "Authentication server for network access",
       color: "bg-blue-100"
     },
@@ -32,7 +32,7 @@ console.log('ping status', pingStatus)
     {
         name: "MikroTik",
         status:  pingStatus.router_status?.reachable === true ? "online" : "offline",
-        icon: <img src='/public/images/mikrotik.svg' className="w-10 h-10" />,
+        icon: <img src='/images/mikrotik.svg' className="w-10 h-10" />,
         description: "a network device, or rather a router and wireless access point, that runs the RouterOS operating system, based on Linux, and is known for its flexibility, advanced features, and ability to handle a wide range of networking tasks ",
         color: "bg-white",
         button: true
