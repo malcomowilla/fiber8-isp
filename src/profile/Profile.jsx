@@ -71,18 +71,12 @@ console.log(user)
       } catch (error) {
         console.error('Error logging out:', error);
        }
-// console.log(user)
-
-//          localStorage.removeItem('jwt')
-//          setCurrentUser(null) // reset user state to 'null'
-
-//          navigate('/signin');
-
-
-    // fetch("/api/logout", {
-    //     method: "DELETE",
-    //     }).then(navigate("/signin"));
   }
+
+
+
+
+
     return (
       <DropdownMenu open={openDropDown} onOpenChange={setOpenDropDown}>
         <DropdownMenuTrigger asChild>

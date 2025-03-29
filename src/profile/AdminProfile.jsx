@@ -6,11 +6,26 @@ import { createAvatar } from '@dicebear/core';
   import toast, { Toaster } from 'react-hot-toast';
   import LoadingAnimation from '../loader/loading_animation.json'
 import Lottie from 'react-lottie';
+import {useNavigate} from 'react-router-dom'
 
 import Backdrop from '@mui/material/Backdrop';
 import { FiKey, FiShield, FiCheck } from 'react-icons/fi';
 import { Tooltip } from '@mui/material';
 import { useLocation } from 'react-router-dom';
+import {
+  Github,
+  LogOut,
+  Mail,
+  MessageSquare,
+  Plus,
+  PlusCircle,
+  Settings,
+  User,
+  UserPlus,
+} from "lucide-react"
+
+
+
 
 
 
@@ -18,6 +33,7 @@ const AdminProfile = () => {
   const {currentUser, setCurrentUser, currentUsername, currentEmail, setOpenDropDown} = useApplicationSettings()
 
   const location = useLocation();
+  const navigate = useNavigate()
 
 const [formData, setFormData] = useState({
   // password_confirmation: '',
@@ -36,12 +52,24 @@ const [registrationStatus, setRegistrationStatus] = useState('');
 
 
 
+
+
+
 // if (location.pathname === '/admin/profile') {
 //   setOpenDropDown(false)
   
 // }
 
 const subdomain = window.location.hostname.split('.')[0]
+
+
+
+
+
+
+
+
+
 
 useEffect(() => {
   
@@ -83,6 +111,37 @@ const handleChangeFormData = (e) => {
     [name]: type === "checkbox" ? checked : value,
   }));
 };
+
+
+
+
+const handleLogout = async () => {
+  try {
+      const response = await fetch('/api/logout', {
+        method: "DELETE",
+        credentials: 'include', // Include cookies in the request
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+
+      },
+      
+      
+
+      );
+      if (response.ok) {
+
+        setCurrentUser(null)
+        navigate('/signin');
+        
+console.log(user)
+      } else {
+        throw new Error('Logout failed');
+      }
+    } catch (error) {
+      console.error('Error logging out:', error);
+     }
+}
 
   const updateProfile = async(e) => {
     setOpenLoad(true)
@@ -336,6 +395,10 @@ setRegistrationStatus('error');
     console.error('Error during WebAuthn credential creation:', err);
   }
 }
+
+
+
+
 
 
   return (
@@ -599,22 +662,10 @@ setRegistrationStatus('error');
                     </div>
 </form>
           <hr />
-          <div className="w-full p-4 text-right text-gray-500">
+          <div className="w-full p-4 text-right text-black dark:text-white" onClick={handleLogout}>
             <button className="inline-flex items-center focus:outline-none mr-4">
-              <svg
-                fill="none"
-                className="w-4 mr-2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
-              Delete account
+            <LogOut   className="mr-2 h-4 w-4 " />
+              Log Out
             </button>
           </div>
         </div>
