@@ -15,10 +15,16 @@ const location = useLocation()
 
 console.log('ping status', pingStatus)
 
-const subdomain = window.location.hostname.split('.')[0];
-console.log('subdomain', subdomain)
+// const subdomain = window.location.hostname.split('.')[0];
+// console.log('subdomain', subdomain)
 
 
+const hostnameParts = window.location.hostname.split('.');
+const domain = hostnameParts.length > 2 
+  ? hostnameParts.slice(-2).join('.')  // Extract last two parts (e.g., "example.com")
+  : window.location.hostname;          // Use full hostname if there's no subdomain
+
+console.log(domain);
 const fetchServiceStatus = async () => {
   try {
     const response = await fetch('/api/service_status');
