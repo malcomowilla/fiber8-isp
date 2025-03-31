@@ -203,7 +203,7 @@ useEffect(() => {
                 </div>
 ) : ''}
 
-          {!subdomain.startsWith('aitechs') ? (
+          {!domain.startsWith('aitechs') ? (
             <>
 
 {service.restartable && (
