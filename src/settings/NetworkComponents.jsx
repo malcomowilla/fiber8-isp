@@ -15,15 +15,19 @@ const location = useLocation()
 
 console.log('ping status', pingStatus)
 
-// const subdomain = window.location.hostname.split('.')[0];
+const subdomain = window.location.hostname.split('.')[0];
 // console.log('subdomain', subdomain)
 
+function getMainDomain(hostname) {
+  const parts = hostname.split('.');
+  
+  if (parts.length >= 3) {
+    return parts[parts.length - 3]; // Get the part before the TLD (e.g., "aitechs" from "fiber8.aitechs.co.ke")
+  } 
+  return hostname; // Return as is if it's already a domain
+}
 
-const hostnameParts = window.location.hostname.split('.');
-const domain = hostnameParts.length > 2 
-  ? hostnameParts.slice(-2).join('.')  // Extract last two parts (e.g., "example.com")
-  : window.location.hostname;          // Use full hostname if there's no subdomain
-
+const domain = getMainDomain(window.location.hostname);
 console.log(domain);
 const fetchServiceStatus = async () => {
   try {
