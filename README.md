@@ -1,11 +1,17 @@
 
-# fiber8-is
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Demo
 
-Currently, two official plugins are available:
+You can try out the ISP Billing System live!  
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
- d1e7b53 (billing system project)
+🔗 **Demo Site:** [Click here to access the demo](https://demo.aitechs.co.ke)  
+
+🛠 **Login Credentials:**  
+- **Email:** `demo@gmail.com`  
+- **Password:** `demo`  
+
+⚠️ _Note: The demo account has limited permissions to prevent unintended modifications._  
+
+
+
+
