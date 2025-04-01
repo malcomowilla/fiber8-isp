@@ -11,6 +11,10 @@ const NetworkComponents = () => {
 
 const {pingStatus, setPingStatus} = useApplicationSettings()
 const [serviceStatus, setServiceStatus] = useState({ freeradius: {}, wireguard: {} });
+const [showRebootConfirm, setShowRebootConfirm] = useState(false);
+
+
+
 const location = useLocation()
 
 console.log('ping status', pingStatus)
@@ -39,6 +43,56 @@ const fetchServiceStatus = async () => {
   }
 };
 
+
+
+
+const rebootRouter = async(e) => {
+  e.preventDefault()
+
+    
+  if (!showRebootConfirm) {
+    setShowRebootConfirm(true);
+    return;
+  }
+
+  try {
+    
+  const response = await fetch('/api/reboot_router', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' ,
+      'X-Subdomain': subdomain
+    },
+  })
+
+  const newData = await response.json()
+  if (response.ok) {
+    toast.success('Router is rebooting', {
+      position: "top-center",
+      duration: 5000,
+    });
+  } else {
+
+
+
+    toast.error(
+      newData.error,{
+        position: "top-center",
+        duration: 5000,
+      }
+    )
+  }
+  } catch (error) {
+    toast.error(
+      'Failed to reboot router server error',{
+        position: "top-center",
+        duration: 5000,
+      }
+    )
+  }
+  
+
+
+}
 
 
 useEffect(() => {
@@ -199,12 +253,32 @@ useEffect(() => {
                 <span className="text-sm font-medium text-black">{service.checked_at && service.checked_at}</span>
               </div>
 
-{service.button === true ? (
-
-<div className=''>
-
-<button className='w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700'> Reboot </button>
-                </div>
+              {service.button === true ? (
+  <div className='space-y-2'>
+    {showRebootConfirm ? (
+      <div className='flex space-x-2'>
+        <button 
+          onClick={rebootRouter}
+          className='bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700'
+        >
+          Confirm Reboot
+        </button>
+        <button 
+          onClick={() => setShowRebootConfirm(false)}
+          className='bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600'
+        >
+          Cancel
+        </button>
+      </div>
+    ) : (
+      <button 
+        onClick={rebootRouter}
+        className='w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700'
+      >
+        Reboot
+      </button>
+    )}
+  </div>
 ) : ''}
 
           {!domain.startsWith('aitechs') ? (
