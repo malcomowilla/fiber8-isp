@@ -79,6 +79,8 @@ const [voucher, setVoucher] = useState({
   vouchers: ''
 })
 
+const [smsBalance, setSmsBalance] = useState(0)
+
 const [smsSettingsForm, setSmsSettingsForm] = useState({
   api_key: '',
   api_secret: '',
@@ -488,7 +490,7 @@ const loginWithVoucher = async(e) => {
      totalSubscribers, setTotalSubscribers,subscribersOnline, setSubscribersOnline,
      subscribersOffline, setSubscribersOffline,selectedAccountTypeHotspot, setSelectedAccountTypeHotspot,
      hotspotMpesaSettings, setHotspotMpesaSettings,openDropDown, setOpenDropDown,
-     pingStatus, setPingStatus
+     pingStatus, setPingStatus,smsBalance, setSmsBalance
      }}  >
     {children}
    </GeneralSettingsContext.Provider>

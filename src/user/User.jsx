@@ -77,12 +77,18 @@ const [permissionAndRoles, setPermissionAndRoles] = useState({
   user: {read: false, readWrite: false},
   userSettings: {read: false, readWrite: false},
   pool: {read: false, readWrite: false},
+  freeRadius: {read: false, readWrite: false},
+  mpesaSettings: {read: false, readWrite: false},
+  rebootRouter: {read: false, readWrite: false}, 
+  userGroup: {read: false, readWrite: false},
+  hotspotTemplate: {read: false, readWrite: false},
+  hotspotVoucher: {read: false, readWrite: false},
+  hotspotSettings: {read: false, readWrite: false},
 });
 
 
 
 
-console.log('permissionAndRoles', userPermisions)
 
 
 const handleCloseDelete = () => {
@@ -184,6 +190,38 @@ console.log('rowData users', rowData)
       read: rowData.can_read_user_setting,
       readWrite: rowData.can_manage_user_setting,
     },
+    freeRadius: {
+      read: rowData.can_read_free_radius,
+      readWrite: rowData.can_manage_free_radius,
+    },
+    mpesaSettings: {
+      read: rowData.can_read_mpesa_settings,
+      readWrite: rowData.can_manage_mpesa_settings,
+    },
+    rebootRouter: {
+      readWrite: rowData.can_reboot_router,
+    },
+
+    userGroup: {
+      read: rowData.can_read_user_group,
+      readWrite: rowData.can_manage_user_group,
+    },
+
+    hotspotTemplate: {
+      read: rowData.can_read_hotspot_template,
+      readWrite: rowData.can_manage_hotspot_template,
+    },
+
+    hotspotVoucher: {
+      read: rowData.can_read_hotspot_voucher,
+      readWrite: rowData.can_manage_hotspot_voucher,
+    }, 
+    hotspotSettings: {
+      read: rowData.can_read_hotspot_settings,
+      readWrite: rowData.can_manage_hotspot_settings,
+    },
+
+
   });
 }
 
@@ -208,6 +246,15 @@ const handleAddButton = ()=> {
     user: {read: false, readWrite: false},
     userSettings: {read: false, readWrite: false},
     pool: {read: false, readWrite: false},
+    freeRadius: {read: false, readWrite: false},
+    mpesaSettings: {read: false, readWrite: false},
+    rebootRouter: {read: false, readWrite: false}, 
+    userGroup: {read: false, readWrite: false},
+    hotspotTemplate: {read: false, readWrite: false},
+    hotspotVoucher: {read: false, readWrite: false},
+    hotspotSettings: {read: false, readWrite: false},
+
+    
 
 
 })
@@ -500,6 +547,11 @@ const fetchAdmins = useCallback(
           userSettings: {
             read: newData[0].can_read_user_setting,
             readWrite: newData[0].can_manage_user_setting,
+          },
+
+          userGroup: {
+            read: newData[0].can_read_user_group,
+            readWrite: newData[0].can_manage_user_group,
           },
         });
       }else{

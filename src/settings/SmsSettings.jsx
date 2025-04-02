@@ -34,11 +34,11 @@ const SettingsNotification = lazy(() => import('../notification/SettingsNotifica
 
 
 const SmsSettings = () => {
-const [smsBalance, setSmsBalance] = useState(0)
 
 
 const {isloading, setisloading, selectedProvider, setSelectedProvider,
-  smsSettingsForm, setSmsSettingsForm
+  smsSettingsForm, setSmsSettingsForm,
+  smsBalance, setSmsBalance
 } = useApplicationSettings()
 const [open, setOpen] = useState(false);
 const [openNotifactionSettings, setOpenSettings] = useState(false)
@@ -86,7 +86,7 @@ const {send_voucher_template, voucher_template} = smsTemplates
 
         if (response.status === 403) {
           toast.error('acess denied for sms balance', {
-            duration: 5000,
+            duration: 4000,
             position: 'top-center',
           })
         }

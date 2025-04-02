@@ -43,6 +43,13 @@ import { LuSettings2 } from "react-icons/lu";
 import { BsRouter } from "react-icons/bs";
 import { FcPackage } from "react-icons/fc";
 import { PiNetwork } from "react-icons/pi";
+import { TbRouter } from "react-icons/tb";
+import { FaUsers } from "react-icons/fa";
+import { LuLayoutTemplate } from "react-icons/lu";
+import { RiHotspotLine } from "react-icons/ri";
+
+
+
 
 
 
@@ -95,6 +102,14 @@ const [seeItem, setSeeItem] = useState({
   pool: false,
   subscription: false,
   tickets: false,
+  freeRadius: false,
+  mpesaSettings: false,
+  rebootRouter: false,
+  userGroup: false,
+  hotspotTemplate: false,
+  hotspotVoucher: false,
+  hotspotSettings: false,
+  
   
   
 })
@@ -183,6 +198,7 @@ console.log('hotspot package read ', permissionAndRoles.hotspotPackage
     can_read_email_setting: permissionAndRoles.emailSettings.read,
     can_manage_hotspot_packages: permissionAndRoles.hotspotPackage.readWrite,
     
+    
     can_read_hotspot_packages: permissionAndRoles.hotspotPackage.read,
    
     can_manage_ip_pool: permissionAndRoles?.pool?.readWrite,
@@ -203,8 +219,23 @@ console.log('hotspot package read ', permissionAndRoles.hotspotPackage
     can_read_support_tickets: permissionAndRoles.tickets.read,
     can_manage_users: permissionAndRoles.user.readWrite,
     can_read_users: permissionAndRoles.user.read,
+
     can_manage_user_setting: permissionAndRoles.userSettings.readWrite,
     can_read_user_setting: permissionAndRoles.userSettings.read,
+    can_manage_free_radius: permissionAndRoles.freeRadius.readWrite,
+    can_read_free_radius: permissionAndRoles.freeRadius.read,
+    can_manage_mpesa_settings: permissionAndRoles.mpesaSettings.readWrite,
+    can_read_mpesa_settings: permissionAndRoles.mpesaSettings.read,
+    can_reboot_router: permissionAndRoles.rebootRouter.readWrite,
+    can_manage_user_group: permissionAndRoles.userGroup.readWrite,
+    can_read_user_group: permissionAndRoles.userGroup.read,
+    can_manage_hotspot_template: permissionAndRoles.hotspotTemplate.readWrite,
+    can_read_hotspot_template: permissionAndRoles.hotspotTemplate.read,
+    can_read_hotspot_voucher: permissionAndRoles.hotspotVoucher.read,
+    can_manage_hotspot_voucher: permissionAndRoles.hotspotVoucher.readWrite,
+    can_manage_hotspot_settings: permissionAndRoles.hotspotSettings.readWrite,
+    can_read_hotspot_settings: permissionAndRoles.hotspotSettings.read,
+
    
   
 
@@ -232,7 +263,7 @@ const variantDiv = {
 
 
   const subdomain = window.location.hostname.split('.')[0]
-const [userRoles, setUserRoles] = useState('')
+const [userRoles, setUserRoles] = useState([])
 
   const getUserGroups = useCallback(
     async() => {
@@ -416,6 +447,10 @@ value={userRoles.find((permission) => {
 })}
 
 
+// value={Array.isArray(userRoles) ? userRoles.find((permission) => {
+//   return permission.name === userPermisions.role;
+// }) || null : null}  //
+
 getOptionLabel={(option) => option.name}
                       
                       sx={{
@@ -532,6 +567,13 @@ w-full p-5 font-medium rtl:text-right
                           {role === 'package' && <FcPackage className='w-5 h-5' />}
                           {role === 'hotspotPackage' && <FcPackage className='w-5 h-5' />}
                           {role === 'subscription' && <PiNetwork className='w-5 h-5' />}
+                          {role === 'freeRadius' && <img src='/images/free_radius.svg' className='w-5 h-5' />}
+                          {role === 'mpesaSettings' && <img src='/images/mpesa-logo.png' className='w-7 h-7' />}
+                          {role === 'rebootRouter' && <TbRouter className='w-5 h-5' />}
+                          {role === 'userGroup' && <FaUsers className='w-5 h-5' />}
+                          {role === 'hotspotTemplate' && <LuLayoutTemplate className='w-5 h-5' />}
+                          {role === 'hotspotVoucher' &&   <p>🎫 </p>}
+                          {role === 'hotspotSettings' &&   <p><RiHotspotLine className='w-5 h-5'  /></p>}
                           
 
   
@@ -583,7 +625,7 @@ whileTap={{scale: 0.95,
 }}
 type='submit'  className={`
  flex-1 flex items-center justify-center  gap-2 px-6 py-3.5 font-medium 
-                        bg-secondary text-black rounded-2xl transition-all
+                        bg-secondary text-black rounded-2xl dark:bg-teal-400 transition-all
                          hover:bg-green-500 duration-300 border-2
                           border-green-500 disabled:opacity-50 disabled:cursor-not-allowed
   `}>

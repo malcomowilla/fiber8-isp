@@ -692,7 +692,7 @@ useEffect(() => {
   <div className='relative flex flex-col mt-20 '>
     <LuRouter className='w-20 h-20 text-red-500 animate-bounce' />
     <div className='absolute -bottom-8 text-white text-lg font-bold'>
-      Router Not Found
+      No Router Connection
     </div>
   </div>
 

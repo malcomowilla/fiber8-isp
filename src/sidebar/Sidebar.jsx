@@ -837,7 +837,7 @@ onClick={() => {
   </motion.li>
 
 
-
+{/* 
                   <motion.li 
                   onClick={() => {
                     if (window.innerWidth < 962) {
@@ -853,7 +853,7 @@ onClick={() => {
                       ">
                         <Groups2Icon/>
                         Hotspot  Subscribers
-                  </motion.li>
+                  </motion.li> */}
 
 
 
