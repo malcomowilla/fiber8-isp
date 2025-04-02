@@ -13,6 +13,8 @@ import DashboardStatistics from '../hotspot_page/DashboardStatistics'
 import { APP_VERSION, APP_NAME, APP_DESCRIPTION } from '../version';
 import TicketStatistics from '../tickets/TicketStatistics'
 import SubscriberStats from '../subscribers/SubscriberStats'
+import { FaSms } from 'react-icons/fa';
+
 
 
 // import { ReloadIcon } from "@radix-ui/react-icons"
@@ -38,7 +40,12 @@ const {seeSidebar, theme
 const [loading, setloading] = useState(false)
 const location = useLocation();
 
-const {fetchCurrentUser, currentUser, companySettings} = useApplicationSettings()
+const {fetchCurrentUser, currentUser, companySettings,
+
+  selectedProvider, setSelectedProvider,
+  smsSettingsForm, setSmsSettingsForm,
+  smsBalance, setSmsBalance
+} = useApplicationSettings()
 
 const { company_name, contact_info, email_info, logo_preview} = companySettings
 const [datetime, setdateTime] = useState(true)
@@ -108,6 +115,51 @@ useEffect(() => {
       return "Working late? Here's a quick overview of today 🌙";
     }
   };
+
+
+
+const subdomain = window.location.hostname.split('.')[0];
+
+  const getSmsBalance  = useCallback(
+    async(selectedProvider) => {
+
+      try {
+        const response = await fetch(`/api/get_sms_balance?selected_provider=${selectedProvider}`, {
+          headers: {
+            'X-Subdomain': subdomain,
+          },
+        })
+        const newData = await response.json()
+
+        if (response.status === 403) {
+          // toast.error('acess denied for sms balance', {
+          //   duration: 4000,
+          //   position: 'top-center',
+          // })
+        }
+        if(response.ok){
+console.log('sms balance', newData)
+setSmsBalance(newData.message)
+        }else{
+         
+            console.log('failed to fetch sms balance')
+        }
+      } catch (error) {
+        console.log('error', error)
+      }
+
+    },
+    [],
+  )
+
+  useEffect(() => {
+
+    if (selectedProvider) {
+      getSmsBalance(selectedProvider)
+    }
+    // getSmsBalance()
+   
+  }, [getSmsBalance, selectedProvider]);
   return (
     <>
     <Header />
@@ -130,6 +182,15 @@ useEffect(() => {
           <p className="capitalize mb-10 dark:text-white text-black text-2xl">
             {date}
           </p>
+
+          {smsBalance && (
+    <div className="flex items-center gap-2 bg-blue-100 dark:bg-blue-900 px-4 py-2 rounded-lg">
+      <FaSms className="text-blue-600 dark:text-blue-300 text-xl" />
+      <span className="text-blue-800 dark:text-blue-200 font-medium">
+        SMS Balance: <span className="font-bold">{smsBalance}</span>
+      </span>
+    </div>
+  )}
           {location.pathname !== '/admin/customer-tickets' && location.pathname !== '/admin/hotspot-dashboard' && location.pathname !== '/admin/pppoe-subscribers' && <ShortCuts />}
 
           

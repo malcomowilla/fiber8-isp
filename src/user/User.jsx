@@ -83,12 +83,12 @@ const [permissionAndRoles, setPermissionAndRoles] = useState({
   userGroup: {read: false, readWrite: false},
   hotspotTemplate: {read: false, readWrite: false},
   hotspotVoucher: {read: false, readWrite: false},
+  hotspotSettings: {read: false, readWrite: false},
 });
 
 
 
 
-console.log('permissionAndRoles', userPermisions)
 
 
 const handleCloseDelete = () => {
@@ -215,7 +215,11 @@ console.log('rowData users', rowData)
     hotspotVoucher: {
       read: rowData.can_read_hotspot_voucher,
       readWrite: rowData.can_manage_hotspot_voucher,
-    }
+    }, 
+    hotspotSettings: {
+      read: rowData.can_read_hotspot_settings,
+      readWrite: rowData.can_manage_hotspot_settings,
+    },
 
 
   });
@@ -248,6 +252,7 @@ const handleAddButton = ()=> {
     userGroup: {read: false, readWrite: false},
     hotspotTemplate: {read: false, readWrite: false},
     hotspotVoucher: {read: false, readWrite: false},
+    hotspotSettings: {read: false, readWrite: false},
 
     
 

@@ -46,6 +46,8 @@ import { PiNetwork } from "react-icons/pi";
 import { TbRouter } from "react-icons/tb";
 import { FaUsers } from "react-icons/fa";
 import { LuLayoutTemplate } from "react-icons/lu";
+import { RiHotspotLine } from "react-icons/ri";
+
 
 
 
@@ -106,6 +108,7 @@ const [seeItem, setSeeItem] = useState({
   userGroup: false,
   hotspotTemplate: false,
   hotspotVoucher: false,
+  hotspotSettings: false,
   
   
   
@@ -230,6 +233,8 @@ console.log('hotspot package read ', permissionAndRoles.hotspotPackage
     can_read_hotspot_template: permissionAndRoles.hotspotTemplate.read,
     can_read_hotspot_voucher: permissionAndRoles.hotspotVoucher.read,
     can_manage_hotspot_voucher: permissionAndRoles.hotspotVoucher.readWrite,
+    can_manage_hotspot_settings: permissionAndRoles.hotspotSettings.readWrite,
+    can_read_hotspot_settings: permissionAndRoles.hotspotSettings.read,
 
    
   
@@ -567,7 +572,8 @@ w-full p-5 font-medium rtl:text-right
                           {role === 'rebootRouter' && <TbRouter className='w-5 h-5' />}
                           {role === 'userGroup' && <FaUsers className='w-5 h-5' />}
                           {role === 'hotspotTemplate' && <LuLayoutTemplate className='w-5 h-5' />}
-                          {role === 'hotspotVoucher' &&   '🎫'}
+                          {role === 'hotspotVoucher' &&   <p>🎫 </p>}
+                          {role === 'hotspotSettings' &&   <p><RiHotspotLine className='w-5 h-5'  /></p>}
                           
 
   
@@ -619,7 +625,7 @@ whileTap={{scale: 0.95,
 }}
 type='submit'  className={`
  flex-1 flex items-center justify-center  gap-2 px-6 py-3.5 font-medium 
-                        bg-secondary text-black rounded-2xl transition-all
+                        bg-secondary text-black rounded-2xl dark:bg-teal-400 transition-all
                          hover:bg-green-500 duration-300 border-2
                           border-green-500 disabled:opacity-50 disabled:cursor-not-allowed
   `}>
