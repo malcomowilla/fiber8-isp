@@ -590,7 +590,7 @@ const newData = await response.json()
 
  const getHotspotTemplates = useCallback(
   async() => {
-    const response = await fetch('/api/hotspot_templates', {
+    const response = await fetch('/api/allow_get_hotspot_templates', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
