@@ -593,7 +593,6 @@ const newData = await response.json()
     const response = await fetch('/api/allow_get_hotspot_templates', {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
         'X-Subdomain': subdomain,
 
       },
