@@ -659,11 +659,10 @@ setPassword(e.target.value)
       >
         <div className="text-center">
           <div onClick={handleThemeSwitch} className="dark:text-white flex justify-center cursor-pointer">
-            <ion-icon
-              name="moon-outline"
-              size="large"
-              className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-            ></ion-icon>
+          <ion-icon onClick={()=>setIcon(!icon)}  name={icon ? 'moon-outline' : 'sunny'} className='' size='large'></ion-icon>
+
+
+
           </div>
           <p className="dark:text-white mt-4 font-bold text-2xl">
             Welcome To <span className=""> {company_name || 'Aitechs'}</span>
