@@ -218,7 +218,7 @@
 
 
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button, TextField, Backdrop, CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
 import { ReloadIcon } from "@radix-ui/react-icons";
@@ -236,6 +236,7 @@ import {
   Modal,
   Typography,
 } from '@mui/material';
+import toast, { Toaster } from 'react-hot-toast';
 
 
 function ResetPassword() {
@@ -247,6 +248,7 @@ function ResetPassword() {
 
   const { companySettings } = useApplicationSettings();
   const { company_name, logo_preview } = companySettings;
+  const navigate = useNavigate()
 
   const subdomain = window.location.hostname.split(".")[0];
 
@@ -270,17 +272,28 @@ function ResetPassword() {
 
       if (response.ok) {
         setEmail("");
+        
+        navigate('/reset-password-email-sent')
+
         setMessage(data.message);
         setError("");
       } else {
+        toast.error('failed to send reset email', {
+          duration: 4000,
+          position: 'top-center',
+        })
         setError(data.error);
         setMessage("");
       }
     } catch (error) {
+      toast.error('failed to send reset email server error', {
+        duration: 4000,
+        position: 'top-center',
+      })
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);
-      setOpen(true);
+      // setOpen(true);
     }
   };
 
@@ -290,6 +303,8 @@ function ResetPassword() {
 
   return (
     <>
+
+    <Toaster />
       <ResetNotification
         handleClose={handleClose}
         open={open}
@@ -353,7 +368,9 @@ function ResetPassword() {
                       </InputAdornment>
                     ),
                   }}
-                  className="bg-gray-50 dark:bg-gray-700 rounded-lg"
+                  className="bg-gray-50 dark:bg-gray-700 rounded-lg
+                  myTextField
+                  "
                   required
                 />
               </motion.div>
@@ -384,7 +401,8 @@ function ResetPassword() {
                 <Button
                   type="submit"
                   variant="contained"
-                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-300"
+                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white 
+                  font-medium rounded-lg transition-all duration-300"
                   disabled={loading}
                 >
                   {loading ? (

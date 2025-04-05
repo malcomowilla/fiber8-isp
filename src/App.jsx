@@ -136,7 +136,8 @@ import { APP_VERSION, APP_NAME, APP_DESCRIPTION } from './version';
 import ClientLogin from './client_portal/ClientLogin'
 import ClientPortal from './client_portal/ClientPortal'
 import NetworkComponents from './settings/NetworkComponents'
-
+import ConfirmResetPassword from './Auth/ConfirmResetPassword'
+import PasswordResetEmailSent from './Auth/PasswordResetEmailSent'
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -640,6 +641,8 @@ const hostname = window.location.hostname;
 
 
       <Route  path='/reset-password' element={<ResetPassword/>}/>
+      <Route path='/confirm-reset-password' element={<ConfirmResetPassword />}/>
+      <Route path='/reset-password-email-sent' element={<PasswordResetEmailSent />}/>
       <Route  path='/hotspot-page' element={<HotspotPage/>}/>
       <Route  path='/hotspot-login' element={<HotspotLogin/>}/>
       <Route  path='/hotspot-trial' element={< HotspotTrial />}/>
