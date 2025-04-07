@@ -648,8 +648,10 @@ transition={{ duration: 0.2, delay: 0.1 }}
 
 
          <li>
-         <button   onClick={()=> setIsExpanded2(!isExpanded2)} type="button" className="flex items-center w-full p-2 text-base
-             text-white transition duration-75 rounded-lg group dark:hover:bg-white dark:hover:text-black hover:bg-black
+         <button   onClick={()=> setIsExpanded2(!isExpanded2)} type="button" className="flex items-center w-full
+          p-2 text-base
+             text-white transition duration-75 rounded-lg group dark:hover:bg-white dark:hover:text-black
+              hover:bg-black
               dark:text-white  " aria-controls="dropdown-example"
                data-collapse-toggle="dropdown-example">
                               <CellTowerIcon/> 
@@ -689,9 +691,45 @@ transition={{ duration: 0.2, delay: 0.1 }}
   transition={{ duration: 0.2, delay: 0.1 }}
  className="flex items-center w-full p-2 gap-x-4 text-white transition
                       duration-75 rounded-lg pl-11 group 
-                       dark:text-white "> 
-                       <MailOutlineIcon/>
+                       dark:text-white cursor-pointer "> 
+                       <MailOutlineIcon />
                    Email
+                  </motion.li>
+
+                  <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
+                   initial={{ opacity: 0, x: -20 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   exit={{ opacity: 0, x: -20 }}
+                   transition={{ duration: 0.2 , delay: 0.2 }}
+                  className="flex items-center w-full p-2 text-white
+                     transition duration-75 rounded-lg pl-11 group cursor-pointer  dark:text-white gap-x-4
+                      " >
+                        <TextsmsSharpIcon/>
+                    <Link to='/admin/send-sms' >SMS</Link>
+                  </motion.li>
+
+
+
+                  <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
+                   initial={{ opacity: 0, x: -20 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   exit={{ opacity: 0, x: -20 }}
+                   transition={{ duration: 0.2 , delay: 0.2 }}
+                  className="flex items-center w-full p-2 text-white
+                     transition duration-75 rounded-lg pl-11 group cursor-pointer  dark:text-white gap-x-4
+                      " >
+                        <TextsmsSharpIcon/>
+                    <Link to='/admin/messages' >Messages</Link>
                   </motion.li>
 
                   <motion.li
@@ -708,9 +746,8 @@ transition={{ duration: 0.2, delay: 0.1 }}
                      transition duration-75 rounded-lg pl-11 group  dark:text-white gap-x-4
                       " >
                         <TextsmsSharpIcon/>
-                    SMS
+                    <Link to='/admin/bulk-messages' >Bulk</Link>  
                   </motion.li>
-
 
                   <motion.li 
                   onClick={() => {

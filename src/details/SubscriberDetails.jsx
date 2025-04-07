@@ -1,5 +1,4 @@
 import { Box, TextField, Autocomplete, Stack, InputAdornment, Button } from '@mui/material';
-
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 // import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -18,6 +17,48 @@ import { useDebounce } from 'use-debounce';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import { MdOutlineMailOutline } from "react-icons/md";
+import { MdOutlinePerson } from "react-icons/md";
+import { FaRegUser } from "react-icons/fa";
+import { TbLockPassword } from "react-icons/tb";
+import { FaHouseChimneyUser } from "react-icons/fa6";
+import { FaRegBuilding } from "react-icons/fa";
+
+
+
+
+
+
+const iconUrl = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png';
+
+
+
+
+function LocationMarker({ position, setPosition }) {
+  useMapEvents({
+    click(e) {
+      setPosition(e.latlng);
+    },
+  });
+
+  return position ? (
+    <Marker position={position} icon={new L.Icon({ iconUrl, iconSize: [25, 41], iconAnchor: [12, 41] })}>
+      <Popup>
+        Latitude: {position.lat}, Longitude: {position.lng}
+      </Popup>
+    </Marker>
+  ) : null;
+}
+
 
 const SubscriberDetails = ({handleClose,   
   packageNamee,
@@ -28,7 +69,16 @@ const SubscriberDetails = ({handleClose,
 
   const {settingsformData, subscriberSettings, setSubscriberSettings} = useApplicationSettings()
   const {name, ref_no , ppoe_password,  ppoe_username,  phone_number, email, second_phone_number,
-     package_name, installation_fee, subscriber_discount, date_registered, router_name}= formData
+     package_name, installation_fee, subscriber_discount, date_registered, router_name,
+     latitude, longitude, house_number, building_name
+    }= formData
+
+
+
+     const [position, setPosition] = useState(null);
+     const [mapReady, setMapReady] = useState(false);
+     const [openMapDialog, setOpenMapDialog] = useState(false);
+     const mapRef = useRef();
 
 
 
@@ -40,6 +90,104 @@ const SubscriberDetails = ({handleClose,
 
   const [initialPackage, setInitialPackage] = useState(null);
   const [mikrotik_router, setRouter] = useState(null)
+
+
+
+
+
+  useEffect(() => {
+    setMapReady(true);
+    handleGetLocationPageload();
+  }, []);
+
+  const handleGetLocationPageload = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          setPosition({ lat: latitude, lng: longitude });
+          setFormData({
+            ...formData,
+            latitude: latitude,
+            longitude: longitude
+          });
+          
+        },
+        (err) => {
+          console.log(`Error getting location: ${err.message}`);
+        }
+      );
+    } else {
+      console.log("Geolocation is not supported by this browser.");
+    }
+  };
+
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          setPosition({ lat: latitude, lng: longitude });
+          if (mapRef.current) {
+            mapRef.current.flyTo([latitude, longitude], 15);
+          }
+        },
+        (err) => {
+          alert(`Error getting location: ${err.message}`);
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+
+  const handleOpenMapDialog = () => {
+    setOpenMapDialog(true);
+  };
+
+  const handleCloseMapDialog = () => {
+    setOpenMapDialog(false);
+    // Save the position to form data when dialog closes
+    if (position) {
+      // setFormData({
+      //   ...formData,
+      //   latitude: position.lat,
+      //   longitude: position.lng
+      // });
+    }
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -86,13 +234,13 @@ const subdomain = window.location.hostname.split('.')[0];
         }else{
   toast.error('failed to fetch subscriber settings', {
     position: "top-center",
-    duration: 4000,
+    duration: 2000,
   })  
         }
       } catch (error) {
         toast.error('failed to fetch subscriber settings server error', {
           position: "top-center",
-          duration: 4000,
+          duration: 2000,
         })  
       }
     },
@@ -107,7 +255,11 @@ const subdomain = window.location.hostname.split('.')[0];
   
 
 
+  const handleChangeBuildingNameAndHouseNumber =(e)=> {
+    const {value, name} = e.target 
+    setFormData({...formData, [name]:  value})
 
+  }
 
 
       const handleEmailChange =(e)=> {
@@ -116,7 +268,12 @@ const subdomain = window.location.hostname.split('.')[0];
         console.log('my date',email)
 
       }
+      const handleLatitudeLongitudeChange =(e)=> {
+        const {value, name} = e.target 
+        setFormData({...formData, [name]:  value})
+        console.log('latitude, long',value)
 
+      }
 
 
       useEffect(() => {
@@ -262,8 +419,6 @@ const handleChangeName = (e) => {
 
 const fetchPackages = useMemo(() => async ()=> {
   
-
-
   try {
     const response = await fetch('/api/get_package',{
       method: 'GET',
@@ -317,382 +472,473 @@ const fetchPackages = useMemo(() => async ()=> {
 
 
     <>
-    <Toaster />
-     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="relative  w-full  md:mx-auto  md:max-w-4xl p-4"
-    >
-      <form onSubmit={createSubscriber}>
-        {/* Name and User Group */}
-        <div className="mb-3">
-          <Box
-          className='flex flex-col md:flex-row gap-4
-          '
-          
-          
-           sx={{
-            '& .MuiTextField-root': {  marginTop: '', 
-                '& label.Mui-focused': {
-                  color: 'black',
-                  fontSize:'18px'
-               
-                  },
-                '& .MuiOutlinedInput-root': {
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "black",
-                  borderWidth: '3px'
-                  },
-              '&.Mui-focused fieldset':  {
-                  borderColor: 'black', 
-               
-                }
-                },
-           },
-         }}
-          >
-          <TextField
-          className='myTextField'
-            id="name"
-            value={name}
-            onChange={handleChangeName}
-            label="Name"
-            variant="outlined"
-            fullWidth
-            sx={{
-                       '& .MuiTextField-root': { m: 1, marginTop: '', 
-                           '& label.Mui-focused': {
-                             color: 'black',
-                             fontSize:'18px'
-                          
-                             },
-                           '& .MuiOutlinedInput-root': {
-                           "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                             borderColor: "black",
-                             borderWidth: '3px'
-                             },
-                         '&.Mui-focused fieldset':  {
-                             borderColor: 'black', 
-                          
-                           }
-                           },
-                      },
-                    }}
-
-          />
-
-<TextField id="ref_no" className='myTextField' fullWidth
- onChange={handleChangeForm} value={ref_no} label="Ref No" variant="outlined" />
-
-          </Box>
-        </div>
-
-        {/* Email and Phone */}
-        <div className="">
-          <Box
-          className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-6'
-           sx={{
-            '& .MuiTextField-root': { m: 1, marginTop: '', 
-                '& label.Mui-focused': {
-                  color: 'black',
-                  fontSize:'18px'
-               
-                  },
-                '& .MuiOutlinedInput-root': {
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "black",
-                  borderWidth: '3px'
-                  },
-              '&.Mui-focused fieldset':  {
-                  borderColor: 'black', 
-               
-                }
-                },
-           },
-         }}
-          >
-          <TextField
-           className='myTextField'
-            name="email"
-            value={email}
-            onChange={handleEmailChange}
-            label="Email"
-            type="email"
-            variant="outlined"
-            fullWidth
-            sx={{ mb: 2 }}
-          />
-
-          
-          <TextField
-           className='myTextField'
-            id="phone_number"
-            value={formData.phone_number}
-            onChange={handlePhoneNumberChange}
-            label="Phone"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <img src="/images/icons8-kenya-48.png" alt="kenyan-flag" />
-                </InputAdornment>
-              ),
-            }}
-            variant="outlined"
-            fullWidth
-          />
-
-          </Box>
-        </div>
-
-        {/* Package and Date */}
-        <div className="">
-
-          <Box
-          className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 myTextField'
-
-          sx={{
-            '& .MuiTextField-root': { m: 1, marginTop: '', 
-                '& label.Mui-focused': {
-                  color: 'black',
-                  fontSize:'18px'
-               
-                  },
-                '& .MuiOutlinedInput-root': {
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "black",
-                  borderWidth: '3px'
-                  },
-              '&.Mui-focused fieldset':  {
-                  borderColor: 'black', 
-               
-                }
-                },
-           },
-         }}
-          >
-          <Autocomplete
-            value={packageName.find((pkg) => pkg.name === formData.package_name) || null}
-            options={packageName}
-            getOptionLabel={(option) => option.name}
-            renderInput={(params) => (
-              <TextField  className='myTextField' {...params} label="Select Package" variant="outlined" fullWidth />
-            )}
-            onChange={(event, newValue) => {
-              setFormData({ ...formData, package_name: newValue ? newValue.name : '' });
-            }}
-            sx={{ mb: 2 }}
-          />
-          <DatePicker
-           className='myTextField'
-            value={date_registered}
-            onChange={(date) => handleChangeDate(date)}
-            label="Date Registered"
-            renderInput={(params) => <TextField {...params} fullWidth sx={{ mb: 2 }} />}
-          />
-
-          </Box>
-        </div>
-
-        {/* Installation Fee and Discount */}
-        <div >
-
-          <Box
-          className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3"
-            sx={{
-              '& .MuiTextField-root': { m: 1, marginTop: '', 
+     <Toaster />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative w-full md:mx-auto md:max-w-4xl p-4"
+      >
+        <form onSubmit={createSubscriber}>
+          {/* Name and User Group */}
+          <div className="mb-3">
+            <Box className='flex flex-col md:flex-row gap-4'
+              sx={{
+                '& .MuiTextField-root': {
+                  marginTop: '',
                   '& label.Mui-focused': {
                     color: 'black',
-                    fontSize:'16px'
-                 
-                    },
+                    fontSize: '18px'
+                  },
                   '& .MuiOutlinedInput-root': {
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "black",
+                      borderWidth: '3px',
+                      fontSize: '17px'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'black',
+                    }
+                  },
+                },
+              }}
+            >
+              <TextField
+                className='myTextField'
+                id="name"
+                onChange={handleChangeName}
+                value={name}
+                InputProps={{
+                  startAdornment: <MdOutlinePerson className='w-8 h-8 mr-2 text-blue-500' />,
+                }}
+                label="Name"
+                variant="outlined"
+                fullWidth
+              />
+
+              {/* <TextField id="ref_no" className='myTextField' fullWidth
+                onChange={handleChangeForm} value={ref_no} label="Ref No" variant="outlined" /> */}
+
+
+
+<TextField 
+            InputProps={{
+              startAdornment: <FaRegBuilding className='w-5 h-5 mr-2 text-yellow-500' />,
+            }}
+            className='myTextField' fullWidth
+                label="Building Name"
+                name="building_name"
+
+                value={formData.building_name}
+                onChange={handleChangeBuildingNameAndHouseNumber}
+                variant="outlined" />
+
+            </Box>
+          </div>
+
+          {/* Email and Phone */}
+          <div className="">
+            <Box className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-6'
+              sx={{
+                '& .MuiTextField-root': {
+                  marginTop: '',
+                  '& label.Mui-focused': {
+                    color: 'black',
+                    fontSize: '18px'
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "black",
+                      borderWidth: '3px'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'black',
+                    }
+                  },
+                },
+              }}
+            >
+              <TextField
+               InputProps={{
+                startAdornment: <MdOutlineMailOutline className='w-7 h-7 mr-2 text-red-500' />,
+              }}
+                className='myTextField'
+                name="email"
+                value={email}
+                onChange={handleEmailChange}
+                label="Email"
+                type="email"
+                variant="outlined"
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+
+              <TextField
+                className='myTextField'
+                id="phone_number"
+                value={formData.phone_number}
+                onChange={handlePhoneNumberChange}
+                label="Phone"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <img src="/images/icons8-kenya-48.png" alt="kenyan-flag" />
+                    </InputAdornment>
+                  ),
+                }}
+                variant="outlined"
+                fullWidth
+              />
+            </Box>
+          </div>
+
+          {/* Package and Date */}
+          <div className="">
+            <Box className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 myTextField'
+              sx={{
+                '& .MuiTextField-root': {
+                  marginTop: '',
+                  '& label.Mui-focused': {
+                    color: 'black',
+                    fontSize: '18px'
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "black",
+                      borderWidth: '3px'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'black',
+                    }
+                  },
+                },
+              }}
+            >
+              <Autocomplete
+                value={packageName.find((pkg) => pkg.name === formData.package_name) || null}
+                options={packageName}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField className='myTextField' {...params} label="Select Package" variant="outlined" fullWidth />
+                )}
+                onChange={(event, newValue) => {
+                  setFormData({ ...formData, package_name: newValue ? newValue.name : '' });
+                }}
+                sx={{ mb: 2 }}
+              />
+              <DatePicker
+                className='myTextField'
+                value={date_registered}
+                onChange={(date) => handleChangeDate(date)}
+                label="Date Registered"
+                renderInput={(params) => <TextField {...params} fullWidth sx={{ mb: 2 }} />}
+              />
+            </Box>
+          </div>
+
+          {/* Installation Fee and Discount */}
+          <div>
+            <Box className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3"
+              sx={{
+                '& .MuiTextField-root': {
+                  marginTop: '',
+                  '& label.Mui-focused': {
+                    color: 'black',
+                    fontSize: '16px'
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "black",
+                      borderWidth: '3px'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'black',
+                    }
+                  },
+                },
+              }}
+            >
+              <TextField
+            
+                className='myTextField'
+                id="installation_fee"
+                value={installation_fee}
+                onChange={handleChangeForm}
+                label="Installation Fee"
+                type="number"
+                InputProps={{
+                  startAdornment: (
+                     <InputAdornment position="start">KES 💴</InputAdornment>
+                  ),
+                }}
+                variant="outlined"
+                fullWidth
+              />
+            
+
+            <TextField 
+            onChange={handleChangeBuildingNameAndHouseNumber}
+            value={formData.house_number}
+            name="house_number"
+            InputProps={{
+              startAdornment: <FaHouseChimneyUser className='w-5 h-5 mr-2 text-green-500' />,
+            }}
+            className='myTextField' fullWidth
+                label="House Number" variant="outlined" />
+
+
+            </Box>
+          </div>
+
+          <Box className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 myTextField'
+            sx={{
+              '& .MuiTextField-root': {
+                marginTop: '',
+                '& label.Mui-focused': {
+                  color: 'black',
+                  fontSize: '16px'
+                },
+                '& .MuiOutlinedInput-root': {
                   "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                     borderColor: "black",
                     borderWidth: '3px'
-                    },
-                '&.Mui-focused fieldset':  {
-                    borderColor: 'black', 
-                 
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'black',
                   }
-                  },
-             },
-           }}
-          >
-          <TextField
-           className='myTextField'
-         
-            id="installation_fee"
-            value={installation_fee}
-            onChange={handleChangeForm}
-            label="Installation Fee"
-            type="number"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">KES</InputAdornment>
-              ),
-            }}
-            variant="outlined"
-            fullWidth
-          />
-          <TextField
-           className='myTextField'
-            id="subscriber_discount"
-            value={subscriber_discount}
-            onChange={handleChangeForm}
-            label="Amount Subtracted From Customers Next Bill"
-            type="number"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">KES</InputAdornment>
-              ),
-            }}
-            variant="outlined"
-            fullWidth
-          />
-
-          </Box>
-        </div>
-
-        <Box
-         className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 myTextField'
-         sx={{
-          '& .MuiTextField-root': { m: 1, marginTop: '', 
-              '& label.Mui-focused': {
-                color: 'black',
-                fontSize:'16px'
-             
                 },
-              '& .MuiOutlinedInput-root': {
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "black",
-                borderWidth: '3px'
-                },
-            '&.Mui-focused fieldset':  {
-                borderColor: 'black', 
-             
-              }
               },
-         },
-       }}
-        >
-{subscriberSettings.use_autogenerated_number_as_ppoe_username  ? (
-   <TextField id="ppoe_password"  onChange={handleChangeForm}  value={ppoe_password}
-   label="Ppoe Password" variant="outlined"/>
-): null}
+            }}
+          >
+            {subscriberSettings.use_autogenerated_number_as_ppoe_username ? (
+              <TextField id="ppoe_password" onChange={handleChangeForm}
+              InputProps={{
+                startAdornment: <TbLockPassword className='w-6 h-6 mr-2 text-blue-500' />,
+              }}
+              value={ppoe_password}
+                label="Ppoe Password" variant="outlined" />
+            ) : null}
 
+            {subscriberSettings.use_autogenerated_number_as_ppoe_username === false &&
+              subscriberSettings.use_autogenerated_number_as_ppoe_password === false && (
+                <>
+                  <TextField id="ppoe_password" onChange={handleChangeForm}
+                  
+                  InputProps={{
+                    startAdornment: <TbLockPassword className='w-7 h-7 mr-2 text-blue-500' />,
+                  }}
+                  value={ppoe_password}
+                    label="Ppoe Password" variant="outlined" />
 
+                  <TextField
+                  InputProps={{
+                    startAdornment: <FaRegUser className='w-5 h-5 mr-2 text-blue-500' />,
+                  }}
+                  
+                  id="ppoe_username" onChange={handleChangeForm} value={ppoe_username}
+                    label="Ppoe Username" variant="outlined" />
+                </>
+              )}
 
-{subscriberSettings.use_autogenerated_number_as_ppoe_username === false &&
- subscriberSettings.use_autogenerated_number_as_ppoe_password === false && (
-
-  <>
-  <TextField id="ppoe_password"  onChange={handleChangeForm}  value={ppoe_password}
-   label="Ppoe Password" variant="outlined"/>
-
-
-   <TextField id="ppoe_username"  onChange={handleChangeForm} value={ppoe_username}   
-     label="Ppoe Username" variant="outlined" />
-     </>
-) }
-
-{/* 
-
-<TextField id="ppoe_username"  onChange={handleChangeForm} value={ppoe_username}   
-     label="Ppoe Username" variant="outlined" /> */}
-      
-
-{subscriberSettings.use_autogenerated_number_as_ppoe_password ? (
-     <TextField id="ppoe_username"  onChange={handleChangeForm} value={ppoe_username}   
-     label="Ppoe Username" variant="outlined" />
-
-
-): null}
-
-
-
-      
-
+            {subscriberSettings.use_autogenerated_number_as_ppoe_password ? (
+              <TextField id="ppoe_username" onChange={handleChangeForm} 
+              InputProps={{
+                startAdornment: <FaRegUser className='w-5 h-5 mr-2 text-blue-500' />,
+              }}
+              value={ppoe_username}
+                label="Ppoe Username" variant="outlined" />
+            ) : null}
           </Box>
 
-        {/* Location and Description */}
-        <div className="mb-6">
-          <Box
-          
-          sx={{
-            '& .MuiTextField-root': { m: 1, marginTop: '', 
-                '& label.Mui-focused': {
-                  color: 'black',
-                  fontSize:'16px'
-               
+          {/* Location and Description */}
+          <div className="mb-6">
+            <Box
+              sx={{
+                '& .MuiTextField-root': {
+                  marginTop: '',
+                  '& label.Mui-focused': {
+                    color: 'black',
+                    fontSize: '16px'
                   },
-                '& .MuiOutlinedInput-root': {
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "black",
-                  borderWidth: '3px'
+                  '& .MuiOutlinedInput-root': {
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "black",
+                      borderWidth: '3px'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'black',
+                    }
                   },
-              '&.Mui-focused fieldset':  {
-                  borderColor: 'black', 
-               
-                }
                 },
-           },
-         }}
-          >
-          <TextField
-           className='myTextField'
-            id="location"
-            label="Description Of Location"
-            variant="outlined"
-            fullWidth
-            multiline
-            rows={4}
-            sx={{ mb: 2 }}
-          />
+              }}
+            >
+              <TextField
+                className='myTextField'
+                id="location"
+                label="Description Of Location"
+                variant="outlined"
+                fullWidth
+                multiline
+                rows={4}
+                sx={{ mb: 2 }}
+                // value={location}
+                onChange={handleChangeForm}
+              />
 
-          </Box>
-        </div>
+              {/* Location Button */}
+              <Button
+                variant="outlined"
+                startIcon={<MyLocationIcon />}
+                onClick={handleOpenMapDialog}
+                sx={{ mb: 2 }}
+              >
+                Set Location on Map
+              </Button>
 
-        {/* Buttons */}
-        <div className="flex justify-end gap-4 mt-6">
-          {/* <Button
-            color="error"
-            startIcon={<CloseIcon />}
-            variant="outlined"
-            onClick={handleClose}
-          >
-            Cancel
-          </Button> */}
+              {/* Display coordinates if available */}
+              {position && (
+                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                  {/* <TextField
+                  className='myTextField'
+                    label="Latitude"
+                    id="latitude"
+                    onChange={handleChangeForm}
+                    // value={name}
+                    value={position.lat.toFixed(6)}
+                    sx={{ flex: 1 }}
+                  /> */}
+                   <TextField
+                  className='myTextField'
+                    label="Latitude"
+                    name="latitude"
+                    onChange={handleLatitudeLongitudeChange}
+                    value={formData.latitude}
+                    // value={latitude}
+                  />
+                  <TextField
+                  className='myTextField'
+                  name="longitude"
+                  onChange={handleLatitudeLongitudeChange}
+                  value={formData.longitude}
+                    label="Longitude"
+                    // InputProps={{ readOnly: true }}
+                    sx={{ flex: 1 }}
+                  />
+                </Box>
+              )}
+            </Box>
+          </div>
 
-<button   onClick={(e)=> {
-  e.preventDefault()
-handleClose()
-}} className='bg-red-600 text-white rounded-3xl px-4 py-2
+          {/* Buttons */}
+          <div className="flex justify-end gap-4 mt-6">
+            <button onClick={(e) => {
+              e.preventDefault()
+              handleClose()
+            }} className='bg-red-600 text-white rounded-3xl px-4 py-2
           transform hover:scale-110 transition duration-500 hover:bg-red-200  
           text-lg ' >
+              Cancel
+            </button>
 
-            Cancel
-          </button>
-          {/* <LoadingButton
-            loadingPosition="start"
-            startIcon={<AutorenewIcon />}
-            type="submit"
-            loading={isloading}
-            color="success"
-            variant="outlined"
-          >
-            Save
-          </LoadingButton> */}
-
-          <button className='bg-black text-white rounded-3xl px-4 py-2
+            <button className='bg-black text-white rounded-3xl px-4 py-2
           transform hover:scale-110 transition duration-500 hover:bg-green-500
           text-lg' type="submit">
+              Save
+            </button>
+          </div>
+        </form>
+      </motion.div>
 
-            Save
-          </button>
-        </div>
-      </form>
-    </motion.div>
+      {/* Map Dialog */}
+      <Dialog
+        fullWidth={true}
+        maxWidth="md"
+        open={openMapDialog}
+        onClose={handleCloseMapDialog}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            overflow: 'hidden',
+          },
+        }}
+      >
+        <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white', fontSize: '1.5rem', fontWeight: 'bold' }}>
+          Node Location
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
+          <Stack spacing={3}>
+            {mapReady && (
+              <div id="map" style={{ height: '500px', borderRadius: '8px', overflow: 'hidden' }}>
+                <MapContainer
+                  center={position ? position : { lat: 0, lng: 0 }}
+                  zoom={position ? 15 : 15}
+                  style={{ height: '100%' }}
+                  whenCreated={(map) => { mapRef.current = map; }}
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  <LocationMarker position={position} setPosition={setPosition} />
+                </MapContainer>
+              </div>
+            )}
+
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Button
+                variant="contained"
+                startIcon={<MyLocationIcon />}
+                onClick={handleGetLocation}
+                sx={{
+                  bgcolor: 'primary.main',
+                  '&:hover': { bgcolor: 'primary.dark' },
+                }}
+              >
+                Get My Location
+              </Button>
+
+              <TextField
+              className='myTextField'
+                label="Latitude"
+                value={position?.lat?.toFixed(6) || ''}
+                InputProps={{ readOnly: true }}
+                sx={{ flex: 1 }}
+              />
+
+              <TextField
+              className='myTextField'
+                label="Longitude"
+                value={position?.lng?.toFixed(6) || ''}
+                InputProps={{ readOnly: true }}
+                sx={{ flex: 1 }}
+              />
+            </Stack>
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button
+            onClick={handleCloseMapDialog}
+            variant="outlined"
+            sx={{
+              borderColor: 'primary.main',
+              color: 'primary.main',
+              '&:hover': { borderColor: 'primary.dark' },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleCloseMapDialog}
+            sx={{
+              bgcolor: 'primary.main',
+              '&:hover': { bgcolor: 'primary.dark' },
+            }}
+          >
+            Save Location
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
 //     <div className=' relative right-20 w-full'>
 //           <form onSubmit={createSubscriber}>

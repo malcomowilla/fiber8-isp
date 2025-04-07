@@ -32,6 +32,10 @@ const PPPOEsubscribers = () => {
 
   const intialValue = {
     name: '',
+    latitude: '',
+    longitude: '',
+    house_number: '',
+    building_name: '',
     phone_number: '',
     ppoe_username: '',
     ppoe_password: '',
