@@ -40,6 +40,7 @@ import { MdSettingsInputAntenna } from "react-icons/md";
 
 import { TfiDashboard } from "react-icons/tfi";
 import { CgComponents } from "react-icons/cg";
+import { TbCloudNetwork } from "react-icons/tb";
 
 
 
@@ -457,6 +458,7 @@ className="flex items-center  w-full p-2 text-white transition
 
 
 
+               
 
 
 
@@ -471,11 +473,11 @@ className="flex items-center  w-full p-2 text-white transition
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.2 , delay: 0.2 }}
                   >
-                     <Link to='/admin/network-components' className="flex items-center w-full p-2 text-white
+                     <Link to='/admin/networks-wireguard-config' className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg group  dark:text-white
                        gap-x-3">
-                              <CgComponents className='rounded-full h-8 w-8' />
-                        components</Link>
+                              <TbCloudNetwork className='rounded-full h-8 w-8' />
+                        ip_networks</Link>
                   </motion.li>
 
                   <motion.li
