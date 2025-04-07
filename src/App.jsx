@@ -141,6 +141,7 @@ import PasswordResetEmailSent from './Auth/PasswordResetEmailSent'
 import SendSms from './sms/SendSms'
 import  AllMessages from './sms/AllMessages'
 import BulkMessage from './sms/BulkMessage'
+import WireguardConfigForm from './wireguard/WireguardConfigForm'
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -710,6 +711,7 @@ const hostname = window.location.hostname;
 <Route path='/admin/network-components' element={<NetworkComponents/>}/>
 <Route path='/admin/messages' element={<AllMessages/>}/>
 <Route path='/admin/bulk-messages' element={<BulkMessage/>}/>
+<Route path='/admin/networks-wireguard-config' element={<WireguardConfigForm/>}/>
 </Route>
 
 </Route >
