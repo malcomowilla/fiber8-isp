@@ -285,12 +285,12 @@ const fetchSavedSmsSettings = useCallback(
       const data = await response.json();
 
       const newData = data.length > 0 
-        ? data.reduce((latest, item) => new Date(item.created_at) > new Date(latest.created_at) ? item : latest, data[0])
-        : null;
+      ? data.reduce((latest, item) => new Date(item.updated_at) > new Date(latest.updated_at) ? item : latest, data[0])
+      : null;
   
       if (response.ok) {
         console.log('Fetched SMS settings:', newData);
-        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID } = newData;
+        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID } = newData[0];
         // setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID });
         setSelectedProvider(sms_provider);
         // setSelectedProvider(newData[0].sms_provider);
