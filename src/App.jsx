@@ -138,6 +138,9 @@ import ClientPortal from './client_portal/ClientPortal'
 import NetworkComponents from './settings/NetworkComponents'
 import ConfirmResetPassword from './Auth/ConfirmResetPassword'
 import PasswordResetEmailSent from './Auth/PasswordResetEmailSent'
+import SendSms from './sms/SendSms'
+import  AllMessages from './sms/AllMessages'
+import BulkMessage from './sms/BulkMessage'
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -676,6 +679,7 @@ const hostname = window.location.hostname;
 }/>
 <Route/>
 <Route path='/admin/side-bar' element={<Sidebar/>}/> 
+<Route path='/admin/send-sms' element={<SendSms/>}/>
 <Route path='/admin/profile' element={<AdminProfile/>}/>
 <Route path='/admin/pppoe-packages' element={< PPPOEpackages/>}/>
 <Route path='/admin/pppoe-subscribers' element={< PPPOEsubscribers/>}/>
@@ -704,6 +708,8 @@ const hostname = window.location.hostname;
 <Route path='/admin/customer-tickets' element={<CustomerTickets/>}/>
 <Route path='/admin/ip-pool-table' element={<IpPoolTable/>}/>
 <Route path='/admin/network-components' element={<NetworkComponents/>}/>
+<Route path='/admin/messages' element={<AllMessages/>}/>
+<Route path='/admin/bulk-messages' element={<BulkMessage/>}/>
 </Route>
 
 </Route >

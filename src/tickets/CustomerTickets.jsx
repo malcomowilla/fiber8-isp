@@ -789,7 +789,7 @@ onRowClick={handleRowClick}
 
  options={{
         paging: true,
-       pageSizeOptions:[5, 10, 20, 25, 50, 100],
+       pageSizeOptions:[5, 10, 20],
        pageSize: 10,
        search: false,
   

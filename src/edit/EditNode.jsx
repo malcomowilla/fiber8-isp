@@ -1,382 +1,195 @@
-import * as React from 'react';
-// import Box from '@mui/material/Box';
+import { useState, useRef, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-// import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-// import FormControl from '@mui/material/FormControl';
-// import FormControlLabel from '@mui/material/FormControlLabel';
-// import InputLabel from '@mui/material/InputLabel';
-// import MenuItem from '@mui/material/MenuItem';
-// import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
-import Autocomplete from '@mui/material/Autocomplete';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useMapEvents } from 'react-leaflet';
+import L from 'leaflet';  // import Leaflet
+import 'leaflet/dist/leaflet.css'
 
+// Fix for default marker icons
+const iconUrl = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png';
 
-export default function MaxWidthDialog  ({open, handleClose})  {
-    const [maxWidth, setMaxWidth] = React.useState('lg');
-
-    const [fullWidth, setFullWidth] = React.useState(true);
-
-    const top100Films = [
-        { label: 'Fiber',},
-        { label: 'Wireless',  },
-        { label: 'MDU' },
-     
-    ]
-  
-  
-  return (
-    <React.Fragment>
- 
-    <Dialog
-            fullWidth={fullWidth}
-
-      maxWidth={maxWidth}
-      open={open}
-      onClose={handleClose}
-    >
-      <DialogTitle>Node Details</DialogTitle>
-      <DialogContent>
-
-        <form action="">
-
-           
-
-
-
-                <Stack  className='myTextField'   spacing={{
-                    xs: 1,
-                    sm: 2,
-                    md: 3,
-                    lg: 4,
-                    xl: 5,
-
-                }}  sx={{
-                    display:'flex',
-                    marginTop: 3,
-
-'& label.Mui-focused': {
-    color: 'black',
-    fontSize: '17px'
-  
+function LocationMarker({ position, setPosition }) {
+  useMapEvents({
+    click(e) {
+      setPosition(e.latlng);
     },
-  '& .MuiOutlinedInput-root': {
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderColor: "black",
-    borderWidth: '3px'
-    },
-  '&.Mui-focused fieldset':  {
-    borderColor: 'black', 
-    
-  
-  }
-  },
-                }}  direction={{
-                    xs: 'column',
-                    lg:'row',
-                    xl: 'row',
-                    sm:'row'
-                }}>
+  });
 
-                    <TextField  sx={{
-                        width: {
-                            sm: '50%',
-                            lg: '50%',
-                            xl: '40%',
-                            md: '45%'
-                        }
-                    }} label='Name'/>
-                    <TextField  label='Code'/>
-                  
-<Autocomplete
-      id="combo-box-demo"
-      options={top100Films}
-      sx={{  width: {
-        sm: '50%',
-        lg: '50%',
-        xl: '40%',
-        md: '45%'
-    } }}
-      renderInput={(params) => <TextField {...params} label="Type" />}
-    />
-
-                </Stack>
-
-                
-
-
-                    <Stack direction='column'>
-
-                    </Stack>
-
-
-
-
-            <Stack className='myTextField'  sx={{
-marginTop: 2,
-'& label.Mui-focused': {
-    color: 'black',
-    fontSize: '17px'
-  
-    },
-  '& .MuiOutlinedInput-root': {
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderColor: "black",
-    borderWidth: '3px'
-    },
-  '&.Mui-focused fieldset':  {
-    borderColor: 'black', 
-    
-  
-  }
-  },
-}}   spacing={{
-lg: 4,
-xl: 4,
-sm: 4,
-md: 4,
-xs: 2
-}} direction={{
-xs: 'column',
-sm: 'row',
-md: 'row',
-lg: 'row',
-xl: 'row'
-}}>
-
-
-<Autocomplete
-      id="combo-box-demo"
-      options={top100Films}
-      sx={{  width: {
-        sm: '50%',
-        lg: '50%',
-        xl: '40%',
-        md: '45%'
-    } }}
-      renderInput={(params) => <TextField {...params} label="Parent Node Conects To" />}
-    />
-
-
-
-
-<Autocomplete
-      id="combo-box-demo"
-      options={top100Films}
-      sx={{  width: {
-        sm: '50%',
-        lg: '50%',
-        xl: '40%',
-        md: '45%'
-    } }}
-      renderInput={(params) => <TextField {...params} label="Subnet" />}
-    />
-            </Stack>
-
-
-
-
-
-            <Stack   className='myTextField'  sx={{
-marginTop: 2,
-'& label.Mui-focused': {
-    color: 'black',
-    fontSize: '17px'
-  
-    },
-  '& .MuiOutlinedInput-root': {
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderColor: "black",
-    borderWidth: '3px'
-    },
-  '&.Mui-focused fieldset':  {
-    borderColor: 'black', 
-    
-  
-  }
-  },
-}}   spacing={{
-lg: 4,
-xl: 4,
-sm: 4,
-md: 4,
-xs: 2
-}} direction={{
-xs: 'column',
-sm: 'row',
-md: 'row',
-lg: 'row',
-xl: 'row'
-}} >
-
-
-<Autocomplete
-      id="combo-box-demo"
-      options={top100Films}
-      sx={{  width: {
-        sm: '50%',
-        lg: '50%',
-        xl: '40%',
-        md: '45%'
-    } }}
-      renderInput={(params) => <TextField {...params} label="Zones" />}
-    />
-
-
-
-<Autocomplete
-      id="combo-box-demo"
-      options={top100Films}
-      sx={{  width: {
-        sm: '50%',
-        lg: '50%',
-        xl: '40%',
-        md: '45%'
-    } }}
-      renderInput={(params) => <TextField {...params} label="Subnet" />}
-    />
-            </Stack>
-
-                        <div className='flex justify-center mt-12'>
-
-                        <div className='dark:bg-gray-500 bg-gray-800 dark:text-white
-                          text-white flex justify-center items-center gap-x-4  w-[200px] h-10'>
-        <p className='text-lg'>Get Location</p>
-
-        <ion-icon name="location-outline"></ion-icon>
-        </div>
-                        </div>
-      
-
-
-            <Stack    sx={{
-                
-marginTop: 14,
-
-'& label.Mui-focused': {
-    color: 'black',
-    fontSize: '17px'
-  
-    },
-  '& .MuiOutlinedInput-root': {
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderColor: "black",
-    borderWidth: '3px'
-    },
-  '&.Mui-focused fieldset':  {
-    borderColor: 'black', 
-    
-  
-  }
-  },
-}}   spacing={{
-lg: 4,
-xl: 4,
-sm: 4,
-md: 4,
-xs: 2
-}} direction={{
-xs: 'column',
-sm: 'row',
-md: 'row',
-lg: 'row',
-xl: 'row'
-}}  className='myTextField'>
-
-                <TextField    sx={{
-                    width:{
-                        sm: '100%'
-                },
-                }}  label='Latitude'/>
-                <TextField  sx={{
-                    width:{
-                        sm: '100%'
-                },
-                }}  label='Longitude'/>
-
-            </Stack>
-
-
-
-<TextField label='Description Of Location'   className='myTextField' sx={{
-    marginTop: 5,
-"& .MuiInputBase-root": {
-height: 400
-},
-'& label.Mui-focused': {
-    color: 'black',
-    fontSize: '16px'
-  
-    },
-  '& .MuiOutlinedInput-root': {
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderColor: "black",
-    borderWidth: '3px'
-    },
-  '&.Mui-focused fieldset':  {
-    borderColor: 'black', 
-    
-  
-  }
-  },
-}} fullWidth/>
-
-
-
-
-
-
-
-
-                <Stack  className='myTextField' sx={{
-                                    marginTop: 4,
-                                      '& label.Mui-focused': {
-                                          color: 'black',
-                                          fontSize: '17px'
-                                        
-                                          },
-                                        '& .MuiOutlinedInput-root': {
-                                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                                          borderColor: "black",
-                                          borderWidth: '3px'
-                                          },
-                                        '&.Mui-focused fieldset':  {
-                                          borderColor: 'black', 
-                                          
-                                        
-                                        }
-                                        },
-                }}   spacing={{
-                lg: 4,
-                xl: 4,
-                sm: 4,
-                md: 4,
-                xs: 2
-            }} direction={{
-                xs: 'column',
-                sm: 'row',
-                md: 'row',
-                lg: 'row',
-                xl: 'row'
-            }}>
-                        <DialogActions>
-
-                <Button variant='outlined' color='success'>Save</Button>
-            <Button onClick={handleClose} variant='outlined' color='error'>Close</Button>
-            </DialogActions>
-
-            </Stack>
-        </form>
-    
-        
-      </DialogContent>
-     
-    </Dialog>
-  </React.Fragment>
-  )
+  return position ? (
+    <Marker position={position} icon={new L.Icon({ iconUrl, iconSize: [25, 41], iconAnchor: [12, 41] })}>
+      <Popup>
+        Latitude: {position.lat}, Longitude: {position.lng}
+      </Popup>
+    </Marker>
+  ) : null;
 }
 
+export default function Node({ open, handleClose }) {
+  const [name, setName] = useState('');
+  const [position, setPosition] = useState(null);
+  const [mapReady, setMapReady] = useState(false);
+  const mapRef = useRef();
+
+  useEffect(() => {
+    setMapReady(true);
+  }, []);
+
+console.log('position', position);
+
+  const handleGetLocationPageload = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          setPosition({ lat: latitude, lng: longitude });
+        },
+        (err) => {
+          alert(`Error getting location: ${err.message}`);
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+
+
+
+
+
+  useEffect(() => {
+    setMapReady(true);
+    handleGetLocationPageload(); // 👈 This will trigger the permission request on load
+  }, []);
+  
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          setPosition({ lat: latitude, lng: longitude });
+        },
+        (err) => {
+          alert(`Error getting location: ${err.message}`);
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+
+  return (
+    <Dialog
+      fullWidth={true}
+      maxWidth="md"
+      open={open}
+      onClose={handleClose}
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          overflow: 'hidden',
+        },
+      }}
+    >
+      <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white', fontSize: '1.5rem', fontWeight: 'bold' }}>
+        Node Location
+      </DialogTitle>
+      <DialogContent sx={{ pt: 3 }}>
+        <Stack spacing={3}>
+          <TextField
+            fullWidth
+            label="Node Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            sx={{
+              '& label.Mui-focused': {
+                color: 'primary.main',
+              },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: 'primary.main',
+                  borderWidth: 2,
+                },
+              },
+            }}
+          />
+
+          {mapReady && (
+            <div id="map" style={{ height: '300px', borderRadius: '8px', overflow: 'hidden' }}>
+              <MapContainer
+                center={position ? position : { lat: 0, lng: 0 }}
+                zoom={position ? 15 : 13}
+                id="map" style={{ height: '500px' }}
+                whenCreated={(map) => { mapRef.current = map; }}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <LocationMarker position={position} setPosition={setPosition} />
+              </MapContainer>
+            </div>
+          )}
+
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Button
+              variant="contained"
+              startIcon={<MyLocationIcon />}
+              onClick={handleGetLocation}
+              sx={{
+                bgcolor: 'primary.main',
+                '&:hover': { bgcolor: 'primary.dark' },
+              }}
+            >
+              Get My Location
+            </Button>
+
+            <TextField
+              label="Latitude"
+              value={position?.lat?.toFixed(6) || ''}
+              InputProps={{ readOnly: true }}
+              sx={{ flex: 1 }}
+            />
+
+            <TextField
+              label="Longitude"
+              value={position?.lng?.toFixed(6) || ''}
+              InputProps={{ readOnly: true }}
+              sx={{ flex: 1 }}
+            />
+          </Stack>
+        </Stack>
+      </DialogContent>
+      <DialogActions sx={{ px: 3, py: 2 }}>
+        <Button
+          onClick={handleClose}
+          variant="outlined"
+          sx={{
+            borderColor: 'primary.main',
+            color: 'primary.main',
+            '&:hover': { borderColor: 'primary.dark' },
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          disabled={!position}
+          sx={{
+            bgcolor: 'primary.main',
+            '&:hover': { bgcolor: 'primary.dark' },
+            '&:disabled': { bgcolor: 'grey.300' },
+          }}
+        >
+          Save Location
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
