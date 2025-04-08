@@ -51,8 +51,8 @@ function WireguardConfigForm() {
 
 
   const subnetOptions = [
-    { value: '8', label: '/8 (16,777,214 hosts)' },
-    { value: '16', label: '/16 (65,534 hosts)' },
+    // { value: '8', label: '/8 (16,777,214 hosts)' },
+    // { value: '16', label: '/16 (65,534 hosts)' },
     { value: '24', label: '/24 (254 hosts)' },
     { value: '30', label: '/30 (2 hosts)' },
   ];
@@ -83,6 +83,7 @@ function WireguardConfigForm() {
           client_ip: formData.customIp,
           create_radius_entry: formData.createRadiusEntry,
           pppoe_username: formData.pppoeUsername
+
         })
       });
 
@@ -135,6 +136,8 @@ const CopyButton = styled(IconButton)(({ theme }) => ({
         <form onSubmit={handleSubmit}>
           <Box sx={{ display: 'grid', gap: 3 }}>
             <TextField
+                          className='myTextField'
+
               label="Network Address"
               name="networkAddress"
               value={formData.networkAddress}
@@ -166,6 +169,7 @@ const CopyButton = styled(IconButton)(({ theme }) => ({
               value={formData.customIp}
               onChange={handleChange}
               fullWidth
+              className='myTextField'
               placeholder="e.g., 10.2.0.42"
             />
             
@@ -187,6 +191,8 @@ const CopyButton = styled(IconButton)(({ theme }) => ({
                 value={formData.pppoeUsername}
                 onChange={handleChange}
                 fullWidth
+                className='myTextField'
+
                 required={formData.createRadiusEntry}
               />
             )}
@@ -220,6 +226,8 @@ const CopyButton = styled(IconButton)(({ theme }) => ({
           <Box sx={{ mb: 3 }}>
             <Typography><strong>Network:</strong> {config.network}</Typography>
             <Typography><strong>Assigned IP:</strong> {config.client_ip}</Typography>
+            <Typography><strong>Server IP:</strong> {config.server_ip}</Typography>
+
           </Box>
           
           <Divider sx={{ my: 2 }} />
@@ -268,14 +276,14 @@ const CopyButton = styled(IconButton)(({ theme }) => ({
           </ConfigBlock>
           
           <Divider sx={{ my: 2 }} />
-          
+{/*           
           <Typography variant="h6" gutterBottom>
             Server Configuration:
-          </Typography>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
+          </Typography> */}
+          {/* <Typography variant="body2" color="text.secondary" gutterBottom>
             This peer configuration has been automatically added to your WireGuard server.
-          </Typography>
-          <ConfigBlock>
+          </Typography> */}
+          {/* <ConfigBlock>
             <CopyButton 
               size="small" 
               onClick={() => copyToClipboard(config.server_config, 'server')}
@@ -283,7 +291,7 @@ const CopyButton = styled(IconButton)(({ theme }) => ({
               {copied['server'] ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
             </CopyButton>
             <PreformattedText>{config.server_config}</PreformattedText>
-          </ConfigBlock>
+          </ConfigBlock> */}
         </ConfigPaper>
       )}
     </Box>
