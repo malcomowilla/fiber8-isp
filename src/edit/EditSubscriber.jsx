@@ -18,6 +18,8 @@ import Address from '../details/Address';
 import TabPanel from '@mui/lab/TabPanel';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
+import {useState, useEffect} from 'react'
+
 import {
   Tabs,
   useMediaQuery,
@@ -28,7 +30,15 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const EditSubscriber = ({handleClose, open, formData , createSubscriber, handleChangeForm, packageNamee, setFormData, isloading }) => {
+const EditSubscriber = ({handleClose, open, formData , createSubscriber,
+  setShowClientStatsAndSubscriptions, showClientStatsAndSUbscriptions,
+   handleChangeForm, packageNamee, setFormData, isloading,
+  
+  
+   onlyShowSubscription,setOnlyShowSubscription
+
+  
+  }) => {
   const [value, setValue] = React.useState('1');
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -36,6 +46,8 @@ const EditSubscriber = ({handleClose, open, formData , createSubscriber, handleC
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+
 
   return (
     // <React.Fragment>
@@ -88,6 +100,8 @@ const EditSubscriber = ({handleClose, open, formData , createSubscriber, handleC
     // </React.Fragment>
 
 
+    
+
 <Dialog
   open={open}
   onClose={handleClose}
@@ -129,12 +143,23 @@ const EditSubscriber = ({handleClose, open, formData , createSubscriber, handleC
               scrollButtons="auto"
             >
               <Tab label="SUBSCRIBER DETAILS" value="1" />
-              <Tab label="ADDRESS" value="2" />
-              <Tab label="DEVICES" value="3" />
-              <Tab label="INVOICE" value="4" />
-              <Tab label="RECEIPT" value="5" />
-              <Tab label="STATS" value="6" />
-              <Tab label="SUBSCRIPTIONS" value="7" />
+              {onlyShowSubscription  && <>{showClientStatsAndSUbscriptions ? <Tab label="ADDRESS" value="2" /> : null} </>}
+
+
+            {onlyShowSubscription && <>{showClientStatsAndSUbscriptions && <Tab label="LIVE DATA" value="11" />}</>}
+
+{onlyShowSubscription && <>{showClientStatsAndSUbscriptions && <Tab label="INVOICE" value="4" />}</>}
+
+
+{onlyShowSubscription && <>{showClientStatsAndSUbscriptions && <Tab label="STATS" value="6" />}</>}
+
+            {showClientStatsAndSUbscriptions && <Tab label="SUBSCRIPTIONS" value="7" />}
+            {onlyShowSubscription && <>{showClientStatsAndSUbscriptions && <Tab label="COMUNICATIONS" value="8" />}</>}
+            {onlyShowSubscription && <>{showClientStatsAndSUbscriptions && <Tab label="ACTIVITY LOGS" value="9" />}</>}
+             {onlyShowSubscription && <>{showClientStatsAndSUbscriptions && <Tab label="PAYMENT HISTORY" value="10" />}</>}
+
+
+
               
             </TabList>
           </Box>
@@ -154,7 +179,17 @@ const EditSubscriber = ({handleClose, open, formData , createSubscriber, handleC
           <TabPanel value="4"><Invoice handleClose={handleClose}/></TabPanel>
           <TabPanel value="5"><Receipt handleClose={handleClose}/></TabPanel>
           <TabPanel value="6"><Stats handleClose={handleClose}/></TabPanel>
-          <TabPanel value="7"><Subscriptions handleClose={handleClose}/></TabPanel>
+          <TabPanel value="7"><Subscriptions
+           handleClose={handleClose}
+           
+           isloading={isloading}
+           formData={formData}
+           createSubscriber={createSubscriber}
+           packageNamee={packageNamee}
+           setFormData={setFormData}
+           handleChangeForm={handleChangeForm}
+           
+           /></TabPanel>
         </TabContext>
       </Box>
     </Typography>

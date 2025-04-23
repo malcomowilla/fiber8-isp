@@ -246,11 +246,14 @@ useEffect(() => {
         },
       })
 const newData = await response.json()
+
       if (response) {
         console.log('fetched router settings', newData)
         const {router_name, use_radius} = newData[0]
         setFormData({...settingsformData, router_name, use_radius })
         setRouter(router_name)
+
+
       } else {
         toast.error(newData.error, {
           position: "top-center",

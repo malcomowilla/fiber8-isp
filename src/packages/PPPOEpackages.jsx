@@ -63,12 +63,13 @@ const [deleteNotification, setDeleteNotification] = useState(false)
 const initialValue = {
   name: '',
   validity: '',
+  validity_period_units: '',
+
   download_limit: '',
   upload_limit: '',
   price:  '',
   upload_burst_limit: '',
   download_burst_limit: '',
-  validity_period_units: '',
 router_name: settingsformData.router_name,
 ip_pool: ''
 

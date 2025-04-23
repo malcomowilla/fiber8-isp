@@ -473,11 +473,66 @@ className="flex items-center  w-full p-2 text-white transition
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.2 , delay: 0.2 }}
                   >
+                    
                      <Link to='/admin/networks-wireguard-config' className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg group  dark:text-white
                        gap-x-3">
-                              <TbCloudNetwork className='rounded-full h-8 w-8' />
+                        <div>
+                              <img src='/images/wireguard2.png' className='rounded-full h-7 w-7' />
+                              </div>
+                        wireguard</Link>
+                  </motion.li>
+
+
+
+
+
+                  <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 , delay: 0.2 }}
+                  >
+                    
+                     <Link to='/admin/ip_networks' className="flex items-center w-full p-2 text-white
+                     transition duration-75 rounded-lg group  dark:text-white
+                       gap-x-3">
+                        <div>
+                              <TbCloudNetwork className='rounded-full h-7 w-7' />
+                              </div>
                         ip_networks</Link>
+                  </motion.li>
+
+
+
+
+
+
+
+                  <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 , delay: 0.2 }}
+                  >
+                    
+                     <Link to='/admin/network-components' className="flex items-center w-full p-2 text-white
+                     transition duration-75 rounded-lg group  dark:text-white
+                       gap-x-3">
+                        <div>
+                              <CgComponents className='rounded-full h-7 w-7' />
+                              </div>
+                        components</Link>
                   </motion.li>
 
                   <motion.li
