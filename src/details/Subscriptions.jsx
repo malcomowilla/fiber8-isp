@@ -1,9 +1,808 @@
 
-const Subscriptions = () => {
+import { Box, TextField, Autocomplete, Stack, InputAdornment, Button, } from '@mui/material';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+// import InputLabel from '@mui/material/InputLabel';
+// import MenuItem from '@mui/material/MenuItem';
+// import FormControl from '@mui/material/FormControl';
+// import Select from '@mui/material/Select';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import LoadingButton from '@mui/lab/LoadingButton';
+import CloseIcon from '@mui/icons-material/Close';
+
+import {useApplicationSettings} from '../settings/ApplicationSettings'
+import {  useState, useEffect, useMemo, useRef, useCallback} from 'react'
+import { useDebounce } from 'use-debounce';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import { MdOutlineMailOutline } from "react-icons/md";
+import { MdOutlinePerson } from "react-icons/md";
+import { FaRegUser } from "react-icons/fa";
+import { TbLockPassword } from "react-icons/tb";
+import { FaHouseChimneyUser } from "react-icons/fa6";
+import { FaRegBuilding } from "react-icons/fa";
+import { GiCycle } from "react-icons/gi";
+import { MdOutlineBlock } from "react-icons/md";
+
+
+
+import { 
+   
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Divider,
+  Typography,
+  Grid,
+  IconButton,
+  Tooltip,
+  CircularProgress,
+  Snackbar,
+  Alert
+} from '@mui/material';
+
+import { MdOutlineNetworkPing } from "react-icons/md";
+import MaterialTable from 'material-table';
+
+
+import { FaRandom } from "react-icons/fa";
+import { FaCheckCircle } from "react-icons/fa";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CloudIcon from '@mui/icons-material/Cloud';
+import WarningIcon from '@mui/icons-material/Warning';
+
+import { MdNetworkPing } from "react-icons/md";
+import { FaUser } from "react-icons/fa";
+import { FaCalendarAlt } from "react-icons/fa";
+
+
+
+
+const Subscriptions = ({
+  packageNamee,
+  handleClose,
+
+  formData,  createSubscriber, handleChangeForm, setFormData, isloading,
+  setShowClientStatsAndSubscriptions
+
+}) => {
+
+  const {settingsformData, subscriberSettings, setSubscriberSettings} = useApplicationSettings()
+  const {name, ref_no , ppoe_password,  ppoe_username,  phone_number, email, second_phone_number,
+     package_name, installation_fee, subscriber_discount, date_registered, router_name,
+     latitude, longitude, house_number, building_name
+    }= formData
+
+
+
+  const [poe_package,] = useDebounce(package_name, 1000)
+  const [ routerName] = useDebounce( router_name, 1000)
+
+  const [packageName, setPackageName] = useState([])
+  const [routers, setRouters]= useState ([])
+
+  const [initialPackage, setInitialPackage] = useState(null);
+  const [mikrotik_router, setRouter] = useState(null)
+
+    const [networks, setNetworks] = useState([]);
+    const [ipAssigned, setIpAssigned] = useState(false);
+    const [ipAddress, setIpAddress] = useState('');
+    const [showMaterialTable, setShowMaterialTable] = useState(true);
+    const [showForm, setShowForm] = useState(false);
+    const [ips, setIps] = useState([])
+    const [subscriptions, setSubscriptions] = useState([])
+
+const subdomain = window.location.hostname.split('.')[0];
+
+
+
+
+
+
+
+
+const fetchPackages = useMemo(() => async ()=> {
+  
+  try {
+    const response = await fetch('/api/get_package',{
+      method: 'GET',
+      headers: {
+        'X-Subdomain': subdomain,
+      },
+  
+    }
+  
+  )
+    const newData = await response.json()
+  if (response.ok) {
+    // console.log('package',newData)
+    setPackageName(newData)
+
+  } else {
+    console.log('failed to fetch routers')
+
+  }
+  
+  } catch (error) {
+    
+    console.log(error)
+  
+  }
+  
+  
+  }, [])
+  
+
+
+
+  useEffect(() => {
+    
+    fetchPackages()
+  }, [ fetchPackages, poe_package]);
+
+  const getSubscriptions = useCallback(
+    async() => {
+      
+      try {
+        const response = await fetch('/api/subscriptions', {
+          headers: { 'X-Subdomain': subdomain },
+        })
+        const data = await response.json()
+        setSubscriptions(data)
+      }
+      catch (error) {
+        console.log(error)
+      }
+    },
+    []
+  )
+
+
+
+  useEffect(() => {
+    getSubscriptions() 
+   
+  }, [getSubscriptions]);
+const getIps = useCallback(
+  async(network_name) => {
+    
+    try {
+      const response = await fetch(`/api/get_ips?network_name=${network_name}`, {
+        headers: { 'X-Subdomain': subdomain },
+      })
+      const data = await response.json()
+      setIps(data)
+    } catch (error) {
+      
+      console.log(error)
+    }
+  },
+  [],
+)
+
+const handleChangeNetwork =(e)=> {
+  const {value, name} = e.target 
+  console.log('network_name',value)
+  setFormData({...formData, [name]:  value})
+  getIps(value) 
+
+}
+
+
+const handleChangeIpAddress =(e)=> {
+  const {value, name} = e.target 
+  console.log('ip_address',value)
+  setFormData({...formData, [name]:  value})
+
+}
+
+
+
+    const fetchData = async () => {
+      // setLoading(true);
+      try {
+        const response = await fetch('/api/ip_networks', {
+          headers: { 'X-Subdomain': subdomain }
+        });
+        if (response.ok) {
+          const result = await response.json();
+          setNetworks(result);
+        } else {
+          throw new Error('Failed to fetch IP networks');
+        }
+      } catch (error) {
+        // showSnackbar(error.message, 'error');
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+
+    useEffect(() => {
+      fetchData();
+     
+    }, []);
+
+
+    const assignRandomIp = () => {
+      if (networks.length > 0) {
+        const network = networks[0]; // Using first network for demo
+        const baseIp = network.network.split('.');
+        const randomIp = `${baseIp[0]}.${baseIp[1]}.${baseIp[2]}.${Math.floor(Math.random() * 254) + 1}`;
+        setIpAddress(randomIp);
+        setIpAssigned(true);
+        setFormData({
+          ...formData,
+          ip_address: randomIp
+        });
+      }
+    };
+
+
+    
+
+
+const handleRowClick = (event, rowData) => {
+console.log('rowData subscription add',rowData)
+getIps(rowData.network_name)
+setShowClientStatsAndSubscriptions
+// formData.id = rowData.id
+// formData.network_name = rowData.network_name 
+// formData.ip_address = rowData.ip_address
+setShowMaterialTable(false)
+  setShowForm(true)
+  setFormData(rowData)
+  // setFormData({
+  //   ...rowData,
+  //   // id: rowData.id,
+  //   ppoe_username: formData.ppoe_username,
+  //   ppoe_password: formData.ppoe_password,
+  // })
+
+//   setFormData({
+// ...rowData,
+//     id: rowData.id,
+//     ip_address: rowData.ip_address,
+//     package_name: rowData.package_name,
+//     expiry: rowData.expiry,
+//     status: rowData.status,
+//     type: rowData.type,
+//   }) 
+  console.log('rowData subscription2',rowData)
+
+  
+}
+
+console.log('formData ip adress', formData)
+
+
+const createSubscription = async(e) => {
+
+  e.preventDefault()
+
+  try {
+    const method = formData.id ? 'PUT' : 'POST'
+    const url = formData.id ? `/api/subscriptions/${formData.id}` : '/api/subscriptions'
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Subdomain': subdomain
+      },
+      body: JSON.stringify({ subscription: formData }) // Must be wrapped under `subscription`
+    })
+
+const newData = await response.json()
+
+if (response.ok) {
+  
+  console.log('subscription created')
+  setShowMaterialTable(false)
+  setShowForm(false)
+  setShowMaterialTable(true)
+
+
+
+  if (formData.id) {
+  toast.success('Subscription updated successfully', {  position: "top-center", duration: 3000 })
+    setSubscriptions(subscriptions.map(item => item.id === newData.id ? newData : item))
+  } else {
+    toast.success('Subscription added successfully', {  position: "top-center", duration: 3000 })
+
+    setSubscriptions([...subscriptions,...formData, newData])
+
+  }
+} else {
+  toast.error('Error creating subscription', {  position: "top-center", duration: 3000 })
+  console.log('failed to create subscription')
+  setShowForm(true)
+  setShowMaterialTable(false)
+
+} 
+  } catch (error) {
+    toast.error('Error creating subscription server error', {  position: "top-center", duration: 3000 })
+    setShowMaterialTable(true)
+    setShowForm(false)
+    console.log(error)
+  }
+}
+
+
+
+const handleIpChange = (event) => {
+  const selectedIp = event.target.value;
+  console.log('Changing IP to:', selectedIp); // Debug
+  
+  setFormData(prev => ({
+    ...prev,
+    ip_address: selectedIp
+  }));
+};
   return (
-    <div>
-      r
-    </div>
+    <>
+{showMaterialTable && (
+  <>
+  
+        {/* <CloudIcon sx={{ mr: 2, color: 'primary.main' }} /> */}
+
+
+      <MaterialTable
+
+        title="Subscription"
+        onRowClick={(event, rowData)=>handleRowClick(event, rowData)}
+
+        columns={[
+          {
+            title: 'Status',
+            field: 'status',
+            headerStyle: { color: 'black' }  // ✅ This applies to the header cell
+          },
+          { title: 'Type', field: 'type' },
+          { title: 'Package', field: 'package' ,
+            headerStyle: { color: 'black' } 
+          },
+          {
+            title: 'IP Address',
+            field: 'ip_address',
+            headerStyle: { color: 'black' } ,
+            render: rowData => (
+              <p style={{ color: 'green', fontSize: '15px' }}>
+                {rowData.ip_address}
+                <MdNetworkPing className='text-green-500 cursor-pointer'/>
+              </p>
+            ),
+          },
+          { title: 'Node', field: 'node',  headerStyle: { color: 'black' }  },
+          { title: 'mac_adress', field: 'mac_adress',  headerStyle: { color: 'black' }  },
+          {
+            title: 'Password',
+            field: 'ppoe_password',
+            headerStyle: { color: 'black' } ,
+            render: rowData => (
+              <p style={{ color: 'red', fontSize: '15px' }}>
+                {rowData.ppoe_password}
+                <TbLockPassword className='text-red-500 cursor-pointer'/>
+              </p>
+            ),
+          },
+          {
+            title: 'Username',
+            field: 'ppoe_username',
+            headerStyle: { color: 'black' } ,
+            render: rowData => (
+              <p style={{ color: 'blue', fontSize: '15px' }}>
+                {rowData.ppoe_username}
+                <FaUser className='text-blue-700 cursor-pointer'/>
+              </p>
+            ),
+          },
+          { title: 'Expiry', field: 'expiry' ,
+
+            render: rowData => (
+              <p style={{ color: 'black', fontSize: '15px' }}>
+                {rowData.expiry}
+                <FaCalendarAlt className='text-orange-500 cursor-pointer'/>
+              </p>
+            ),
+          },
+        ]}
+        data={subscriptions}
+        actions={[
+          {
+            icon: () => (
+                <IconButton color="primary">
+                  <AddCircleIcon
+                   onClick={()=> {
+                    setShowMaterialTable(false)
+                    setShowForm(true)
+
+                    setShowClientStatsAndSubscriptions(false)
+
+                  }}
+                  fontSize="large" />
+                </IconButton>
+            ),
+            tooltip: 'Add Subscription',
+            isFreeAction: true,
+            // onClick: (event, rowData) => handleRowClick(event, rowData)
+
+            // onClick: handleOpenAddDialog
+          },
+          {
+            icon: () => <EditIcon 
+            // onClick={()=> {
+            //   setShowMaterialTable(false)
+            //   setShowForm(true)
+            // }}
+            color="primary" />,
+            tooltip: 'Edit Network',
+            onClick: (event, rowData) => handleRowClick(event, rowData)
+           
+          },
+          {
+            icon: () => <DeleteIcon color="error" />,
+            tooltip: 'Delete Network',
+            // onClick: (event, rowData) => handleDelete(rowData.id)
+            // onClick: (event, rowData) => handleDeleteClick(rowData.id)
+          }
+        ]}
+        options={{
+          actionsColumnIndex: -1,
+          pageSize: 10,
+          pageSizeOptions: [10, 20, 50],
+          showTitle: false,
+          headerStyle: {
+            backgroundColor: '#f5f5f5',
+            fontWeight: 'bold'
+          }
+        }}
+      />
+ <button onClick={(e) => {
+              e.preventDefault()
+              handleClose()
+            }} className='bg-red-600 mt-4 text-white rounded-3xl px-4 py-2
+          transform hover:scale-110 transition duration-500 hover:bg-red-200  
+          text-lg ' >
+              Cancel
+            </button>
+  </>
+)}
+
+
+
+
+{showForm && (
+  <>
+ <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Toaster />
+      
+      {/* Credentials Section */}
+      <form onSubmit={createSubscription}>
+      <Stack spacing={3} sx={{ mb: 3 }}>
+        {subscriberSettings.use_autogenerated_number_as_ppoe_username && (
+          <motion.div whileHover={{ scale: 1.01 }}>
+            <TextField
+              fullWidth
+              className='myTextField'
+              id="ppoe_password"
+              onChange={handleChangeForm}
+              value={ppoe_password}
+              label="PPPoE Password"
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <TbLockPassword className="text-blue-500" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </motion.div>
+        )}
+
+        {!subscriberSettings.use_autogenerated_number_as_ppoe_username && (
+          <>
+            <motion.div whileHover={{ scale: 1.01 }}>
+              <TextField
+                fullWidth
+                className='myTextField'
+                id="ppoe_password"
+                onChange={handleChangeForm}
+                value={ppoe_password}
+                label="PPPoE Password"
+                variant="outlined"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <TbLockPassword className="text-blue-500" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </motion.div>
+
+            <motion.div whileHover={{ scale: 1.01 }}>
+              <TextField
+                fullWidth
+                className='myTextField'
+                id="ppoe_username"
+                onChange={handleChangeForm}
+                value={ppoe_username}
+                label="PPPoE Username"
+                variant="outlined"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <FaRegUser className="text-blue-500" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </motion.div>
+          </>
+        )}
+      </Stack>
+
+      {/* IP Address Section */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold' }}>
+          Assign Ips
+        </Typography>
+
+
+        <Stack direction="row" spacing={2} alignItems="center">
+        <FormControl sx={{ mt: 3 }} fullWidth>
+        <InputLabel sx={{
+          fontSize: '18px',
+        }}>IPv4 Adreses</InputLabel>
+<Select
+  value={formData.ip_address || ''}
+  onChange={handleIpChange}
+  name="ip_address"
+  label="IPv4 Address"
+  required
+>
+  {ips.length > 0 ? (
+    ips.map(ip => (
+      <MenuItem key={ip} value={ip}>
+        {ip}
+        {/* {formData.ip_address || 'No IPs available'} */}
+      </MenuItem>
+    ))
+  ) : (
+    <MenuItem>
+      {formData.ip_address || 'No IPs available'}
+    </MenuItem>
+  )}
+</Select>
+          </FormControl>
+          
+          {/* <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Tooltip title="Assign Random IP">
+              <Button
+                variant="outlined"
+                startIcon={<FaRandom />}
+                onClick={assignRandomIp}
+                sx={{ height: '56px' }}
+              >
+                Assign IP
+              </Button>
+            </Tooltip>
+          </motion.div> */}
+        </Stack>
+      </motion.div>
+
+      {/* Network Selection */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+        
+      >
+        <FormControl sx={{ mt: 3 }} fullWidth>
+          <InputLabel>IPv4 Network</InputLabel>
+          <Select
+          value={formData.network_name}
+          onChange={handleChangeNetwork}
+          name='network_name'
+          className='myTextField'
+            label="IPv4 Network"
+            required
+            sx={{
+              '& .MuiSelect-icon': {
+                color: 'primary.main'
+              }
+            }}
+          >
+            {networks.map(network => (
+              <MenuItem 
+                key={network.id} 
+                value={network.title}
+                sx={{ display: 'flex', justifyContent: 'space-between' }}
+              >
+                <span>{network.title}</span>
+
+                <Typography sx={{
+                  p: 2,
+                  color: 'primary.main',
+                }} variant="caption" color="text.secondary">
+                  {network.network} 
+                </Typography>
+
+                <Typography sx={{
+                  p: 2,
+                  color: 'primary.main',
+                }} variant="caption" color="text.secondary">
+                  {network.total_ip_addresses} IPs available
+                </Typography>
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+          {/* Package and Date */}
+          <div className="mt-4">
+            <Box className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 myTextField'
+              sx={{
+                '& .MuiTextField-root': {
+                  marginTop: '',
+                  '& label.Mui-focused': {
+                    color: 'black',
+                    fontSize: '18px'
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "black",
+                      borderWidth: '3px'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'black',
+                    }
+                  },
+                },
+              }}
+            >
+              <Autocomplete
+                value={packageName.find((pkg) => pkg.name === formData.package_name) || null}
+                options={packageName}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField className='myTextField' {...params} label="Select Package" variant="outlined" fullWidth />
+                )}
+                onChange={(event, newValue) => {
+                  setFormData({ ...formData, package_name: newValue ? newValue.name : '' });
+                }}
+                sx={{ mb: 2 }}
+              />
+               <Box
+      sx={{
+        '& > :not(style)': { m: 1, },
+      }}>
+            <TextField fullWidth label='validity-period'   sx={{
+
+'& label.Mui-focused': {
+  color: 'black',
+  fontSize:'16px'
+
+  },
+'& .MuiOutlinedInput-root': {
+"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+  borderColor: "black",
+  borderWidth: '3px'
+  },
+'&.Mui-focused fieldset':  {
+  borderColor: 'black', // Set border color to transparent when focused
+
+}
+},
+         
+        }}    className='myTextField' value={formData.validity}   
+            id='validity' 
+        onChange={handleChangeForm}   placeholder='validity-period...' type='number' ></TextField>
+
+</Box>
+
+
+
+<FormControl  
+
+
+  sx={{
+    '& > :not(style)': { m: 1,  },
+
+'& label.Mui-focused': {
+  color: 'black',
+  fontSize:'16px'
+  },
+'& .MuiOutlinedInput-root': {
+"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+  borderColor: "black",
+  borderWidth: '3px'
+  },
+'&.Mui-focused fieldset':  {
+  borderColor: 'black', // Set border color to transparent when focused
+
+}
+},
+         
+        }}   >
+        <InputLabel id="validity_period_units">Validity period units</InputLabel>
+        <Select
+          id="validity_period_units"
+          label="Validity-period-units"
+          
+          value={formData.validity_period_units}
+          onChange={e=> setFormData({...formData, validity_period_units: e.target.value})}
+
+        >
+          <MenuItem value={'days'}>days</MenuItem>
+          <MenuItem value={'hours'}>hours</MenuItem>
+        </Select>
+      </FormControl>
+            </Box>
+          </div>
+          <div className="flex gap-4 mt-6">
+
+          <button  className='bg-black text-white rounded-3xl px-4 py-2
+          transform hover:scale-110 transition duration-500 hover:bg-green-500
+          text-lg' type="submit">
+              Save
+            </button>
+
+            <button onClick={(e) => {
+              e.preventDefault()
+              setShowForm(false)
+              setShowMaterialTable(true)
+            }} className='bg-red-600 text-white rounded-3xl px-4 py-2
+          transform hover:scale-110 transition duration-500 hover:bg-red-200  
+          text-lg ' >
+              Cancel
+            </button>
+            </div>
+ 
+      </motion.div>
+
+
+      <div className='flex justify-center gap-x-3 mt-4'>
+      <Tooltip title="Disconnect service">
+
+<GiCycle className='text-green-500 cursor-pointer'/>
+</Tooltip>
+
+
+<Tooltip title='Block service'>
+          <MdOutlineBlock className='text-red-500 cursor-pointer'/>
+        </Tooltip>
+        </div>
+
+        </form>
+    </motion.div>
+  </>
+)}
+   
+    </>
   )
 }
 

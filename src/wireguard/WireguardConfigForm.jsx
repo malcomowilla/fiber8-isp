@@ -172,8 +172,10 @@ const CopyButton = styled(IconButton)(({ theme }) => ({
               className='myTextField'
               placeholder="e.g., 10.2.0.42"
             />
+
+
             
-            <FormControlLabel
+            {/* <FormControlLabel
               control={
                 <Checkbox
                   name="createRadiusEntry"
@@ -195,7 +197,7 @@ const CopyButton = styled(IconButton)(({ theme }) => ({
 
                 required={formData.createRadiusEntry}
               />
-            )}
+            )} */}
             
             <Button
               type="submit"

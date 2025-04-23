@@ -40,6 +40,11 @@ const PPPOEsubscribers = () => {
     ppoe_username: '',
     ppoe_password: '',
     ref_no: '',
+    network_name: '',
+    validity: '',
+    validity_period_units: '',
+  
+    ip_address: '',
     package_name: '',
     installation_fee: '',
     subscriber_discount: '',
@@ -60,13 +65,25 @@ const [savedNotification, setSavedNotification] = useState(false)
 const [search, setSearch] = useState('')
 const [openLoad, setOpenLoad] = useState(false)
 const [openDelete, setOpenDelete] = useState(false)
+const [showClientStatsAndSUbscriptions, setShowClientStatsAndSubscriptions] = useState(true)
+const [onlyShowSubscription, setOnlyShowSubscription] = useState(false)
+
 
 
   const handleClickOpen = () => {
     setOpen(true);
-    setFormData(intialValue)
+    
+    // setFormData(intialValue)
+    setShowClientStatsAndSubscriptions(true)
+
 
   };
+
+  const handleCLickAdd = () => {
+    setOpen(true);
+    setFormData(intialValue)
+    setShowClientStatsAndSubscriptions(false)
+  }
 
   const handleCloseDelete = () => {
     setOpenDelete(false);
@@ -105,10 +122,15 @@ const [openDelete, setOpenDelete] = useState(false)
   }
 
 
-  const handleRowClick = (event, rowData) => {
-    console.log('subscribers',rowData)
-   
+const handleClickRow = () => {
+  setShowClientStatsAndSubscriptions(true)
+}
 
+  const handleRowClick = (event, rowData) => {
+    
+    console.log('subscribers',rowData)
+   console.log('showClientStatsAndSUbscriptions',showClientStatsAndSUbscriptions)
+    setShowClientStatsAndSubscriptions(true)
 setFormData({
   ...rowData,
   date_registered: dayjs(rowData.date_registered), 
@@ -310,11 +332,11 @@ toast.error('failed to delete subscriber', {
     {title: 'ref_no', field: 'ref_no',  headerClassName: 'dark:text-black' ,  sorting: true, defaultSort: 'asc'},
   
     {title: 'phone_number', field: 'phone_number',  headerClassName: 'dark:text-black'},
-    {title: 'package_name', field: 'package_name', type: 'numeric', headerClassName: 'dark:text-black', align: 'left'},
-    {title: 'Last Renewed', field:'Last Renewed',  headerClassName: 'dark:text-black'},
-    {title: 'Expires', field:'Expires',  headerClassName: 'dark:text-black'},
+    {title: 'package', field: 'package_name', type: 'numeric', headerClassName: 'dark:text-black', align: 'left'},
+    {title: 'House Number', field:'house_number',  headerClassName: 'dark:text-black'},
+    {title: ' Building', field:'building_name',  headerClassName: 'dark:text-black'},
   
-    {title: 'Online', field:'Online',  headerClassName: 'dark:text-black'},
+    {title: 'Status', field:'status',  headerClassName: 'dark:text-black'},
     {title: 'Action', field:'Action',  headerClassName: 'dark:text-black',
     render: (params) =>  
     
@@ -329,7 +351,6 @@ toast.error('failed to delete subscriber', {
   }
   
   ]
-
 
 
   const DeleteButton = ({ id }) => (
@@ -355,13 +376,31 @@ toast.error('failed to delete subscriber', {
 <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
   
    </Backdrop>
-<EditSubscriber  isloading={loading}   packageName={formData.package_name} 
+
+{/*    
+<EditSubscriber  isloading={loading}  
+showClientStatsAndSUbscriptions={showClientStatsAndSUbscriptions} setShowClientStatsAndSubscriptions={setShowClientStatsAndSubscriptions}
+packageName={formData.package_name} 
   open={open} handleClose={handleClose}  formData={formData}  setFormData={setFormData}  createSubscriber={createSubscriber} 
 handleChangeForm={handleChange}
         
             />
-          
-
+           */}
+{open && (
+  <EditSubscriber
+    isloading={loading}
+    onlyShowSubscription={onlyShowSubscription} setOnlyShowSubscription={setOnlyShowSubscription}
+    showClientStatsAndSUbscriptions={showClientStatsAndSUbscriptions}
+    setShowClientStatsAndSubscriptions={setShowClientStatsAndSubscriptions}
+    packageName={formData.package_name}
+    open={open}
+    handleClose={handleClose}
+    formData={formData}
+    setFormData={setFormData}
+    createSubscriber={createSubscriber}
+    handleChangeForm={handleChange}
+  />
+)}
 
 <div className="flex items-center max-w-sm mx-auto p-3">  
      
@@ -402,13 +441,12 @@ data={tableData}
 title='PPPoe Subcribers'
 
 onRowClick={(event, rowData)=>handleRowClick(event, rowData)}
-
 icons={{
   Add: () => <AddIcon onClick={handleClickOpen} />,
 }}
 actions={[
   {
-    icon: () => <AddIcon onClick={handleClickOpen} />,
+    icon: () => <AddIcon onClick={handleCLickAdd} />,
     isFreeAction: true, // This makes the action always visible
     tooltip: 'Add Subscribers',
   },

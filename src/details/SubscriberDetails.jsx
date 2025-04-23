@@ -592,7 +592,6 @@ const fetchPackages = useMemo(() => async ()=> {
             </Box>
           </div>
 
-          {/* Package and Date */}
           <div className="">
             <Box className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 myTextField'
               sx={{
@@ -614,7 +613,7 @@ const fetchPackages = useMemo(() => async ()=> {
                 },
               }}
             >
-              <Autocomplete
+              {/* <Autocomplete
                 value={packageName.find((pkg) => pkg.name === formData.package_name) || null}
                 options={packageName}
                 getOptionLabel={(option) => option.name}
@@ -625,7 +624,7 @@ const fetchPackages = useMemo(() => async ()=> {
                   setFormData({ ...formData, package_name: newValue ? newValue.name : '' });
                 }}
                 sx={{ mb: 2 }}
-              />
+              /> */}
               <DatePicker
                 className='myTextField'
                 value={date_registered}
@@ -737,6 +736,14 @@ const fetchPackages = useMemo(() => async ()=> {
                   
                   id="ppoe_username" onChange={handleChangeForm} value={ppoe_username}
                     label="Ppoe Username" variant="outlined" />
+
+<TextField id="ppoe_password" onChange={handleChangeForm}
+                  
+                  InputProps={{
+                    startAdornment: <TbLockPassword className='w-7 h-7 mr-2 text-blue-500' />,
+                  }}
+                  value={ppoe_password}
+                    label="Ppoe Password" variant="outlined" />
                 </>
               )}
 
@@ -748,6 +755,15 @@ const fetchPackages = useMemo(() => async ()=> {
               value={ppoe_username}
                 label="Ppoe Username" variant="outlined" />
             ) : null}
+
+
+<TextField id="ppoe_password" onChange={handleChangeForm}
+                  
+                  InputProps={{
+                    startAdornment: <TbLockPassword className='w-7 h-7 mr-2 text-blue-500' />,
+                  }}
+                  value={ppoe_password}
+                    label="Ppoe Password" variant="outlined" />
           </Box>
 
           {/* Location and Description */}
