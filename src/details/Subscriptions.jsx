@@ -430,7 +430,8 @@ const handleIpChange = (event) => {
                    onClick={()=> {
                     setShowMaterialTable(false)
                     setShowForm(true)
-
+                    setFormData({...formData, id: ''})
+                    
                     setShowClientStatsAndSubscriptions(false)
 
                   }}
@@ -439,6 +440,7 @@ const handleIpChange = (event) => {
             ),
             tooltip: 'Add Subscription',
             isFreeAction: true,
+
             // onClick: (event, rowData) => handleRowClick(event, rowData)
 
             // onClick: handleOpenAddDialog
