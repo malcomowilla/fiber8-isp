@@ -2115,7 +2115,7 @@ InputProps={{
 <TextField  
             onChange={handleFormDataChangeForCompany}
             name='customer_support_email'
-            value={customer_support_email   === null || customer_support_email === 'null' && '' }
+            value={customer_support_email}
             label='Customer Support Email'  
             type='text'
             InputProps={{
