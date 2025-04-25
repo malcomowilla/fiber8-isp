@@ -2068,7 +2068,7 @@ type='submit'
           }}
             onChange={handleFormDataChangeForCompany}
             name='email_info'
-            value={email_info === null || email_info === 'null' && '' }
+            value={email_info}
             label='Email Info' 
             type='text'
           />
@@ -2079,7 +2079,7 @@ type='submit'
           }} 
             onChange={handleFormDataChangeForCompany}
             name='contact_info'
-            value={contact_info === null || contact_info === 'null' && '' }
+            value={contact_info}
             label='Company Contact Info' 
             type='text'
           />
@@ -2092,7 +2092,7 @@ type='submit'
               startAdornment: <MdOutlineMailOutline className='mr-2'/>
 
             }}
-            value={agent_email === null || agent_email === 'null' && '' }
+            value={agent_email}
             label='Agent Email' 
             type='text'
           />
@@ -2104,7 +2104,7 @@ InputProps={{
 }} 
             onChange={handleFormDataChangeForCompany}
             name='customer_support_phone_number'
-            value={customer_support_phone_number === null || customer_support_phone_number === 'null' && '' } 
+            value={customer_support_phone_number} 
             label='Customer Support Phone Number'
             type='text'
           />
