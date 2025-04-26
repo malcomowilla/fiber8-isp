@@ -75,7 +75,7 @@ useEffect(() => {
   
 }, [fetchtotalSubscribers]);
   return (
-    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+    <div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 align-center'>
           
   <motion.div
     className="w-full max-w-md h-full max-h-min p-2 bg-gradient-to-r from-blue-500 to-blue-600 border

@@ -78,7 +78,7 @@ const Subscriptions = ({
   handleClose,
 
   formData,  createSubscriber, handleChangeForm, setFormData, isloading,
-  setShowClientStatsAndSubscriptions
+  setShowClientStatsAndSubscriptions, setOnlyShowSubscription,onlyShowSubscription
 
 }) => {
 
@@ -116,8 +116,9 @@ const subdomain = window.location.hostname.split('.')[0];
 
 
 
-const fetchPackages = useMemo(() => async ()=> {
-  
+const fetchPackages = useCallback(
+  async() => {
+    
   try {
     const response = await fetch('/api/get_package',{
       method: 'GET',
@@ -143,17 +144,15 @@ const fetchPackages = useMemo(() => async ()=> {
     console.log(error)
   
   }
-  
-  
-  }, [])
-  
-
+  },
+  [],
+)
 
 
   useEffect(() => {
     
     fetchPackages()
-  }, [ fetchPackages, poe_package]);
+  }, [fetchPackages, poe_package]);
 
   const getSubscriptions = useCallback(
     async() => {
@@ -260,13 +259,20 @@ const handleChangeIpAddress =(e)=> {
 const handleRowClick = (event, rowData) => {
 console.log('rowData subscription add',rowData)
 getIps(rowData.network_name)
-setShowClientStatsAndSubscriptions
+// setShowClientStatsAndSubscriptions(false)
 // formData.id = rowData.id
 // formData.network_name = rowData.network_name 
 // formData.ip_address = rowData.ip_address
-setShowMaterialTable(false)
-  setShowForm(true)
+
+
   setFormData(rowData)
+  setFormData({
+    ...rowData,
+    // id: rowData.id,
+    package_name: rowData.package,
+   
+  })
+
   // setFormData({
   //   ...rowData,
   //   // id: rowData.id,
@@ -283,22 +289,19 @@ setShowMaterialTable(false)
 //     status: rowData.status,
 //     type: rowData.type,
 //   }) 
-  console.log('rowData subscription2',rowData)
 
   
 }
 
-console.log('formData ip adress', formData)
 
 
 const createSubscription = async(e) => {
-
   e.preventDefault()
 
   try {
-    const method = formData.id ? 'PUT' : 'POST'
+        const method = formData.id ? 'PUT' : 'POST'
     const url = formData.id ? `/api/subscriptions/${formData.id}` : '/api/subscriptions'
-    const response = await fetch(url, {
+        const response = await fetch(url, {
       method: method,
       headers: {
         'Content-Type': 'application/json',
@@ -307,40 +310,104 @@ const createSubscription = async(e) => {
       body: JSON.stringify({ subscription: formData }) // Must be wrapped under `subscription`
     })
 
-const newData = await response.json()
+ const newData = await response.json()
 
-if (response.ok) {
+ if (response.ok) {
   
-  console.log('subscription created')
-  setShowMaterialTable(false)
-  setShowForm(false)
-  setShowMaterialTable(true)
-
 
 
   if (formData.id) {
-  toast.success('Subscription updated successfully', {  position: "top-center", duration: 3000 })
+
+  toast.success('Subscription updated successfully', {position: "top-center", duration: 3000 })
     setSubscriptions(subscriptions.map(item => item.id === newData.id ? newData : item))
+    setShowForm(false)
+  setShowMaterialTable(true)
   } else {
+
     toast.success('Subscription added successfully', {  position: "top-center", duration: 3000 })
 
-    setSubscriptions([...subscriptions,...formData, newData])
+    setSubscriptions([...subscriptions, newData])
+    setShowForm(false)
+  setShowMaterialTable(true)
 
   }
-} else {
-  toast.error('Error creating subscription', {  position: "top-center", duration: 3000 })
-  console.log('failed to create subscription')
-  setShowForm(true)
-  setShowMaterialTable(false)
+ } else {
+  
 
-} 
+ toast.error('Error creating subscription', {  position: "top-center", duration: 3000 })
+  console.log('failed to create subscription')
+   setShowForm(true)
+   setShowMaterialTable(false)
+ }
+
   } catch (error) {
+    
+       
     toast.error('Error creating subscription server error', {  position: "top-center", duration: 3000 })
     setShowMaterialTable(true)
     setShowForm(false)
     console.log(error)
   }
+
 }
+
+// const createSubscription = async(e) => {
+
+//   e.preventDefault()
+
+//   try {
+//     const method = formData.id ? 'PUT' : 'POST'
+//     const url = formData.id ? `/api/subscriptions/${formData.id}` : '/api/subscriptions'
+//     const response = await fetch(url, {
+//       method: method,
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'X-Subdomain': subdomain
+//       },
+//       body: JSON.stringify({ subscription: formData }) // Must be wrapped under `subscription`
+//     })
+
+// const newData = await response.json()
+
+// if (response.ok) {
+  
+//   console.log('subscription created')
+//   // setShowMaterialTable(false)
+  
+
+//   if (formData.id) {
+
+//   toast.success('Subscription updated successfully', {position: "top-center", duration: 3000 })
+//     setSubscriptions(subscriptions.map(item => item.id === newData.id ? newData : item))
+//     setShowForm(false)
+//   setShowMaterialTable(true)
+//   } else {
+//     const newData = await response.json()
+
+//     toast.success('Subscription added successfully', {  position: "top-center", duration: 3000 })
+
+//     setSubscriptions([...subscriptions, newData])
+//     setShowForm(false)
+//   setShowMaterialTable(true)
+
+//   }
+// } else {
+
+//   toast.error('Error creating subscription', {  position: "top-center", duration: 3000 })
+//   console.log('failed to create subscription')
+//   setShowForm(true)
+//   setShowMaterialTable(false)
+
+
+// } 
+//   } catch (error) {
+    
+//     toast.error('Error creating subscription server error', {  position: "top-center", duration: 3000 })
+//     setShowMaterialTable(true)
+//     setShowForm(false)
+//     console.log(error)
+//   }
+// }
 
 
 
@@ -353,6 +420,68 @@ const handleIpChange = (event) => {
     ip_address: selectedIp
   }));
 };
+
+
+
+
+const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+const [networkToDelete, setNetworkToDelete] = useState(null);
+const [loading, setLoading] = useState(false);
+
+
+
+
+const handleDeleteClick = (id) => {
+  setNetworkToDelete(id);
+  setDeleteConfirmOpen(true);
+};
+
+
+const handleDeleteCancel = () => {
+  setDeleteConfirmOpen(false);
+  setNetworkToDelete(null);
+};
+
+
+
+
+
+const handleDeleteConfirm = async () => {
+  try {
+    setLoading(true);
+    const response = await fetch(`/api/subscriptions/${networkToDelete}`, {
+      method: 'DELETE',
+      headers: { 'X-Subdomain': subdomain }
+    });
+
+    if (!response.ok) {
+      toast.error('Failed to delete subscription', {
+        position: 'top-center',
+        duration: 4000,
+      });
+      throw new Error('Failed to delete network');
+
+    }
+
+    if (response.ok) {
+      toast.success('Subscription deleted successfully', {
+          position: 'top-center',
+          duration: 4000,
+      })
+      setSubscriptions((tableData)=> tableData.filter(item => item.id !== networkToDelete))
+    } else {
+      
+    }
+    // showSnackbar('Network deleted successfully');
+    // fetchData(); // Refresh data
+  } catch (error) {
+    // showSnackbar(error.message, 'error');
+  } finally {
+    // setLoading(false);
+    setDeleteConfirmOpen(false);
+    setNetworkToDelete(null);
+  }
+};
   return (
     <>
 {showMaterialTable && (
@@ -360,8 +489,9 @@ const handleIpChange = (event) => {
   
         {/* <CloudIcon sx={{ mr: 2, color: 'primary.main' }} /> */}
 
-
+<Toaster/>
       <MaterialTable
+
 
         title="Subscription"
         onRowClick={(event, rowData)=>handleRowClick(event, rowData)}
@@ -447,10 +577,11 @@ const handleIpChange = (event) => {
           },
           {
             icon: () => <EditIcon 
-            // onClick={()=> {
-            //   setShowMaterialTable(false)
-            //   setShowForm(true)
-            // }}
+            onClick={()=> {
+              setShowMaterialTable(false)
+              setShowForm(true)
+              setOnlyShowSubscription(false)
+            }}
             color="primary" />,
             tooltip: 'Edit Network',
             onClick: (event, rowData) => handleRowClick(event, rowData)
@@ -459,6 +590,8 @@ const handleIpChange = (event) => {
           {
             icon: () => <DeleteIcon color="error" />,
             tooltip: 'Delete Network',
+            onClick: (event, rowData) => handleDeleteClick(rowData.id)
+
             // onClick: (event, rowData) => handleDelete(rowData.id)
             // onClick: (event, rowData) => handleDeleteClick(rowData.id)
           }
@@ -474,14 +607,14 @@ const handleIpChange = (event) => {
           }
         }}
       />
- <button onClick={(e) => {
+ {/* <button onClick={(e) => {
               e.preventDefault()
               handleClose()
-            }} className='bg-red-600 mt-4 text-white rounded-3xl px-4 py-2
+            }} className='bg-red-600 mt-2 text-white rounded-3xl p-2
           transform hover:scale-110 transition duration-500 hover:bg-red-200  
           text-lg ' >
               Cancel
-            </button>
+            </button> */}
   </>
 )}
 
@@ -777,6 +910,7 @@ const handleIpChange = (event) => {
               e.preventDefault()
               setShowForm(false)
               setShowMaterialTable(true)
+              setOnlyShowSubscription(true)
             }} className='bg-red-600 text-white rounded-3xl px-4 py-2
           transform hover:scale-110 transition duration-500 hover:bg-red-200  
           text-lg ' >
@@ -804,6 +938,38 @@ const handleIpChange = (event) => {
   </>
 )}
    
+
+
+   <Dialog open={deleteConfirmOpen} onClose={handleDeleteCancel}>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
+          <WarningIcon color="warning" sx={{ mr: 1 }} />
+          Confirm Deletion
+        </DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this subscription?</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={handleDeleteCancel} 
+            variant="outlined" 
+            startIcon={<DeleteIcon />}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleDeleteConfirm} 
+            variant="contained" 
+            color="error"
+            startIcon={<WarningIcon />}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={20} /> : 'Delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }
