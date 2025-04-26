@@ -65,7 +65,7 @@ const [savedNotification, setSavedNotification] = useState(false)
 const [search, setSearch] = useState('')
 const [openLoad, setOpenLoad] = useState(false)
 const [openDelete, setOpenDelete] = useState(false)
-const [showClientStatsAndSUbscriptions, setShowClientStatsAndSubscriptions] = useState(true)
+const [showClientStatsAndSUbscriptions, setShowClientStatsAndSubscriptions] = useState(false)
 const [onlyShowSubscription, setOnlyShowSubscription] = useState(false)
 
 
@@ -127,7 +127,7 @@ const handleClickRow = () => {
 }
 
   const handleRowClick = (event, rowData) => {
-    
+    setOnlyShowSubscription(true)
     console.log('subscribers',rowData)
    console.log('showClientStatsAndSUbscriptions',showClientStatsAndSUbscriptions)
     setShowClientStatsAndSubscriptions(true)

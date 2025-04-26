@@ -142,21 +142,20 @@ const EditSubscriber = ({handleClose, open, formData , createSubscriber,
               variant={isMobile ? 'scrollable' : 'standard'}
               scrollButtons="auto"
             >
-              <Tab label="SUBSCRIBER DETAILS" value="1" />
-              {onlyShowSubscription  && <>{showClientStatsAndSUbscriptions ? <Tab label="ADDRESS" value="2" /> : null} </>}
+            {onlyShowSubscription && <Tab label="SUBSCRIBER DETAILS" value="1" />}  
+
+{onlyShowSubscription && showClientStatsAndSUbscriptions ? <Tab label="ADDRESS" value="2" /> : null}
+            {onlyShowSubscription && showClientStatsAndSUbscriptions && <Tab label="LIVE DATA" value="11" />}
+
+{onlyShowSubscription && showClientStatsAndSUbscriptions && <Tab label="INVOICE" value="4" />}
 
 
-            {onlyShowSubscription && <>{showClientStatsAndSUbscriptions && <Tab label="LIVE DATA" value="11" />}</>}
-
-{onlyShowSubscription && <>{showClientStatsAndSUbscriptions && <Tab label="INVOICE" value="4" />}</>}
-
-
-{onlyShowSubscription && <>{showClientStatsAndSUbscriptions && <Tab label="STATS" value="6" />}</>}
+{onlyShowSubscription && showClientStatsAndSUbscriptions && <Tab label="STATS" value="6" />}
 
             {showClientStatsAndSUbscriptions && <Tab label="SUBSCRIPTIONS" value="7" />}
-            {onlyShowSubscription && <>{showClientStatsAndSUbscriptions && <Tab label="COMUNICATIONS" value="8" />}</>}
-            {onlyShowSubscription && <>{showClientStatsAndSUbscriptions && <Tab label="ACTIVITY LOGS" value="9" />}</>}
-             {onlyShowSubscription && <>{showClientStatsAndSUbscriptions && <Tab label="PAYMENT HISTORY" value="10" />}</>}
+            {onlyShowSubscription && showClientStatsAndSUbscriptions && <Tab label="COMUNICATIONS" value="8" />}
+            {onlyShowSubscription && showClientStatsAndSUbscriptions && <Tab label="ACTIVITY LOGS" value="9" />}
+             {onlyShowSubscription && showClientStatsAndSUbscriptions && <Tab label="PAYMENT HISTORY" value="10" />}
 
 
 
@@ -181,7 +180,9 @@ const EditSubscriber = ({handleClose, open, formData , createSubscriber,
           <TabPanel value="6"><Stats handleClose={handleClose}/></TabPanel>
           <TabPanel value="7"><Subscriptions
            handleClose={handleClose}
+           setOnlyShowSubscription={setOnlyShowSubscription} 
            
+           onlyShowSubscription={onlyShowSubscription}
            isloading={isloading}
            formData={formData}
            createSubscriber={createSubscriber}
