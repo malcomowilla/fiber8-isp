@@ -622,12 +622,63 @@ const handleDeleteConfirm = async () => {
             render: rowData => (
               <p style={{ color: 'green', fontSize: '15px' }}>
                 {rowData.ip_address}
-                <MdNetworkPing className='text-green-500 cursor-pointer'/>
+                <MdNetworkPing className='text-magenta-500 cursor-pointer'/>
               </p>
             ),
           },
           { title: 'Node', field: 'node',  headerStyle: { color: 'black' }  },
-          { title: 'mac_adress', field: 'mac_adress',  headerStyle: { color: 'black' }  },
+          {
+            title: 'MAC Address',
+            field: 'mac_adress',
+            headerStyle: { 
+              color: 'black',
+              fontWeight: 'bold'
+            },
+            render: rowData => {
+              // Find status info or use empty object as fallback
+              const statusInfo = onlineStatusData.find(item => 
+                item.ppoe_username === rowData.ppoe_username
+              ) || {};
+          
+              const macAddress = statusInfo.mac_adress || 'Not available';
+          
+              // Determine if device is online (for ping icon color)
+              const isOnline = statusInfo.status === 'online';
+              const pingColor = isOnline ? 'text-green-500' : 'text-gray-400';
+              const pingTooltip = isOnline ? 'Device is online' : 'Device is offline';
+          
+              return (
+                <div className="flex items-center gap-2">
+                  <Tooltip title={pingTooltip} arrow>
+                    <div className="flex items-center">
+                      <MdNetworkPing 
+                        className={`${pingColor} cursor-pointer ${isOnline ? 'animate-pulse' : ''}`} 
+                        onClick={() => {
+                          // Add your ping action here
+                          console.log(`Pinging device with MAC: ${macAddress}`);
+                        }}
+                      />
+                    </div>
+                  </Tooltip>
+                  
+                  <Tooltip title="Click to copy" arrow>
+                    <span 
+                      className="font-mono text-sm bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 cursor-pointer"
+                      onClick={() => {
+                        navigator.clipboard.writeText(macAddress);
+                        toast.success('MAC address copied!', { 
+                          position: 'top-center',
+                          duration: 2000
+                        });
+                      }}
+                    >
+                      {macAddress}
+                    </span>
+                  </Tooltip>
+                </div>
+              );
+            }
+          },
           {
             title: 'Password',
             field: 'ppoe_password',
