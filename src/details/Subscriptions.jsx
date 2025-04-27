@@ -69,6 +69,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import { MdNetworkPing } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
 import { FaCalendarAlt } from "react-icons/fa";
+import { IoWarningOutline } from "react-icons/io5";
 
 
 
@@ -333,8 +334,9 @@ const createSubscription = async(e) => {
   }
  } else {
   
+  toast.error(newData.error, {  position: "top-center", duration: 4000 })
 
- toast.error('Error creating subscription', {  position: "top-center", duration: 3000 })
+ toast.error('Error creating subscription', {  position: "top-center", duration: 2000 })
   console.log('failed to create subscription')
    setShowForm(true)
    setShowMaterialTable(false)
@@ -429,7 +431,30 @@ const [networkToDelete, setNetworkToDelete] = useState(null);
 const [loading, setLoading] = useState(false);
 
 
+const getOnlineStatus = useCallback(
+  async() => {
+    try {
+      
+      const response = await fetch('/api/last_seen', {
+        headers: { 'X-Subdomain': subdomain },
+      });
+      const data = await response.json()
+      // setOnlineStatus(data)
+      console.log('online status',data)
+    } catch (error) {
+      
+    }
+  },
+  [],
+)
 
+
+useEffect(() => {
+  // setInterval(() => {
+  //   getOnlineStatus()
+  // }, 10000);
+  getOnlineStatus()
+}, [getOnlineStatus]);
 
 const handleDeleteClick = (id) => {
   setNetworkToDelete(id);
@@ -470,14 +495,14 @@ const handleDeleteConfirm = async () => {
       })
       setSubscriptions((tableData)=> tableData.filter(item => item.id !== networkToDelete))
     } else {
-      
+      setLoading(false);
     }
     // showSnackbar('Network deleted successfully');
     // fetchData(); // Refresh data
   } catch (error) {
     // showSnackbar(error.message, 'error');
   } finally {
-    // setLoading(false);
+    setLoading(false);
     setDeleteConfirmOpen(false);
     setNetworkToDelete(null);
   }
@@ -623,6 +648,11 @@ const handleDeleteConfirm = async () => {
 
 {showForm && (
   <>
+ <div className='p-4 flex'>
+   <IoWarningOutline className='text-orange-600 text-2xl' />
+
+   <span className='flex text-lg text-orange-400'>Note- <p className=''>Editing subscription details will affect the current connected session.</p> </span>
+    </div>
  <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
