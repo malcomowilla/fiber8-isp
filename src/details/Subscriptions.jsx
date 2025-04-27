@@ -36,6 +36,7 @@ import { FaRegBuilding } from "react-icons/fa";
 import { GiCycle } from "react-icons/gi";
 import { MdOutlineBlock } from "react-icons/md";
 
+import { MdErrorOutline } from "react-icons/md";
 
 
 import { 
@@ -107,6 +108,9 @@ const Subscriptions = ({
     const [showForm, setShowForm] = useState(false);
     const [ips, setIps] = useState([])
     const [subscriptions, setSubscriptions] = useState([])
+    const [onlineStatusData, setOnlineStatusData] = useState([]);
+
+
 
 const subdomain = window.location.hostname.split('.')[0];
 
@@ -430,23 +434,35 @@ const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 const [networkToDelete, setNetworkToDelete] = useState(null);
 const [loading, setLoading] = useState(false);
 
+const getOnlineStatus = useCallback(async () => {
+  try {
+    const response = await fetch('/api/last_seen', {
+      headers: { 'X-Subdomain': subdomain },
+    });
+    const data = await response.json();
+    setOnlineStatusData(data);
+  } catch (error) {
+    console.log(error);
+    // Set error status if API fails
+    setOnlineStatusData([{ status: 'error' }]);
+  }
+}, [subdomain]);
 
-const getOnlineStatus = useCallback(
-  async() => {
-    try {
-      
-      const response = await fetch('/api/last_seen', {
-        headers: { 'X-Subdomain': subdomain },
-      });
-      const data = await response.json()
-      // setOnlineStatus(data)
-      console.log('online status',data)
-    } catch (error) {
-      
-    }
-  },
-  [],
-)
+
+
+useEffect(() => {
+  // Initial call
+  getOnlineStatus();
+  
+  // Set up interval for polling
+  const intervalId = setInterval(() => {
+    getOnlineStatus();
+  }, 10000);
+
+  // Clean up interval on unmount
+  return () => clearInterval(intervalId);
+}, [getOnlineStatus]);
+
 
 
 useEffect(() => {
@@ -525,9 +541,77 @@ const handleDeleteConfirm = async () => {
           {
             title: 'Status',
             field: 'status',
-            headerStyle: { color: 'black' }  // ✅ This applies to the header cell
+            headerStyle: { 
+              color: 'black',
+              fontWeight: 'bold',
+              fontSize: '14px'
+            },
+            cellStyle: {
+              minWidth: '180px' // Ensures consistent width for status cells
+            },
+            render: rowData => {
+              // Find status info or use empty object as fallback
+              const statusInfo = onlineStatusData.find(item => 
+                item.ppoe_username === rowData.ppoe_username
+              ) || { status: 'offline' };
+          
+              // Status indicator configuration
+              const statusConfig = {
+                online: {
+                  icon: (
+                    <div className="relative inline-flex items-center">
+                      <MdNetworkPing className="text-green-500 animate-ping absolute opacity-75" />
+                      <MdNetworkPing className="text-green-500 relative" />
+                    </div>
+                  ),
+                  text: 'Online',
+                  color: 'text-green-600',
+                  bg: 'bg-green-50',
+                  tooltip: 'Device is currently connected'
+                },
+                offline: {
+                  icon: <MdOutlineNetworkPing className="text-gray-500" />,
+                  text: statusInfo.last_seen ? `Last seen: ${statusInfo.last_seen}` : 'Offline',
+                  color: 'text-gray-600',
+                  bg: 'bg-gray-50',
+                  tooltip: statusInfo.last_seen ? `Last active: ${statusInfo.last_seen}` : 'No connection data'
+                },
+                error: {
+                  icon: <MdErrorOutline className="text-red-500 animate-pulse" />,
+                  text: 'Connection Error',
+                  color: 'text-red-600',
+                  bg: 'bg-red-50',
+                  tooltip: 'Failed to retrieve status data'
+                }
+              };
+          
+              const currentStatus = statusInfo.status in statusConfig 
+                ? statusInfo.status 
+                : 'offline';
+          
+              const { icon, text, color, bg, tooltip } = statusConfig[currentStatus];
+          
+              return (
+                <Tooltip title={tooltip} arrow>
+                  <div className={`flex items-center px-3 py-1 rounded-full ${bg}`}>
+                    {icon}
+                    <span className={`ml-2 text-sm font-medium ${color}`}>
+                      {text}
+                    </span>
+                  </div>
+                </Tooltip>
+              );
+            }
           },
-          { title: 'Type', field: 'type' },
+          { 
+            title: 'Type', 
+            field: 'type',
+            headerStyle: {
+              color: 'black',
+              fontWeight: 'bold',
+              fontSize: '14px'
+            }
+          },
           { title: 'Package', field: 'package' ,
             headerStyle: { color: 'black' } 
           },
