@@ -329,7 +329,7 @@ className="flex items-center  w-full p-2 text-white transition
 
 
 
-                  <motion.li
+                  {/* <motion.li
                   onClick={() => {
                     if (window.innerWidth < 962) {
                       setSeeSideBar(true);
@@ -348,7 +348,9 @@ className="flex items-center  w-full p-2 text-white transition
                      <Link to='/admin/pppoe-subscriptions' >                 
                       PPOE subscriptions                  
                       </Link>
-                  </motion.li>
+                  </motion.li> */}
+
+
 
 
                   <motion.li

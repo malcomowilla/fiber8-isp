@@ -19,6 +19,7 @@ import TabPanel from '@mui/lab/TabPanel';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import {useState, useEffect} from 'react'
+import LiveData from '../details/LiveData';
 
 import {
   Tabs,
@@ -34,7 +35,8 @@ const EditSubscriber = ({handleClose, open, formData , createSubscriber,
   setShowClientStatsAndSubscriptions, showClientStatsAndSUbscriptions,
    handleChangeForm, packageNamee, setFormData, isloading,
   
-  
+   name,
+   package_name,
    onlyShowSubscription,setOnlyShowSubscription
 
   
@@ -47,7 +49,7 @@ const EditSubscriber = ({handleClose, open, formData , createSubscriber,
     setValue(newValue);
   };
 
-
+console.log('name',name)
 
   return (
     // <React.Fragment>
@@ -178,6 +180,12 @@ const EditSubscriber = ({handleClose, open, formData , createSubscriber,
           <TabPanel value="4"><Invoice handleClose={handleClose}/></TabPanel>
           <TabPanel value="5"><Receipt handleClose={handleClose}/></TabPanel>
           <TabPanel value="6"><Stats handleClose={handleClose}/></TabPanel>
+
+
+          <TabPanel value="11"><LiveData handleClose={handleClose} 
+          name={name}
+          package_name={package_name}
+          /></TabPanel>
           <TabPanel value="7"><Subscriptions
            handleClose={handleClose}
            setOnlyShowSubscription={setOnlyShowSubscription} 
