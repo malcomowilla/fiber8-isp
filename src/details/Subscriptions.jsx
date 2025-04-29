@@ -111,7 +111,8 @@ const Subscriptions = ({
     const [ips, setIps] = useState([])
     const [subscriptions, setSubscriptions] = useState([])
     const [onlineStatusData, setOnlineStatusData] = useState([]);
-
+    const [blockLoading, setBlockLoading] = useState(false);
+    const [blockedSubscriptions, setBlockedSubscriptions] = useState([]);
 
 
 const subdomain = window.location.hostname.split('.')[0];
@@ -119,7 +120,46 @@ const subdomain = window.location.hostname.split('.')[0];
 
 
 
+const handleBlockService = async (subscriptionData) => {
+  setBlockLoading(true);
+  try {
+    const response = await fetch('/api/block_service', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Subdomain': subdomain
+      },
+      body: JSON.stringify({ subscription: subscriptionData })
+    });
 
+    const result = await response.json();
+    
+    if (response.ok) {
+      toast.success('Service blocked successfully', {
+        position: 'top-center',
+        duration: 3000,
+        icon: <MdOutlineBlock className="text-red-500" />
+      });
+      // Update the blocked status in state
+      setBlockedSubscriptions([...blockedSubscriptions, subscriptionData.id]);
+      // Refresh the online status
+      getOnlineStatus();
+    } else {
+      toast.error(result.error || 'Failed to block service', {
+        position: 'top-center',
+        duration: 3000
+      });
+    }
+  } catch (error) {
+    toast.error('Network error while blocking service', {
+      position: 'top-center',
+      duration: 3000
+    });
+    console.error('Block service error:', error);
+  } finally {
+    setBlockLoading(false);
+  }
+};
 
 
 
@@ -358,64 +398,6 @@ const createSubscription = async(e) => {
   }
 
 }
-
-// const createSubscription = async(e) => {
-
-//   e.preventDefault()
-
-//   try {
-//     const method = formData.id ? 'PUT' : 'POST'
-//     const url = formData.id ? `/api/subscriptions/${formData.id}` : '/api/subscriptions'
-//     const response = await fetch(url, {
-//       method: method,
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'X-Subdomain': subdomain
-//       },
-//       body: JSON.stringify({ subscription: formData }) // Must be wrapped under `subscription`
-//     })
-
-// const newData = await response.json()
-
-// if (response.ok) {
-  
-//   console.log('subscription created')
-//   // setShowMaterialTable(false)
-  
-
-//   if (formData.id) {
-
-//   toast.success('Subscription updated successfully', {position: "top-center", duration: 3000 })
-//     setSubscriptions(subscriptions.map(item => item.id === newData.id ? newData : item))
-//     setShowForm(false)
-//   setShowMaterialTable(true)
-//   } else {
-//     const newData = await response.json()
-
-//     toast.success('Subscription added successfully', {  position: "top-center", duration: 3000 })
-
-//     setSubscriptions([...subscriptions, newData])
-//     setShowForm(false)
-//   setShowMaterialTable(true)
-
-//   }
-// } else {
-
-//   toast.error('Error creating subscription', {  position: "top-center", duration: 3000 })
-//   console.log('failed to create subscription')
-//   setShowForm(true)
-//   setShowMaterialTable(false)
-
-
-// } 
-//   } catch (error) {
-    
-//     toast.error('Error creating subscription server error', {  position: "top-center", duration: 3000 })
-//     setShowMaterialTable(true)
-//     setShowForm(false)
-//     console.log(error)
-//   }
-// }
 
 
 
@@ -1100,18 +1082,35 @@ const handleDeleteConfirm = async () => {
  
       </motion.div>
 
-
       <div className='flex justify-center gap-x-3 mt-4'>
-      <Tooltip title="Disconnect service">
+  <Tooltip title="Disconnect service">
+    <GiCycle className='text-green-500 cursor-pointer hover:text-green-700'/>
+  </Tooltip>
 
-<GiCycle className='text-green-500 cursor-pointer'/>
-</Tooltip>
-
-
-<Tooltip title='Block service'>
-          <MdOutlineBlock className='text-red-500 cursor-pointer'/>
-        </Tooltip>
-        </div>
+  <Tooltip title={blockedSubscriptions.includes(formData.id) ? 'Unblock service' : 'Block service'}>
+    <div className="relative">
+      {blockLoading && blockedSubscriptions.includes(formData.id) ? (
+        <CircularProgress 
+          size={24}
+          thickness={4}
+          sx={{
+            color: 'red',
+            animationDuration: '1.5s',
+          }}
+        />
+      ) : (
+        <MdOutlineBlock 
+          className={`cursor-pointer text-2xl ${
+            blockedSubscriptions.includes(formData.id) 
+              ? 'text-red-700 animate-pulse' 
+              : 'text-red-500 hover:text-red-700'
+          }`}
+          onClick={() => handleBlockService(formData)}
+        />
+      )}
+    </div>
+  </Tooltip>
+</div>
 
         </form>
     </motion.div>
