@@ -561,11 +561,11 @@ const handleDeleteConfirm = async () => {
                 online: {
                   icon: (
                     <div className="relative inline-flex items-center">
-                      <MdNetworkPing className="text-green-500 animate-ping absolute opacity-75" />
-                      <MdNetworkPing className="text-green-500 relative" />
+                      <MdNetworkPing className={` ${ statusInfo.status === 'blocked'  ? 'text-red-700' : 'text-green-600'}  animate-ping absolute opacity-75`} />
+                      <MdNetworkPing className="text-green-600 relative" />
                     </div>
                   ),
-                  text: 'Online',
+                  text: statusInfo.status === 'blocked' ? 'Blocked' : 'Online',
                   color: 'text-green-600',
                   bg: 'bg-green-50',
                   tooltip: 'Device is currently connected'
