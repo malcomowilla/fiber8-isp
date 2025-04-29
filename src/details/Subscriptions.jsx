@@ -76,6 +76,7 @@ import { MdOutlineOnlinePrediction } from "react-icons/md";
 
 
 
+
 const Subscriptions = ({
   packageNamee,
   handleClose,
@@ -548,10 +549,9 @@ const handleDeleteConfirm = async () => {
               fontSize: '14px'
             },
             cellStyle: {
-              minWidth: '180px' // Ensures consistent width for status cells
+              minWidth: '180px'
             },
             render: rowData => {
-              // Find status info or use empty object as fallback
               const statusInfo = onlineStatusData.find(item => 
                 item.ppoe_username === rowData.ppoe_username
               ) || { status: 'offline' };
@@ -561,14 +561,25 @@ const handleDeleteConfirm = async () => {
                 online: {
                   icon: (
                     <div className="relative inline-flex items-center">
-                      <MdNetworkPing className={` ${ statusInfo.status === 'blocked'  ? 'text-red-700' : 'text-green-600'}  animate-ping absolute opacity-75`} />
-                      <MdNetworkPing className="text-green-600 relative" />
+                      <MdNetworkPing className="text-green-500 animate-ping absolute opacity-75" />
+                      <MdNetworkPing className="text-green-500 relative" />
                     </div>
                   ),
-                  text: statusInfo.status === 'blocked' ? 'Blocked' : 'Online',
+                  text: 'Online',
                   color: 'text-green-600',
                   bg: 'bg-green-50',
                   tooltip: 'Device is currently connected'
+                },
+                blocked: {
+                  icon: (
+                    <div className="relative inline-flex items-center">
+                      <MdOutlineBlock className="text-red-700" />
+                    </div>
+                  ),
+                  text: 'Blocked',
+                  color: 'text-red-700',
+                  bg: 'bg-red-50',
+                  tooltip: 'Device is currently blocked'
                 },
                 offline: {
                   icon: <MdOutlineNetworkPing className="text-gray-500" />,
@@ -586,9 +597,12 @@ const handleDeleteConfirm = async () => {
                 }
               };
           
-              const currentStatus = statusInfo.status in statusConfig 
-                ? statusInfo.status 
-                : 'offline';
+              // First check if status is blocked, then fall back to other statuses
+              const currentStatus = statusInfo.status === 'blocked' 
+                ? 'blocked' 
+                : statusInfo.status in statusConfig 
+                  ? statusInfo.status 
+                  : 'offline';
           
               const { icon, text, color, bg, tooltip } = statusConfig[currentStatus];
           
