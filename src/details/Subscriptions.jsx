@@ -573,7 +573,7 @@ const handleDeleteConfirm = async () => {
                 blocked: {
                   icon: (
                     <div className="relative inline-flex items-center">
-                      <MdOutlineBlock className="text-red-700" />
+                      <MdOutlineBlock className="text-red-700 animate-ping" />
                     </div>
                   ),
                   text: 'Blocked',
