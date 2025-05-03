@@ -143,6 +143,7 @@ import  AllMessages from './sms/AllMessages'
 import BulkMessage from './sms/BulkMessage'
 import WireguardConfigForm from './wireguard/WireguardConfigForm'
 import IpNetworks from './wireguard/IpNetworks'
+import ServiceExpired from './service_expired/ServiceExpired'
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -657,6 +658,7 @@ hostname.endsWith('.aitechs.co.ke')
     <Route path='/email-sent' element={<EmailSent/>}/>
     <Route path='/how-did-you-hear' element={<HowDidYouHear/>}/>
     <Route path='/account-locked' element={<AccountLocked/>}/>
+    <Route path='/service-expired' element={<ServiceExpired/>}/>
 
 <Route element={<ProtectAuthSystemAdmin  />}>
     <Route path='/system-admin-dashboard' element={<DashboardSytemAdmin/>}/> 
