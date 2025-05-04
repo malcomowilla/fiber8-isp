@@ -551,7 +551,7 @@ const darkTheme = createTheme({
 const handleGetCompanySettings = useCallback(
   async() => {
     try {
-      const response = await fetch('/api/get_company_settings', {
+      const response = await fetch('/api/allow_get_company_settings', {
         headers: {
           'X-Subdomain': subdomain,
         },
@@ -580,7 +580,7 @@ const handleGetCompanySettings = useCallback(
     
     }
   },
-  [setCompanySettings],
+  [],
 )
 
 useEffect(() => {
@@ -606,7 +606,7 @@ className="w-24 h-24 mx-auto rounded-full"
 <Helmet>
                 <meta charSet="utf-8" />
                 {/* <title>My Title</title> */}
-                <link rel="icon" type="image/svg+xml" href={logo_preview || "/images/aitechs.png"} 
+                <link rel="icon" type="image/svg+xml" href={logo_preview} 
                 onError={(e) => { e.target.src = "/images/aitechs.png"; }}
                 />
 
