@@ -42,10 +42,25 @@ const navigate = useNavigate()
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="min-h-screen bg-gradient-to-br from-blue-50 to-white 
-        dark:from-gray-900 dark:to-gray-800 flex items-center
-         justify-center px-4"
+      className="bg-gradient-to-br from-blue-900 to-indigo-900 min-h-screen
+ flex items-center justify-center relative overflow-hidden"
     >
+
+<div className="absolute inset-0 opacity-20">
+    {[...Array(20)].map((_, i) => (
+      <div 
+        key={i}
+        className="absolute rounded-full bg-blue-400 animate-spin"
+        style={{
+          width: `${Math.random() * 10 + 5}px`,
+          height: `${Math.random() * 10 + 5}px`,
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          animationDuration: `${Math.random() * 5 + 3}s`
+        }}
+      />
+    ))}
+  </div>
       <motion.div
         variants={itemVariants}
         className="max-w-md w-full bg-white/80 dark:bg-gray-800/80 
@@ -57,13 +72,19 @@ const navigate = useNavigate()
           className="flex flex-col items-center"
           variants={itemVariants}
         >
-          <img
-  className="mx-auto h-20 w-20 rounded-full shadow-lg ring-4
-               ring-emerald-50"
+        <div className="text-center mb-6">
+        <div className="inline-flex items-center justify-center p-4 bg-blue-600/20 rounded-full">
+          {/* Shield + Network icon */}
+        
+<img
+className="w-24 h-24 mx-auto rounded-full"
   src={logo_preview || "/images/aitechs.png"}
   alt={company_name || "Aitechs"}
   onError={(e) => { e.target.src = "/images/aitechs.png"; }}
 />
+        </div>
+        
+      </div>
           <h1 className="mt-4 text-2xl font-bold text-gray-900 dark:text-white">
             {company_name}
           </h1>
