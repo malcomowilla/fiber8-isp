@@ -647,147 +647,177 @@ setPassword(e.target.value)
 
 </main> */}
 
+<main className="bg-gradient-to-br from-blue-900 to-indigo-900 min-h-screen
+ flex items-center justify-center relative overflow-hidden">
+  {/* Network nodes animation */}
+  <div className="absolute inset-0 opacity-20">
+    {[...Array(20)].map((_, i) => (
+      <div 
+        key={i}
+        className="absolute rounded-full bg-blue-400 animate-spin"
+        style={{
+          width: `${Math.random() * 10 + 5}px`,
+          height: `${Math.random() * 10 + 5}px`,
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          animationDuration: `${Math.random() * 5 + 3}s`
+        }}
+      />
+    ))}
+  </div>
 
+  <motion.section
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+    className="w-full max-w-md p-6 z-10"
+  >
+    <div className="text-center mb-8">
+      <div className="flex justify-center mb-6">
+        {/* ISP Network Icon */}
+        <svg 
+          className="w-16 h-16 text-white" 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+            d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <p className="text-white text-3xl font-bold">
+        {company_name || 'Aitechs'} <span className="text-blue-300">Networks</span>
+      </p>
+      <p className="text-blue-200 mt-2">Secure ISP Management Portal</p>
+    </div>
 
-
-<main className="bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center">
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md p-6"
-      >
-        <div className="text-center">
-          <div onClick={handleThemeSwitch} className="dark:text-white flex justify-center cursor-pointer">
-          <ion-icon onClick={()=>setIcon(!icon)}  name={icon ? 'moon-outline' : 'sunny'} className='' size='large'></ion-icon>
-
-
-
-          </div>
-          <p className="dark:text-white mt-4 font-bold text-2xl">
-            Welcome To <span className=""> {company_name || 'Aitechs'}</span>
-          </p>
-        </div>
-
-        <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-          <div className="text-center">
-          <img
-  className="w-[100px] h-[100px] mx-auto rounded-full"
+    <div className="bg-white/10 backdrop-blur-md rounded-xl shadow-2xl p-8 border border-white/20">
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center justify-center p-4 bg-blue-600/20 rounded-full">
+          {/* Shield + Network icon */}
+        
+<img
+className="w-24 h-24 mx-auto rounded-full"
   src={logo_preview || "/images/aitechs.png"}
   alt={company_name || "Aitechs"}
   onError={(e) => { e.target.src = "/images/aitechs.png"; }}
 />
-          </div>
-
-          <h2 className="mt-6 text-xl font-semibold text-gray-900 dark:text-white text-center">
-            Sign in to your account
-          </h2>
-
-          <form onSubmit={handleSignIn} className="mt-6 space-y-6">
-            {/* Email Field */}
-            <TextField
-              fullWidth
-              label="Email"
-              type="email"
-
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              variant="outlined"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Email className="text-gray-500" />
-                  </InputAdornment>
-                ),
-              }}
-              className="bg-gray-50 dark:bg-gray-700 rounded-lg myTextField"
-            />
-
-            {/* Password Field */}
-            <TextField
-              fullWidth
-              label="Password"
-              type={isSeen ? "text" : "password"}
-              value={isPassword}
-              onChange={(e) => setPassword(e.target.value)}
-              variant="outlined"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock className="text-gray-500" />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={() => setIsSeen(!isSeen)}>
-                      {isSeen ? (
-                        <Visibility className="text-gray-500" />
-                      ) : (
-                        <VisibilityOff className="text-gray-500" />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              className="bg-gray-50 dark:bg-gray-700 rounded-lg myTextField"
-            />
-
-            {/* Forgot Password and Passkey Links */}
-            <div className="flex gap-6 justify-center">
-
-              <span className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400">
-              <Link
-                to="/reset-password"
-                
-              >
-                Forgot password?
-              </Link>
-              </span>
-
-              <span className='mx-2 text-gray-400'>|</span>
-
-              <span className="flex items-center text-sm text-blue-600
-               hover:text-blue-500 dark:text-blue-400">
-              <Link
-                to="/passkey-signin"
-                
-              >
-                <IoKeyOutline className="mr-1" />
-                Passkey
-              </Link>
-              </span>
-
-
-
-            </div>
-
-            {/* Sign In Button */}
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-all duration-300"
-              disabled={loading}
-            >
-              {loading ? (
-                <ReloadIcon className="animate-spin" />
-              ) : (
-                "Sign In"
-              )}
-            </Button>
-          </form>
-
-          {/* Additional Info */}
-          {/* <p className="mt-6 text-sm text-center text-gray-600 dark:text-gray-400">
-            New on our platform? Reach us at 0791568852 for a free trial!
-          </p> */}
         </div>
-      </motion.section>
-    </main>
+        <h2 className="mt-4 text-xl font-bold text-white">
+          Network Operations Center
+        </h2>
+      </div>
 
+      <form onSubmit={handleSignIn} className="space-y-6">
+        {/* Email Field */}
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg className="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Network Admin Email"
+            required
+          />
+        </div>
 
+        {/* Password Field */}
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg className="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <input
+            type={isSeen ? "text" : "password"}
+            value={isPassword}
+            onChange={(e) => setPassword(e.target.value)}
+            className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Access Key"
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setIsSeen(!isSeen)}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-300 hover:text-white"
+          >
+            {isSeen ? (
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            ) : (
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+              </svg>
+            )}
+          </button>
+        </div>
 
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={handleThemeSwitch}
+            className="text-blue-300 hover:text-white flex items-center"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {icon ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              )}
+            </svg>
+            {icon ? 'Night Mode' : 'Day Mode'}
+          </button>
 
+          <div className="text-sm">
+            <Link to="/reset-password" className="text-blue-300 hover:text-white">
+              Forgot Access Key?
+            </Link>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
+          disabled={loading}
+        >
+          {loading ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Authenticating...
+            </>
+          ) : (
+            <>
+              <svg className="-ml-1 mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+              </svg>
+              Access Network Dashboard
+            </>
+          )}
+        </button>
+      </form>
+
+      <div className="mt-6 text-center">
+        <p className="text-sm text-blue-200">
+          <Link to='/passkey-signin' className="font-semibold text-white">
+          Need passwordless access?  <span className="font-semibold text-white">
+            sign in with passkey</span>
+
+            </Link>
+        </p>
+      </div>
+    </div>
+  </motion.section>
+</main>
 
     </>
   )

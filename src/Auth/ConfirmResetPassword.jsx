@@ -273,9 +273,25 @@ const [openFailedPasswordAlert, setopenFailedPasswordAlert] = useState(false)
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="min-h-screen bg-gradient-to-br 
-        bg-white"
+      className="bg-gradient-to-br from-blue-900 to-indigo-900 min-h-screen
+ flex items-center justify-center relative overflow-hidden"
     >
+
+<div className="absolute inset-0 opacity-20">
+    {[...Array(20)].map((_, i) => (
+      <div 
+        key={i}
+        className="absolute rounded-full bg-blue-400 animate-spin"
+        style={{
+          width: `${Math.random() * 10 + 5}px`,
+          height: `${Math.random() * 10 + 5}px`,
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          animationDuration: `${Math.random() * 5 + 3}s`
+        }}
+      />
+    ))}
+  </div>
       <div className="container mx-auto px-4 py-8 min-h-screen flex
        items-center justify-center">
         <motion.div 
@@ -299,7 +315,7 @@ const [openFailedPasswordAlert, setopenFailedPasswordAlert] = useState(false)
   alt={company_name || "Aitechs"}
   onError={(e) => { e.target.src = "/images/aitechs.png"; }}
 />
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-3xl font-bold text-white">
               Reset Your Password
             </h2>
           </motion.div>

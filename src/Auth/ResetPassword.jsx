@@ -316,8 +316,25 @@ function ResetPassword() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900"
+        className="bg-gradient-to-br from-blue-900 to-indigo-900 min-h-screen
+ flex items-center justify-center relative overflow-hidden"
       >
+
+<div className="absolute inset-0 opacity-20">
+    {[...Array(20)].map((_, i) => (
+      <div 
+        key={i}
+        className="absolute rounded-full bg-blue-400 animate-spin"
+        style={{
+          width: `${Math.random() * 10 + 5}px`,
+          height: `${Math.random() * 10 + 5}px`,
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          animationDuration: `${Math.random() * 5 + 3}s`
+        }}
+      />
+    ))}
+  </div>
         <div className="text-center">
           {/* <motion.p
             initial={{ y: -20, opacity: 0 }}
@@ -337,14 +354,19 @@ function ResetPassword() {
           className="w-full max-w-md p-6 bg-white rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
         >
           <div className="flex flex-col items-center">
-            <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-            <img
-  className="w-40 h-40 mr-2 rounded-full"
+          <div className="text-center mb-6">
+        <div className="inline-flex items-center justify-center p-4 bg-blue-600/20 rounded-full">
+          {/* Shield + Network icon */}
+        
+<img
+className="w-24 h-24 mx-auto rounded-full"
   src={logo_preview || "/images/aitechs.png"}
   alt={company_name || "Aitechs"}
   onError={(e) => { e.target.src = "/images/aitechs.png"; }}
 />
-            </a>
+        </div>
+        
+      </div>
 
             <form onSubmit={handleSignIn} className="w-full space-y-6">
               {/* Email Input */}
@@ -380,11 +402,12 @@ function ResetPassword() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8, duration: 0.5 }}
-                className="flex items-center justify-start"
+                className="flex items-center cursor-pointer  justify-start"
               >
                 <Link
                   to="/signin"
-                  className="flex items-center text-blue-600 hover:text-blue-500 dark:text-blue-400"
+                  className="flex items-center relative cursor-pointer
+                   text-blue-600 hover:text-blue-500 dark:text-blue-400"
                 >
                   <ArrowBack className="mr-2" />
                   <span>Back to Login</span>

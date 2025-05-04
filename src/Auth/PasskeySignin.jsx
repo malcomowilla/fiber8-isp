@@ -620,37 +620,58 @@ toast.error(newData.error, {
   initial="hidden"
   animate="visible"
   variants={containerVariants}
-  className="min-h-screen relative"
+  className="bg-gradient-to-br from-blue-900 to-indigo-900 min-h-screen
+ flex items-center justify-center relative overflow-hidden"
 >
+
+
+<div className="absolute inset-0 opacity-20">
+    {[...Array(20)].map((_, i) => (
+      <div 
+        key={i}
+        className="absolute rounded-full bg-blue-400 animate-spin"
+        style={{
+          width: `${Math.random() * 10 + 5}px`,
+          height: `${Math.random() * 10 + 5}px`,
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          animationDuration: `${Math.random() * 5 + 3}s`
+        }}
+      />
+    ))}
+  </div>
   <div className="flex flex-col items-center justify-center min-h-screen px-4">
     {/* Logo Section */}
-    <div className="flex justify-center items-center w-full">
-      <a href="#" className="flex items-center text-2xl font-semibold text-gray-900 dark:text-white">
-      
+   
 
+    {/* Passkey Card */}
+    <motion.div
+      variants={itemVariants}
+      className="bg-white/10 backdrop-blur-md rounded-xl shadow-2xl p-8 border border-white/20"
+    >
+      <h2 className="text-2xl font-semibold text-center font-montserat text-white
+       dark:text-white mb-6">
+        Sign in with Passkey
+      </h2>
 
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center justify-center p-4 bg-blue-600/20 rounded-full">
+          {/* Shield + Network icon */}
+        
 <img
 className="w-24 h-24 mx-auto rounded-full"
   src={logo_preview || "/images/aitechs.png"}
   alt={company_name || "Aitechs"}
   onError={(e) => { e.target.src = "/images/aitechs.png"; }}
 />
-      </a>
-    </div>
-
-    {/* Passkey Card */}
-    <motion.div
-      variants={itemVariants}
-      className="bg-white dark:bg-gray-800 dark:border-gray-700 backdrop-blur-xl rounded-3xl shadow-xl p-8 border border-gray-100 mb-[200px]"
-    >
-      <h2 className="text-2xl font-semibold text-center font-montserat text-black dark:text-white mb-6">
-        Sign in with Passkey
-      </h2>
+        </div>
+        
+      </div>
 
       <form onSubmit={authenticateWebAuthn} className="space-y-6">
         {/* Username Input */}
         <div className="space-y-2">
-          <label className="text-2xl font-medium text-white dark:text-gray-300">
+          <label className="text-2xl font-medium text-white ">
             Username
           </label>
           <motion.div className="relative" whileFocus={{ scale: 1.02 }}>
@@ -685,18 +706,20 @@ className="w-24 h-24 mx-auto rounded-full"
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                   <FaRegUser className="text-black" />
+                   <FaRegUser className="text-white" />
                   </InputAdornment>
                 ),
               }}
-              className="bg-gray-50 dark:bg-gray-700 rounded-lg myTextField"
+              className="block w-full pl-10 myTextField pr-3 py-3 bg-white/5
+               border border-white/20 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+
             />
           </motion.div>
         </div>
 
         {/* Divider */}
         <div className="flex justify-center items-center">
-          <p className="text-2xl dark:text-white font-montserat-light">Or</p>
+          <p className="text-2xl text-white font-montserat-light">Or</p>
         </div>
 
         {/* Email Input */}
@@ -737,11 +760,14 @@ name='email'
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Email className="text-gray-500" />
+                    <Email className="text-white" />
                   </InputAdornment>
                 ),
               }}
-              className="bg-gray-50 dark:bg-gray-700 rounded-lg myTextField"
+              className="block w-full pl-10 pr-3 py-3 bg-white/5 
+              myTextField
+              border border-white/20 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+
             />
 
           </motion.div>
@@ -749,7 +775,7 @@ name='email'
 
         {/* Fingerprint Icon */}
         <div className="flex justify-center items-center">
-          <MdFingerprint className="text-4xl text-gray-600 dark:text-gray-400" />
+          <MdFingerprint className="text-4xl text-white " />
         </div>
 
         {/* Action Buttons */}
@@ -758,8 +784,8 @@ name='email'
             whileTap={{ scale: 0.98 }}
             type="submit"
             className="w-full py-3 px-4 bg-blue-500 text-white font-medium 
-            rounded-xl shadow-lg hover:bg-emerald-700 hover:shadow-emerald-500/25 
-            transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 
+            rounded-xl shadow-lg hover:bg-gray-700 hover:shadow-gray-500/25 
+            transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500
             focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center 
             justify-center space-x-2"
             disabled={isloading}
