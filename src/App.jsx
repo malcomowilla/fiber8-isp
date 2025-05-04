@@ -594,10 +594,21 @@ const hostname = window.location.hostname;
   return (
     <main>
 
+
+{/*           
+<img
+className="w-24 h-24 mx-auto rounded-full"
+  src={logo_preview || "/images/aitechs.png"}
+  alt={company_name || "Aitechs"}
+  onError={(e) => { e.target.src = "/images/aitechs.png"; }}
+/> */}
+
 <Helmet>
                 <meta charSet="utf-8" />
                 {/* <title>My Title</title> */}
-                <link rel="icon" type="image/svg+xml" href={logo_preview} />
+                <link rel="icon" type="image/svg+xml" href={logo_preview || "/images/aitechs.png"} 
+                onError={(e) => { e.target.src = "/images/aitechs.png"; }}
+                />
 
             </Helmet>
 

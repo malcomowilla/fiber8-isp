@@ -35,7 +35,7 @@ const subdomain = window.location.hostname.split('.')[0]
 const handleGetCompanySettings = useCallback(
   async() => {
     try {
-      const response = await fetch('/api/get_company_settings', {
+      const response = await fetch('/api/allow_get_company_settings', {
         headers: {
           'X-Subdomain': subdomain,
         },
