@@ -14,6 +14,8 @@ import { APP_VERSION, APP_NAME, APP_DESCRIPTION } from '../version';
 import TicketStatistics from '../tickets/TicketStatistics'
 import SubscriberStats from '../subscribers/SubscriberStats'
 import { FaSms } from 'react-icons/fa';
+import { IoWarningOutline } from "react-icons/io5";
+
 
 
 
@@ -184,13 +186,43 @@ setSmsBalance(newData.message)
           </p>
 
           {smsBalance && (
-    <div className="flex items-center gap-2 bg-blue-100 dark:bg-blue-900 px-4 py-2 rounded-lg">
+    <div className="flex items-center gap-2 bg-white border
+    dark:bg-gray-800 dark:border-gray-700
+    border-t-blue-600 px-4 py-2 rounded-lg">
       <FaSms className="text-blue-600 dark:text-blue-300 text-xl" />
       <span className="text-blue-800 dark:text-blue-200 font-medium">
         SMS Balance: <span className="font-bold">{smsBalance}</span>
       </span>
     </div>
   )}
+
+{window.location.hostname === 'demo.aitechs.co.ke' && (
+  <div className='flex items-center gap-2 mt-2 bg-white border
+    dark:bg-gray-800 
+    border-t-red-600 px-4 py-2 rounded-lg'>
+    <IoWarningOutline className='text-red-600 dark:text-red-300 text-xl' />
+    <span className='text-red-800 dark:text-red-200 font-medium'>
+      Warning: This is a demo version of the system. Please do not use this for any real purpose.
+    </span>
+  </div>
+)}
+
+<div className='flex items-center gap-2 mt-2 bg-white border
+    dark:bg-gray-800 
+    border-t-red-600 px-4 py-2 rounded-lg'>
+      <div className='flex'>
+    <IoWarningOutline className='text-red-600 dark:text-red-300 text-xl' />
+    <div className='flex flex-col'>
+    <span className='text-red-800 dark:text-red-200 font-medium '>
+      License- <span className=' text-black font-light dark:text-white'>Your license will expire in </span>
+      <p className='text-black text-sm font-light dark:text-white'>Expiry Date: </p>
+
+    </span>
+    </div>
+    </div>
+  </div>
+
+<div className='mt-4'>
           {location.pathname !== '/admin/customer-tickets' && location.pathname !== '/admin/hotspot-dashboard' && location.pathname !== '/admin/pppoe-subscribers' && <ShortCuts />}
 
           
@@ -200,6 +232,7 @@ setSmsBalance(newData.message)
           {location.pathname === '/admin/customer-tickets' && <TicketStatistics />}
           {location.pathname === '/admin/pppoe-subscribers' && <SubscriberStats />}
 
+</div>
           <div className="mt-8">
             <Outlet />
           </div>

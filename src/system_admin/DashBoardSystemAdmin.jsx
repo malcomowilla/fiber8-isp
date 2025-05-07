@@ -40,6 +40,8 @@ import { FaPerson } from "react-icons/fa6";
 import ClientRequests from './ClientRequests'
 import PasskeyList from './PasskeyList'
 import { IoMdKey } from "react-icons/io";
+import { LuPackageMinus } from "react-icons/lu";
+import PlanManager from './PlanManager'
 
 
 
@@ -104,6 +106,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
       case 5: return "Reset Password Admin";
       case 6: return "Client Requests";
       case 7: return "Passkeys";
+      case 8: return "Plan Manager";
       default: return "Dashboard";
     }
   };
@@ -120,6 +123,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
     { label: <p className='text-black'>Reset Password Admin</p>, icon: <LockResetIcon />, value: 5 },
     { label: <p className='text-black'>Client Requests</p>, icon: <FaPerson  className='w-6 h-6 rounded-full'/>, value: 6 },
     { label: <p className='text-black'>Passkeys</p>, icon: <IoMdKey  className='w-6 h-6 rounded-full'/>, value: 7 },
+    { label: <p className='text-black'>Plan Manager</p>, icon: <LuPackageMinus  className='w-6 h-6 rounded-full'/>, value: 8 },
   ];
 
   const pageTransitionVariants = {
@@ -339,6 +343,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
                   {value === 5 && <ResetPasswordSystemAdmin />}
                   {value === 6 && <ClientRequests />}
                   {value === 7 && <PasskeyList />}
+                  {value === 8 && <PlanManager />}
 
                 </motion.div>
               )}  

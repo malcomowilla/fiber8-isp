@@ -413,7 +413,7 @@ const getCurreentHotspotPlan = useCallback(
      
 
       if (response.ok) {
-        setCurrentHotspotPlan(data.current_hotspot_plan);
+        setCurrentHotspotPlan(data.hotspot_plans);
           console.log('current plan', data.current_hotspot_plan);
       } else {
           console.log('Error fetching current plan');
@@ -448,7 +448,7 @@ const getCurrentPlan = useCallback(
        
 
         if (response.ok) {
-            setCurrentPlan(data.current_plan);
+            setCurrentPlan(data.ppoe_plans);
             console.log('current plan', data.current_plan);
         } else {
             console.log('Error fetching current plan');
@@ -623,7 +623,7 @@ useEffect(() => {
                     error={!!errors.plan}
                     required
                   >
-                    {hotspot_plans.map((plan) => (
+                    {hotspot_plans?.map((plan) => (
                       <MenuItem 
                       sx={{
                         fontSize: '16px'
