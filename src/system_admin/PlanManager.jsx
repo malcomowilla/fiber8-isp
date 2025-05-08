@@ -20,6 +20,26 @@ import {
   Autocomplete
 } from '@mui/material';
 import { toast } from 'react-toastify';
+import MaterialTable from 'material-table';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CloudIcon from '@mui/icons-material/Cloud';
+import WarningIcon from '@mui/icons-material/Warning';
+
+import { 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions, 
+  Divider,
+  Grid,
+  IconButton,
+  Tooltip,
+  Snackbar,
+  Alert
+} from '@mui/material';
+
 // 0x011A68747470733a2f2f74723036392e616974656368732e636f2e6b65020561646d696e030561646d696e
 // Predefined plans for dropdown selection only
 const PREDEFINED_PPPOE_PLANS = [
@@ -51,6 +71,7 @@ const PlanManager = () => {
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const subdomain = window.location.hostname.split('.')[0];
+  const [planCategory, setPlanCategory] = useState('');
 
   // Fetch plans from backend only (for table display)
   useEffect(() => {
@@ -65,7 +86,8 @@ const PlanManager = () => {
         headers: { 'X-Subdomain': subdomain },
       });
       const data = await res.json();
-      setPlans(data.pppoe_plans || []);
+      setPlans(data || []);
+      setPlanCategory(data)
     } catch (err) {
       toast.error('Failed to fetch PPPoE plans');
       setPlans([]);
@@ -81,7 +103,8 @@ const PlanManager = () => {
         headers: { 'X-Subdomain': subdomain },
       });
       const data = await res.json();
-      setHotspotPlans(data.hotspot_plans || []);
+      setHotspotPlans(data|| []);
+      setPlanCategory(data)
     } catch (err) {
       toast.error('Failed to fetch Hotspot plans');
       setHotspotPlans([]);
@@ -94,7 +117,7 @@ const PlanManager = () => {
   const getPredefinedOptions = () => {
     return (planType === 'pppoe' ? PREDEFINED_PPPOE_PLANS : PREDEFINED_HOTSPOT_PLANS)
       .map(plan => ({
-        label: plan.name,
+        label:  `${plan.name} ${plan.maximum_pppoe_subscribers || plan.hotspot_subscribers} ${planType === 'pppoe' ?  'PPPoE Subscribers' : 'Hotspot Subscribers'}/${plan.expiry_days || 30} Days`,
         value: plan.name,
         plan: {
           name: plan.name,
@@ -200,24 +223,24 @@ const PlanManager = () => {
             renderInput={(params) => (
               <TextField
                 {...params}
+                className='myTextField'
                 label="Select Predefined Plan"
                 sx={{ mb: 2 }}
               />
             )}
           />
 
-          {selectedPlan && (
             <>
-              <TextField
+              {/* <TextField
                 label="Plan Name"
-                value={selectedPlan.name}
+                value={selectedPlan?.name}
                 onChange={(e) => setSelectedPlan({...selectedPlan, name: e.target.value})}
                 fullWidth
                 required
                 sx={{ mb: 2 }}
-              />
+              /> */}
 
-              <TextField
+              {/* <TextField
                 label={planType === 'pppoe' ? 'Max PPPoE Subscribers' : 'Max Hotspot Users'}
                 type="number"
                 value={maxSubscribers}
@@ -225,9 +248,9 @@ const PlanManager = () => {
                 fullWidth
                 required
                 sx={{ mb: 2 }}
-              />
+              /> */}
 
-              <TextField
+              {/* <TextField
                 label="Expiry Days"
                 type="number"
                 value={expiryDays}
@@ -235,9 +258,8 @@ const PlanManager = () => {
                 fullWidth
                 required
                 sx={{ mb: 2 }}
-              />
+              /> */}
             </>
-          )}
 
           <Box sx={{ display: 'flex', gap: 2 }}>
             {selectedPlan ? (
@@ -275,7 +297,12 @@ const PlanManager = () => {
 
         
         <PlanTable 
-          plans={currentPlans} 
+        hotspotPlans={hotspotPlans}
+        planCategory={planCategory}
+        planType={planType}
+          // plans={currentPlans} 
+          plans={plans} 
+
           type={planType}
           onEdit={(plan) => {
             setSelectedPlan(plan);
@@ -293,7 +320,7 @@ const PlanManager = () => {
   );
 };
 
-const PlanTable = ({ plans, type, onEdit }) => {
+const PlanTable = ({ plans, type, onEdit, planType, planCategory, hotspotPlans }) => {
   if (plans.length === 0) {
     return (
       <Paper sx={{ p: 3 }}>
@@ -303,44 +330,147 @@ const PlanTable = ({ plans, type, onEdit }) => {
   }
 
   return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>
-              {type === 'pppoe' ? 'Max Subscribers' : 'Hotspot Users'}
-            </TableCell>
-            <TableCell>Expiry Days</TableCell>
-            <TableCell>Billing Cycle</TableCell>
-            <TableCell>Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {plans.map((plan) => (
-            <TableRow key={plan.id}>
-              <TableCell>{plan.name}</TableCell>
-              <TableCell>
-                {type === 'pppoe' 
-                  ? plan.maximum_pppoe_subscribers 
-                  : plan.hotspot_subscribers}
-              </TableCell>
-              <TableCell>{plan.expiry_days || 30}</TableCell>
-              <TableCell>{plan.billing_cycle || 'monthly'}</TableCell>
-              <TableCell>
-                <Button 
-                  size="small" 
-                  onClick={() => onEdit(plan)}
-                  variant="outlined"
-                >
-                  Edit
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    // <TableContainer component={Paper}>
+    //   <Table>
+    //     <TableHead>
+    //       <TableRow>
+    //         <TableCell>Name</TableCell>
+    //         <TableCell>
+    //           {type === 'pppoe' ? 'Max Subscribers' : 'Hotspot Users'}
+    //         </TableCell>
+    //         <TableCell>Expiry Days</TableCell>
+    //         <TableCell>Billing Cycle</TableCell>
+    //         <TableCell>Actions</TableCell>
+    //       </TableRow>
+    //     </TableHead>
+    //     <TableBody>
+    //       {plans.map((plan) => (
+    //         <TableRow key={plan.id}>
+    //           <TableCell>{plan.name}</TableCell>
+    //           <TableCell>
+    //             {type === 'pppoe' 
+    //               ? plan.maximum_pppoe_subscribers 
+    //               : plan.hotspot_subscribers}
+    //           </TableCell>
+    //           <TableCell>{plan.expiry_days || 30}</TableCell>
+    //           <TableCell>{plan.billing_cycle || 'monthly'}</TableCell>
+    //           <TableCell>
+    //             <Button 
+    //               size="small" 
+    //               onClick={() => onEdit(plan)}
+    //               variant="outlined"
+    //             >
+    //               Edit
+    //             </Button>
+    //           </TableCell>
+    //         </TableRow>
+    //       ))}
+    //     </TableBody>
+    //   </Table>
+    // </TableContainer>
+
+    <>
+        {planType === 'pppoe' ? (
+           <MaterialTable
+           title={<p className='text-black'>PPPoE Plans</p>}
+           columns={[
+            { title: 'Maximum Subscribers', field: 'maximum_pppoe_subscribers' },
+            { title: 'Expiry Days', field: 'expiry_days' },
+            {title: 'Company Name', field: 'account.subdomain'},
+            { title: 'Billing Cycle', field: 'billing_cycle' },
+             { title: 'Plan Name', field: 'name' 
+             },
+           ]}
+           data={plans}
+           // isLoading={loading}
+           actions={[
+             {
+               icon: () => (
+                 <Tooltip title="Add PPoe Plan">
+                   <IconButton color="primary">
+                     <AddCircleIcon fontSize="large" />
+                   </IconButton>
+                 </Tooltip>
+               ),
+               tooltip: 'Add PPOe Plan',
+               isFreeAction: true,
+               // onClick: handleOpenAddDialog
+             },
+             {
+               icon: () => <EditIcon color="primary" />,
+               tooltip: 'Edit PPOe Plan',
+               // onClick: (event, rowData) => handleOpenEditDialog(rowData)
+             },
+             {
+               icon: () => <DeleteIcon color="error" />,
+               tooltip: 'Delete PPOe Plan',
+               // onClick: (event, rowData) => handleDelete(rowData.id)
+               // onClick: (event, rowData) => handleDeleteClick(rowData.id)
+             }
+           ]}
+           options={{
+             actionsColumnIndex: -1,
+             pageSize: 10,
+             pageSizeOptions: [5, 10, 20],
+            //  showTitle: false,
+             headerStyle: {
+               backgroundColor: '#f5f5f5',
+               fontWeight: 'bold'
+             }
+           }}
+         />
+        ) :  <MaterialTable
+        title="Hotspot Plans"
+        columns={[
+          { title: 'Maximum Hotspot Subscribers', field: 'hotspot_subscribers' },
+            { title: 'Expiry Days', field: 'expiry_days' },
+            {title: 'Company Name', field: 'account.subdomain'},
+            { title: 'Billing Cycle', field: 'billing_cycle' },
+             { title: 'Plan Name', field: 'name' 
+             },
+        ]}
+        data={hotspotPlans}
+        // isLoading={loading}
+        actions={[
+          {
+            icon: () => (
+              <Tooltip title="Add Network">
+                <IconButton color="primary">
+                  <AddCircleIcon fontSize="large" />
+                </IconButton>
+              </Tooltip>
+            ),
+            tooltip: 'Add Network',
+            isFreeAction: true,
+            // onClick: handleOpenAddDialog
+          },
+          {
+            icon: () => <EditIcon color="primary" />,
+            tooltip: 'Edit Network',
+            // onClick: (event, rowData) => handleOpenEditDialog(rowData)
+          },
+          {
+            icon: () => <DeleteIcon color="error" />,
+            tooltip: 'Delete Network',
+            // onClick: (event, rowData) => handleDelete(rowData.id)
+            // onClick: (event, rowData) => handleDeleteClick(rowData.id)
+          }
+        ]}
+        options={{
+          actionsColumnIndex: -1,
+          pageSize: 10,
+          pageSizeOptions: [5, 10, 20],
+          // showTitle: false,
+          headerStyle: {
+            backgroundColor: '#f5f5f5',
+            fontWeight: 'bold'
+          }
+        }}
+      />}
+
+   
+
+</>
   );
 };
 
