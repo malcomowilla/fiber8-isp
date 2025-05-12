@@ -41,6 +41,8 @@ import {
 } from '@mui/material';
 import { FaRegBuilding } from "react-icons/fa";
 import EditPlan from './EditPlan';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
 
 // 0x011A68747470733a2f2f74723036392e616974656368732e636f2e6b65020561646d696e030561646d696e
 // Predefined plans for dropdown selection only
@@ -78,6 +80,45 @@ const PlanManager = () => {
   const [planCategory, setPlanCategory] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [openPlanManager, setOpenPlanManager] = useState(false);
+
+
+
+
+
+
+
+
+  const defaultMaterialTheme = createTheme({
+    props: {
+      MuiInputLabel: {
+          shrink: true
+       }
+  },
+    palette: {
+    
+      
+      mode:  'light' ,
+      primary: {
+        light: '#757ce8',
+        main: '#3f50b5',
+        dark: '000000',
+        contrastText: '#fff',
+      },
+      secondary: {
+        light: '#ff7961',
+        main: '#f44336',
+        dark: '#ba000d',
+        contrastText: '#000',
+      },
+  
+    },
+  
+  });
+  const [materialuitheme, setMaterialuiTheme] = 
+  useState(createTheme(defaultMaterialTheme));
+
+
+
 
 
   // Fetch plans from backend only (for table display)
@@ -208,9 +249,13 @@ const PlanManager = () => {
 
   return (
     <>
+
     <Box sx={{ p: 4 }}>
       <Typography variant="h4" gutterBottom>Plan Manager</Typography>
       
+
+      <ThemeProvider theme={materialuitheme}>
+
       <Paper sx={{ p: 3, mb: 4 }}>
         <form onSubmit={handleSubmit}>
           <FormControl fullWidth sx={{ mb: 2 }}>
@@ -256,6 +301,7 @@ const PlanManager = () => {
               />
             )}
           />
+          
 
             <>
               {/* <TextField
@@ -288,6 +334,8 @@ const PlanManager = () => {
               /> */}
             </>
 
+
+
           <Box sx={{ display: 'flex', gap: 2 }}>
             {selectedPlan ? (
               <>
@@ -315,6 +363,11 @@ const PlanManager = () => {
           </Box>
         </form>
       </Paper>
+
+      </ThemeProvider>
+
+
+
 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
@@ -362,13 +415,54 @@ openPlanManager, setOpenPlanManager
  }) => {
 
 
+
+  const defaultMaterialTheme = createTheme({
+    props: {
+      MuiInputLabel: {
+          shrink: true
+       }
+  },
+    palette: {
+    
+      
+      mode:  'light' ,
+      primary: {
+        light: '#757ce8',
+        main: '#3f50b5',
+        dark: '000000',
+        contrastText: '#fff',
+      },
+      secondary: {
+        light: '#ff7961',
+        main: '#f44336',
+        dark: '#ba000d',
+        contrastText: '#000',
+      },
+  
+    },
+  
+  });
+  
+  const [materialuitheme, setMaterialuiTheme] = 
+  useState(createTheme(defaultMaterialTheme));
+
+
   if (plans.length === 0) {
     return (
+      <ThemeProvider theme={materialuitheme}>
+
       <Paper sx={{ p: 3 }}>
         <Typography>No plans found</Typography>
       </Paper>
+
+      </ThemeProvider>
     );
   }
+
+
+
+
+
 
   return (
     // <TableContainer component={Paper}>
@@ -418,6 +512,8 @@ open={openPlanManager} onClose={() => setOpenPlanManager(false)}
 />
 
         {planType === 'pppoe' ? (
+
+<ThemeProvider theme={materialuitheme}>
            <MaterialTable
            title={<p className='text-black'>PPPoE Plans</p>}
            columns={[
@@ -469,7 +565,13 @@ open={openPlanManager} onClose={() => setOpenPlanManager(false)}
              }
            }}
          />
-        ) :  <MaterialTable
+
+         </ThemeProvider>
+
+
+        ) : 
+        <ThemeProvider theme={materialuitheme}>
+        <MaterialTable
         title="Hotspot Plans"
         columns={[
           { title: 'Maximum Hotspot Subscribers', field: 'hotspot_subscribers' },
@@ -518,7 +620,11 @@ open={openPlanManager} onClose={() => setOpenPlanManager(false)}
             fontWeight: 'bold'
           }
         }}
-      />}
+      />
+      </ThemeProvider>
+      }
+
+      
 
    
 
