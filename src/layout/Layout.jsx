@@ -249,7 +249,7 @@ setSmsBalance(newData.message)
 
   function calculateTimeRemaining(expiryDateString) {
     // Parse the expiry date (format: "June 07, 2025 at 05:12 PM")
-    const expiryDate = new Date(expiryDateString.replace(' at ', ' '));
+    const expiryDate = new Date(expiryDateString?.replace(' at ', ' '));
     const now = new Date();
     const diffMs = expiryDate - now;
     
@@ -282,7 +282,7 @@ setSmsBalance(newData.message)
     // If less than 1 minute remains
     if (result === '') return 'in less than 1 minute';
   
-    return `in ${result.trim()}`;
+    return `in ${result?.trim()}`;
   }
   return (
     <>
