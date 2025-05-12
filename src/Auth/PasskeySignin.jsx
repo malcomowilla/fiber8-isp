@@ -293,12 +293,24 @@ setSeeError(false)
 
 const newData = await createResponse.json()
 
+
+
+if (createResponse.status === 402) {
+  setTimeout(() => {
+    navigate('/license-expired')
+   }, 1800);
+  
+}
+
+
     if (createResponse.ok ) {
       setSeeError(false);
       setOpenLoad(false);
       
-    navigate('/admin/analytics')
+    // navigate('/admin/analytics')
    
+
+    navigate('/admin/router-stats')
 
       // setTimeout(() => {
       //   // setDone(true);
