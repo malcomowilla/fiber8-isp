@@ -342,7 +342,7 @@ setSmsBalance(newData.message)
       animate={{ x: 0 }}
       transition={{ delay: 0.1 }}
     >
-      Current Plan: <span className="text-blue-600 dark:text-blue-300">{currentPPOEPlan}</span>
+      Current PPPoe Plan: <span className="text-blue-600 dark:text-blue-300">{currentPPOEPlan || 'Not Set'}</span>
     </motion.p>
     
     <motion.p 
@@ -392,6 +392,8 @@ setSmsBalance(newData.message)
   </div>
 )}
 
+
+
 <div className='flex items-center gap-2 mt-2 bg-white border dark:bg-gray-800 border-t-red-600 px-4 py-2 rounded-lg'>
   <div className='flex'>
     {condition ? (
@@ -403,9 +405,11 @@ setSmsBalance(newData.message)
       <span className='text-red-800 dark:text-red-200 font-medium'>
         <span className={`
           ${condition ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'}
-          `}>PPPOE License -  </span> <span className='text-black font-light dark:text-white'>Your license expires in
+          `}> <span className='font-bold'>PPPOE License</span> -  </span> <span className='text-black
+           font-light dark:text-white'>Your
+           license expires in
         <span className='ml-2 text-red-600 dark:text-red-300'>
-            ({calculateTimeRemaining(expiry)} remaining)
+            ({ expiry === 'No license' ? 'No license' : calculateTimeRemaining(expiry)})
           </span>
 
            </span>
@@ -431,50 +435,46 @@ setSmsBalance(newData.message)
   </div>
 </div>
 
-<div className='flex items-center gap-2 mt-2 bg-white border dark:bg-gray-800 border-b-orange-600 px-4 py-2 rounded-lg'>
+
+
+
+<div className='flex items-center gap-2 mt-2 bg-white border dark:bg-gray-800
+ border-t-red-600 px-4 py-2 rounded-lg'>
   <div className='flex'>
-    {expiry2 === '' ? (
-      <IoCloseCircleOutline className='text-gray-500 dark:text-gray-400 text-xl ani' />
-    ) : condition2 ? (
-      <IoWarningOutline className='text-orange-600 dark:text-orange-300 text-xl animate-pulse' />
+    {condition2 ? (
+      <IoWarningOutline className='text-red-600 dark:text-red-300 text-xl animate-pulse' />
     ) : (
       <IoCheckmarkCircleOutline className='text-green-600 dark:text-green-300 text-xl animate-bounce' />
     )}
     <div className='flex flex-col'>
-      <span className={`${expiry2 === '' ? 'text-gray-800' : condition2 ? 'text-orange-800' : 'text-green-800'} dark:text-white font-medium`}>
-        Hotspot License - <span className='text-black font-light dark:text-white'>
-          {expiry2  || 'No active license'}
-        </span>
+      <span className='text-red-800 dark:text-red-200 font-medium'>
+        <span className={`
+          ${condition2 ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'}
+          `}> <span className='font-bold'>Hotspot License- </span>  </span> <span className='text-black 
+          font-light dark:text-white'>Your license expires in
+        <span className='ml-2 text-red-600 dark:text-red-300'>
+            ({ expiry2 === 'No license' ? 'No license' : calculateTimeRemaining(expiry2)})
+          </span>
+
+           </span>
+       
       </span>
+      
       <p className='text-black text-sm font-light dark:text-white'>
-        {expiry2 === 'No license' ? (
-          'No active license found'
-        ) : (
-          <>
+        Expiry Date: <span className='font-bold'>{expiry2}</span>
+          
+      </p>
 
-
-<p className={`text-black text-sm 
+      <p className={`text-black text-sm 
         font-light dark:text-white`}>
         Status: <span className={`font-bold
           
-                  ${status === 'active' ? 'text-emerald-600' : 'text-red-600'}
+                  ${status2 === 'active' ? 'text-emerald-600' : 'text-red-600'}
 
           `}>{status2}</span>
           
       </p>
 
-            Expiry Date: <span className='font-bold'>{expiry2}</span>
-            {condition2 && (
-              <span className='ml-2 text-orange-600 dark:text-orange-300'>
-                ({calculateTimeRemaining(expiry2)} remaining)
-              </span>
-
-
-
-            )}
-          </>
-        )}
-      </p>
     </div>
   </div>
 </div>
