@@ -20,7 +20,7 @@ const ShortCuts = () => {
         <Card title="Team" to='/admin/user' subtitle="Manage team" href="#" Icon={FiUsers} />
         <Card
           title="Billing"
-          subtitle="Manage cards"
+          subtitle="Manage licenses"
           href="#"
           Icon={FiCreditCard}
         />

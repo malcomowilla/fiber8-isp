@@ -7,6 +7,8 @@ import {useEffect, useCallback, useState} from 'react'
 import toast,{Toaster} from 'react-hot-toast'
 import { useLocation } from 'react-router-dom';
 
+
+
 const NetworkComponents = () => {
 
 const {pingStatus, setPingStatus} = useApplicationSettings()
@@ -14,7 +16,7 @@ const [serviceStatus, setServiceStatus] = useState({ freeradius: {}, wireguard: 
 const [showRebootConfirm, setShowRebootConfirm] = useState(false);
 
 
-
+// const navigate = useNavigate()
 const location = useLocation()
 
 console.log('ping status', pingStatus)
@@ -65,6 +67,15 @@ const rebootRouter = async(e) => {
   })
 
   const newData = await response.json()
+
+
+  if (response.status === 402) {
+    setTimeout(() => {
+      window.location.href = '/license-expired';
+     }, 1800);
+    
+  }
+  
   if (response.ok) {
     toast.success('Router is rebooting', {
       position: "top-center",
@@ -204,6 +215,14 @@ useEffect(() => {
         body: JSON.stringify({ service }),
       });
 
+
+
+  if (response.status === 402) {
+    setTimeout(() => {
+      navigate('/license-expired')
+     }, 1800);
+    
+  }
       if (response.ok) {
         toast.success(`${service} restarted successfully`);
         fetchServiceStatus(); // Refresh status after restart

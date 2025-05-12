@@ -59,6 +59,15 @@ const handleLogout = async () => {
         
 
         );
+
+
+        if (response.status === 402) {
+          setTimeout(() => {
+            navigate('/license-expired')
+           }, 1800);
+          
+        }
+
         if (response.ok) {
 
           setCurrentUser(null)

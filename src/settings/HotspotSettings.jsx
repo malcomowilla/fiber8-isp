@@ -321,6 +321,7 @@ const HotspotSettings = () => {
   // const [hotspotBanner, setHotspotBanner] = useState(null);
   // const [hotspotBannerPreview, setHotspotBannerPreview] = useState(null); 
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
 
 const {phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setHotspotInfo,
   email, setEmail,
@@ -369,6 +370,16 @@ const {phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setH
       });
 
       const newData = await response.json();
+
+
+  if (response.status === 402) {
+    setTimeout(() => {
+      navigate('/license-expired')
+     }, 1800);
+    
+  }
+
+
       if (response.ok) {
         setLoading(false);
         setPhoneNumber(newData.phone_number);

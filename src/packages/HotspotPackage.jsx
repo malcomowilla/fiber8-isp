@@ -7,7 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import {Link} from 'react-router-dom'
-import {  useState} from 'react'
+import {  useState, useNavigate} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 import LoadingAnimation from '../loader/loading_animation.json'
 import Lottie from 'react-lottie';
@@ -78,6 +78,7 @@ const [hotspotPackage, setHotspotPackage] = useState({
 })
 
 
+const navigate = useNavigate()
 
 const handleWeekdayChange = (day) => {
   console.log('day', day);
@@ -268,6 +269,24 @@ const createHotspotPackage = async (e) => {
     });
 
     const newData = await response.json();
+
+
+
+    if (response.status === 402) {
+      setTimeout(() => {
+        navigate('/license-expired')
+       }, 1800);
+      
+    }
+
+
+    if (response.status === 423) {
+      setTimeout(() => {
+       navigate('/account-locked')
+      }, 1800); 
+     }
+
+
     if (response.ok) {
       setOpen(false); // Close the form modal
       setOpenLoad(false)

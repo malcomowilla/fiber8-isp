@@ -39,6 +39,8 @@ import {
   Snackbar,
   Alert
 } from '@mui/material';
+import { FaRegBuilding } from "react-icons/fa";
+import EditPlan from './EditPlan';
 
 // 0x011A68747470733a2f2f74723036392e616974656368732e636f2e6b65020561646d696e030561646d696e
 // Predefined plans for dropdown selection only
@@ -49,7 +51,8 @@ const PREDEFINED_PPPOE_PLANS = [
   { name: "Bronze", maximum_pppoe_subscribers: 1000 },
   { name: "Startup", maximum_pppoe_subscribers: 300 },
   { name: "Basic", maximum_pppoe_subscribers: 50 },
-  { name: "Silver", maximum_pppoe_subscribers: 500 }
+  { name: "Silver", maximum_pppoe_subscribers: 500 },
+  {name: 'Free', maximum_pppoe_subscribers: 'unlimited'}
 ];
 
 const PREDEFINED_HOTSPOT_PLANS = [
@@ -58,7 +61,8 @@ const PREDEFINED_HOTSPOT_PLANS = [
   { name: "Gold Hotspot", hotspot_subscribers: 1000 },
   { name: "Business", hotspot_subscribers: 2000 },
   { name: "Startup", hotspot_subscribers: 300 },
-  { name: "Silver", hotspot_subscribers: 500 }
+  { name: "Silver", hotspot_subscribers: 500 },
+  {name: 'Free', hotspot_subscribers: 'unlimited'}
 ];
 
 const PlanManager = () => {
@@ -72,6 +76,9 @@ const PlanManager = () => {
   const [loading, setLoading] = useState(false);
   const subdomain = window.location.hostname.split('.')[0];
   const [planCategory, setPlanCategory] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [openPlanManager, setOpenPlanManager] = useState(false);
+
 
   // Fetch plans from backend only (for table display)
   useEffect(() => {
@@ -117,13 +124,14 @@ const PlanManager = () => {
   const getPredefinedOptions = () => {
     return (planType === 'pppoe' ? PREDEFINED_PPPOE_PLANS : PREDEFINED_HOTSPOT_PLANS)
       .map(plan => ({
-        label:  `${plan.name} ${plan.maximum_pppoe_subscribers || plan.hotspot_subscribers} ${planType === 'pppoe' ?  'PPPoE Subscribers' : 'Hotspot Subscribers'}/${plan.expiry_days || 30} Days`,
+        label:  `${plan.name} ${plan.maximum_pppoe_subscribers || plan.hotspot_subscribers}
+         ${planType === 'pppoe' ?  'PPPoE Subscribers' : 'Hotspot Subscribers'}/${plan.name === 'Free' ? 365 : 30} Days`,
         value: plan.name,
         plan: {
           name: plan.name,
           [planType === 'pppoe' ? 'maximum_pppoe_subscribers' : 'hotspot_subscribers']: 
             planType === 'pppoe' ? plan.maximum_pppoe_subscribers : plan.hotspot_subscribers,
-          expiry_days: 30,
+          expiry_days: plan.name === 'Free' ? 365 : 30,
           billing_cycle: 'monthly'
         }
       }));
@@ -131,6 +139,7 @@ const PlanManager = () => {
 
   const handlePlanSelect = (option) => {
     if (option) {
+      console.log('plans', option.plan)
       setSelectedPlan(option.plan);
       setMaxSubscribers(
         planType === 'pppoe' 
@@ -140,21 +149,22 @@ const PlanManager = () => {
       setExpiryDays(option.plan.expiry_days || 30);
       setEditMode(false); // Always treat as new plan when selecting from predefined
     } else {
-      resetForm();
+      // resetForm();
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedPlan?.name) {
-      toast.error('Plan name is required');
-      return;
-    }
+    // if (!selectedPlan?.name) {
+    //   toast.error('Plan name is required');
+    //   return;
+    // }
 
     const payload = {
       name: selectedPlan.name,
       [planType === 'pppoe' ? 'maximum_pppoe_subscribers' : 'hotspot_subscribers']: maxSubscribers,
       expiry_days: expiryDays,
+      company_name: companyName,
       billing_cycle: 'monthly',
     };
 
@@ -174,7 +184,7 @@ const PlanManager = () => {
       if (res.ok) {
         toast.success(`Plan ${editMode ? 'updated' : 'created'} successfully!`);
         planType === 'pppoe' ? fetchPlans() : fetchHotspotPlans();
-        resetForm();
+        // resetForm();
       } else {
         const errorData = await res.json();
         toast.error(errorData.message || 'Failed to save plan');
@@ -193,8 +203,11 @@ const PlanManager = () => {
 
   const currentPlans = planType === 'pppoe' ? plans : hotspotPlans;
   const predefinedOptions = getPredefinedOptions();
+  console.log('selected plan', selectedPlan)
+
 
   return (
+    <>
     <Box sx={{ p: 4 }}>
       <Typography variant="h4" gutterBottom>Plan Manager</Typography>
       
@@ -213,7 +226,21 @@ const PlanManager = () => {
               <MenuItem value="pppoe">PPPoE Plan</MenuItem>
               <MenuItem value="hotspot">Hotspot Plan</MenuItem>
             </Select>
+
+
+
+          <TextField 
+          InputProps={{
+            startAdornment: <FaRegBuilding className="mr-2" />,
+          }}
+          className='myTextField' sx={{
+            borderRadius: 2,
+            mt: 6,
+          }} label="Company Name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} 
+          fullWidth  />
           </FormControl>
+
+
 
           <Autocomplete
             options={predefinedOptions}
@@ -302,8 +329,13 @@ const PlanManager = () => {
         planType={planType}
           // plans={currentPlans} 
           plans={plans} 
-
+          companyName={companyName}
+          setCompanyName={setCompanyName}
+          selectedPlan={selectedPlan}
+          handlePlanSelect={handlePlanSelect}
           type={planType}
+          openPlanManager={openPlanManager}
+          setOpenPlanManager={setOpenPlanManager}
           onEdit={(plan) => {
             setSelectedPlan(plan);
             setMaxSubscribers(
@@ -317,10 +349,19 @@ const PlanManager = () => {
         />
       )}
     </Box>
+
+    </>
   );
 };
 
-const PlanTable = ({ plans, type, onEdit, planType, planCategory, hotspotPlans }) => {
+const PlanTable = ({ plans, type, onEdit, planType, planCategory, hotspotPlans,
+
+  
+companyName, setCompanyName,selectedPlan,handlePlanSelect,
+openPlanManager, setOpenPlanManager
+ }) => {
+
+
   if (plans.length === 0) {
     return (
       <Paper sx={{ p: 3 }}>
@@ -370,6 +411,12 @@ const PlanTable = ({ plans, type, onEdit, planType, planCategory, hotspotPlans }
     // </TableContainer>
 
     <>
+
+<EditPlan companyName={companyName} setCompanyName={setCompanyName}
+planType={planType} selectedPlan={selectedPlan} handlePlanSelect={handlePlanSelect}
+open={openPlanManager} onClose={() => setOpenPlanManager(false)}
+/>
+
         {planType === 'pppoe' ? (
            <MaterialTable
            title={<p className='text-black'>PPPoE Plans</p>}
@@ -378,8 +425,11 @@ const PlanTable = ({ plans, type, onEdit, planType, planCategory, hotspotPlans }
             { title: 'Expiry Days', field: 'expiry_days' },
             {title: 'Company Name', field: 'account.subdomain'},
             { title: 'Billing Cycle', field: 'billing_cycle' },
+            {title: 'Status', field: 'status'},
              { title: 'Plan Name', field: 'name' 
              },
+
+             {title: 'Expiry', field: 'expiry'},
            ]}
            data={plans}
            // isLoading={loading}
@@ -397,7 +447,7 @@ const PlanTable = ({ plans, type, onEdit, planType, planCategory, hotspotPlans }
                // onClick: handleOpenAddDialog
              },
              {
-               icon: () => <EditIcon color="primary" />,
+               icon: () => <EditIcon color="primary" onClick={() => setOpenPlanManager(true)} />,
                tooltip: 'Edit PPOe Plan',
                // onClick: (event, rowData) => handleOpenEditDialog(rowData)
              },
@@ -426,6 +476,8 @@ const PlanTable = ({ plans, type, onEdit, planType, planCategory, hotspotPlans }
             { title: 'Expiry Days', field: 'expiry_days' },
             {title: 'Company Name', field: 'account.subdomain'},
             { title: 'Billing Cycle', field: 'billing_cycle' },
+            {title: 'Expiry', field: 'expiry'},
+            {title: 'Status', field: 'status'},
              { title: 'Plan Name', field: 'name' 
              },
         ]}

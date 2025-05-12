@@ -136,6 +136,16 @@ const saveEmailSettings = async(e) => {
 const newData = await response.json()
 
 const {domain, api_key, smtp_host, smtp_username, sender_email, smtp_password} = newData
+
+
+
+if (response.status === 402) {
+  setTimeout(() => {
+    window.location.href = '/license-expired';
+   }, 1800);
+  
+}
+
     if (response.ok) {
      
       setEmailSettingsForm({...emailSettingsForm, domain, api_key, smtp_host, smtp_username, sender_email, smtp_password})

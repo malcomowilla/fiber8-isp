@@ -51,6 +51,7 @@
     "dayjs": "^1.11.11",
     "flowbite": "^2.3.0",
     "flowbite-react": "^0.7.3",
+    "formik": "^2.4.6",
     "framer-motion": "^11.17.0",
     "input-otp": "^1.2.0",
     "ionicons": "^7.4.0",
@@ -64,6 +65,7 @@
     "react-chartjs-2": "^5.2.0",
     "react-datetime-picker": "^5.6.0",
     "react-dom": "^19.0.0-rc.1",
+    "react-feather": "^2.0.10",
     "react-helmet": "^6.1.0",
     "react-hook-form": "^7.51.1",
     "react-hot-toast": "^2.5.1",
@@ -80,6 +82,7 @@
     "tailwindcss-animate": "^1.0.7",
     "use-debounce": "^10.0.0",
     "vaul": "^0.9.0",
+    "yup": "^1.6.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {

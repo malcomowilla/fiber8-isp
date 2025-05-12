@@ -166,7 +166,7 @@ const EditClient = ({ open, onClose, handleChange, formData, hotspot_plans, plan
               }}
             />
 
-            <FormControl fullWidth margin="normal" variant="outlined">
+            {/* <FormControl fullWidth margin="normal" variant="outlined">
               <InputLabel>Plan</InputLabel>
               <Select
                 name="plan"
@@ -185,13 +185,13 @@ const EditClient = ({ open, onClose, handleChange, formData, hotspot_plans, plan
                       </MenuItem>
                     ))}
               </Select>
-            </FormControl>
+            </FormControl> */}
 
 
 
 
 
-
+{/* 
 
             <FormControl fullWidth margin="normal" variant="outlined">
               <InputLabel>Hotspot Plan</InputLabel>
@@ -212,7 +212,7 @@ const EditClient = ({ open, onClose, handleChange, formData, hotspot_plans, plan
                       </MenuItem>
                     ))}
               </Select>
-            </FormControl>
+            </FormControl> */}
 
             <TextField
               fullWidth

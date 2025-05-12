@@ -8,7 +8,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
 
 import AddIcon from '@mui/icons-material/Add';
-import {useState, useMemo,useEffect, useCallback} from'react'
+import {useState, useMemo,useEffect, useCallback, useNavigate} from'react'
 import EditSubscriber from '../edit/EditSubscriber'
 import dayjs from 'dayjs';
 import SubscriberNotification from '../notification/SubscriberNotification'
@@ -29,6 +29,7 @@ import toast, { Toaster } from 'react-hot-toast';
 
 const PPPOEsubscribers = () => {
   const { settingsformData } = useApplicationSettings();
+  // const navigate = useNavigate()
 
   const intialValue = {
     name: '',
@@ -229,6 +230,16 @@ e.preventDefault()
     const newData = await response.json()
 
 
+
+    if (response.status === 402) {
+      setTimeout(() => {
+        // navigate('/license-expired')
+        window.location.href='/license-expired';
+       }, 1800);
+      
+    }
+
+
 if (response.ok) {
   setOpen(false)
   setOpenLoad(false)
@@ -303,6 +314,15 @@ try {
 
 })
 
+
+
+if (response.status === 402) {
+  setTimeout(() => {
+    navigate('/license-expired')
+   }, 1800);
+  
+}
+
 if (response.ok) {
 setTableData((tableData)=> tableData.filter(item => item.id !== id))
 toast.success('subscriber deleted successfully', {
@@ -331,6 +351,7 @@ toast.error('failed to delete subscriber', {
     {title: 'name', field: 'name', headerClassName: 'dark:text-black ', defaultSort: 'asc'},
     {title: 'ref_no', field: 'ref_no',  headerClassName: 'dark:text-black' ,  sorting: true, defaultSort: 'asc'},
   
+    
     {title: 'phone_number', field: 'phone_number',  headerClassName: 'dark:text-black'},
     {title: 'package', field: 'package_name', type: 'numeric', headerClassName: 'dark:text-black', align: 'left'},
     {title: 'House Number', field:'house_number',  headerClassName: 'dark:text-black'},

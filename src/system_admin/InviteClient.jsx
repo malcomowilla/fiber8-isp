@@ -25,6 +25,11 @@ import DeleteClient from './DeleteClient';
 import DeleteIcon from '@mui/icons-material/Delete';
 import  EditClient from './EditClient'
 import EditIcon from '@mui/icons-material/Edit';
+import AddClient from './AddClient';
+import { FaRegBuilding } from "react-icons/fa";
+
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+
 
 
 
@@ -42,14 +47,16 @@ const InviteClient = () => {
     smtpUsername: '',
     plan: '' ,// Add planId to formData
     hotspot_plan: '',
-    password: ''
+    password: '',
+    company_name: '',
   });
 
   const [errors, setErrors] = useState({
     email: '',
     phone_number: '',
     username: '',
-    plan: ''
+    plan: '',
+    company_name: ''
   });
 
   const [loading, setLoading] = useState(false);
@@ -62,13 +69,16 @@ const InviteClient = () => {
   const [hotspot_plans, setHotspotPlans] = useState([]); // State to store hotspot plans
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentHotspotPlan, setCurrentHotspotPlan] = useState(null);
+  const [addClient, setAddClient] = useState(false);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+  const handleCloseAddClient = () => setAddClient(false);
+
 
   const subdomain = window.location.hostname.split('.')[0];
 
-
+const handleAddClient = () => setAddClient(true);
   // hotspot_plans
   // Fetch plans from the backend
   const fetchPlans = async () => {
@@ -179,6 +189,13 @@ const InviteClient = () => {
       isValid = false;
     }
 
+
+    if (!formData.username.trim()) {
+      newErrors.company_name = 'Company Name is required';
+      isValid = false;
+    }
+
+
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim()) {
@@ -200,10 +217,10 @@ const InviteClient = () => {
     }
 
     // Plan validation
-    if (!formData.plan) {
-      newErrors.plan = 'Plan is required';
-      isValid = false;
-    }
+    // if (!formData.plan) {
+    //   newErrors.plan = 'Plan is required';
+    //   isValid = false;
+    // }
 
     setErrors(newErrors);
     return isValid;
@@ -215,6 +232,11 @@ const InviteClient = () => {
       ...prev,
       [name]: value
     }));
+
+
+
+
+    
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -256,7 +278,7 @@ const InviteClient = () => {
 
       const newData = await response.json();
       if (response.ok) {
-        
+        setAddClient(false)
         if (formData.id) {
           handleCloseModal()
           toaster.success('Client updated successfully', {
@@ -273,6 +295,7 @@ const InviteClient = () => {
             }))
           );
         } else {
+          setAddClient(false)
           toaster.success('Client added successfully', {
             duration: 5000,
             icon: '✅'
@@ -280,20 +303,24 @@ const InviteClient = () => {
   
           fetchClients();
         }
+        setAddClient(false)
         setFormData({
           email: '',
           phone_number: '',
           user_name: '',
+          company_name: '',
           domainSubdomain: '',
           emailApiKey: '',
           senderEmail: '',
           smtpPassword: '',
+          password: '',
           smtpHost: '',
           smtpUsername: '',
           plan: '' // Reset planId
         });
         
       } else {
+        setAddClient(false)
         toaster.error('Something went wrong, please try again', {
           duration: 5000,
           position: 'top-center',
@@ -478,9 +505,19 @@ useEffect(() => {
       );
   return (
     <>
+<AddClient open={addClient} onClose={handleCloseAddClient} currentPlan={currentPlan} formData={formData} 
+    handleChange={handleChange} hotspot_plans={hotspot_plans} plans={plans}
+    setFormData={setFormData}  handleInvite={handleInvite}
+    fetchingClients={fetchingClients} setFetchingClients={setFetchingClients}
+    loading={loading} clients={clients} setClients={setClients} errors={errors}
+    />
+
+
     <EditClient open={isModalOpen} onClose={handleCloseModal} currentPlan={currentPlan} formData={formData} 
     handleChange={handleChange} hotspot_plans={hotspot_plans} plans={plans}
     setFormData={setFormData}  handleInvite={handleInvite}/>
+
+
       <Toaster />
       <DeleteClient
         id={row_data.id}
@@ -497,7 +534,7 @@ useEffect(() => {
       )}
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <form onSubmit={handleInvite}>
+        {/* <form onSubmit={handleInvite}>
           <Slide direction="up" in={true} mountOnEnter unmountOnExit>
             <motion.div
               initial={{ opacity: 0 }}
@@ -547,7 +584,6 @@ useEffect(() => {
                   onChange={handleChange}
                   error={!!errors.username}
                   helperText={errors.username}
-                  // required
                   sx={{ borderRadius: 2 }}
                 />
                 <TextField
@@ -559,7 +595,6 @@ useEffect(() => {
                   onChange={handleChange}
                   error={!!errors.email}
                   helperText={errors.email}
-                  // required
                   sx={{ borderRadius: 2 }}
                 />
                 <TextField
@@ -570,101 +605,32 @@ useEffect(() => {
                   onChange={handleChange}
                   error={!!errors.phone_number}
                   helperText={errors.phone_number}
-                  // required
                   sx={{ borderRadius: 2 }}
                 />
 
-                {/* Plan Selection */}
-                <FormControl variant="outlined" sx={{ borderRadius: 2 , color: 'black', fontSize: '16px'}}>
-                  <InputLabel>Select Plan</InputLabel>
-                  <Select
-                    sx={{
-                      color: 'black',
-                      fontSize: '16px'
-                    }}
-                    name="plan"
-                    value={formData.plan}
-                    onChange={handleChange}
-                    label="Select Plan"
-                    error={!!errors.plan}
-                    required
-                  >
-                    {plans.map((plan) => (
-                      <MenuItem 
-                      sx={{
-                        color: 'black',
-                        fontSize: '16px'
-                      }}
-                      key={plan.id} value={plan.name}>
-                        {plan.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-
-
-
-
-
-
-
-                <FormControl variant="outlined" sx={{ borderRadius: 2 ,  fontSize: '16px'}}>
-                  <InputLabel>Select Hotspot Plan</InputLabel>
-                  <Select
-                    sx={{
-                      fontSize: '16px',
-
-                    }}
-                    name="hotspot_plan"
-                    value={formData.hotspot_plan}
-                    onChange={handleChange}
-                    label="Select Plan"
-                    error={!!errors.plan}
-                    required
-                  >
-                    {hotspot_plans?.map((plan) => (
-                      <MenuItem 
-                      sx={{
-                        fontSize: '16px'
-                      }}
-                      key={plan.id} value={plan.name}>
-                        {plan.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
+               
+               
                 <TextField
-                  label="email api key"
-                  variant="outlined"
-                  name="emailApiKey"
-                  value={formData.emailApiKey}
+                  label="Company Name"
+                  name="company_name"
+                  value={formData.company_name}
                   onChange={handleChange}
-                  error={!!errors.emailApiKey}
-                  helperText={errors.emailApiKey}
+                  error={!!errors.company_name}
+                  helperText={errors.company_name}
                   sx={{ borderRadius: 2 }}
+                
                 />
 
-                <TextField
-                  value={formData.senderEmail}
-                  onChange={handleChange}
-                  error={!!errors.senderEmail}
-                  helperText={errors.senderEmail}
-                  name='senderEmail'
-                  label="sender email"
-                  variant="outlined"
-                  sx={{ borderRadius: 2 }}
-                />
 
-                <TextField
-                  label="subdomain"
-                  name="domainSubdomain"
-                  value={formData.domainSubdomain}
+<TextField
+                  label="Client Password"
+                  name="password"
+                  value={formData.password}
                   onChange={handleChange}
-                  error={!!errors.domainSubdomain}
-                  helperText={errors.domainSubdomain}
+                  error={!!errors.password}
+                  helperText={errors.password}
                   sx={{ borderRadius: 2 }}
+                
                 />
 
 
@@ -680,7 +646,7 @@ useEffect(() => {
               </Box>
             </motion.div>
           </Slide>
-        </form>
+        </form> */}
 
 
 
@@ -689,18 +655,36 @@ useEffect(() => {
 
         <MaterialTable
           onRowClick={handleRowClick}
+          actions={[
+            {
+              icon: () => (
+                <Tooltip title="Add Client">
+                  <IconButton color="primary">
+                    <AddCircleIcon fontSize="large" onClick={() => handleAddClient()} />
+                  </IconButton>
+                </Tooltip>
+              ),
+              tooltip: 'Add Client',
+              isFreeAction: true,
+              // onClick: handleOpenAddDialog
+            },
+         
+          ]}
+
+          
           columns={[
-            { title: "Subdomain", field: "subdomain" },
+            { title: "Company Name", field: "subdomain" },
             { title: "User Name", field: "username" },
             { title: "Email", field: "email" },
-            { title: "Plan", field: "plan" },
-            { title: "Hotspot Plan", field: "hotspot_plan" },
+            // { title: "Plan", field: "plan" },
+            // { title: "Hotspot Plan", field: "hotspot_plan" },
             { title: "Role", field: "role" },
             { title: "Phone Number", field: "phone_number" },
             { title: "Locked Account", field: "locked_account" },
             {title: 'Action', field:'Action',
 
               render: (rowData) =>  
+
                 
                  <>
                   

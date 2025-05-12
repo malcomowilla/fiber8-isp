@@ -1,6 +1,4 @@
 
-
-
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton } from '@mui/material';
 // import {useState} from 'react'
@@ -36,6 +34,8 @@ const FixedPayments = () => {
   const handleClose = () => {
     setOpen(false);
   };
+
+  
   const DeleteButton = ({ id }) => (
         <IconButton style={{ color: '#8B0000' }}>
           <DeleteIcon />
@@ -43,11 +43,13 @@ const FixedPayments = () => {
       );
 
 
-  const EditButton = ( ) => (
+  const EditButton = () => (
     <IconButton onClick={handleClickOpen} style={{color: 'black'}} >
-      <EditIcon />
+   <EditIcon />
     </IconButton>
   );
+
+
 const columns = [
   {title: 'Confirmation Code', field: 'Confirmation Code',   },
   {title: 'Paybill', field: 'Paybill',  },
