@@ -392,6 +392,9 @@ toaster.error('eror creating ticket', {
                   try {
                     setIsSearching(true)
                     const response = await fetch('/api/get_tickets', {
+                      headers: {
+                        'X-Subdomain': subdomain
+                      }
                     //   signal: controller.signal,  
               
                     })
@@ -443,7 +446,7 @@ toaster.error('eror creating ticket', {
                 try {
                   setloading(true)
                   
-              const response = await fetch(`/api/delete_ticket/${id}`, {
+              const response = await fetch(`/api/support_tickets/${id}`, {
                 method: 'DELETE'
                 })
                 

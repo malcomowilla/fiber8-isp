@@ -19,7 +19,7 @@ import {ApplicationContext} from '../context/ApplicationContext'
 import DeletePackage from '../delete/DeletePackage'
 import MaterialTable from 'material-table'
 import EditPackage from '../edit/EditPackage'
-import { useContext, useState, useEffect, useMemo, useRef, useCallback} from 'react'
+import { useContext, useState, useEffect, useMemo, useRef, useCallback, useNavigate} from 'react'
 import {CableContext} from '../context/CableContext'
 import PackageNotification  from '.././notification/PackageNotification'
 import DeletePackageNotification from '.././notification/DeletePackageNotification'
@@ -46,6 +46,8 @@ const useStyles = makeStyles({
 const PPPOEpackages = () => {
   const classes = useStyles();
 
+
+  // const navigate = useNavigate()
   // const cableContext = useContext(CableContext)
   const [open, setOpen] = useState(false);
   const [loading, setloading] = useState(false)
@@ -228,6 +230,25 @@ const createPackage = async (e) => {
       });
 
       const newData = await response.json();
+
+
+
+      if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+
+
+      if (response.status === 423) {
+        setTimeout(() => {
+         navigate('/account-locked')
+        }, 1800); 
+       }
+
+
       if (response.ok) {
         setOpen(false); // Close the form modal
         setloading(false);

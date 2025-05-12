@@ -281,7 +281,7 @@ setSeeError(false)
 }
 } catch (error) {
   toast.error('something went wrong', {
-    duration: 8000,
+    duration: 5000,
     position: "top-center",
   })
 }
@@ -342,8 +342,11 @@ const newData = await createResponse.json()
       setSeeError(false);
       setOpenLoad(false);
       
-    navigate('/admin/analytics')
-   
+    // navigate('/admin/analytics')
+    navigate('/admin/router-stats')
+
+
+    // admin/router-stats
 
       // setTimeout(() => {
       //   // setDone(true);
@@ -413,7 +416,7 @@ const handleSignIn = async (e) => {
       "Content-Type": "application/json",
 
     }, 
-    signal: controller.signal,  
+    // signal: controller.signal,  
 
     // Authorization: `Bearer ${token}`,
 
@@ -441,6 +444,16 @@ const handleSignIn = async (e) => {
     navigate('/account-locked')
    }, 1800); 
   }
+
+
+  if (users.status === 402) {
+    setTimeout(() => {
+      navigate('/license-expired')
+     }, 1800);
+    
+  }
+
+  
   // if (users.status === 401) {
   //   setOfflineError(false)
 
@@ -458,7 +471,9 @@ const handleSignIn = async (e) => {
 if (enable_2fa_for_admin_passkeys) {
   authenticateWebAuthn(email)
 } else {
-  navigate('/admin/analytics')
+  // navigate('/admin/analytics')
+  navigate('/admin/router-stats')
+// window.location.href='/admin/router-stats'
   setEmail('')
   setPassword('')
 }

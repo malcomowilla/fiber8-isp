@@ -27,7 +27,7 @@ import { RiLockPasswordLine } from "react-icons/ri";
 
 const RadiusSettings = () => {
 
-
+// const navigate = useNavigate()
     const [radiusSettings, setRadiusSettings] = useState({
         shortname: '',
         ipaddr: '',
@@ -96,6 +96,16 @@ const saveRadiusSettings = async(e) => {
         })
 
         const newData = await response.json()
+
+
+
+  if (response.status === 402) {
+    setTimeout(() => {
+      window.location.href = '/license-expired';
+     }, 1800);
+    
+  }
+
         if (response.ok) {
             toast.success('radius settings saved successfully', {
                 position: "top-center",

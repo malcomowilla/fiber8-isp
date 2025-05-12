@@ -41,6 +41,7 @@ import { MdSettingsInputAntenna } from "react-icons/md";
 import { TfiDashboard } from "react-icons/tfi";
 import { CgComponents } from "react-icons/cg";
 import { TbCloudNetwork } from "react-icons/tb";
+import { MdOutlineQueryStats } from "react-icons/md";
 
 
 
@@ -145,13 +146,21 @@ const handleGetCompanySettings = useCallback(
   onError={(e) => { e.target.src = "/images/aitechs.png"; }}
 />
    {/* <img  className='h-[80px] w-[80px] rounded-full'  src={logo_preview || '/images/aitechs.png'}  alt="company-logo" /> */}
-      <p className='font-extrabold dotted-font lg:text-xl'>{company_name}</p>
+      <p className='font-extrabold dotted-font lg:text-xl'>{company_name || "Aitechs"}</p>
       <ArrowBackSharpIcon className='cursor-pointer' onClick={()=> setSeeSideBar(!seeSidebar)}/>
    {/* <ion-icon  onClick={()=> setSeeSideBar(!seeSidebar)}  className='menu-black' size='large' name="menu"></ion-icon> */}
 
 
+
+
+
+
+
    </div>
   
+
+
+
 
       <ul className="space-y-2 font-extralight">
 
@@ -229,6 +238,35 @@ const handleGetCompanySettings = useCallback(
                     alt="Analytics"
                   />
                   Analytics
+                </Link>
+              </motion.li>
+
+
+
+
+
+
+
+
+
+
+              <motion.li
+              onClick={() => {
+                if (window.innerWidth < 962) {
+                  setSeeSideBar(true);
+                }
+              }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2, delay: 0.1 }}
+              >
+                <Link
+                  to="/admin/router-stats"
+                  className="flex items-center gap-x-4 w-full p-2 transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700"
+                >
+                <MdOutlineQueryStats  className='w-6 h-6'/>
+                  Routers Stats
                 </Link>
               </motion.li>
             </>
@@ -598,7 +636,7 @@ className="flex items-center  w-full p-2 text-white transition
                      transition duration-75 rounded-lg  group 
                       dark:text-white  gap-x-3">
                            <RouterIcon/>
-                           Mikrotik
+                           Routers
                            </Link>
                         </motion.li>
 

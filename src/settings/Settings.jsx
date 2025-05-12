@@ -11,6 +11,8 @@ import EmailSettings from './EmailSettings'
 const SmsSettings = lazy(() => import('./SmsSettings'))
 const SupportSettings = lazy(() => import('./SupportSettings'))
 const  RadiusSettings = lazy(() => import('./RadiusSettings'))
+const LicenseSettings = lazy(() => import('./LicenseSettings'))
+
 
 import UiLoader from '../uiloader/UiLoader'
 
@@ -43,6 +45,9 @@ const Settings = () => {
       transition-all duration-300 hover:text-black '>RADIUS</p>
 
 
+<p   onClick={()=> selectTab('LICENSE')} className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300
+      transition-all duration-300 hover:text-black '>LICENSE</p>
+
       
       <p   onClick={()=> selectTab('MPESA')} className='hover:dark:bg-gray-200 p-2 h-10
        rounded-lg hover:bg-blue-300
@@ -71,6 +76,8 @@ const Settings = () => {
 {selectedTab === 'MPESA' && <MpesaSettings/>}
 
 {selectedTab === 'EMAIL' && <EmailSettings/>}
+{selectedTab === 'LICENSE' && <LicenseSettings/>}
+
 
 {selectedTab === 'SMS' && <SmsSettings/>}
 {selectedTab === 'RADIUS' && <RadiusSettings/>}

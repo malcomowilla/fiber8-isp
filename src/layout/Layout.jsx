@@ -15,6 +15,21 @@ import TicketStatistics from '../tickets/TicketStatistics'
 import SubscriberStats from '../subscribers/SubscriberStats'
 import { FaSms } from 'react-icons/fa';
 import { IoWarningOutline } from "react-icons/io5";
+import { motion } from "framer-motion";
+import VerifiedIcon from '@mui/icons-material/Verified';
+import { 
+  Cable as CableIcon,
+  Wifi as WifiIcon,
+  CalendarMonth as CalendarMonthIcon
+} from '@mui/icons-material';
+
+import { IoSparklesOutline } from "react-icons/io5";
+
+import { 
+  IoCheckmarkCircleOutline, 
+  IoCloseCircleOutline 
+} from 'react-icons/io5';
+
 
 
 
@@ -51,6 +66,18 @@ const {fetchCurrentUser, currentUser, companySettings,
 
 const { company_name, contact_info, email_info, logo_preview} = companySettings
 const [datetime, setdateTime] = useState(true)
+const [expiry, setExpiry] = useState('No license')
+const [expiry2, setExpiry2] = useState('No license')
+const [condition, setCondition] = useState(false)
+const [condition2, setCondition2] = useState(false)
+const [status, setStatus] = useState('Not Active')
+const [status2, setStatus2] = useState('Not Active')
+const [currentHotspotPlan, setCurrentHotspotPlan] = useState(null)
+const [currentPPOEPlan, setCurrentPPOEPlan] = useState(null)
+
+
+
+
 
 const [date, setDate] = useState(new Date().toLocaleTimeString('en-US', { hour: 'numeric', 
   minute: 'numeric', second: 'numeric', hour12: true }))
@@ -73,6 +100,60 @@ const [date, setDate] = useState(new Date().toLocaleTimeString('en-US', { hour: 
    clearTimeout(timeout)
   }, []);
    
+
+
+
+  const getCurrentHotspotPlan = useCallback(
+    async() => {
+      const response = await fetch('/api/get_current_hotspot_plan', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
+      const newData = await response.json()
+      if (response.ok) {
+        console.log('current hotspot plan', newData)
+        setExpiry2(newData[0].expiry)
+        setCondition2(newData[0].condition)
+        setStatus2(newData[0].status)
+        setCurrentHotspotPlan(newData[0].name)
+        // setCurrentPPOEPlan(newData.message)
+      }
+    },
+    [],
+  )
+
+useEffect(() => {
+  getCurrentHotspotPlan()
+ 
+}, [getCurrentHotspotPlan]);
+
+
+
+  const getCurrentPPOEPlan = useCallback(
+    async() => {
+      const response = await fetch('/api/get_current_pppoe_plan', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
+      const newData = await response.json()
+      if (response.ok) {
+        console.log('current pppoe plan', newData)
+        setExpiry(newData[0].expiry)
+        setCondition(newData[0].condition)
+        setStatus(newData[0].status)
+        setCurrentPPOEPlan(newData[0].name)
+        // setCurrentPPOEPlan(newData.message)
+      }
+    },
+    [],
+  )
+
+  useEffect(() => {
+    getCurrentPPOEPlan()
+   
+  }, [getCurrentPPOEPlan]);
   
   
   useEffect(() => {
@@ -162,6 +243,47 @@ setSmsBalance(newData.message)
     // getSmsBalance()
    
   }, [getSmsBalance, selectedProvider]);
+
+
+
+
+  function calculateTimeRemaining(expiryDateString) {
+    // Parse the expiry date (format: "June 07, 2025 at 05:12 PM")
+    const expiryDate = new Date(expiryDateString.replace(' at ', ' '));
+    const now = new Date();
+    const diffMs = expiryDate - now;
+    
+    // If already expired
+    if (diffMs <= 0) return 'today (license expired)';
+  
+    // Calculate time components
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  
+    // Build human-readable string
+    let result = '';
+    if (diffDays > 0) {
+      const weeks = Math.floor(diffDays / 7);
+      const days = diffDays % 7;
+      
+      if (weeks > 0) result += `${weeks} week${weeks !== 1 ? 's' : ''} `;
+      if (days > 0) result += `${days} day${days !== 1 ? 's' : ''} `;
+    }
+    
+    if (diffHours > 0 && diffDays < 2) {
+      result += `${diffHours} hour${diffHours !== 1 ? 's' : ''} `;
+    }
+    
+    if (diffMinutes > 0 && diffDays === 0) {
+      result += `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`;
+    }
+  
+    // If less than 1 minute remains
+    if (result === '') return 'in less than 1 minute';
+  
+    return `in ${result.trim()}`;
+  }
   return (
     <>
     <Header />
@@ -184,6 +306,60 @@ setSmsBalance(newData.message)
           <p className="capitalize mb-10 dark:text-white text-black text-2xl">
             {date}
           </p>
+          <motion.div 
+  className="flex items-center px-6 py-4 mb-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600"
+  initial={{ opacity: 0, scale: 0.95 }}
+  animate={{ opacity: 1, scale: 1 }}
+  transition={{ duration: 0.3 }}
+>
+  {/* Animated verification badges */}
+  <motion.div
+    className="relative mr-4"
+    animate={{
+      rotate: [0, 5, -5, 0],
+      y: [0, -3, 0]
+    }}
+    transition={{
+      duration: 3,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }}
+  >
+    <div className="relative">
+      <VerifiedIcon className="text-blue-500 dark:text-blue-400 text-4xl drop-shadow-md" />
+      <VerifiedIcon 
+        className="text-indigo-400 dark:text-indigo-300 text-3xl absolute -bottom-1 -right-1 drop-shadow-md"
+        style={{ transform: 'rotate(15deg)' }}
+      />
+    </div>
+  </motion.div>
+
+  {/* Plan information */}
+  <div className="flex-1 space-y-2">
+    <motion.p 
+      className="font-bold text-gray-800 dark:text-white text-lg"
+      initial={{ x: -10 }}
+      animate={{ x: 0 }}
+      transition={{ delay: 0.1 }}
+    >
+      Current Plan: <span className="text-blue-600 dark:text-blue-300">{currentPPOEPlan}</span>
+    </motion.p>
+    
+    <motion.p 
+      className="font-bold text-gray-800 dark:text-white text-lg"
+      initial={{ x: -10 }}
+      animate={{ x: 0 }}
+      transition={{ delay: 0.2 }}
+    >
+      Hotspot Plan: <span className="text-purple-600 dark:text-purple-300">
+        {currentHotspotPlan || 'Not Set'}
+      </span>
+    </motion.p>
+  </div>
+</motion.div>
+
+  {/* Rest of your menu items */}
+  {/* ... */}
 
           {/* {smsBalance && (
     <div className="flex items-center gap-2 bg-white border
@@ -199,7 +375,7 @@ setSmsBalance(newData.message)
 <div className="flex items-center gap-2 bg-white border
     dark:bg-gray-800 dark:border-gray-700
     border-t-blue-600 px-4 py-2 rounded-lg">
-      <FaSms className="text-blue-600 dark:text-blue-300 text-xl" />
+      <FaSms className="text-blue-600 dark:text-blue-300 text-xl animate-bounce" />
       <span className="text-blue-800 dark:text-blue-200 font-medium">
         SMS Balance: <span className="font-bold">{smsBalance}</span>
       </span>
@@ -216,20 +392,95 @@ setSmsBalance(newData.message)
   </div>
 )}
 
-<div className='flex items-center gap-2 mt-2 bg-white border
-    dark:bg-gray-800 
-    border-t-red-600 px-4 py-2 rounded-lg'>
-      <div className='flex'>
-    <IoWarningOutline className='text-red-600 dark:text-red-300 text-xl' />
+<div className='flex items-center gap-2 mt-2 bg-white border dark:bg-gray-800 border-t-red-600 px-4 py-2 rounded-lg'>
+  <div className='flex'>
+    {condition ? (
+      <IoWarningOutline className='text-red-600 dark:text-red-300 text-xl animate-pulse' />
+    ) : (
+      <IoCheckmarkCircleOutline className='text-green-600 dark:text-green-300 text-xl animate-bounce' />
+    )}
     <div className='flex flex-col'>
-    <span className='text-red-800 dark:text-red-200 font-medium '>
-      License- <span className=' text-black font-light dark:text-white'>Your license will expire in </span>
-      <p className='text-black text-sm font-light dark:text-white'>Expiry Date: </p>
+      <span className='text-red-800 dark:text-red-200 font-medium'>
+        <span className={`
+          ${condition ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'}
+          `}>PPPOE License -  </span> <span className='text-black font-light dark:text-white'>Your license expires in
+        <span className='ml-2 text-red-600 dark:text-red-300'>
+            ({calculateTimeRemaining(expiry)} remaining)
+          </span>
 
-    </span>
-    </div>
+           </span>
+       
+      </span>
+      
+      <p className='text-black text-sm font-light dark:text-white'>
+        Expiry Date: <span className='font-bold'>{expiry}</span>
+          
+      </p>
+
+      <p className={`text-black text-sm 
+        font-light dark:text-white`}>
+        Status: <span className={`font-bold
+          
+                  ${status === 'active' ? 'text-emerald-600' : 'text-red-600'}
+
+          `}>{status}</span>
+          
+      </p>
+
     </div>
   </div>
+</div>
+
+<div className='flex items-center gap-2 mt-2 bg-white border dark:bg-gray-800 border-b-orange-600 px-4 py-2 rounded-lg'>
+  <div className='flex'>
+    {expiry2 === '' ? (
+      <IoCloseCircleOutline className='text-gray-500 dark:text-gray-400 text-xl ani' />
+    ) : condition2 ? (
+      <IoWarningOutline className='text-orange-600 dark:text-orange-300 text-xl animate-pulse' />
+    ) : (
+      <IoCheckmarkCircleOutline className='text-green-600 dark:text-green-300 text-xl animate-bounce' />
+    )}
+    <div className='flex flex-col'>
+      <span className={`${expiry2 === '' ? 'text-gray-800' : condition2 ? 'text-orange-800' : 'text-green-800'} dark:text-white font-medium`}>
+        Hotspot License - <span className='text-black font-light dark:text-white'>
+          {expiry2  || 'No active license'}
+        </span>
+      </span>
+      <p className='text-black text-sm font-light dark:text-white'>
+        {expiry2 === 'No license' ? (
+          'No active license found'
+        ) : (
+          <>
+
+
+<p className={`text-black text-sm 
+        font-light dark:text-white`}>
+        Status: <span className={`font-bold
+          
+                  ${status === 'active' ? 'text-emerald-600' : 'text-red-600'}
+
+          `}>{status2}</span>
+          
+      </p>
+
+            Expiry Date: <span className='font-bold'>{expiry2}</span>
+            {condition2 && (
+              <span className='ml-2 text-orange-600 dark:text-orange-300'>
+                ({calculateTimeRemaining(expiry2)} remaining)
+              </span>
+
+
+
+            )}
+          </>
+        )}
+      </p>
+    </div>
+  </div>
+</div>
+
+
+
 
 <div className='mt-4'>
           {location.pathname !== '/admin/customer-tickets' && location.pathname !== '/admin/hotspot-dashboard' && location.pathname !== '/admin/pppoe-subscribers' && <ShortCuts />}

@@ -43,6 +43,7 @@ const {isloading, setisloading, selectedProvider, setSelectedProvider,
 const [open, setOpen] = useState(false);
 const [openNotifactionSettings, setOpenSettings] = useState(false)
 const [smsSettingId, setSmsSettingId] = useState(null)
+// const navigate = useNavigate()
 const templateData = {
   // admin_otp_confirmation_template: '' ,
   // payment_reminder_template: '',
@@ -328,6 +329,16 @@ const saveSmsSettings = async (e) => {
 
     const newData = await response.json();
 
+
+
+
+  if (response.status === 402) {
+    setTimeout(() => {
+      window.location.href = '/license-expired';
+      // navigate('/license-expired')
+     }, 1800);
+    
+  }
     if (response.ok) {
       setisloading(false);
       const {api_key, api_secret, sender_id, short_code, partnerID} = newData 

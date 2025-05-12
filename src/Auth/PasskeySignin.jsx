@@ -202,6 +202,23 @@ async function authenticateWebAuthn(e) {
     const challenge = options.challenge;
 
 try {
+
+
+  if (response.status === 402) {
+    setTimeout(() => {
+      navigate('/license-expired')
+     }, 1800);
+    
+  }
+
+
+
+  if (response.status === 423) {
+    setTimeout(() => {
+     navigate('/account-locked')
+    }, 1800); 
+   }
+
   if (response.ok) {
     setOpenLoad(false)
     setSeeError(false)

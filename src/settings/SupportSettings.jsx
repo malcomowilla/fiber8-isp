@@ -10,7 +10,7 @@ import styled from "styled-components";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent"; // Import the SupportAgent icon
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
-import {useState, useEffect, useCallback, lazy, Suspense} from 'react'
+import {useState, useEffect, useCallback, lazy, Suspense, } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 import UiLoader from '../uiloader/UiLoader'
 import Backdrop from '../backdrop/Backdrop'
@@ -22,6 +22,7 @@ const SettingsNotification = lazy(() => import('../notification/SettingsNotifica
 const SupportSettings = () => {
 
     const [open, setOpen] = useState(false);
+    // const navigate = useNavigate()
     const [openNotifactionSettings, setOpenSettings] = useState(false)
     const [ticketForm, setTicketForm] = useState({
         prefix: '',
@@ -117,6 +118,16 @@ e.preventDefault()
             }),
         })
         const newData = await response.json()
+
+
+
+        if (response.status === 402) {
+          setTimeout(() => {
+            window.location.href = '/license-expired';
+           }, 1800);
+          
+        }
+
         if (response.ok) {
             toast.success('ticket settings saved successfully', {
                 position: 'top-center',
@@ -255,6 +266,7 @@ e.preventDefault()
               Configure system-wide settings for support tickets, including
               notifications, priorities, and workflows.
             </Typography>
+
 
 
 

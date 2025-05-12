@@ -14,11 +14,12 @@ import {
   Lock,
   Person,
 } from "@mui/icons-material";
-import { useEffect, useState, useCallback, lazy } from "react";
+import { useEffect, useState, useCallback, lazy} from "react";
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import toast, { Toaster } from 'react-hot-toast';
 const SettingsNotification = lazy(() => import('../notification/SettingsNotification'))
 import Backdrop from '../backdrop/Backdrop'
+import { FaRegBuilding } from "react-icons/fa";
 
 
 
@@ -41,7 +42,7 @@ const { consumer_key, consumer_secret, passkey, short_code } = hotspotMpesaSetti
 const [open, setOpen] = useState(false);
 const [openNotifactionSettings, setOpenSettings] = useState(false)
 const [isloading, setisloading] = useState(false)
-
+// const navigate = useNavigate()
 
 const subdomain = window.location.hostname.split('.')[0]
 
@@ -205,6 +206,15 @@ e.preventDefault()
     })
 
 const newData = await response.json()
+
+
+  if (response.status === 402) {
+    setTimeout(() => {
+      window.location.href = '/license-expired';
+     }, 1800);
+    
+  }
+
     if (response.ok) {
       setisloading(false)
       setOpen(false)

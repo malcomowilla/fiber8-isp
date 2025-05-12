@@ -99,6 +99,7 @@ const InputOTPWithSeparator = lazy(()=> import('./Auth/InputOTPWithSeparator')
 const NotFound = lazy(()=> import('./404/NotFound')
 )
 
+const RouterStatistics = lazy(() => import('./analytics/RouterStatistics'))
 const Layout = lazy(()=>  import('./layout/Layout')
 )
 const HotspotPage = lazy(() => import('./hotspot_page/HotspotPage'))
@@ -144,6 +145,7 @@ import BulkMessage from './sms/BulkMessage'
 import WireguardConfigForm from './wireguard/WireguardConfigForm'
 import IpNetworks from './wireguard/IpNetworks'
 import ServiceExpired from './service_expired/ServiceExpired'
+import LicenseExpired from './license_expired/LicenseExpired'
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -576,8 +578,8 @@ const handleGetCompanySettings = useCallback(
         console.log('failed to fetch company settings')
       }
     } catch (error) {
-      toast.error('internal servere error  while fetching company settings')
-    
+          // toast.error('internal servere error  while fetching company settings')
+ console.log(error)   
     }
   },
   [],
@@ -606,7 +608,7 @@ className="w-24 h-24 mx-auto rounded-full"
 <Helmet>
                 <meta charSet="utf-8" />
                 {/* <title>My Title</title> */}
-                <link rel="icon" type="image/svg+xml" href={logo_preview || "/images/aitechs.png"} 
+                <link rel="icon" type="image/svg+xml" href={logo_preview} 
                 onError={(e) => { e.target.src = "/images/aitechs.png"; }}
                 />
 
@@ -670,6 +672,7 @@ hostname.endsWith('.aitechs.co.ke')
     <Route path='/how-did-you-hear' element={<HowDidYouHear/>}/>
     <Route path='/account-locked' element={<AccountLocked/>}/>
     <Route path='/service-expired' element={<ServiceExpired/>}/>
+    <Route  path='/license-expired' element={<LicenseExpired/>}/>
 
 <Route element={<ProtectAuthSystemAdmin  />}>
     <Route path='/system-admin-dashboard' element={<DashboardSytemAdmin/>}/> 
@@ -694,6 +697,7 @@ hostname.endsWith('.aitechs.co.ke')
 }/>
 <Route/>
 <Route path='/admin/side-bar' element={<Sidebar/>}/> 
+<Route path='/admin/router-stats' element={<RouterStatistics/>}/>
 <Route path='/admin/send-sms' element={<SendSms/>}/>
 <Route path='/admin/profile' element={<AdminProfile/>}/>
 <Route path='/admin/pppoe-packages' element={< PPPOEpackages/>}/>

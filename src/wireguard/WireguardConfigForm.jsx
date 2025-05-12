@@ -92,6 +92,15 @@ function WireguardConfigForm() {
         throw new Error(errorData.error || 'Failed to generate configuration');
       }
 
+
+      if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired';
+         }, 1800);
+        
+      }
+
       const data = await response.json();
       setConfig(data);
     } catch (err) {
