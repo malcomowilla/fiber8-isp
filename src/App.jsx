@@ -123,6 +123,7 @@ const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
 
  const UploadSubscriber = lazy(() => import('./upload_subscriber/UploadSubscriber') )
  const IpPool = lazy(() => import('./ip_pool/IpPool') )
+ const GoogleAuth = lazy(() => import('./Auth/GoogleAuth') )
 
 const CustomerTickets = lazy(() => import('./tickets/CustomerTickets') )
 const AccountLocked = lazy(()=> import('./account_locked/AccountLocked'))
@@ -146,6 +147,8 @@ import WireguardConfigForm from './wireguard/WireguardConfigForm'
 import IpNetworks from './wireguard/IpNetworks'
 import ServiceExpired from './service_expired/ServiceExpired'
 import LicenseExpired from './license_expired/LicenseExpired'
+const GoogleAuthenticatorSetup = lazy(() => import('./Auth/GoogleAuth'))
+const TwoFactorAuthVerification = lazy(() => import('./Auth/TwoFactorAuth'))
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -673,6 +676,7 @@ hostname.endsWith('.aitechs.co.ke')
     <Route path='/account-locked' element={<AccountLocked/>}/>
     <Route path='/service-expired' element={<ServiceExpired/>}/>
     <Route  path='/license-expired' element={<LicenseExpired/>}/>
+    <Route path='/two-factor-auth' element={<TwoFactorAuthVerification/>}/>
 
 <Route element={<ProtectAuthSystemAdmin  />}>
     <Route path='/system-admin-dashboard' element={<DashboardSytemAdmin/>}/> 
@@ -731,6 +735,7 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/bulk-messages' element={<BulkMessage/>}/>
 <Route path='/admin/networks-wireguard-config' element={<WireguardConfigForm/>}/>
 <Route path='/admin/ip_networks' element={<IpNetworks/>}/>
+<Route path='/admin/google-authenticator' element={<GoogleAuthenticatorSetup/>}/>
 </Route>
 
 </Route >

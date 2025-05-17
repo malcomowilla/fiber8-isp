@@ -74,6 +74,7 @@ const {api_key, api_secret, sender_id, short_code, partnerID} = smsSettingsForm
 
 const {send_voucher_template, voucher_template} = smsTemplates
 
+
   const getSmsBalance  = useCallback(
     async(selectedProvider) => {
 
@@ -193,11 +194,11 @@ const fetchSavedSmsSettings = useCallback(
       const data = await response.json();
 
       const newData = data.length > 0 
-        ? data.reduce((latest, item) => new Date(item.updated_at) > new Date(latest.updated_at) ? item : latest, data[0])
+        ? data.reduce((latest, item) => new Date(item.sms_setting_updated_at) > new Date(latest.sms_setting_updated_at) ? item : latest, data[0])
         : null;
   
       if (response.ok) {
-        console.log('Fetched SMS settings:', newData);
+        console.log('Fetched saved  SMS settings:', newData);
         const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID } = newData[0];
         setSmsSettingId(newData.id)
         setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID });
@@ -284,7 +285,7 @@ const fetchSmsSettings = useCallback(async () => {
       position: 'top-center',
     });
   }
-}, [selectedProvider]);
+}, [selectedProvider, setSmsSettingsForm, subdomain]);
 
 
 useEffect(() => {

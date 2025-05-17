@@ -21,6 +21,7 @@ const ApplicationSettings = ({children}) => {
       const initialValueAdminSettings = {
         enable_2fa_for_admin_email: false,
         enable_2fa_for_admin_sms: false,
+        enable_2fa_google_auth: false,
         send_password_via_sms: false,
         send_password_via_email: false,
         enable_2fa_for_admin_passkeys: false,
@@ -170,13 +171,76 @@ const handleChangeHotspotVoucher = (e) => {
 
       const handleChangeAdminSettings = (e) => {
         const { type, name, checked, value } = e.target;
+        console.log('e.target', e.target)
+        console.log('name', name)
+        console.log('checked', e.target.checked)
+
+      
 
         // const captlalName = value.charAt(0).toUpperCase() + value.slice(1)
         const capitalizedName = value.toUpperCase()
-        setAdminSettings((prevFormData) => ({
-          ...prevFormData,
-          [name]: type === "checkbox" ? checked : capitalizedName,
-        }));
+
+
+        setAdminSettings((prevData) => {
+          let updatedData = { ...prevData };
+          let updatedSettings = { ...prevData, [name]: type === "checkbox" ? checked : capitalizedName, };
+      
+      // console.log('check_inactive_hrs', updatedData .check_inactive_hrs)
+          // Handle specific cases for check_inactive_minutes, check_inactive_hrs, and check_inactive_days
+          if (name === 'enable_2fa_for_admin_sms') {
+            updatedSettings.enable_2fa_for_admin_sms = true
+            updatedSettings.enable_2fa_for_admin_email = false
+            updatedSettings.enable_2fa_for_admin_passkeys = false
+            updatedSettings.enable_2fa_google_auth = false
+            
+      
+      
+      
+          } else if (name === 'enable_2fa_for_admin_email') {
+              updatedSettings.enable_2fa_for_admin_email = true
+              updatedSettings.enable_2fa_for_admin_sms = false
+              updatedSettings.enable_2fa_for_admin_passkeys = false
+              updatedSettings.enable_2fa_google_auth = false
+      
+      
+          
+            
+          } else if (name === 'enable_2fa_for_admin_passkeys') {
+              updatedSettings.enable_2fa_for_admin_passkeys = true
+              updatedSettings.enable_2fa_google_auth = false
+              updatedSettings.enable_2fa_for_admin_sms = false
+              updatedSettings.enable_2fa_for_admin_email = false
+            
+          }else if (name === 'enable_2fa_google_auth'){
+            updatedSettings.enable_2fa_google_auth = true
+            updatedSettings.enable_2fa_for_admin_passkeys = false
+            updatedSettings.enable_2fa_for_admin_email = false
+            updatedSettings.enable_2fa_for_admin_sms = false
+
+
+            
+            
+          
+          }else if (name === 'login_with_otp_email'){
+            updatedSettings.enable_2fa_for_admin = true
+          
+          }
+      
+          // Update the value for the changed field
+          updatedSettings[name] = type === 'checkbox' ? checked : value;
+      
+          // Update enable_2fa_for_admin based on the checked value
+         
+      
+          console.log("is it true or false=>", name );
+      
+          return updatedSettings;
+        });
+
+        // setAdminSettings((prevFormData) => ({
+        //   ...prevFormData,
+        //   [name]: type === "checkbox" ? checked : capitalizedName,
+        // }));
       }
 
     const [isloading, setisloading] = useState(false)

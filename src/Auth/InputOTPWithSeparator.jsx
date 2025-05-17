@@ -82,6 +82,7 @@ const [showPassword, setShowPassword] = useState(false);
   const { enable_2fa_for_admin_email, enable_2fa_for_admin_sms, send_password_via_sms,
     send_password_via_email, check_is_inactive,
     checkinactiveminutes, checkinactivehrs,checkinactivedays,
+    enable_2fa_google_auth,
     enable_2fa_for_admin_passkeys
    }= adminSettings;
 
@@ -174,11 +175,13 @@ const getAdminSettings = useCallback(
         const {enable_2fa_for_admin_email, enable_2fa_for_admin_sms, send_password_via_sms,
           send_password_via_email, check_is_inactive,
           enable_2fa_for_admin_passkeys,
+          enable_2fa_google_auth,
           checkinactiveminutes, checkinactivehrs,checkinactivedays} = newData[0]
         setAdminSettings(prevData => ({
           ...prevData, 
           enable_2fa_for_admin_email, enable_2fa_for_admin_sms, send_password_via_sms,
           enable_2fa_for_admin_passkeys,
+          enable_2fa_google_auth,
           send_password_via_email, check_is_inactive,
           checkinactiveminutes, checkinactivehrs,checkinactivedays
         }));
@@ -470,12 +473,21 @@ const handleSignIn = async (e) => {
 
 if (enable_2fa_for_admin_passkeys) {
   authenticateWebAuthn(email)
-} else {
-  // navigate('/admin/analytics')
-  navigate('/admin/router-stats')
-// window.location.href='/admin/router-stats'
-  setEmail('')
-  setPassword('')
+
+} else if (enable_2fa_google_auth) {
+  // Redirect to 2FA with email
+  navigate('/two-factor-auth', { 
+    state: { email } 
+  });
+  
+// } else if (enable_2fa_google_auth) {
+ ''
+}else{
+ // navigate('/admin/analytics')
+ navigate('/admin/router-stats')
+ // window.location.href='/admin/router-stats'
+   setEmail('')
+   setPassword('')
 }
 
     
