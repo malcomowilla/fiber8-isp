@@ -42,6 +42,8 @@ import { TfiDashboard } from "react-icons/tfi";
 import { CgComponents } from "react-icons/cg";
 import { TbCloudNetwork } from "react-icons/tb";
 import { MdOutlineQueryStats } from "react-icons/md";
+import { IoStatsChartOutline } from "react-icons/io5";
+import { SiPaloaltonetworks } from "react-icons/si";
 
 
 
@@ -210,7 +212,8 @@ const handleGetCompanySettings = useCallback(
               >
                 <Link
                   to="/admin/admin-dashboard"
-                  className="flex items-center gap-x-4 w-full p-2 transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700"
+                  className="flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700"
                 >
                   <ManageAccountsOutlinedIcon />
                   Management
@@ -328,12 +331,16 @@ className="flex items-center  w-full p-2 text-white transition
                        dark:text-white ">
                               {/* <WifiIcon className='w-[500px]'/>    */}
 
+<div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
 <div className='bg-white rounded-full text-black w-[2.9rem] h-[2.9rem] pt-3 text-center font-extrabold'>
    <p className='text-sm dotted-font'>MBPS</p>
 </div>
-                     <Link to='/admin/pppoe-packages'>
+                     <Link className='' to='/admin/pppoe-packages'>
                        PPOE packages                 
                        </Link>
+
+                       </div>
                   </motion.li>
 
 
@@ -352,11 +359,16 @@ className="flex items-center  w-full p-2 text-white transition
                   className="flex items-center w-full p-2 text-white transition
                       duration-75 text-nowrap  space-x-4 group 
                        dark:text-white">
+
+                    <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>    
             <img src="/images/icons8-person.gif " className='rounded-full w-10  h-10' alt="" />
 
-                     <Link to='/admin/pppoe-subscribers' >                  
+                     <Link className='text-wrap' to='/admin/pppoe-subscribers' >                  
                       PPOE subscribers                 
                   </Link>
+
+                  </div>
                   </motion.li>
 
 
@@ -404,12 +416,17 @@ className="flex items-center  w-full p-2 text-white transition
                   className="flex items-center w-full p-2 text-white transition
                       duration-75   space-x-4 group 
                        dark:text-white">
+
+                        <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                                  <FaUpload className='w-6 h-6 text-yellow-600'/>   
 
 
                      <Link to='/admin/upload-subscriber' >                 
                       upload subscribers                  
                       </Link>
+
+                      </div>
                   </motion.li>
 
                   
@@ -466,11 +483,16 @@ className="flex items-center  w-full p-2 text-white transition
    exit={{ opacity: 0, x: -20 }}
    transition={{ duration: 0.2 , delay: 0.1 }}
    >
+
+    <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                      <Link to='/admin/nodes' className="flex items-center w-full p-2 text-white transition
                       duration-75 rounded-lg  group 
                        dark:text-white  gap-x-3">
                         <img src="/images/icons8-map-pin.gif " className='w-8 h-8 rounded-full' alt="" />
                         Nodes</Link>
+
+                        </div>
                   </motion.li>
 
 
@@ -486,11 +508,15 @@ className="flex items-center  w-full p-2 text-white transition
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.2 , delay: 0.2 }}
                   >
+                    <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                      <Link to='/admin/zones' className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg group  dark:text-white
                        gap-x-3">
                               <img src="/images/icons8-map.gif" className='rounded-full h-8 w-8' alt="" />
                         Zones</Link>
+
+                        </div>
                   </motion.li>
 
 
@@ -514,6 +540,8 @@ className="flex items-center  w-full p-2 text-white transition
                   transition={{ duration: 0.2 , delay: 0.2 }}
                   >
                     
+                    <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                      <Link to='/admin/networks-wireguard-config' className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg group  dark:text-white
                        gap-x-3">
@@ -521,6 +549,8 @@ className="flex items-center  w-full p-2 text-white transition
                               <img src='/images/wireguard2.png' className='rounded-full h-7 w-7' />
                               </div>
                         wireguard</Link>
+
+                        </div>
                   </motion.li>
 
 
@@ -538,7 +568,8 @@ className="flex items-center  w-full p-2 text-white transition
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.2 , delay: 0.2 }}
                   >
-                    
+                    <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                      <Link to='/admin/ip_networks' className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg group  dark:text-white
                        gap-x-3">
@@ -546,6 +577,8 @@ className="flex items-center  w-full p-2 text-white transition
                               <TbCloudNetwork className='rounded-full h-7 w-7' />
                               </div>
                         ip_networks</Link>
+
+</div>
                   </motion.li>
 
 
@@ -566,6 +599,8 @@ className="flex items-center  w-full p-2 text-white transition
                   transition={{ duration: 0.2 , delay: 0.2 }}
                   >
                     
+                    <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                      <Link to='/admin/network-components' className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg group  dark:text-white
                        gap-x-3">
@@ -573,6 +608,9 @@ className="flex items-center  w-full p-2 text-white transition
                               <CgComponents className='rounded-full h-7 w-7' />
                               </div>
                         components</Link>
+
+
+                        </div>
                   </motion.li>
 
                   <motion.li
@@ -586,11 +624,15 @@ className="flex items-center  w-full p-2 text-white transition
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.2 , delay: 0.3 }}
                   >
+
+                    <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                      <Link  className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg  group 
                       dark:text-white  gap-x-3">
                         <img src="/images/icons8-map (1).gif" className='w-8 h-8 rounded-full' alt="" />
                         Map</Link>
+                        </div>
                   </motion.li>
 
 
@@ -632,12 +674,17 @@ className="flex items-center  w-full p-2 text-white transition
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.2 , delay: 0.5 }}
                         >
+
+                          <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                            <Link to='/admin/nas' className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg  group 
                       dark:text-white  gap-x-3">
                            <RouterIcon/>
                            Routers
                            </Link>
+
+                           </div>
                         </motion.li>
 
       </>
@@ -789,8 +836,12 @@ transition={{ duration: 0.2, delay: 0.1 }}
  className="flex items-center w-full p-2 gap-x-4 text-white transition
                       duration-75 rounded-lg pl-11 group 
                        dark:text-white cursor-pointer "> 
+                       <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                        <MailOutlineIcon />
                    Email
+
+                   </div>
                   </motion.li>
 
                   <motion.li
@@ -806,8 +857,13 @@ transition={{ duration: 0.2, delay: 0.1 }}
                   className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg pl-11 group cursor-pointer  dark:text-white gap-x-4
                       " >
+
+                        <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                         <TextsmsSharpIcon/>
                     <Link to='/admin/send-sms' >SMS</Link>
+
+                    </div>
                   </motion.li>
 
 
@@ -825,8 +881,11 @@ transition={{ duration: 0.2, delay: 0.1 }}
                   className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg pl-11 group cursor-pointer  dark:text-white gap-x-4
                       " >
+                        <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                         <TextsmsSharpIcon/>
                     <Link to='/admin/messages' >Messages</Link>
+                    </div>
                   </motion.li>
 
                   <motion.li
@@ -842,8 +901,11 @@ transition={{ duration: 0.2, delay: 0.1 }}
                   className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg pl-11 group  dark:text-white gap-x-4
                       " >
+                        <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                         <TextsmsSharpIcon/>
                     <Link to='/admin/bulk-messages' >Bulk</Link>  
+                    </div>
                   </motion.li>
 
                   <motion.li 
@@ -859,8 +921,13 @@ transition={{ duration: 0.2, delay: 0.1 }}
                   className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg pl-11 group gap-x-4
                       dark:text-white ">
+
+                        <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                         <img src="/images/logo-whatsapp.svg" className='sm:w-[30px] max-sm:w-[30px]' alt="" />
                      Whatsap
+
+                     </div>
                   </motion.li>
 
       </>
@@ -919,12 +986,15 @@ transition={{ duration: 0.2, delay: 0.1 }}
                    exit={{ opacity: 0, x: -20 }}
                    transition={{ duration: 0.2 , delay: 0.1 }}
                   >
+                    <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-6 group text-white hover:bg-gray-700'>
                      <Link  to='/admin/hotspot-dashboard' className="flex items-center w-full p-2
                       text-white transition
                       duration-75 rounded-lg  group gap-x-3 text-nowrap 
                        dark:text-white "> 
-                        <TfiDashboard/>
+                        <IoStatsChartOutline className='text-white '/>
                       Hotspot  Dashboard</Link>
+                      </div>
                   </motion.li>
 
 
@@ -939,11 +1009,14 @@ transition={{ duration: 0.2, delay: 0.1 }}
                    exit={{ opacity: 0, x: -20 }}
                    transition={{ duration: 0.2 , delay: 0.1 }}
                   >
+                    <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-6 group text-white hover:bg-gray-700'>
                      <Link  to='/admin/hotspot-package' className="flex items-center w-full p-2 text-white transition
                       duration-75 rounded-lg  group gap-x-3 text-nowrap 
                        dark:text-white "> 
-                        <WavesIcon/>
+                        <SiPaloaltonetworks className='text-white'/>
                       Hotspot  Package</Link>
+                      </div>
                   </motion.li>
 
 
@@ -961,13 +1034,14 @@ onClick={() => {
  transition={{ duration: 0.2 , delay: 0.1 }}
 >
 
-
+<div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-6 group text-white hover:bg-gray-700'>
 <Link  to='/admin/hotspot-templates' className="flex items-center w-full p-2 text-white transition
                       duration-75 rounded-lg  group gap-x-3 text-nowrap 
                        dark:text-white "> 
                         <LuLayoutTemplate/>
                       Hotspot  Templates</Link>
-
+</div>
   </motion.li>
 
 
@@ -1002,11 +1076,14 @@ onClick={() => {
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.2 , delay: 0.3 }}
                   >
+                    <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-6 group text-white hover:bg-gray-700'>
                      <Link to='/admin/hotspot-subscriptions' className="flex items-center w-full p-2 text-white 
                      transition duration-75 rounded-lg group 
                       dark:text-white gap-x-3  ">
                         🎫
                       Vouchers</Link>
+                      </div>
                   </motion.li>
 
 
@@ -1113,12 +1190,14 @@ onClick={() => {
                   {/* <ion-icon name="logo-twitch" ></ion-icon> */}
 
 
-
+<div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                      <Link to='/admin/customer-tickets' className='flex items-center gap-x-2 text-white'>
                      <LuTicketsPlane className='w-5 h-5 text-red-600'/>
 
                      Tickets
                      </Link>
+                     </div>
                   </motion.li>
                 </>
               )}
@@ -1180,9 +1259,13 @@ onClick={() => {
  exit={{ opacity: 0, x: -20 }}
  transition={{ duration: 0.2, delay: 0.1 }}
 className=' rounded-lg  space-x-2  text-white p-2 flex'>
+
+  <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
 <img src="/images/icons8-male-user.gif" className='rounded-full w-8 h-8' alt="user" />
      <Link to='/admin/user'> User </Link>
 
+</div>
       </motion.li>
 
 
@@ -1197,10 +1280,15 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
        exit={{ opacity: 0, x: -20 }}
        transition={{ duration: 0.2, delay: 0.2 }}
       className=' rounded-lg  text-white  space-x-3  p-2 flex'>
+
+        <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
       <img src="/images/icons8-people.gif" className='rounded-full w-8 h-8' alt="" />
    <Link to='/admin/user-group'>
       User Group
       </Link>
+      </div>
+
        </motion.li>
    </>
 )}

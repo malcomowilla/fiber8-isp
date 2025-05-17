@@ -725,6 +725,21 @@ className="w-24 h-24 mx-auto rounded-full"
 
 
 <TextField
+sx={{
+  "& label.Mui-focused": {
+    color: "white",
+    fontSize: "16px",
+  },
+  "& .MuiOutlinedInput-root": {
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "white",
+      borderWidth: "3px",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "black",
+    },
+  },
+}}
               fullWidth
               label="Username"
 
@@ -779,6 +794,22 @@ className="w-24 h-24 mx-auto rounded-full"
 
 
 <TextField
+
+sx={{
+  "& label.Mui-focused": {
+    color: "white",
+    fontSize: "16px",
+  },
+  "& .MuiOutlinedInput-root": {
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "white",
+      borderWidth: "3px",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "black",
+    },
+  },
+}}
               fullWidth
               label="Email"
               type="email"

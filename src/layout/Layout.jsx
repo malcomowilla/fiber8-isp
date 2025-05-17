@@ -45,7 +45,6 @@ import {
         
 // }
 
-
 const Layout = () => {
 
 
@@ -112,11 +111,18 @@ const [date, setDate] = useState(new Date().toLocaleTimeString('en-US', { hour: 
       })
       const newData = await response.json()
       if (response.ok) {
-        console.log('current hotspot plan', newData)
-        setExpiry2(newData[0].expiry)
-        setCondition2(newData[0].condition)
-        setStatus2(newData[0].status)
-        setCurrentHotspotPlan(newData[0].name)
+
+        if (newData.length === 0) {
+          setExpiry2('No license')
+          setStatus2('Not Active')
+        } else {
+          console.log('current hotspot plan', newData)
+        setExpiry2(newData[0]?.expiry)
+        setCondition2(newData[0]?.condition)
+        setStatus2(newData[0]?.status)
+        setCurrentHotspotPlan(newData[0]?.name)
+        }
+        
         // setCurrentPPOEPlan(newData.message)
       }
     },
@@ -129,7 +135,7 @@ useEffect(() => {
 }, [getCurrentHotspotPlan]);
 
 
-
+console.log('expiry', expiry)
   const getCurrentPPOEPlan = useCallback(
     async() => {
       const response = await fetch('/api/get_current_pppoe_plan', {
@@ -139,12 +145,19 @@ useEffect(() => {
       })
       const newData = await response.json()
       if (response.ok) {
-        console.log('current pppoe plan', newData)
-        setExpiry(newData[0].expiry)
-        setCondition(newData[0].condition)
-        setStatus(newData[0].status)
-        setCurrentPPOEPlan(newData[0].name)
-        // setCurrentPPOEPlan(newData.message)
+
+        if (newData.length === 0) {
+          setExpiry('No license')
+          setStatus('Not Active')
+        }else{
+          setExpiry(newData[0]?.expiry)
+          setCondition(newData[0]?.condition)
+          setStatus(newData[0]?.status)
+          setCurrentPPOEPlan(newData[0]?.name)
+          // setCurrentPPOEPlan(newData.message)
+        }
+
+       
       }
     },
     [],
@@ -296,7 +309,7 @@ setSmsBalance(newData.message)
         <div className={`p-4 h-full`}>
           <div className="p-2">
             <p className="font-extrabold dark:text-white text-black text-xl welcome-message">
-              <span>{getTimeBasedGreeting()}, {company_name}</span>
+              <span>{getTimeBasedGreeting()}, {company_name || 'Aitechs'},</span>
             </p>
             <p className="dark:text-white text-black text-sm mt-1 welcome-message">
               {getWelcomeMessage()}
@@ -427,7 +440,7 @@ setSmsBalance(newData.message)
           
                   ${status === 'active' ? 'text-emerald-600' : 'text-red-600'}
 
-          `}>{status}</span>
+          `}>{status === 'Not Active' ? 'Not Active' : status}</span>
           
       </p>
 

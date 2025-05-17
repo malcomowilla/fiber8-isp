@@ -764,14 +764,16 @@ const handleDeleteConfirm = async () => {
           }
         }}
       />
- {/* <button onClick={(e) => {
+ <button onClick={(e) => {
               e.preventDefault()
               handleClose()
-            }} className='bg-red-600 mt-2 text-white rounded-3xl p-2
+            }} className='bg-red-600  absolute top-[800px] lg:top-[855px]
+            max-sm:top-[800px]
+            text-white rounded-3xl px-4 py-2
           transform hover:scale-110 transition duration-500 hover:bg-red-200  
           text-lg ' >
               Cancel
-            </button> */}
+            </button>
   </>
 )}
 

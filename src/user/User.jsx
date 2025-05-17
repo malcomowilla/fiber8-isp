@@ -4,7 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import EditIcon from '@mui/icons-material/Edit';
 
-import { IconButton } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 // import GetAppIcon from '@mui/icons-material/GetApp';
 // import {Link} from 'react-router-dom'
 // import {  useState} from 'react'
@@ -23,7 +23,9 @@ import { useDebounce } from 'use-debounce';
 import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading animation
 import Backdrop from '@mui/material/Backdrop';
 
+import { LuDot } from "react-icons/lu";
 
+import { FaPhoneVolume } from "react-icons/fa6";
 
 // const rows = [
 //   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
@@ -281,6 +283,33 @@ const columns = [
   {title: 'Phone', field: 'phone_number',    },
   {title: 'Email', field: 'email',    },
   {title: 'Role', field: 'role',    },
+  {title: 'Last Login At', field: 'last_login_at'},
+  {title: 'Status', field: 'status', 
+
+    render: (rowData) =>  
+    
+     <>
+      {rowData.status === 'active' ? 
+      <div className='flex items-center relative'>
+        <p> {rowData.status}</p>
+      <LuDot  style={{ animation: 'pulse 0.5s infinite' }} className='text-green-500
+      absolute left-0 top-0
+      w-10 h-10'
+    
+      />
+      </div>
+      
+       :
+
+       <div className='flex relative'>
+        <p className=''> {rowData.status === 'active' ? 'active' : 'inactive'}</p>
+       <LuDot style={{ animation: 'pulse 0.5s infinite' }} className='text-red-500 
+       absolute left-0 top-0
+       w-10 h-10 '/>
+       </div>
+       }
+       </>
+  },
     {title: 'Date Registered', field: 'date_registered',    },
 
   
@@ -290,9 +319,27 @@ const columns = [
     
      <>
       
+      <div className='flex items-center gap-2'>
+       <Tooltip title="Call">
+        <IconButton arrow color="primary" onClick={()=>{window.location.href = `tel:${params.phone_number}`}}>
+         <FaPhoneVolume className='text-green-500 text-xl'/>
+         </IconButton>
+         </Tooltip>
+
+         <Tooltip title="Delete">
+          <IconButton >
        <DeleteButton {...params} />
+       </IconButton>
+       </Tooltip>
+
+
+       <Tooltip title="Edit">
+        <IconButton >
        <EditButton {...params}/>
-      
+
+         </IconButton>
+       </Tooltip>
+      </div>
        </>
 
 

@@ -33,6 +33,8 @@ import {
   import { GoPasskeyFill } from "react-icons/go";
   import {useApplicationSettings} from '../settings/ApplicationSettings'
   import { IoPersonOutline } from "react-icons/io5";
+  import { TbPasswordFingerprint } from "react-icons/tb";
+
 
 
   const subdomain = window.location.hostname.split('.')[0]
@@ -109,6 +111,20 @@ console.log(user)
              
             </DropdownMenuItem>
             
+
+
+
+
+            <DropdownMenuItem className='cursor-pointer'>
+              
+              <TbPasswordFingerprint className="mr-2 h-4 w-4" />
+              <Link to='/admin/google-authenticator'>
+              <span>setup auth</span>
+              </Link>
+
+              <DropdownMenuShortcut>⇧⌘SA</DropdownMenuShortcut>
+             
+            </DropdownMenuItem>
 
             <DropdownMenuItem className='cursor-pointer'>
               

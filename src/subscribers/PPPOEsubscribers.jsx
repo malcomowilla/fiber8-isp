@@ -14,7 +14,8 @@ import dayjs from 'dayjs';
 import SubscriberNotification from '../notification/SubscriberNotification'
 import { IoPeople } from "react-icons/io5";
 import {motion} from 'framer-motion'
-import { Button } from '@mui/material';
+import { Button, Tooltip, } from '@mui/material';
+import { FaPhoneVolume } from "react-icons/fa6";
 
 import LoadingAnimation from '../loader/loading_animation.json'
 import Lottie from 'react-lottie';
@@ -202,8 +203,31 @@ setFormData({
 
     
 
+  const [status, setStatus] = useState('active')
+    const getSubscriptions = useCallback(
+      async() => {
+        
+        try {
+          const response = await fetch('/api/subscriptions', {
+            headers: { 'X-Subdomain': subdomain },
+          })
+          const data = await response.json()
+          setStatus(data)
+          // setSubscriptions(data)
+        }
+        catch (error) {
+          console.log(error)
+        }
+      },
+      []
+    )
   
-
+  
+  
+    useEffect(() => {
+      getSubscriptions() 
+     
+    }, [getSubscriptions]);
 
 
   const createSubscriber = async (e) => {
@@ -318,7 +342,8 @@ try {
 
 if (response.status === 402) {
   setTimeout(() => {
-    navigate('/license-expired')
+    window.location.href = '/license-expired';
+    // navigate('/license-expired')
    }, 1800);
   
 }
@@ -353,19 +378,67 @@ toast.error('failed to delete subscriber', {
   
     
     {title: 'phone_number', field: 'phone_number',  headerClassName: 'dark:text-black'},
-    {title: 'package', field: 'package_name', type: 'numeric', headerClassName: 'dark:text-black', align: 'left'},
+    {title: 'package', field: 'package_name',
+       type: 'numeric', headerClassName: 'dark:text-black', align: 'left', 
+      render: (rowData) => {
+        const statusInfo = status.find(item => 
+          item?.ppoe_username || item?.ppoe_password === rowData?.ref_no
+        ) || { status: 'offline' };
+
+        return (
+          <>
+<p
+className={`${statusInfo.status === 'active' ? 'text-emerald-500' : 'text-red-500'
+        } `}
+>{statusInfo.package} </p>
+        </>
+        )
+        
+      }
+      },
     {title: 'House Number', field:'house_number',  headerClassName: 'dark:text-black'},
     {title: ' Building', field:'building_name',  headerClassName: 'dark:text-black'},
   
-    {title: 'Status', field:'status',  headerClassName: 'dark:text-black'},
+    {title: 'Status', field:'status',  headerClassName: 'dark:text-black',  
+      render: (rowData) => {
+        const statusInfo = status.find(item => 
+          item?.ppoe_username || item?.ppoe_password === rowData?.ref_no
+        ) || { status: 'offline' };
+       
+        
+        return <span className={`flex items-center px-3 py-1 rounded-full ${
+          statusInfo.status === 'active' ? 'bg-green-100 text-green-800' 
+          : 'bg-red-100 text-red-800'
+        }`}>
+          {statusInfo.status === 'active' ? 'active' : 'offline'}
+        </span>
+      }
+        
+    },
     {title: 'Action', field:'Action',  headerClassName: 'dark:text-black',
     render: (params) =>  
     
     <>
-     
+    <div className='flex items-center gap-2'>
+      <Tooltip title="Call">
+      <IconButton arrow color="primary" onClick={()=>{window.location.href = `tel:${params.phone_number}`}}>
+     <FaPhoneVolume className='text-green-500 text-xl'/>
+     </IconButton>
+     </Tooltip>
+
+     <Tooltip title="Delete">
+      <IconButton >
       <DeleteButton {...params} />
+      </IconButton>
+      </Tooltip>
+
+
+      <Tooltip title="Edit">
+        <IconButton >
       <EditButton {...params}/>
-     
+      </IconButton>
+      </Tooltip>
+     </div>
       </>
   
   

@@ -78,7 +78,7 @@ const [hotspotPackage, setHotspotPackage] = useState({
 })
 
 
-const navigate = useNavigate()
+// const navigate = useNavigate()
 
 const handleWeekdayChange = (day) => {
   console.log('day', day);
@@ -270,11 +270,10 @@ const createHotspotPackage = async (e) => {
 
     const newData = await response.json();
 
-
-
     if (response.status === 402) {
       setTimeout(() => {
-        navigate('/license-expired')
+        window.location.href = '/license-expired';
+        // navigate('/license-expired')
        }, 1800);
       
     }
@@ -282,7 +281,8 @@ const createHotspotPackage = async (e) => {
 
     if (response.status === 423) {
       setTimeout(() => {
-       navigate('/account-locked')
+        window.location.href = '/account-locked';
+      //  navigate('/account-locked')
       }, 1800); 
      }
 
