@@ -728,7 +728,7 @@ console.log('selected provider',selectedProvider)
         <div className='mt-12 flex justify-center shadow-2xl w-full h-[100px] items-center dark:bg-gray-900 '>
 
         <p>
-            {smsBalance}
+           SMS balance:{smsBalance}
         </p>
         </div>
 
