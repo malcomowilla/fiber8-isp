@@ -381,7 +381,7 @@ toast.error('failed to delete subscriber', {
     {title: 'package', field: 'package_name',
        type: 'numeric', headerClassName: 'dark:text-black', align: 'left', 
       render: (rowData) => {
-        const statusInfo = status.find(item => 
+        const statusInfo = status?.find(item => 
           item?.ppoe_username || item?.ppoe_password === rowData?.ref_no
         ) || { status: 'offline' };
 

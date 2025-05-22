@@ -389,7 +389,7 @@ const PPPoEPackages = () => {
       >
         <div className="absolute inset-0 bg-[url('https://via.placeholder.com/1920x800')] bg-cover bg-center opacity-20"></div>
         <div className="relative z-10 text-center max-w-4xl px-6 animate-fade-in">
-          <div className="flex justify-end mb-4">
+          {/* <div className="flex justify-end mb-4">
             <Link to='/signin' className="">
               <motion.button
                 className="bg-gradient-to-r from-teal-600 to-green-600 text-white font-semibold py-2 px-6 rounded-lg hover:scale-105 transition-transform duration-300"
@@ -399,7 +399,7 @@ const PPPoEPackages = () => {
                 Sign In
               </motion.button>
             </Link>
-          </div>
+          </div> */}
           <h2 className="text-4xl font-semibold text-gray-200 mb-4 font-montserat">Welcome to {company_name}</h2>
           <h1 className="text-6xl font-bold mb-6 bg-clip-text font-montserat text-transparent bg-gradient-to-r from-green-400 to-teal-400">
             Stay Connected Anywhere

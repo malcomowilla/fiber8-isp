@@ -15,6 +15,7 @@ import EditNode from '../edit/EditNode'
 import MaterialTable from 'material-table'
 import { FaCircleNodes } from "react-icons/fa6";
 import { useDebounce } from 'use-debounce';
+import toast,{  Toaster } from 'react-hot-toast';
 
 
 
@@ -30,7 +31,10 @@ const Nodes = () => {
   const [search, setSearch] = useState('')
   const [searchInput] = useDebounce(search, 1000)
 
-
+  const [name, setName] = useState('');
+  const [position, setPosition] = useState(null);
+  const [mapReady, setMapReady] = useState(false);
+  const [nodeId, setNodeId] = useState('');
 
   const handleClickOpen = () => {
       setOpen(true);
@@ -48,16 +52,99 @@ const Nodes = () => {
 
 
   const EditButton = () => (
-    <IconButton style={{color: 'black'}} onClick={handleClickOpen} >
+    <IconButton style={{color: 'green'}} onClick={handleClickOpen} >
       <EditIcon />
     </IconButton>
   );
-const columns = [
-    {title: 'Name', field: 'Name',  },
 
-  {title: ' Code', field: ' Code',    },
-  {title: ' Type', field: ' Type',    },
-  {title: ' Zone', field: ' Zone',    },
+  const handleRowClick = (event, rowData) => {
+    console.log('rowData node',rowData)
+    // setPosition(rowData?.latitude, rowData?.longitude)
+    setName(rowData?.name)
+    setNodeId(rowData?.id)
+  }
+
+  const createNode = async(e) => {
+    e.preventDefault();
+
+    try {
+
+      const url = nodeId ? `/api/nodes/${nodeId}` : '/api/nodes';
+      const method = nodeId ? 'PATCH' : 'POST';
+      const response = await fetch(`${url}`, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+        },
+        body: JSON.stringify({ name, position }),
+      });
+      if (response.ok) {
+        setOpen(false)
+
+
+const newData = await response.json()
+        if (nodeId) {
+          setNodes(nodes.map(item => (item.id === nodeId ? newData : item)))
+
+          toast.success('Node updated successfully', {
+            position: "top-center",
+            duration: 4000,
+            
+          })
+        } else {
+          
+          setNodes([...nodes, newData])
+          toast.success('Node created successfully', {
+            position: "top-center",
+            duration: 4000,
+            
+          })
+        }
+      }
+    } catch (error) {
+      
+    }
+
+
+  }
+
+const subdomain = window.location.hostname.split('.')[0];
+
+  const getNodes = useCallback(
+    async() => {
+     
+      
+      try {
+        const response = await fetch('/api/nodes', {
+          headers: { 'X-Subdomain': subdomain },
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setNodes(data)
+          
+        } else {
+          
+
+        }
+      } catch (error) {
+        
+      }
+    },
+    [],
+  )
+  
+
+  useEffect(() => {
+    getNodes()
+   
+  }, [getNodes]);
+
+const columns = [
+    {title: 'Name', field: 'name',  },
+
+  {title: 'Latitude', field: 'latitude',    },
+  {title: 'Longitude', field: 'longitude',    },
 
   {title: 'Action', field:'Action', align: 'right',
 
@@ -76,10 +163,18 @@ const columns = [
 
 ]
 
+
+
+
   return (
     <>
+    <Toaster />
     <div className=''>
-         <EditNode  open={open} handleClose={handleClose}/>
+         <EditNode  open={open} handleClose={handleClose}
+         name={name} setName={setName} position={position} setPosition={setPosition}
+         mapReady={mapReady} setMapReady={setMapReady}
+         createNode={createNode}
+         />
        
        
 
@@ -124,9 +219,9 @@ const columns = [
       
       title='Nodes'
       
-    //   data={rows}
+       data={nodes}
 
-      
+      onRowClick={handleRowClick}
     actions={[
 
       {
@@ -144,8 +239,8 @@ const columns = [
 
 options={{
         paging: true,
-       pageSizeOptions:[5, 10, 20],
-       pageSize: 20,
+       pageSizeOptions:[5, 10],
+       pageSize: 10,
        search: false,
 searchFieldStyle: {
   borderColor: 'red'

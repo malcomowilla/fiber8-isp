@@ -44,6 +44,7 @@ import { TbCloudNetwork } from "react-icons/tb";
 import { MdOutlineQueryStats } from "react-icons/md";
 import { IoStatsChartOutline } from "react-icons/io5";
 import { SiPaloaltonetworks } from "react-icons/si";
+import { FaHandshake } from "react-icons/fa";
 
 
 
@@ -1199,6 +1200,18 @@ onClick={() => {
                      </Link>
                      </div>
                   </motion.li>
+
+
+
+
+
+
+
+
+
+
+
+                  
                 </>
               )}
 
@@ -1260,7 +1273,7 @@ onClick={() => {
  transition={{ duration: 0.2, delay: 0.1 }}
 className=' rounded-lg  space-x-2  text-white p-2 flex'>
 
-  <div className='flex items-center gap-x-4 w-full p-2 
+  <div className='flex items-center gap-x-4 w-full p-2 cursor-pointer
                   transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
 <img src="/images/icons8-male-user.gif" className='rounded-full w-8 h-8' alt="user" />
      <Link to='/admin/user'> User </Link>
@@ -1281,9 +1294,12 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
        transition={{ duration: 0.2, delay: 0.2 }}
       className=' rounded-lg  text-white  space-x-3  p-2 flex'>
 
-        <div className='flex items-center gap-x-4 w-full p-2 
+        <div className='flex items-center gap-x-4 w-full p-2  cursor-pointer
                   transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
+                    <Link to='/admin/user-group'>
       <img src="/images/icons8-people.gif" className='rounded-full w-8 h-8' alt="" />
+      </Link>
+
    <Link to='/admin/user-group'>
       User Group
       </Link>
@@ -1317,6 +1333,24 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
 
 
 
+         <li
+         onClick={() => {
+          if (window.innerWidth < 962) {
+            setSeeSideBar(true);
+          }
+        }}
+         className='dark:hover:bg-white  p-2  flex items-center 
+             text-white rounded-lg dark:text-white   group dark:hover:text-black
+             
+             cuursor-pointer
+             hover:bg-black'>
+
+
+            <Link  to='/admin/client-leads' className='flex ' >
+                  <FaHandshake className='w-6 h-6'/>
+               <span className="flex-1 ms-3 whitespace-nowrap">Leads</span>
+            </Link>
+         </li>
 
 
 

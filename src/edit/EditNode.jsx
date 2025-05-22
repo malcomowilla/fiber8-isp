@@ -31,10 +31,10 @@ function LocationMarker({ position, setPosition }) {
   ) : null;
 }
 
-export default function Node({ open, handleClose }) {
-  const [name, setName] = useState('');
-  const [position, setPosition] = useState(null);
-  const [mapReady, setMapReady] = useState(false);
+export default function Node({ open, handleClose,
+  mapReady, setMapReady, name, setName, position, setPosition,
+  createNode
+ }) {
   const mapRef = useRef();
 
   useEffect(() => {
@@ -97,17 +97,20 @@ console.log('position', position);
         },
       }}
     >
+      <form onSubmit={createNode}>
       <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white', fontSize: '1.5rem', fontWeight: 'bold' }}>
         Node Location
       </DialogTitle>
-      <DialogContent sx={{ pt: 3 }}>
+      <DialogContent sx={{ pt: 30 }}>
         <Stack spacing={3}>
           <TextField
             fullWidth
+            className='myTextField'
             label="Node Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             sx={{
+              
               '& label.Mui-focused': {
                 color: 'primary.main',
               },
@@ -152,12 +155,14 @@ console.log('position', position);
 
             <TextField
               label="Latitude"
+              className='myTextField'
               value={position?.lat?.toFixed(6) || ''}
               InputProps={{ readOnly: true }}
               sx={{ flex: 1 }}
             />
 
             <TextField
+              className='myTextField'
               label="Longitude"
               value={position?.lng?.toFixed(6) || ''}
               InputProps={{ readOnly: true }}
@@ -179,6 +184,7 @@ console.log('position', position);
           Cancel
         </Button>
         <Button
+          type="submit"
           variant="contained"
           disabled={!position}
           sx={{
@@ -190,6 +196,7 @@ console.log('position', position);
           Save Location
         </Button>
       </DialogActions>
+      </form>
     </Dialog>
   );
 }

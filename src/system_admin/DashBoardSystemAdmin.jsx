@@ -42,7 +42,8 @@ import PasskeyList from './PasskeyList'
 import { IoMdKey } from "react-icons/io";
 import { LuPackageMinus } from "react-icons/lu";
 import PlanManager from './PlanManager'
-
+import CompanyLeads from './CompanyLeads'
+import { FaHandshake } from "react-icons/fa";
 
 
 
@@ -124,6 +125,9 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
     { label: <p className='text-black'>Client Requests</p>, icon: <FaPerson  className='w-6 h-6 rounded-full'/>, value: 6 },
     { label: <p className='text-black'>Passkeys</p>, icon: <IoMdKey  className='w-6 h-6 rounded-full'/>, value: 7 },
     { label: <p className='text-black'>Plan Manager</p>, icon: <LuPackageMinus  className='w-6 h-6 rounded-full'/>, value: 8 },
+
+
+    { label: <p className='text-black'>Company Leads</p>, icon: <FaHandshake  className='w-6 h-6 rounded-full'/>, value: 9 },
   ];
 
   const pageTransitionVariants = {
@@ -344,6 +348,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
                   {value === 6 && <ClientRequests />}
                   {value === 7 && <PasskeyList />}
                   {value === 8 && <PlanManager />}
+                  {value === 9 && <CompanyLeads />}
 
                 </motion.div>
               )}  
