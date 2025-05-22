@@ -135,7 +135,6 @@ useEffect(() => {
 }, [getCurrentHotspotPlan]);
 
 
-console.log('expiry', expiry)
   const getCurrentPPOEPlan = useCallback(
     async() => {
       const response = await fetch('/api/get_current_pppoe_plan', {

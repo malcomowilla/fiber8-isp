@@ -16,6 +16,12 @@ import { MdOutlineMessage } from "react-icons/md";
 import { BsQuestionCircle } from "react-icons/bs";
 import { FaWhatsapp } from "react-icons/fa6";
 
+import { FaCreditCard } from "react-icons/fa";
+import { FaUsersCog } from "react-icons/fa";
+import { IoKeyOutline } from "react-icons/io5";
+import { MdEmail } from "react-icons/md";
+
+import { FaPhoneVolume } from "react-icons/fa6";
 
 
 
@@ -259,7 +265,8 @@ const scrollIntoViewRefTop = useRef(null)
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.5 }}
-              className="text-2xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-teal-400"
+              className="text-2xl font-semibold mb-4 bg-clip-text 
+              text-white bg-gradient-to-r from-green-400 to-teal-400"
             >
               {currentText}
             </motion.div>
@@ -286,15 +293,15 @@ const scrollIntoViewRefTop = useRef(null)
           <p className="text-xl text-gray-300 mb-8">
             Empower your business with our cutting-edge SaaS platform for seamless internet management. Fast, reliable, and scalable.
           </p>
-
+<Link to='/contact-us'>
           <button 
-          onClick={() => window.open('https://wa.me/254791568852?text=Hello%20I%20am%20interested%20in%20your%20services', '_blank')}
+          // onClick={() => window.open('https://wa.me/254791568852?text=Hello%20I%20am%20interested%20in%20your%20services', '_blank')}
 
           className="bg-gradient-to-r from-green-600 to-teal-600
            text-white font-semibold py-3 px-8 rounded-lg hover:scale-105 transition-transform duration-300">
             Contact Us
           </button>
-
+</Link>
           </div>
          
           <div className=" ">
@@ -332,7 +339,7 @@ damping: 15,
 
         
         className="text-4xl font-bold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r
-         from-green-400 to-teal-400 animate-slide-in">
+         text-white animate-slide-in">
           Why Choose Us?
         </motion.h2>
 
@@ -375,9 +382,9 @@ damping: 15,
                 damping: 15, // Reduces the bounciness
               },
             }}
-          className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-green-500
+          className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-orange-500
            transition-all duration-300 hover:scale-105 animate-fade-in-up delay-200">
-            <div className="text-4xl mb-4 text-green-500">🔒</div>
+            <div className="text-4xl mb-4 text-orange-500">🔒</div>
             <h3 className="text-2xl font-bold mb-4">99.99% Uptime</h3>
             <p className="text-gray-400">Our network ensures maximum reliability with 99.99% uptime.</p>
           </motion.div>
@@ -454,6 +461,110 @@ damping: 15,
             <h3 className="text-2xl font-bold mb-4">24/7 Expert Support</h3>
             <p className="text-gray-400">Our team is available round the clock to assist you.</p>
           </motion.div>
+
+
+
+
+
+
+
+          <motion.div
+         viewport={{ once: true, amount: 0.5 }} 
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{
+            opacity: 1,
+            
+            scale: 1.05, 
+            transition: {
+             duration: 0.3,
+              type: "spring",
+              stiffness: 120, // Controls how stiff the animation is
+              damping: 15, // Reduces the bounciness
+            },
+          }}className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-yellow-500
+           transition-all duration-300 hover:scale-105 animate-fade-in-up delay-400">
+            <div className="text-4xl mb-4 text-yellow-500">
+            <FaCreditCard />
+
+            </div>
+            <h3 className="text-2xl font-bold mb-4">Voucher based System</h3>
+            <p className="text-gray-400">
+            Generate and manage hotspot access vouchers for your customers.
+            </p>
+
+          </motion.div>
+
+
+
+
+
+
+
+
+
+          <motion.div
+         viewport={{ once: true, amount: 0.5 }} 
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{
+            opacity: 1,
+            
+            scale: 1.05, 
+            transition: {
+             duration: 0.3,
+              type: "spring",
+              stiffness: 120, // Controls how stiff the animation is
+              damping: 15, // Reduces the bounciness
+            },
+          }}className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-amber-500
+           transition-all duration-300 hover:scale-105 animate-fade-in-up 
+           
+           delay-400 cursor-pointer">
+            <div className="text-4xl mb-4 text-amber-500">
+            <FaUsersCog className="inline-block mr-2" />
+
+            </div>
+            <h3 className="text-2xl font-bold mb-4">User Management</h3>
+            <p className="text-gray-400">
+            Complete control over user roles, permissions, and settings
+            </p>
+
+          </motion.div>
+
+
+
+
+
+
+          <motion.div
+  viewport={{ once: true, amount: 0.5 }} 
+  initial={{ opacity: 0, scale: 0.9 }}
+  whileInView={{
+    opacity: 1,
+    scale: 1.05, 
+    transition: {
+      duration: 0.3,
+      type: "spring",
+      stiffness: 120,
+      damping: 15,
+    },
+  }}
+  className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-rose-700
+           transition-all duration-300 hover:scale-105 animate-fade-in-up 
+           delay-400 cursor-pointer">
+  <div className="text-4xl mb-4 text-rose-700">
+    <IoKeyOutline className="inline-block mr-2" />
+  </div>
+  <h3 className="text-2xl font-bold mb-4">Multi-Layer Security</h3>
+  <p className="text-gray-400 mb-3">
+    Enterprise-grade protection with customizable authentication:
+  </p>
+  <ul className="text-gray-400 text-sm space-y-2 list-disc pl-5">
+    <li>Flexible 2FA via SMS, email, or authenticator apps</li>
+    <li>Passwordless login with secure passkeys</li>
+    <li>Granular role-based access controls</li>
+    <li>Real-time security notifications</li>
+  </ul>
+</motion.div>
         </div>
       </section>
 
@@ -553,7 +664,9 @@ from-gray-900 to-gray-600'>
 
 
 
-<section  className="py-20 px-6 bg-gradient-to-br from-gray-900 to-gray-950">
+<section  className="py-20 px-6 bg-gradient-to-br from-gray-900
+cursor-pointer
+to-gray-950">
 
 <div className='grid lg:grid-cols-2 grid-cols-1 gap-8'> 
 
@@ -576,6 +689,34 @@ bg-blue-400 p-4 rounded-xl  mt-4 text-center
   <p className='font-bold'>contact us</p>
 </div>
 </div>
+
+
+
+
+<div className='flex flex-col  gap-8'>
+<div className='flex flex-row gap-2 cursor-pointer'>
+<FaPhoneVolume className='w-8 h-8' />
+<div className='flex flex-col'>
+<p className='font-bold'>Call us</p>
+<p className='font-light'>  <a href="tel:+254791568852">+254791568852</a></p>
+</div>
+
+</div>
+
+
+
+
+<div className='flex flex-row gap-2 cursor-pointer'>
+<MdEmail className='w-8 h-8' />
+<div className='flex flex-col'>
+<p className='font-bold'>Email us</p>
+<p className='font-light'>  <a href="mailto:malcomowilla@gmail.com">malcomowilla@gmail.com</a></p>
+</div>
+
+</div>
+  </div>
+
+
 
 
 
@@ -611,7 +752,7 @@ damping: 15,
          }}
          viewport={{ once: true, amount: 0.5 }}
         className="text-4xl font-bold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r
-         from-green-400 to-teal-400 animate-slide-in">
+         text-white animate-slide-in">
          PPOE Pricing Plans
         </motion.h2>
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -632,11 +773,57 @@ damping: 15,
           }}
           viewport={{ once: true, amount: 0.5 }}
           className="bg-gray-900 p-8 rounded-xl border border-gray-800
+           hover:border-lime-500 transition-all duration-300 hover:scale-105
+           cursor-pointer
+           animate-fade-in-up">
+            <h3 className="text-2xl font-bold mb-4 text-lime-500">Custom</h3>
+            <p className="text-gray-400 mb-6">up to 100 ppoe subscribers</p>
+            <p className="text-4xl font-bold mb-6">
+              KES2000<span className="text-lg text-gray-400">/month</span>
+            </p>
+            <ul className="text-gray-400 mb-8">
+              <li className="mb-2">✅ Your Own Sudomain</li>
+              <li className="mb-2">✅Bulk SMS & Email Intergration</li>
+              <li className="mb-2">✅ 24/7 Email Support</li>
+              <li className="mb-2">✅ MPesa Intergration</li>
+              <li className="mb-2">✅ Centralized Admin Dashboard Management</li>
+              <li className="mb-2">❌ Customizable PPOE Plans</li>
+
+
+              <li className="mb-2">❌ Advanced Analytics</li>
+            </ul>
+            <button className="bg-gradient-to-r from-lime-600 to-lime-600
+             text-white font-semibold py-3 px-8 rounded-lg w-full hover:scale-105 
+             transition-transform duration-300">
+              Choose Plan
+            </button>
+          </motion.div>
+
+
+
+         
+          <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{
+            opacity: 1,
+            
+            scale: 1.05, 
+            transition: {
+             duration: 0.3,
+              type: "spring",
+              stiffness: 120, // Controls how stiff the animation is
+              damping: 15, // Reduces the bounciness
+            },
+          }}
+          viewport={{ once: true, amount: 0.5 }}
+          className="bg-gray-900 p-8 rounded-xl border
+          cursor-pointer
+          border-gray-800
            hover:border-green-500 transition-all duration-300 hover:scale-105 animate-fade-in-up">
             <h3 className="text-2xl font-bold mb-4 text-green-500">Basic</h3>
             <p className="text-gray-400 mb-6">up to 50 ppoe subscribers</p>
             <p className="text-4xl font-bold mb-6">
-              KES2000<span className="text-lg text-gray-400">/month</span>
+              KES1500<span className="text-lg text-gray-400">/month</span>
             </p>
             <ul className="text-gray-400 mb-8">
               <li className="mb-2">✅ Your Own Sudomain</li>
@@ -653,10 +840,6 @@ damping: 15,
               Choose Plan
             </button>
           </motion.div>
-
-
-
-         
 
 
 
@@ -681,7 +864,10 @@ damping: 15,
           }}
           viewport={{ once: true, amount: 0.5 }}
           className="bg-gray-900 p-8 rounded-xl border border-purple-500 transform 
-          scale-105 hover:scale-110 transition-all duration-300 animate-fade-in-up delay-200">
+          scale-105 hover:scale-110 transition-all duration-300 
+          cursor-pointer
+          animate-fade-in-up delay-200">
+
             <h3 className="text-2xl font-bold mb-4 text-purple-500">Pro</h3>
             <p className="text-gray-400 mb-6">up to 100 ppoe subscribers</p>
             <p className="text-4xl font-bold mb-6">
@@ -695,7 +881,7 @@ damping: 15,
               <li className="mb-2">✅ Customizable PPOE Plans</li>
 
             </ul>
-            <button className="bg-gradient-to-r from-teal-600 to-green-600 text-white font-semibold py-3 px-8 rounded-lg w-full hover:scale-105 transition-transform duration-300">
+            <button className="bg-gradient-to-r from-purple-600 to-purple-600 text-white font-semibold py-3 px-8 rounded-lg w-full hover:scale-105 transition-transform duration-300">
               Choose Plan
             </button>
           </motion.div>
@@ -717,7 +903,9 @@ damping: 15,
             },
           }}
           viewport={{ once: true, amount: 0.5 }}
-          className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-blue-500 transition-all duration-300 hover:scale-105 animate-fade-in-up">
+          className="bg-gray-900 p-8 rounded-xl border
+          cursor-pointer
+          border-gray-800 hover:border-blue-500 transition-all duration-300 hover:scale-105 animate-fade-in-up">
             <h3 className="text-2xl font-bold mb-4 text-blue-500">Standard</h3>
             <p className="text-gray-400 mb-6">up to 180 ppoe subscribers</p>
             <p className="text-4xl font-bold mb-6">
@@ -734,7 +922,8 @@ damping: 15,
 
               <li className="mb-2">❌ Advanced Analytics</li>
             </ul>
-            <button className="bg-gradient-to-r from-green-600 to-teal-600 text-white font-semibold py-3 px-8 rounded-lg w-full hover:scale-105 transition-transform duration-300">
+            <button className="bg-gradient-to-r from-blue-600 to-blue-600 text-white 
+            font-semibold py-3 px-8 rounded-lg w-full hover:scale-105 transition-transform duration-300">
               Choose Plan
             </button>
           </motion.div>
@@ -758,7 +947,11 @@ damping: 15,
           }}
           viewport={{ once: true, amount: 0.5 }}
           className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-red-500 
-          transition-all duration-300 hover:scale-105 animate-fade-in-up">
+          transition-all duration-300 hover:scale-105 
+          cursor-pointer
+          animate-fade-in-up">
+
+
             <h3 className="text-2xl font-bold mb-4 text-red-500">Startup</h3>
             <p className="text-gray-400 mb-6">up to 300 ppoe subscribers</p>
             <p className="text-4xl font-bold mb-6">
@@ -775,7 +968,8 @@ damping: 15,
 
               <li className="mb-2">✅ Advanced Analytics</li>
             </ul>
-            <button className="bg-gradient-to-r from-teal-600 to-green-600 text-white font-semibold py-3 px-8 rounded-lg w-full hover:scale-105 transition-transform duration-300">
+            <button className="bg-gradient-to-r from-red-600 to-red-500 text-white 
+            font-semibold py-3 px-8 rounded-lg w-full hover:scale-105 transition-transform duration-300">
               Choose Plan
             </button>
           </motion.div>
@@ -800,7 +994,13 @@ damping: 15,
             },
           }}
           viewport={{ once: true, amount: 0.5 }}
-          className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-yellow-500 transition-all duration-300 hover:scale-105 animate-fade-in-up">
+          className="bg-gray-900 p-8 rounded-xl border border-gray-800
+          
+          hover:border-yellow-500 transition-all
+          cursor-pointer
+          duration-300 hover:scale-105 animate-fade-in-up">
+
+
             <h3 className="text-2xl font-bold mb-4 text-yellow-500">Silver</h3>
             <p className="text-gray-400 mb-6">up to 500 ppoe subscribers</p>
             <p className="text-4xl font-bold mb-6">
@@ -840,7 +1040,11 @@ damping: 15,
           }}
           viewport={{ once: true, amount: 0.5 }}
           className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-cyan-500
-           transition-all duration-300 hover:scale-105 animate-fade-in-up">
+           transition-all duration-300 hover:scale-105 
+           cursor-pointer
+           animate-fade-in-up">
+
+
             <h3 className="text-2xl font-bold mb-4 text-cyan-500">Bronze</h3>
             <p className="text-gray-400 mb-6">up to 1000 ppoe subscribers</p>
             <p className="text-4xl font-bold mb-6">
@@ -886,7 +1090,11 @@ damping: 15,
           }}
           viewport={{ once: true, amount: 0.5 }}
           className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-amber-300 transition-all 
-          duration-300 hover:scale-105 animate-fade-in-up delay-800">
+          duration-300 hover:scale-105
+          cursor-pointer
+          animate-fade-in-up delay-800">
+
+
             <h3 className="text-2xl font-bold mb-4 text-amber-300">Enterprise</h3>
             <p className="text-gray-400 mb-6">Custom solutions for large-scale isp businesses.</p>
             <p className="text-4xl font-bold mb-6">
@@ -901,7 +1109,7 @@ damping: 15,
               <li className="mb-2">✅ Customizable PPOE Plans</li>
 
             </ul>
-            <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-8 rounded-lg w-full hover:scale-105 transition-transform duration-300">
+            <button className="bg-gradient-to-r from-amber-500 to-amber-500 text-white font-semibold py-3 px-8 rounded-lg w-full hover:scale-105 transition-transform duration-300">
               Contact Us
             </button>
           </motion.div>

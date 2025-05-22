@@ -149,6 +149,8 @@ import ServiceExpired from './service_expired/ServiceExpired'
 import LicenseExpired from './license_expired/LicenseExpired'
 const GoogleAuthenticatorSetup = lazy(() => import('./Auth/GoogleAuth'))
 const TwoFactorAuthVerification = lazy(() => import('./Auth/TwoFactorAuth'))
+const ContactUs = lazy(() => import('./contact_us/ContactUs'))
+const ClientLead = lazy(() => import('./client_lead/ClientLead'))
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -653,7 +655,10 @@ hostname.endsWith('.aitechs.co.ke')
   <Route index path='/'  element={<Signup/>}/>
 ): null}    */}
 
-{hostname === 'aitechs.co.ke' ? (
+
+{/* aitechs.co.ke */}
+
+{hostname === 'localhost' ? (
       <Route index path="/" element={<Signup />} />
     ) : hostname.endsWith('localhost') ? (
       <Route index path="/" element={<PPPoEPackages />} />
@@ -677,6 +682,7 @@ hostname.endsWith('.aitechs.co.ke')
     <Route path='/service-expired' element={<ServiceExpired/>}/>
     <Route  path='/license-expired' element={<LicenseExpired/>}/>
     <Route path='/two-factor-auth' element={<TwoFactorAuthVerification/>}/>
+    <Route path='/contact-us' element={<ContactUs/>}/>
 
 <Route element={<ProtectAuthSystemAdmin  />}>
     <Route path='/system-admin-dashboard' element={<DashboardSytemAdmin/>}/> 
@@ -736,6 +742,7 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/networks-wireguard-config' element={<WireguardConfigForm/>}/>
 <Route path='/admin/ip_networks' element={<IpNetworks/>}/>
 <Route path='/admin/google-authenticator' element={<GoogleAuthenticatorSetup/>}/>
+<Route path='/admin/client-leads' element={<ClientLead/>}/>
 </Route>
 
 </Route >

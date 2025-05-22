@@ -735,8 +735,8 @@ useEffect(() => {
 
 options={{
         paging: true,
-       pageSizeOptions:[5, 10, 20],
-       pageSize: 20,
+       pageSizeOptions:[5, 10],
+       pageSize: 10,
        search: false,
 searchFieldStyle: {
   borderColor: 'red'

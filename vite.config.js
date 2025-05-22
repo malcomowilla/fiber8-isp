@@ -18,6 +18,7 @@ export default defineConfig({
         // rewrite: (path) => path.replace(/^\/api/, ''),
 
         
+
         target: (req) => {
           const host = req.headers.host; // Get the request hostname
       

@@ -15,8 +15,8 @@ import {
 } from '@mui/material';
 import { ContentCopy, Check } from '@mui/icons-material';
 import { Autocomplete } from '@mui/material';
-import { useEffect } from 'react';
-
+import { useEffect,  } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -24,7 +24,7 @@ const SendSms = () => {
     const [subscribers, setSubscribers] = useState([]);
 
 
-
+const navigate = useNavigate()
 
     const subdomain = window.location.hostname.split('.')[0]
 
@@ -102,12 +102,25 @@ const SendSms = () => {
       if (!response.ok) {
         throw new Error('Failed to send SMS');
       }
-      
-      setSnackbar({
+      if (response.ok) {
+
+        setTimeout(() => {
+          navigate('/admin/messages')
+        }, 3000)
+         setSnackbar({
         open: true,
         message: 'SMS sent successfully!',
         severity: 'success'
       });
+
+      } else {
+        setSnackbar({
+          open: true,
+          message: 'Failed to send SMS',
+          severity: 'error'
+        });
+      }
+     
       
       // Clear form
       setSmsData({
