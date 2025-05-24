@@ -1102,9 +1102,8 @@ onClick={() => {
                    exit={{ opacity: 0, x: -20 }}
                    transition={{ duration: 0.2 , delay: 0.4 }}
                   >
-                     <Link to='/admin/hotspot_anlytics'  className="flex items-center w-full p-2 text-white 
-                     transition duration-75 rounded-lg  group 
-                      dark:text-white gap-x-3  ">
+                     <Link to='/admin/hotspot_anlytics'  className="flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-6 group text-white hover:bg-gray-700  ">
                         <WifiIcon/>
                         Hotspot     Overview</Link>
                   </ motion.li>
@@ -1122,12 +1121,13 @@ onClick={() => {
                    exit={{ opacity: 0, x: -20 }}
                    transition={{ duration: 0.2 , delay: 0.4 }}
                   >
-                     <Link to='/admin/hotspot_settings'  className="flex items-center w-full p-2 text-white 
-                     transition duration-75 rounded-lg  group 
-                      dark:text-white gap-x-3  ">
+                     <Link to='/admin/hotspot_settings'  className="flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-6 group text-white hover:bg-gray-700">
                         <MdSettingsInputAntenna/>
                         Settings</Link>
                   </ motion.li>
+
+                 
 
                  
 

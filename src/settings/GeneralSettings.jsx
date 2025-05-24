@@ -156,7 +156,7 @@ const handleGetCompanySettings = useCallback(
         console.log('failed to fetch company settings')
       }
     } catch (error) {
-      toast.error('internal servere error  while fetching company settings')
+      toast.error('internal server error  while fetching company settings', )
     
     }
   },
@@ -247,16 +247,16 @@ const newData = await response.json()
       } else {
         toast.error(newData.error, {
           position: "top-center",
-          duration: 5000,
+          duration: 4000,
         })
         toast.error('failed to fetch router settings', {
-          duration: 7000,
+          duration: 4000,
           position: "top-center",
         });
       }
     } catch (error) {
       toast.error('failed to fetch router settings', {
-        duration: 7000,
+        duration: 4000,
         position: "top-center",
       });
       
@@ -324,7 +324,7 @@ toast.success('settings updated successfully', {
           setOpen(false)
           toast.error('failed to update settings', {
             position: "top-center",
-            duration: 7000,
+            duration: 4000,
             
           })
           console.log('not created')
@@ -337,7 +337,7 @@ toast.success('settings updated successfully', {
             'Failed to update settings something went wrong',
             {
               position: "top-center",
-              duration: 7000,
+              duration: 4000,
               
             }
           )
@@ -452,7 +452,7 @@ toast.success("company settings updated successfully", {
   console.log('error creating company settings',error)
   toast.error('internal server error', {
       position: "top-center",
-      duration: 7000,
+      duration: 4000,
     })
 
   
@@ -504,7 +504,7 @@ duration: 5000,
 
         toast.error('failed to fetch admin settings', {
           position: "top-center",
-          duration: 6000,
+          duration: 4000,
         })
       }
     } catch (error) {
@@ -545,7 +545,7 @@ const handleChangeAdminSetting = async(e) => {
     if (response.ok) {
       toast.success('admin settings updated successfully', {
         position: "top-center",
-        duration: 5000,
+        duration: 4000,
       })
       setisloading(false)
       setOpen(false)
@@ -568,7 +568,7 @@ const handleChangeAdminSetting = async(e) => {
       setOpenSettings(false)
       toast.error('failed to update admin settings', {
         position: "top-center",
-        duration: 6000,
+        duration: 4000,
       })
       
     }

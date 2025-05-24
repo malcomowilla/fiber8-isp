@@ -14,7 +14,7 @@ import dayjs from 'dayjs';
 import SubscriberNotification from '../notification/SubscriberNotification'
 import { IoPeople } from "react-icons/io5";
 import {motion} from 'framer-motion'
-import { Button, Tooltip, } from '@mui/material';
+import { Button, Tooltip, Box,  Chip, Typography, useTheme } from '@mui/material';
 import { FaPhoneVolume } from "react-icons/fa6";
 
 import LoadingAnimation from '../loader/loading_animation.json'
@@ -219,7 +219,7 @@ setFormData({
           console.log(error)
         }
       },
-      []
+      [subdomain]
     )
   
   
@@ -372,6 +372,15 @@ toast.error('failed to delete subscriber', {
 
 
 
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  
+
+
   const columns = [
     {title: 'name', field: 'name', headerClassName: 'dark:text-black ', defaultSort: 'asc'},
     {title: 'ref_no', field: 'ref_no',  headerClassName: 'dark:text-black' ,  sorting: true, defaultSort: 'asc'},
@@ -388,9 +397,9 @@ toast.error('failed to delete subscriber', {
         return (
           <>
 <p
-className={`${statusInfo.status === 'active' ? 'text-emerald-500' : 'text-red-500'
+className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-500'
         } `}
->{statusInfo.package} </p>
+>{statusInfo?.package} </p>
         </>
         )
         
@@ -551,7 +560,7 @@ actions={[
 
 options={{
   sorting: true,
-  pageSizeOptions:[2, 5, 10, 20, 25, 50, 100],
+  pageSizeOptions:[2, 5, 10],
   pageSize: 10,
   paginationPosition: 'bottom',
 exportButton: true,
