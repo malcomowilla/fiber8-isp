@@ -29,10 +29,11 @@ import {
   IoCheckmarkCircleOutline, 
   IoCloseCircleOutline 
 } from 'react-icons/io5';
+import CurrentPlans from './CurrentPlans'
 
+import SmsBalance from './SmsBalance'
 
-
-
+import License from './License'
 
 // import { ReloadIcon } from "@radix-ui/react-icons"
 
@@ -318,57 +319,35 @@ setSmsBalance(newData.message)
           <p className="capitalize mb-10 dark:text-white text-black text-2xl">
             {date}
           </p>
-          <motion.div 
-  className="flex items-center px-6 py-4 mb-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-600"
-  initial={{ opacity: 0, scale: 0.95 }}
-  animate={{ opacity: 1, scale: 1 }}
-  transition={{ duration: 0.3 }}
->
-  {/* Animated verification badges */}
-  <motion.div
-    className="relative mr-4"
-    animate={{
-      rotate: [0, 5, -5, 0],
-      y: [0, -3, 0]
-    }}
-    transition={{
-      duration: 3,
-      repeat: Infinity,
-      ease: "easeInOut"
-    }}
-  >
-    <div className="relative">
-      <VerifiedIcon className="text-blue-500 dark:text-blue-400 text-4xl drop-shadow-md" />
-      <VerifiedIcon 
-        className="text-indigo-400 dark:text-indigo-300 text-3xl absolute -bottom-1 -right-1 drop-shadow-md"
-        style={{ transform: 'rotate(15deg)' }}
-      />
-    </div>
-  </motion.div>
+         
 
-  {/* Plan information */}
-  <div className="flex-1 space-y-2">
-    <motion.p 
-      className="font-bold text-gray-800 dark:text-white text-lg"
-      initial={{ x: -10 }}
-      animate={{ x: 0 }}
-      transition={{ delay: 0.1 }}
-    >
-      Current PPPoe Plan: <span className="text-blue-600 dark:text-blue-300">{currentPPOEPlan || 'Not Set'}</span>
-    </motion.p>
-    
-    <motion.p 
-      className="font-bold text-gray-800 dark:text-white text-lg"
-      initial={{ x: -10 }}
-      animate={{ x: 0 }}
-      transition={{ delay: 0.2 }}
-    >
-      Hotspot Plan: <span className="text-purple-600 dark:text-purple-300">
-        {currentHotspotPlan || 'Not Set'}
-      </span>
-    </motion.p>
-  </div>
-</motion.div>
+{location.pathname !== '/admin/hotspot_anlytics' &&
+ location.pathname !== '/admin/admin-dashboard'  && location.pathname !== '/admin/pppoe-subscribers' 
+ && location.pathname !== '/admin/networks-wireguard-config' &&
+ location.pathname !== '/admin/network-components' &&
+ location.pathname !== '/admin/nas' && location.pathname !== '/admin/nodes' &&
+ location.pathname !== '/admin/upload-subscriber' &&
+ location.pathname !== '/admin/user' &&
+ location.pathname !== '/admin/user-group' && location.pathname !== '/admin/client-leads' &&
+ location.pathname !== '/admin/settings' && location.pathname !== '/admin/google-authenticator' &&
+ location.pathname !== '/admin/profile' && location.pathname !== '/admin/customer-tickets' &&
+ location.pathname !== '/admin/hotspot-dashboard' && location.pathname !== '/admin/hotspot-package' &&
+ location.pathname !== '/admin/hotspot-subscriptions' && 
+ location.pathname !== '/admin/hotspot-templates' && 
+
+ location.pathname !== '/admin/hotspot_settings' && location.pathname !== '/admin/send-sms' &&
+
+ location.pathname !== '/admin/messages' && location.pathname !== '/admin/bulk-messages' && 
+ location.pathname !== '/admin/pppoe-packages' &&
+
+
+
+ <CurrentPlans
+currentPPOEPlan={currentPPOEPlan} currentHotspotPlan={currentHotspotPlan} 
+/>}
+
+
+
 
   {/* Rest of your menu items */}
   {/* ... */}
@@ -384,14 +363,25 @@ setSmsBalance(newData.message)
     </div>
   )} */}
 
-<div className="flex items-center gap-2 bg-white border
-    dark:bg-gray-800 dark:border-gray-700
-    border-t-blue-600 px-4 py-2 rounded-lg">
-      <FaSms className="text-blue-600 dark:text-blue-300 text-xl animate-bounce" />
-      <span className="text-blue-800 dark:text-blue-200 font-medium">
-        SMS Balance: <span className="font-bold">{smsBalance}</span>
-      </span>
-    </div>
+{location.pathname !== '/admin/hotspot_anlytics' && location.pathname !== '/admin/pppoe-subscribers'
+ && location.pathname !== '/admin/networks-wireguard-config'
+ &&  location.pathname !== '/admin/ip_networks' && location.pathname !== '/admin/network-components'
+ && location.pathname !== '/admin/nas' && location.pathname !== '/admin/nodes' &&
+  location.pathname !== '/admin/upload-subscriber'
+  && location.pathname !== '/admin/user' && location.pathname !== '/admin/user-group'
+ && location.pathname !== '/admin/client-leads' && location.pathname !== '/admin/settings' &&
+location.pathname !== '/admin/google-authenticator' && 
+location.pathname !== '/admin/profile' && location.pathname !== '/admin/customer-tickets' &&
+
+location.pathname !== '/admin/hotspot-dashboard' && location.pathname !== '/admin/hotspot-package' &&
+location.pathname !== '/admin/hotspot-subscriptions' &&
+location.pathname !== '/admin/hotspot-templates' &&
+
+location.pathname !== '/admin/hotspot_settings' &&
+
+location.pathname !== '/admin/pppoe-packages' &&
+    <SmsBalance  smsBalance={smsBalance} />
+}
 
 {window.location.hostname === 'demo.aitechs.co.ke' && (
   <div className='flex items-center gap-2 mt-2 bg-white border
@@ -406,101 +396,60 @@ setSmsBalance(newData.message)
 
 
 
-<div className='flex items-center gap-2 mt-2 bg-white border dark:bg-gray-800 border-t-red-600 px-4 py-2 rounded-lg'>
-  <div className='flex'>
-    {condition ? (
-      <IoWarningOutline className='text-red-600 dark:text-red-300 text-xl animate-pulse' />
-    ) : (
-      <IoCheckmarkCircleOutline className='text-green-600 dark:text-green-300 text-xl animate-bounce' />
-    )}
-    <div className='flex flex-col'>
-      <span className='text-red-800 dark:text-red-200 font-medium'>
-        <span className={`
-          ${condition ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'}
-          `}> <span className='font-bold'>PPPOE License</span> -  </span> <span className='text-black
-           font-light dark:text-white'>Your
-           license expires in
-        <span className='ml-2 text-red-600 dark:text-red-300'>
-            ({ expiry === 'No license' ? 'No license' : calculateTimeRemaining(expiry)})
-          </span>
-
-           </span>
-       
-      </span>
-      
-      <p className='text-black text-sm font-light dark:text-white'>
-        Expiry Date: <span className='font-bold'>{expiry}</span>
-          
-      </p>
-
-      <p className={`text-black text-sm 
-        font-light dark:text-white`}>
-        Status: <span className={`font-bold
-          
-                  ${status === 'active' ? 'text-emerald-600' : 'text-red-600'}
-
-          `}>{status === 'Not Active' ? 'Not Active' : status}</span>
-          
-      </p>
-
-    </div>
-  </div>
-</div>
 
 
 
+  {location.pathname !== '/admin/hotspot_anlytics' && location.pathname !== '/admin/pppoe-subscribers' 
+  && location.pathname !== '/admin/networks-wireguard-config' && location.pathname !== '/admin/ip_networks' && 
+  location.pathname !== '/admin/network-components' &&
+  location.pathname !== '/admin/nas' &&
+  location.pathname !== '/admin/user' && location.pathname !== '/admin/user-group' &&
+  location.pathname !== '/admin/client-leads' &&
+  location.pathname !== '/admin/profile' && location.pathname !== '/admin/customer-tickets' &&
+  location.pathname !== '/admin/hotspot-dashboard' && location.pathname !== '/admin/hotspot-subscriptions' &&
 
-<div className='flex items-center gap-2 mt-2 bg-white border dark:bg-gray-800
- border-t-red-600 px-4 py-2 rounded-lg'>
-  <div className='flex'>
-    {condition2 ? (
-      <IoWarningOutline className='text-red-600 dark:text-red-300 text-xl animate-pulse' />
-    ) : (
-      <IoCheckmarkCircleOutline className='text-green-600 dark:text-green-300 text-xl animate-bounce' />
-    )}
-    <div className='flex flex-col'>
-      <span className='text-red-800 dark:text-red-200 font-medium'>
-        <span className={`
-          ${condition2 ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'}
-          `}> <span className='font-bold'>Hotspot License- </span>  </span> <span className='text-black 
-          font-light dark:text-white'>Your license expires in
-        <span className='ml-2 text-red-600 dark:text-red-300'>
-            ({ expiry2 === 'No license' ? 'No license' : calculateTimeRemaining(expiry2)})
-          </span>
+  location.pathname !== '/admin/hotspot-templates' &&
+  location.pathname !== '/admin/hotspot_settings' &&
+  location.pathname !== '/admin/send-sms' &&
+  location.pathname !== '/admin/messages' &&
+  location.pathname !== '/admin/bulk-messages' &&  
+  location.pathname !== '/admin/pppoe-packages' &&
 
-           </span>
-       
-      </span>
-      
-      <p className='text-black text-sm font-light dark:text-white'>
-        Expiry Date: <span className='font-bold'>{expiry2}</span>
-          
-      </p>
-
-      <p className={`text-black text-sm 
-        font-light dark:text-white`}>
-        Status: <span className={`font-bold
-          
-                  ${status2 === 'active' ? 'text-emerald-600' : 'text-red-600'}
-
-          `}>{status2}</span>
-          
-      </p>
-
-    </div>
-  </div>
-</div>
-
-
+   <License expiry={expiry} condition={condition} 
+  status={status}
+ expiry2={expiry2} condition2={condition2} status2={status2}
+  calculateTimeRemaining={calculateTimeRemaining} /> }
 
 
 <div className='mt-4'>
-          {location.pathname !== '/admin/customer-tickets' && location.pathname !== '/admin/hotspot-dashboard' && location.pathname !== '/admin/pppoe-subscribers' && <ShortCuts />}
+          {location.pathname !== '/admin/customer-tickets' && location.pathname 
+          !== '/admin/hotspot-dashboard' && location.pathname !== '/admin/pppoe-subscribers' 
+          &&  location.pathname !== '/admin/hotspot_anlytics' 
+           && location.pathname !== '/admin/nodes'
+           
+           && location.pathname !== '/admin/user'
+           && location.pathname !== '/admin/client-leads'
+           && location.pathname !== '/admin/settings'
+           && location.pathname !== '/admin/profile'
+           && location.pathname !== '/admin/passkeys'
+           && location.pathname !== '/admin/router-stats'
+           && location.pathname !== '/admin/hotspot-package'
+           && location.pathname !== '/admin/hotspot-templates'
+           && location.pathname !== '/admin/hotspot_settings'
+           && location.pathname !== '/admin/send-sms' &&
+           location.pathname !== '/admin/messages' && location.pathname !== '/admin/bulk-messages'
 
-          
+
+           
+           &&<ShortCuts />
+           
+           }
+
+
           {/* {location.pathname !== '/admin/customer-tickets' && <ShortCuts />}
           {location.pathname !== '/admin/hotspot-dashboard' && <ShortCuts />} */}
           {location.pathname === '/admin/hotspot-dashboard' && <DashboardStatistics />}
+
           {location.pathname === '/admin/customer-tickets' && <TicketStatistics />}
           {location.pathname === '/admin/pppoe-subscribers' && <SubscriberStats />}
 

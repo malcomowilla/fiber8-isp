@@ -18,6 +18,35 @@ import { MdOutlineTimer } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import {Link} from 'react-router-dom'
 
+
+
+
+
+import RouterIcon from '@mui/icons-material/Router';
+
+import { LuUsers } from "react-icons/lu";
+
+// ChartJS.register(   BarElement, CategoryScale,  LinearScale, Title, Tooltip, Legend);
+
+import MaterialTable from "material-table";
+import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
+import { Box, Button, Chip, Typography, useTheme  } from '@mui/material';
+import { Add as AddIcon, GetApp as GetAppIcon } from '@mui/icons-material';
+import { MdOutlineSupportAgent } from "react-icons/md";
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useDebounce } from 'use-debounce';
+import { LiaSmsSolid } from "react-icons/lia";
+import { FaRegCheckCircle, FaRegTimesCircle, FaRegClock } from "react-icons/fa";
+import { formatDistanceToNow } from 'date-fns';
+
+import { format } from 'date-fns';
+import { LuDollarSign, LuClock, LuCalendar } from "react-icons/lu";
+import { MdOutlineOnlinePrediction } from "react-icons/md";
+import { IoCloudOfflineOutline } from "react-icons/io5";
+
+
+
 const SubscriberStats = () => {
     const { welcomeMessage, welcome, setFormData, settingsformData, 
         totalSubscribers, setTotalSubscribers,subscribersOnline, setSubscribersOnline,
@@ -74,67 +103,54 @@ useEffect(() => {
   fetchtotalSubscribers()
   
 }, [fetchtotalSubscribers]);
-  return (
-    <div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 align-center'>
-          
-  <motion.div
-    className="w-full max-w-md h-full max-h-min p-2 bg-gradient-to-r from-blue-500 to-blue-600 border
-     border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform
-      transition-all hover:scale-105 relative overflow-hidden
-      gradient-border
-      "
+
+
+
+
+
+
+
+const StatCard = ({ title, value, icon, trend, color }) => (
+  <motion.div 
     variants={cardVariants}
-    initial="hidden"
-    animate="visible"
-    transition={{ duration: 0.5, delay: 0.2 }}
-    whileHover={{ scale: 1.05, rotate: 1 }}
+    className={`p-6 rounded-xl shadow-md bg-white`}
   >
-
-<Link to='/admin/pppoe-subscribers' className='cursor-pointer
-
-flex justify-center flex-col items-center'> 
-<IoEyeOutline className='text-white'/>
-<p className='text-white'>view</p>
-
-</Link>
-    {/* Floating Icons */}
-    <motion.div
-      className="absolute -top-4 -right-4 opacity-20"
-      animate={{ rotate: 360 }}
-      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-    >
-      <LiaUserSolid className="w-20 h-20 text-white" />
-    </motion.div>
-
-    <div className='flex justify-center items-center py-8 '>
-      <div className='flex flex-row'>
-    <LiaUserSolid className="w-10 h-10 mb-4 text-white relative z-10" />
-    <div className='flex flex-col justify-center'>
-
-    <a href="#">
-
-      <h5 className="mb-2 text-xl font-semibold tracking-tight text-white raleway-dots-relative">
-        Total Subscribers
-      </h5>
-    </a>
-
-
-<div className='text-center'>
-    <motion.p 
-    animate={{ scale: [1, 1.1, 1] }}
-    transition={{ duration: 1, repeat: Infinity }}
-    className="mb-3 font-normal cursor-pointer
- text-white text-3xl">{totalSubscribers}</motion.p>
-</div>
-
-
-
- </div>
-</div>
-</div>
-    
-    {/* Subtle Glow Effect */}
+    <div className="flex justify-between items-start">
+      <div>
+        <Typography variant="subtitle2" color="textSecondary">
+          <p className='text-black '>{title}</p>
+        </Typography>
+        <Typography variant="h4" className="mt-1 font-bold">
+          <p className='text-black '>{value}</p>
+        </Typography>
+      </div>
+      <Box 
+        className={`p-3 rounded-full`}
+        sx={{ bgcolor: `${color}.50`, color: `${color}.600` }}
+      >
+        {icon}
+      </Box>
+    </div>
+    {trend && (
+      <Typography 
+        variant="caption" 
+        className={`mt-2 flex items-center ${trend.value > 0 ? 'text-green-600' : 'text-red-600'}`}
+      >
+        {trend.value > 0 ? '↑' : '↓'} {Math.abs(trend.value)}% {trend.label}
+      </Typography>
+    )}
   </motion.div>
+);
+  return (
+    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 align-center'>
+          
+          <StatCard 
+          title="Total Subscribers" 
+          value={totalSubscribers}
+          icon={<LuUsers size={24} className='text-black' />} 
+          trend={{ value: 8, label: 'vs yesterday' }}
+          color="secondary"
+        />
 
 
 
@@ -146,102 +162,27 @@ flex justify-center flex-col items-center'>
 
 
   {/* Subscribers Online Card */}
-  <motion.div
-    className="w-full max-w-md h-full max-h-min p-2 bg-gradient-to-r from-green-500 to-teal-600 border
-     border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform
-      transition-all hover:scale-105 relative overflow-hidden
-      gradient-border"
-    variants={cardVariants}
-    initial="hidden"
-    animate="visible"
-    transition={{ duration: 0.5, delay: 0.4 }}
-    whileHover={{ scale: 1.05, rotate: -1 }}
-  >
-    {/* Floating Icons */}
-    <div className='flex justify-center py-[50px]'>
-    <motion.div
-      className="absolute -top-4 -right-4 opacity-20"
-      animate={{ rotate: 360 }}
-      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-    >
-
-      <WifiIcon className="w-20 h-20 text-white" />
-    </motion.div>
-    
-      <div className='flex flex-col'>
-    <div className='flex flex-row gap-2'>
-    <WifiIcon className="w-10 h-10 mb-4 text-white relative z-10 animate-pulse" />
-    <a href="#">
-      <h5 className="mb-2 text-xl font-semibold tracking-tight text-white raleway-dots-relative">
-        Subscribers Online
-      </h5>
-    </a>
-
-    </div>
-    <motion.p
-     animate={{ scale: [1, 1.1, 1] }}
-     transition={{ duration: 1, repeat: Infinity }}
-    className="mb-3 font-normal text-white text-center text-3xl">{subscribersOnline}</motion.p>
-
-</div>
-    </div>
-    {/* Subtle Glow Effect */}
-    <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-500 opacity-0 hover:opacity-20 transition-opacity duration-300"></div>
-  </motion.div>
+  <StatCard 
+          title="Subscribers Online"
+          value={subscribersOnline}
+          icon={<MdOutlineOnlinePrediction size={24} className='text-black' />} 
+          trend={{ value: 8, label: 'vs yesterday' }}
+          color="secondary"
+        />
 
 
 
 
 
   {/* Subscribers Offline Card */}
-  <motion.div
-
-    className="w-full max-w-md h-full max-h-min p-2 bg-white border
-     border-gray-900 rounded-lg shadow-2xl dark:border-gray-700 transform
-      transition-all hover:scale-105 relative overflow-hidden
-      "
-    variants={cardVariants}
-    initial="hidden"
-    animate="visible"
-    transition={{ duration: 0.5, delay: 0.6 }}
-    whileHover={{ scale: 1.05, rotate: 1 }}
-  >
-    {/* Floating Icons */}
-
-    <div className='flex justify-center gap-3  py-[50px]'>
-
-    <motion.div
-      className="absolute -top-4 -right-4 opacity-20"
-      animate={{ rotate: 360 }}
-      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-    >
-      <WifiOffIcon className="w-20 h-20 text-red" />
-    </motion.div>
-    
-
-
-    <WifiOffIcon className="w-10 h-10 mb-4 text-red-600 relative z-10 animate-pulse" />
-
-<div className='flex flex-col '>
-    <a href="#">
-      <h5 className="mb-2 text-xl font-semibold tracking-tight text-black raleway-dots-relative">
-        Subscribers Offline
-      </h5>
-    </a>
-
-
-
-    <motion.p 
-     animate={{ scale: [1, 1.1, 1] }}
-     transition={{ duration: 1, repeat: Infinity }}
-    className="mb-3 font-normal text-black text-center text-3xl">{subscribersOffline}</motion.p>
-</div>
-    {/* Subtle Glow Effect */}
-    <div className="absolute inset-0 bg-gradient-to-r from-red-400
-     to-red-500 opacity-0 hover:opacity-20 transition-opacity duration-300"></div>
-     </div>
-  </motion.div>
-
+  
+  <StatCard 
+          title="Subscribers Offline"
+          value={subscribersOffline}
+          icon={<IoCloudOfflineOutline  size={24} className='text-black' />} 
+          trend={{ value: 8, label: 'vs yesterday' }}
+          color="secondary"
+        />
   
     </div>
   )

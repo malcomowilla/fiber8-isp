@@ -656,7 +656,7 @@ actions={[
   
 options={{
         paging: true,
-       pageSizeOptions:[5, 10, 20, 25, 50, 100],
+       pageSizeOptions:[5, 10],
        pageSize: 10,
        search: false,
        searchFieldAlignment:'right',
