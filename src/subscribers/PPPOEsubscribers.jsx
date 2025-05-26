@@ -203,7 +203,9 @@ setFormData({
 
     
 
-  const [status, setStatus] = useState('active')
+  const [status, setStatus] = useState([])
+
+
     const getSubscriptions = useCallback(
       async() => {
         
@@ -416,10 +418,10 @@ className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-5
        
         
         return <span className={`flex items-center px-3 py-1 rounded-full ${
-          statusInfo.status === 'active' ? 'bg-green-100 text-green-800' 
+          statusInfo?.status === 'active' ? 'bg-green-100 text-green-800' 
           : 'bg-red-100 text-red-800'
         }`}>
-          {statusInfo.status === 'active' ? 'active' : 'offline'}
+          {statusInfo?.status === 'active' ? 'active' : 'offline'}
         </span>
       }
         
