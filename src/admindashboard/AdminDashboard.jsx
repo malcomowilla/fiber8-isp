@@ -1,6 +1,7 @@
 
 import {Link} from 'react-router-dom'
 import {motion } from 'framer-motion'
+import { useState, useEffect, useCallback } from 'react';
 
 const AdminDashboard = () => {
 
@@ -9,6 +10,70 @@ const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
+
+const [totalSubscribers, setTotalSubscribers] = useState(0);
+
+
+const subdomain = window.location.hostname.split('.')[0];
+  const fetchtotalSubscribers = useCallback(
+    async() => {
+      try {
+        const response = await fetch('/api/total_subscribers', {
+          headers: {
+            'X-Subdomain': subdomain,
+          },
+        });
+
+        const newData = await response.json();
+
+        if (response.ok) {
+          setTotalSubscribers(newData.total_subscribers)
+        } else {
+          console.log('failed to fetch total subscribers')
+        }
+      } catch (error) {
+        console.log('failed to fetch total subscribers')
+      }
+      
+    },
+    [],
+  )
+  
+useEffect(() => {
+  fetchtotalSubscribers()
+  
+}, [fetchtotalSubscribers]);
+
+
+
+
+const [status, setStatus] = useState([])
+
+
+const getSubscriptions = useCallback(
+  async() => {
+    
+    try {
+      const response = await fetch('/api/subscriptions', {
+        headers: { 'X-Subdomain': subdomain },
+      })
+      const data = await response.json()
+      setStatus(data)
+      // setSubscriptions(data)
+    }
+    catch (error) {
+      console.log(error)
+    }
+  },
+  [subdomain]
+)
+
+
+
+useEffect(() => {
+  getSubscriptions() 
+ 
+}, [getSubscriptions]);
   return (
    <>
    
@@ -73,7 +138,7 @@ bg-gradient-to-r from-white to-white  rounded-lg shadow-2xl sm:p-8 dark:bg-gray-
                     </div>
                     <div className="inline-flex items-center text-base font-semibold
                      text-gray-900 dark:text-black">
-                        $3467
+                        {totalSubscribers}
                     </div>
                 </div>
             </li>
