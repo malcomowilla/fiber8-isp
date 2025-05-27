@@ -19,6 +19,7 @@ export default defineConfig({
 
         
         target: (req) => {
+          
           const host = req.headers.host; // Get the request hostname
       
           // Check if the host is "aitechs.co.ke" or any subdomain of it
