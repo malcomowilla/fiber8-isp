@@ -224,9 +224,13 @@ const createPackage = async (e) => {
           'X-Subdomain': subdomain,
 
         },
-        body: JSON.stringify({...formData, router_name: settingsformData.router_name,
-          use_radius: settingsformData.use_radius,
-        }),
+        body: JSON.stringify({
+          package: {
+            ...formData,
+            router_name: settingsformData.router_name,
+            use_radius: settingsformData.use_radius
+          }
+        })
       });
 
       const newData = await response.json();
@@ -244,7 +248,8 @@ const createPackage = async (e) => {
 
       if (response.status === 423) {
         setTimeout(() => {
-         navigate('/account-locked')
+        //  navigate('/account-locked')
+         window.location.href='/account-locked'
         }, 1800); 
        }
 
