@@ -1,5 +1,6 @@
 
 
+
 import MaterialTable from 'material-table'
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -28,7 +29,7 @@ import toast, { Toaster } from 'react-hot-toast';
 
 
 
-const PPPOEsubscribers = () => {
+const LastMonthRegisteredSubscribers = () => {
   const { settingsformData } = useApplicationSettings();
   // const navigate = useNavigate()
 
@@ -593,7 +594,7 @@ headerStyle:{
   )
 }
 
-export default PPPOEsubscribers
+export default LastMonthRegisteredSubscribers
 
 
 

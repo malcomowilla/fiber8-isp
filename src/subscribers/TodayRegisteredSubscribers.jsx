@@ -28,7 +28,7 @@ import toast, { Toaster } from 'react-hot-toast';
 
 
 
-const PPPOEsubscribers = () => {
+const TodayRegisteredSubscribers = () => {
   const { settingsformData } = useApplicationSettings();
   // const navigate = useNavigate()
 
@@ -145,6 +145,18 @@ setFormData({
 
   const subdomain = window.location.hostname.split('.')[0]; 
 
+
+
+   const getTodaysSubscribers = (subscribers) => {
+  const today = new Date();
+  const todayStart = new Date(today.setHours(0, 0, 0, 0));
+  const todayEnd = new Date(today.setHours(23, 59, 59, 999));
+  
+  return subscribers.filter(sub => {
+    const regDate = new Date(sub.registration_date);
+    return regDate >= todayStart && regDate <= todayEnd;
+  });
+};
     
   const fetchSubscribers = useCallback(
     async() => {
@@ -162,8 +174,7 @@ setFormData({
     
       const newData = await response.json()
     if (response.ok) {
-      setTableData(newData)
-  
+setTableData(getTodaysSubscribers(newData));  
     } else {
       console.log('failed to fetch routers')
 
@@ -398,6 +409,7 @@ toast.error('failed to delete subscriber', {
           item?.ppoe_username || item?.ppoe_password === rowData?.ref_no
         ) || { status: 'offline' };
 
+
         return (
           <>
 <p
@@ -410,7 +422,7 @@ className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-5
       }
       },
     {title: 'House Number', field:'house_number',  headerClassName: 'dark:text-black'},
-    {title: ' Building', field:'building_name',  headerClassName: 'dark:text-black'},
+    {title: 'Building', field:'building_name',  headerClassName: 'dark:text-black'},
   
     {title: 'Status', field:'status',  headerClassName: 'dark:text-black',  
       render: (rowData) => {
@@ -471,6 +483,8 @@ className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-5
     </IconButton>
   )
 
+
+ 
   
   return (
     <div>
@@ -593,7 +607,7 @@ headerStyle:{
   )
 }
 
-export default PPPOEsubscribers
+export default TodayRegisteredSubscribers
 
 
 

@@ -338,7 +338,7 @@ setSmsBalance(newData.message)
  location.pathname !== '/admin/hotspot_settings' && location.pathname !== '/admin/send-sms' &&
 
  location.pathname !== '/admin/messages' && location.pathname !== '/admin/bulk-messages' && 
- location.pathname !== '/admin/pppoe-packages' &&
+ location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/today-subscribers' &&
 
 
 
@@ -379,7 +379,7 @@ location.pathname !== '/admin/hotspot-templates' &&
 
 location.pathname !== '/admin/hotspot_settings' &&
 
-location.pathname !== '/admin/pppoe-packages' &&
+location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/today-subscribers' &&
     <SmsBalance  smsBalance={smsBalance} />
 }
 
@@ -413,7 +413,7 @@ location.pathname !== '/admin/pppoe-packages' &&
   location.pathname !== '/admin/send-sms' &&
   location.pathname !== '/admin/messages' &&
   location.pathname !== '/admin/bulk-messages' &&  
-  location.pathname !== '/admin/pppoe-packages' &&
+  location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/today-subscribers' &&
 
    <License expiry={expiry} condition={condition} 
   status={status}
@@ -438,6 +438,7 @@ location.pathname !== '/admin/pppoe-packages' &&
            && location.pathname !== '/admin/hotspot_settings'
            && location.pathname !== '/admin/send-sms' &&
            location.pathname !== '/admin/messages' && location.pathname !== '/admin/bulk-messages'
+           && location.pathname !== '/admin/today-subscribers'
 
 
            
@@ -451,7 +452,13 @@ location.pathname !== '/admin/pppoe-packages' &&
           {location.pathname === '/admin/hotspot-dashboard' && <DashboardStatistics />}
 
           {location.pathname === '/admin/customer-tickets' && <TicketStatistics />}
-          {location.pathname === '/admin/pppoe-subscribers' && <SubscriberStats />}
+
+          
+          {location.pathname === '/admin/pppoe-subscribers' 
+            && <SubscriberStats />}
+
+
+            {location.pathname === '/admin/today-subscribers' && <SubscriberStats />}
 
 </div>
           <div className="mt-8">

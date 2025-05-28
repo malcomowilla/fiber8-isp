@@ -1,5 +1,6 @@
 
 
+
 import MaterialTable from 'material-table'
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -23,12 +24,17 @@ import Backdrop from '@mui/material/Backdrop';
 import DeleteSubscriber from '../delete/DeleteSubscriber'
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 import toast, { Toaster } from 'react-hot-toast';
+import isBetween from 'dayjs/plugin/isBetween';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(isBetween);
+dayjs.extend(customParseFormat);
 
 // import Autocomplete from '@mui/material/Autocomplete';
 
 
 
-const PPPOEsubscribers = () => {
+const ThisWeekRegisteredSubscribers = () => {
   const { settingsformData } = useApplicationSettings();
   // const navigate = useNavigate()
 
@@ -80,6 +86,23 @@ const [onlyShowSubscription, setOnlyShowSubscription] = useState(false)
 
 
   };
+
+
+ const getThisWeeksSubscribers = (subscribers) => subscribers.filter((subscriber) => {
+  const format = 'MMM D, YYYY [at] hh:mm A';
+  const regDate = dayjs(subscriber.registration_date, format);
+
+  if (!regDate.isValid()) {
+    console.warn('Invalid date:', subscriber.registration_date);
+    return false;
+  }
+
+  const startOfWeek = dayjs().startOf('week'); // Sunday by default
+  const endOfWeek = dayjs().endOf('week');
+
+  return regDate.isBetween(startOfWeek, endOfWeek, null, '[]'); // inclusive
+});
+
 
   const handleCLickAdd = () => {
     setOpen(true);
@@ -162,7 +185,9 @@ setFormData({
     
       const newData = await response.json()
     if (response.ok) {
-      setTableData(newData)
+      // setTableData(newData)
+      setTableData(getThisWeeksSubscribers(newData));
+
   
     } else {
       console.log('failed to fetch routers')
@@ -593,7 +618,7 @@ headerStyle:{
   )
 }
 
-export default PPPOEsubscribers
+export default ThisWeekRegisteredSubscribers
 
 
 
