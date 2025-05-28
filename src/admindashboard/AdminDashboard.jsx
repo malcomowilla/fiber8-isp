@@ -12,6 +12,34 @@ const cardVariants = {
   };
 
 const [totalSubscribers, setTotalSubscribers] = useState(0);
+const [registrations, setRegistrations] = useState({
+    todayCount: 0,
+    thisWeekCount: 0,
+    thisMonthCount: 0,
+    lastMonthCount: 0
+  });
+
+
+// <Route path='/admin/today-subscribers' element={<TodayRegisteredSubscribers/>}/>
+
+// <Route path='/admin/this-month-subscribers' element={<ThisMonthRegisteredSubscribers/>}/>
+
+
+{/* <Route path='/admin/this-week-subscribers' element={<ThisWeekRegisteredSubscribers/>}/> */}
+
+  useEffect(() => {
+    const fetchRegistrationStats = async () => {
+      try {
+        const response = await fetch('/api/registration_stats');
+        const data = await response.json();
+        setRegistrations(data);
+      } catch (error) {
+        console.error('Error fetching registration stats:', error);
+      }
+    };
+  
+    fetchRegistrationStats();
+  }, []);
 
 
 const subdomain = window.location.hostname.split('.')[0];
@@ -109,22 +137,7 @@ bg-gradient-to-r from-white to-white  rounded-lg shadow-2xl sm:p-8 dark:bg-gray-
    </div>
    <div className="flow-root">
         <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-700">
-            <li className="py-3 sm:py-4">
-                <div className="flex items-center">
-                   
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate
-                         dark:text-black">
-                            View Subscriber
-                        </p>
-                      
-                    </div>
-                    <div className="inline-flex items-center text-base 
-                    font-semibold text-gray-900 dark:text-black">
-                        $320
-                    </div>
-                </div>
-            </li>
+            
 
              
             <li className="py-3 sm:py-4">
@@ -415,87 +428,88 @@ bg-gradient-to-r from-white to-white  rounded-lg shadow-2xl sm:p-8 dark:bg-gray-
    
 
 
-
 <motion.div
- variants={cardVariants}
- initial="hidden"
- animate="visible"
- transition={{ duration: 0.5, delay: 0.4 }}
-className="w-full max-w-md p-4 bg-white 
-bg-gradient-to-r from-white to-white border border-gray-200 rounded-lg  shadow-2xl sm:p-8
- dark:bg-gray-800 dark:border-gray-700 dark:text-black max-h-[400px]">
+  variants={cardVariants}
+  initial="hidden"
+  animate="visible"
+  transition={{ duration: 0.5, delay: 0.4 }}
+  className="w-full max-w-md p-4 bg-white 
+  bg-gradient-to-r from-white to-white border border-gray-200 rounded-lg shadow-2xl sm:p-8
+  dark:bg-gray-800  cursor-pointer dark:border-gray-700 dark:text-black max-h-[400px]">
 
-    <div className="flex items-center justify-between mb-4">
-
-<div className='flex flex-row gap-x-3'>
+  <div className="flex items-center justify-between mb-4">
+    <div className='flex flex-row gap-x-3'>
       <ion-icon name="person-outline"></ion-icon>
-        <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-black">Registrations</h5>
+      <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-black">Registrations</h5>
+    </div>
+  </div>
+  
+  <div className="flow-root">
+    <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-700">
+      <Link to ='/admin/today-subscribers' className="py-3 sm:py-4">
+      <li className="py-3 sm:py-4">
+        <div className="flex items-center">
+          <div className="flex-1 min-w-0 ms-4">
+            <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
+              Registered Today
+            </p>
+          </div>
+          <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-black">
+            {registrations.todayCount || 0}
+          </div>
         </div>
-        
-   </div>
-   <div className="flow-root">
-        <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-700">
-            <li className="py-3 sm:py-4">
-                <div className="flex items-center">
-                   
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate
-                         dark:text-black">
-                        Registered Today
-                        </p>
-                      
-                    </div>
-                    
-                </div>
-            </li>
-            <li className="py-3 sm:py-4">
-                <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Registered This week
-                     </p>
-                       
-                    </div>
-                   
-                </div>
-            </li>
-            
-            <li className="py-3 sm:py-4">
-                <div className="flex items-center ">
-                   
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                        Registered This Month
+      </li>
+      </Link>
 
-                        </p>
-                      
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        $367
-                    </div>
-                </div>
-            </li>
-            <li className="pt-3 pb-0 sm:pt-4">
-                <div className="flex items-center ">
-                 
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Registered Last Month
-                        </p>
-                       
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        $2367
-                    </div>
-                </div>
-            </li>
-        </ul>
-   </div>
+
+
+      <Link to="/admin/this-week-subscribers " className='cursor-pointer'>
+      <li className="py-3 sm:py-4">
+        <div className="flex items-center">
+          <div className="flex-1 min-w-0 ms-4">
+            <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
+              Registered This Week
+            </p>
+          </div>
+          <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-black">
+            {registrations.thisWeekCount || 0}
+          </div>
+        </div>
+      </li>
+      </Link>
+
+
+
+      <Link to="/admin/this-month-subscribers">
+      <li className="py-3 sm:py-4">
+        <div className="flex items-center">
+          <div className="flex-1 min-w-0 ms-4">
+            <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
+              Registered This Month
+            </p>
+          </div>
+          <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-black">
+            {registrations.thisMonthCount || 0}
+          </div>
+        </div>
+      </li>
+      </Link>
+      
+      <li className="pt-3 pb-0 sm:pt-4">
+        <div className="flex items-center">
+          <div className="flex-1 min-w-0 ms-4">
+            <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
+              Registered Last Month
+            </p>
+          </div>
+          <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-black">
+            {registrations.lastMonthCount || 0}
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
 </motion.div>
-
    
    
    

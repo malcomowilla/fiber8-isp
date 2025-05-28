@@ -1,5 +1,6 @@
 
 
+
 import MaterialTable from 'material-table'
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -28,7 +29,7 @@ import toast, { Toaster } from 'react-hot-toast';
 
 
 
-const PPPOEsubscribers = () => {
+const ThisMonthRegisteredSubscribers = () => {
   const { settingsformData } = useApplicationSettings();
   // const navigate = useNavigate()
 
@@ -145,6 +146,25 @@ setFormData({
 
   const subdomain = window.location.hostname.split('.')[0]; 
 
+
+const getThisMonthsSubscribers = (subscribers) => {
+  const format = 'MMM D, YYYY [at] hh:mm A';
+
+  return subscribers.filter((subscriber) => {
+    const regDate = dayjs(subscriber.registration_date, format);
+
+    if (!regDate.isValid()) {
+      console.warn('Invalid date:', subscriber.registration_date);
+      return false;
+    }
+
+    const startOfMonth = dayjs().startOf('month');
+    const endOfMonth = dayjs().endOf('month');
+
+    return regDate.isBetween(startOfMonth, endOfMonth, null, '[]'); // inclusive
+  });
+};
+
     
   const fetchSubscribers = useCallback(
     async() => {
@@ -162,7 +182,9 @@ setFormData({
     
       const newData = await response.json()
     if (response.ok) {
-      setTableData(newData)
+      // setTableData(newData)
+            setTableData(getThisMonthsSubscribers(newData));
+
   
     } else {
       console.log('failed to fetch routers')
@@ -593,7 +615,7 @@ headerStyle:{
   )
 }
 
-export default PPPOEsubscribers
+export default ThisMonthRegisteredSubscribers
 
 
 

@@ -124,6 +124,9 @@ const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
  const UploadSubscriber = lazy(() => import('./upload_subscriber/UploadSubscriber') )
  const IpPool = lazy(() => import('./ip_pool/IpPool') )
  const GoogleAuth = lazy(() => import('./Auth/GoogleAuth') )
+const TodayRegisteredSubscribers = lazy(() => import('./subscribers/TodayRegisteredSubscribers') )
+const ThisWeekRegisteredSubscribers = lazy(() => import('./subscribers/ThisWeekRegisteredSubscribers') )
+const ThisMonthRegisteredSubscribers = lazy(() => import('./subscribers/ThisMonthRegisteredSubscribers') )
 
 const CustomerTickets = lazy(() => import('./tickets/CustomerTickets') )
 const AccountLocked = lazy(()=> import('./account_locked/AccountLocked'))
@@ -712,6 +715,12 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/profile' element={<AdminProfile/>}/>
 <Route path='/admin/pppoe-packages' element={< PPPOEpackages/>}/>
 <Route path='/admin/pppoe-subscribers' element={< PPPOEsubscribers/>}/>
+<Route path='/admin/today-subscribers' element={<TodayRegisteredSubscribers/>}/>
+
+<Route path='/admin/this-month-subscribers' element={<ThisMonthRegisteredSubscribers/>}/>
+
+
+<Route path='/admin/this-week-subscribers' element={<ThisWeekRegisteredSubscribers/>}/>
 <Route path='/admin/fixed-payments' element={<FixedPayments/>}/>
 <Route path='/admin/edit-package' element={<EditPackage/>}/>
 <Route path='/admin/pppoe-subscriptions' element={<PPPOEsubscriptions/>}/>

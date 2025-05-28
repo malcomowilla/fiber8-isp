@@ -44,7 +44,8 @@ import toast, { Toaster } from 'react-hot-toast';
 
 
 
-const EditPackage = ({open, handleClose, formData, loading, setFormData, showNotification, nameError, validityError,
+const EditPackage = ({open, handleClose, formData, loading, setFormData, showNotification, 
+  nameError, validityError,
   uploadBurstSpeedError, downloadBurstSpeedError,
   priceError, uploadLimitError, downloadLimitError,
   createPackage,offlineerror,isloading, validityPeriodUnitError,
@@ -133,17 +134,12 @@ const onChange = (e) =>{
 
 //   const isComplete = name && price && upload_limit && download_limit && validity && validity_period_units && upload_burst_speed
 //  && download_burst_speed ;
-const isComplete = formData.name && formData.validity && formData.upload_limit && formData.download_limit && formData.price 
-&& formData.upload_burst_limit && formData.download_burst_limit && formData.router_name
 
 
 
 
 
 
-
-
-  setFormComplete(isComplete);
   }
 
   
