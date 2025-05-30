@@ -212,7 +212,7 @@ useEffect(() => {
 
 <img src={FreeRadiusLogo}  className='w-12 h-12' alt="FreeRADIUS Logo" />
                 </motion.div>
-                <p className="dark:text-white text-black">
+                <p className="dark:text-white roboto-condensed text-black">
                 Radius Settings
                 </p>
               </motion.div>
@@ -228,9 +228,10 @@ useEffect(() => {
             }}
           >
           <Typography variant="body1" sx={{ mb: 2 }}>
-  <strong>What does this setting do?</strong>
+  <strong className='roboto-condensed-light'>What does this setting do?</strong>
   <br />
-  Configure RADIUS server settings for MikroTik, including user authentication, rate limits, session timeouts, and burst limits.
+ <p className='roboto-condensed'> Configure RADIUS server settings for MikroTik, including user authentication, 
+  rate limits, session timeouts, and burst limits. </p>
 </Typography>
 
 

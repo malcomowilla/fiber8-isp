@@ -149,7 +149,7 @@ const handleGetCompanySettings = useCallback(
   onError={(e) => { e.target.src = "/images/aitechs.png"; }}
 />
    {/* <img  className='h-[80px] w-[80px] rounded-full'  src={logo_preview || '/images/aitechs.png'}  alt="company-logo" /> */}
-      <p className='font-extrabold dotted-font lg:text-xl'>{company_name || "Aitechs"}</p>
+      <p className='font-extrabold roboto-condensed lg:text-xl'>{company_name || "Aitechs"}</p>
       <ArrowBackSharpIcon className='cursor-pointer' onClick={()=> setSeeSideBar(!seeSidebar)}/>
    {/* <ion-icon  onClick={()=> setSeeSideBar(!seeSidebar)}  className='menu-black' size='large' name="menu"></ion-icon> */}
 
@@ -165,7 +165,7 @@ const handleGetCompanySettings = useCallback(
 
 
 
-      <ul className="space-y-2 font-extralight">
+      <ul className="space-y-2 font-extralight roboto-condensed ">
 
 
          <button   onClick={()=> setIsExpanded5(!isExpanded5)} type="button" className="flex 

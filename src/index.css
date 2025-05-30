@@ -78,7 +78,6 @@ input[type="text"]:not(:placeholder-shown) ~ .input-text {
 }
 
 
-
 input[type="text"]:focus ~ .input-text2,
 input[type="text"]:not(:placeholder-shown) ~ .input-text2 {
   outline: none;
@@ -152,6 +151,33 @@ input[type="text"]:not(:placeholder-shown) ~ .input-text2 {
 }
 
 
+.roboto-condensed {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+
+.roboto-condensed-bold {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 800;
+  font-style: normal;
+}
+
+
+
+
+
+.roboto-condensed-light {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 18px;
+}
 
 .font-montserat {
   font-family: "Montserrat", serif;
@@ -199,6 +225,11 @@ input[type="text"]:not(:placeholder-shown) ~ .input-text2 {
   
   body {
     @apply bg-background text-foreground;
+        font-family: "Roboto Condensed", sans-serif;
+        font-weight: 400;
+  font-style: normal;
+
+    
   }
   
 

@@ -545,7 +545,7 @@ console.log('selected provider',selectedProvider)
        value={send_voucher_template}
        id="fullWidth" multiline 
        rows={4}
-        helperText={<p className='text-black text-sm tracking-wider playwrite-de-grund'> 
+        helperText={<p className='text-black text-sm tracking-wider roboto-condensed-light'> 
             place  {"{{voucher_code}}"}
 
                     where the voucher code should appear in the text and either  {"{{phone_number}}"}, 
@@ -564,7 +564,7 @@ console.log('selected provider',selectedProvider)
        name='voucher_template' 
        id="fullWidth" multiline 
        rows={4}
-        helperText={<p className='text-black text-sm tracking-wider playwrite-de-grund'> 
+        helperText={<p className='text-black text-sm tracking-wider roboto-condensed-light'> 
             place  {"{{voucher_code}}"}
 
                     where the voucher code should appear in the text and either  {"{{phone_number}}"}, 
@@ -735,7 +735,8 @@ console.log('selected provider',selectedProvider)
 
         <div className='mt-12'>
       
-<label htmlFor="message" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">PPOE subscriber welcome message </label>
+<label htmlFor="message" className="block mb-2 text-sm font-medium text-gray-900
+ dark:text-white roboto-condensed-light">PPPOE subscriber welcome message </label>
 <textarea id="message" rows="4" className="block p-2.5 w-full text-sm text-gray-900
  bg-gray-50 rounded-lg border border-gray-300 focus:ring-gray-500 focus:border-gray-500
   dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white

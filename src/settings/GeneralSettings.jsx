@@ -887,7 +887,7 @@ const SettingsCheckbox = ({ label, description, checked, onChange, name }) => (
 
     <>
      {/* {children} */}
-     <Suspense fallback={<div className='flex justify-center items-center '>{ <UiLoader/> }</div>}>
+     <Suspense fallback={<div className='flex justify-center items-center'>{ <UiLoader/> }</div>}>
     {/* <GeneralContext.Provider > */}
     <Toaster />
 <Backdrop  handleClose={handleClose}  open={open}/>
@@ -919,7 +919,7 @@ const SettingsCheckbox = ({ label, description, checked, onChange, name }) => (
                   <FiUsers
                   className='dark:text-white text-black'
                   />
-                  <p className='dark:text-white text-black
+                  <p className='dark:text-white roboto-condensed  text-black
                   text-lg
                   '>User Registration</p>
                 </motion.div>
@@ -1346,7 +1346,7 @@ width:{
           <Typography variant="h6">
             <div className='flex gap-3'>
             <MdTextsms className='text-green-500'/>
-            <p className='dark:text-white text-black text-lg'>Sms settings</p>
+            <p className='dark:text-white text-black text-lg roboto-condensed '>Sms settings</p>
               
             </div>
             
@@ -1363,10 +1363,10 @@ width:{
             padding: "20px",
           }}
         >
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            <strong>What does this setting do?</strong>
+          <Typography className='roboto-condensed'  variant="body1" sx={{ mb: 2 }}>
+            <strong className='roboto-condensed-bold'>What does this setting do?</strong>
             <br />
-            This setting allows you to select a user to input systemwide sms settings
+            <p className=''>This setting allows you to select a user to input systemwide sms settings</p>
           </Typography>
 
           <Autocomplete
@@ -1516,7 +1516,7 @@ width:{
           <Typography variant="h6">
             <div className='flex gap-3'>
             <BsRouter className='text-red-500'/>
-            <p className='dark:text-white text-black text-lg'>Router Management</p>
+            <p className='dark:text-white text-black text-lg roboto-condensed'>Router Management</p>
               
             </div>
             
@@ -1533,12 +1533,12 @@ width:{
             padding: "20px",
           }}
         >
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            <strong>What does this setting do?</strong>
+          <Typography className='' variant="body1" sx={{ mb: 2 }}>
+            <strong className='roboto-condensed roboto-condensed-bold'>What does this setting do?</strong>
             <br />
-            This setting allows you to select a router that will be applied
+            <p className='roboto-condensed'>This setting allows you to select a router that will be applied
             system-wide. Choosing the correct router ensures effective
-            communication between your system and the router, optimizing network
+            communication between your system and the router, optimizing network </p>
             performance.
           </Typography>
 
@@ -1716,7 +1716,8 @@ width:{
             <div className='flex gap-3 text-amber-800'>
 
               <CiUser />
-              <p className='dark:text-white text-black text-lg'>Fixed Subscriber Account</p>
+              <p className='dark:text-white text-black
+               text-lg roboto-condensed'>Fixed Subscriber Account</p>
             </div>
            
             
@@ -2014,7 +2015,7 @@ type='submit'
             
             <div className='flex gap-3 '>
               <FaRegBuilding className='text-cyan-600'/>
-            <p className='dark:text-white text-black text-lg'>Company Settings</p>
+            <p className='dark:text-white text-black text-lg roboto-condensed'>Company Settings</p>
             </div>
             </Typography>
             
@@ -2130,7 +2131,7 @@ InputProps={{
 
           {/* Add the new image upload section */}
           <div className="flex flex-col gap-4 p-4">
-            <label className="text-lg font-medium  dark:text-white text-black">Company Logo</label>
+            <label className="text-lg font-medium  dark:text-white text-black roboto-condensed-bold">Company Logo</label>
             <input
               type="file"
               accept="image/*"
@@ -2164,8 +2165,8 @@ InputProps={{
                 </div>
               ) : (
                 <div className="text-gray-500">
-                  <p className='dark:text-white text-black'>Click to upload company logo</p>
-                  <p className="text-sm dark:text-white text-black">PNG, JPG up to 5MB</p>
+                  <p className='dark:text-white text-black roboto-condensed'>Click to upload company logo</p>
+                  <p className="text-sm dark:text-white text-black roboto-condensed-light">PNG, JPG up to 5MB</p>
                 </div>
               )}
             </label>
