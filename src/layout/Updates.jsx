@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 
 
 
-
 const Updates = () => {
   const [showUpdate, setShowUpdate] = useState(false);
   const [storedVersion, setStoredVersion] = useState('');

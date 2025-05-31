@@ -497,6 +497,40 @@ useEffect(() => {
       )} */}
 
 
+ <div className='flex justify-between items-center mt-4
+  bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 border-l-4 border-blue-500'>
+  <div className='flex items-center space-x-4'>
+    {/* Tux Linux Penguin Icon */}
+    <div className='w-12 h-12'>
+      <svg viewBox="0 0 128 128" className='w-full h-full '>
+        <path fill="#000" d="M122.2 78.3c1.6-1.6 1.6-4.2 0-5.8-1.6-1.6-4.2-1.6-5.8 0L89.8 99.2l-8.3-8.3c-1.6-1.6-4.2-1.6-5.8 0-1.6 1.6-1.6 4.2 0 5.8l11.2 11.2c.8.8 1.8 1.2 2.9 1.2 1 0 2.1-.4 2.9-1.2l29.3-29.3z"/>
+        <path fill="#000" d="M64.1 1.3C29.5 1.3 1.5 29.3 1.5 63.9s28 62.6 62.6 62.6 62.6-28 62.6-62.6S98.7 1.3 64.1 1.3zm0 120C32.5 121.3 6.5 95.3 6.5 63.9S32.5 6.5 64.1 6.5s57.6 26 57.6 57.4-26 57.4-57.6 57.4z"/>
+        <path fill="#000" d="M64.1 12.8c-28.2 0-51.1 22.9-51.1 51.1s22.9 51.1 51.1 51.1 51.1-22.9 51.1-51.1-22.9-51.1-51.1-51.1zm0 97.9c-25.8 0-46.8-21-46.8-46.8s21-46.8 46.8-46.8 46.8 21 46.8 46.8-21 46.8-46.8 46.8z"/>
+      </svg>
+    </div>
+    
+    <div>
+      <p className='font-bold text-black dark:text-white text-xl'>
+        SYSTEM RESOURCES
+        <span className='ml-2 text-sm font-normal bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full'>
+          Mikrotik
+        </span>
+      </p>
+      {/* <p className='text-gray-600 dark:text-gray-300 text-sm mt-1'>
+        Ubuntu 22.04 LTS • Kernel 5.15.0-76-generic
+      </p> */}
+    </div>
+  </div>
+{/* 
+  <div className='flex items-center space-x-2'>
+    <span className={`w-3 h-3 rounded-full ${isServerOnline ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
+    <p className='font-light text-black dark:text-white text-lg'>
+      {isServerOnline ? 'Online' : 'Offline'}
+    </p>
+  </div> */}
+</div>
+
+
 {routerData ? (
   <motion.div
     className="p-6 mt-10"
@@ -715,7 +749,7 @@ useEffect(() => {
     </motion.div>
   </motion.div>
 ) : (
-  <div className='flex flex-col items-center  m
+  <div className='flex flex-col items-center  mt-10
   bg-gradient-to-r from-purple-500 to-indigo-600'>
   {/* Router Icon with Animation */}
   <div className='relative flex flex-col mt-20 '>
