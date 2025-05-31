@@ -170,7 +170,7 @@ if (res.ok) {
           <Box display="flex" alignItems="center" mb={3}>
             <LicenseIcon color="primary" sx={{ fontSize: 40, mr: 2 }} />
             <Typography variant="h5" component="h1">
-              License Settings
+              <p className='roboto-condensed'>License Settings </p>
             </Typography>
           </Box>
   
@@ -181,11 +181,13 @@ if (res.ok) {
               <Grid item xs={12} md={6}>
                 <Box display="flex" alignItems="center" mb={2}>
                   <WarningIcon color="warning" sx={{ mr: 1 }} />
-                  <Typography variant="h6">Expiration Warning</Typography>
+                  <Typography variant="h6">
+                    
+                    <p className='roboto-condensed'>Expiration Warning </p></Typography>
                 </Box>
   
                 <Typography variant="body1" paragraph>
-                  Set how many days before license expiration users should be notified.
+                  <p className='roboto-condensed'>Set how many days before license expiration users should be notified.</p>
                 </Typography>
   
                 <Box display="flex" alignItems="center" mt={3}>
@@ -211,17 +213,17 @@ if (res.ok) {
                   <Typography variant="subtitle1" gutterBottom>
                     <Box display="flex" alignItems="center">
                       <SettingsIcon color="info" sx={{ mr: 1 }} />
-                      <p className='dark:text-black'>Current Settings</p>
+                      <p className='dark:text-black roboto-condensed'>Current Settings</p>
                     </Box>
                   </Typography>
                   <Typography variant="body2">
-                  <p className='dark:text-black'>  Users will receive warnings <strong>
+                  <p className='dark:text-black roboto-condensed-light'>  Users will receive warnings <strong>
                         {formik.values.warningDays} day{formik.values.warningDays !== 1 ? 's' : ''}
                         </strong> before license expiration.</p>
                   </Typography>
                   {formik.values.phoneNotification && (
                     <Typography variant="body2" mt={1}>
-                      <p className='dark:text-black'>SMS notifications will be sent to: </p> <strong>{formik.values.phoneNumber}</strong>
+                      <p className='dark:text-black roboto-condensed'>SMS notifications will be sent to: </p> <strong>{formik.values.phoneNumber}</strong>
                     </Typography>
                   )}
                 </Box>
@@ -231,7 +233,11 @@ if (res.ok) {
                 <Divider sx={{ my: 2 }} />
                 <Box display="flex" alignItems="center" mb={2}>
                   <NotificationsIcon color="success" sx={{ mr: 1 }} />
-                  <Typography variant="h6">Notification Settings</Typography>
+                  <Typography variant="h6">
+                    
+                    <p className='roboto-condensed'>Notification Settings</p>
+                    
+                    </Typography>
                 </Box>
   
                 <FormControlLabel
@@ -243,7 +249,7 @@ if (res.ok) {
                       color="primary"
                     />
                   }
-                  label="Enable SMS notifications"
+                  label= {<p className='roboto-condensed'>Enable SMS notifications</p>}
                 />
   
                 {formik.values.phoneNotification && (
@@ -274,7 +280,7 @@ if (res.ok) {
                 startIcon={<CheckCircleIcon />}
                 sx={{ minWidth: 120 }}
               >
-                Save Settings
+                <p className='roboto-condensed-light'>Save Settings</p>
               </Button>
             </Box>
           </form>

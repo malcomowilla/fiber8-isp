@@ -113,12 +113,14 @@ useEffect(() => {
 const StatCard = ({ title, value, icon, trend, color }) => (
   <motion.div 
     variants={cardVariants}
-    className={`p-6 rounded-xl shadow-md bg-white`}
+    className={`p-6 rounded-xl shadow-md bg-white 
+      hover:shadow-xl cursor-pointer transition-shadow duration-300 ease-in-out
+      roboto-condensed-light`}
   >
     <div className="flex justify-between items-start">
       <div>
         <Typography variant="subtitle2" color="textSecondary">
-          <p className='text-black '>{title}</p>
+          <p className='text-black roboto-condensed-light '>{title}</p>
         </Typography>
         <Typography variant="h4" className="mt-1 font-bold">
           <p className='text-black '>{value}</p>
@@ -148,7 +150,7 @@ const StatCard = ({ title, value, icon, trend, color }) => (
           title="Total Subscribers" 
           value={totalSubscribers}
           icon={<LuUsers size={24} className='text-black' />} 
-          trend={{ value: 8, label: 'vs yesterday' }}
+          trend={{ value: 8, label: <p className=''>vs yesterday</p> }}
           color="secondary"
         />
 

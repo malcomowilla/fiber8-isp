@@ -624,11 +624,11 @@ className="w-24 h-24 mx-auto rounded-full"
 
 
 
-<SignupNotification  openSignupNotification={ openSignupNotification} handleClose={handleClose} />
+<SignupNotification  openSignupNotification={openSignupNotification} handleClose={handleClose} />
           <ThemeProvider theme={materialuitheme}>
 
       <Suspense fallback={<div className='flex justify-center items-center '>{ <UiLoader/> }</div>}>
-      < LocalizeDate  >
+      <LocalizeDate>
       <CableProvider>
         
         

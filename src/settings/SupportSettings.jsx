@@ -245,7 +245,7 @@ e.preventDefault()
                     sx={{ fontSize: "2rem", color: "#ff6f61" }}
                   />
                 </motion.div>
-                <p className="dark:text-white text-black">
+                <p className="dark:text-white text-black roboto-condensed">
                   Support Tickets Settings
                 </p>
               </motion.div>
@@ -261,10 +261,10 @@ e.preventDefault()
             }}
           >
             <Typography variant="body1" sx={{ mb: 2 }}>
-              <strong>What does this setting do?</strong>
+              <strong className='roboto-condensed-light'>What does this setting do?</strong>
               <br />
-              Configure system-wide settings for support tickets, including
-              notifications, priorities, and workflows.
+              <p className='roboto-condensed'>Configure system-wide settings for support tickets, including
+              notifications, priorities, and workflows. </p>
             </Typography>
 
 

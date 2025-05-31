@@ -34,6 +34,7 @@ import CurrentPlans from './CurrentPlans'
 import SmsBalance from './SmsBalance'
 
 import License from './License'
+import Updates from './Updates'
 
 // import { ReloadIcon } from "@radix-ui/react-icons"
 
@@ -340,6 +341,7 @@ setSmsBalance(newData.message)
  location.pathname !== '/admin/messages' && location.pathname !== '/admin/bulk-messages' && 
  location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/today-subscribers' &&
 
+location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers' &&
 
 
  <CurrentPlans
@@ -363,6 +365,9 @@ currentPPOEPlan={currentPPOEPlan} currentHotspotPlan={currentHotspotPlan}
     </div>
   )} */}
 
+<Updates />
+
+
 {location.pathname !== '/admin/hotspot_anlytics' && location.pathname !== '/admin/pppoe-subscribers'
  && location.pathname !== '/admin/networks-wireguard-config'
  &&  location.pathname !== '/admin/ip_networks' && location.pathname !== '/admin/network-components'
@@ -380,6 +385,7 @@ location.pathname !== '/admin/hotspot-templates' &&
 location.pathname !== '/admin/hotspot_settings' &&
 
 location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/today-subscribers' &&
+location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers'  &&
     <SmsBalance  smsBalance={smsBalance} />
 }
 
@@ -414,6 +420,8 @@ location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/t
   location.pathname !== '/admin/messages' &&
   location.pathname !== '/admin/bulk-messages' &&  
   location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/today-subscribers' &&
+  location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers'  &&
+ location.pathname !== '/admin/upload-subscriber' &&
 
    <License expiry={expiry} condition={condition} 
   status={status}
@@ -438,7 +446,9 @@ location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/t
            && location.pathname !== '/admin/hotspot_settings'
            && location.pathname !== '/admin/send-sms' &&
            location.pathname !== '/admin/messages' && location.pathname !== '/admin/bulk-messages'
-           && location.pathname !== '/admin/today-subscribers'
+           && location.pathname !== '/admin/today-subscribers' && 
+           location.pathname !== '/admin/this-week-subscribers' && 
+           location.pathname !== '/admin/this-month-subscribers' 
 
 
            
@@ -459,6 +469,9 @@ location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/t
 
 
             {location.pathname === '/admin/today-subscribers' && <SubscriberStats />}
+            {location.pathname === '/admin/this-week-subscribers' && <SubscriberStats />}
+
+            {location.pathname === '/admin/this-month-subscribers' && <SubscriberStats />}
 
 </div>
           <div className="mt-8">
@@ -471,7 +484,7 @@ location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/t
         <Sidebar />
       </div>
 
-<div className='flex justify-center'>
+<div className='flex justify-center roboto-condensed-light'>
       <footer className="p-4  bottom-0 font-mono  bg-gray-200 dark:bg-gray-800">
         <p className="text-black dark:text-white ">
           {APP_DESCRIPTION} -  <span className='border-2 border-green-600
