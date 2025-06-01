@@ -44,6 +44,8 @@ import { LuPackageMinus } from "react-icons/lu";
 import PlanManager from './PlanManager'
 import CompanyLeads from './CompanyLeads'
 import { FaHandshake } from "react-icons/fa";
+import { GiRecycle } from "react-icons/gi";
+import WriteChanges from './WriteChanges'
 
 
 
@@ -125,6 +127,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
     { label: <p className='text-black'>Client Requests</p>, icon: <FaPerson  className='w-6 h-6 rounded-full'/>, value: 6 },
     { label: <p className='text-black'>Passkeys</p>, icon: <IoMdKey  className='w-6 h-6 rounded-full'/>, value: 7 },
     { label: <p className='text-black'>Plan Manager</p>, icon: <LuPackageMinus  className='w-6 h-6 rounded-full'/>, value: 8 },
+    { label: <p className='text-black'>ChangeLogs</p>, icon: <GiRecycle  className='w-6 h-6 rounded-full'/>, value: 10 },
 
 
     { label: <p className='text-black'>Company Leads</p>, icon: <FaHandshake  className='w-6 h-6 rounded-full'/>, value: 9 },
@@ -349,6 +352,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
                   {value === 7 && <PasskeyList />}
                   {value === 8 && <PlanManager />}
                   {value === 9 && <CompanyLeads />}
+                  {value === 10 && <WriteChanges />}
 
                 </motion.div>
               )}  

@@ -1,7 +1,10 @@
 import { RiErrorWarningLine, RiDownloadLine } from "react-icons/ri";
 import { APP_VERSION, APP_NAME, APP_DESCRIPTION } from '../version';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { PiRecycleFill } from "react-icons/pi";
+
+import ChangeLog from './ChangeLog';
 
 
 
@@ -10,6 +13,29 @@ import { useEffect, useState } from 'react';
 const Updates = () => {
   const [showUpdate, setShowUpdate] = useState(false);
   const [storedVersion, setStoredVersion] = useState('');
+      const [open, setOpen] = useState(false);
+  const [changelogs, setChangelogs] = useState([]);
+
+
+
+  const getChangelogs = useCallback(
+    async() => {
+      const response = await fetch('/api/change_logs');
+      if (response.ok) {
+        const data = await response.json();
+        setChangelogs(data);
+      }
+    },
+    [],
+  )
+  
+
+
+  useEffect(() => {
+    getChangelogs();
+   
+  }, [getChangelogs]);
+
 
   const releaseDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
@@ -44,6 +70,9 @@ const Updates = () => {
   if (!showUpdate) return null;
 
   return (
+    <>
+
+    <ChangeLog  open={open} setOpen={setOpen}  changelogs={changelogs} />
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -83,9 +112,20 @@ const Updates = () => {
                 onClick={handleUpdate}
                 className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors duration-200"
               >
-                <RiDownloadLine />
+                <RiDownloadLine className='text-2xl' />
                 Refresh to Update
               </button>
+
+              
+ <button
+                onClick={() => setOpen(true)}
+                className="flex-1 flex items-center justify-center gap-2 bg-orange-600
+                 hover:bg-orange-700 text-white py-2 px-4 rounded-lg transition-colors duration-200"
+              >
+                <PiRecycleFill className='text-2xl' />
+                View Change Log
+              </button>
+
               <button 
                 onClick={() => setShowUpdate(false)}
                 className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg transition-colors duration-200"
@@ -103,6 +143,7 @@ const Updates = () => {
         )}
       </div>
     </motion.div>
+    </>
   );
 };
 
