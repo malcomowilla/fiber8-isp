@@ -25,6 +25,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloudIcon from '@mui/icons-material/Cloud';
 import WarningIcon from '@mui/icons-material/Warning';
+import toast, { Toaster } from 'react-hot-toast';
 
 
 
@@ -68,10 +69,30 @@ const IpNetworks = () => {
       const response = await fetch('/api/ip_networks', {
         headers: { 'X-Subdomain': subdomain }
       });
+      const result = await response.json();
       if (response.ok) {
-        const result = await response.json();
+        
         setData(result);
       } else {
+
+        if (response.status === 401) {
+  toast.error(result.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+
         throw new Error('Failed to fetch IP networks');
       }
     } catch (error) {
@@ -252,6 +273,7 @@ const IpNetworks = () => {
   };
   return (
     <>
+    <Toaster />
       <Typography variant="h4" gutterBottom sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
         <CloudIcon sx={{ mr: 2, color: 'primary.main' }} />
         IP Networks Management

@@ -66,7 +66,23 @@ const fetchTicketSettings =useCallback(
                 minimum_digits: newData[0].minimum_digits
             })
         }else{
-
+if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
 
           toast.error(newData.error, {
             position: 'top-center',
@@ -141,6 +157,25 @@ e.preventDefault()
                 minimum_digits: newData.minimum_digits
             })
         }else{
+
+
+          if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
             toast.error('failed to save ticket settings', {
                 duration: 3000,
                 position: 'top-center',
@@ -274,7 +309,8 @@ e.preventDefault()
 name='prefix'
 onChange={handleChange}
 helperText={
-    <p className='dark:text-white text-black text-lg md:w-full md:text-sm  text-wrap w-[140px]'>Can be any letter example(FK, TQ, QM, M, A, B)</p>}
+    <p className='dark:text-white text-black text-lg md:w-full md:text-sm  
+    text-wrap w-[140px] roboto-condensed'>Can be any letter example(FK, TQ, QM, M, A, B)</p>}
 className='myTextField'
   sx={{
     width: '100%',
@@ -326,7 +362,8 @@ sx={{
 fullWidth
 label='Minimum Digits'
 helperText={
-  <p className='dark:text-white text-black text-lg md:w-full md:text-sm  text-wrap w-[140px]'> 
+  <p className='dark:text-white text-black text-lg md:w-full md:text-sm 
+   text-wrap w-[140px] roboto-condensed'> 
     Minimum Digits(Zeros will be added to the front of the prefix, eg SUB001 for
         three digits)
      </p>  

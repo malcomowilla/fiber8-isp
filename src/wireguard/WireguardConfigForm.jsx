@@ -20,6 +20,9 @@ import {
 import { styled } from '@mui/material/styles';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
+import toast, { Toaster } from 'react-hot-toast';
+
+
 
 const ConfigPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -86,8 +89,20 @@ function WireguardConfigForm() {
 
         })
       });
+      const newData = await response.json();
 
       if (!response.ok) {
+
+         if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to generate configuration');
       }
@@ -136,6 +151,8 @@ const CopyButton = styled(IconButton)(({ theme }) => ({
   };
 
   return (
+    <>
+    <Toaster />
     <Box sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
       <Typography variant="h4" gutterBottom>
         WireGuard Configuration Generator
@@ -306,6 +323,7 @@ const CopyButton = styled(IconButton)(({ theme }) => ({
         </ConfigPaper>
       )}
     </Box>
+    </>
   );
 }
 

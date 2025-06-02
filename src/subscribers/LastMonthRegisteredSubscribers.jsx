@@ -166,6 +166,23 @@ setFormData({
       setTableData(newData)
   
     } else {
+      if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
       console.log('failed to fetch routers')
 
       toast.error(newData.error, {
@@ -298,6 +315,23 @@ if (formData.id) {
 
   
 } else {
+  if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
   setOpenLoad(false)
   console.log('failed to fetch')
   setloading(false)

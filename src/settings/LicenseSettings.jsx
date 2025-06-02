@@ -65,6 +65,24 @@ if (res.ok) {
         phoneNotification: data[0].phone_notification ?? false,
         phoneNumber: data[0].phone_number ?? '',
       });
+}else{
+  if (res.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (res.status === 401) {
+  toast.error(data.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
 }
       
 

@@ -127,6 +127,23 @@ const getUserGroups = useCallback(
           return search.toLowerCase() === '' ? user_group : user_group.name.toLowerCase().includes(search)
         }))
       } else {
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
         setIsSearching(false)
         toast.error('failed to get  user groups', { position: "top-center", duration: 4000 }) 
       }

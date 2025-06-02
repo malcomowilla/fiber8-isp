@@ -227,14 +227,15 @@ const handleChangeHotspotVoucher = (e) => {
           }
       
           // Update the value for the changed field
-          updatedSettings[name] = type === 'checkbox' ? checked : value;
+          // updatedSettings[name] = type === 'checkbox' ? checked : value;
       
           // Update enable_2fa_for_admin based on the checked value
          
       
-          console.log("is it true or false=>", name );
-      
+          // console.log("is it true or false=>", name );
+      console.log("is it true or false=>", updatedSettings );
           return updatedSettings;
+
         });
 
         // setAdminSettings((prevFormData) => ({

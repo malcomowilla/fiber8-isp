@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
+import toast, { Toaster } from 'react-hot-toast';
 
 const ServiceExpired = () => {
   const [showInstructions, setShowInstructions] = useState(false);
@@ -57,6 +58,23 @@ const handleGetCompanySettings = useCallback(
 
         console.log('company settings fetched', newData)
       }else{
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
         console.log('failed to fetch company settings')
       }
     } catch (error) {
@@ -75,7 +93,7 @@ useEffect(() => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex flex-col items-center justify-center p-4">
       {/* Removed Next.js Head component - add meta tags in your index.html instead */}
-
+<Toaster />
       <motion.div 
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}

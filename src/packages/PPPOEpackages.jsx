@@ -244,7 +244,16 @@ const createPackage = async (e) => {
          }, 1800);
         
       }
-
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
 
       if (response.status === 423) {
         setTimeout(() => {
@@ -331,12 +340,44 @@ try {
       return search.toLowerCase() === ''? poe_package : poe_package.name.toLowerCase().includes(search)
     }))
 
-
+if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
 
     // setTableData(newData)
   }else{
 
-
+if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
     toast.error(newData.error, {
       position: 'top-center',
       duration: 5000,

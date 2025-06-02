@@ -205,6 +205,24 @@ const fetchSavedSmsSettings = useCallback(
         setSelectedProvider(sms_provider);
         // setSelectedProvider(newData[0].sms_provider);
       } else {
+
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
         toast.error(newData.error || 'Failed to fetch SMS settings', {
           duration: 3000,
           position: 'top-center',
@@ -259,6 +277,23 @@ const fetchSmsSettings = useCallback(async () => {
       
         // setSelectedProvider('');
       } else {
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
         console.log('Fetched SMS settings:', newData);
       
         const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID } = newData;
@@ -353,6 +388,23 @@ const saveSmsSettings = async (e) => {
         position: 'top-center',
       });
     } else {
+      if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
       setisloading(false);
       setOpenSettings(false);
       setOpen(false);
@@ -411,6 +463,23 @@ const getSmsTemplate = useCallback(
           voucher_template: voucher_template
         })
       } else {
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
         toast.error('failed to fetch sms templates', {
           duration: 3000,
           position: 'top-center',

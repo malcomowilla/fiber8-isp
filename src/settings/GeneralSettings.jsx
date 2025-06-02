@@ -153,6 +153,24 @@ const handleGetCompanySettings = useCallback(
 
         console.log('company settings fetched', newData)
       }else{
+
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
         console.log('failed to fetch company settings')
       }
     } catch (error) {
@@ -191,6 +209,23 @@ const fetchRouters = useMemo(() => async ()=> {
     setRouters(newData)
 
   } else {
+    if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
     console.log('failed to fetch routers')
 
   }
@@ -245,6 +280,23 @@ const newData = await response.json()
 
 
       } else {
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
         toast.error(newData.error, {
           position: "top-center",
           duration: 4000,
@@ -497,6 +549,27 @@ const getAdminSettings = useCallback(
         console.log('admin settings fetched', newData)
       }else{
 
+
+
+if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
+
+
 toast.error(newData.error, {
 position: "top-center",
 duration: 5000,
@@ -603,6 +676,23 @@ const handleGetSmsProviderSettings = useCallback(
         setSmsProvider({...sms_provider, sms_provider: newData[0].sms_provider})
 
       } else {
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
         toast.error('failed to fetch sms provider settings', {
           duration: 2000,
           position: 'top-center',
@@ -688,7 +778,23 @@ const fetchSavedSmsSettings = useCallback(
       
         setSmsProviders(data)
       } else {
-       
+       if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(data.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
       }
     } catch (error) {
       toast.error('Internal server error: Something went wrong with fetching SMS settings', {
@@ -812,7 +918,23 @@ setSubscriberSettings(
   }
 )
       }else{
-
+if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
 toast.error(newData.error, {
 position: "top-center",
 duration: 5000,
@@ -1007,13 +1129,14 @@ const SettingsCheckbox = ({ label, description, checked, onChange, name }) => (
 <div className="space-y-6 p-4  rounded-lg shadow-sm">
   <h3 className="text-lg font-medium text-black dark:text-white">Inactivity Timeout Settings</h3>
   
-  <div className="space-y-4 ">
+  <div className="space-y-4">
     <div className=' '>
 
     <SettingsCheckbox
       label="Logout an admin after a period of inactivity"
       description="When enabled, administrators will be logged out automatically after a specified period of inactivity."
       value={check_is_inactive}
+      checked={check_is_inactive}
       onChange={handleChangeAdminSettings}
       name="check_is_inactive"
     />

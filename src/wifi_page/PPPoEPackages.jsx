@@ -187,6 +187,8 @@ import { useApplicationSettings } from '../settings/ApplicationSettings';
 import { Link } from 'react-router-dom';
 import PackageNotFoundAnimation from '../loader/package_not_found.json';
 import Lottie from 'react-lottie';
+import toast, { Toaster } from 'react-hot-toast';
+
 
 const PPPoEPackages = () => {
   const [packages, setPackages] = useState([]);
@@ -233,6 +235,16 @@ const PPPoEPackages = () => {
         }));
         console.log('company settings fetched', newData);
       } else {
+         if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
         console.log('failed to fetch company settings');
       }
     } catch (error) {
@@ -268,6 +280,16 @@ const PPPoEPackages = () => {
         console.log('package', data);
         setPackages(data);
       } else {
+         if (response.status === 401) {
+  toast.error(data.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
         console.error('Failed to fetch packages');
       }
     } catch (error) {
@@ -314,6 +336,7 @@ const PPPoEPackages = () => {
 
   return (
     <>
+    <Toaster />
       {/* Floating Customer Support */}
       <motion.div 
         className="fixed bottom-[100px] right-6 z-50"

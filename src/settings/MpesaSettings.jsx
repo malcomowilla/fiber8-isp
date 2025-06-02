@@ -81,10 +81,31 @@ const fetchSavedHotspotMpesaSettings = useCallback(
         setSelectedAccountTypeHotspot(newData.account_type)
         setHotspotMpesaSettings({ consumer_key, consumer_secret, passkey, short_code })
       } else {
+
+
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
         toast.error(newData.error || 'Failed to fetch hotspot mpesa settings', {
           duration: 3000,
           position: 'top-center',
         });
+
+        
       }
     } catch (error) {
       toast.error('Internal server error: Something went wrong with fetching hotspot mpesa settings', {

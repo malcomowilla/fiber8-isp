@@ -146,6 +146,16 @@ const fetchSubscribers = useCallback(
 
   } else {
     console.log('failed to fetch routers')
+     if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
 toast.error(
   'Failed to get subscribers',
   {
@@ -341,6 +351,19 @@ toaster.error(newData.error, {
 })
 
 
+
+ if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
+
+
 toaster.error('eror creating ticket', {
     position: "top-center",
     duration: 5000,
@@ -412,6 +435,16 @@ toaster.error('eror creating ticket', {
                       }))
                       console.log('ticket data', newData)
                     } else {
+                       if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
                       setIsSearching(false)
                       toaster.error(newData.error, {
                         position: 'top-right',

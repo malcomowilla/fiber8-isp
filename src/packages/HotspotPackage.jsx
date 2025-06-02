@@ -218,13 +218,53 @@ useEffect(() => {
         }
       })
       const newData = await response.json()
+
+
+      if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
       if (response.ok) {
+
+
+
         // setPackages(newData)
         setIsSearching(false)
         setPackages(newData.filter((package_name)=> {
           return search.toLowerCase() === '' ? package_name : package_name.name.toLowerCase().includes(search)
         }))
       } else {
+
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
         setIsSearching(false)
         toast.error('failed to fetch hotspot packages', {
           duration: 7000,

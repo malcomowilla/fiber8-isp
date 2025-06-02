@@ -156,6 +156,25 @@ if (response.status === 402) {
       setOpenSettings(true);
       setOpen(false);
     } else {
+
+      if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
+
       toast.success('Failed to save email settings', {
         duration: 3000,
         position: 'top-center',
