@@ -52,18 +52,18 @@ const StatCard = ({ title, value, icon, color, extratext }) => {
 
   const stats = [
     {
-      title: <p className='text-black font-thin'>Total Tickets</p>,
-      value: <p className='text-black font-thin'>0</p>, 
-      extratext: <p className='text-black font-thin'> All support tickets</p>,
+      title: <p className='text-black '>Total Tickets</p>,
+      value: <p className='text-black '>0</p>, 
+      extratext: <p className='text-black '> All support tickets</p>,
       icon: <div className='bg-green-300 p-1 rounded-lg'>< LuTicketSlash className='text-green-500'/></div>,
 
       color: "bg-white",
     },
 
     {
-        title: <p className='text-black font-thin'>Open Tickets</p>,
-        value: <p className='text-black font-thin'>0</p>, 
-        extratext: <p className='text-black font-thin'> Ticket requiring attention</p>,
+        title: <p className='text-black '>Open Tickets</p>,
+        value: <p className='text-black '>0</p>, 
+        extratext: <p className='text-black '> Ticket requiring attention</p>,
         icon:  <div className='bg-orange-300 p-1 rounded-lg'>< CgDanger className='text-red-500'/></div>,
   
         color: "bg-white",
@@ -72,14 +72,14 @@ const StatCard = ({ title, value, icon, color, extratext }) => {
       title: "Solved Tickets",
       value: 0,
       icon: <IoCheckmarkDoneOutline />,
-      extratext: <p className='text-black font-thin'> Ticket resolved(issue resolved)</p>,
+      extratext: <p className='text-white'> Ticket resolved(issue resolved)</p>,
       color: "bg-blue-500",
     },
     {
-      title: <p className='text-black font-thin'>High Priority Tickets</p>,
-      value: <p className='text-black font-thin'>0</p>,
+      title: <p className='text-black'>High Priority Tickets</p>,
+      value: <p className='text-black'>0</p>,
       icon:  <div className='bg-red-300 p-1 rounded-lg'><AiOutlineFire  className='text-red-500'/> </div>,
-      extratext: <p className='text-black font-thin'> High Priority Ticket</p>,
+      extratext: <p className='text-black'> High Priority Ticket</p>,
       color: "bg-white",
     },
   

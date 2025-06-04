@@ -342,6 +342,8 @@ setSmsBalance(newData.message)
  location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/today-subscribers' &&
 
 location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers' &&
+location.pathname !== '/admin/scheduler' &&
+
 
 
  <CurrentPlans
@@ -386,6 +388,7 @@ location.pathname !== '/admin/hotspot_settings' &&
 
 location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/today-subscribers' &&
 location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers'  &&
+location.pathname !== '/admin/scheduler' &&
     <SmsBalance  smsBalance={smsBalance} />
 }
 
@@ -422,7 +425,7 @@ location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/
   location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/today-subscribers' &&
   location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers'  &&
  location.pathname !== '/admin/upload-subscriber' &&
-
+location.pathname !== '/admin/scheduler' &&
    <License expiry={expiry} condition={condition} 
   status={status}
  expiry2={expiry2} condition2={condition2} status2={status2}
@@ -448,7 +451,7 @@ location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/
            location.pathname !== '/admin/messages' && location.pathname !== '/admin/bulk-messages'
            && location.pathname !== '/admin/today-subscribers' && 
            location.pathname !== '/admin/this-week-subscribers' && 
-           location.pathname !== '/admin/this-month-subscribers' 
+           location.pathname !== '/admin/this-month-subscribers' && location.pathname !== '/admin/scheduler'
 
 
            

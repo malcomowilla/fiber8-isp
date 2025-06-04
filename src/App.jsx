@@ -130,6 +130,7 @@ const ThisMonthRegisteredSubscribers = lazy(() => import('./subscribers/ThisMont
 
 const CustomerTickets = lazy(() => import('./tickets/CustomerTickets') )
 const AccountLocked = lazy(()=> import('./account_locked/AccountLocked'))
+const Calendar = lazy(() => import('./calendar/Calendar'))
 import {Helmet} from "react-helmet";
 import {useApplicationSettings} from './settings/ApplicationSettings'
 
@@ -154,6 +155,7 @@ const GoogleAuthenticatorSetup = lazy(() => import('./Auth/GoogleAuth'))
 const TwoFactorAuthVerification = lazy(() => import('./Auth/TwoFactorAuth'))
 const ContactUs = lazy(() => import('./contact_us/ContactUs'))
 const ClientLead = lazy(() => import('./client_lead/ClientLead'))
+import {onMessage, messaging,} from './firebase/firebase';
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -601,6 +603,38 @@ useEffect(() => {
 
 const hostname = window.location.hostname;
 
+
+
+
+
+
+
+
+
+
+
+
+   onMessage(messaging, (payload) => {
+    const { title, body, image} = payload.notification;
+    if (title|| body || image) {
+      const audio = new Audio('/751326__robinhood76__13129-mystery-cash-bonus.wav')
+      audio.play();
+    }
+    if (Notification.permission === 'granted') {
+    
+      new Notification(title, {
+
+        
+      body,
+        icon: image, // Use the image URL as the icon
+      });
+
+     
+    }
+    
+    console.log('Message received:', payload);
+  });
+
   return (
     <main>
 
@@ -734,6 +768,7 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/zones' element={<Zones/>}/>
 <Route path='/admin/nodes' element={<Nodes/>}/>
 <Route path='/admin/user' element={<User/>}/>
+<Route path='/admin/scheduler' element={<Calendar/>}/>
 <Route path='/admin/user-group' element={<UserGroup/>}/>
 <Route path='/admin/analytics' element={<Analytics/>}/>
 <Route path='/admin/hotspot_anlytics' element={<Hotspotanalytics/>}/>

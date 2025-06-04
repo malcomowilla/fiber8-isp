@@ -45,6 +45,7 @@ import { MdOutlineQueryStats } from "react-icons/md";
 import { IoStatsChartOutline } from "react-icons/io5";
 import { SiPaloaltonetworks } from "react-icons/si";
 import { FaHandshake } from "react-icons/fa";
+import { FaRegCalendarAlt } from "react-icons/fa";
 
 
 
@@ -1349,6 +1350,28 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
             <Link  to='/admin/client-leads' className='flex ' >
                   <FaHandshake className='w-6 h-6'/>
                <span className="flex-1 ms-3 whitespace-nowrap">Leads</span>
+            </Link>
+         </li>
+
+
+
+
+  <li
+         onClick={() => {
+          if (window.innerWidth < 962) {
+            setSeeSideBar(true);
+          }
+        }}
+         className='dark:hover:bg-white  p-2  flex items-center 
+             text-white rounded-lg dark:text-white   group dark:hover:text-black
+             
+             cuursor-pointer
+             hover:bg-black'>
+
+
+            <Link  to='/admin/scheduler' className='flex ' >
+                  <FaRegCalendarAlt  className='w-6 h-6'/>
+               <span className="flex-1 ms-3 whitespace-nowrap">Scheduler</span>
             </Link>
          </li>
 

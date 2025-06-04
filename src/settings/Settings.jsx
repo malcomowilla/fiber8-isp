@@ -12,6 +12,7 @@ const SmsSettings = lazy(() => import('./SmsSettings'))
 const SupportSettings = lazy(() => import('./SupportSettings'))
 const  RadiusSettings = lazy(() => import('./RadiusSettings'))
 const LicenseSettings = lazy(() => import('./LicenseSettings'))
+const TaskSettings = lazy(() => import('./TaskSettings'))
 
 
 import UiLoader from '../uiloader/UiLoader'
@@ -66,8 +67,19 @@ const Settings = () => {
 
       <p    onClick={()=> selectTab('EMAIL')} className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg
        hover:bg-blue-300 transition-all duration-300 hover:text-black'>EMAIL</p>
+
+
+
+      <p    onClick={()=> selectTab('TASK')} className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg
+       hover:bg-blue-300 transition-all duration-300 hover:text-black'>TASK</p>
+
+
       <p className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300 transition-all 
       duration-300 hover:text-black'>PAYMENT</p>
+
+
+
+
       <p className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300 
       transition-all duration-300 hover:text-black'>NOTIFICATION</p>
         </div>
@@ -83,6 +95,8 @@ const Settings = () => {
 {selectedTab === 'RADIUS' && <RadiusSettings/>}
 
 {selectedTab === 'SUPPORT' && <SupportSettings/>}
+
+{selectedTab === 'TASK' && <TaskSettings/>}
 {/* {selectedTab && <Sms/>}
 {selectedTab && <Mpesa/>}
 {selectedTab && <Website/>}

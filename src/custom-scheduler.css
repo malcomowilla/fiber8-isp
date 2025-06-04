@@ -1,0 +1,227 @@
+.rs__calendar {
+    background-color: #f9f9f9;
+  }
+  
+  .rs__event__item {
+    color: #555555;
+  }
+  
+  .rs__cell.rs__cell--selected {
+    background-color: #4CAF50;
+  }
+
+  .MuiInputBase-input.MuiOutlinedInput-input.css-1t8l2tu-MuiInputBase-input-MuiOutlinedInput-input:focus{
+    --tw-ring-color: 'transparent';
+    border-color: 'transparent';
+  }
+
+  .MuiTypography-root.MuiTypography-body1.rs__hover__op.css-vkc4v8-MuiTypography-root{
+    color: black;
+  }
+
+
+
+
+  .MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedEnd.Mui-readOnly.MuiInputBase-readOnly.css-nxo287-MuiInputBase-input-MuiOutlinedInput-input{
+    
+    /* border: 2px solid rgb(230, 13, 13); */
+    --tw-ring-color: 'transparent';
+    border-color: 'red';
+
+  }
+
+
+/* 
+  .css-154xyx0-MuiInputBase-root-MuiOutlinedInput-root:focus{
+    --tw-ring-color: 'transparent';
+    border-color: 'red';
+  } */
+
+  .MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-fullWidth.MuiInputBase-formControl.MuiInputBase-adornedEnd.Mui-readOnly.MuiInputBase-readOnly.css-154xyx0-MuiInputBase-root-MuiOutlinedInput-root:focus{
+    color: 'red';
+  }
+
+  .MuiTypography-root.MuiTypography-body1.css-vkc4v8-MuiTypography-root{
+    color: black;
+    
+  }
+
+
+  .rs__cell.rs__header.rs__time{
+    color: black;
+    border-color: 'black';
+  }
+
+  .MuiTypography-root.MuiTypography-body1.css-1mdftu-MuiTypography-root{
+color: black
+  }
+
+
+  .MuiTypography-root.MuiTypography-body1.rs__hover__op.css-1mdftu-MuiTypography-root{
+    color: black
+  }
+
+
+/* 
+  .rs__cell .rs__header .rs__today_cell .div :nth-child(1){
+    color: yellow;
+  } */
+  
+  .rs__table_header {
+    background-color: #1976D2;
+    color: yellow;
+  }
+
+.date-navigator :nth-child(2) {color :black;}
+  
+
+.MuiOutlinedInput-input:focus{
+  --tw-ring-color: 'transparent';
+  border-color: 'transparent';
+}
+/* 
+
+  .rs__view_navigator{
+    background-color: white;
+    color: green;
+  }
+  .rs__view_navigator :nth-child(2) {color :black;}
+  .rs__view_navigator :nth-child(1) {color :green;}
+  .rs__view_navigator :nth-child(3) {color :black}
+  .rs__view_navigator :nth-child(4) {color :green}
+
+   */
+
+
+
+
+
+
+  .rs__view_navigator :nth-child(1):hover{
+    background-color: rgba(121, 168, 121, 0.254);
+    color: black;
+    
+  }
+
+
+
+  .rs__view_navigator :nth-child(2):hover{
+    background-color: rgba(121, 168, 121, 0.254);
+    color: black;
+    
+  }
+
+
+
+
+  .rs__view_navigator :nth-child(3):hover{
+    background-color: rgba(121, 168, 121, 0.254);
+    color: black;
+    
+  }
+
+
+
+  .rs__view_navigator :nth-child(4):hover{
+    background-color: rgba(121, 168, 121, 0.254);
+    color: black;
+    
+  }
+
+
+
+  .rs__view_navigator :nth-child(5):hover{
+    background-color: rgba(121, 168, 121, 0.254);
+    color: black;
+    
+  }
+
+
+
+
+
+
+
+
+
+
+
+.fc-view {
+  @apply w-full h-full lg:h-3/4 xl:h-2/3 bg-white;
+}
+
+
+.fc-day {
+  @apply m-8;
+}
+
+.fc-scrollgrid-sync-table {
+  @apply w-full;
+}
+
+
+
+
+.fc-h-event {
+  @apply bg-green-500 border border-green-600 ;
+  
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+  @apply bg-green-300 ;
+}
+
+.fc-dayGridMonth-view.fc-view.fc-daygrid{
+  font-family: "Playwrite DE Grund", cursive;
+    font-optical-sizing: auto;
+    color: black;
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+
+.fc-today-button.fc-button.fc-button-primary{
+  font-family: "Playwrite DE Grund", cursive;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+
+
+.fc-toolbar-title{
+  font-family: "Playwrite DE Grund", cursive;
+    font-optical-sizing: auto;
+    color: black;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.fc-timeGridWeek-view.fc-view.fc-timegrid{
+  color: black;
+  font-family: "Playwrite DE Grund", cursive;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+
+
+.fc .fc-button{
+  @apply bg-green-800 hover:bg-green-900  ;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  @apply bg-green-600;
+}
+
+.fc .fc-button-primary:disabled {
+  @apply bg-green-600;
+}
+.fc-v-event {
+  @apply bg-green-500 border border-green-600 ;
+  
+}
