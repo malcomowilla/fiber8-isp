@@ -4,7 +4,7 @@
 
 You can try out the ISP Billing System live!  
 
-🔗 **Demo Site:** [Click here to access the demo](https://demo.aitechs.co.ke)  
+🔗 **Demo Site:** [Click here to access the demo](https://demo.aitechs.co.ke/signin)  
 
 🛠 **Login Credentials:**  
 - **Email:** `demo@gmail.com`  
