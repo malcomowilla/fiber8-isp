@@ -695,9 +695,9 @@ hostname.endsWith('.aitechs.co.ke')
 
 {/* aitechs.co.ke */}
 
-{hostname === 'localhost' ? (
+{hostname === 'aitechs.co.ke' ? (
       <Route index path="/" element={<Signup />} />
-    ) : hostname.endsWith('localhost') ? (
+    ) : hostname.endsWith('.aitechs.co.ke') ? (
       <Route index path="/" element={<PPPoEPackages />} />
     ) : null}
 
