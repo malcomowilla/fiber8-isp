@@ -413,7 +413,7 @@ useEffect(() => {
         <div className="dark:bg-gray-800 bg-white w-full max-w-md rounded-2xl 
         shadow-lg p-6 ">
           <h2 className="text-3xl font-bold text-gray-900
-           dark:text-white mb-6 font-montserat-regular">
+           dark:text-white mb-6 roboto-condensed">
           System Admin
           </h2>
           

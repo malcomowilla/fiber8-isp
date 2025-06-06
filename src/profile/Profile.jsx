@@ -34,6 +34,7 @@ import {
   import {useApplicationSettings} from '../settings/ApplicationSettings'
   import { IoPersonOutline } from "react-icons/io5";
   import { TbPasswordFingerprint } from "react-icons/tb";
+import toast, { Toaster } from 'react-hot-toast';
 
 
 
@@ -62,6 +63,17 @@ const handleLogout = async () => {
 
         );
 
+        const newData = await response.json()
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
 
         if (response.status === 402) {
           setTimeout(() => {
@@ -89,6 +101,8 @@ console.log(user)
 
 
     return (
+      <>
+      <Toaster />
       <DropdownMenu open={openDropDown} onOpenChange={setOpenDropDown}>
         <DropdownMenuTrigger asChild>
 
@@ -189,6 +203,7 @@ console.log(user)
 
         </DropdownMenuContent>
       </DropdownMenu>
+      </>
     )
   }
   
