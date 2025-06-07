@@ -75,12 +75,7 @@ if (response.status === 401) {
          }, 1900);
 }
 
-        if (response.status === 402) {
-          setTimeout(() => {
-            navigate('/license-expired')
-           }, 1800);
-          
-        }
+       
 
         if (response.ok) {
 
@@ -89,6 +84,12 @@ if (response.status === 401) {
           
 console.log(user)
         } else {
+           if (response.status === 402) {
+          setTimeout(() => {
+            navigate('/license-expired')
+           }, 1800);
+          
+        }
           throw new Error('Logout failed');
         }
       } catch (error) {
