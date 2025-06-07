@@ -92,6 +92,7 @@ const createLead = async(e) => {
           body: JSON.stringify({ ...formData }),
         });
 
+        const newData = await response.json()
         if (response.ok) {
             setOpenEdit(false)
             if (formData.id) {
@@ -113,7 +114,16 @@ const createLead = async(e) => {
             
         } else {
             
-
+ if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
             if (formData.id) {
                 
                 toast.error('Failed to update lead', {
@@ -123,6 +133,7 @@ const createLead = async(e) => {
                   })
             } else {
                 
+
                 toast.error('Failed to create lead', {
                     position: "top-center",
                     duration: 4000,
@@ -158,7 +169,16 @@ const newData = await response.json()
             if (response.ok) {
                 setLeads(newData)
             } else {
-                
+                 if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
             }
         } catch (error) {
             

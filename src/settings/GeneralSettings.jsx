@@ -49,6 +49,7 @@ import { CiUser } from "react-icons/ci";
 
 import { FaPhone } from "react-icons/fa";
 import { MdTextsms } from "react-icons/md";
+import { IoWarningOutline } from "react-icons/io5";
 
 
 
@@ -126,7 +127,7 @@ const handleChangeSmsProvider = (e) => {
 
 
 const subdomain = window.location.hostname.split('.')[0]
-
+console.log('subdomain',subdomain)
 
 const handleGetCompanySettings = useCallback(
   async() => {
@@ -596,7 +597,7 @@ useEffect(() => {
   getAdminSettings()
   
 }, [getAdminSettings]);
-
+console.log('enable_2fa_google_auth', enable_2fa_google_auth)
 
 const handleChangeAdminSetting = async(e) => {
   e.preventDefault()
@@ -615,7 +616,21 @@ const handleChangeAdminSetting = async(e) => {
     })
 
     const data = await response.json();
-    if (response.ok) {
+if (subdomain === 'demo' && 
+enable_2fa_google_auth == true 
+      || enable_2fa_for_admin_passkeys == true || enable_2fa_for_admin_email == true
+      || enable_2fa_for_admin_sms == true) {
+
+        toast.error('demo mode does not allow admin settings update', {
+          position: "top-center",
+          duration: 4000,
+        })
+
+
+  
+} else {
+
+       if (response.ok) {
       toast.success('admin settings updated successfully', {
         position: "top-center",
         duration: 4000,
@@ -643,8 +658,12 @@ const handleChangeAdminSetting = async(e) => {
         position: "top-center",
         duration: 4000,
       })
-      
-    }
+   
+    }  
+}
+
+    
+   
   } catch (error) {
     setisloading(false)
     setOpen(false)
@@ -1068,7 +1087,13 @@ const SettingsCheckbox = ({ label, description, checked, onChange, name }) => (
 
     <SettingsCheckbox
     checked={enable_2fa_for_admin_sms}
-      label="Enable Two-Factor Authentication SMS(2FA)"
+      label= {<p>Enable Two-Factor Authentication SMS(2FA) (<p className='font-bold'>experimental 
+      dont try this for now,
+        incase of any eror arising from this setting dont hesitate to call support </p>
+        
+
+        ) <IoWarningOutline className='text-red-800 
+        w-5 h-5 inline-block align-middle'/></p>}
       description="When enabled, administrators will receive a one-time 
       password via SMS during two-factor authentication login. This adds an extra layer of security by requiring both password and SMS verification."
       onChange={handleChangeAdminSettings}
@@ -1079,7 +1104,13 @@ const SettingsCheckbox = ({ label, description, checked, onChange, name }) => (
     <SettingsCheckbox
     checked={enable_2fa_for_admin_email}
      onChange={handleChangeAdminSettings}
-      label="Enable Two-Factor Authentication Email(2FA)"
+      label={<p>Enable Two-Factor Authentication Email(2FA) (<p className='font-bold'>experimental 
+      dont try this for now,
+        incase of any eror arising from this setting dont hesitate to call support </p>
+        
+
+        ) <IoWarningOutline className='text-red-800 
+        w-5 h-5 inline-block align-middle'/>   </p>}
       description="When enabled, administrators will receive a one-time password via email during two-factor authentication login. This provides an alternative verification method using email instead of SMS."
      value={enable_2fa_for_admin_email}
       name="enable_2fa_for_admin_email"
