@@ -178,45 +178,54 @@ const handleChangeHotspotVoucher = (e) => {
       
 
         // const captlalName = value.charAt(0).toUpperCase() + value.slice(1)
-        const capitalizedName = value.toUpperCase()
+        // const capitalizedName = value.toUpperCase()
 
 
         setAdminSettings((prevData) => {
           let updatedData = { ...prevData };
-          let updatedSettings = { ...prevData, [name]: type === "checkbox" ? checked : capitalizedName, };
+          let updatedSettings = { ...prevData, [name]: type === "checkbox" ? checked : value, };
       
       // console.log('check_inactive_hrs', updatedData .check_inactive_hrs)
           // Handle specific cases for check_inactive_minutes, check_inactive_hrs, and check_inactive_days
           if (name === 'enable_2fa_for_admin_sms') {
-            // updatedSettings.enable_2fa_for_admin_sms = true
-            // updatedSettings.enable_2fa_for_admin_email = false
-            // updatedSettings.enable_2fa_for_admin_passkeys = false
-            // updatedSettings.enable_2fa_google_auth = false
-            
-      
+
+ if (updatedSettings.enable_2fa_for_admin_sms) {
+    updatedSettings.enable_2fa_for_admin_email = false;
+    updatedSettings.enable_2fa_for_admin_passkeys = false;
+    updatedSettings.enable_2fa_google_auth = false;
+  }
+           
       
       
           } else if (name === 'enable_2fa_for_admin_email') {
-              updatedSettings.enable_2fa_for_admin_email = true
-              updatedSettings.enable_2fa_for_admin_sms = false
+             if (updatedSettings.enable_2fa_for_admin_email) {
+               updatedSettings.enable_2fa_for_admin_sms = false
               updatedSettings.enable_2fa_for_admin_passkeys = false
               updatedSettings.enable_2fa_google_auth = false
       
+             }
+             
       
           
             
           } else if (name === 'enable_2fa_for_admin_passkeys') {
-              updatedSettings.enable_2fa_for_admin_passkeys = true
-              updatedSettings.enable_2fa_google_auth = false
+
+            if (updatedSettings.enable_2fa_for_admin_passkeys) {
+               updatedSettings.enable_2fa_google_auth = false
               updatedSettings.enable_2fa_for_admin_sms = false
               updatedSettings.enable_2fa_for_admin_email = false
             
+            }
+               
+             
           }else if (name === 'enable_2fa_google_auth'){
-            updatedSettings.enable_2fa_google_auth = true
-            updatedSettings.enable_2fa_for_admin_passkeys = false
+            if ( updatedSettings.enable_2fa_google_auth) {
+               updatedSettings.enable_2fa_for_admin_passkeys = false
             updatedSettings.enable_2fa_for_admin_email = false
             updatedSettings.enable_2fa_for_admin_sms = false
 
+            }
+           
 
             
             

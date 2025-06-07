@@ -597,7 +597,9 @@ useEffect(() => {
   getAdminSettings()
   
 }, [getAdminSettings]);
-console.log('enable_2fa_google_auth', enable_2fa_google_auth)
+console.log('enable_2fa_google_auth=>', enable_2fa_for_admin_sms, 
+'enable_2fa_for_admin_email =>',enable_2fa_for_admin_email, "enable_2fa_for_admin_passkeys =>", enable_2fa_for_admin_passkeys
+)
 
 const handleChangeAdminSetting = async(e) => {
   e.preventDefault()
