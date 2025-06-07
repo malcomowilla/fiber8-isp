@@ -604,7 +604,10 @@ console.log('enable_2fa_google_auth=>', enable_2fa_for_admin_sms,
 const handleChangeAdminSetting = async(e) => {
   e.preventDefault()
   try {
-    const response = await fetch('/api/admin_settings', {
+    const url = subdomain === 'demo' && enable_2fa_google_auth == true || enable_2fa_for_admin_passkeys == true
+    && enable_2fa_for_admin_email && enable_2fa_for_admin_sms ?  '/api/admin_settings' : '/api/admin_settings_demo'
+        
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
