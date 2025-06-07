@@ -62,7 +62,7 @@ const [welcome, setWelcome] = useState(false)
       const [currentSystemAdmin, setCurrentSystemAdmin] = useState('')
       const [currentUsername, setCurrentUsername] = useState('')
       const [subscriberSettings, setSubscriberSettings] = useState(subscriber_settings)
-      const [adminSettings, setAdminSettings] = useState(initialValueAdminSettings)
+      let [adminSettings, setAdminSettings] = useState(initialValueAdminSettings)
       const [companySettings, setCompanySettings] = useState({
         company_name: '',
   contact_info: '',
@@ -188,10 +188,10 @@ const handleChangeHotspotVoucher = (e) => {
       // console.log('check_inactive_hrs', updatedData .check_inactive_hrs)
           // Handle specific cases for check_inactive_minutes, check_inactive_hrs, and check_inactive_days
           if (name === 'enable_2fa_for_admin_sms') {
-            updatedSettings.enable_2fa_for_admin_sms = true
-            updatedSettings.enable_2fa_for_admin_email = false
-            updatedSettings.enable_2fa_for_admin_passkeys = false
-            updatedSettings.enable_2fa_google_auth = false
+            // updatedSettings.enable_2fa_for_admin_sms = true
+            // updatedSettings.enable_2fa_for_admin_email = false
+            // updatedSettings.enable_2fa_for_admin_passkeys = false
+            // updatedSettings.enable_2fa_google_auth = false
             
       
       

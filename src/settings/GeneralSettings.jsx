@@ -83,7 +83,7 @@ const GeneralSettings = ({children}) => {
      companySettings;
 
 
-     const { enable_2fa_for_admin_email, enable_2fa_for_admin_sms, send_password_via_sms,
+     let { enable_2fa_for_admin_email, enable_2fa_for_admin_sms, send_password_via_sms,
       send_password_via_email, check_is_inactive,
       checkinactiveminutes, checkinactivehrs,checkinactivedays,
       enable_2fa_google_auth,
@@ -621,6 +621,10 @@ enable_2fa_google_auth == true
       || enable_2fa_for_admin_passkeys == true || enable_2fa_for_admin_email == true
       || enable_2fa_for_admin_sms == true) {
 
+        enable_2fa_for_admin_passkeys = false
+        enable_2fa_for_admin_email = false
+        enable_2fa_for_admin_sms = false
+        enable_2fa_google_auth = false
         toast.error('demo mode does not allow admin settings update', {
           position: "top-center",
           duration: 4000,
