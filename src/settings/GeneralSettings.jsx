@@ -621,23 +621,9 @@ const handleChangeAdminSetting = async(e) => {
     })
 
     const data = await response.json();
-if (subdomain === 'demo' && 
-enable_2fa_google_auth == true 
-      || enable_2fa_for_admin_passkeys == true || enable_2fa_for_admin_email == true
-      || enable_2fa_for_admin_sms == true) {
-
-        enable_2fa_for_admin_passkeys = false
-        enable_2fa_for_admin_email = false
-        enable_2fa_for_admin_sms = false
-        enable_2fa_google_auth = false
-        toast.error('demo mode does not allow admin settings update', {
-          position: "top-center",
-          duration: 4000,
-        })
 
 
   
-} else {
 
        if (response.ok) {
       toast.success('admin settings updated successfully', {
@@ -665,24 +651,22 @@ enable_2fa_google_auth == true
       || enable_2fa_for_admin_passkeys == true || enable_2fa_for_admin_email == true
       || enable_2fa_for_admin_sms == true) {
 
-        enable_2fa_for_admin_passkeys = false
-        enable_2fa_for_admin_email = false
-        enable_2fa_for_admin_sms = false
-        enable_2fa_google_auth = false
-        toast.error('demo mode does not allow admin settings update', {
-          position: "top-center",
-          duration: 4000,
-        })
-      setisloading(false)
-      setOpen(false)
-      setOpenSettings(false)
-      toast.error('failed to update admin settings', {
+        toast.error('failed to update admin settings', {
         position: "top-center",
         duration: 4000,
       })
+
+        
+      } else {
+         setisloading(false)
+      setOpen(false)
+      setOpenSettings(false)
+      
+      }
+     
    
     }  
-}
+
 
     
    
