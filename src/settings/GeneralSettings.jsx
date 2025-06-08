@@ -646,6 +646,7 @@ const handleChangeAdminSetting = async(e) => {
       }));
 
     } else {
+        
       if (subdomain === 'demo' && 
 enable_2fa_google_auth == true 
       || enable_2fa_for_admin_passkeys == true || enable_2fa_for_admin_email == true
@@ -661,6 +662,10 @@ enable_2fa_google_auth == true
          setisloading(false)
       setOpen(false)
       setOpenSettings(false)
+      toast.error('failed to update admin settings', {
+        position: "top-center",
+        duration: 4000,
+      })
       
       }
      
