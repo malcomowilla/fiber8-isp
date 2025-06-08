@@ -605,7 +605,7 @@ const handleChangeAdminSetting = async(e) => {
   e.preventDefault()
   try {
     const url = subdomain === 'demo' && enable_2fa_google_auth === true || enable_2fa_for_admin_passkeys === true
-    && enable_2fa_for_admin_email=== true && enable_2fa_for_admin_sms === true ?  '/api/admin_settings_demo' : '/api/admin_settings'
+    || enable_2fa_for_admin_email === true || enable_2fa_for_admin_sms === true ?  '/api/admin_settings_demo' : '/api/admin_settings'
         
     const response = await fetch(url, {
       method: 'POST',
