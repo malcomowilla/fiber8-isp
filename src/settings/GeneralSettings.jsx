@@ -651,7 +651,7 @@ enable_2fa_google_auth == true
       || enable_2fa_for_admin_passkeys == true || enable_2fa_for_admin_email == true
       || enable_2fa_for_admin_sms == true) {
 
-        toast.error('failed to update admin settings', {
+        toast.error('demo mode does not allow admin settings update', {
         position: "top-center",
         duration: 4000,
       })
