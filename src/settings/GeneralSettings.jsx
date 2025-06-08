@@ -660,6 +660,19 @@ enable_2fa_google_auth == true
       }));
 
     } else {
+      if (subdomain === 'demo' && 
+enable_2fa_google_auth == true 
+      || enable_2fa_for_admin_passkeys == true || enable_2fa_for_admin_email == true
+      || enable_2fa_for_admin_sms == true) {
+
+        enable_2fa_for_admin_passkeys = false
+        enable_2fa_for_admin_email = false
+        enable_2fa_for_admin_sms = false
+        enable_2fa_google_auth = false
+        toast.error('demo mode does not allow admin settings update', {
+          position: "top-center",
+          duration: 4000,
+        })
       setisloading(false)
       setOpen(false)
       setOpenSettings(false)
