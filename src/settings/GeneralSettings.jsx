@@ -676,13 +676,28 @@ enable_2fa_google_auth == true
     
    
   } catch (error) {
-    setisloading(false)
-    setOpen(false)
-    setOpenSettings(false)
-    toast.error(
-      'Error updating  admin settings server error',
+     if (subdomain === 'demo' && 
+enable_2fa_google_auth == true 
+      || enable_2fa_for_admin_passkeys == true || enable_2fa_for_admin_email == true
+      || enable_2fa_for_admin_sms == true) {
 
-    )
+        toast.error('demo mode does not allow admin settings update', {
+        position: "top-center",
+        duration: 4000,
+      })
+
+        
+      } else {
+         setisloading(false)
+      setOpen(false)
+      setOpenSettings(false)
+      toast.error('failed to update admin settings server error', {
+        position: "top-center",
+        duration: 4000,
+      })
+      
+      }
+   
   }
 }
 
