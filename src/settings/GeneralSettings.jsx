@@ -604,8 +604,8 @@ console.log('enable_2fa_google_auth=>', enable_2fa_for_admin_sms,
 const handleChangeAdminSetting = async(e) => {
   e.preventDefault()
   try {
-    const url = subdomain === 'demo' && enable_2fa_google_auth === true || enable_2fa_for_admin_passkeys === true
-    || enable_2fa_for_admin_email === true || enable_2fa_for_admin_sms === true ?  '/api/admin_settings_demo' : '/api/admin_settings'
+    const url =   enable_2fa_google_auth === true || enable_2fa_for_admin_passkeys === true
+    || enable_2fa_for_admin_email === true || enable_2fa_for_admin_sms === true && subdomain === 'demo' ?  '/api/admin_settings_demo' : '/api/admin_settings'
         
     const response = await fetch(url, {
       method: 'POST',
@@ -647,10 +647,10 @@ const handleChangeAdminSetting = async(e) => {
 
     } else {
         
-      if (subdomain === 'demo' && 
+      if (  
 enable_2fa_google_auth == true 
       || enable_2fa_for_admin_passkeys == true || enable_2fa_for_admin_email == true
-      || enable_2fa_for_admin_sms == true) {
+      || enable_2fa_for_admin_sms == true && subdomain === 'demo') {
 
         toast.error('demo mode does not allow admin settings update', {
         position: "top-center",

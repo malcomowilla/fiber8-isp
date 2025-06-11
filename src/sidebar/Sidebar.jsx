@@ -1,7 +1,6 @@
 
 import { useContext, useCallback, useEffect} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
-
 import {Link} from  'react-router-dom'
 import WifiIcon from '@mui/icons-material/Wifi';
 // import RssFeedIcon from '@mui/icons-material/RssFeed';
@@ -37,7 +36,6 @@ import { FaUpload } from "react-icons/fa6";
 import { BsHddNetwork } from "react-icons/bs";
 import { LuLayoutTemplate } from "react-icons/lu";
 import { MdSettingsInputAntenna } from "react-icons/md";
-
 import { TfiDashboard } from "react-icons/tfi";
 import { CgComponents } from "react-icons/cg";
 import { TbCloudNetwork } from "react-icons/tb";
@@ -215,7 +213,8 @@ const handleGetCompanySettings = useCallback(
                 <Link
                   to="/admin/admin-dashboard"
                   className="flex items-center gap-x-4 w-full p-2 
-                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700"
+                  transition duration-75 rounded-lg pl-11 group text-white
+                   hover:bg-gray-700"
                 >
                   <ManageAccountsOutlinedIcon />
                   Management
