@@ -119,8 +119,8 @@ function WireguardConfigForm() {
         
       }
 
-      const data = await response.json();
-      setConfig(data);
+      // const data = await response.json();
+      setConfig(newData);
     } catch (err) {
       setError(err.message);
     } finally {
