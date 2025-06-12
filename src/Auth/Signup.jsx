@@ -676,7 +676,7 @@ animate-fade-in-up' />
 
 
 <p className='font-bold text-2xl'>Ask Us A Question</p>
-<p className='font-thin'>For demo logins please reachout via whatsap below </p>
+<p className='font-thin'>For demo logins or free trials please reachout via whatsap below </p>
 
 
 <div className='flex flex-row gap-2 cursor-pointer

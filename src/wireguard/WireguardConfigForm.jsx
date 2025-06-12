@@ -68,6 +68,8 @@ function WireguardConfigForm() {
     }));
   };
 
+      const subdomain = window.location.hostname.split('.')[0];
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -79,6 +81,7 @@ function WireguardConfigForm() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
         },
         body: JSON.stringify({
           network_address: formData.networkAddress,
@@ -103,8 +106,8 @@ function WireguardConfigForm() {
           window.location.href='/signin'
          }, 1900);
 }
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate configuration');
+        // const errorData = await response.json();
+        throw new Error(newData.error || 'Failed to generate configuration');
       }
 
 

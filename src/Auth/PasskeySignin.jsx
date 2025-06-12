@@ -15,6 +15,7 @@ import { MdFingerprint } from "react-icons/md";
 import LoadingAnimation from '../loader/loading_animation.json'
 import { TextField, Button, IconButton , InputAdornment,} from "@mui/material";
 import { Email, Phone, Person, Business, Lock, Edit, Close } from '@mui/icons-material';
+import { MdOutlineCancel } from "react-icons/md";
 
 
 
@@ -40,6 +41,8 @@ const goBack = useNavigate()
 const [seeError, setSeeError] = useState(false)
 const [loading, setloading] = useState(false)
 const [openLoad, setOpenLoad] = useState(false);
+const [loginError, setLoginError] = useState(false) 
+const [uierror, setUiError] = useState(false)
 
 const app_theme = localStorage.getItem('theme_normal')
 
@@ -165,7 +168,7 @@ const handleGetCompanySettings = useCallback(
         console.log('failed to fetch company settings')
       }
     } catch (error) {
-      toast.error('internal servere error  while fetching company settings')
+      // toast.error('internal servere error  while fetching company settings')
     
     }
   },
@@ -235,8 +238,10 @@ setSeeError(false)
       setDone(false);
 }
 } catch (error) {
+  // setLoginError(true)
+  setUiError(true)
   toast.error('something went wrong', {
-    duration: 8000,
+    duration: 6000,
     position: "top-center",
   })
 }
@@ -312,19 +317,17 @@ if (createResponse.status === 402) {
 
     navigate('/admin/router-stats')
 
-      // setTimeout(() => {
-      //   // setDone(true);
-      //   // setloading(false);
-      //   setTimeout(() => {
-      //     navigate('/admin/location')
-      //   }, 1000);
-      // }, 2500);
+     
     } else {
+
+      setUiError(true)
+
       toast.error('something went wrong', {
-        duration: 8000,
+        duration: 5000,
         position: "top-center",
       })
-      // setRegistrationError(options.errors);
+
+
       setSeeError(true);
       setOpenLoad(false);
 toast.error(newData.error, {
@@ -335,6 +338,8 @@ toast.error(newData.error, {
     }
   } catch (err) {
     setSeeError(true);
+      setUiError(true)
+
     toast.error('something went wrong', {
       duration: 8000,
       position: "top-center",
@@ -678,8 +683,8 @@ toast.error(newData.error, {
       variants={itemVariants}
       className="bg-white/10 backdrop-blur-md rounded-xl shadow-2xl p-8 border border-white/20"
     >
-      <h2 className="text-2xl font-semibold text-center font-montserat text-white
-       dark:text-white mb-6">
+      <h2 className="text-2xl font-semibold text-center  text-white
+       dark:text-white mb-6 roboto-condensed">
         Sign in with Passkey
       </h2>
 
@@ -838,6 +843,20 @@ name='email'
           <MdFingerprint className="text-4xl text-white " />
         </div>
 
+{uierror && (
+    <div onClick={() => setUiError(false)}  className="flex items-center cursor-pointer p-4 mb-4 text-sm text-red-800
+     rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+  <svg className="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" 
+  fill="currentColor" viewBox="0 0 20 20">
+    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 
+    1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+  </svg>
+  <span className="sr-only">Info</span>
+  <div>
+    <span className="font-medium">something went wrong</span> 
+  </div>
+</div>
+   )}
         {/* Action Buttons */}
         <div className="space-y-4 pt-4">
           <motion.button

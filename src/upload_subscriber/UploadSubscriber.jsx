@@ -62,10 +62,15 @@ const UploadSubscriber = () => {
             body: formData,
           });
     
+          const newData = await response.json();
           if (response.ok) {
             toast.success('Subscribers imported successfully!');
           } else {
             toast.error('Failed to import subscribers.');
+            toast.error(newData.error, {
+              position: "top-center",
+              duration: 4000,
+            });
           }
         } catch (error) {
           toast.error('Error importing subscribers:', error);
