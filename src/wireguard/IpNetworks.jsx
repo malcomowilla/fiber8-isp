@@ -276,20 +276,20 @@ const IpNetworks = () => {
     <Toaster />
       <Typography variant="h4" gutterBottom sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
         <CloudIcon sx={{ mr: 2, color: 'primary.main' }} />
-        IP Networks Management
+        <p className='roboto-condensed'>IP Networks Management </p>
       </Typography>
 
       <MaterialTable
         title=""
         columns={[
-          { title: 'Title', field: 'title' },
-          { title: 'Network', field: 'network' },
-          { title: 'NAS', field: 'nas' 
+          { title: <p className='text-sm text-black'>Title</p>, field: 'title' },
+          { title: <p className='text-sm text-black'>Network</p>, field: 'network' },
+          { title: <p className='text-sm text-black'>NAS </p>, field: 'nas' 
           },
-          { title: 'Netmask', field: 'net_mask' },
-          { title: 'Subnet Mask', field: 'subnet_mask' },
-          { title: 'Total IPs', field: 'total_ip_addresses', type: 'numeric' },
-          { title: 'Client Host Range', field: 'client_host_range' },
+          { title: <p className='text-sm text-black'>Netmask</p>, field: 'net_mask' },
+          { title: <p className='text-sm text-black'>Subnet Mask</p>, field: 'subnet_mask' },
+          { title: <p className='text-sm text-black'>Total IPs</p>,  field: 'total_ip_addresses', type: 'numeric' },
+          { title: <p className='text-sm text-black'> Client Host Range </p>, field: 'client_host_range' },
         ]}
         data={data}
         isLoading={loading}

@@ -303,7 +303,7 @@ setSmsBalance(newData.message)
     <Header />
     <div
       className={`h-screen flex flex-col overflow-y-scroll transition-all duration-500 ease-in-out ${
-        seeSidebar ? '' : 'sm:ml-64'
+        seeSidebar ? 'ml-10' : 'sm:ml-64'
       }`}
     >
       <div className="flex-grow p-4 overflow-x-hidden">

@@ -6,6 +6,7 @@ import {Profile} from '../profile/Profile'
 import {useState, useEffect} from 'react'
 import ArrowBackSharpIcon from '@mui/icons-material/ArrowBackSharp';
 import EastSharpIcon from '@mui/icons-material/EastSharp';
+import {useApplicationSettings} from '../settings/ApplicationSettings'
 
 
 
@@ -22,30 +23,13 @@ const {  handleThemeSwitch
   const [user, setUser] = useState(null);
   const [icon, setIcon] = useState()
 
-  // const token = localStorage.getItem("jwt");
-
-// useEffect( () => {
-
+const {isExpanded, setIsExpanded, isExpanded1, setIsExpanded1 , isExpanded2, setIsExpanded2,
   
-//   const fetchUserData = async () => {
-//     const response = await fetch('/api/me', {
-//       method: 'GET',
-//       // headers: {
-//       //   Authorization: `Bearer ${token}`,
+  isExpanded3, setIsExpanded3, isExpanded4, setIsExpanded4, isExpanded5, setIsExpanded5,  
+   isExpanded6, setIsExpanded6, isExpanded7, setIsExpanded7,
 
-//       // },
-//       credentials: 'include', // Include cookies in the request
 
-//     })
-// const data = await response.json()
-// if (response.ok) {
-// setUser(data['username']) 
-// }
-//   }
-
-//   fetchUserData()
-  
-// }, []);
+} = useContext(ApplicationContext);
 
 
 const {seeSidebar, setSeeSideBar, setPreferDarkMode, preferDarkMode
@@ -62,10 +46,11 @@ const {seeSidebar, setSeeSideBar, setPreferDarkMode, preferDarkMode
       </div> */}
 
 
-      <div   style={{ cursor: 'pointer',}}  onClick={()=> setSeeSideBar(!seeSidebar)} className='transition-all 
+      <div   style={{ cursor: 'pointer',}}  onClick={()=> 
+      setSeeSideBar(!seeSidebar)} className='transition-all 
       duration-500    '>
         
-      {seeSidebar ?   <EastSharpIcon />  : <ArrowBackSharpIcon  />}
+      {seeSidebar ?   <EastSharpIcon className='ml-[13px] fixed  '/>  : <ArrowBackSharpIcon  />}
 
 </div>
 

@@ -210,11 +210,22 @@ const handleGetCalendarEvents = useCallback(
       } else {
         console.log('error')
         setopenErrorAlert(true)
-         if (response.status === 401) {
+//          if (response.status === 401) {
+//   toast.error(newData.error, {
+//     position: "top-center",
+//     duration: 4000,
+//   })
+// }
+
+if (response.status === 401) {
   toast.error(newData.error, {
     position: "top-center",
     duration: 4000,
   })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
 }
 
       }

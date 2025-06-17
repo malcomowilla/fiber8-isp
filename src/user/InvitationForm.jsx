@@ -349,7 +349,8 @@ const [userRoles, setUserRoles] = useState([])
             <FiAlertCircle className="text-white/10 rotate-12 text-[250px] absolute z-0 -top-24 -left-24" />
             <div className="relative z-10">
               
-              <h3 className="text-3xl font-montserat font-bold text-center mb-2 ">
+              <h3 className="text-3xl  font-bold
+               text-center mb-2 roboto-condensed">
                 Invite Users
               </h3>
 <form onSubmit={inviteUser}>
