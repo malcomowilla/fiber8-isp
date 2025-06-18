@@ -2,13 +2,13 @@
 import {Link} from 'react-router-dom'
 import {motion } from 'framer-motion'
 import { useState, useEffect, useCallback } from 'react';
-import {useApplictionSettings} from '../settings/ApplicationSettings'
+import { useApplicationSettings } from '../settings/ApplicationSettings';
 
 const AdminDashboard = () => {
 const {showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
        showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
-        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,} = useApplictionSettings()
+        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,} = useApplicationSettings()
 
 const cardVariants = {
     hidden: { opacity: 0, y: 20 },
