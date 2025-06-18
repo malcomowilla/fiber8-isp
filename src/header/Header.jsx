@@ -50,7 +50,7 @@ const {seeSidebar, setSeeSideBar, setPreferDarkMode, preferDarkMode
       setSeeSideBar(!seeSidebar)} className='transition-all 
       duration-500    '>
         
-      {seeSidebar ?   <EastSharpIcon className='ml-[13px] fixed  '/>  : <ArrowBackSharpIcon  />}
+      {seeSidebar ?   <EastSharpIcon className='ml-[17px] fixed  '/>  : <ArrowBackSharpIcon  />}
 
 </div>
 

@@ -73,6 +73,7 @@ import LocalizeDate from './date-picker/LocalizeDate'
 // import Sms from './sms/Sms'
 const Sms = lazy(()=> import('./sms/Sms'))
 const HotspotSettings = lazy(()=> import('./settings/HotspotSettings'))
+
 import ProtectAuth from './Auth/ProtectAuth'
 import HotspotPayments from './payments/HotspotPayments'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -156,6 +157,7 @@ const TwoFactorAuthVerification = lazy(() => import('./Auth/TwoFactorAuth'))
 const ContactUs = lazy(() => import('./contact_us/ContactUs'))
 const ClientLead = lazy(() => import('./client_lead/ClientLead'))
 import {onMessage, messaging,} from './firebase/firebase';
+const PrivateNetwork = lazy(() => import('./network/PrivateNetwork'))
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -277,7 +279,13 @@ const subdomain = window.location.hostname.split('.')[0]
 // const domain = window.location.hostname.split('.')[1]
 
 
-const {companySettings, setCompanySettings} = useApplicationSettings()
+const {companySettings, setCompanySettings,
+   showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
+      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
+       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
+        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
+
+} = useApplicationSettings()
 const {logo_preview} = companySettings
 console.log('subdomain',subdomain)
 const handleClose = () => {
@@ -681,7 +689,7 @@ className="w-24 h-24 mx-auto rounded-full"
 {/* </GeneralSettings> */}
 
 
-
+<div>
 <Routes>
 {/* 
 <Route index path='/' element={<PPPoEPackages/>}/>
@@ -787,6 +795,7 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/ip_networks' element={<IpNetworks/>}/>
 <Route path='/admin/google-authenticator' element={<GoogleAuthenticatorSetup/>}/>
 <Route path='/admin/client-leads' element={<ClientLead/>}/>
+<Route path='/admin/private-network' element={<PrivateNetwork/>}/>
 </Route>
 
 </Route >
@@ -798,7 +807,7 @@ hostname.endsWith('.aitechs.co.ke')
       
      <Route path="*" element={<NotFound />}/>
 </Routes>
-
+</div>
 </ApplicationContext.Provider>
 
       </CableProvider>

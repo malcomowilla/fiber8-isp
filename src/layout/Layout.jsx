@@ -62,7 +62,11 @@ const {fetchCurrentUser, currentUser, companySettings,
 
   selectedProvider, setSelectedProvider,
   smsSettingsForm, setSmsSettingsForm,
-  smsBalance, setSmsBalance
+  smsBalance, setSmsBalance,
+  showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
+      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
+       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
+        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
 } = useApplicationSettings()
 
 const { company_name, contact_info, email_info, logo_preview} = companySettings
@@ -300,7 +304,24 @@ setSmsBalance(newData.message)
   }
   return (
     <>
+    <div onClick={() => {
+            setShowMenu1(false)
+            setShowMenu2(false)
+            setShowMenu3(false)
+            setShowMenu4(false)
+            setShowMenu5(false)
+            setShowMenu6(false)
+            setShowMenu7(false)
+            setShowMenu8(false)
+            setShowMenu9(false)
+            setShowMenu10(false)
+            setShowMenu11(false)  
+            setShowMenu12(false)
+          }}>
     <Header />
+    </div>
+
+    
     <div
       className={`h-screen flex flex-col overflow-y-scroll transition-all duration-500 ease-in-out ${
         seeSidebar ? 'ml-10' : 'sm:ml-64'
@@ -321,7 +342,6 @@ setSmsBalance(newData.message)
             {date}
           </p>
          
-
 {location.pathname !== '/admin/hotspot_anlytics' &&
  location.pathname !== '/admin/admin-dashboard'  && location.pathname !== '/admin/pppoe-subscribers' 
  && location.pathname !== '/admin/networks-wireguard-config' &&
@@ -342,13 +362,34 @@ setSmsBalance(newData.message)
  location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/today-subscribers' &&
 
 location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers' &&
-location.pathname !== '/admin/scheduler' &&
+location.pathname !== '/admin/scheduler' && location.pathname !== '/admin/private-network' &&
 
 
 
+
+
+<div
+ onClick={() => {
+            setShowMenu1(false)
+            setShowMenu2(false)
+            setShowMenu3(false)
+            setShowMenu4(false)
+            setShowMenu5(false)
+            setShowMenu6(false)
+            setShowMenu7(false)
+            setShowMenu8(false)
+            setShowMenu9(false)
+            setShowMenu10(false)
+            setShowMenu11(false)  
+            setShowMenu12(false)
+          }}
+>
  <CurrentPlans
 currentPPOEPlan={currentPPOEPlan} currentHotspotPlan={currentHotspotPlan} 
-/>}
+/>
+</div>
+
+}
 
 
 
@@ -388,12 +429,44 @@ location.pathname !== '/admin/hotspot_settings' &&
 
 location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/today-subscribers' &&
 location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers'  &&
-location.pathname !== '/admin/scheduler' &&
+location.pathname !== '/admin/scheduler' && location.pathname !== '/admin/private-network' &&
+<div
+ onClick={() => {
+            setShowMenu1(false)
+            setShowMenu2(false)
+            setShowMenu3(false)
+            setShowMenu4(false)
+            setShowMenu5(false)
+            setShowMenu6(false)
+            setShowMenu7(false)
+            setShowMenu8(false)
+            setShowMenu9(false)
+            setShowMenu10(false)
+            setShowMenu11(false)  
+            setShowMenu12(false)
+          }}
+>
     <SmsBalance  smsBalance={smsBalance} />
+    </div>
 }
 
 {window.location.hostname === 'demo.aitechs.co.ke' && (
-  <div className='flex items-center gap-2 mt-2 bg-white border
+  <div
+  onClick={() => {
+            setShowMenu1(false)
+            setShowMenu2(false)
+            setShowMenu3(false)
+            setShowMenu4(false)
+            setShowMenu5(false)
+            setShowMenu6(false)
+            setShowMenu7(false)
+            setShowMenu8(false)
+            setShowMenu9(false)
+            setShowMenu10(false)
+            setShowMenu11(false)  
+            setShowMenu12(false)
+          }}
+  className='flex items-center gap-2 mt-2 bg-white border
     dark:bg-gray-800 
     border-t-red-600 px-4 py-2 rounded-lg'>
     <IoWarningOutline className='text-red-600 dark:text-red-300 text-xl' />
@@ -425,14 +498,47 @@ location.pathname !== '/admin/scheduler' &&
   location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/today-subscribers' &&
   location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers'  &&
  location.pathname !== '/admin/upload-subscriber' &&
-location.pathname !== '/admin/scheduler' &&
+location.pathname !== '/admin/scheduler' && location.pathname !== '/admin/private-network' &&
+<div
+ onClick={() => {
+            setShowMenu1(false)
+            setShowMenu2(false)
+            setShowMenu3(false)
+            setShowMenu4(false)
+            setShowMenu5(false)
+            setShowMenu6(false)
+            setShowMenu7(false)
+            setShowMenu8(false)
+            setShowMenu9(false)
+            setShowMenu10(false)
+            setShowMenu11(false)  
+            setShowMenu12(false)
+          }}
+>
    <License expiry={expiry} condition={condition} 
   status={status}
  expiry2={expiry2} condition2={condition2} status2={status2}
-  calculateTimeRemaining={calculateTimeRemaining} /> }
+  calculateTimeRemaining={calculateTimeRemaining} />
+  </div>
+   }
 
 
-<div className='mt-4'>
+<div 
+onClick={() => {
+            setShowMenu1(false)
+            setShowMenu2(false)
+            setShowMenu3(false)
+            setShowMenu4(false)
+            setShowMenu5(false)
+            setShowMenu6(false)
+            setShowMenu7(false)
+            setShowMenu8(false)
+            setShowMenu9(false)
+            setShowMenu10(false)
+            setShowMenu11(false)  
+            setShowMenu12(false)
+          }}
+className='mt-4'>
           {location.pathname !== '/admin/customer-tickets' && location.pathname 
           !== '/admin/hotspot-dashboard' && location.pathname !== '/admin/pppoe-subscribers' 
           &&  location.pathname !== '/admin/hotspot_anlytics' 
@@ -455,29 +561,173 @@ location.pathname !== '/admin/scheduler' &&
 
 
            
-           &&<ShortCuts />
+           && <div
+            onClick={() => {
+            setShowMenu1(false)
+            setShowMenu2(false)
+            setShowMenu3(false)
+            setShowMenu4(false)
+            setShowMenu5(false)
+            setShowMenu6(false)
+            setShowMenu7(false)
+            setShowMenu8(false)
+            setShowMenu9(false)
+            setShowMenu10(false)
+            setShowMenu11(false)  
+            setShowMenu12(false)
+          }}
+           ><ShortCuts /> </div>
            
            }
 
 
           {/* {location.pathname !== '/admin/customer-tickets' && <ShortCuts />}
           {location.pathname !== '/admin/hotspot-dashboard' && <ShortCuts />} */}
-          {location.pathname === '/admin/hotspot-dashboard' && <DashboardStatistics />}
+          {location.pathname === '/admin/hotspot-dashboard' && 
+          <div
+          
+           onClick={() => {
+            setShowMenu1(false)
+            setShowMenu2(false)
+            setShowMenu3(false)
+            setShowMenu4(false)
+            setShowMenu5(false)
+            setShowMenu6(false)
+            setShowMenu7(false)
+            setShowMenu8(false)
+            setShowMenu9(false)
+            setShowMenu10(false)
+            setShowMenu11(false)  
+            setShowMenu12(false)
+          }}
+          >
+          <DashboardStatistics 
+          
+          />
+          </div>
+          }
 
-          {location.pathname === '/admin/customer-tickets' && <TicketStatistics />}
+          {location.pathname === '/admin/customer-tickets' && 
+          <div
+           onClick={() => {
+            setShowMenu1(false)
+            setShowMenu2(false)
+            setShowMenu3(false)
+            setShowMenu4(false)
+            setShowMenu5(false)
+            setShowMenu6(false)
+            setShowMenu7(false)
+            setShowMenu8(false)
+            setShowMenu9(false)
+            setShowMenu10(false)
+            setShowMenu11(false)  
+            setShowMenu12(false)
+          }}
+          >
+          <TicketStatistics />
+          </div>
+          }
+
 
           
           {location.pathname === '/admin/pppoe-subscribers' 
-            && <SubscriberStats />}
+            && <div
+             onClick={() => {
+            setShowMenu1(false)
+            setShowMenu2(false)
+            setShowMenu3(false)
+            setShowMenu4(false)
+            setShowMenu5(false)
+            setShowMenu6(false)
+            setShowMenu7(false)
+            setShowMenu8(false)
+            setShowMenu9(false)
+            setShowMenu10(false)
+            setShowMenu11(false)  
+            setShowMenu12(false)
+          }}
+            ><SubscriberStats />
+            </div>
+            }
 
 
-            {location.pathname === '/admin/today-subscribers' && <SubscriberStats />}
-            {location.pathname === '/admin/this-week-subscribers' && <SubscriberStats />}
+            {location.pathname === '/admin/today-subscribers' &&
+            <div
+             onClick={() => {
+            setShowMenu1(false)
+            setShowMenu2(false)
+            setShowMenu3(false)
+            setShowMenu4(false)
+            setShowMenu5(false)
+            setShowMenu6(false)
+            setShowMenu7(false)
+            setShowMenu8(false)
+            setShowMenu9(false)
+            setShowMenu10(false)
+            setShowMenu11(false)  
+            setShowMenu12(false)
+          }}
+            >
+            <SubscriberStats />
+            </div>
+            }
+            {location.pathname === '/admin/this-week-subscribers' && 
+            <div
+             onClick={() => {
+            setShowMenu1(false)
+            setShowMenu2(false)
+            setShowMenu3(false)
+            setShowMenu4(false)
+            setShowMenu5(false)
+            setShowMenu6(false)
+            setShowMenu7(false)
+            setShowMenu8(false)
+            setShowMenu9(false)
+            setShowMenu10(false)
+            setShowMenu11(false)  
+            setShowMenu12(false)
+          }}
+            >
+            <SubscriberStats />
+            </div>
+            }
 
-            {location.pathname === '/admin/this-month-subscribers' && <SubscriberStats />}
+            {location.pathname === '/admin/this-month-subscribers' &&
+            <div 
+             onClick={() => {
+            setShowMenu1(false)
+            setShowMenu2(false)
+            setShowMenu3(false)
+            setShowMenu4(false)
+            setShowMenu5(false)
+            setShowMenu6(false)
+            setShowMenu7(false)
+            setShowMenu8(false)
+            setShowMenu9(false)
+            setShowMenu10(false)
+            setShowMenu11(false)  
+            setShowMenu12(false)
+          }}
+            >
+            <SubscriberStats />
+            </div>
+            }
 
 </div>
-          <div className="mt-8">
+          <div className="mt-8" onClick={() => {
+            setShowMenu1(false)
+            setShowMenu2(false)
+            setShowMenu3(false)
+            setShowMenu4(false)
+            setShowMenu5(false)
+            setShowMenu6(false)
+            setShowMenu7(false)
+            setShowMenu8(false)
+            setShowMenu9(false)
+            setShowMenu10(false)
+            setShowMenu11(false)  
+            setShowMenu12(false)
+          }}>
             <Outlet />
           </div>
         </div>

@@ -73,6 +73,12 @@ const GeneralSettings = ({children}) => {
      setFormData, companySettings, setCompanySettings,
      handleChangeSubscriberSettings,subscriberSettings,setSubscriberSettings,
      handleChangeAdminSettings, adminSettings, setAdminSettings,
+
+      showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
+      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
+       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
+        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
+
     } = useApplicationSettings();
 
 

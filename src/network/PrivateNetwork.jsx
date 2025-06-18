@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import MaterialTable from 'material-table';
 import { 
@@ -31,7 +32,7 @@ import { useApplicationSettings } from '../settings/ApplicationSettings';
 
 
 
-const IpNetworks = () => {
+const PrivateNetwork = () => {
   const subdomain = window.location.hostname.split('.')[0];
   const [openDialog, setOpenDialog] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -40,6 +41,7 @@ const IpNetworks = () => {
     title: '',
     network: '',
     subnet_mask: '24',
+    private_ip: '',
     nas: ''
   });
   const [nas, setNas] = useState([]);
@@ -73,7 +75,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/ip_networks', {
+      const response = await fetch('/api/wireguard_peers', {
         headers: { 'X-Subdomain': subdomain }
       });
       const result = await response.json();
@@ -140,6 +142,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       title: '',
       network: '',
       subnet_mask: '24',
+      private_ip: '',
       nas: ''
     });
     setOpenDialog(true);
@@ -152,7 +155,8 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       title: rowData.title,
       network: rowData.network,
       subnet_mask: rowData.subnet_mask,
-      nas: rowData.nas
+      nas: rowData.nas,
+      private_ip: rowData.private_ip
     });
     setOpenDialog(true);
   };
@@ -170,7 +174,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      const url = editing ? `/api/ip_networks/${currentNetwork.id}` : '/api/ip_networks';
+      const url = editing ? `/api/wireguard_peers/${currentNetwork.id}` : '/api/wireguard_peers';
       const method = editing ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -180,11 +184,12 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
           'X-Subdomain': subdomain
         },
         body: JSON.stringify({
-          ip_network: {
+          wireguard_peer: {
             ...formData,
             nas: formData.nas,
             total_ip_addresses: calculateTotalIps(formData.subnet_mask),
-            client_host_range: calculateHostRange(formData.network, formData.subnet_mask)
+            client_host_range: calculateHostRange(formData.network, formData.subnet_mask),
+            private_ip: formData.private_ip
           }
         })
       });
@@ -314,33 +319,29 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       }}
        variant="h4" gutterBottom sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
         <CloudIcon sx={{ mr: 2, color: 'primary.main' }} />
-        <p className='roboto-condensed'>IP Networks Management </p>
+        <p className='roboto-condensed'>Private Networks Management </p>
       </Typography>
 
       <MaterialTable
         title=""
         columns={[
-          { title: <p className='text-sm text-black'>Title</p>, field: 'title' },
-          { title: <p className='text-sm text-black'>Network</p>, field: 'network' },
-          { title: <p className='text-sm text-black'>NAS </p>, field: 'nas' 
+          { title: <p className='text-sm text-black'>AllowedIps</p>, field: 'allowed_ips' },
+          { title: <p className='text-sm text-black'>Private IP </p>, field: 'private_ip' 
           },
-          { title: <p className='text-sm text-black'>Netmask</p>, field: 'net_mask' },
-          { title: <p className='text-sm text-black'>Subnet Mask</p>, field: 'subnet_mask' },
-          { title: <p className='text-sm text-black'>Total IPs</p>,  field: 'total_ip_addresses', type: 'numeric' },
-          { title: <p className='text-sm text-black'> Client Host Range </p>, field: 'client_host_range' },
+
         ]}
         data={data}
         isLoading={loading}
         actions={[
           {
             icon: () => (
-              <Tooltip title="Add Network">
+              <Tooltip title="Add Private Network">
                 <IconButton color="primary">
                   <AddCircleIcon fontSize="large" />
                 </IconButton>
               </Tooltip>
             ),
-            tooltip: 'Add Network',
+            tooltip: 'Add Private Network',
             isFreeAction: true,
             onClick: handleOpenAddDialog
           },
@@ -359,7 +360,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
         options={{
           actionsColumnIndex: -1,
           pageSize: 10,
-          pageSizeOptions: [10, 20, 50],
+          pageSizeOptions: [10],
           showTitle: false,
           headerStyle: {
             backgroundColor: '#f5f5f5',
@@ -378,7 +379,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
           Confirm Deletion
         </DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to delete this network?</Typography>
+          <Typography>Are you sure you want to delete this private network?</Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
             This action cannot be undone.
           </Typography>
@@ -408,12 +409,12 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       {/* Add/Edit Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>
-          {editing ? 'Edit Network' : 'Add New Network'}
+          {editing ? 'Edit Private Network' : 'Add Private Network'}
         </DialogTitle>
         <DialogContent sx={{ pt: 3 }}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <TextField
+              {/* <TextField
               sx={{mt: 2}}
                 fullWidth
                 label="Title"
@@ -422,17 +423,17 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
                 value={formData.title}
                 onChange={handleInputChange}
                 required
-              />
+              /> */}
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Network Address"
-                name="network"
+                label="Private Ip"
+                name="private_ip"
                   className='myTextField'
-                value={formData.network}
+                value={formData.private_ip}
                 onChange={handleInputChange}
-                placeholder="e.g., 10.0.0.0"
+                placeholder="e.g., 10.0.0.1"
                 required
               />
             </Grid>
@@ -455,7 +456,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <FormControl fullWidth>
                 <InputLabel>NAS Router</InputLabel>
                 <Select
@@ -476,18 +477,18 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
                   ))}
                 </Select>
               </FormControl>
-            </Grid>
+            </Grid> */}
             <Grid item xs={12}>
               <Divider sx={{ my: 2 }} />
-              <Typography variant="subtitle1" color="text.secondary">
+              {/* <Typography variant="subtitle1" color="text.secondary">
                 Network Details:
-              </Typography>
-              <Typography>
+              </Typography> */}
+              {/* <Typography>
                 <strong>Total IP Addresses:</strong> {calculateTotalIps(formData.subnet_mask)}
-              </Typography>
-              <Typography>
+              </Typography> */}
+              {/* <Typography>
                 <strong>Client Host Range:</strong> {calculateHostRange(formData.network, formData.subnet_mask)}
-              </Typography>
+              </Typography> */}
             </Grid>
           </Grid>
         </DialogContent>
@@ -499,7 +500,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
             onClick={handleSubmit} 
             variant="contained" 
             color="primary"
-            disabled={loading || !formData.title || !formData.network || !formData.nas}
+            disabled={loading || !formData.subnet_mask || !formData.private_ip}
             startIcon={loading && <CircularProgress size={20} />}
           >
             {editing ? 'Update' : 'Create'}
@@ -551,4 +552,4 @@ class IPAddress {
   }
 }
 
-export default IpNetworks;
+export default PrivateNetwork;

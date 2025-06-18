@@ -22,6 +22,7 @@ import EditLead from './EditLead'
 import { FaArrowsTurnRight } from "react-icons/fa6";
 import ConfirmLeadConversion from './ConfirmLeadConversion'
 import { IoMdPerson } from "react-icons/io";
+import {useApplicationSettings} from '../settings/ApplicationSettings'
 
 
 
@@ -37,6 +38,13 @@ const ClientLead = () => {
   const [searchInput] = useDebounce(search, 1000)
   const [leads, setLeads] = useState([])
   const [loading, setLoading] = useState(true)
+  const { showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
+      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
+       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
+        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
+} = useApplicationSettings()
+
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -299,7 +307,22 @@ const handleCloseDelete = () => {
 
     <EditLead  setOpen={setOpenEdit} open={openEdit} 
      loading={loading} formData={formData}  createLead={createLead} setFormData={setFormData}/>
-    <div className=''>
+    <div 
+    onClick={() => {
+      setShowMenu1(false)
+      setShowMenu2(false) 
+      setShowMenu3(false)
+      setShowMenu4(false) 
+      setShowMenu5(false)
+      setShowMenu6(false)
+      setShowMenu7(false)
+      setShowMenu8(false)
+      setShowMenu9(false)
+      setShowMenu10(false)
+      setShowMenu11(false)  
+      setShowMenu12(false)
+    }}
+    className=''>
          {/* <EditNode  open={open} handleClose={handleClose}/> */}
        
        

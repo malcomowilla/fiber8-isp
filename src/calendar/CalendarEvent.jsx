@@ -35,6 +35,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CloudIcon from '@mui/icons-material/Cloud';
 import WarningIcon from '@mui/icons-material/Warning';
 import toast, { Toaster } from 'react-hot-toast';
+import {useApplicationSettings} from '../settings/ApplicationSettings'
 
 
 
@@ -46,7 +47,13 @@ const CalendarEvent = ({ isOpen, setIsOpen , calendarEventForm, handleChange, ha
   const {title, start, end, task_type, status, assigned_to, client } = calendarEventForm
 //   const { settings, borderRadiusClasses } = useLayoutSettings();
 
+const {
+   showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
+      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
+       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
+        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
 
+} = useApplicationSettings()
 
 
   const my_task_type = [

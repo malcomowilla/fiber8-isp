@@ -21,6 +21,7 @@ import { styled } from '@mui/material/styles';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
 import toast, { Toaster } from 'react-hot-toast';
+import {useApplicationSettings} from '../settings/ApplicationSettings'
 
 
 
@@ -52,10 +53,13 @@ function WireguardConfigForm() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState({});
 
-
+const {showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
+      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
+       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
+        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,}
+         = useApplicationSettings();
   const subnetOptions = [
-    // { value: '8', label: '/8 (16,777,214 hosts)' },
-    // { value: '16', label: '/16 (65,534 hosts)' },
+    
     { value: '24', label: '/24 (254 hosts)' },
     { value: '30', label: '/30 (2 hosts)' },
   ];
@@ -156,7 +160,22 @@ const CopyButton = styled(IconButton)(({ theme }) => ({
   return (
     <>
     <Toaster />
-    <Box sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
+    <Box 
+    onClick={() => {
+      setShowMenu1(false)
+      setShowMenu2(false)
+      setShowMenu3(false)
+      setShowMenu4(false) 
+      setShowMenu5(false)
+      setShowMenu6(false)
+      setShowMenu7(false)
+      setShowMenu8(false)
+      setShowMenu9(false)
+      setShowMenu10(false)
+      setShowMenu11(false)
+        setShowMenu12(false)
+    }}
+    sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
       <Typography variant="h4" gutterBottom>
         WireGuard Configuration Generator
       </Typography>

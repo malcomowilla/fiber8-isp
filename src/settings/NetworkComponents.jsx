@@ -11,7 +11,12 @@ import { useLocation } from 'react-router-dom';
 
 const NetworkComponents = () => {
 
-const {pingStatus, setPingStatus} = useApplicationSettings()
+const {pingStatus, setPingStatus,
+  showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
+      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
+       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
+        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
+} = useApplicationSettings()
 const [serviceStatus, setServiceStatus] = useState({ freeradius: {}, wireguard: {} });
 const [showRebootConfirm, setShowRebootConfirm] = useState(false);
 
@@ -238,7 +243,22 @@ useEffect(() => {
 
     <>
     <Toaster />
-    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+    <div 
+    onClick={() => {
+      setShowMenu1(false)
+      setShowMenu2(false)
+      setShowMenu3(false) 
+      setShowMenu4(false) 
+      setShowMenu5(false) 
+      setShowMenu6(false) 
+      setShowMenu7(false) 
+      setShowMenu8(false) 
+      setShowMenu9(false) 
+      setShowMenu10(false) 
+      setShowMenu11(false)    
+      setShowMenu12(false)
+    }}
+    className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
       {services.map((service, index) => (
         <motion.div
           key={index}

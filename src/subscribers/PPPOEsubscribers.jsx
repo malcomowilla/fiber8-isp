@@ -29,7 +29,13 @@ import toast, { Toaster } from 'react-hot-toast';
 
 
 const PPPOEsubscribers = () => {
-  const { settingsformData } = useApplicationSettings();
+  const { settingsformData,
+showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
+      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
+       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
+        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
+
+   } = useApplicationSettings();
   // const navigate = useNavigate()
 
   const intialValue = {
@@ -468,7 +474,23 @@ className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-5
     render: (params) =>  
     
     <>
-    <div className='flex items-center gap-2'>
+    <div className='flex items-center gap-2'
+    
+    onClick={() => {
+      setShowMenu1(false)
+      setShowMenu2(false)
+      setShowMenu3(false)
+      setShowMenu4(false)
+      setShowMenu5(false)
+      setShowMenu6(false)
+      setShowMenu7(false)
+      setShowMenu8(false)
+      setShowMenu9(false)
+      setShowMenu10(false)
+      setShowMenu11(false)  
+      setShowMenu12(false)
+    }}
+    >
       <Tooltip title="Call">
       <IconButton arrow color="primary" onClick={()=>{window.location.href = `tel:${params.phone_number}`}}>
      <FaPhoneVolume className='text-green-500 text-xl'/>

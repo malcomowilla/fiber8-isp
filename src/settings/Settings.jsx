@@ -13,6 +13,7 @@ const SupportSettings = lazy(() => import('./SupportSettings'))
 const  RadiusSettings = lazy(() => import('./RadiusSettings'))
 const LicenseSettings = lazy(() => import('./LicenseSettings'))
 const TaskSettings = lazy(() => import('./TaskSettings'))
+import {useApplicationSettings} from './ApplicationSettings'
 
 
 import UiLoader from '../uiloader/UiLoader'
@@ -20,6 +21,11 @@ import UiLoader from '../uiloader/UiLoader'
 const Settings = () => {
     const [selectedTab, setSelectedTab] = useState('GENERAL')
     const [isPending, startTransition] = useTransition()
+    const { showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
+      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
+       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
+        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
+} = useApplicationSettings()
 
 
     const selectTab = (tab) => {
@@ -29,7 +35,22 @@ const Settings = () => {
     }
   return (
     <Suspense fallback={<div className='flex justify-center items-center '>{ <UiLoader/> }</div>}>
-    <div className= 'w-full h-screen'>
+    <div className= 'w-full h-screen'
+    onClick={() => {
+      setShowMenu1(false)
+      setShowMenu2(false)
+      setShowMenu3(false)
+      setShowMenu4(false) 
+      setShowMenu5(false)
+      setShowMenu6(false)
+      setShowMenu7(false)
+      setShowMenu8(false)
+      setShowMenu9(false)
+      setShowMenu10(false)
+      setShowMenu11(false)  
+      setShowMenu12(false)
+    }}
+    >
 
         <div className='flex sm:flex-row  text-white bg-black h-20 border p-2 
         overflow-x-scroll   lg:overflow-hidden  font-mono gap-x-20 cursor-pointer rounded-xl '>

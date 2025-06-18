@@ -16,7 +16,7 @@ import MaterialTable from 'material-table'
 import { FaCircleNodes } from "react-icons/fa6";
 import { useDebounce } from 'use-debounce';
 import toast,{  Toaster } from 'react-hot-toast';
-
+import {useApplicationSettings} from '../settings/ApplicationSettings'
 
 
 
@@ -36,6 +36,10 @@ const Nodes = () => {
   const [mapReady, setMapReady] = useState(false);
   const [nodeId, setNodeId] = useState('');
 
+  const {showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
+      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
+       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
+        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,} = useApplicationSettings();
   const handleClickOpen = () => {
       setOpen(true);
     };
@@ -169,7 +173,22 @@ const columns = [
   return (
     <>
     <Toaster />
-    <div className=''>
+    <div className=''
+    onClick={() => {
+      setShowMenu1(false)
+      setShowMenu2(false)
+      setShowMenu3(false)
+      setShowMenu4(false) 
+      setShowMenu5(false)
+      setShowMenu6(false)
+      setShowMenu7(false)
+      setShowMenu8(false)
+      setShowMenu9(false)
+      setShowMenu10(false)
+      setShowMenu11(false)  
+      setShowMenu12(false)
+    }}
+    >
          <EditNode  open={open} handleClose={handleClose}
          name={name} setName={setName} position={position} setPosition={setPosition}
          mapReady={mapReady} setMapReady={setMapReady}

@@ -112,6 +112,24 @@ const [pingStatus, setPingStatus] = useState([]); // Stores ping statuses
 
 const {vouchers} = voucher
 
+const [showMenu1, setShowMenu1] = useState(false);
+
+const [showMenu2, setShowMenu2] = useState(false);
+
+const [showMenu3, setShowMenu3] = useState(false);
+
+const [showMenu4, setShowMenu4] = useState(false);
+
+const [showMenu5, setShowMenu5] = useState(false);
+
+const [showMenu6, setShowMenu6] = useState(false);
+const [showMenu7, setShowMenu7] = useState(false);
+const [showMenu8, setShowMenu8] = useState(false);
+const [showMenu9, setShowMenu9] = useState(false);
+
+const [showMenu10, setShowMenu10] = useState(false);
+const [showMenu11, setShowMenu11] = useState(false);
+const [showMenu12, setShowMenu12] = useState(false);
 // const { vouchers } = voucher
 const handleChangeHotspotVoucher = (e) => {
   const { value, name } = e.target;
@@ -564,7 +582,11 @@ const loginWithVoucher = async(e) => {
      totalSubscribers, setTotalSubscribers,subscribersOnline, setSubscribersOnline,
      subscribersOffline, setSubscribersOffline,selectedAccountTypeHotspot, setSelectedAccountTypeHotspot,
      hotspotMpesaSettings, setHotspotMpesaSettings,openDropDown, setOpenDropDown,
-     pingStatus, setPingStatus,smsBalance, setSmsBalance
+     pingStatus, setPingStatus,smsBalance, setSmsBalance,
+     showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
+      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
+       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
+        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
      }}  >
     {children}
    </GeneralSettingsContext.Provider>

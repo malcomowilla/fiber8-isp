@@ -47,6 +47,7 @@ import { SiPaloaltonetworks } from "react-icons/si";
 import { FaHandshake } from "react-icons/fa";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { AiOutlineWhatsApp } from "react-icons/ai";
+import { PiNetworkSlashLight } from "react-icons/pi";
 
 
 
@@ -63,43 +64,53 @@ const {isExpanded, setIsExpanded, isExpanded1, setIsExpanded1 , isExpanded2, set
 
 } = useContext(ApplicationContext);
 
-const {companySettings, setCompanySettings} = useApplicationSettings()
+const {companySettings, setCompanySettings,
+showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
+      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
+       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
+        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
+
+} = useApplicationSettings()
   
 const {company_name, contact_info, email_info, logo_preview} = companySettings
-const [showMenu1, setShowMenu1] = useState(false);
-
-const [showMenu2, setShowMenu2] = useState(false);
-
-const [showMenu3, setShowMenu3] = useState(false);
-
-const [showMenu4, setShowMenu4] = useState(false);
-
-const [showMenu5, setShowMenu5] = useState(false);
-
-const [showMenu6, setShowMenu6] = useState(false);
-const [showMenu7, setShowMenu7] = useState(false);
-const [showMenu8, setShowMenu8] = useState(false);
-const [showMenu9, setShowMenu9] = useState(false);
-
-const [showMenu10, setShowMenu10] = useState(false);
-const [showMenu11, setShowMenu11] = useState(false);
-const [showMenu12, setShowMenu12] = useState(false);
 
 
 
+console.log(seeSidebar)
+useEffect(() => {
 
+  if (window.innerWidth < 1080) {
+    if (seeSidebar === true) {
+            setIsExpanded(false)
+            setIsExpanded2(false)
+            setIsExpanded3(false)
+            setIsExpanded4(false)
+            setIsExpanded5(false)
+            setIsExpanded6(false)
+            setIsExpanded7(false)
+
+          }
+  }
+     
+  
+  
+}, [setIsExpanded2, setIsExpanded3, setIsExpanded4,
+  setIsExpanded5, setIsExpanded6, setIsExpanded7, setIsExpanded,
+  setSeeSideBar, seeSidebar,
+]);
 
 
 
 useEffect(() => {
   const handleResize = () => {
     setSeeSideBar(window.innerWidth < 1080);
+    
   };
 
-  // Call once to set the correct initial state
   handleResize();
 
   window.addEventListener("resize", handleResize);
+  
   return () => window.removeEventListener("resize", handleResize);
 }, []);
 
@@ -187,7 +198,12 @@ const handleGetCompanySettings = useCallback(
 
 
       {!seeSidebar &&  
-        <ArrowBackSharpIcon className='cursor-pointer'
+        <ArrowBackSharpIcon
+        sx={{
+          width: 30,
+          height: 30
+        }}
+        className='cursor-pointer'
          onClick={()=> {
           setSeeSideBar(!seeSidebar)
           if (!seeSidebar) {
@@ -202,7 +218,6 @@ const handleGetCompanySettings = useCallback(
           }
          }}/>
 }
-   {/* <ion-icon  onClick={()=> setSeeSideBar(!seeSidebar)}  className='menu-black' size='large' name="menu"></ion-icon> */}
 
 
 
@@ -234,15 +249,14 @@ const handleGetCompanySettings = useCallback(
           setShowMenu11(false)  
           setShowMenu12(false)
          }}
-         onClick={()=> setIsExpanded5(!isExpanded5)} type="button" className="flex 
+          type="button" className="flex 
          flex-row mt-[50px]  hover:bg-black  dark:bg-white dark:hover:text-black
           items-center  p-2 text-base  
              text-white  duration-700  rounded-lg group hover:
               dark:text-black " aria-controls="dropdown-example"
                data-collapse-toggle="dropdown-example">
                      <BarChartIcon />
-                     {showMenu1 &&  <ul 
-                     onMouseEnter={() => setShowMenu1(true)}
+                     {showMenu1 &&  <span 
                               onMouseLeave={() => setShowMenu1(false)}
 
                      className="flex-1 ms-3 
@@ -330,7 +344,7 @@ const handleGetCompanySettings = useCallback(
                   Routers Stats
                 </Link>
               </motion.li>
-                     </ul>}
+                     </span>}
                     
 
 
@@ -487,7 +501,7 @@ const handleGetCompanySettings = useCallback(
     setIsExpanded(false)
    }}
   
-  onClick={()=> setIsExpanded(!isExpanded)} type="button" className="flex items-center w-full p-2 
+ type="button" className="flex items-center w-full p-2 
             text-base  dark:hover:bg-white dark:hover:text-black hover:bg-black
                   transition-colors duration-700      
               rounded-lg group 
@@ -502,7 +516,7 @@ className="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap
 bg-white shadow-lg rounded-lg text-black
 ">
   
-  <p className='text-center'>PPPoe </p>
+  <p className='text-center roboto-condensed-bold '>PPPoe </p>
 
 
 <motion.li 
@@ -781,7 +795,7 @@ className="flex items-center  w-full p-2 text-white transition
 
 {showMenu3 ? (
 
-            <ul
+            <motion.ul
             
             onMouseLeave={() => {
               setShowMenu3(false)
@@ -790,8 +804,8 @@ className="flex items-center  w-full p-2 text-white transition
             id="dropdown-example"
         className="py-1 space-y-1 bg-white shadow-lg rounded-lg"
      >
-
-Network
+{seeSidebar && <p className='text-black roboto-condensed-bold'>Networks </p>
+ }
 
   
    <motion.li
@@ -846,9 +860,30 @@ Network
 
 
 
+  <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 , delay: 0.2 }}
+                  >
+                    <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-black hover:bg-gray-700'>
+                     <Link to='/admin/private-network' className="flex items-center w-full p-2 ttext-black
+                     transition duration-75 rounded-lg group  
+                       gap-x-3">
+                              <PiNetworkSlashLight
+                              className='w-8 h-8 text-blue-600'
+ />
+                        private network</Link>
 
+                        </div>
+                  </motion.li>
                
-
 
 
                   <motion.li
@@ -997,7 +1032,7 @@ Network
 
 
 
-            </ul>
+            </motion.ul>
 ): null}
 
                    
@@ -1105,6 +1140,30 @@ Network
 
 
 
+  <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 , delay: 0.2 }}
+                  >
+                    <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-black hover:bg-gray-700'>
+                     <Link to='/admin/private-network' className="flex items-center w-full p-2 ttext-black
+                     transition duration-75 rounded-lg group  
+                       gap-x-3">
+                              <PiNetworkSlashLight
+                              className='w-8 h-8 text-blue-600'
+ />
+                        <p className='text-white'>private network</p></Link>
+
+                        </div>
+                  </motion.li>
+               
                
 
 
@@ -1287,15 +1346,86 @@ Network
          
          <li>
 
-{!seeSidebar ? (
-<button   onClick={()=> setIsExpanded1(!isExpanded1)} type="button" className="flex items-center w-full p-2 text-base
+{seeSidebar ? (
+<button 
+
+onMouseEnter={() => {
+    setShowMenu2(false)
+    setShowMenu1(false)
+    setShowMenu3(false)
+    setShowMenu4(true)
+    setShowMenu5(false)
+    setShowMenu6(false)
+    setShowMenu7(false)
+    setShowMenu8(false)
+    setShowMenu9(false)
+    setShowMenu10(false)
+    setShowMenu11(false)  
+    setShowMenu12(false)
+    setIsExpanded(false)
+   }}
+ type="button" className="flex items-center w-full p-2 text-base
               transition duration-75 rounded-lg group dark:hover:bg-white dark:hover:text-black hover:bg-black
               dark:text-white text-white " aria-controls="dropdown-example"
                data-collapse-toggle="dropdown-example">
                      <PaymentsIcon/>
-                     {!seeSidebar && <span className="flex-1 ms-3 text-left rtl:text-right
-                      whitespace-nowrap">Payments</span>}
+                     
 
+{showMenu4? (
+<ul
+onMouseLeave={() => {
+  setShowMenu4(false)
+}}
+className="flex-1 ms-3 text-e rtl:text-right
+                      whitespace-nowrap bg-white rounded-lg shadow-lg ">
+                        
+                        <p className='text-center text-black roboto-condensed-bold'>Payments </p>
+                        
+<motion.li
+onClick={() => {
+  if (window.innerWidth < 962) {
+    setSeeSideBar(true);
+  }
+}}
+initial={{ opacity: 0, x: -20 }}
+animate={{ opacity: 1, x: 0 }}
+exit={{ opacity: 0, x: -20 }}
+transition={{ duration: 0.2, delay: 0.1 }}
+>
+                     <Link   to='/admin/fixed-payments'  className="flex items-center w-full p-2
+                      text-black transition
+                      duration-75 rounded-lg  group gap-x-3
+                       ">
+                        <PaymentIcon />
+                         PPOE payments  
+                       </Link>
+                  </motion.li>
+
+
+
+
+                  <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
+                   initial={{ opacity: 0, x: -20 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   exit={{ opacity: 0, x: -20 }}
+                   transition={{ duration: 0.2, delay: 0.2 }}
+                  >
+                     <Link to='/admin/hotspot-payments'  className="flex items-center w-full p-2
+                      text-black
+                     transition duration-75 rounded-lg  group text-nowrap  gap-x-3
+                      ">
+                         <PaymentsSharpIcon/>
+                      Hotspot Payments                  
+                      </Link>
+                      </motion.li>
+                        </ul>
+
+): null }
                   
                     {isExpanded ? (
                      <KeyboardArrowUpSharpIcon/>
@@ -1309,9 +1439,12 @@ Network
                      </>
 }
             </button>
-): <button   onClick={()=> setIsExpanded1(!isExpanded1)} type="button" className="flex items-center w-full p-2 text-base
-              transition duration-75 rounded-lg group dark:hover:bg-white dark:hover:text-black hover:bg-black
-              dark:text-white text-white " aria-controls="dropdown-example"
+            
+): <button   onClick={()=> setIsExpanded1(!isExpanded1)} type="button" className="flex
+ items-center w-full p-2 text-base
+              transition duration-75 rounded-lg group dark:hover:bg-white dark:hover:text-black
+               hover:bg-black
+             text-white" aria-controls="dropdown-example"
                data-collapse-toggle="dropdown-example">
                      <PaymentsIcon/>
                      {!seeSidebar && <span className="flex-1 ms-3 text-left rtl:text-right
@@ -1418,7 +1551,7 @@ transition={{ duration: 0.2, delay: 0.1 }}
   setShowMenu11(false)  
   setShowMenu12(false)
  }}
- onClick={()=> setIsExpanded2(!isExpanded2)} type="button" className="flex 
+  type="button" className="flex 
          items-center w-full
           p-2 text-base
              text-white transition duration-75 rounded-lg group dark:hover:bg-white
@@ -1435,7 +1568,11 @@ transition={{ duration: 0.2, delay: 0.1 }}
     setShowMenu5(false)
   }}
   className="flex-1 ms-3 text-left rtl:text-right 
-                              whitespace-nowrap bg-white shadow-lg rounded-lg">Comunication
+                              whitespace-nowrap bg-white shadow-lg rounded-lg">
+                                
+                                <p className='roboto-condensed-bold text-center
+                                text-black
+                                '>Comunication</p>
                               
                               <motion.li
  onClick={() => {
@@ -1731,7 +1868,7 @@ transition={{ duration: 0.2, delay: 0.1 }}
 
 
  }}
- onClick={()=> setIsExpanded3(!isExpanded3)} type="button" className="flex items-center w-full p-2
+  type="button" className="flex items-center w-full p-2
   text-base
              text-white transition duration-75 rounded-lg group 
               dark:text-white dark:hover:bg-white dark:hover:text-black hover:bg-black "
@@ -1747,7 +1884,9 @@ transition={{ duration: 0.2, delay: 0.1 }}
   
  }}
  className="flex-1 ms-3 text-left rtl:text-right
-                    bg-white shadow-lg">Hotspot Bundle
+                    bg-white shadow-lg">
+                      
+                      <p className='text-center roboto-condensed-bold text-black '>Hotspot Bundle </p>
                     
                     
 
@@ -1792,7 +1931,7 @@ transition={{ duration: 0.2, delay: 0.1 }}
                       duration-75 rounded-lg  group gap-x-3 text-nowrap 
                        dark:text-white "> 
                         <SiPaloaltonetworks className='text-black'/>
-                      Hotspot  Package</Link>
+                      <p className='text-black'>Hotspot  Package</p></Link>
                       </div>
                   </motion.li>
 
@@ -2124,7 +2263,7 @@ onClick={() => {
   setShowMenu1(false)
 
  }}
- onClick={()=> setIsExpanded6(!isExpanded6)} type="button" className="flex items-center p-2 text-white
+  type="button" className="flex items-center p-2 text-white
              rounded-lg dark:text-white hover:cursor-pointer group
              dark:hover:bg-white dark:hover:text-black hover:bg-black"
                aria-controls="dropdown-example"
@@ -2257,9 +2396,10 @@ onClick={() => {
 <div className='flex items-center gap-x-4 w-full p-2 
                   transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                      <Link to='/admin/customer-tickets' className='flex items-center gap-x-2 text-white'>
-                     <LuTicketsPlane className='w-5 h-5 text-red-600'/>
+                     {!seeSidebar &&    <LuTicketsPlane className='w-5 h-5 text-red-600'/>}
 
-                     Tickets
+{!seeSidebar &&    <p>Tickets</p>}
+                     
                      </Link>
                      </div>
                   </motion.li>
@@ -2306,7 +2446,8 @@ onClick={() => {
     }}
     className="flex items-center p-2 text-white
              rounded-lg dark:text-white hover:cursor-pointer group
-             dark:hover:bg-white dark:hover:text-black hover:bg-black" onClick={()=> setIsExpanded7(!isExpanded7)}>
+             dark:hover:bg-white dark:hover:text-black hover:bg-black"
+             >
             
                <svg className="flex-shrink-0 w-5 h-5 text-white transition duration-75
                  group-hover:dark:text-black  " 
@@ -2325,7 +2466,7 @@ onClick={() => {
                 bg-white rounded-lg shadow-lg
                 ">
                   
-                  <p className='text-black text-center'>Users </p>
+                  <p className='text-black text-center roboto-condensed-bold'>Users </p>
                 
 <motion.li 
 onClick={() => {
@@ -2490,7 +2631,7 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
 
         
 {seeSidebar ? (
- <li  className="flex items-center p-2 text-white rounded-lg
+ <li  className="flex items-center p-2 mt-6 text-white rounded-lg
              dark:text-white hover:cursor-pointer translate-y-[-1.4rem]
               dark:hover:bg-white dark:hover:text-black hover:bg-black  group">
            

@@ -71,8 +71,14 @@ const Analytics = () => {
 
   const { welcomeMessage, welcome, setFormData, settingsformData, 
     totalSubscribers, setTotalSubscribers,subscribersOnline, setSubscribersOnline,
-    subscribersOffline, setSubscribersOffline
+    subscribersOffline, setSubscribersOffline,
+    showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
+      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
+       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
+        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
    } = useApplicationSettings();
+
+
   const [date, setDate] = useState(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }));
   const [datetime, setdateTime] = useState(true);
   const [routerData, setRouterData] = useState(null);
@@ -270,7 +276,22 @@ useEffect(() => {
 }, [fetchtotalSubscribers]);
   return (
     <>
-      <div className="p-2">
+      <div
+      onClick={() => {
+        setShowMenu1(false)
+        setShowMenu2(false)
+        setShowMenu3(false)
+        setShowMenu4(false)
+        setShowMenu5(false)
+        setShowMenu6(false)
+        setShowMenu7(false)
+        setShowMenu8(false)
+        setShowMenu9(false)
+        setShowMenu10(false)
+        setShowMenu11(false)  
+        setShowMenu12(false)
+      }}
+      className="p-2">
       <div className='flex justify-between items-center bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 border-l-4 border-blue-500'>
   <div className='flex items-center space-x-4'>
     {/* Tux Linux Penguin Icon */}
