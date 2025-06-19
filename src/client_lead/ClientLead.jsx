@@ -171,13 +171,22 @@ const createLead = async(e) => {
               
             });
             
-            if (!response.ok) throw new Error('Failed to fetch leads');
 const newData = await response.json()
-           
+           if (response.status === 403) {
+        toast.error(newData.error, {
+          position: "top-center",
+          duration: 6000, 
+        })      
+      }
             if (response.ok) {
                 setLeads(newData)
             } else {
-                
+                if (response.status === 403) {
+        toast.error(newData.error, {
+          position: "top-center",
+          duration: 6000, 
+        })      
+      }
 
               if (response.status === 401) {
   toast.error(newData.error, {

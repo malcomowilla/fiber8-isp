@@ -62,6 +62,8 @@ const [userPermisions, setUserPermisions] = useState({
  const [users, setUsers] = useState([])
  const [openDelete, setOpenDelete] = useState(false);
 
+ 
+
 const [permissionAndRoles, setPermissionAndRoles] = useState({
   package: { read: false, readWrite: false },
   hotspotPackage: { read: false, readWrite: false },
@@ -86,6 +88,12 @@ const [permissionAndRoles, setPermissionAndRoles] = useState({
   hotspotTemplate: {read: false, readWrite: false},
   hotspotVoucher: {read: false, readWrite: false},
   hotspotSettings: {read: false, readWrite: false},
+  clientLead: {read: false, readWrite: false},
+  calendarEvent: {read: false, readWrite: false},
+  uploadSubscriber: {read: false, readWrite: false},
+  wireguardConfiguration :{read: false, readWrite: false},
+  ipNetworks :{read: false, readWrite: false},
+  privateIps :{read: false, readWrite: false},
 });
 
 
@@ -222,6 +230,32 @@ console.log('rowData users', rowData)
       read: rowData.can_read_hotspot_settings,
       readWrite: rowData.can_manage_hotspot_settings,
     },
+    clientLead: {
+      read: rowData.can_read_lead,
+      readWrite: rowData.can_create_lead,
+    },
+    calendarEvent: {
+      read: rowData.can_read_calendar_events,
+      readWrite: rowData.can_create_calendar_events,
+    },
+
+    uploadSubscriber: {
+      read: rowData.can_upload_subscriber,
+      readWrite: rowData.can_upload_subscriber,
+    },
+
+    wireguardConfiguration: {
+      read: rowData.can_create_wireguard_configuration,
+      readWrite: rowData.can_create_wireguard_configuration,
+    },
+    ipNetworks: {
+      read: rowData.can_manage_networks,
+      readWrite: rowData.can_manage_networks,
+    },
+    privateIps: {
+      read: rowData.can_manage_private_ips,
+      readWrite: rowData.can_manage_private_ips,
+    },
 
 
   });
@@ -255,6 +289,12 @@ const handleAddButton = ()=> {
     hotspotTemplate: {read: false, readWrite: false},
     hotspotVoucher: {read: false, readWrite: false},
     hotspotSettings: {read: false, readWrite: false},
+    clientLead: {read: false, readWrite: false},
+    calendarEvent: {read: false, readWrite: false},
+    uploadSubscriber: {read: false, readWrite: false},
+    wireguardConfiguration: {read: false, readWrite: false},
+    ipNetworks: {read: false, readWrite: false},
+    privateIps: {read: false, readWrite: false},
 
     
 

@@ -76,7 +76,6 @@ const {company_name, contact_info, email_info, logo_preview} = companySettings
 
 
 
-console.log(seeSidebar)
 useEffect(() => {
 
   if (window.innerWidth < 1080) {
@@ -169,7 +168,7 @@ const handleGetCompanySettings = useCallback(
 
 <aside  className={`fixed top-0 left-0 z-50  w-64 h-screen transition-all duration-300 ease-in-out 
   bg-gray-800        mogra-regular shadow-xl   
-  lg:block ${seeSidebar ? 'w-[58px]' : 'w-[240px] ml-1'}    
+  lg:block ${seeSidebar ? 'w-[58px]' : 'w-[240px] '}    
 `}aria-label="Sidebar">
    <div className={`h-full px-3 py-4   
       dark:bg-gray-800

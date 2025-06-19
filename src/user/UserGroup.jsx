@@ -134,6 +134,13 @@ const getUserGroups = useCallback(
          }, 1800);
         
       }
+
+      if (response.status === 403) {
+        toast.error(newData.error, {
+          position: "top-center",
+          duration: 6000, 
+        })      
+      }
 if (response.status === 401) {
   toast.error(newData.error, {
     position: "top-center",

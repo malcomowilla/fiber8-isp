@@ -36,16 +36,6 @@ import SmsBalance from './SmsBalance'
 import License from './License'
 import Updates from './Updates'
 
-// import { ReloadIcon } from "@radix-ui/react-icons"
-
-
-
-// ${seeSidebar ? 'w-[240]  ' : 'w-[1px] overflow-hidden'
-        
-        
-        
-        
-// }
 
 const Layout = () => {
 
@@ -239,7 +229,6 @@ const subdomain = window.location.hostname.split('.')[0];
           // })
         }
         if(response.ok){
-console.log('sms balance', newData)
 setSmsBalance(newData.message)
         }else{
          
@@ -392,21 +381,6 @@ currentPPOEPlan={currentPPOEPlan} currentHotspotPlan={currentHotspotPlan}
 }
 
 
-
-
-  {/* Rest of your menu items */}
-  {/* ... */}
-
-          {/* {smsBalance && (
-    <div className="flex items-center gap-2 bg-white border
-    dark:bg-gray-800 dark:border-gray-700
-    border-t-blue-600 px-4 py-2 rounded-lg">
-      <FaSms className="text-blue-600 dark:text-blue-300 text-xl" />
-      <span className="text-blue-800 dark:text-blue-200 font-medium">
-        SMS Balance: <span className="font-bold">{smsBalance}</span>
-      </span>
-    </div>
-  )} */}
 
 <Updates />
 

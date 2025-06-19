@@ -1,7 +1,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { FiAlertCircle } from "react-icons/fi";
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import TextField from '@mui/material/TextField';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import { Accordion } from "flowbite-react";
@@ -47,6 +47,18 @@ import { TbRouter } from "react-icons/tb";
 import { FaUsers } from "react-icons/fa";
 import { LuLayoutTemplate } from "react-icons/lu";
 import { RiHotspotLine } from "react-icons/ri";
+import { ImCancelCircle } from "react-icons/im";
+import { FaHandshakeSimple } from "react-icons/fa6";
+import { MdEventAvailable } from "react-icons/md";
+import { GoUpload } from "react-icons/go";
+import { FcDataConfiguration } from "react-icons/fc";
+import { GiMeshNetwork } from "react-icons/gi";
+import { TbNetwork } from "react-icons/tb";
+
+
+
+
+
 
 
 
@@ -109,6 +121,14 @@ const [seeItem, setSeeItem] = useState({
   hotspotTemplate: false,
   hotspotVoucher: false,
   hotspotSettings: false,
+  clientLead: false,
+  calendarEvent: false,
+  uploadSubscriber: false,
+  wireguardConfiguration: false,
+privateIps: false,
+ipNetworks: false,
+
+
   
   
   
@@ -159,89 +179,76 @@ const handleUserDetailsFormDataChange = (e)=> {
 }
 
 
-const handleUserRoleFormDataChange = (role,  event)=> {
+const handleUserRoleFormDataChange = (role, event) => {
   const { name } = event.target;
-  setPermissionAndRoles((prevData)=> {
-    const newPermission = {...prevData}
+
+  setPermissionAndRoles((prevData) => {
+    const newPermission = { ...prevData, [role]: { ...prevData[role] } };
+
     if (name === 'read') {
       newPermission[role].read = !newPermission[role].read;
       if (newPermission[role].read) {
-        newPermission[role].readWrite = false
+        newPermission[role].readWrite = false;
       }
-
-      
-    
     } else if (name === 'readWrite') {
-      newPermission[role].readWrite = !newPermission[role].readWrite
-
-      if (newPermission[role].readWrite ) {
-        newPermission[role].read = false 
+      newPermission[role].readWrite = !newPermission[role].readWrite;
+      if (newPermission[role].readWrite) {
+        newPermission[role].read = false;
       }
-      
     }
-    return newPermission
-  })
+console.log('newpermision role read', newPermission[role].read)
+    setUserPermisions((prevUserPermissions) => ({
+      ...prevUserPermissions,
+      can_manage_subscriber: newPermission.subscriber.readWrite,
+      can_read_read_subscriber: newPermission.subscriber.read,
+      can_manage_ticket_settings: newPermission.ticketSettings.readWrite,
+      can_read_ticket_settings: newPermission.ticketSettings.read,
+      can_read_ppoe_package: newPermission.package.read,
+      can_manage_ppoe_package: newPermission.package.readWrite,
+      can_manage_company_setting: newPermission.companySettings.readWrite,
+      can_read_company_setting: newPermission.companySettings.read,
+      can_manage_email_setting: newPermission.emailSettings.readWrite,
+      can_read_email_setting: newPermission.emailSettings.read,
+      can_manage_hotspot_packages: newPermission.hotspotPackage.readWrite,
+      can_read_hotspot_packages: newPermission.hotspotPackage.read,
+      can_manage_ip_pool: newPermission?.pool?.readWrite,
+      can_read_ip_pool: newPermission?.pool?.read,
+      can_manage_nas_routers: newPermission?.router?.readWrite,
+      can_read_nas_routers: newPermission?.router?.read,
+      can_manage_router_setting: newPermission?.routerSettings?.readWrite,
+      can_read_router_setting: newPermission?.routerSettings?.read,
+      can_manage_sms: newPermission.sms.readWrite,
+      can_read_sms: newPermission.sms.read,
+      can_manage_sms_settings: newPermission.smsSettings.readWrite,
+      can_read_sms_settings: newPermission.smsSettings.read,
+      can_manage_subscriber_setting: newPermission.subscriberSettings.readWrite,
+      can_read_subscriber_setting: newPermission.subscriberSettings.read,
+      can_manage_subscription: newPermission.subscription.readWrite,
+      can_read_subscription: newPermission.subscription.read,
+      can_manage_support_tickets: newPermission.tickets.readWrite,
+      can_read_support_tickets: newPermission.tickets.read,
+      can_manage_users: newPermission.user.readWrite,
+      can_read_users: newPermission.user.read,
+      can_manage_user_setting: newPermission.userSettings.readWrite,
+      can_read_user_setting: newPermission.userSettings.read,
+      can_manage_free_radius: newPermission.freeRadius.readWrite,
+      can_read_free_radius: newPermission.freeRadius.read,
+      can_manage_mpesa_settings: newPermission.mpesaSettings.readWrite,
+      can_read_mpesa_settings: newPermission.mpesaSettings.read,
+      can_reboot_router: newPermission.rebootRouter.readWrite,
+      can_manage_user_group: newPermission.userGroup.readWrite,
+      can_read_user_group: newPermission.userGroup.read,
+      can_manage_hotspot_template: newPermission.hotspotTemplate.readWrite,
+      can_read_hotspot_template: newPermission.hotspotTemplate.read,
+      can_read_hotspot_voucher: newPermission.hotspotVoucher.read,
+      can_manage_hotspot_voucher: newPermission.hotspotVoucher.readWrite,
+      can_manage_hotspot_settings: newPermission.hotspotSettings.readWrite,
+      can_read_hotspot_settings: newPermission.hotspotSettings.read,
+    }));
 
-console.log('hotspot package read ', permissionAndRoles.hotspotPackage
-)
-  setUserPermisions((prevData) => ({
-    ...prevData,
-    can_manage_subscriber: permissionAndRoles.subscriber.readWrite,
-    can_read_read_subscriber: permissionAndRoles.subscriber.read,
-    can_manage_ticket_settings: permissionAndRoles.ticketSettings.readWrite,
-    can_read_ticket_settings: permissionAndRoles.ticketSettings.read,
-    can_read_ppoe_package: permissionAndRoles.package.read,
-    can_manage_ppoe_package: permissionAndRoles.package.readWrite,
-    can_manage_company_setting: permissionAndRoles.companySettings.readWrite,
-    can_read_company_setting: permissionAndRoles.companySettings.read,
-    can_manage_email_setting: permissionAndRoles.emailSettings.readWrite,
-    can_read_email_setting: permissionAndRoles.emailSettings.read,
-    can_manage_hotspot_packages: permissionAndRoles.hotspotPackage.readWrite,
-    
-    
-    can_read_hotspot_packages: permissionAndRoles.hotspotPackage.read,
-   
-    can_manage_ip_pool: permissionAndRoles?.pool?.readWrite,
-    can_read_ip_pool: permissionAndRoles?.pool?.read,
-    can_manage_nas_routers: permissionAndRoles?.router?.readWrite,
-    can_read_nas_routers: permissionAndRoles?.router?.read,
-    can_manage_router_setting: permissionAndRoles?.routerSettings?.readWrite,
-    can_read_router_setting: permissionAndRoles?.routerSettings?.read,
-    can_manage_sms: permissionAndRoles.sms.readWrite,
-    can_read_sms: permissionAndRoles.sms.read,
-    can_manage_sms_settings: permissionAndRoles.smsSettings.readWrite,
-    can_read_sms_settings: permissionAndRoles.smsSettings.read,
-    can_manage_subscriber_setting: permissionAndRoles.subscriberSettings.readWrite,
-    can_read_subscriber_setting: permissionAndRoles.subscriberSettings.read,
-    can_manage_subscription: permissionAndRoles.subscription.readWrite,
-    can_read_subscription: permissionAndRoles.subscription.read,
-    can_manage_support_tickets: permissionAndRoles.tickets.readWrite,
-    can_read_support_tickets: permissionAndRoles.tickets.read,
-    can_manage_users: permissionAndRoles.user.readWrite,
-    can_read_users: permissionAndRoles.user.read,
-
-    can_manage_user_setting: permissionAndRoles.userSettings.readWrite,
-    can_read_user_setting: permissionAndRoles.userSettings.read,
-    can_manage_free_radius: permissionAndRoles.freeRadius.readWrite,
-    can_read_free_radius: permissionAndRoles.freeRadius.read,
-    can_manage_mpesa_settings: permissionAndRoles.mpesaSettings.readWrite,
-    can_read_mpesa_settings: permissionAndRoles.mpesaSettings.read,
-    can_reboot_router: permissionAndRoles.rebootRouter.readWrite,
-    can_manage_user_group: permissionAndRoles.userGroup.readWrite,
-    can_read_user_group: permissionAndRoles.userGroup.read,
-    can_manage_hotspot_template: permissionAndRoles.hotspotTemplate.readWrite,
-    can_read_hotspot_template: permissionAndRoles.hotspotTemplate.read,
-    can_read_hotspot_voucher: permissionAndRoles.hotspotVoucher.read,
-    can_manage_hotspot_voucher: permissionAndRoles.hotspotVoucher.readWrite,
-    can_manage_hotspot_settings: permissionAndRoles.hotspotSettings.readWrite,
-    can_read_hotspot_settings: permissionAndRoles.hotspotSettings.read,
-
-   
-  
-
-
-  }));
-}
+    return newPermission;
+  });
+};
 
 
 const variantDiv = {
@@ -295,15 +302,6 @@ const [userRoles, setUserRoles] = useState([])
     
   }, [getUserGroups]);
 
-  // const userRoles = [
-  //   { label: 'customer_support',  },
-  //   { label: 'administrator',},
-  //   { label: 'super_administrator',},
-  //   { label: "technician",  },
-  //   { label: "agent",  },
-
-    
-  //   ]
 
 
 
@@ -331,11 +329,13 @@ const [userRoles, setUserRoles] = useState([])
     <AnimatePresence>
       {isOpen && (
         <motion.div
+       
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           
-          className="bg-slate-900/20 backdrop-blur p-8 fixed inset-0 z-50 grid place-items-center  overflow-y-scroll
+          className="bg-slate-900/20 backdrop-blur p-8 fixed inset-0 
+          z-50 grid place-items-center  overflow-y-scroll
            cursor-pointer"
         >
           <motion.div
@@ -346,7 +346,16 @@ const [userRoles, setUserRoles] = useState([])
             max-w-[600px]
              shadow-xl cursor-default relative `}
           >
-            <FiAlertCircle className="text-white/10 rotate-12 text-[250px] absolute z-0 -top-24 -left-24" />
+           
+
+<ImCancelCircle 
+onClick={()=>{
+  setIsOpen(false)
+
+}}
+className=" rotate-12 text-[40px] dark:text-white
+            absolute z-0 -top-[10px] -left-[30px] cursor-pointer"  />            
+
             <div className="relative z-10">
               
               <h3 className="text-3xl  font-bold
@@ -529,14 +538,14 @@ getOptionLabel={(option) => option.name}
    
    
 
-{Object.keys(seeItem).map((role, index)=> (
-  <>
-  {console.log('role', permissionAndRoles)}
+{Object.keys(seeItem).map((user_role, index)=> (
+  <React.Fragment key={user_role}>
+  {/* {console.log('user_role', user_role)} */}
 <div key={index}>
 
 
 
-<h2  id={`accordion-open-heading-${index}`} onClick={()=> handleSeeItem(role)}>
+<h2  id={`accordion-open-heading-${index}`} onClick={()=> handleSeeItem(user_role)}>
 
 
 <button type="button"    className="flex items-center justify-between 
@@ -552,37 +561,47 @@ w-full p-5 font-medium rtl:text-right
    aria-controls={`accordion-open-body-${index}`}
    >
   <span className="flex items-center gap-3">    
-                        {role === 'userSettings' && <GrUserSettings className='w-5 h-5'/>}
-                          {role === 'sms' && <MdOutlineTextsms className='w-5 h-5'/>}
-                          {role === 'tickets' && <PiTicketLight className='w-5 h-5' />}
-                          {role === 'user' && <FaUserFriends className='w-5 h-5'/>}
-                          {role === 'emailSettings' && <RiMailSettingsLine className='w-5 h-5'/>}
-                          {role === 'smsSettings' && <  RiChatSettingsLine className='w-5 h-5'/>}
-                          {role === 'ticketSettings' && <TbFileSettings className='w-5 h-5' />}
-                          {role === 'routerSettings' && <GiSettingsKnobs className='w-5 h-5' />}
-                          {role === 'subscriberSettings' && <RiUserSettingsFill className='w-5 h-5' />}
-                          {role === 'companySettings' && <RiUserSettingsFill className='w-5 h-5' />}
-                          {role === 'pool' && <LuSettings2 className='w-5 h-5' />}
-                          {role === 'router' && <BsRouter className='w-5 h-5' />}
-                          {role === 'subscriber' && <GoPeople className='w-5 h-5' />}
-                          {role === 'package' && <FcPackage className='w-5 h-5' />}
-                          {role === 'hotspotPackage' && <FcPackage className='w-5 h-5' />}
-                          {role === 'subscription' && <PiNetwork className='w-5 h-5' />}
-                          {role === 'freeRadius' && <img src='/images/free_radius.svg' className='w-5 h-5' />}
-                          {role === 'mpesaSettings' && <img src='/images/mpesa-logo.png' className='w-7 h-7' />}
-                          {role === 'rebootRouter' && <TbRouter className='w-5 h-5' />}
-                          {role === 'userGroup' && <FaUsers className='w-5 h-5' />}
-                          {role === 'hotspotTemplate' && <LuLayoutTemplate className='w-5 h-5' />}
-                          {role === 'hotspotVoucher' &&   <p>🎫 </p>}
-                          {role === 'hotspotSettings' &&   <p><RiHotspotLine className='w-5 h-5'  /></p>}
+                        {user_role === 'userSettings' && <GrUserSettings className='w-5 h-5'/>}
+                          {user_role === 'sms' && <MdOutlineTextsms className='w-5 h-5'/>}
+                          {user_role === 'tickets' && <PiTicketLight className='w-5 h-5' />}
+                          {user_role === 'user' && <FaUserFriends className='w-5 h-5'/>}
+                          {user_role === 'emailSettings' && <RiMailSettingsLine className='w-5 h-5'/>}
+                          {user_role === 'smsSettings' && <  RiChatSettingsLine className='w-5 h-5'/>}
+                          {user_role === 'ticketSettings' && <TbFileSettings className='w-5 h-5' />}
+                          {user_role === 'routerSettings' && <GiSettingsKnobs className='w-5 h-5' />}
+                          {user_role === 'subscriberSettings' && <RiUserSettingsFill className='w-5 h-5' />}
+                          {user_role === 'companySettings' && <RiUserSettingsFill className='w-5 h-5' />}
+                          {user_role === 'pool' && <LuSettings2 className='w-5 h-5' />}
+                          {user_role === 'router' && <BsRouter className='w-5 h-5' />}
+                          {user_role === 'subscriber' && <GoPeople className='w-5 h-5' />}
+                          {user_role === 'package' && <FcPackage className='w-5 h-5' />}
+                          {user_role === 'hotspotPackage' && <FcPackage className='w-5 h-5' />}
+                          {user_role === 'subscription' && <PiNetwork className='w-5 h-5' />}
+                          {user_role === 'freeRadius' && <img src='/images/free_radius.svg' className='w-5 h-5' />}
+                          {user_role === 'mpesaSettings' && <img src='/images/mpesa-logo.png' className='w-7 h-7' />}
+                          {user_role === 'rebootRouter' && <TbRouter className='w-5 h-5' />}
+                          {user_role === 'userGroup' && <FaUsers className='w-5 h-5' />}
+                          {user_role === 'hotspotTemplate' && <LuLayoutTemplate className='w-5 h-5' />}
+                          {user_role === 'hotspotVoucher' &&   <p>🎫 </p>}
+              {user_role === 'hotspotSettings' &&   <p><RiHotspotLine className='w-5 h-5'/></p>}
+                 {user_role === 'clientLead' &&   <p><FaHandshakeSimple className='w-5 h-5'/></p>}
+                 {user_role === 'calendarEvent' &&   <p><MdEventAvailable className='w-5 h-5'/></p>}
+                 {user_role === 'uploadSubscriber' &&   <p><GoUpload className='w-5 h-5'/></p>}
+                 {user_role === 'wireguardConfiguration' &&   <p><FcDataConfiguration
+                  className='w-5 h-5'/></p>}
+
+                  {user_role === 'ipNetworks' &&   <p><GiMeshNetwork className='w-5 h-5'/></p>}
+                 {user_role === 'privateIps' &&   <p><TbNetwork className='w-5 h-5'/></p>}
+
+
                           
 
   
   
   
-   {role}
+   {user_role}
   </span>
-  {seeItem[role] ?   <IoIosArrowUp /> : <IoIosArrowDown />}
+  {seeItem[user_role] ?   <IoIosArrowUp /> : <IoIosArrowDown />}
   
   
 </button>
@@ -590,7 +609,7 @@ w-full p-5 font-medium rtl:text-right
 
 
 <motion.div variants={variantDiv} transition={{duration:0.1, ease: "easeInOut",
-  }} initial='hidden' animate={seeItem[role] ? "visible" : "hidden"} className='flex justify-between'>
+  }} initial='hidden' animate={seeItem[user_role] ? "visible" : "hidden"} className='flex justify-between'>
 <p>Item</p>
 <p>Read</p>
 <p>Read/Write</p>
@@ -598,22 +617,24 @@ w-full p-5 font-medium rtl:text-right
 
 
 <motion.div variants={variantDiv} transition={{duration:0.1, ease: "easeInOut",
-  }} initial='hidden' animate={seeItem[role] ? "visible" : "hidden"} className='flex justify-between'>
+  }} initial='hidden' animate={seeItem[user_role] ? "visible" : "hidden"} className='flex justify-between'>
             <p className="dark:text-black text-black ">
-            {role}
+            {user_role}
           </p>
 
-      <FormControlLabel control={<Checkbox checked={permissionAndRoles[role]?.read} color='success' 
-       onChange={(event)=>handleUserRoleFormDataChange(role, event)} />}   name='read'  />
+      <FormControlLabel control={<Checkbox checked={permissionAndRoles[user_role]?.read} color='success' 
+       onChange={(event)=>handleUserRoleFormDataChange(user_role, event)} />}   name='read'  />
 
 
-      <FormControlLabel control={<Checkbox color='success' checked={permissionAndRoles[role]?.readWrite}
-       onChange={(event)=>handleUserRoleFormDataChange(role, event)} />}   name='readWrite'  />
+      <FormControlLabel 
+      
+      control={<Checkbox color='success' checked={permissionAndRoles[user_role]?.readWrite}
+       onChange={(event)=>handleUserRoleFormDataChange(user_role, event)} />}   name='readWrite'  />
             </motion.div>
 
             </div>
 
-  </>
+  </ React.Fragment>
 ))}
 
     </div>
@@ -636,7 +657,6 @@ type='submit'  className={`
       <button   onClick={(e) =>{
             e.preventDefault()
             setIsOpen(false)
-            setBottomNavigation(true)
 
           } } className={`flex-1 px-6 py-3.5 font-medium 
                    text-gray-700 rounded-2xl transition-all
@@ -676,4 +696,3 @@ type='submit'  className={`
 };
 
 export default InvitationForm;
-
