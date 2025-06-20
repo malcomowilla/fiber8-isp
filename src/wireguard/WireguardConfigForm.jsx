@@ -350,6 +350,401 @@
 // }
 
 // export default WireguardConfigForm;
+
+
+
+// import React, { useState } from 'react';
+// import {
+//   Box,
+//   Typography,
+//   TextField,
+//   Button,
+//   FormControl,
+//   InputLabel,
+//   Select,
+//   MenuItem,
+//   Checkbox,
+//   FormControlLabel,
+//   Paper,
+//   Divider,
+//   Alert,
+//   CircularProgress,
+//   IconButton,
+//   Tooltip,
+//   Dialog,
+//   DialogTitle,
+//   DialogContent,
+//   DialogActions
+// } from '@mui/material';
+// import { styled } from '@mui/material/styles';
+// import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+// import CheckIcon from '@mui/icons-material/Check';
+// import QrCode2Icon from '@mui/icons-material/QrCode2';
+// import toast, { Toaster } from 'react-hot-toast';
+// import { useApplicationSettings } from '../settings/ApplicationSettings';
+
+// const ConfigPaper = styled(Paper)(({ theme }) => ({
+//   padding: theme.spacing(3),
+//   marginTop: theme.spacing(3),
+//   backgroundColor: theme.palette.background.paper,
+// }));
+
+// const PreformattedText = styled('pre')(({ theme }) => ({
+//   padding: theme.spacing(2),
+//   backgroundColor: theme.palette.grey[100],
+//   borderRadius: theme.shape.borderRadius,
+//   overflowX: 'auto',
+//   whiteSpace: 'pre-wrap',
+//   wordWrap: 'break-word',
+// }));
+
+// const ConfigBlock = styled('div')(({ theme }) => ({
+//   position: 'relative',
+//   padding: theme.spacing(2),
+//   backgroundColor: theme.palette.grey[100],
+//   borderRadius: theme.shape.borderRadius,
+//   marginBottom: theme.spacing(2),
+//   '&:hover $copyButton': {
+//     opacity: 1,
+//   },
+// }));
+
+// const CopyButton = styled(IconButton)(({ theme }) => ({
+//   position: 'absolute',
+//   right: theme.spacing(1),
+//   top: theme.spacing(1),
+//   opacity: 0,
+//   transition: 'opacity 0.2s',
+// }));
+
+// const QrCodeContainer = styled('div')(({ theme }) => ({
+//   display: 'flex',
+//   justifyContent: 'center',
+//   padding: theme.spacing(3),
+//   backgroundColor: 'white',
+//   borderRadius: theme.shape.borderRadius,
+//   margin: theme.spacing(2, 0),
+// }));
+
+// function WireguardConfigForm() {
+//   const [formData, setFormData] = useState({
+//     networkAddress: '10.2.0.0',
+//     subnetMask: '24',
+//     customIp: '',
+//     createRadiusEntry: false,
+//     pppoeUsername: ''
+//   });
+//   const [config, setConfig] = useState(null);
+//   const [error, setError] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [copied, setCopied] = useState({});
+//   const [qrDialogOpen, setQrDialogOpen] = useState(false);
+//   const [qrCodeData, setQrCodeData] = useState(null);
+//   const [qrLoading, setQrLoading] = useState(false);
+
+//   const { showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
+//     showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
+//     showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
+//     showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12 }
+//     = useApplicationSettings();
+
+//   const subnetOptions = [
+//     { value: '24', label: '/24 (254 hosts)' },
+//     { value: '30', label: '/30 (2 hosts)' },
+//   ];
+
+//   const handleChange = (e) => {
+//     const { name, value, type, checked } = e.target;
+//     setFormData(prev => ({
+//       ...prev,
+//       [name]: type === 'checkbox' ? checked : value
+//     }));
+//   };
+
+//   const subdomain = window.location.hostname.split('.')[0];
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setLoading(true);
+//     setError(null);
+//     setConfig(null);
+
+//     try {
+//       const response = await fetch('/api/wireguard/generate_config', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//           'X-Subdomain': subdomain,
+//         },
+//         body: JSON.stringify({
+//           network_address: formData.networkAddress,
+//           subnet_mask: formData.subnetMask,
+//           client_ip: formData.customIp,
+//           create_radius_entry: formData.createRadiusEntry,
+//           pppoe_username: formData.pppoeUsername
+//         })
+//       });
+//       const newData = await response.json();
+
+//       if (!response.ok) {
+//         if (response.status === 401) {
+//           toast.error(newData.error, {
+//             position: "top-center",
+//             duration: 4000,
+//           })
+//           setTimeout(() => {
+//             window.location.href = '/signin'
+//           }, 1900);
+//         }
+//         throw new Error(newData.error || 'Failed to generate configuration');
+//       }
+
+//       if (response.status === 402) {
+//         setTimeout(() => {
+//           window.location.href = '/license-expired';
+//         }, 1800);
+//       }
+
+//       setConfig(newData);
+//     } catch (err) {
+//       setError(err.message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const handleGenerateQrCode = async () => {
+//     if (!config) return;
+    
+//     setQrLoading(true);
+//     setQrDialogOpen(true);
+    
+//     try {
+//       const response = await fetch('/api/wireguard/generate_wireguard_app_config', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//           'X-Subdomain': subdomain,
+//         },
+//         body: JSON.stringify({
+//           client_private_key: config.private_key,
+//           client_ip: config.client_ip,
+//           server_public_key: config.public_key
+//         })
+//       });
+      
+//       if (!response.ok) {
+//         throw new Error('Failed to generate QR code');
+//       }
+      
+//       const qrData = await response.json();
+//       setQrCodeData(qrData.qr_code_data_url);
+//     } catch (err) {
+//       toast.error(err.message);
+//     } finally {
+//       setQrLoading(false);
+//     }
+//   };
+
+//   const copyToClipboard = (text, key) => {
+//     navigator.clipboard.writeText(text);
+//     setCopied(prev => ({ ...prev, [key]: true }));
+//     setTimeout(() => setCopied(prev => ({ ...prev, [key]: false })), 2000);
+//     toast.success('Copied to clipboard!');
+//   };
+
+//   return (
+//     <>
+//       <Toaster />
+//       <Box
+//         onClick={() => {
+//           setShowMenu1(false)
+//           setShowMenu2(false)
+//           setShowMenu3(false)
+//           setShowMenu4(false)
+//           setShowMenu5(false)
+//           setShowMenu6(false)
+//           setShowMenu7(false)
+//           setShowMenu8(false)
+//           setShowMenu9(false)
+//           setShowMenu10(false)
+//           setShowMenu11(false)
+//           setShowMenu12(false)
+//         }}
+//         sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
+//         <Typography variant="h4" gutterBottom>
+//           WireGuard Configuration Generator
+//         </Typography>
+
+//         <Paper elevation={3} sx={{ p: 3 }}>
+//           <form onSubmit={handleSubmit}>
+//             <Box sx={{ display: 'grid', gap: 3 }}>
+//               <TextField
+//                 className='myTextField'
+//                 label="Network Address"
+//                 name="networkAddress"
+//                 value={formData.networkAddress}
+//                 onChange={handleChange}
+//                 fullWidth
+//                 required
+//               />
+
+//               <FormControl fullWidth>
+//                 <InputLabel>Subnet Mask</InputLabel>
+//                 <Select
+//                   name="subnetMask"
+//                   value={formData.subnetMask}
+//                   label="Subnet Mask"
+//                   onChange={handleChange}
+//                   required
+//                 >
+//                   {subnetOptions.map(option => (
+//                     <MenuItem key={option.value} value={option.value}>
+//                       {option.label}
+//                     </MenuItem>
+//                   ))}
+//                 </Select>
+//               </FormControl>
+
+//               <TextField
+//                 label="Custom IP (optional)"
+//                 name="customIp"
+//                 value={formData.customIp}
+//                 onChange={handleChange}
+//                 fullWidth
+//                 className='myTextField'
+//                 placeholder="e.g., 10.2.0.42"
+//               />
+
+//               <Button
+//                 type="submit"
+//                 variant="contained"
+//                 color="primary"
+//                 disabled={loading}
+//                 startIcon={loading ? <CircularProgress size={20} /> : null}
+//                 sx={{ mt: 2 }}
+//               >
+//                 {loading ? 'Generating...' : 'Generate Configuration'}
+//               </Button>
+//             </Box>
+//           </form>
+//         </Paper>
+
+//         {error && (
+//           <Alert severity="error" sx={{ mt: 3 }}>
+//             {error}
+//           </Alert>
+//         )}
+
+//         {config && (
+//           <ConfigPaper elevation={3}>
+//             <Typography variant="h5" gutterBottom>
+//               Generated Configuration
+//             </Typography>
+
+//             <Box sx={{ mb: 3 }}>
+//               <Typography><strong>Network:</strong> {config.network}</Typography>
+//               <Typography><strong>Assigned IP:</strong> {config.client_ip}</Typography>
+//               <Typography><strong>Server IP:</strong> {config.server_ip}</Typography>
+//             </Box>
+
+//             <Divider sx={{ my: 2 }} />
+
+//             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+//               <Typography variant="h6" gutterBottom>
+//                 Client Keys:
+//               </Typography>
+//               <Button
+//                 variant="outlined"
+//                 startIcon={<QrCode2Icon />}
+//                 onClick={handleGenerateQrCode}
+//                 disabled={!config}
+//               >
+//                 Generate QR Code
+//               </Button>
+//             </Box>
+
+//             <ConfigBlock>
+//               <CopyButton
+//                 size="small"
+//                 onClick={() => copyToClipboard(config.private_key, 'private')}
+//               >
+//                 {copied['private'] ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
+//               </CopyButton>
+//               <Typography variant="subtitle2">Private Key:</Typography>
+//               <Typography sx={{ wordBreak: 'break-all' }}>{config.private_key}</Typography>
+//             </ConfigBlock>
+
+//             <ConfigBlock>
+//               <CopyButton
+//                 size="small"
+//                 onClick={() => copyToClipboard(config.public_key, 'public')}
+//               >
+//                 {copied['public'] ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
+//               </CopyButton>
+//               <Typography variant="subtitle2">Public Key:</Typography>
+//               <Typography sx={{ wordBreak: 'break-all' }}>{config.public_key}</Typography>
+//             </ConfigBlock>
+
+//             <Divider sx={{ my: 2 }} />
+
+//             <Typography variant="h6" gutterBottom>
+//               MikroTik Configuration:
+//             </Typography>
+//             <Typography variant="body2" color="text.secondary" gutterBottom>
+//               Copy and paste these commands into your MikroTik terminal:
+//             </Typography>
+//             <ConfigBlock>
+//               <CopyButton
+//                 size="small"
+//                 onClick={() => copyToClipboard(config.mikrotik_config, 'mikrotik')}
+//               >
+//                 {copied['mikrotik'] ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
+//               </CopyButton>
+//               <PreformattedText>{config.mikrotik_config}</PreformattedText>
+//             </ConfigBlock>
+//           </ConfigPaper>
+//         )}
+//       </Box>
+
+//       {/* QR Code Dialog */}
+//       <Dialog open={qrDialogOpen} onClose={() => setQrDialogOpen(false)} maxWidth="sm" fullWidth>
+//         <DialogTitle>WireGuard Client QR Code</DialogTitle>
+//         <DialogContent>
+//           {qrLoading ? (
+//             <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+//               <CircularProgress />
+//             </Box>
+//           ) : qrCodeData ? (
+//             <>
+//               <Typography variant="body1" gutterBottom>
+//                 Scan this QR code with the WireGuard app to automatically configure your client:
+//               </Typography>
+//               <QrCodeContainer>
+//                 <img src={qrCodeData} alt="WireGuard QR Code" style={{ maxWidth: '100%', height: 'auto' }} />
+//               </QrCodeContainer>
+//               <Typography variant="body2" color="text.secondary">
+//                 If scanning doesn't work, you can manually enter the configuration using the details above.
+//               </Typography>
+//             </>
+//           ) : (
+//             <Alert severity="error">Failed to generate QR code</Alert>
+//           )}
+//         </DialogContent>
+//         <DialogActions>
+//           <Button onClick={() => setQrDialogOpen(false)}>Close</Button>
+//         </DialogActions>
+//       </Dialog>
+//     </>
+//   );
+// }
+
+// export default WireguardConfigForm;
+
+
+
+
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -360,18 +755,19 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Checkbox,
-  FormControlLabel,
   Paper,
   Divider,
   Alert,
   CircularProgress,
   IconButton,
-  Tooltip,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Grid,
+  Card,
+  CardContent,
+  CardActions
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -401,17 +797,12 @@ const ConfigBlock = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.grey[100],
   borderRadius: theme.shape.borderRadius,
   marginBottom: theme.spacing(2),
-  '&:hover $copyButton': {
-    opacity: 1,
-  },
 }));
 
 const CopyButton = styled(IconButton)(({ theme }) => ({
   position: 'absolute',
   right: theme.spacing(1),
   top: theme.spacing(1),
-  opacity: 0,
-  transition: 'opacity 0.2s',
 }));
 
 const QrCodeContainer = styled('div')(({ theme }) => ({
@@ -423,13 +814,21 @@ const QrCodeContainer = styled('div')(({ theme }) => ({
   margin: theme.spacing(2, 0),
 }));
 
+const ActionCard = styled(Card)(({ theme }) => ({
+  marginBottom: theme.spacing(3),
+  boxShadow: theme.shadows[2],
+  transition: 'transform 0.2s, box-shadow 0.2s',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: theme.shadows[4],
+  },
+}));
+
 function WireguardConfigForm() {
   const [formData, setFormData] = useState({
     networkAddress: '10.2.0.0',
     subnetMask: '24',
     customIp: '',
-    createRadiusEntry: false,
-    pppoeUsername: ''
   });
   const [config, setConfig] = useState(null);
   const [error, setError] = useState(null);
@@ -438,12 +837,17 @@ function WireguardConfigForm() {
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
   const [qrCodeData, setQrCodeData] = useState(null);
   const [qrLoading, setQrLoading] = useState(false);
+  const [qrFormData, setQrFormData] = useState({
+    privateKey: '',
+    clientIp: '',
+    serverPublicKey: ''
+  });
 
-  const { showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
-    showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
-    showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
-    showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12 }
-    = useApplicationSettings();
+  const { 
+    setShowMenu1, setShowMenu2, setShowMenu3, setShowMenu4, 
+    setShowMenu5, setShowMenu6, setShowMenu7, setShowMenu8,
+    setShowMenu9, setShowMenu10, setShowMenu11, setShowMenu12 
+  } = useApplicationSettings();
 
   const subnetOptions = [
     { value: '24', label: '/24 (254 hosts)' },
@@ -451,16 +855,18 @@ function WireguardConfigForm() {
   ];
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleQrFormChange = (e) => {
+    const { name, value } = e.target;
+    setQrFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const subdomain = window.location.hostname.split('.')[0];
 
-  const handleSubmit = async (e) => {
+  const handleGenerateConfig = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -477,42 +883,33 @@ function WireguardConfigForm() {
           network_address: formData.networkAddress,
           subnet_mask: formData.subnetMask,
           client_ip: formData.customIp,
-          create_radius_entry: formData.createRadiusEntry,
-          pppoe_username: formData.pppoeUsername
         })
       });
       const newData = await response.json();
 
       if (!response.ok) {
         if (response.status === 401) {
-          toast.error(newData.error, {
-            position: "top-center",
-            duration: 4000,
-          })
-          setTimeout(() => {
-            window.location.href = '/signin'
-          }, 1900);
+          toast.error(newData.error, { position: "top-center", duration: 4000 });
+          setTimeout(() => { window.location.href = '/signin' }, 1900);
         }
         throw new Error(newData.error || 'Failed to generate configuration');
       }
 
       if (response.status === 402) {
-        setTimeout(() => {
-          window.location.href = '/license-expired';
-        }, 1800);
+        setTimeout(() => { window.location.href = '/license-expired' }, 1800);
       }
 
       setConfig(newData);
+      toast.success('Configuration generated successfully!');
     } catch (err) {
       setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   const handleGenerateQrCode = async () => {
-    if (!config) return;
-    
     setQrLoading(true);
     setQrDialogOpen(true);
     
@@ -524,9 +921,9 @@ function WireguardConfigForm() {
           'X-Subdomain': subdomain,
         },
         body: JSON.stringify({
-          client_private_key: config.private_key,
-          client_ip: config.client_ip,
-          server_public_key: config.public_key
+          client_private_key: qrFormData.privateKey || (config?.private_key || ''),
+          client_ip: qrFormData.clientIp || (config?.client_ip || ''),
+          server_public_key: qrFormData.serverPublicKey || (config?.public_key || '')
         })
       });
       
@@ -536,6 +933,7 @@ function WireguardConfigForm() {
       
       const qrData = await response.json();
       setQrCodeData(qrData.qr_code_data_url);
+      toast.success('QR code generated!');
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -550,158 +948,204 @@ function WireguardConfigForm() {
     toast.success('Copied to clipboard!');
   };
 
+  const closeAllMenus = () => {
+    [
+      setShowMenu1, setShowMenu2, setShowMenu3, setShowMenu4,
+      setShowMenu5, setShowMenu6, setShowMenu7, setShowMenu8,
+      setShowMenu9, setShowMenu10, setShowMenu11, setShowMenu12
+    ].forEach(setter => setter(false));
+  };
+
   return (
     <>
       <Toaster />
-      <Box
-        onClick={() => {
-          setShowMenu1(false)
-          setShowMenu2(false)
-          setShowMenu3(false)
-          setShowMenu4(false)
-          setShowMenu5(false)
-          setShowMenu6(false)
-          setShowMenu7(false)
-          setShowMenu8(false)
-          setShowMenu9(false)
-          setShowMenu10(false)
-          setShowMenu11(false)
-          setShowMenu12(false)
-        }}
-        sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          WireGuard Configuration Generator
+      <Box onClick={closeAllMenus} sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
+        <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
+          WireGuard Configuration Tools
         </Typography>
 
-        <Paper elevation={3} sx={{ p: 3 }}>
-          <form onSubmit={handleSubmit}>
-            <Box sx={{ display: 'grid', gap: 3 }}>
-              <TextField
-                className='myTextField'
-                label="Network Address"
-                name="networkAddress"
-                value={formData.networkAddress}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
+        <Grid container spacing={3}>
+          {/* Configuration Generator */}
+          <Grid item xs={12} md={6}>
+            <ActionCard>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Generate New Configuration
+                </Typography>
+                <form onSubmit={handleGenerateConfig}>
+                  <Box sx={{ display: 'grid', gap: 2 }}>
+                    <TextField
+                      label="Network Address"
+                      name="networkAddress"
+                      value={formData.networkAddress}
+                      onChange={handleChange}
+                      fullWidth
+                      required
+                    />
 
-              <FormControl fullWidth>
-                <InputLabel>Subnet Mask</InputLabel>
-                <Select
-                  name="subnetMask"
-                  value={formData.subnetMask}
-                  label="Subnet Mask"
-                  onChange={handleChange}
-                  required
+                    <FormControl fullWidth>
+                      <InputLabel>Subnet Mask</InputLabel>
+                      <Select
+                        name="subnetMask"
+                        value={formData.subnetMask}
+                        label="Subnet Mask"
+                        onChange={handleChange}
+                        required
+                      >
+                        {subnetOptions.map(option => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    <TextField
+                      label="Custom IP (optional)"
+                      name="customIp"
+                      value={formData.customIp}
+                      onChange={handleChange}
+                      fullWidth
+                      placeholder="e.g., 10.2.0.42"
+                    />
+                  </Box>
+                </form>
+              </CardContent>
+              <CardActions sx={{ justifyContent: 'flex-end', p: 2 }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleGenerateConfig}
+                  disabled={loading}
+                  startIcon={loading ? <CircularProgress size={20} /> : null}
                 >
-                  {subnetOptions.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                  {loading ? 'Generating...' : 'Generate Config'}
+                </Button>
+              </CardActions>
+            </ActionCard>
 
-              <TextField
-                label="Custom IP (optional)"
-                name="customIp"
-                value={formData.customIp}
-                onChange={handleChange}
-                fullWidth
-                className='myTextField'
-                placeholder="e.g., 10.2.0.42"
-              />
+            {/* QR Code Generator */}
+            <ActionCard>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Generate QR Code
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  Create a scannable QR code from existing configuration
+                </Typography>
+                
+                <Box sx={{ display: 'grid', gap: 2 }}>
+                  <TextField
+                    label="Private Key (optional)"
+                    name="privateKey"
+                    value={qrFormData.privateKey}
+                    onChange={handleQrFormChange}
+                    fullWidth
+                    placeholder="Will use generated config if empty"
+                  />
+                  
+                  <TextField
+                    label="Client IP (optional)"
+                    name="clientIp"
+                    value={qrFormData.clientIp}
+                    onChange={handleQrFormChange}
+                    fullWidth
+                    placeholder="Will use generated config if empty"
+                  />
+                  
+                  <TextField
+                    label="Server Public Key (optional)"
+                    name="serverPublicKey"
+                    value={qrFormData.serverPublicKey}
+                    onChange={handleQrFormChange}
+                    fullWidth
+                    placeholder="Will use generated config if empty"
+                  />
+                </Box>
+              </CardContent>
+              <CardActions sx={{ justifyContent: 'flex-end', p: 2 }}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<QrCode2Icon />}
+                  onClick={handleGenerateQrCode}
+                  disabled={qrLoading}
+                >
+                  {qrLoading ? 'Generating...' : 'Generate QR Code'}
+                </Button>
+              </CardActions>
+            </ActionCard>
+          </Grid>
 
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                startIcon={loading ? <CircularProgress size={20} /> : null}
-                sx={{ mt: 2 }}
-              >
-                {loading ? 'Generating...' : 'Generate Configuration'}
-              </Button>
-            </Box>
-          </form>
-        </Paper>
+          {/* Results Panel */}
+          <Grid item xs={12} md={6}>
+            {error && (
+              <Alert severity="error" sx={{ mb: 3 }}>
+                {error}
+              </Alert>
+            )}
 
-        {error && (
-          <Alert severity="error" sx={{ mt: 3 }}>
-            {error}
-          </Alert>
-        )}
+            {config && (
+              <ConfigPaper elevation={0}>
+                <Typography variant="h5" gutterBottom>
+                  Generated Configuration
+                </Typography>
 
-        {config && (
-          <ConfigPaper elevation={3}>
-            <Typography variant="h5" gutterBottom>
-              Generated Configuration
-            </Typography>
+                <Box sx={{ mb: 3 }}>
+                  <Typography><strong>Network:</strong> {config.network}</Typography>
+                  <Typography><strong>Assigned IP:</strong> {config.client_ip}</Typography>
+                  <Typography><strong>Server IP:</strong> {config.server_ip}</Typography>
+                </Box>
 
-            <Box sx={{ mb: 3 }}>
-              <Typography><strong>Network:</strong> {config.network}</Typography>
-              <Typography><strong>Assigned IP:</strong> {config.client_ip}</Typography>
-              <Typography><strong>Server IP:</strong> {config.server_ip}</Typography>
-            </Box>
+                <Divider sx={{ my: 2 }} />
 
-            <Divider sx={{ my: 2 }} />
+                <Typography variant="h6" gutterBottom>
+                  Client Keys
+                </Typography>
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="h6" gutterBottom>
-                Client Keys:
-              </Typography>
-              <Button
-                variant="outlined"
-                startIcon={<QrCode2Icon />}
-                onClick={handleGenerateQrCode}
-                disabled={!config}
-              >
-                Generate QR Code
-              </Button>
-            </Box>
+                <ConfigBlock>
+                  <CopyButton
+                    size="small"
+                    onClick={() => copyToClipboard(config.private_key, 'private')}
+                  >
+                    {copied['private'] ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
+                  </CopyButton>
+                  <Typography variant="subtitle2">Private Key:</Typography>
+                  <Typography sx={{ wordBreak: 'break-all' }}>{config.private_key}</Typography>
+                </ConfigBlock>
 
-            <ConfigBlock>
-              <CopyButton
-                size="small"
-                onClick={() => copyToClipboard(config.private_key, 'private')}
-              >
-                {copied['private'] ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
-              </CopyButton>
-              <Typography variant="subtitle2">Private Key:</Typography>
-              <Typography sx={{ wordBreak: 'break-all' }}>{config.private_key}</Typography>
-            </ConfigBlock>
+                <ConfigBlock>
+                  <CopyButton
+                    size="small"
+                    onClick={() => copyToClipboard(config.public_key, 'public')}
+                  >
+                    {copied['public'] ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
+                  </CopyButton>
+                  <Typography variant="subtitle2">Public Key:</Typography>
+                  <Typography sx={{ wordBreak: 'break-all' }}>{config.public_key}</Typography>
+                </ConfigBlock>
 
-            <ConfigBlock>
-              <CopyButton
-                size="small"
-                onClick={() => copyToClipboard(config.public_key, 'public')}
-              >
-                {copied['public'] ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
-              </CopyButton>
-              <Typography variant="subtitle2">Public Key:</Typography>
-              <Typography sx={{ wordBreak: 'break-all' }}>{config.public_key}</Typography>
-            </ConfigBlock>
+                <Divider sx={{ my: 2 }} />
 
-            <Divider sx={{ my: 2 }} />
-
-            <Typography variant="h6" gutterBottom>
-              MikroTik Configuration:
-            </Typography>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              Copy and paste these commands into your MikroTik terminal:
-            </Typography>
-            <ConfigBlock>
-              <CopyButton
-                size="small"
-                onClick={() => copyToClipboard(config.mikrotik_config, 'mikrotik')}
-              >
-                {copied['mikrotik'] ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
-              </CopyButton>
-              <PreformattedText>{config.mikrotik_config}</PreformattedText>
-            </ConfigBlock>
-          </ConfigPaper>
-        )}
+                <Typography variant="h6" gutterBottom>
+                  MikroTik Configuration
+                </Typography>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Copy and paste these commands into your MikroTik terminal:
+                </Typography>
+                <ConfigBlock>
+                  <CopyButton
+                    size="small"
+                    onClick={() => copyToClipboard(config.mikrotik_config, 'mikrotik')}
+                  >
+                    {copied['mikrotik'] ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
+                  </CopyButton>
+                  <PreformattedText>{config.mikrotik_config}</PreformattedText>
+                </ConfigBlock>
+              </ConfigPaper>
+            )}
+          </Grid>
+        </Grid>
       </Box>
 
       {/* QR Code Dialog */}
@@ -718,10 +1162,19 @@ function WireguardConfigForm() {
                 Scan this QR code with the WireGuard app to automatically configure your client:
               </Typography>
               <QrCodeContainer>
-                <img src={qrCodeData} alt="WireGuard QR Code" style={{ maxWidth: '100%', height: 'auto' }} />
+                <img 
+                  src={qrCodeData} 
+                  alt="WireGuard QR Code" 
+                  style={{ 
+                    maxWidth: '100%', 
+                    height: 'auto',
+                    maxHeight: '400px',
+                    objectFit: 'contain'
+                  }} 
+                />
               </QrCodeContainer>
-              <Typography variant="body2" color="text.secondary">
-                If scanning doesn't work, you can manually enter the configuration using the details above.
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                If scanning doesn't work, you can manually enter the configuration.
               </Typography>
             </>
           ) : (
@@ -730,6 +1183,20 @@ function WireguardConfigForm() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setQrDialogOpen(false)}>Close</Button>
+          {qrCodeData && (
+            <Button 
+              onClick={() => {
+                const keyToCopy = qrFormData.privateKey || config?.private_key;
+                if (keyToCopy) {
+                  copyToClipboard(keyToCopy, 'qr_private_key');
+                  toast.success('Private key copied to clipboard');
+                }
+              }}
+              disabled={!(qrFormData.privateKey || config?.private_key)}
+            >
+              Copy Private Key
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </>
@@ -737,3 +1204,7 @@ function WireguardConfigForm() {
 }
 
 export default WireguardConfigForm;
+
+
+
+

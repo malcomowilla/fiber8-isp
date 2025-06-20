@@ -79,10 +79,34 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
         headers: { 'X-Subdomain': subdomain }
       });
       const result = await response.json();
+      if (response.status === 401) {
+
+  toast.error(response.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
       if (response.ok) {
         
         setData(result);
       } else {
+        
+
+        if (response.status === 401) {
+  toast.error(result.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
+
 
         if (response.status === 401) {
   toast.error(result.error, {
@@ -264,7 +288,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
   const handleDeleteConfirm = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/ip_networks/${networkToDelete}`, {
+      const response = await fetch(`/api/wireguard_peers/${networkToDelete}`, {
         method: 'DELETE',
         headers: { 'X-Subdomain': subdomain }
       });

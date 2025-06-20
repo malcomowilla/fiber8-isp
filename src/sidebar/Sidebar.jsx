@@ -178,7 +178,7 @@ const handleGetCompanySettings = useCallback(
    <div className='flex justify-between   text-white'>
 {seeSidebar ? (
   <img
-  className="h-[28px] w-[28px] rounded-full"
+  className="h-[32px] w-[32px] rounded-full"
   src={logo_preview || "/images/aitechs.png"}
   alt={company_name || "Aitechs"}
   onError={(e) => { e.target.src = "/images/aitechs.png"; }}
@@ -2468,11 +2468,11 @@ onClick={() => {
                   <p className='text-black text-center roboto-condensed-bold'>Users </p>
                 
 <motion.li 
-onClick={() => {
-  if (window.innerWidth < 962) {
-    setSeeSideBar(true);
-  }
-}}
+// onClick={() => {
+//   if (window.innerWidth < 962) {
+//     setSeeSideBar(true);
+//   }
+// }}
  initial={{ opacity: 0, x: -20 }}
  animate={{ opacity: 1, x: 0 }}
  exit={{ opacity: 0, x: -20 }}
@@ -2482,18 +2482,18 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
   <div className='flex items-center gap-x-4 w-full p-2 cursor-pointer
                   transition duration-75 rounded-lg pl-11 group text-black hover:bg-gray-700'>
 <img src="/images/icons8-male-user.gif" className='rounded-full w-8 h-8' alt="user" />
-     <Link to='/admin/user t'> User </Link>
+     <Link to='/admin/user'> User </Link>
 
 </div>
       </motion.li>
 
 
       <motion.li
-      onClick={() => {
-        if (window.innerWidth < 962) {
-          setSeeSideBar(true);
-        }
-      }}
+      // onClick={() => {
+      //   if (window.innerWidth < 962) {
+      //     setSeeSideBar(true);
+      //   }
+      // }}
        initial={{ opacity: 0, x: -20 }}
        animate={{ opacity: 1, x: 0 }}
        exit={{ opacity: 0, x: -20 }}
@@ -2644,10 +2644,13 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
          </li>
 ):  <li  className="flex items-center p-2 text-white rounded-lg
              dark:text-white hover:cursor-pointer translate-y-[-1.4rem]
-              dark:hover:bg-white dark:hover:text-black hover:bg-black  group">
+              dark:hover:bg-white dark:hover:text-black
+               hover:bg-black  group mt-10">
            
            <ReceiptIcon/>
-               {!seeSidebar && <span className="flex-1 ms-3 whitespace-nowrap">Invoices</span>}
+               {!seeSidebar && <span className="flex-1 ms-3
+               
+               whitespace-nowrap ">Invoices</span>}
 
                <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
