@@ -1,4 +1,8 @@
-import { Box, TextField, Autocomplete, Stack, InputAdornment, Button } from '@mui/material';
+import { Box, TextField, Autocomplete, Stack, InputAdornment, Button,
+  DialogContentText,Chip
+
+
+ } from '@mui/material';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 // import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -10,6 +14,8 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import LoadingButton from '@mui/lab/LoadingButton';
 import CloseIcon from '@mui/icons-material/Close';
+import { ContentCopy, Check, Close, Add } from '@mui/icons-material';
+
 
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import {  useState, useEffect, useMemo, useRef, useCallback} from 'react'
@@ -63,11 +69,14 @@ function LocationMarker({ position, setPosition }) {
 const SubscriberDetails = ({handleClose,   
   packageNamee,
 
-  formData,  createSubscriber, handleChangeForm, setFormData, isloading
+  formData,  createSubscriber, handleChangeForm, setFormData, isloading,
+  selectedLocations, setSelectedLocations
 }) => {
 
 
-  const {settingsformData, subscriberSettings, setSubscriberSettings} = useApplicationSettings()
+  const {settingsformData, subscriberSettings, setSubscriberSettings,
+    locationInput, setLocationInput, allLocations, setAllLocations
+  } = useApplicationSettings()
   const {name, ref_no , ppoe_password,  ppoe_username,  phone_number, email, second_phone_number,
      package_name, installation_fee, subscriber_discount, date_registered, router_name,
      latitude, longitude, house_number, building_name
@@ -156,34 +165,6 @@ const SubscriberDetails = ({handleClose,
       // });
     }
   };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -459,15 +440,51 @@ const fetchPackages = useMemo(() => async ()=> {
   }, [ fetchPackages, poe_package]);
 
 
-  const top100Films = [
-    { label: 'The Shawshank Redemption', year: 1994 },
-    { label: 'The Godfather', year: 1972 },
-    { label: 'The Godfather: Part II', year: 1974 },
-    { label: 'The Dark Knight', year: 2008 },
-    { label: '12 Angry Men', year: 1957 },
-    { label: "Schindler's List", year: 1993 },
-    
-    ]
+
+
+ const [newLocationDialogOpen, setNewLocationDialogOpen] = useState(false);
+    const [pendingLocation, setPendingLocation] = useState('');
+    console.log('selectedLocations',selectedLocations)
+   
+
+    const handleLocationChange = (event, value) => {
+        setSelectedLocations(value);
+    };
+
+    const handleLocationInputChange = (event, value) => {
+        setLocationInput(value);
+    };
+
+    const handleDeleteLocation = (locationToDelete) => () => {
+        setSelectedLocations(selectedLocations.filter(location => location !== locationToDelete));
+    };
+
+    const handleAddNewLocation = () => {
+        if (locationInput && !allLocations.includes(locationInput)) {
+            setPendingLocation(locationInput);
+            setNewLocationDialogOpen(true);
+        }
+    };
+
+    const confirmAddNewLocation = () => {
+        const newLocation = pendingLocation.trim();
+        if (newLocation) {
+            // Add to master list
+            setAllLocations(prev => [...prev, newLocation]);
+            // Add to selected locations
+            setSelectedLocations(prev => [...prev, newLocation]);
+            // Clear input
+            setLocationInput('');
+        }
+        setNewLocationDialogOpen(false);
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter' && locationInput && !allLocations.includes(locationInput)) {
+            event.preventDefault();
+            handleAddNewLocation();
+        }
+    };
   return (
 
 
@@ -515,6 +532,9 @@ const fetchPackages = useMemo(() => async ()=> {
                 variant="outlined"
                 fullWidth
               />
+
+
+              
 
               {/* <TextField id="ref_no" className='myTextField' fullWidth
                 onChange={handleChangeForm} value={ref_no} label="Ref No" variant="outlined" /> */}
@@ -613,18 +633,7 @@ const fetchPackages = useMemo(() => async ()=> {
                 },
               }}
             >
-              {/* <Autocomplete
-                value={packageName.find((pkg) => pkg.name === formData.package_name) || null}
-                options={packageName}
-                getOptionLabel={(option) => option.name}
-                renderInput={(params) => (
-                  <TextField className='myTextField' {...params} label="Select Package" variant="outlined" fullWidth />
-                )}
-                onChange={(event, newValue) => {
-                  setFormData({ ...formData, package_name: newValue ? newValue.name : '' });
-                }}
-                sx={{ mb: 2 }}
-              /> */}
+            
               <DatePicker
                 className='myTextField'
                 value={date_registered}
@@ -632,6 +641,64 @@ const fetchPackages = useMemo(() => async ()=> {
                 label="Date Registered"
                 renderInput={(params) => <TextField {...params} fullWidth sx={{ mb: 2 }} />}
               />
+
+
+
+               <Box sx={{ mt: 2 }}>
+                                <Autocomplete
+                                    multiple
+                                    freeSolo
+                                    options={allLocations}
+                                    value={selectedLocations}
+                                    onChange={handleLocationChange}
+                                    inputValue={locationInput}
+                                    onInputChange={handleLocationInputChange}
+                                    renderInput={(params) => (
+                                        <TextField 
+                                        className='myTextField'
+                                            {...params} 
+                                            label="Locations" 
+                                            placeholder="Type and press enter to add new locations"
+                                            onKeyDown={handleKeyDown}
+                                        />
+                                    )}
+                                    renderTags={(value, getTagProps) =>
+                                        value.map((option, index) => (
+                                            <Chip
+                                                key={option}
+                                                label={option}
+                                                {...getTagProps({ index })}
+                                                deleteIcon={<Close />}
+                                                onDelete={handleDeleteLocation(option)}
+                                            />
+                                        ))
+                                    }
+                                />
+                                {locationInput && !allLocations.includes(locationInput) && (
+                                    <Button
+                                        size="small"
+                                        startIcon={<Add />}
+                                        onClick={handleAddNewLocation}
+                                        sx={{ mt: 1 }}
+                                    >
+                                        Add "{locationInput}" as new location
+                                    </Button>
+                                )}
+                            </Box>
+
+                            {selectedLocations.length > 0 && (
+                                <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                    {selectedLocations.map((location) => (
+                                        <Chip
+                                            key={location}
+                                            label={location}
+                                            onDelete={handleDeleteLocation(location)}
+                                            deleteIcon={<Close />}
+                                            variant="outlined"
+                                        />
+                                    ))}
+                                </Box>
+                            )}
             </Box>
           </div>
 
@@ -864,6 +931,21 @@ const fetchPackages = useMemo(() => async ()=> {
           </div>
         </form>
       </motion.div>
+
+        <Dialog open={newLocationDialogOpen} onClose={() => setNewLocationDialogOpen(false)}>
+                <DialogTitle>Add New Location</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to add "{pendingLocation}" as a new location?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setNewLocationDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={confirmAddNewLocation} color="primary" autoFocus>
+                        Add Location
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
       {/* Map Dialog */}
       <Dialog

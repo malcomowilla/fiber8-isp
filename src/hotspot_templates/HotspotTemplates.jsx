@@ -491,6 +491,10 @@ e.preventDefault()
       const newData = await response.json();
 
       if (response.ok) {
+
+        setTimeout(() => {
+          navigate('/hotspot-page');
+        }, 2000);
         toast.success('Hotspot Templates Saved Successfully', {
           duration: 3000,
           position: 'top-right',
@@ -605,7 +609,7 @@ const newData = await response.json();
 <SettingsNotification open={openNotifactionSettings} handleClose={ handleCloseNotifaction }/>
 
       <div className="min-h-screen p-8">
-        <h1 className="text-4xl font-thin text-center mb-8
+        <h1 className="text-4xl roboto-condensed-bold font-thin text-center mb-8
         
         text-black dark:text-white">
           Choose a Hotspot Template
@@ -618,7 +622,7 @@ const newData = await response.json();
             >
               <div className="flex flex-col items-center">
                 <div className="w-16  h-16 rounded-full flex items-center justify-center"></div>
-                <h2 className="text-xl font-thin dark:text-white text-black mt-4">
+                <h2 className="text-xl  dark:text-white text-black mt-4">
                   {template.name}
                 </h2>
                 <img
@@ -668,7 +672,7 @@ const newData = await response.json();
 
           <motion.button 
           whileHover={{ scale: 1.1 }}
-          className='bg-green-500 text-white px-4 py-2 rounded'
+          className='bg-green-500 text-white px-10 text-lg py-4 rounded-lg '
            onClick={saveHotspotTemplate}>Save</motion.button>
           </div>
            

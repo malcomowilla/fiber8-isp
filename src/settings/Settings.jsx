@@ -53,7 +53,7 @@ const Settings = () => {
     >
 
         <div className='flex sm:flex-row  text-white bg-black h-20 border p-2 
-        overflow-x-scroll   lg:overflow-hidden  font-mono gap-x-20 cursor-pointer rounded-xl '>
+        overflow-x-scroll   lg:overflow-hidden  roboto-condensed gap-x-20 cursor-pointer rounded-xl '>
         <p  onClick={()=>      selectTab('GENERAL')} className='hover:dark:bg-g
         ray-600 p-2 h-10 hover:text-black rounded-lg hover:bg-blue-300
 

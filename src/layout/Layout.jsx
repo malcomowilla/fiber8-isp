@@ -352,6 +352,7 @@ setSmsBalance(newData.message)
 
 location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers' &&
 location.pathname !== '/admin/scheduler' && location.pathname !== '/admin/private-network' &&
+location.pathname !== '/admin/analytics' &&
 
 
 

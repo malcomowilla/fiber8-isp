@@ -269,7 +269,7 @@ const sortedMessages = [...sms].sort((a, b) => {
                                 label="Delivered"
                                 color="success"
                                 variant="outlined"
-                                size="small"
+                                size="small" 
                               />
                             );
                           case 'failed':
@@ -407,7 +407,7 @@ const sortedMessages = [...sms].sort((a, b) => {
             onRowClick={(event, rowData) => setMessage(rowData)}
             options={{
               paging: true,
-              pageSizeOptions: [10, 25, 50],
+              pageSizeOptions: [10],
               pageSize: 10,
               search: false,
               showTitle: false,

@@ -292,9 +292,9 @@ useEffect(() => {
         setShowMenu12(false)
       }}
       className="p-2">
-      <div className='flex justify-between items-center bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 border-l-4 border-blue-500'>
+        {subdomain === 'fiber8.aitechs.co.ke' || !subdomain === 'fyber8.aitechs.co.ke' ? (
+ <div className='flex justify-between items-center bg- dark:bg-gray-800 rounded-lg shadow-2xl p-6 border-l-4 border-blue-500'>
   <div className='flex items-center space-x-4'>
-    {/* Tux Linux Penguin Icon */}
     <div className='w-12 h-12'>
       <svg viewBox="0 0 128 128" className='w-full h-full '>
         <path fill="#000" d="M122.2 78.3c1.6-1.6 1.6-4.2 0-5.8-1.6-1.6-4.2-1.6-5.8 0L89.8 99.2l-8.3-8.3c-1.6-1.6-4.2-1.6-5.8 0-1.6 1.6-1.6 4.2 0 5.8l11.2 11.2c.8.8 1.8 1.2 2.9 1.2 1 0 2.1-.4 2.9-1.2l29.3-29.3z"/>
@@ -310,19 +310,13 @@ useEffect(() => {
           Linux Server
         </span>
       </p>
-      {/* <p className='text-gray-600 dark:text-gray-300 text-sm mt-1'>
-        Ubuntu 22.04 LTS • Kernel 5.15.0-76-generic
-      </p> */}
+      
     </div>
   </div>
-{/* 
-  <div className='flex items-center space-x-2'>
-    <span className={`w-3 h-3 rounded-full ${isServerOnline ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
-    <p className='font-light text-black dark:text-white text-lg'>
-      {isServerOnline ? 'Online' : 'Offline'}
-    </p>
-  </div> */}
+
 </div>
+        ) : null}
+     
       
 
       <div className="grid grid-auto-fit gap-6 mt-4">
@@ -332,6 +326,8 @@ useEffect(() => {
 
 
 
+{subdomain === 'fiber8.aitechs.co.ke' || subdomain === 'fyber8.aitechs.co.ke' ? (
+<>
   <motion.div
   
             className="max-w-sm p-6 bg-gradient-to-r from-purple-500 to-purple-600 border border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform transition-all hover:scale-105 relative overflow-hidden"
@@ -366,7 +362,6 @@ useEffect(() => {
             </div>
           </motion.div>
 
-          {/* Ubuntu Memory Usage Card */}
           <motion.div
             className="max-w-sm p-6 bg-gradient-to-r from-green-500 to-green-600 border
              border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform 
@@ -462,6 +457,9 @@ useEffect(() => {
               {ubuntuStats.uptime}
             </motion.p>
           </motion.div>
+          </>
+): null}
+          
 
         
 </div>

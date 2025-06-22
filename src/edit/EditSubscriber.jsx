@@ -37,7 +37,8 @@ const EditSubscriber = ({handleClose, open, formData , createSubscriber,
   
    name,
    package_name,
-   onlyShowSubscription,setOnlyShowSubscription
+   onlyShowSubscription,setOnlyShowSubscription,
+   selectedLocations, setSelectedLocations
 
   
   }) => {
@@ -173,6 +174,9 @@ console.log('name',name)
               packageNamee={packageNamee}
               setFormData={setFormData}
               handleChangeForm={handleChangeForm}
+              selectedLocations={selectedLocations}
+              setSelectedLocations={setSelectedLocations}
+
             />
           </TabPanel>
           <TabPanel value="2"><Address handleClose={handleClose}/></TabPanel>

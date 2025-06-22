@@ -172,6 +172,19 @@ const handleChangeHotspotVoucher = (e) => {
       const [hotspotInfo, setHotspotInfo] = useState("");
       const [hotspotBanner, setHotspotBanner] = useState(null);
       const [hotspotBannerPreview, setHotspotBannerPreview] = useState(null); 
+      const [locationInput, setLocationInput] = useState('');
+    const [allLocations, setAllLocations] = useState([
+        'Nairobi',
+        'Mombasa',
+        'Kisumu',
+        'Eldoret',
+        'Nakuru',
+        'Thika',
+        'Malindi',
+        'Kitale',
+        'Kakamega',
+        'Kisii'
+    ]);
 
       const handleChangeSubscriberSettings = (e) => {
         const { type, name, checked, value } = e.target;
@@ -587,6 +600,7 @@ const loginWithVoucher = async(e) => {
       showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
        showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
         showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
+        locationInput, setLocationInput, allLocations, setAllLocations,
      }}  >
     {children}
    </GeneralSettingsContext.Provider>

@@ -51,6 +51,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
     network_name: '',
     validity: '',
     validity_period_units: '',
+    
   
     ip_address: '',
     package_name: '',
@@ -75,6 +76,7 @@ const [openLoad, setOpenLoad] = useState(false)
 const [openDelete, setOpenDelete] = useState(false)
 const [showClientStatsAndSUbscriptions, setShowClientStatsAndSubscriptions] = useState(false)
 const [onlyShowSubscription, setOnlyShowSubscription] = useState(false)
+    const [selectedLocations, setSelectedLocations] = useState([]);
 
 
 
@@ -289,7 +291,10 @@ e.preventDefault()
 "Content-Type" : "application/json",
         'X-Subdomain': subdomain,
         },
-        body: JSON.stringify({...formData, router_name:
+        body: JSON.stringify({...formData, 
+          location: selectedLocations,
+          router_name:
+          
            settingsformData.router_name, use_radius: settingsformData.use_radius})
       }
     )
@@ -566,6 +571,8 @@ handleChangeForm={handleChange}
     setFormData={setFormData}
     createSubscriber={createSubscriber}
     handleChangeForm={handleChange}
+    selectedLocations={selectedLocations}
+     setSelectedLocations={setSelectedLocations}
   />
 )}
 

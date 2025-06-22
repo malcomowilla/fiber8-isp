@@ -724,7 +724,7 @@ const loginWithVoucher = async(e) => {
         console.log('failed to fetch company settings')
       }
     } catch (error) {
-      toast.error('internal servere error  while fetching company settings')
+      // toast.error('internal servere error  while fetching company settings')
     
     }
   },
