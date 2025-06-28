@@ -315,7 +315,7 @@ if (createResponse.status === 402) {
     // navigate('/admin/analytics')
    
 
-    navigate('/admin/router-stats')
+    navigate('/admin/analytics')
 
      
     } else {

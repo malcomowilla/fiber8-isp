@@ -121,7 +121,8 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
     { label: <p className='text-black'>Reset Password Client</p>, icon: <LockResetIcon />, value: -1 },
 
     { label: <p className='text-black'>Invite Client</p>, icon: <PeopleIcon />, value: 3 },
-    { label: <p className='text-black'>Profile</p>, icon:(<Avatar className='w-10 h-10 rounded-full' src={generateAvatar(systemAdminEmail)} 
+    { label: <p className='text-black'>Profile</p>, icon:(<Avatar className='w-10 h-10 rounded-full' 
+      src={generateAvatar(systemAdminEmail)} 
     alt={`${systemAdminEmail}'s avatar`} />), value: 4 },
     { label: <p className='text-black'>Reset Password Admin</p>, icon: <LockResetIcon />, value: 5 },
     { label: <p className='text-black'>Client Requests</p>, icon: <FaPerson  className='w-6 h-6 rounded-full'/>, value: 6 },

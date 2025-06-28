@@ -1,6 +1,4 @@
 
-
-
 import React from 'react';
 import { Box, Typography, Avatar, Button, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -530,7 +528,8 @@ console.log('subdomain_aitechs', subdomain_aitechs)
 
 
 <label className="inline-flex items-center me-5 cursor-pointer">
-  <input onChange={handleChangePasskey} type="checkbox" checked={loginWithPasskey} className="sr-only peer" />
+  <input onChange={handleChangePasskey}  checked={loginWithPasskey}  
+   type="checkbox"  className="sr-only peer" />
   <div className="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4
    peer-focus:ring-yellow-300 dark:peer-focus:ring-yellow-800 peer-checked:after:translate-x-full 
    rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-['']

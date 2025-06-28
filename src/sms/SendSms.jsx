@@ -107,6 +107,7 @@ const navigate = useNavigate()
         setTimeout(() => {
           navigate('/admin/messages')
         }, 3000)
+        
          setSnackbar({
         open: true,
         message: 'SMS sent successfully!',

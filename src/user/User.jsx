@@ -5,6 +5,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
 import { IconButton, Tooltip } from '@mui/material';
+import { FaPhoneVolume } from "react-icons/fa6";
+
 // import GetAppIcon from '@mui/icons-material/GetApp';
 // import {Link} from 'react-router-dom'
 // import {  useState} from 'react'
@@ -25,7 +27,6 @@ import Backdrop from '@mui/material/Backdrop';
 
 import { LuDot } from "react-icons/lu";
 
-import { FaPhoneVolume } from "react-icons/fa6";
 
 // const rows = [
 //   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
@@ -365,6 +366,7 @@ const columns = [
          <FaPhoneVolume className='text-green-500 text-xl'/>
          </IconButton>
          </Tooltip>
+
 
          <Tooltip title="Delete">
           <IconButton >

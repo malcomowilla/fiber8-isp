@@ -315,35 +315,11 @@ const handleGetCompanySettings = useCallback(
               </motion.li>
 
 
+             
 
-
-
-
-
-
-
-
-              <motion.li
-              onClick={() => {
-                if (window.innerWidth < 962) {
-                  setSeeSideBar(true);
-                }
-              }}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2, delay: 0.1 }}
-              >
-                <Link
-                  to="/admin/router-stats"
-                  className="flex items-center gap-x-4 w-full p-2 transition 
-                  duration-75 rounded-lg pl-11 group text-black hover:bg-gray-700"
-                >
-                <MdOutlineQueryStats  className='w-6 h-6'/>
-                  Routers Stats
-                </Link>
-              </motion.li>
-                     </span>}
+                     </span>
+                     
+                     }
                     
 
 
@@ -450,25 +426,7 @@ const handleGetCompanySettings = useCallback(
 
 
 
-              <motion.li
-              onClick={() => {
-                if (window.innerWidth < 962) {
-                  setSeeSideBar(true);
-                }
-              }}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2, delay: 0.1 }}
-              >
-                <Link
-                  to="/admin/router-stats"
-                  className="flex items-center gap-x-4 w-full p-2 transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700"
-                >
-                <MdOutlineQueryStats  className='w-6 h-6'/>
-                  Routers Stats
-                </Link>
-              </motion.li>
+             
             </>
           )}
         </AnimatePresence>
@@ -2450,10 +2408,14 @@ onClick={() => {
             
                <svg className="flex-shrink-0 w-5 h-5 text-white transition duration-75
                  group-hover:dark:text-black  " 
-                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
-                  <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 
-                  9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 
-                  0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 
+                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                 viewBox="0 0 20 18">
+                  <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 
+                  4 0 1 0 14 2Zm1 
+                  9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 
+                  0 1-1v-1a5.006 5.006 
+                  0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 
+                  0 0 0-5 5v2a1 1 
                   0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z"/>
                </svg>
                {showMenu8 ? (
@@ -2465,7 +2427,7 @@ onClick={() => {
                 bg-white rounded-lg shadow-lg
                 ">
                   
-                  <p className='text-black text-center roboto-condensed-bold'>Users </p>
+                  <p className='text-black text-center roboto-condensed-bold'>Userss </p>
                 
 <motion.li 
 // onClick={() => {

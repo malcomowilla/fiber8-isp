@@ -19,6 +19,9 @@ import {
 } from '@mui/material';
 import { ContentCopy, Check, Close, Add } from '@mui/icons-material';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
+import { useNavigate } from 'react-router-dom';
+
+
 
 const BulkMessage = () => {
   const { locationInput, setLocationInput, allLocations, setAllLocations, } = useApplicationSettings()
@@ -27,6 +30,10 @@ const BulkMessage = () => {
    
     const [newLocationDialogOpen, setNewLocationDialogOpen] = useState(false);
     const [pendingLocation, setPendingLocation] = useState('');
+
+    const [strictFilter, setStrictFilter] = useState(false);
+    const navigate = useNavigate()
+
 
     useEffect(() => {
         const fetchSubscribers = async () => {
@@ -71,7 +78,6 @@ const BulkMessage = () => {
         { label: 'Inactive', value: 'inactive' },
     ];
 
-    const [status, setStatus] = useState(clientStatus[0]);
 
     const handleLocationChange = (event, value) => {
         setSelectedLocations(value);
@@ -131,7 +137,8 @@ const BulkMessage = () => {
             const dataToSend = {
                 ...smsData,
                 locations: selectedLocations,
-                status: status.value
+                status: status.value,
+                strict_filter: strictFilter
             };
             
             const response = await fetch('/api/send_bulk_sms', {
@@ -146,7 +153,11 @@ const BulkMessage = () => {
             if (!response.ok) {
                 throw new Error('Failed to send SMS');
             }
-            
+            if (response.ok) {
+                 setTimeout(() => {
+          navigate('/admin/messages')
+        }, 3000)
+            }
             setSnackbar({
                 open: true,
                 message: 'SMS sent successfully!',
@@ -169,6 +180,14 @@ const BulkMessage = () => {
             setLoading(false);
         }
     };
+
+        const [status, setStatus] = useState(clientStatus[0]);
+
+    function handleChangeStrictFilter() {
+      // setLoginWithPasskey(e.target.checked);
+      setStrictFilter(!strictFilter);
+      
+   }
 
     return (
         <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
@@ -284,6 +303,27 @@ const BulkMessage = () => {
                         </Grid>
                     </Grid>
                     
+                    <label
+                    
+                    className="inline-flex items-center me-5 cursor-pointer">
+  <input type="checkbox"  className="sr-only peer" onChange={handleChangeStrictFilter} 
+   checked={strictFilter} />
+  <div className="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700
+   peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800
+    peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
+     peer-checked:after:border-white
+      after:content-[''] after:absolute after:top-0.5 after:start-[2px]
+       after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5
+        after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-400
+         dark:peer-checked:bg-blue-400"></div>
+  <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+    Strict Filter</span>
+</label>
+<p>
+    When strict filter is enabled, a user has to match all the filters applied, if not, a user can have any of them
+
+</p>
+
                     <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
                         <Button 
                             type="submit" 

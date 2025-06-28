@@ -55,7 +55,7 @@ const { setCurrentUser, handleThemeSwitch
 const navigate = useNavigate()
 const [icon, setIcon] = useState()
 
-  const [isSeen, setIsSeen] = useState(true)
+  const [isSeen, setIsSeen] = useState(false)
   const [showErrors, setShowErrors] = useState(false)
   const [isPassword, setPassword] = useState('')
   const [email, setEmail] = useState('')
@@ -343,7 +343,7 @@ const newData = await createResponse.json()
       setSeeError(false);
       setOpenLoad(false);
       
-    navigate('/admin/router-stats')
+    navigate('/admin/analytics')
 
     } else {
       toast.error('something went wrong', {
@@ -442,19 +442,13 @@ const handleSignIn = async (e) => {
     
   }
 
-  
-  // if (users.status === 401) {
-  //   setOfflineError(false)
-
-  // }
 
   if (actualUserDataInJson.redirect) {
-    window.location.href = actualUserDataInJson.redirect; // Redirect manually
+    window.location.href = actualUserDataInJson.redirect; 
   }
   
   if (users.ok || users.status === 202) {
     
-    // enable_2fa_for_admin_passkeys
 
 
 if (enable_2fa_for_admin_passkeys) {
@@ -470,7 +464,7 @@ if (enable_2fa_for_admin_passkeys) {
  ''
 }else{
  // navigate('/admin/analytics')
- navigate('/admin/router-stats')
+ navigate('/admin/analytics')
  // window.location.href='/admin/router-stats'
    setEmail('')
    setPassword('')
@@ -478,16 +472,9 @@ if (enable_2fa_for_admin_passkeys) {
 
     
   
-    // setShowErrors(false)
     setloading(false)
    
 
-    // setWelcomeMessage(actualUserDataInJson.welcome_back)
-   
-    
-  //  setCurrentUser(actualUserDataInJson.user)
-
-  //  setOfflineError(false)
 
 
   } else {
@@ -525,7 +512,6 @@ if (enable_2fa_for_admin_passkeys) {
 
 
 
-console.log("Logo Preview URL:", logo_preview);
 
 
   return (
@@ -747,7 +733,7 @@ className="w-24 h-24 mx-auto rounded-full"
         {/* Email Field */}
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
@@ -764,7 +750,7 @@ className="w-24 h-24 mx-auto rounded-full"
         {/* Password Field */}
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
@@ -779,7 +765,7 @@ className="w-24 h-24 mx-auto rounded-full"
           <button
             type="button"
             onClick={() => setIsSeen(!isSeen)}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-300 hover:text-white"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-500 hover:text-white"
           >
             {isSeen ? (
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

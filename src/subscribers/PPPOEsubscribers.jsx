@@ -438,6 +438,7 @@ toast.error('failed to delete subscriber', {
   
     
     {title: 'phone_number', field: 'phone_number',  headerClassName: 'dark:text-black'},
+    {title: 'Location', field: 'location',  headerClassName: 'dark:text-black'},
     {title: 'package', field: 'package_name',
        type: 'numeric', headerClassName: 'dark:text-black', align: 'left', 
       render: (rowData) => {

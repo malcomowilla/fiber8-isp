@@ -3,13 +3,15 @@ import MaterialTable from 'material-table'
 
 import AddIcon from '@mui/icons-material/Add';
 
-
+import { FaPhoneVolume } from "react-icons/fa6";
+import { FaHands } from "react-icons/fa";
+import CleanHandsIcon from '@mui/icons-material/CleanHands';
 
 // import EditIcon from '@mui/icons-material/Edit';
 
 import { useState, useEffect, useCallback } from 'react'
 
-import { IconButton } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IoIosQrScanner } from "react-icons/io";
 import EditVoucher from '../edit/EditVoucher'
@@ -24,7 +26,7 @@ import DeleteVoucher from '../delete/DeleteVoucher'
 import { FaDesktop } from "react-icons/fa"; // Import device icon
 import { useDebounce } from 'use-debounce';
 import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading animation
-
+import SendVoucher from './SendVoucher'
 
 
 
@@ -53,7 +55,10 @@ const HotspotSubscriptions = () => {
   const [search, setSearch] = useState('')
   const [searchInput] = useDebounce(search, 1000)
   const [isSearching, setIsSearching] = useState(false); // New state for search loading
+  const [openSendVoucher, setOpenSendVoucher] = useState(false);
   
+
+
 
   const { settingsformData, setFormData, selectedProvider, setSelectedProvider, 
     setSmsSettingsForm
@@ -73,7 +78,7 @@ const HotspotSubscriptions = () => {
   const [vouchers, setVouchers] = useState([])
   const [openLoad, setopenLoad] = useState(false)
   const [openDelete, setOpenDelete] = useState(false);
-
+const [voucher, setVoucher] = useState('')
 
   const handleCloseDelete = () => {
     setOpenDelete(false);
@@ -115,7 +120,7 @@ setVoucherForm((prevState) => ({
 
   const handleRowClick = (event, rowData) => {
     console.log('vouchers',rowData)
-   
+   setVoucher(rowData.voucher)
     setVoucherForm(rowData)
 
 
@@ -141,6 +146,13 @@ setVoucherForm((prevState) => ({
               {rowData.shared_users && (
                 <span className=" text-sm text-black dark:text-white">({rowData.shared_users})</span>
               )}
+
+               <Tooltip title="Call">
+        <IconButton arrow color="primary" 
+        onClick={() => setOpenSendVoucher(true)}>
+         <FaPhoneVolume className='text-green-500 text-xl'/>
+         </IconButton>
+         </Tooltip>
             </div>
           ),
         },
@@ -239,8 +251,22 @@ const getHotspotVouchers = useCallback(
         setVouchers(newData.filter((voucher)=> {
           return search.toLowerCase() === '' ? voucher : voucher.status.toLowerCase().includes(search)
         }))
+
+
+        
       } else {
         setIsSearching(false)
+        if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
         toast.error('Failed to fetch vouchers', {
           position: "top-center",
           duration: 4000,
@@ -420,6 +446,10 @@ setopenLoad(false)
   return (
     <>
 
+<SendVoucher  open={openSendVoucher} setOpen={setOpenSendVoucher}
+
+voucher={voucher}
+/>
 
 <DeleteVoucher  openDelete={openDelete} handleCloseDelete={handleCloseDelete} 
 deleteVoucher={deleteVoucher} id={voucherForm.id} loading={loading}/>
@@ -516,16 +546,29 @@ actions={[
  {
   icon: ()=> <AddIcon onClick={handleClickOpen}/>,
     isFreeAction: true,
-    tooltip: 'Add Voucher'
+    tooltip: 'Add Voucher',
   
   
 
+ },
 
- }
+{
+  
+
+  icon: ()=>  <button className='flex text-white gap-2 bg-green-600
+  p-2 rounded-md
+  '> <FaHands  className='text-white text-xl'/>
+  <p className='text-sm'>compensate</p>
+    </button>,
+    isFreeAction: true,
+
+
+
+}
 ]}
 options={{
   sorting: true,
-  pageSizeOptions:[2, 5, 10, 20],
+  pageSizeOptions:[2, 5, 10],
   // pageSize: 20,
   paginationPosition: 'bottom',
 exportButton: true,

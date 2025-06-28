@@ -124,7 +124,7 @@ const TwoFactorAuthVerification = ({ onVerify, onBack}) => {
         })
 
         setTimeout(() => {
-            navigate('/admin/router-stats')  
+            navigate('/admin/analytics')  
         }, 2800);
        
         setIsLoading(false);

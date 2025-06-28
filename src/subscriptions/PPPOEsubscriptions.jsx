@@ -8,19 +8,6 @@ import EditSubscription from '../edit/EditSubscription'
 import {useState} from 'react'
 
 
-// const rows = [
-//   {  Speed: '4M/4M', Name: 'Makena', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: 'Jane', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: 'Andrew', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: 'Jemo', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: 'James', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: 'Jeane', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: 'Oscar', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: 'Silky', Price: 4000, Validity: 30 },
-// ];
-
-
-
 
 
 const PPPOEsubscriptions = () => {
