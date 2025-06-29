@@ -172,17 +172,21 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
     setOpenDialog(true);
   };
 
+  const [cleanIp, setCleanIp] = useState('')
   const handleOpenEditDialog = (rowData) => {
     setEditing(true);
     setCurrentNetwork(rowData);
     setFormData({
       title: rowData.title,
       network: rowData.network,
-      subnet_mask: rowData.subnet_mask,
+      // subnet_mask: rowData.private_ip.sp,
       nas: rowData.nas,
       private_ip: rowData.private_ip
     });
     setOpenDialog(true);
+    // const {private_ip} = rowData
+    // const cleanIp = private_ip.split('/')[0]
+    // setCleanIp(cleanIp)
   };
 
   const handleCloseDialog = () => {
@@ -213,7 +217,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
             nas: formData.nas,
             total_ip_addresses: calculateTotalIps(formData.subnet_mask),
             client_host_range: calculateHostRange(formData.network, formData.subnet_mask),
-            private_ip: formData.private_ip
+            private_ip:  formData.private_ip
           }
         })
       });
@@ -343,7 +347,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       }}
        variant="h4" gutterBottom sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
         <CloudIcon sx={{ mr: 2, color: 'primary.main' }} />
-        <p className='roboto-condensed'>Private Networks Management </p>
+        <p className='roboto-condensed'>Private Routes Management </p>
       </Typography>
 
       <MaterialTable
@@ -452,7 +456,9 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Private Ip"
+                 multiline
+            rows={3}
+                label="Private Routes"
                 name="private_ip"
                   className='myTextField'
                 value={formData.private_ip}
@@ -461,7 +467,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
                 required
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            {/* <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
                 <InputLabel>Subnet Mask</InputLabel>
                 <Select
@@ -479,7 +485,11 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
                   ))}
                 </Select>
               </FormControl>
-            </Grid>
+            </Grid> */}
+
+
+
+
             {/* <Grid item xs={12}>
               <FormControl fullWidth>
                 <InputLabel>NAS Router</InputLabel>
@@ -524,7 +534,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
             onClick={handleSubmit} 
             variant="contained" 
             color="primary"
-            disabled={loading || !formData.subnet_mask || !formData.private_ip}
+            disabled={loading || !formData.private_ip}
             startIcon={loading && <CircularProgress size={20} />}
           >
             {editing ? 'Update' : 'Create'}

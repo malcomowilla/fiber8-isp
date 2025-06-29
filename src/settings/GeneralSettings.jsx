@@ -23,6 +23,7 @@ import { FaRegBuilding } from "react-icons/fa";
 import { FaQuestion } from "react-icons/fa6";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { MdOutlinePhonelinkSetup } from "react-icons/md";
+import { GrRobot } from "react-icons/gr";
 
 
 
@@ -50,7 +51,21 @@ import { CiUser } from "react-icons/ci";
 import { FaPhone } from "react-icons/fa";
 import { MdTextsms } from "react-icons/md";
 import { IoWarningOutline } from "react-icons/io5";
+import {
+  Title as TitleIcon,
+  AccessTime as AccessTimeIcon,
+  Public as PublicIcon,
+  Security as SecurityIcon,
+  Save as SaveIcon
 
+
+} from '@mui/icons-material';
+
+import {
+  Grid,
+  InputAdornment,
+  Button
+} from '@mui/material';
 
 
 
@@ -78,6 +93,7 @@ const GeneralSettings = ({children}) => {
       showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
        showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
         showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
+        formDataGeneralSettings, setFormDataGeneralSettings
 
     } = useApplicationSettings();
 
@@ -1061,6 +1077,180 @@ const SettingsCheckbox = ({ label, description, checked, onChange, name }) => (
     </p>
   </div>
 );
+
+const timezones = [
+  // UTC and GMT
+  { value: 'UTC', label: 'UTC (Coordinated Universal Time)' },
+  { value: 'GMT', label: 'GMT (Greenwich Mean Time)' },
+
+  // Africa
+  { value: 'Africa/Abidjan', label: 'Africa - Abidjan (GMT)' },
+  { value: 'Africa/Accra', label: 'Africa - Accra (GMT)' },
+  { value: 'Africa/Addis_Ababa', label: 'Africa - Addis Ababa (EAT, UTC+3)' },
+  { value: 'Africa/Algiers', label: 'Africa - Algiers (CET, UTC+1)' },
+  { value: 'Africa/Asmara', label: 'Africa - Asmara (EAT, UTC+3)' },
+  { value: 'Africa/Cairo', label: 'Africa - Cairo (EET, UTC+2)' },
+  { value: 'Africa/Casablanca', label: 'Africa - Casablanca (WET, UTC+0/+1)' },
+  { value: 'Africa/Dar_es_Salaam', label: 'Africa - Dar es Salaam (EAT, UTC+3)' },
+  { value: 'Africa/Djibouti', label: 'Africa - Djibouti (EAT, UTC+3)' },
+  { value: 'Africa/Johannesburg', label: 'Africa - Johannesburg (SAST, UTC+2)' },
+  { value: 'Africa/Kampala', label: 'Africa - Kampala (EAT, UTC+3)' },
+  { value: 'Africa/Khartoum', label: 'Africa - Khartoum (EAT, UTC+3)' },
+  { value: 'Africa/Lagos', label: 'Africa - Lagos (WAT, UTC+1)' },
+  { value: 'Africa/Nairobi', label: 'Africa - Nairobi (EAT, UTC+3)' },
+  { value: 'Africa/Tripoli', label: 'Africa - Tripoli (EET, UTC+2)' },
+  { value: 'Africa/Tunis', label: 'Africa - Tunis (CET, UTC+1)' },
+
+  // Americas
+  { value: 'America/Adak', label: 'America - Adak (HST/HDT, UTC-10/-9)' },
+  { value: 'America/Anchorage', label: 'America - Anchorage (AKST/AKDT, UTC-9/-8)' },
+  { value: 'America/Argentina/Buenos_Aires', label: 'America - Buenos Aires (ART, UTC-3)' },
+  { value: 'America/Bogota', label: 'America - Bogotá (COT, UTC-5)' },
+  { value: 'America/Chicago', label: 'America - Chicago (CST/CDT, UTC-6/-5)' },
+  { value: 'America/Denver', label: 'America - Denver (MST/MDT, UTC-7/-6)' },
+  { value: 'America/Los_Angeles', label: 'America - Los Angeles (PST/PDT, UTC-8/-7)' },
+  { value: 'America/Mexico_City', label: 'America - Mexico City (CST, UTC-6)' },
+  { value: 'America/New_York', label: 'America - New York (EST/EDT, UTC-5/-4)' },
+  { value: 'America/Panama', label: 'America - Panama (EST, UTC-5)' },
+  { value: 'America/Phoenix', label: 'America - Phoenix (MST, UTC-7)' },
+  { value: 'America/Santiago', label: 'America - Santiago (CLT/CLST, UTC-4/-3)' },
+  { value: 'America/Sao_Paulo', label: 'America - São Paulo (BRT/BRST, UTC-3/-2)' },
+  { value: 'America/Toronto', label: 'America - Toronto (EST/EDT, UTC-5/-4)' },
+  { value: 'America/Vancouver', label: 'America - Vancouver (PST/PDT, UTC-8/-7)' },
+
+  // Asia
+  { value: 'Asia/Bangkok', label: 'Asia - Bangkok (ICT, UTC+7)' },
+  { value: 'Asia/Beirut', label: 'Asia - Beirut (EET/EEST, UTC+2/+3)' },
+  { value: 'Asia/Dubai', label: 'Asia - Dubai (GST, UTC+4)' },
+  { value: 'Asia/Hong_Kong', label: 'Asia - Hong Kong (HKT, UTC+8)' },
+  { value: 'Asia/Jakarta', label: 'Asia - Jakarta (WIB, UTC+7)' },
+  { value: 'Asia/Jerusalem', label: 'Asia - Jerusalem (IST/IDT, UTC+2/+3)' },
+  { value: 'Asia/Kolkata', label: 'Asia - Kolkata (IST, UTC+5:30)' },
+  { value: 'Asia/Riyadh', label: 'Asia - Riyadh (AST, UTC+3)' },
+  { value: 'Asia/Seoul', label: 'Asia - Seoul (KST, UTC+9)' },
+  { value: 'Asia/Shanghai', label: 'Asia - Shanghai (CST, UTC+8)' },
+  { value: 'Asia/Singapore', label: 'Asia - Singapore (SGT, UTC+8)' },
+  { value: 'Asia/Taipei', label: 'Asia - Taipei (CST, UTC+8)' },
+  { value: 'Asia/Tokyo', label: 'Asia - Tokyo (JST, UTC+9)' },
+  { value: 'Asia/Yangon', label: 'Asia - Yangon (MMT, UTC+6:30)' },
+
+  // Europe
+  { value: 'Europe/Amsterdam', label: 'Europe - Amsterdam (CET/CEST, UTC+1/+2)' },
+  { value: 'Europe/Athens', label: 'Europe - Athens (EET/EEST, UTC+2/+3)' },
+  { value: 'Europe/Berlin', label: 'Europe - Berlin (CET/CEST, UTC+1/+2)' },
+  { value: 'Europe/Dublin', label: 'Europe - Dublin (GMT/IST, UTC+0/+1)' },
+  { value: 'Europe/Lisbon', label: 'Europe - Lisbon (WET/WEST, UTC+0/+1)' },
+  { value: 'Europe/London', label: 'Europe - London (GMT/BST, UTC+0/+1)' },
+  { value: 'Europe/Madrid', label: 'Europe - Madrid (CET/CEST, UTC+1/+2)' },
+  { value: 'Europe/Moscow', label: 'Europe - Moscow (MSK, UTC+3)' },
+  { value: 'Europe/Paris', label: 'Europe - Paris (CET/CEST, UTC+1/+2)' },
+  { value: 'Europe/Rome', label: 'Europe - Rome (CET/CEST, UTC+1/+2)' },
+  { value: 'Europe/Zurich', label: 'Europe - Zurich (CET/CEST, UTC+1/+2)' },
+
+  // Oceania
+  { value: 'Australia/Adelaide', label: 'Australia - Adelaide (ACDT, UTC+10:30)' },
+  { value: 'Australia/Brisbane', label: 'Australia - Brisbane (AEST, UTC+10)' },
+  { value: 'Australia/Darwin', label: 'Australia - Darwin (ACST, UTC+9:30)' },
+  { value: 'Australia/Perth', label: 'Australia - Perth (AWST, UTC+8)' },
+  { value: 'Australia/Sydney', label: 'Australia - Sydney (AEDT, UTC+11)' },
+  { value: 'Pacific/Auckland', label: 'Pacific - Auckland (NZDT, UTC+13)' },
+  { value: 'Pacific/Guam', label: 'Pacific - Guam (ChST, UTC+10)' },
+  { value: 'Pacific/Honolulu', label: 'Pacific - Honolulu (HST, UTC-10)' },
+  { value: 'Pacific/Tahiti', label: 'Pacific - Tahiti (TAHT, UTC-10)' },
+
+  // Military
+  { value: 'Etc/GMT', label: 'GMT (Greenwich Mean Time)' },
+  { value: 'Etc/UTC', label: 'UTC (Coordinated Universal Time)' },
+];
+
+
+
+const handleSaveSystemGeneralSettings = async(e) => {
+  e.preventDefault()
+  try {
+    const response = await fetch('/api/general_settings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Subdomain': subdomain,
+      },
+      body: JSON.stringify({
+        title: formDataGeneralSettings.title,
+        timezone: formDataGeneralSettings.timezone,
+        allowed_ips: formDataGeneralSettings.allowed_ips
+      })
+    })
+
+      const newData = await response.json();
+
+    if (response.ok) {
+      setFormDataGeneralSettings({
+        title: newData.title,
+        timezone: newData.timezone,
+        allowed_ips: newData.allowed_ips
+      })
+      toast.success('System general settings updated successfully', {
+        duration: 3000,
+        position: 'top-right',
+      });
+       
+    } else {
+      
+      toast.error('System general settings update failed', {
+        duration: 3000,
+        position: 'top-right',
+      });
+    }
+  } catch (error) {
+    
+    toast.error('System general settings update failed', {
+        duration: 3000,
+        position: 'top-right',
+      });
+  }
+
+
+
+}
+
+
+
+
+
+
+
+const handleGetSystemGeneralSettings = useCallback(
+  async() => {
+     try {
+    const response = await fetch('/api/general_settings', {
+      headers: {
+        'X-Subdomain': subdomain,
+      },
+    })
+    const newData = await response.json()
+    if (response.ok) {
+      setFormDataGeneralSettings({
+        title: newData[0].title,
+        timezone: newData[0].timezone,
+        allowed_ips: newData[0].allowed_ips
+      })
+      console.log('system general settings fetched', newData)
+    } else {
+      console.log('failed to fetch system general settings')
+    }
+  } catch (error) {
+    console.log(error)
+  }
+  },
+  [],
+)
+
+useEffect(() => {
+  handleGetSystemGeneralSettings()
+ 
+}, [handleGetSystemGeneralSettings]);
+
+
   return (
 
     <>
@@ -2384,6 +2574,198 @@ InputProps={{
       </form>
 
 
+
+<form onSubmit={handleSaveSystemGeneralSettings}>
+  <Accordion
+    sx={{
+      backgroundColor: "transparent",
+      boxShadow: "none",
+    }}
+  >
+    <AccordionSummary
+      expandIcon={
+        <ArrowDownwardIcon
+          className='dark:text-white text-black'
+          sx={{ transition: "transform 0.3s" }}
+        />
+      }
+      aria-controls="panel1-content"
+      id="panel1-header"
+      sx={{
+        backgroundColor: "rgba(0, 0, 0, 0.05)",
+        borderRadius: "10px",
+        color: "black",
+      }}
+    >
+      <Typography variant="h6">
+        <div className='flex gap-3'>
+          <GrRobot className='text-blue-800 w-6 h-6'/>
+          <p className='dark:text-white text-black text-lg roboto-condensed'>
+            GENERAL SETTINGS
+          </p>
+        </div>
+      </Typography>
+    </AccordionSummary>
+
+    <AccordionDetails
+      sx={{
+        backgroundColor: "rgba(0, 0, 0, 0.05)",
+        borderRadius: "10px",
+        marginTop: "10px",
+        padding: "20px",
+      }}
+    >
+      <Grid container spacing={3}>
+        {/* Title Field */}
+        <Grid item xs={12} md={6}>
+          <TextField
+            fullWidth
+            className='myTextField'
+            label="System Title"
+            variant="outlined"
+            value={formDataGeneralSettings.title || ''}
+            onChange={(e) => setFormDataGeneralSettings({...formDataGeneralSettings, title: e.target.value})}
+            sx={{
+              "& label.Mui-focused": {
+                color: "black",
+                fontSize: "16px",
+              },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "black",
+                  borderWidth: "2px",
+                },
+              },
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <TitleIcon className="text-gray-500" />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+
+        {/* Timezone Selector */}
+        <Grid item xs={12} md={6}>
+          <Autocomplete
+          className='myTextField'
+            fullWidth
+            options={timezones}
+            getOptionLabel={(option) => option.label}
+            value={timezones.find(tz => tz.value === formDataGeneralSettings.timezone) || null}
+            onChange={(event, newValue) => {
+              setFormDataGeneralSettings({...formDataGeneralSettings, timezone: newValue ? newValue.value : ''});
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Timezone"
+                variant="outlined"
+                sx={{
+                  "& label.Mui-focused": {
+                    color: "black",
+                    fontSize: "16px",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "black",
+                      borderWidth: "2px",
+                    },
+                  },
+                }}
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                    <>
+                      <InputAdornment position="start">
+                        <AccessTimeIcon className="text-gray-500" />
+                      </InputAdornment>
+                      {params.InputProps.startAdornment}
+                    </>
+                  ),
+                }}
+              />
+            )}
+            renderOption={(props, option) => (
+              <li {...props}>
+                <div className="flex items-center">
+                  <PublicIcon className="mr-2 text-gray-500" />
+                  <span>{option.label}</span>
+                </div>
+              </li>
+            )}
+          />
+        </Grid>
+
+        {/* Allowed IPs */}
+        <Grid item xs={12}>
+          <TextField
+          className='myTextField'
+            fullWidth
+            multiline
+            rows={3}
+            label="Allowed IPs (comma separated)"
+            variant="outlined"
+            value={formDataGeneralSettings.allowed_ips || ''}
+            onChange={(e) => setFormDataGeneralSettings({...formDataGeneralSettings, allowed_ips: e.target.value})}
+            sx={{
+              "& label.Mui-focused": {
+                color: "black",
+                fontSize: "16px",
+              },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "black",
+                  borderWidth: "2px",
+                },
+              },
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SecurityIcon className="text-gray-500" />
+                </InputAdornment>
+              ),
+            }}
+            helperText="Enter IP addresses that can access Aitechs, separated by commas"
+          />
+        </Grid>
+
+        {/* Submit Button */}
+        <Grid item xs={12} className="flex justify-end">
+          <Tooltip title="Update general settings system-wide">
+            <Button
+              type="submit"
+              sx={{
+                padding: "10px 30px",
+                backgroundColor: "#3f51b5",
+                color: "white",
+                borderRadius: "8px",
+                fontWeight: "bold",
+                textTransform: "none",
+                fontSize: "16px",
+                "&:hover": {
+                  backgroundColor: "#303f9f",
+                  boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+                },
+              }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              component={motion.button}
+              startIcon={<SaveIcon />}
+            >
+              Save Settings
+            </Button>
+          </Tooltip>
+        </Grid>
+      </Grid>
+    </AccordionDetails>
+  </Accordion>
+</form>
+
+
       {/* </GeneralContext.Provider > */}
       </Suspense >
      
@@ -2394,4 +2776,8 @@ InputProps={{
 
 export default GeneralSettings
 // export const useSettings = (()=> useContext(GeneralContext ))
+
+
+
+
 

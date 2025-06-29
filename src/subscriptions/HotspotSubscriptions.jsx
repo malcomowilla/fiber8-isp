@@ -27,7 +27,7 @@ import { FaDesktop } from "react-icons/fa"; // Import device icon
 import { useDebounce } from 'use-debounce';
 import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading animation
 import SendVoucher from './SendVoucher'
-
+import CompensationVoucher from '../edit/CompensationVoucher'
 
 
 // import EditSubscription from '../edit/EditSubscription'
@@ -79,6 +79,7 @@ const HotspotSubscriptions = () => {
   const [openLoad, setopenLoad] = useState(false)
   const [openDelete, setOpenDelete] = useState(false);
 const [voucher, setVoucher] = useState('')
+const [openCompensationVoucher, setOpenCompensationVoucher] = useState(false);
 
   const handleCloseDelete = () => {
     setOpenDelete(false);
@@ -147,7 +148,7 @@ setVoucherForm((prevState) => ({
                 <span className=" text-sm text-black dark:text-white">({rowData.shared_users})</span>
               )}
 
-               <Tooltip title="Call">
+               <Tooltip title="send voucher to device">
         <IconButton arrow color="primary" 
         onClick={() => setOpenSendVoucher(true)}>
          <FaPhoneVolume className='text-green-500 text-xl'/>
@@ -443,6 +444,10 @@ setopenLoad(false)
     }
   }
 
+  const handleCloseCompensationVoucher = () => {
+    setOpenCompensationVoucher(false);
+  }
+
   return (
     <>
 
@@ -466,6 +471,15 @@ deleteVoucher={deleteVoucher} id={voucherForm.id} loading={loading}/>
     setVoucherForm={setVoucherForm}
     handleChangeVoucher={handleChangeVoucher}
 
+    />
+
+
+    <CompensationVoucher open={openCompensationVoucher}
+    handleClose={handleCloseCompensationVoucher}
+    
+     voucherForm={voucherForm} createVoucher={createVoucher}
+    setVoucherForm={setVoucherForm}
+    handleChangeVoucher={handleChangeVoucher}
     />
     <div>
 
@@ -555,7 +569,9 @@ actions={[
 {
   
 
-  icon: ()=>  <button className='flex text-white gap-2 bg-green-600
+  icon: ()=>  <button
+  onClick={() => setOpenCompensationVoucher(true)}
+  className='flex text-white gap-2 bg-green-600
   p-2 rounded-md
   '> <FaHands  className='text-white text-xl'/>
   <p className='text-sm'>compensate</p>

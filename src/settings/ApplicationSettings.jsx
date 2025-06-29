@@ -186,6 +186,14 @@ const handleChangeHotspotVoucher = (e) => {
         'Kisii'
     ]);
 
+    const [formDataGeneralSettings, setFormDataGeneralSettings] = useState({
+      title: '',
+      timezone: '',
+      allowed_ips: '',
+    });
+
+
+
       const handleChangeSubscriberSettings = (e) => {
         const { type, name, checked, value } = e.target;
 
@@ -601,6 +609,7 @@ const loginWithVoucher = async(e) => {
        showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
         showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
         locationInput, setLocationInput, allLocations, setAllLocations,
+        formDataGeneralSettings, setFormDataGeneralSettings
      }}  >
     {children}
    </GeneralSettingsContext.Provider>
