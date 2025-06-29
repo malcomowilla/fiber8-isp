@@ -221,6 +221,18 @@ const subdomain = window.location.hostname.split('.')[0];
    setnasFormData({...nasformData,password, username, ip_address })
 
   } else {
+
+
+if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
     console.log('failed to fetch routers')
 toast.error(newData.error,{
 position: 'top-center',
