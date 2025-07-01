@@ -316,9 +316,19 @@ function ResetPassword() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="bg-gradient-to-br from-blue-900 to-indigo-900 min-h-screen
+        className=" min-h-screen
  flex items-center justify-center relative overflow-hidden"
       >
+
+          <div className="absolute inset-0 z-0">
+    <img
+      src="/images/Telecommunications-Aitechs.jpg" // 
+      alt="Network Background"
+      className="w-full h-full object-cover"
+    />
+    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+  </div>
+
 
 <div className="absolute inset-0 opacity-20">
     {[...Array(20)].map((_, i) => (
@@ -335,23 +345,14 @@ function ResetPassword() {
       />
     ))}
   </div>
-        <div className="text-center">
-          {/* <motion.p
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="text-red-800 mt-8 font-bold text-2xl dotted-font"
-          >
-            {company_name}{" "}
-            <span className="dark:text-white text-black">your ISP of choice</span>
-          </motion.p> */}
-        </div>
+      
 
         <motion.section
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="w-full max-w-md p-6 bg-white rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+          className="w-full max-w-md p-6 z-10
+          bg-white/10 backdrop-blur-md rounded-xl shadow-2xl p-8 border border-white/20"
         >
           <div className="flex flex-col items-center">
           <div className="text-center mb-6">
@@ -376,9 +377,16 @@ className="w-24 h-24 mx-auto rounded-full"
                 transition={{ delay: 0.6, duration: 0.5 }}
               >
                 <TextField
+                sx={{
+                  "& label.Mui-focused": {
+                    color: "black",
+                    fontSize: "16px",
+                  },
+                }}
                   fullWidth
-                  label="Your email"
+                  // label="Your email"
                   type="email"
+                  placeholder="Enter your email"
                   name="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -390,7 +398,7 @@ className="w-24 h-24 mx-auto rounded-full"
                       </InputAdornment>
                     ),
                   }}
-                  className="bg-gray-50 dark:bg-gray-700 rounded-lg
+                  className="bg-white rounded-lg
                   myTextField
                   "
                   required
@@ -409,8 +417,8 @@ className="w-24 h-24 mx-auto rounded-full"
                   className="flex items-center relative cursor-pointer
                    text-blue-600 hover:text-blue-500 dark:text-blue-400"
                 >
-                  <ArrowBack className="mr-2" />
-                  <span>Back to Login</span>
+                  <ArrowBack className="mr-2 text-white" />
+                  <span className='text-white'>Back to Login</span>
                 </Link>
               </motion.div>
 

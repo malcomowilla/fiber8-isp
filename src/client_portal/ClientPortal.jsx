@@ -1,8 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { FaChartLine, FaMoneyBill, FaUser, FaTicketAlt } from 'react-icons/fa';
+import { SlLogout } from "react-icons/sl";
+import { useNavigate } from 'react-router-dom';
+
+
+
 
 const ClientPortal = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const navigate = useNavigate();
+
+
+
+
+    const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      const response = await fetch('/api/customer-logout', {
+        method: 'POST',
+        credentials: 'include', // Important for cookie-based auth
+      });
+
+      if (response.ok) {
+        // Redirect to login page after successful logout
+        navigate('/client-login');
+      } else {
+        console.error('Logout failed');
+
+        // You might want to show an error message here
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   const renderSection = () => {
     switch (activeSection) {
@@ -21,6 +55,8 @@ const ClientPortal = () => {
 
   return (
     <div className='flex min-h-screen bg-gray-100'>
+
+
       {/* Sidebar */}
       <div className='w-64 bg-blue-800 text-white p-4'>
         <h1 className='text-2xl font-bold mb-6'>Customer Portal</h1>
@@ -45,10 +81,31 @@ const ClientPortal = () => {
               <FaUser className='inline mr-2' /> Profile
             </li>
             <li
-              className={`mb-4 p-2 rounded hover:bg-blue-700 cursor-pointer ${activeSection === 'tickets' ? 'bg-blue-700' : ''}`}
+              className={`mb-4 p-2
+                 rounded hover:bg-blue-700 cursor-pointer ${activeSection === 'tickets' ? 'bg-blue-700' : ''}`}
               onClick={() => setActiveSection('tickets')}
             >
               <FaTicketAlt className='inline mr-2' /> Tickets
+            </li>
+
+
+            <li 
+              className='mb-4 p-2 rounded hover:bg-blue-700 cursor-pointer'
+              onClick={handleLogout}
+            >
+              {isLoggingOut ? (
+                <span className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Logging out...
+                </span>
+              ) : (
+                <span className="flex items-center">
+                  <SlLogout className='w-4 h-4 mr-2' /> Logout
+                </span>
+              )}
             </li>
           </ul>
         </nav>
@@ -161,8 +218,16 @@ const Tickets = () => (
         Create New Ticket
       </button>
       <div className='h-64 bg-gray-200 rounded'></div>
+
     </div>
   </div>
+);
+
+
+const LogoutButton = () => (
+
+       <SlLogout className='w-5 h-5 inline-block align-middle'/>
+
 );
 
 export default ClientPortal;

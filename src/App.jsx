@@ -158,6 +158,8 @@ const ContactUs = lazy(() => import('./contact_us/ContactUs'))
 const ClientLead = lazy(() => import('./client_lead/ClientLead'))
 import {onMessage, messaging,} from './firebase/firebase';
 const PrivateNetwork = lazy(() => import('./network/PrivateNetwork'))
+const ProtectAuthClient = lazy(() => import('./Auth/ProtectAuthClient'))
+const QrCodeDisplay = lazy(() => import('./qr_code/QrCodeDisplay'))
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -803,7 +805,13 @@ hostname.endsWith('.aitechs.co.ke')
       <Route  path='/signin' element={<InputOTPWithSeparator/>}/>
       <Route  path='/passkey-signin' element={<PasskeySignin/>}/>
       <Route  path='/client-login' element={<ClientLogin/>}/>
-      <Route  path='/client-portal' element={<ClientPortal/>}/>
+      <Route path='/qr-code-display' element={<QrCodeDisplay/>}/>
+
+<Route element={<ProtectAuthClient />}>
+    <Route path='/client-portal' element={<ClientPortal/>}/> 
+    </Route>  
+
+
       
      <Route path="*" element={<NotFound />}/>
 </Routes>

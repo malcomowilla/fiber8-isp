@@ -23,6 +23,9 @@ import Backdrop from '@mui/material/Backdrop';
 import DeleteSubscriber from '../delete/DeleteSubscriber'
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 import toast, { Toaster } from 'react-hot-toast';
+import { useDebounce } from 'use-debounce';
+import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading animation
+
 
 // import Autocomplete from '@mui/material/Autocomplete';
 
@@ -78,6 +81,8 @@ const [showClientStatsAndSUbscriptions, setShowClientStatsAndSubscriptions] = us
 const [onlyShowSubscription, setOnlyShowSubscription] = useState(false)
     const [selectedLocations, setSelectedLocations] = useState([]);
 
+const [searchInput] = useDebounce(search, 1000)
+const [isSearching, setIsSearching] = useState(false); // New state for search loading
 
 
   const handleClickOpen = () => {
@@ -158,6 +163,7 @@ setFormData({
     async() => {
       
     try {
+      setIsSearching(true)
       const response = await fetch('/api/subscribers',{
         headers: {
           'X-Subdomain': subdomain,
@@ -170,8 +176,13 @@ setFormData({
     
       const newData = await response.json()
     if (response.ok) {
-      setTableData(newData)
-  
+      // setTableData(newData)
+      setIsSearching(false)
+  setTableData(newData.filter((subscriber)=> {
+     return search.toLowerCase() === '' ? subscriber : subscriber.name.toLowerCase().includes(search) || subscriber.ref_no.toLowerCase().includes(search) || subscriber.location?.some(loc => 
+      typeof loc === 'string' && loc.toLowerCase().includes(search.toLowerCase())
+  );
+                      }))
     } else {
       if (response.status === 402) {
         setTimeout(() => {
@@ -214,7 +225,7 @@ if (response.status === 401) {
     
     }
     },
-    [],
+    [searchInput],
   )
   
   
@@ -609,6 +620,35 @@ handleChangeForm={handleChange}
         <span className="sr-only">Search</span>
     </button>
 </div>
+
+
+ {isSearching ? (
+  
+  <div className="absolute inset-0 flex justify-center cursor-pointer items-center  
+   bg-opacity-70 z-[2] mb-[50rem]">
+      <CircularProgress size={90} color="inherit" className='text-black dark:text-white' /> 
+      
+      </div>
+    
+  ) : (
+    <div className='hidden'>
+    <svg
+      className="w-4 h-4"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 20 20"
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+      />
+    </svg>
+    </div>
+  )} 
 
 
 <MaterialTable columns={columns}

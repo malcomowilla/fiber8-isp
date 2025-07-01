@@ -654,11 +654,17 @@ toast.error(newData.error, {
   initial="hidden"
   animate="visible"
   variants={containerVariants}
-  className="bg-gradient-to-br from-blue-900 to-indigo-900 min-h-screen
- flex items-center justify-center relative overflow-hidden"
+  className="min-h-screen flex items-center justify-center relative overflow-hidden"
 >
 
-
+<div className="absolute inset-0 z-0">
+    <img
+      src="/images/Telecommunications-Aitechs.jpg" // Replace with your image path
+      alt="Network Background"
+      className="w-full h-full object-cover"
+    />
+    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+  </div>
 <div className="absolute inset-0 opacity-20">
     {[...Array(20)].map((_, i) => (
       <div 

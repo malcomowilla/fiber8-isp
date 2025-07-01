@@ -1,5 +1,6 @@
 
 
+
 import { useContext, useEffect, useState} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 import { Navigate, Outlet } from "react-router-dom";
@@ -16,7 +17,7 @@ import Backdrop from '@mui/material/Backdrop';
 
 
 
-const ProtectAuth = ({children}) => {
+const ProtectAuthClient = ({children}) => {
 
 
 
@@ -30,7 +31,7 @@ const ProtectAuth = ({children}) => {
   };
 
 
-  const {  currentUser, fetchCurrentUser} = useApplicationSettings();
+  const {  currentCustomer, setCurrentCustomer, fetchCurrentCustomer} = useApplicationSettings();
   const [loading, setLoading] = useState(true);
 
 
@@ -39,19 +40,19 @@ const ProtectAuth = ({children}) => {
 
   useEffect(() => {
     const loadUser = async () => {
-      await fetchCurrentUser();
+      await fetchCurrentCustomer();
       setLoading(false);
     };
 
     loadUser();
-  }, [fetchCurrentUser]);
+  }, [fetchCurrentCustomer]);
 
 
 
     const {   user
     } = useContext(ApplicationContext);
      
-    const isAuthenticated = currentUser && currentUser.id;
+    const isAuthenticated = currentCustomer && currentCustomer.id;
 
   if (loading) {
     return <>
@@ -62,8 +63,8 @@ const ProtectAuth = ({children}) => {
   if (isAuthenticated) {
     return <Outlet />;
   } else {
-    return <Navigate to="/signin" replace={true} />;
+    return <Navigate to="/client-login" replace={true} />;
   }
 }
 
-export default ProtectAuth
+export default ProtectAuthClient
