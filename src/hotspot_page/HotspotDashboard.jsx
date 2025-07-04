@@ -57,8 +57,9 @@ const [stats, setStats] = useState([])
       <EditIcon />
     </IconButton>
   );
+  
 const columns = [
-  {title: 'voucher', field: 'voucher',   },
+  {title: 'voucher', field: 'username',   },
   {title: 'ip adress', field: 'ip_address',  },
   {title: 'start time', field: 'start_time'},
   {title: 'up time', field: 'up_time'},

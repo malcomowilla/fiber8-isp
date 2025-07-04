@@ -48,6 +48,7 @@ const DashboardStatistics = () => {
   const [expiredVouchers, setExpiredVouchers] = useState(0)
   const [activeVouchers, setActiveVouchers] = useState(0)
   const [onlineUsers, setOnlineUsers] = useState(0)
+  const [totalBandwidth, setTotalBandwidth] = useState(0)
   const {companySettings, setCompanySettings,
 
     templateStates, setTemplateStates,
@@ -102,6 +103,7 @@ const getActiveHotspotUsers = useCallback(
         const { hotspot_users } = newData
         setOnlineUsers(newData.active_user_count)
         console.log('hotspot users fetched', newData)
+        setTotalBandwidth(newData.total_bandwidth)
       }else{
         // toast.error('failed to get active users', {
         //   position: "top-center",
@@ -125,7 +127,7 @@ useEffect(() => {
 
   const interval = setInterval(() => {
     getActiveHotspotUsers()
-  }, 10000);
+  }, 8000);
   return () => clearInterval(interval);
   
 }, [getActiveHotspotUsers]);
@@ -170,9 +172,6 @@ useEffect(() => {
 
 
 
-
-
-
 const getExpiredVouchers = useCallback(async () => {
   try {
     console.log("Fetching expired vouchers..."); // <== Check if this appears
@@ -211,27 +210,27 @@ const getExpiredVouchers = useCallback(async () => {
 
   const stats = [
     {
-      title: <p className='font-thin'>Active Vouchers</p>,
+      title: <p className=''>Active Vouchers</p>,
       value: activeVouchers,
       icon: "🎫",
       color: "bg-purple-500",
     },
 
     {
-      title: <p className='font-thin'>Expired Vouchers</p>,
-      value: <p className='font-thin'>{expiredVouchers}</p>, // Example value
+      title: <p className=''>Expired Vouchers</p>,
+      value: <p className=''>{expiredVouchers}</p>, // Example value
       icon: "⛔", // Icon for expired vouchers
       color: "bg-red-500", // Red color for expired items
     },
     {
-      title: <p className='font-light'>Online Users</p>,
-      value: <p className='font-light'> {onlineUsers}</p>,
+      title: <p className=''>Online Users</p>,
+      value: <p className=''> {onlineUsers}</p>,
       icon: "👥",
       color: "bg-blue-500",
     },
     {
-      title: <p className='font-thin text-black'>Payments Today  </p>,
-      value: <p className='font-thin text-black'>2300</p>,
+      title: <p className=' text-black'>Payments Today  </p>,
+      value: <p className=' text-black'>2300</p>,
       icon: "💳",
       color: "bg-white",
     },
@@ -242,8 +241,8 @@ const getExpiredVouchers = useCallback(async () => {
       color: "bg-orange-500",
     },
     {
-      title: <p className='font-light'>Data Consumed</p>,
-      value: <p className='font-light'>1200</p>,
+      title: <p className='font-light'>Data Consumed (24H)</p>,
+      value: <p className='font-light'>{totalBandwidth}</p>,
       icon: "📊",
       color: "bg-pink-500",
     },
@@ -251,8 +250,8 @@ const getExpiredVouchers = useCallback(async () => {
 
   return (
     <div className="min-h-sm bg-gradient-to-r  p-2">
-      <h1 className="text-4xl  text-white 
-      font-thin
+      <h1 className="text-4xl  text-black dark:text-white  
+      
       mb-8">Hotspot Statistics</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {stats.map((stat, index) => (
