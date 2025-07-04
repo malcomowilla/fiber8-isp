@@ -82,7 +82,8 @@ const Subscriptions = ({
   handleClose,
 
   formData,  createSubscriber, handleChangeForm, setFormData, isloading,
-  setShowClientStatsAndSubscriptions, setOnlyShowSubscription,onlyShowSubscription
+  setShowClientStatsAndSubscriptions, setOnlyShowSubscription,onlyShowSubscription,
+  subscriberId
 
 }) => {
 
@@ -205,7 +206,8 @@ const fetchPackages = useCallback(
     async() => {
       
       try {
-        const response = await fetch('/api/subscriptions', {
+        const response = await fetch(`/api/subscriptions?subscriber_id=${subscriberId}`, {
+
           headers: { 'X-Subdomain': subdomain },
         })
         const data = await response.json()
@@ -347,7 +349,7 @@ const createSubscription = async(e) => {
 
   try {
         const method = formData.id ? 'PUT' : 'POST'
-    const url = formData.id ? `/api/subscriptions/${formData.id}` : '/api/subscriptions'
+    const url = formData.id ? `/api/subscriptions/${formData.id}?subscriber_id=${subscriberId}` : `/api/subscriptions?subscriber_id=${subscriberId}`
         const response = await fetch(url, {
       method: method,
       headers: {

@@ -20,6 +20,7 @@ import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import {useState, useEffect} from 'react'
 import LiveData from '../details/LiveData';
+import ActivityLogs from '../details/ActivityLogs';
 
 import {
   Tabs,
@@ -38,7 +39,8 @@ const EditSubscriber = ({handleClose, open, formData , createSubscriber,
    name,
    package_name,
    onlyShowSubscription,setOnlyShowSubscription,
-   selectedLocations, setSelectedLocations
+   selectedLocations, setSelectedLocations,
+   setSubscriberId, subscriberId
 
   
   }) => {
@@ -158,7 +160,7 @@ console.log('name',name)
             {showClientStatsAndSUbscriptions && <Tab label="SUBSCRIPTIONS" value="7" />}
             {onlyShowSubscription && showClientStatsAndSUbscriptions && <Tab label="COMUNICATIONS" value="8" />}
             {onlyShowSubscription && showClientStatsAndSUbscriptions && <Tab label="ACTIVITY LOGS" value="9" />}
-             {onlyShowSubscription && showClientStatsAndSUbscriptions && <Tab label="PAYMENT HISTORY" value="10" />}
+    {onlyShowSubscription && showClientStatsAndSUbscriptions && <Tab label="PAYMENT HISTORY" value="10" />}
 
 
 
@@ -184,6 +186,7 @@ console.log('name',name)
           <TabPanel value="4"><Invoice handleClose={handleClose}/></TabPanel>
           <TabPanel value="5"><Receipt handleClose={handleClose}/></TabPanel>
           <TabPanel value="6"><Stats handleClose={handleClose}/></TabPanel>
+          <TabPanel value="9"><ActivityLogs/></TabPanel>
 
 
           <TabPanel value="11"><LiveData handleClose={handleClose} 
@@ -193,6 +196,7 @@ console.log('name',name)
           <TabPanel value="7"><Subscriptions
            handleClose={handleClose}
            setOnlyShowSubscription={setOnlyShowSubscription} 
+           subscriberId={subscriberId}
            
            onlyShowSubscription={onlyShowSubscription}
            isloading={isloading}

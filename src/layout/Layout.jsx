@@ -254,6 +254,62 @@ setSmsBalance(newData.message)
 
 
 
+  const fetchSavedSmsSettings = useCallback(
+  async() => {
+    
+    try {
+      const response = await fetch(`/api/saved_sms_settings`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+        },
+      });
+  
+      const data = await response.json();
+
+      const newData = data.length > 0 
+        ? data.reduce((latest, item) => new Date(item.sms_setting_updated_at) > new Date(latest.sms_setting_updated_at) ? item : latest, data[0])
+        : null;
+        console.log('newdata updated at', newData)
+  
+      if (response.ok) {
+        console.log('Fetched saved  SMS settings:', newData);
+        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID } = newData;
+        // setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID });
+        setSelectedProvider(sms_provider);
+        // setSelectedProvider(newData[0].sms_provider);
+      } else {
+
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+ 
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
+      
+      }
+    } catch (error) {
+     
+    }
+  },
+  [],
+)
+
+
+useEffect(() => {
+  fetchSavedSmsSettings();
+ 
+}, [fetchSavedSmsSettings]);
+
+
   function calculateTimeRemaining(expiryDateString) {
     // Parse the expiry date (format: "June 07, 2025 at 05:12 PM")
     const expiryDate = new Date(expiryDateString?.replace(' at ', ' '));
@@ -352,7 +408,7 @@ setSmsBalance(newData.message)
 
 location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers' &&
 location.pathname !== '/admin/scheduler' && location.pathname !== '/admin/private-network' &&
-location.pathname !== '/admin/analytics' &&
+location.pathname !== '/admin/analytics' && location.pathname !== '/admin/router_details' &&
 
 
 
@@ -386,44 +442,6 @@ currentPPOEPlan={currentPPOEPlan} currentHotspotPlan={currentHotspotPlan}
 <Updates />
 
 
-{location.pathname !== '/admin/hotspot_anlytics' && location.pathname !== '/admin/pppoe-subscribers'
- && location.pathname !== '/admin/networks-wireguard-config'
- &&  location.pathname !== '/admin/ip_networks' && location.pathname !== '/admin/network-components'
- && location.pathname !== '/admin/nas' && location.pathname !== '/admin/nodes' &&
-  location.pathname !== '/admin/upload-subscriber'
-  && location.pathname !== '/admin/user' && location.pathname !== '/admin/user-group'
- && location.pathname !== '/admin/client-leads' && location.pathname !== '/admin/settings' &&
-location.pathname !== '/admin/google-authenticator' && 
-location.pathname !== '/admin/profile' && location.pathname !== '/admin/customer-tickets' &&
-
-location.pathname !== '/admin/hotspot-dashboard' && location.pathname !== '/admin/hotspot-package' &&
-location.pathname !== '/admin/hotspot-subscriptions' &&
-location.pathname !== '/admin/hotspot-templates' &&
-
-location.pathname !== '/admin/hotspot_settings' &&
-
-location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/today-subscribers' &&
-location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers'  &&
-location.pathname !== '/admin/scheduler' && location.pathname !== '/admin/private-network' &&
-<div
- onClick={() => {
-            setShowMenu1(false)
-            setShowMenu2(false)
-            setShowMenu3(false)
-            setShowMenu4(false)
-            setShowMenu5(false)
-            setShowMenu6(false)
-            setShowMenu7(false)
-            setShowMenu8(false)
-            setShowMenu9(false)
-            setShowMenu10(false)
-            setShowMenu11(false)  
-            setShowMenu12(false)
-          }}
->
-    <SmsBalance  smsBalance={smsBalance} />
-    </div>
-}
 
 {window.location.hostname === 'demo.aitechs.co.ke' && (
   <div
@@ -474,6 +492,7 @@ location.pathname !== '/admin/scheduler' && location.pathname !== '/admin/privat
   location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers'  &&
  location.pathname !== '/admin/upload-subscriber' &&
 location.pathname !== '/admin/scheduler' && location.pathname !== '/admin/private-network' &&
+location.pathname !== '/admin/router_details' &&
 <div
  onClick={() => {
             setShowMenu1(false)
@@ -493,9 +512,13 @@ location.pathname !== '/admin/scheduler' && location.pathname !== '/admin/privat
    <License expiry={expiry} condition={condition} 
   status={status}
  expiry2={expiry2} condition2={condition2} status2={status2}
-  calculateTimeRemaining={calculateTimeRemaining} />
+  calculateTimeRemaining={calculateTimeRemaining}  smsBalance={smsBalance} />
   </div>
    }
+
+
+
+
 
 
 <div 
@@ -534,7 +557,9 @@ className='mt-4'>
            location.pathname !== '/admin/this-week-subscribers' && 
            location.pathname !== '/admin/this-month-subscribers' && location.pathname !== '/admin/scheduler'
 
+           &&
 
+location.pathname !== '/admin/router_details' 
            
            && <div
             onClick={() => {

@@ -284,7 +284,7 @@ const handleGetCompanySettings = useCallback(
                    hover:bg-gray-700"
                 >
                   <ManageAccountsOutlinedIcon />
-                  Management
+                  Activity Logs
                 </Link>
               </motion.li>
 
@@ -389,7 +389,7 @@ const handleGetCompanySettings = useCallback(
                    hover:bg-gray-700"
                 >
                   <ManageAccountsOutlinedIcon />
-                  Management
+                  Activity Logs
                 </Link>
               </motion.li>
 

@@ -6,7 +6,8 @@ import EditIcon from '@mui/icons-material/Edit';
 // import RadioGroup from '@mui/material/RadioGroup';
 // import FormControlLabel from '@mui/material/FormControlLabel';
 
-import { IconButton,  Checkbox } from '@mui/material';
+import { IconButton, Checkbox,Tooltip,
+ } from '@mui/material';
 import GetAppIcon from '@mui/icons-material/GetApp';
 // import {Link} from 'react-router-dom'
 import {  useState, useEffect, useMemo, useCallback} from 'react'
@@ -22,13 +23,16 @@ import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { LuRouter } from "react-icons/lu";
 
 import InputAdornment from '@mui/material/InputAdornment';
+import { FaFulcrum } from "react-icons/fa";
 
+import { useNavigate } from 'react-router-dom';
+import Loading from './Loading'
 
 
 
 const Nas = () => {
 
-
+const navigate = useNavigate()
   const [open, setOpen] = useState(false);
 
 const [loading, setloading] = useState(false)
@@ -40,7 +44,8 @@ const { nasformData, setnasFormData,initialValueNas, setTableData,
       showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
        showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
         showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
-
+routerName, setRouterName,openNasTable, setOpenNasTable,
+        openRouterDetails, setOpenRouterDetails
 
  } =  useApplicationSettings() 
 const [selectedRouter, setSelectedRouter] = useState(null);
@@ -49,6 +54,10 @@ const [search ,setSearch] = useState('')
 
 
 const [tableDataNas, setTableDataNas] = useState([]); // Stores routers
+
+
+  const [openLoading, setOpenLoading] = useState(false);
+
 
 const [selectedRouterId, setSelectedRouterId] = useState(() => {
   const savedRouterId = localStorage.getItem('selectedCheckedRouter');
@@ -64,8 +73,7 @@ const handleCloseDelete = () => {
   setOpenDelete(false);
 };
 
-
-
+  
   const handleClickOpen = () => {
     setOpen(true);
     setnasFormData(initialValueNas)
@@ -160,6 +168,7 @@ const subdomain = window.location.hostname.split('.')[0];
   const handleRowClick = (event, rowData) => {
     setnasFormData(rowData);
     console.log('router row data', rowData)
+    setRouterName(rowData.id)
   
     // Add your custom logic here, such as opening a modal or updating state
   };
@@ -368,7 +377,7 @@ const handleSubmit = async (e)=> {
             const newData = await response.json()
             if (response.ok) {
               setPingStatus(newData)
-              console.log('router ping status fetch', newData)
+              console.log('router ping status fetch array', newData[0])
               // setTableData((prevData) => ({
               //   ...prevData, 
               //   ...newData // This will overwrite existing keys if they exist
@@ -419,21 +428,27 @@ const handleSubmit = async (e)=> {
 // pingStatus]
 
 
-
-const mergedTableData = tableDataNas.map((router) => {
-  console.log('router', router)
-  const response = pingStatus?.response || "";
-  const pingTimeMatch = response.match(/time (\d+ms)/); // Extracts "time XXXXms"
-  const pingTime = pingTimeMatch ? pingTimeMatch[1] : "N/A"; // Default if no match
-  const ip_adress_router = pingStatus?.ip
-
+const mergedTableData = tableDataNas.map((nasRouter) => {
+  // Find matching ping status for this router
+  const routerPingStatus = pingStatus.find(
+    (status) => status?.ip === nasRouter.ip_address
+  );
+  console.log('routerPingStatus', routerPingStatus)
+  // Extract ping time if available
+  const response = routerPingStatus?.response || "";
+  const pingTimeMatch = response.match(/time[=<](\d+\.?\d*ms)/i); // More robust regex
+  const pingTime = pingTimeMatch ? pingTimeMatch[1] : "N/A";
+  
   return {
-    ...router,
-    ping: pingTime || "N/A", // Extracted ping time
-    reachable: router.ping_status?.router_status?.reachable ? "reachable" : "not reachable",
-    ip_adress_router
+    ...nasRouter,
+    ping: pingTime || "N/A",
+    reachable: routerPingStatus?.reachable ? "Reachable" : "Not reachable",
+    ip_adress_router: routerPingStatus?.ip || nasRouter.ip_address || "N/A",
+    last_checked: routerPingStatus?.checked_at || "Never checked",
+    response: response || "N/A"
   };
 });
+
 
 
 
@@ -461,11 +476,11 @@ const columns = [
       <span style={{ 
         // color: pingStatus.router_status?.response ? 'green' : 'red', 
         // color: rowData.ping_status?.router_status?.reachable === true ? 'green' : 'red', 
-        color: pingStatus?.reachable === true ? 'green' : 'red', 
+        color: rowData.reachable === 'Reachable' ? 'green' : 'red', 
         fontWeight: 'bold' 
       }}>
-{rowData.ip_adress_router
- === rowData.ip_address ? rowData.ping : ''}
+{rowData.response.match(/time[=<](\d+\.?\d*\s*ms)/i)?.[1] ?? 'N/A'}
+
       </span>
     )
   },
@@ -476,11 +491,10 @@ const columns = [
     field: 'reachable',
     render: rowData => (
       <span style={{ 
-        color: pingStatus?.reachable === true ? 'green' : 'red', 
+        color: rowData.reachable === 'Reachable' ? 'green' : 'red', 
         fontWeight: 'bold' 
       }}>
-        {rowData.ip_adress_router
- === rowData.ip_address ? pingStatus?.reachable === true ? 'reachable' : 'not reachable' : ''}
+        {rowData.reachable === 'Reachable' ? 'Reachable' : 'Not Reachable' }
       </span>
     )
   },
@@ -496,18 +510,37 @@ const columns = [
   render: (rowData) =>  
     
      <>
-      
+      <div className='flex flex-row'>
        <DeleteButton  id={rowData.id} />
        <EditButton />
-   
+
+       <Tooltip 
+        onClick={() => {
+                   setOpenLoading(true);
+                    setTimeout(() => {
+                       navigate(`/admin/router_details?id=${routerName}`);
+                    }, 2000);
+                  }}
+       title="View Traffic" className='text-green-700 w-6 h-6'>
+                  <FaFulcrum 
+                 
+                  fontSize="large" />
+              </Tooltip>
+   </div>
        </>
 
 }
 
-
 ]
+const handleCloseLoading = () => {
+  setOpenLoading(false);
+};
 
   return (
+    <>
+    <Loading openLoading={openLoading} setOpenLoading={setOpenLoading}
+    handleClose={handleCloseLoading}
+    />
     <div  
     onClick={() => {
       setShowMenu1(false)
@@ -586,7 +619,7 @@ const columns = [
 
 options={{
         paging: true,
-       pageSizeOptions:[5, 10, 20, 25, 50, 100],
+       pageSizeOptions:[5, 10, 20],
        pageSize: 20,
        search: false,
 searchFieldStyle: {
@@ -624,6 +657,7 @@ headerStyle:{
       />
 
     </div>
+    </>
   )
 }
 

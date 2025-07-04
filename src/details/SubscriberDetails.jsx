@@ -38,7 +38,20 @@ import { FaRegUser } from "react-icons/fa";
 import { TbLockPassword } from "react-icons/tb";
 import { FaHouseChimneyUser } from "react-icons/fa6";
 import { FaRegBuilding } from "react-icons/fa";
-
+import { 
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Divider,
+  Typography,
+  Grid,
+  IconButton,
+  Tooltip,
+  CircularProgress,
+  Snackbar,
+  Alert
+} from '@mui/material';
 
 
 
@@ -79,7 +92,7 @@ const SubscriberDetails = ({handleClose,
   } = useApplicationSettings()
   const {name, ref_no , ppoe_password,  ppoe_username,  phone_number, email, second_phone_number,
      package_name, installation_fee, subscriber_discount, date_registered, router_name,
-     latitude, longitude, house_number, building_name
+     latitude, longitude, house_number, building_name,location,node
     }= formData
 
 
@@ -99,6 +112,7 @@ const SubscriberDetails = ({handleClose,
 
   const [initialPackage, setInitialPackage] = useState(null);
   const [mikrotik_router, setRouter] = useState(null)
+  const [nodes, setNodes] = useState([])
 
 
 
@@ -177,6 +191,52 @@ const SubscriberDetails = ({handleClose,
 
 
 const subdomain = window.location.hostname.split('.')[0];
+
+
+ const getNodes = useCallback(
+    async() => {
+     
+      
+      try {
+        const response = await fetch('/api/nodes', {
+          headers: { 'X-Subdomain': subdomain },
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setNodes(data)
+          
+        } else {
+          
+
+        }
+      } catch (error) {
+        
+      }
+    },
+    [],
+  )
+  
+
+  useEffect(() => {
+    getNodes()
+   
+  }, [getNodes]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   const fetchSubscriberSettings = useCallback(
     async() => {
       try {
@@ -724,23 +784,22 @@ const fetchPackages = useMemo(() => async ()=> {
                 },
               }}
             >
-              <TextField
-            
+             <TextField
                 className='myTextField'
-                id="installation_fee"
-                value={installation_fee}
-                onChange={handleChangeForm}
-                label="Installation Fee"
-                type="number"
+                id="second_phone_number"
+                value={formData.second_phone_number}
+                onChange={handlePhoneNumberChange}
+                label="Second Phone"
                 InputProps={{
                   startAdornment: (
-                     <InputAdornment position="start">KES 💴</InputAdornment>
+                    <InputAdornment position="start">
+                      <img src="/images/icons8-kenya-48.png" alt="kenyan-flag" />
+                    </InputAdornment>
                   ),
                 }}
                 variant="outlined"
                 fullWidth
               />
-            
 
             <TextField 
             onChange={handleChangeBuildingNameAndHouseNumber}
@@ -855,7 +914,7 @@ const fetchPackages = useMemo(() => async ()=> {
                 },
               }}
             >
-              <TextField
+              {/* <TextField
                 className='myTextField'
                 id="location"
                 label="Description Of Location"
@@ -866,21 +925,43 @@ const fetchPackages = useMemo(() => async ()=> {
                 sx={{ mb: 2 }}
                 // value={location}
                 onChange={handleChangeForm}
-              />
+              /> */}
+
+                <InputLabel>Nodes</InputLabel>
+                <Select
+                fullWidth
+                  id="node"
+                  name='node'
+                  value={formData.node}
+                  // onChange={handleChangeForm}
+                  onChange={(e) => {
+                    console.log('node in form',e.target.value);
+                    const selectedNode = nodes.find(n => n.name === e.target.value);
+                    console.log('selectedNode',selectedNode)
+                      setFormData(prev => ({ ...prev, node: selectedNode.name }));
+                  }}
+                  label="Node"
+                >
+                  {nodes.map(nod => (
+                    <MenuItem key={nod.id} value={nod.name}>
+                      <p className='text-black'>{nod.name} </p>
+                    </MenuItem>
+                  ))}
+                </Select>
 
               {/* Location Button */}
               <Button
                 variant="outlined"
                 startIcon={<MyLocationIcon />}
                 onClick={handleOpenMapDialog}
-                sx={{ mb: 2 }}
+                sx={{ mt: 2 }}
               >
                 Set Location on Map
               </Button>
 
               {/* Display coordinates if available */}
               {position && (
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
                   {/* <TextField
                   className='myTextField'
                     label="Latitude"
@@ -1038,606 +1119,7 @@ const fetchPackages = useMemo(() => async ()=> {
         </DialogActions>
       </Dialog>
     </>
-//     <div className=' relative right-20 w-full'>
-//           <form onSubmit={createSubscriber}>
 
-//         <div className='grid grid-cols-1 md:grid-cols-3 gap-4 '>
-//         <Box
-//       sx={{
-//         '& .MuiTextField-root': { m: 1, marginTop: '',  width: {
-//             xs: '40%',
-//             sm: '80%',
-//             md: '50%',
-//             lg: '70%',
-//             xl: '70%',
-//         },
-//             '& label.Mui-focused': {
-//               color: 'black',
-//               fontSize:'18px'
-            
-//               },
-//             '& .MuiOutlinedInput-root': {
-//             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-//               borderColor: "black",
-//               borderWidth: '3px'
-//               },
-//             '&.Mui-focused fieldset':  {
-//               borderColor: 'black', // Set border color to transparent when focused
-            
-//             }
-//             },
-//         },
-//       }}
-//       noValidate
-//       autoComplete="on"
-//     >
-//         <TextField id="name"  sx={{
-//         }}  value={name}  onChange={handleChangeName}  className='myTextField' label="Name" variant="outlined" />
-
-// </Box>
-
-
-
-
-
-// <Autocomplete
-                      
-//                       sx={{
-//                         m: 1,width: {
-//                           xs: '40%',
-//                           sm: '80%',
-//                           md: '50%',
-//                           lg: '70%',
-//                           xl: '70%',
-
-              
-              
-              
-//                       },
-//                         '& label.Mui-focused': {
-//                           color: 'black',
-//                           fontSize:'16px'
-//                           },
-//                         '& .MuiOutlinedInput-root': {
-//                         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-//                           borderColor: "black",
-//                           borderWidth: '3px'
-//                           },
-//                         '&.Mui-focused fieldset':  {
-//                           borderColor: 'black', // Set border color to transparent when focused
-                        
-//                         }
-//                         },
-                                 
-//                                 }} 
-                    
-                                
-//                                       // getOptionLabel={'4MBPS'}
-                    
-//                             options={top100Films}
-                            
-//                                     renderInput={(params) => (
-//                                       <TextField
-//                                       id="user_group"
-                    
-//                                       className='myTextField'
-//                                         {...params}
-//                                         label="Select User Group"
-                                      
-                    
-                                       
-//                                       />
-//                                     )}
-                                  
-                                
-                                    
-                    
-//                                   />
-                                  
-                            
-
-
-//                                   <Autocomplete
-                      
-//                       sx={{
-//                         m: 1, width: {
-//                           xs: '40%',
-//                           sm: '80%',
-//                           md: '50%',
-//                           lg: '70%',
-//                           xl:'70%'
-                          
-              
-//                       },
-//                         '& label.Mui-focused': {
-//                           color: 'black',
-//                           fontSize:'16px'
-//                           },
-//                         '& .MuiOutlinedInput-root': {
-//                         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-//                           borderColor: "black",
-//                           borderWidth: '3px'
-//                           },
-//                         '&.Mui-focused fieldset':  {
-//                           borderColor: 'black', // Set border color to transparent when focused
-                        
-//                         }
-//                         },
-                                 
-//                                 }} 
-                    
-                                
-//                                       // getOptionLabel={'4MBPS'}
-                    
-//                             options={top100Films}
-                            
-//                                     renderInput={(params) => (
-//                                       <TextField
-//                                       id="node"
-                    
-//                                       className='myTextField'
-//                                         {...params}
-//                                         label="Select Node"
-                                      
-                    
-                                       
-//                                       />
-//                                     )}
-                                  
-                                
-                                    
-                    
-//                                   />
-
-
-
-
-
-//       </div>
-      
-
-
-// <div className='grid grid-cols-1 md:grid-cols-2 gap-1 '>
-
-// <Stack
-// spacing={{
-//   xs: 2,
-//   sm: 2,
-//   md: 4,
-//   lg: 5
-  
-// }}
-// direction={{
-//   xs: 'column',
-//   sm:'row',
-//   md: 'row',
-//   lg: 'row',
-//   xl: 'row',
-//   xxl: 'row',
-
-// }}
-//       sx={{
-//         '& > :not(style)': { m: 1, width: {
-//             xs: '20%',
-//             sm: '80%',
-//             md: '50%',
-//             lg: '40%',
-//             xl:'70%',
-//             xxl: '100%'
-//         },
-//         '& label.Mui-focused': {
-//           color: 'black',
-//           fontSize:'18px'
-        
-//           },
-//         '& .MuiOutlinedInput-root': {
-//         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-//           borderColor: "black",
-//           borderWidth: '3px'
-//           },
-//         '&.Mui-focused fieldset':  {
-//           borderColor: 'black', // Set border color to transparent when focused
-        
-//         }
-//         }, },
-//       }}
-//       noValidate
-//       autoComplete="on"
-//     >
-//       <TextField   name="email" value={email}   onChange={handleEmailChange} className='myTextField'
-//         type='email' label="Email" variant="outlined"/>
-
-
-//     <TextField id="phone_number"   value={formData.phone_number} placeholder='+254791568852' onChange={handlePhoneNumberChange} label="Phone"   InputProps={{
-
-//       startAdornment: (
-//         <InputAdornment  position='start'>
-//         <img src="/images/icons8-kenya-48.png" alt="kenyan-flag1" />
-//         </InputAdornment>  
-//       )
-//     }}  
-//      className='myTextField'  variant="outlined" />
-
-
-// </Stack>
-// </div>
-  
-
-
-
-//                 <div className='grid grid-cols-1 '>
-
-// <Box
-//       className='myTextField'
-//       sx={{
-//         '& > :not(style)': { m: 1,  width: {
-//             xs: '30%',
-//             sm: '80%',
-//             md: '50%',
-//             lg: '100%',
-//             xl:'100%'
-//         }  , '& label.Mui-focused': {
-//           color: 'black',
-//           fontSize:'17px'
-        
-//           },
-//         '& .MuiOutlinedInput-root': {
-//         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-//           borderColor: "black",
-//           borderWidth: '3px'
-//           },
-//         '&.Mui-focused fieldset':  {
-//           borderColor: 'black', // Set border color to transparent when focused
-        
-//         }
-//         },},
-//       }}
-//       noValidate
-//       autoComplete="on"
-//     >
-//       <TextField id="second_phone_number"  placeholder='+254791568852'  onChange={handlePhoneNumberChange2}  value={second_phone_number}
-//          InputProps={{
-//       startAdornment: (
-//         <InputAdornment  position='start'>
-//         <img src="/images/icons8-kenya-48.png" alt="kenyan-flag1" />
-//         </InputAdornment>  
-//       )
-//     }} label="Phone Number" variant="outlined" />
-//     </Box>
-//                 </div>
-
-
-
-
-//                 <div className='grid grid-cols-1 md:grid-cols-3'>
-//                 <Box
-//       className='myTextField'
-//       sx={{
-//         '& > :not(style)': { m: 1, width: {
-//             xs: '50%',
-//             sm: '80%',
-//             md: '50%',
-//             lg: '40%',
-//         } ,
-//         '& label.Mui-focused': {
-//           color: 'black',
-//           fontSize:'17px'
-        
-//           },
-//         '& .MuiOutlinedInput-root': {
-//         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-//           borderColor: "black",
-//           borderWidth: '3px'
-//           },
-//         '&.Mui-focused fieldset':  {
-//           borderColor: 'black', // Set border color to transparent when focused
-        
-//         }
-//         }, },
-//       }}
-//       noValidate
-//       autoComplete="on"
-//     >
-//               <TextField id="ref_no"  onChange={handleChangeForm} value={ref_no} label="Ref No" variant="outlined" />
-
-//       <TextField id="ppoe_username"  onChange={handleChangeForm} value={ppoe_username}   label="Ppoe Username" variant="outlined" />
-//       <TextField id="ppoe_password"  onChange={handleChangeForm}  value={ppoe_password} label="Ppoe Password" variant="outlined"/>
-
-
-//     </Box>
-
-//                 </div>
-
-             
-//                 <div className='grid grid-cols-1  md:grid-cols-2  '>
-
-
-
-
-//                 <Autocomplete
-//             value={packageName.find(pkg => pkg.name === initialPackage) || null}
-
-//         sx={{
-//           m: 1,
-//           width: {
-//             xs: '50%',
-//             sm: '80%',
-//             md: '50%',
-//             lg: '70%',
-//           },
-//           '& label.Mui-focused': {
-//             color: 'black',
-//             fontSize: '16px'
-//           },
-//           '& .MuiOutlinedInput-root': {
-//             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-//               borderColor: "black",
-//               borderWidth: '3px'
-//             },
-//             '&.Mui-focused fieldset': {
-//               borderColor: 'black',
-//             }
-//           },
-//         }}
-//         getOptionLabel={(option) => option.name}
-
-//         options={packageName}
-//         renderInput={(params) => (
-//           <TextField
-//             id="router_name"
-//             className='myTextField'
-//             {...params}
-//             label="Select Package"
-//             getOptionValue={(option) => option.id}  
-
-//           />
-//         )}
-//         renderOption={(props, packageName) => (
-//           <Stack
-//             direction='row'
-//             spacing={2}
-//             sx={{
-//               width: '100%',
-//               padding: 1,
-//               '&:hover': {
-//                 backgroundColor: 'rgba(0, 0, 0, 0.1)',
-//                 display: 'flex',
-//                 flexDirection: 'start'
-//               }
-//             }}
-//             {...props}
-//           >
-//             <ion-icon size='large' name="wifi-outline"></ion-icon>
-//             {/* <div className='dark:bg-white  bg-gray-300  rounded-[100px] p-7 place-content-center
-//               text-xl w-7 dark:text-black h-8' >4</div> */}
-//             <Stack direction='column'>
-//             <span>{packageName.name}</span>
-//             <span>KES{packageName.price}</span>
-//             </Stack>
-          
-//           </Stack>
-          
-//         )}
-//         onChange={(event, newValue) => {
-//           console.log("Selected Package:", newValue);
-
-//           setFormData({ ...formData, package_name: newValue ? newValue.name : '' });
-//         }}
-
-//       />
-                                  
-                               
-
-
-//     <DemoContainer   sx={{ m: 1, width: {
-//             xs: '50%',
-//             sm: '80%',
-//             md: '50%',
-//             lg: '50%',
-//         },  '& label.Mui-focused': {
-//           color: 'black',
-//           fontSize:'16px'
-        
-//           },
-//         '& .MuiOutlinedInput-root': {
-//         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-//           borderColor: "black",
-//           borderWidth: '3px'
-//           },
-//         '&.Mui-focused fieldset':  {
-//           borderColor: 'black', // Set border color to transparent when focused
-        
-//         }
-//         },  }} components={['DatePicker']}>
-//         <DatePicker  className='myTextField' onChange={(date)=> handleChangeDate(date)} 
-//          value={date_registered}  label="Date Registered" />
-
-//       </DemoContainer>
-//                 </div>
-
-
-
-
-
-//                 <div>
-//                 <Stack
-//       component="form"
-//       className='myTextField'
-//       direction={{
-//         xs: 'column',
-//         lg: 'row',
-//         xl: 'row'
-//       }}
-        
-    
-//       sx={{
-//         '& > :not(style)': { m: 1, width: '40ch' },
-//         '& label.Mui-focused': {
-//           color: 'black',
-//           fontSize:'16px'
-        
-//           },
-//         '& .MuiOutlinedInput-root': {
-//         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-//           borderColor: "black",
-//           borderWidth: '3px'
-//           },
-//         '&.Mui-focused fieldset':  {
-//           borderColor: 'black', // Set border color to transparent when focused
-        
-//         }
-//         },
-//       }}
-//       noValidate
-//       autoComplete="on"
-//     >
-     
-//       <TextField id="installation_fee"   InputProps={{
-//       startAdornment: (
-//         <InputAdornment  position='start'>
-//         KES
-//         </InputAdornment>  
-//       )
-//     }}   value={installation_fee}   onChange={handleChangeForm} label="Installation Fee" type='number' variant="outlined" />
-//        <TextField id="subscriber_discount"   InputProps={{
-//       startAdornment: (
-//         <InputAdornment  position='start'>
-//         KES
-//         </InputAdornment>  
-//       )
-//     }}  value={subscriber_discount}  onChange={handleChangeForm}  label="Amount Subtracted From Customers Next Bill" type='number' variant="outlined" />
-//      <TextField id="outlined-basic" label="Installation Fee2" type='number' variant="outlined" />
-
-
-//     </Stack>
-
-
-//                         </div>
-
-
-
-          
-
-
-
-
-
-// <div className='flex justify-center mt-12'>
-
-// <div className='dark:bg-gray-500 bg-gray-800 dark:text-white
-//   text-white flex justify-center items-center gap-x-4  w-[200px] h-10'>
-// <p className='text-lg'>Get Location</p>
-
-// <ion-icon name="location-outline"></ion-icon>
-// </div>
-// </div>
-
-
-
-// <Stack    sx={{
-                
-//                 marginTop: 3,
-//                 width: {
-//                   xs: '50%',
-//                   sm: '90%',
-//                   md: '90%',
-//               } ,
-//                 '& label.Mui-focused': {
-//                     color: 'black',
-//                     fontSize: '17px'
-                  
-//                     },
-//                   '& .MuiOutlinedInput-root': {
-//                   "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-//                     borderColor: "black",
-//                     borderWidth: '3px'
-//                     },
-//                   '&.Mui-focused fieldset':  {
-//                     borderColor: 'black', 
-                    
-                  
-//                   }
-//                   },
-//                 }}   spacing={{
-//                 lg: 4,
-//                 xl: 4,
-//                 sm: 4,
-//                 md: 4,
-//                 xs: 2
-//                 }} direction={{
-//                 xs: 'column',
-//                 sm: 'row',
-//                 md: 'row',
-//                 lg: 'row',
-//                 xl: 'row',
-               
-//                 }}  className='myTextField'>
-                
-//                                 <TextField    sx={{
-//                                   width: '100%'
-//                                 }}  label='Latitude'/>
-//                                 <TextField sx={{
-//                                                                  width: '100%'
-
-//                                 }}  label='Longitude'/>
-                
-//                             </Stack>
-                
-
-
-//    <Box   className='myTextField' sx={{
-//        marginTop: 2,
-// "& .MuiInputBase-root": {
-//   height: 100
-//   }, 
-
-
-//    '& > :not(style)': { m: 1, width: {
-//     xs: '50%',
-//     sm: '80%',
-//     md: '50%',
-//     lg: '100%',
-//     xl:'100%'
-// } ,
-// '& label.Mui-focused': {
-//   color: 'black',
-//   fontSize:'17px'
-
-//   },
-// '& .MuiOutlinedInput-root': {
-// "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-//   borderColor: "black",
-//   borderWidth: '3px'
-//   },
-// '&.Mui-focused fieldset':  {
-//   borderColor: 'black', // Set border color to transparent when focused
-
-// }
-// }, },
-// }} >
-              
-// <TextField    label='Description Of Location'  />
-//     </Box> 
-
-    
-  
-
-              
-//         <div className='flex gap-x-7 mt-3'>
-          
-//         <Button color='error'   startIcon={<CloseIcon/>} variant='outlined' onClick={handleClose} >Cancel</Button>
-
-// <LoadingButton    loadingPosition= 'start'   startIcon={<AutorenewIcon/>} type='submit'
-//  loading={isloading}  color='success'
-//     variant='outlined'   >
-
-
-//   save
-// </LoadingButton>
-//         </div> 
-//         </form>
-
-//     </div>
   )
 }
 

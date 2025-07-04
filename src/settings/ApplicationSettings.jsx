@@ -48,6 +48,7 @@ const ApplicationSettings = ({children}) => {
           send_reminder_sms_expiring_subscriptions: false,
           account_number_starting_value: 0,
           enable_customer_portal: false,
+          installation_fee: 0,
 
 
         }
@@ -109,7 +110,7 @@ const [subscribersOnline, setSubscribersOnline] = useState(0)
 const [subscribersOffline, setSubscribersOffline] = useState(0)
 const [openDropDown, setOpenDropDown] = useState(false)
 
-const [pingStatus, setPingStatus] = useState([]); // Stores ping statuses
+const [pingStatus, setPingStatus] = useState([]); 
 
 const {vouchers} = voucher
 
@@ -194,6 +195,9 @@ const handleChangeHotspotVoucher = (e) => {
     });
 
 const [currentCustomer, setCurrentCustomer] = useState(null)
+const [routerName, setRouterName] = useState(null)
+const [openRouterDetails, setOpenRouterDetails] = useState(false)
+const [openNasTable, setOpenNasTable] = useState(true)
 
       const handleChangeSubscriberSettings = (e) => {
         const { type, name, checked, value } = e.target;
@@ -622,7 +626,9 @@ const loginWithVoucher = async(e) => {
         showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
         locationInput, setLocationInput, allLocations, setAllLocations,
         formDataGeneralSettings, setFormDataGeneralSettings,
-        currentCustomer, setCurrentCustomer,fetchCurrentCustomer
+        currentCustomer, setCurrentCustomer,fetchCurrentCustomer,
+        routerName, setRouterName,openNasTable, setOpenNasTable,
+        openRouterDetails, setOpenRouterDetails
      }}  >
     {children}
    </GeneralSettingsContext.Provider>

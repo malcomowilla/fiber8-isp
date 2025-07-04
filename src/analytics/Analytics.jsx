@@ -32,6 +32,23 @@ import {
 
 import { MdOutlineRouter } from "react-icons/md";
 
+import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
+import { Box, Button, Chip, Typography, useTheme  } from '@mui/material';
+import { Add as AddIcon, GetApp as GetAppIcon } from '@mui/icons-material';
+import { MdOutlineSupportAgent } from "react-icons/md";
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useDebounce } from 'use-debounce';
+import { LiaSmsSolid } from "react-icons/lia";
+import { FaRegCheckCircle, FaRegTimesCircle, FaRegClock } from "react-icons/fa";
+import { formatDistanceToNow } from 'date-fns';
+
+import { format } from 'date-fns';
+import { LuDollarSign, LuClock, LuCalendar } from "react-icons/lu";
+import { MdOutlineOnlinePrediction } from "react-icons/md";
+import { IoCloudOfflineOutline } from "react-icons/io5";
+import { LuUsers } from "react-icons/lu";
+import { MdMobiledataOff } from "react-icons/md";
 
 
 
@@ -84,6 +101,8 @@ const Analytics = () => {
       showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
        showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
         showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
+          
+      
    } = useApplicationSettings();
 
 
@@ -124,16 +143,7 @@ const [routerInfo, setRouterInfo] = useState(null);
           const item = data.system_metrics[0]; // Assuming you need the latest entry
 
           setUbuntuStats({
-            // cpuUsage: item.cpu_usage,
-            // memoryTotal: item.memory_total,
-            // memoryFree: item.memory_free,
-            // memoryUsed: item.memory_used,
-            // diskTotal: item.disk_total,
-            // diskFree: item.disk_free,
-            // diskUsed: item.disk_used,
-            // loadAverage: item.load_average,
-            // uptime: item.uptime,
-
+           
               cpuUsage: item.cpu_usage,
           memoryUsage: item.memory_total,
           diskUsage: item.disk_total,
@@ -145,19 +155,7 @@ const [routerInfo, setRouterInfo] = useState(null);
           });
         }
         
-        // setUbuntuStats({
-        //   cpuUsage: data.system_metrics.cpu_usage,
-        //   memoryUsage: data.system_metrics.memory_total,
-        //   diskUsage: data.system_metrics.disk_total,
-        //   available_memory: data.system_metrics.memory_free,
-        //   uptime: data.uptime,
-        //   available_disk: data.system_metrics.disk_free,
-        //   memory_used: data.system_metrics.memory_used,
-        //   disk_used: data.system_metrics.disk_used,
-        // });
-        
-
-
+    
         
       } else {
         console.error("Failed to fetch Ubuntu stats");
@@ -233,13 +231,7 @@ const [routerInfo, setRouterInfo] = useState(null);
     visible: { opacity: 1, y: 0 },
   };
 
-  // if (loading) {
-  //   return <Lottie className='' options={defaultOptions2} height={400} width={400} />
-  // }
 
-
-
-  // Check if routerData is defined before destructuring
   const { board_name, version, cpu_load, memory_usage, disk_usage,  } = routerData || {};
 
   const trafficData = {
@@ -285,6 +277,11 @@ useEffect(() => {
   fetchtotalSubscribers()
   
 }, [fetchtotalSubscribers]);
+
+
+
+
+
 
 
 
@@ -451,6 +448,42 @@ useEffect(() => {
         const intervalId = setInterval(fetchRouterInfoo, 300000);
         return () => clearInterval(intervalId);
       }, [fetchRouterInfoo]);
+
+
+
+      const StatCard = ({ title, value, icon, trend, color }) => (
+  <motion.div 
+    variants={cardVariants}
+    className={`p-6 rounded-xl shadow-md bg-white 
+      hover:shadow-xl cursor-pointer transition-shadow duration-300 ease-in-out
+      roboto-condensed-light`}
+  >
+    <div className="flex justify-between items-start">
+      <div>
+        <Typography variant="subtitle2" color="textSecondary">
+          <p className='text-black roboto-condensed-light '>{title}</p>
+        </Typography>
+        <Typography variant="h4" className="mt-1 font-bold">
+          <p className='text-black '>{value}</p>
+        </Typography>
+      </div>
+      <Box 
+        className={`p-3 rounded-full`}
+        sx={{ bgcolor: `${color}.50`, color: `${color}.600` }}
+      >
+        {icon}
+      </Box>
+    </div>
+    {trend && (
+      <Typography 
+        variant="caption" 
+        className={`mt-2 flex items-center ${trend.value > 0 ? 'text-green-600' : 'text-red-600'}`}
+      >
+        {trend.value > 0 ? '↑' : '↓'} {Math.abs(trend.value)}% {trend.label}
+      </Typography>
+    )}
+  </motion.div>
+);
     
   return (
     <>
@@ -470,254 +503,13 @@ useEffect(() => {
         setShowMenu12(false)
       }}
       className="p-2">
-        {subdomain === 'fiber8.aitechs.co.ke' || !subdomain === 'fyber8.aitechs.co.ke' ? (
-          
- <div className='flex justify-between items-center bg- dark:bg-gray-800 rounded-lg shadow-2xl p-6 border-l-4 border-blue-500'>
-  <div className='flex items-center space-x-4'>
-    <div className='w-12 h-12'>
-      <svg viewBox="0 0 128 128" className='w-full h-full '>
-        <path fill="#000" d="M122.2 78.3c1.6-1.6 1.6-4.2 0-5.8-1.6-1.6-4.2-1.6-5.8 0L89.8 99.2l-8.3-8.3c-1.6-1.6-4.2-1.6-5.8 0-1.6 1.6-1.6 4.2 0 5.8l11.2 11.2c.8.8 1.8 1.2 2.9 1.2 1 0 2.1-.4 2.9-1.2l29.3-29.3z"/>
-        <path fill="#000" d="M64.1 1.3C29.5 1.3 1.5 29.3 1.5 63.9s28 62.6 62.6 62.6 62.6-28 62.6-62.6S98.7 1.3 64.1 1.3zm0 120C32.5 121.3 6.5 95.3 6.5 63.9S32.5 6.5 64.1 6.5s57.6 26 57.6 57.4-26 57.4-57.6 57.4z"/>
-        <path fill="#000" d="M64.1 12.8c-28.2 0-51.1 22.9-51.1 51.1s22.9 51.1 51.1 51.1 51.1-22.9 51.1-51.1-22.9-51.1-51.1-51.1zm0 97.9c-25.8 0-46.8-21-46.8-46.8s21-46.8 46.8-46.8 46.8 21 46.8 46.8-21 46.8-46.8 46.8z"/>
-      </svg>
-    </div>
-    
-    <div>
-      <p className='font-bold text-black dark:text-white text-xl'>
-        SYSTEM RESOURCES
-        <span className='ml-2 text-sm font-normal bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full'>
-          Linux Server
-        </span>
-      </p>
       
-    </div>
-  </div>
-
-</div>
-        ) : null}
      
       
 
-      <div className="grid grid-auto-fit gap-6 mt-4">
-  {/* Total Subscribers Card */}
-
-
-
-
-
-{subdomain === 'fiber8.aitechs.co.ke' || subdomain === 'fyber8.aitechs.co.ke' ? (
-<>
-  <motion.div
-  
-            className="max-w-sm p-6 bg-gradient-to-r from-purple-500 to-purple-600 border border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform transition-all hover:scale-105 relative overflow-hidden"
-            variants={cardVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ duration: 0.5, delay: 0.2 }}
-            whileHover={{ scale: 1.05, rotate: 1 }}
-          >
-            <div className="flex items-center mb-4">
-              <GoCpu className="w-10 h-10 mr-3 text-white" />
-              <h3 className="text-2xl font-bold text-white">CPU Usage</h3>
-            </div>
-            <motion.p
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 1, repeat: Infinity }}
-              className="mb-3 font-normal text-white text-3xl"
-            >
-             
-             <div className='flex flex-row justify-between  gap-4'>
-              {ubuntuStats.cpuUsage}
-              <p className='text-sm'>Linux</p>
-              </div>
-            </motion.p>
-            <div className="w-full bg-white bg-opacity-20 rounded-full h-3 overflow-hidden relative">
-              <motion.div
-               style={{ width:`${ubuntuStats.cpuUsage}` }}
-                className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full"
-                // animate={{ width: `${ubuntuStats.cpuUsage}%` }}
-                transition={{ duration: 1, ease: "easeOut" }}
-              />
-            </div>
-          </motion.div>
-
-          <motion.div
-            className="max-w-sm p-6 bg-gradient-to-r from-green-500 to-green-600 border
-             border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform 
-             transition-all hover:scale-105 relative overflow-hidden"
-            variants={cardVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ duration: 0.5, delay: 0.4 }}
-            whileHover={{ scale: 1.05, rotate: -1 }}
-          >
-            <div className="flex items-center mb-4">
-              <PiMemory className="w-10 h-10 mr-3 text-white" />
-              <h3 className="text-2xl font-bold text-white">RAM Usage</h3>
-            </div>
-            <div className='flex flex-row justify-between  gap-4'>
-            <div className='flex flex-col'>
-            <motion.p
-           
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 1, repeat: Infinity }}
-              className="mb-3 font-normal text-white text-2xl"
-            >
-              {/* {ubuntuStats.memoryUsage} */}
-              <p> <span className='font-light text-lg'>Used </span> {ubuntuStats.memory_used} </p>
-            </motion.p>
-            <p className='text-white font-light'> [available] {ubuntuStats.available_memory} </p>
-            </div>
-
-            <motion.p
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 1, repeat: Infinity }}
-              className="mb-3 font-normal text-white text-lg"
-            >
-               <p> <span>Total </span>{ubuntuStats.memoryUsage}</p>
-               {/* {ubuntuStats.available_memory} */}
-            </motion.p>
-
-            </div>
-            
-          </motion.div>
-
-          {/* Ubuntu Disk Usage Card */}
-          <motion.div
-            className="max-w-sm p-6 bg-gradient-to-r from-red-500 to-red-600 border border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform transition-all hover:scale-105 relative overflow-hidden"
-            variants={cardVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ duration: 0.5, delay: 0.6 }}
-            whileHover={{ scale: 1.05, rotate: 1 }}
-          >
-            <div className="flex items-center mb-4">
-              <PiFloppyDiskBack className="w-10 h-10 mr-3 text-white" />
-              <h3 className="text-xl font-bold text-white">Disk Usage</h3>
-            </div>
-            <div className='flex flex-row justify-between  gap-4'>
-
-              <div className='flex flex-col'>
-            <motion.p
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 1, repeat: Infinity }}
-              className="mb-3 font-normal text-white text-2xl"
-            >
-              <span className='font-light text-lg'> Used </span>
-              {/* {ubuntuStats.diskUsage}% */}
-              {ubuntuStats.disk_used}
-            </motion.p>
-            <p className='text-white'> [available] {ubuntuStats.available_disk}</p>
-            </div>
-
-            <p className='text-white'><span >Total </span> {ubuntuStats.diskUsage} </p>
-            </div>
-           
-          </motion.div>
-
-          {/* Ubuntu Uptime Card */}
-          <motion.div
-            className="max-w-sm p-6 bg-gradient-to-r from-yellow-500 to-yellow-600 border border-gray-200 rounded-lg shadow-2xl dark:border-gray-700 transform transition-all hover:scale-105 relative overflow-hidden"
-            variants={cardVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ duration: 0.5, delay: 0.8 }}
-            whileHover={{ scale: 1.05, rotate: -1 }}
-          >
-            <div className="flex items-center mb-4">
-              <MdOutlineTimer className="w-10 h-10 mr-3 text-white" />
-              <h3 className="text-2xl font-bold text-white">Uptime</h3>
-            </div>
-            <motion.p
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 1, repeat: Infinity }}
-              className="mb-3 font-normal text-white text-3xl"
-            >
-              {ubuntuStats.uptime}
-            </motion.p>
-          </motion.div>
-          </>
-): null}
-          
-
-        
-</div>
       </div>
 
-      {/* {routerData ? (
-        <motion.div
-          className="p-6 mt-10"
-          variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ duration: 0.5, delay: 0.8 }}
-        >
-          <h2 className="text-2xl font-semibold mb-4 dark:text-white font-montserat">Router Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <motion.div
-              className="p-6 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg text-white"
-              whileHover={{ scale: 1.05 }}
-            >
-              <h3 className="text-2xl font-bold mb-4">Board Details</h3>
-              <p className='font-light'>Board Name: <b className='font-bold'>{board_name}</b> </p>
-              <p>Version: <b className=''>{version}</b> </p>
-              <p>Uptime: <b className=''>{uptime}</b> </p>
-              <p>CPU Load: <b className=''>{cpu_load}</b> </p>
-              <p>Memory Usage: <b className=''>{memory_usage?.used} / {memory_usage?.total}</b> </p>
-              <p>Disk Usage: <b className=''>{disk_usage?.used} / {disk_usage?.total}</b> </p>
-              
-            </motion.div>
-
-            <motion.div
-              className="p-6 bg-white rounded-lg shadow-lg"
-              whileHover={{ scale: 1.05 }}
-            >
-              <h3 className="text-xl font-semibold mb-4 dark:text-black">Traffic Statistics</h3>
-              <div className="h-[300px]">
-                <Bar
-                  data={trafficData}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                      y: {
-                        beginAtZero: true,
-                      },
-                    },
-                  }}
-                />
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-      ) : (
-        <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
-      )} */}
-
-{/* 
- <div className='flex justify-between items-center mt-4
-  bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 border-l-4 border-blue-500'>
-  <div className='flex items-center space-x-4'>
-    <div className='w-12 h-12'>
-      <svg viewBox="0 0 128 128" className='w-full h-full '>
-        <path fill="#000" d="M122.2 78.3c1.6-1.6 1.6-4.2 0-5.8-1.6-1.6-4.2-1.6-5.8 0L89.8 99.2l-8.3-8.3c-1.6-1.6-4.2-1.6-5.8 0-1.6 1.6-1.6 4.2 0 5.8l11.2 11.2c.8.8 1.8 1.2 2.9 1.2 1 0 2.1-.4 2.9-1.2l29.3-29.3z"/>
-        <path fill="#000" d="M64.1 1.3C29.5 1.3 1.5 29.3 1.5 63.9s28 62.6 62.6 62.6 62.6-28 62.6-62.6S98.7 1.3 64.1 1.3zm0 120C32.5 121.3 6.5 95.3 6.5 63.9S32.5 6.5 64.1 6.5s57.6 26 57.6 57.4-26 57.4-57.6 57.4z"/>
-        <path fill="#000" d="M64.1 12.8c-28.2 0-51.1 22.9-51.1 51.1s22.9 51.1 51.1 51.1 51.1-22.9 51.1-51.1-22.9-51.1-51.1-51.1zm0 97.9c-25.8 0-46.8-21-46.8-46.8s21-46.8 46.8-46.8 46.8 21 46.8 46.8-21 46.8-46.8 46.8z"/>
-      </svg>
-    </div>
-    
-    <div>
-      <p className='font-bold text-black dark:text-white text-xl'>
-        SYSTEM RESOURCES
-        <span className='ml-2 text-sm font-normal bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full'>
-          Mikrotik
-        </span>
-      </p>
      
-    </div>
-  </div>
-
-</div> */}
 
  <motion.div 
     onClick={() => {
@@ -739,329 +531,75 @@ useEffect(() => {
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.3 }}
   >
-    {loading && (
-      <motion.div
-        className="flex items-center justify-center py-8"
-        animate={{ rotate: 360 }}
-        transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-      >
-        <RefreshCw className="text-blue-500 animate-spin" size={24} />
-      </motion.div>
-    )}
 
-    {error && (
-      <motion.div 
-        className="flex items-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
-        initial={{ scale: 0.9 }}
-        animate={{ scale: 1 }}
-      >
-        <AlertTriangle className="text-red-500 mr-3" />
-        <div>
-          <p className="font-medium text-red-800 dark:text-red-200">Connection Error</p>
-          <p className="text-sm text-red-600 dark:text-red-300">{error}</p>
-        </div>
-      </motion.div>
-    )}
 
-    {!loading && !error && routerInfo && (
-      <div className="space-y-4">
-        <div className="flex items-center space-x-4">
-          {currentRouterImage ? (
-            <motion.div
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              className="w-20 h-20 flex-shrink-0"
-            >
-              <img 
-                src={currentRouterImage} 
-                alt={routerData}
-                className="w-full h-full object-contain"
-              />
-            </motion.div>
-          ) : (
-            <div className="w-20 h-20 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-lg">
-              <MdOutlineRouter className="text-gray-400" size={32} />
-            </div>
-          )}
+ <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 align-center'>
           
-          <div>
-            <h3 className="text-lg font-bold text-gray-800 dark:text-white flex items-center">
-              <Wifi className="text-green-500 mr-2" size={18} />
-              Router Status
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              Model: <span className="font-medium">{routerInfo}</span>
-            </p>
-          </div>
-        </div>
+          <StatCard 
+          title="All Clients" 
+          value={totalSubscribers}
+          icon={<LuUsers size={24} className='text-black' />} 
+          trend={{ value: 8, label: <p className=''>vs yesterday</p> }}
+          color="secondary"
+        />
 
-        <div className="flex items-center space-x-3 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-          <Clock className="text-blue-500" size={18} />
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Uptime</p>
-            <p className="font-mono text-blue-600 dark:text-blue-300">
-              {uptime}
-            </p>
-          </div>
-        </div>
-      </div>
-    )}
 
-    {!loading && !error && !routerInfo && (
-      <div className="flex items-center justify-center p-6 text-center">
-        <div>
-          <WifiOff className="text-gray-400 mx-auto mb-2" size={32} />
-          <p className="text-gray-500 dark:text-gray-400">No router data available</p>
-        </div>
-      </div>
-    )}
-  </motion.div>
 
-{routerData ? (
-  <motion.div
-    className="p-6 mt-10"
-    variants={cardVariants}
-    initial="hidden"
-    animate="visible"
-    transition={{ duration: 0.5, delay: 0.8 }}
-  >
-    <h2 className="text-2xl font-semibold mb-4 dark:text-white font-montserat">Router Status</h2>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {/* CPU Load Card */}
-      <motion.div
-  className="p-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg text-white"
-  whileHover={{ scale: 1.05 }}
->
-  <div className="flex items-center mb-4">
-    <GoCpu className='p-2 w-12 h-12 mr-3' />
-    <h3 className="text-2xl font-bold">CPU Load</h3>
-  </div>
-  <motion.p
-   animate={{ scale: [1, 1.1, 1] }}
-   transition={{ duration: 1, repeat: Infinity }}
-  className='font-light  mb-2'><b className='font-bold'>{cpu_load}</b></motion.p>
+
+
+
+
+
+
+
+  {/* Subscribers Online Card */}
+  <StatCard 
+          title="Clients Online"
+          value={subscribersOnline}
+          icon={<MdOutlineOnlinePrediction size={24} className='text-black' />} 
+          trend={{ value: 8, label: 'vs yesterday' }}
+          color="secondary"
+        />
+
+
+
+
+
+  {/* Subscribers Offline Card */}
   
-  {/* Progress Bar Container */}
-  <div className="w-full bg-white   bg-opacity-20 rounded-full h-3 overflow-hidden relative">
-    {/* Glow Effect */}
-    <div className="absolute inset-0 rounded-md transition-all duration-300 bg-red-400 
-    animat   " style={{ width: `${cpu_load}` }} />
-    
-    {/* Progress Bar */}
-    <motion.div
-      className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full"
-      initial={{ width: 0 }}
-      animate={{ width: `${cpu_load}%` }}
-      transition={{ duration: 1, ease: "easeOut" }}
-    />
-  </div>
-</motion.div>
-
-      {/* Memory Usage Card */}
-      <motion.div
-        className="p-6 bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg text-white"
-        whileHover={{ scale: 1.05 }}
-      >
-        
-        <div className="flex items-center mb-4">
-          <i className="fas fa-memory text-3xl mr-3"></i>
-          <PiMemory  className='p-2 w-12 h-12 mr-3' />
-          <h3 className="text-xl font-light">RAM Usage</h3>
-        </div>
-        <div className='flex flex-row justify-between'>
-          <div className='flex flex-col'>
-        <motion.p
-         animate={{ scale: [1, 1.1, 1] }}
-         transition={{ duration: 1, repeat: Infinity }}
-        className='font-light'>Used <b className='font-bold text-3xl'>{memory_usage?.used}</b></motion.p>
-        <p>[Available <span>{memory_usage?.free}</span>]</p>
-</div>
-
-        <p className='font-light'>Total  <b className='font-light text-xl'>{memory_usage?.total}</b></p>
-
-        </div>
-      </motion.div>
-
-      {/* Disk Usage Card */}
-      <motion.div
-        className="p-6 bg-gradient-to-r from-red-500 to-red-600 rounded-lg shadow-lg text-white"
-        whileHover={{ scale: 1.05 }}
-      >
-        <div className="flex items-center mb-4">
-          <i className="fas fa-hdd text-3xl mr-3"></i>
-          <PiFloppyDiskBack  className='p-2 w-12 h-12 mr-3' />
-          <h3 className="text-2xl font-bold">Disk Usage</h3>
-        </div>
-        <div className='flex flex-row justify-between'>
-          <div className='flex flex-col'>
-        <motion.p
-         animate={{ scale: [1, 1.1, 1] }}
-         transition={{ duration: 1, repeat: Infinity }}
-        className='font-light'><b className='font-bold text-lg'><span
-        className='font-light text-lg'
-        >Used </span>  {disk_usage?.used}</b></motion.p>
-        <p>[Available <span>{disk_usage?.free}</span>]</p>
-</div>
-
-        <p className='font-light'>Total <b className='font-light text-lg'>{disk_usage?.total}</b></p>
-
-          </div>
-
-
-
-      </motion.div>
-
-      {/* Uptime Card */}
-      <motion.div
-        className="p-6 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg shadow-lg text-white"
-        whileHover={{ scale: 1.05 }}
-      >
-        <div className="flex items-center mb-4">
-          <i className="fas fa-clock text-3xl mr-3"></i>
-          <MdOutlineTimer  className='p-2 w-12 h-12 mr-3' />
-          <motion.h3
-          
-          className="text-2xl font-bold">Uptime</motion.h3>
-        </div>
-        <motion.p
-        
-        className='font-light'><b className='font-bold'>{uptime}</b></motion.p>
-      </motion.div>
+  <StatCard 
+          title="Clients Offline"
+          value={subscribersOffline}
+          icon={<IoCloudOfflineOutline  size={24} className='text-black' />} 
+          trend={{ value: 8, label: 'vs yesterday' }}
+          color="secondary"
+        />
+  
     </div>
 
-    {/* Traffic Graph */}
-    <motion.div
-      className="p-6 mt-6  rounded-lg shadow-lg"
-      whileHover={{ scale: 1.05 }}
-    >
-      <h3 className="text-xl font-semibold mb-4 dark:text-black">Traffic Statistics</h3>
-     
 
-
-      <div className="h-[300px] w-full">
-  <ResponsiveContainer width="100%" height="100%">
-    <AreaChart
-      data={[
-        { 
-          name: "Current",
-
-
-          // parseFloat(cpu_load?.replace("%", "") || 0),
-          // parseFloat(memory_usage?.used?.replace(" MB", "") || 0),
-          // parseFloat(disk_usage?.used?.replace(" GB", "") || 0) * 1024, 
-
-
-
-          cpuLoad: parseFloat(cpu_load?.replace("%", "") || 0),
-          memoryUsed: parseFloat(memory_usage?.used?.replace(" MB", "") || 0),
-          diskUsed: parseFloat(disk_usage?.used.replace("GB", "") || 0), 
-        }
-      ]}
-      margin={{ top: 10, right: 30, left: 20, bottom: 20 }}
-    >
-      <defs>
-        <linearGradient id="colorCpu" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="5%" stopColor="rgba(255, 99, 132, 0.8)" />
-          <stop offset="95%" stopColor="rgba(255, 99, 132, 0)" />
-        </linearGradient>
-        <linearGradient id="colorMemory" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="5%" stopColor="rgba(54, 162, 235, 0.8)" />
-          <stop offset="95%" stopColor="rgba(54, 162, 235, 0)" />
-        </linearGradient>
-        <linearGradient id="colorDisk" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="5%" stopColor="rgba(75, 192, 192, 0.8)" />
-          <stop offset="95%" stopColor="rgba(75, 192, 192, 0)" />
-        </linearGradient>
-      </defs>
+<motion.div 
+    variants={cardVariants}
+    className={`p-6  rounded-xl shadow-md bg-white 
+      hover:shadow-xl cursor-pointer transition-shadow duration-300 ease-in-out
+      roboto-condensed-light w-[500px] mt-4 px-4`}
+  >
+    <div className="flex justify-between items-start">
+      <div>
+        <Typography variant="subtitle2" color="textSecondary">
+          <p className='text-black roboto-condensed-light '>Data (24H)</p>
+        </Typography>
+        
+      </div>
       
-      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-      <XAxis 
-        dataKey="name"
-        tick={{ fill: '#6b7280' }}
-      />
-      <YAxis 
-        tick={{ fill: '#6b7280' }}
-        tickFormatter={(value) => `${value}${value > 100 ? 'MB' : '%'}`}
-      />
-      
-      <Tooltip 
-        contentStyle={{
-          background: 'rgba(255, 255, 255, 0.95)',
-          borderRadius: '8px',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-        }}
-        formatter={(value, name) => {
-          let unit = '%';
-          if (name === 'memoryUsed') unit = 'MB';
-          if (name === 'diskUsed') unit = 'GB';
-          return [`${value}${unit}`, 
-            name === 'cpuLoad' ? 'CPU Load' : 
-            name === 'memoryUsed' ? 'Memory Used' : 'Disk Used'];
-        }}
-      />
-      
-      <Legend 
-        formatter={(value) => {
-          return value === 'cpuLoad' ? 'CPU Load' : 
-                 value === 'memoryUsed' ? 'Memory Used' : 'Disk Used';
-        }}
-      />
-      
-      <Area 
-        type="monotone"
-        dataKey="cpuLoad"
-        stroke="rgba(255, 99, 132, 0.6)"
-        fill="url(#colorCpu)"
-        name="cpuLoad"
-      />
-      <Area 
-        type="monotone"
-        dataKey="memoryUsed"
-        stroke="rgba(54, 162, 235, 0.6)"
-        fill="url(#colorMemory)"
-        name="memoryUsed"
-      />
-      <Area 
-        type="monotone"
-        dataKey="diskUsed"
-        stroke="rgba(75, 192, 192, 0.6)"
-        fill="url(#colorDisk)"
-        name="diskUsed"
-      />
-    </AreaChart>
-  </ResponsiveContainer>
-</div>
-
-    </motion.div>
+        < MdMobiledataOff
+ />
+    </div>
+   
   </motion.div>
-) : (
-  <div className='flex flex-col items-center  mt-10
-  bg-gradient-to-r from-purple-500 to-indigo-600'>
-  {/* Router Icon with Animation */}
-  <div className='relative flex flex-col mt-20 '>
-    <LuRouter className='w-20 h-20 text-red-500 animate-bounce' />
-    <div className='absolute -bottom-8 text-white text-lg font-bold'>
-      No Router Connection
-    </div>
-  </div>
+    
+  </motion.div>
 
-  {/* Lottie Animation */}
-  <div className='mt-1 relative '>
-    <Lottie
-      options={defaultOptions}
-      height={300}
-      width={300}
-      isStopped={false}
-      isPaused={false}
-    />
-  </div>
-
-  {/* Additional Styling */}
-  <p className='mt-1 text-white text-xl font-semibold'>
-    Please check your connection and try again.
-  </p>
-</div>
-)}
     </>
   );
 };

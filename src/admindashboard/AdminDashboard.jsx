@@ -1,8 +1,35 @@
 
 import {Link} from 'react-router-dom'
-import {motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion';
+
 import { useState, useEffect, useCallback } from 'react';
 import { useApplicationSettings } from '../settings/ApplicationSettings';
+import {
+  FaUserCircle,
+  FaDesktop,
+  FaSignInAlt,
+  FaSignOutAlt,
+  FaShieldAlt,
+  FaCog
+} from 'react-icons/fa';
+import {
+  SiApple,
+  SiLinux,
+  SiAndroid,
+  SiIos
+} from 'react-icons/si';
+import { FaWindows } from "react-icons/fa6";
+
+import {
+  BsBrowserChrome,
+  BsBrowserEdge,
+  BsBrowserFirefox,
+  BsBrowserSafari
+} from 'react-icons/bs';
+import MaterialTable from 'material-table'
+import { RiDeleteBin5Line } from "react-icons/ri";
+
+
 
 const AdminDashboard = () => {
 const {showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
@@ -22,7 +49,8 @@ const [registrations, setRegistrations] = useState({
     thisMonthCount: 0,
     lastMonthCount: 0
   });
-
+  const [logs, setLogs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
 // <Route path='/admin/today-subscribers' element={<TodayRegisteredSubscribers/>}/>
 
@@ -30,6 +58,58 @@ const [registrations, setRegistrations] = useState({
 
 
 {/* <Route path='/admin/this-week-subscribers' element={<ThisWeekRegisteredSubscribers/>}/> */}
+
+ const fetchLogs = async () => {
+    try {
+      const response = await fetch('/api/activty_logs');
+      const data = await response.json();
+      setLogs(data);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error fetching logs:', error);
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  const getActionIcon = (action) => {
+    switch (action.toLowerCase()) {
+      case 'login':
+        return <FaSignInAlt className="text-green-500" />;
+      case 'logout':
+        return <FaSignOutAlt className="text-red-500" />;
+      case 'configuration':
+        return <FaCog className="text-blue-500" />;
+      case 'security':
+        return <FaShieldAlt className="text-purple-500" />;
+        case 'delete':
+        return <RiDeleteBin5Line className="text-red-500" />;
+      default:
+        return <FaUserCircle className="text-gray-500" />;
+    }
+  };
+
+  const getOSIcon = (userAgent) => {
+    if (!userAgent) return <FaWindows className="text-blue-400" />;
+    if (/windows/i.test(userAgent)) return <FaWindows className="text-blue-400" />;
+    if (/macintosh|mac os x/i.test(userAgent)) return <SiApple className="text-gray-700" />;
+    if (/linux/i.test(userAgent)) return <SiLinux className="text-yellow-600" />;
+    if (/android/i.test(userAgent)) return <SiAndroid className="text-green-500" />;
+    if (/iphone|ipad|ipod/i.test(userAgent)) return <SiIos className="text-gray-500" />;
+    return <FaDesktop className="text-gray-500" />;
+  };
+
+  const getBrowserIcon = (userAgent) => {
+    if (!userAgent) return <BsBrowserChrome className="text-blue-500" />;
+    if (/chrome/i.test(userAgent)) return <BsBrowserChrome className="text-blue-500" />;
+    if (/firefox/i.test(userAgent)) return <BsBrowserFirefox className="text-orange-500" />;
+    if (/safari/i.test(userAgent)) return <BsBrowserSafari className="text-blue-400" />;
+    if (/edge/i.test(userAgent)) return <BsBrowserEdge className="text-blue-600" />;
+    return <BsBrowserChrome className="text-blue-500" />;
+  };
 
   useEffect(() => {
     const fetchRegistrationStats = async () => {
@@ -112,7 +192,9 @@ useEffect(() => {
    
    
    
-<div 
+
+  
+   <motion.div
 
 onClick={() => {
   setShowMenu1(false)
@@ -128,634 +210,130 @@ onClick={() => {
   setShowMenu11(false)  
   setShowMenu12(false)
 }}
-className='grid grid-auto-fit gap-y-5 gap-x-4
-
- nanum-gothic-coding-regular'>
-
-
-<motion.div 
-
-variants={cardVariants}
-initial="hidden"
-animate="visible"
-transition={{ duration: 0.5, delay: 0.1 }}
-className="w-full max-w-md p-4 bg-white border border-gray-200 
-
-bg-gradient-to-r from-white to-white  rounded-lg shadow-2xl sm:p-8 dark:bg-gray-800 
- dark:border-gray-700">
-    <div className="flex items-center justify-between mb-4">
-      <div className='flex flex-row gap-x-3 dark:text-black'>
-      <ion-icon name="person-outline"></ion-icon>
-        <h5 className="text-xl font-bold leading-none
-        
-        text-gray-900 dark:text-black">Subscribers</h5>
-        </div>
-        <Link  to='/admin/pppoe-subscribers' className="text-sm font-medium text-black
-         hover:underline dark:text-black">
-            View all
-        </Link>
-   </div>
-   <div className="flow-root">
-        <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-700">
-            
-
-             
-            <li className="py-3 sm:py-4">
-               <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Total
-                        </p>
-                     
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        {totalSubscribers}
-                    </div>
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="bg-white rounded-xl shadow-md overflow-hidden"
+    >
+        <MaterialTable
+          title={
+            <motion.div
+              initial={{ y: -20 }}
+              animate={{ y: 0 }}
+              className="text-xl font-bold text-gray-800 p-4"
+            >
+              Activity Logs
+            </motion.div>
+          }
+          data={logs}
+          columns={[
+            {
+              title: 'Action',
+              field: 'action',
+              render: (rowData) => (
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="flex items-center gap-2"
+                >
+                  {getActionIcon(rowData.action)}
+                  <span className='dark:text-black'>{rowData.action}</span>
+                </motion.div>
+              ),
+              cellStyle: {
+                minWidth: '150px'
+              }
+            },
+            {
+              title: 'User',
+              field: 'user',
+              render: (rowData) => (
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="flex items-center gap-2"
+                >
+                  <FaUserCircle className="text-blue-400" />
+                  <span className='dark:text-black'>{rowData.user}</span>
+                </motion.div>
+              )
+            },
+            {
+              title: 'Device',
+              render: (rowData) => (
+                <div className="flex items-center gap-2">
+                  {getOSIcon(rowData.user_agent)}
+                  {getBrowserIcon(rowData.user_agent)}
                 </div>
-            </li>
-            <li className="py-3 sm:py-4">
-                <div className="flex items-center">
-                   
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Online
-                        </p>
-                      
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        $67
-                    </div>
-                </div>
-            </li>
-            <li className="py-3 sm:py-4">
-                <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Conected without Internet
-                        </p>
-                      
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        $367
-                    </div>
-                </div>
-            </li>
-            <li className="pt-3 pb-0 sm:pt-4">
-                <div className="flex items-center ">
-                   
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate
-                         dark:text-black">
-                            Off Line
-                        </p>
-                      
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        $2367
-                    </div>
-                </div>
-            </li>
-
-
-
-
-
-
-
-
-            <li className="py-3 sm:py-4">
-               <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Active Subscription
-                        </p>
-                     
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        $3467
-                    </div>
-                </div>
-            </li>
-
-
-
-
-
-
-            <li className="py-3 sm:py-4">
-               <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Active Last Month
-                        </p>
-                     
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        $3467
-                    </div>
-                </div>
-            </li>
-
-
-
-
-
-
-
-
-
-
-            <li className="py-3 sm:py-4">
-               <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Active This Month
-                        </p>
-                     
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        $3467
-                    </div>
-                </div>
-            </li>
-
-
-
-
-
-
-            <li className="py-3 sm:py-4">
-               <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Expired Within 30 days
-                        </p>
-                     
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold text-gray-900
-                     dark:text-black">
-                        $3467
-                    </div>
-                </div>
-            </li>
-
-
-
-            <li className="py-3 sm:py-4">
-               <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Subscription Renewed Today
-                        </p>
-                     
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        $3467
-                    </div>
-                </div>
-            </li>
-
-
-
-            <li className="py-3 sm:py-4">
-               <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Advanced Renewals
-                        </p>
-                     
-                    </div>
-                    <div className="inline-flex items-center text-base
-                     font-semibold text-gray-900 dark:text-black">
-                        $3467
-                    </div>
-                </div>
-            </li>
-
-
-
-
-            <li className="py-3 sm:py-4">
-               <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Expired
-                        </p>
-                     
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        $3467
-                    </div>
-                </div>
-            </li>
-
-
-            <li className="py-3 sm:py-4">
-               <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Dormant
-                        </p>
-                     
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        $3467
-                    </div>
-                </div>
-            </li>
-
-
-            <li className="py-3 sm:py-4">
-               <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Expired Today
-                        </p>
-                     
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        $3467
-                    </div>
-                </div>
-            </li>
-
-
-
-
-            <li className="py-3 sm:py-4">
-               <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Expiring In the Next Four Days
-                        </p>
-                     
-                    </div>
-                    <div className="inline-flex items-center text-base 
-                    font-semibold text-gray-900 dark:text-black">
-                        $3467
-                    </div>
-                </div>
-            </li>
-
-
-
-
-            <li className="py-3 sm:py-4">
-               <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                            Expired in the Last Four Days
-                        </p>
-                     
-                    </div>
-                    <div className="inline-flex items-center text-base 
-                    font-semibold text-gray-900 dark:text-black">
-                        $3467
-                    </div>
-                </div>
-            </li>
-        </ul>
-   </div>
-</motion.div>
-
-   
-   
-
-   
-
-
-<motion.div
-  variants={cardVariants}
-  initial="hidden"
-  animate="visible"
-  transition={{ duration: 0.5, delay: 0.4 }}
-  className="w-full max-w-md p-4 bg-white 
-  bg-gradient-to-r from-white to-white border border-gray-200 rounded-lg shadow-2xl sm:p-8
-  dark:bg-gray-800  cursor-pointer dark:border-gray-700 dark:text-black max-h-[400px]">
-
-  <div className="flex items-center justify-between mb-4">
-    <div className='flex flex-row gap-x-3'>
-      <ion-icon name="person-outline"></ion-icon>
-      <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-black">Registrations</h5>
-    </div>
-  </div>
-  
-  <div className="flow-root">
-    <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-700">
-      <Link to ='/admin/today-subscribers' className="py-3 sm:py-4">
-      <li className="py-3 sm:py-4">
-        <div className="flex items-center">
-          <div className="flex-1 min-w-0 ms-4">
-            <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-              Registered Today
-            </p>
-          </div>
-          <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-black">
-            {registrations.todayCount || 0}
-          </div>
-        </div>
-      </li>
-      </Link>
-
-
-
-      <Link to="/admin/this-week-subscribers " className='cursor-pointer'>
-      <li className="py-3 sm:py-4">
-        <div className="flex items-center">
-          <div className="flex-1 min-w-0 ms-4">
-            <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-              Registered This Week
-            </p>
-          </div>
-          <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-black">
-            {registrations.thisWeekCount || 0}
-          </div>
-        </div>
-      </li>
-      </Link>
-
-
-
-      <Link to="/admin/this-month-subscribers">
-      <li className="py-3 sm:py-4">
-        <div className="flex items-center">
-          <div className="flex-1 min-w-0 ms-4">
-            <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-              Registered This Month
-            </p>
-          </div>
-          <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-black">
-            {registrations.thisMonthCount || 0}
-          </div>
-        </div>
-      </li>
-      </Link>
-      
-      <li className="pt-3 pb-0 sm:pt-4">
-        <div className="flex items-center">
-          <div className="flex-1 min-w-0 ms-4">
-            <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-              Registered Last Month
-            </p>
-          </div>
-          <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-black">
-            {registrations.lastMonthCount || 0}
-          </div>
-        </div>
-      </li>
-    </ul>
-  </div>
-</motion.div>
-   
-   
-   
-
-
-
-
-
-
-<motion.div 
- variants={cardVariants}
- initial="hidden"
- animate="visible"
- transition={{ duration: 0.5, delay: 0.5 }}
-className="w-full max-w-md p-4 bg-white 
-
-bg-gradient-to-r from-white to-white border border-gray-200 rounded-lg shadow-2xl sm:p-8
- dark:bg-gray-800 dark:border-gray-700  max-h-[400px] dark:text-black">
-
-    <div className="flex items-center justify-between mb-4">
-
-<div className='flex flex-row gap-x-3'>
-
-<ion-icon name="newspaper-outline"></ion-icon>
-        <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-black">Hotspot Sales</h5>
-        </div>
-        
-   </div>
-   <div className="flow-root">
-        <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-700">
-            <li className="py-3 sm:py-4">
-                <div className="flex items-center">
-                   
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                        Packages Sold Today
-                        </p>
-                      
-                    </div>
-                    
-                </div>
-            </li>
-            <li className="py-3 sm:py-4">
-                <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                        Packages Sold Yesterday
-
-                     </p>
-                       
-                    </div>
-                   
-                </div>
-            </li>
-            
-
-            <li className="py-3 sm:py-4">
-                <div className="flex items-center ">
-                   
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                        Packages Sold This Week
-
-                        </p>
-                      
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        $367
-                    </div>
-                </div>
-            </li>
-            <li className="pt-3 pb-0 sm:pt-4">
-                <div className="flex items-center ">
-                 
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900
-                         truncate dark:text-black">
-                        Packages Sold This Month
-
-                        </p>
-                       
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-                        $2367
-                    </div>
-                </div>
-            </li>
-
-
-
-
-           
-            <li className="pt-3 pb-0 sm:pt-4">
-                <div className="flex items-center ">
-                 
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-black">
-                        Packages Sold Last Month
-
-                        </p>
-                       
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold
-                     text-gray-900 dark:text-black">
-
-                    </div>
-                </div>
-            </li>
-        </ul>
-   </div>
-</motion.div>
-
-
-
-
-
-
-
- 
-<motion.div 
- variants={cardVariants}
- initial="hidden"
- animate="visible"
- transition={{ duration: 0.5, delay: 0.6 }}
-className="w-full max-w-md p-4 bg-white bg-gradient-to-r from-stone-500 to-white border
-
-border-gray-200 rounded-lg shadow-2xl sm:p-8
- dark:bg-gray-800 dark:border-gray-700  max-h-[400px]">
-
-    <div className="flex items-center justify-between mb-4">
-
-<div className='flex flex-row gap-x-3'>
-
-<ion-icon name="newspaper-outline"></ion-icon>
-        <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white">Package Sales</h5>
-        </div>
-        
-   </div>
-   <div className="flow-root">
-        <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-700">
-            <li className="py-3 sm:py-4">
-                <div className="flex items-center">
-                   
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                        Packages Sold Today
-                        </p>
-                      
-                    </div>
-                    
-                </div>
-            </li>
-            <li className="py-3 sm:py-4">
-                <div className="flex items-center ">
-                    
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                        Packages Sold Yesterday
-
-                     </p>
-                       
-                    </div>
-                   
-                </div>
-            </li>
-            
-
-            <li className="py-3 sm:py-4">
-                <div className="flex items-center ">
-                   
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                        Packages Sold This Week
-
-                        </p>
-                      
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                        $367
-                    </div>
-                </div>
-            </li>
-            <li className="pt-3 pb-0 sm:pt-4">
-                <div className="flex items-center ">
-                 
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                        Packages Sold This Month
-
-                        </p>
-                       
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                        $2367
-                    </div>
-                </div>
-            </li>
-
-
-
-
-           
-            <li className="pt-3 pb-0 sm:pt-4">
-                <div className="flex items-center ">
-                 
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                        Packages Sold Last Month
-
-                        </p>
-                       
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-
-                    </div>
-                </div>
-            </li>
-        </ul>
-   </div>
-
-   
-</motion.div>  
-   
+              )
+            },
+            {
+              title: 'IP Address',
+              field: 'ip',
+              render: (rowData) => (
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="font-mono text-sm"
+                >
+                  <p className='dark:text-black'>{rowData.ip} </p>
+                </motion.div>
+              )
+            },
+
+
+            {
+              title: 'Description',
+              field: 'description',
+              render: (rowData) => (
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="flex items-center gap-2"
+                >
+                  {getActionIcon(rowData.action)}
+                  <span className='dark:text-black'>{rowData.description}</span>
+                </motion.div>
+              )
+
+            },
+            {
+              title: 'Date',
+              field: 'date',
+              render: (rowData) => (
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="flex flex-col"
+                >
+                  {/* <span className='dark:text-black'>
+                    {new Date(rowData.date).toLocaleDateString()}</span>
+                  <span className="text-lg dark:text-black">
+                    {new Date(rowData.date).toLocaleTimeString()}
+                  </span> */}
+                  {rowData.date}
+                </motion.div>
+              )
+            }
+          ]}
+          isLoading={isLoading}
+          options={{
+            pageSize: 10,
+            pageSizeOptions: [5, 10, 20],
+            sorting: true,
+            search: true,
+            searchFieldAlignment: 'left',
+            headerStyle: {
+              backgroundColor: '#f8fafc',
+              color: '#64748b',
+              fontWeight: '600',
+              fontSize: '0.875rem'
+            },
+            rowStyle: {
+              backgroundColor: '#fff',
+              '&:hover': {
+                backgroundColor: '#f1f5f9'
+              }
+            }
+          }}
+         
+        />
+    </motion.div>
    
 
 
@@ -771,7 +349,6 @@ border-gray-200 rounded-lg shadow-2xl sm:p-8
 
 
    
-</div>
    
    
    

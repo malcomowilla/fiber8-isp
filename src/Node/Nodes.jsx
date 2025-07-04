@@ -68,6 +68,8 @@ const Nodes = () => {
     setNodeId(rowData?.id)
   }
 
+  
+
   const createNode = async(e) => {
     e.preventDefault();
 
@@ -148,6 +150,8 @@ const columns = [
     {title: 'Name', field: 'name',  },
 
   {title: 'Latitude', field: 'latitude',    },
+    {title: 'Latitude', field: 'latitude',    },
+
   {title: 'Longitude', field: 'longitude',    },
 
   {title: 'Action', field:'Action', align: 'right',
@@ -173,6 +177,10 @@ const columns = [
   return (
     <>
     <Toaster />
+    Use nodes to group subscribers per town, neighborhood or village. Nodes are simple display separations with 
+    no influence on the subscriber’s traffic or settings.
+
+
     <div className=''
     onClick={() => {
       setShowMenu1(false)

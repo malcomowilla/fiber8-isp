@@ -98,9 +98,11 @@ console.log('position', position);
       }}
     >
       <form onSubmit={createNode}>
-      <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white', fontSize: '1.5rem', fontWeight: 'bold' }}>
-        Node Location
+      <DialogTitle sx={{ bgcolor: 'transparent', color: 'white', fontSize: '1.5rem', fontWeight: 'bold' }}>
+        <p className='dark:text-white text-black'>Node Location</p>
       </DialogTitle>
+
+
       <DialogContent sx={{ pt: 30 }}>
         <Stack spacing={3}>
           <TextField

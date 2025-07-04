@@ -160,6 +160,7 @@ import {onMessage, messaging,} from './firebase/firebase';
 const PrivateNetwork = lazy(() => import('./network/PrivateNetwork'))
 const ProtectAuthClient = lazy(() => import('./Auth/ProtectAuthClient'))
 const QrCodeDisplay = lazy(() => import('./qr_code/QrCodeDisplay'))
+const RouterDetails = lazy(() => import('./router_details/RouterDetails'))
 
 // const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
 // )
@@ -785,6 +786,7 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/settings' element={<Settings/>}/>
 <Route path='/admin/date' element={<DatePicker/>}></Route>
 <Route path='/admin/nas' element={<Nas/>}/>
+<Route path='/admin/router_details' element={<RouterDetails/>}/>
 <Route path='/admin/passkeys' element={<PasskeyList/>}/>
 <Route path='/admin/ip-pool' element={<IpPool/>}/>
 <Route path='/admin/hotspot_settings' element={<HotspotSettings/>}/>

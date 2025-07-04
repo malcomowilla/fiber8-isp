@@ -61,6 +61,8 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
     installation_fee: '',
     subscriber_discount: '',
     second_phone_number: '',
+    node: '',
+    location: '',
     date_registered: dayjs(),
     email: '',
     router_name: '',
@@ -84,7 +86,7 @@ const [onlyShowSubscription, setOnlyShowSubscription] = useState(false)
 const [searchInput] = useDebounce(search, 1000)
 const [isSearching, setIsSearching] = useState(false); // New state for search loading
 
-
+const [subscriberId, setSubscriberId] = useState('')
   const handleClickOpen = () => {
     setOpen(true);
     
@@ -146,6 +148,7 @@ const handleClickRow = () => {
     console.log('subscribers',rowData)
    console.log('showClientStatsAndSUbscriptions',showClientStatsAndSUbscriptions)
     setShowClientStatsAndSubscriptions(true)
+    setSubscriberId(rowData.id)
 setFormData({
   ...rowData,
   date_registered: dayjs(rowData.date_registered), 
@@ -470,6 +473,8 @@ className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-5
       },
     {title: 'House Number', field:'house_number',  headerClassName: 'dark:text-black'},
     {title: ' Building', field:'building_name',  headerClassName: 'dark:text-black'},
+        {title: 'Node', field:'node',  headerClassName: 'dark:text-black'},
+
   
     {title: 'Status', field:'status',  headerClassName: 'dark:text-black',  
       render: (rowData) => {
@@ -581,6 +586,8 @@ handleChangeForm={handleChange}
     handleClose={handleClose}
     formData={formData}
     setFormData={setFormData}
+    setSubscriberId={setSubscriberId}
+    subscriberId={subscriberId}
     createSubscriber={createSubscriber}
     handleChangeForm={handleChange}
     selectedLocations={selectedLocations}
