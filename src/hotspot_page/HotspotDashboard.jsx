@@ -129,7 +129,11 @@ const getActiveHotspotUsers = useCallback(
   async() => {
 
     try {
-      const response = await fetch(`/api/get_active_hotspot_users?router_name=${settingsformData.router_name}`)
+      const response = await fetch(`/api/get_active_hotspot_users?router_name=${settingsformData.router_name}`, {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
       const newData = await response.json()
       if (response.ok) {
         // setPackages(newData)
