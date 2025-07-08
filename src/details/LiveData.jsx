@@ -224,26 +224,26 @@ const fetchPackages = useCallback(
                   {stats.length > 0 ? session.package : ""}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                  {session.username}
+                  {session?.username}
                 </td>
                 {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
                   <span className="bg-gray-100 px-2 py-1 rounded">{session.password}</span>
                 </td> */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-600 font-mono">
-                  {session.address}
+                  {session?.address}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {session.startTime}
+                  {session?.startTime}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-red-500 font-medium">
-                  {session.upload_speed}
+                  {session?.upload_speed}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-green-500 font-medium">
-                  {session.download_speed}
+                  {session?.download_speed}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                   <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                    {session.uptime}
+                    {session?.uptime}
                   </span>
                 </td>
               </tr>
