@@ -85,7 +85,7 @@ const LiveData = ({ onlineSessions = [], name,package_name,
         const data = await response.json();
         
         if (response.ok) {
-          setStats(data);
+          setStats(data.users);
           
         } else {
           
