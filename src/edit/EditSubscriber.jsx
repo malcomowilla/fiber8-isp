@@ -150,7 +150,11 @@ console.log('name',name)
             {onlyShowSubscription && <Tab label="SUBSCRIBER DETAILS" value="1" />}  
 
 {onlyShowSubscription && showClientStatsAndSUbscriptions ? <Tab label="ADDRESS" value="2" /> : null}
-            {onlyShowSubscription && showClientStatsAndSUbscriptions && <Tab label="LIVE DATA" value="11" />}
+
+            {onlyShowSubscription && showClientStatsAndSUbscriptions && 
+            <Tab label="LIVE DATA" 
+           
+            value="11" />}
 
 {onlyShowSubscription && showClientStatsAndSUbscriptions && <Tab label="INVOICE" value="4" />}
 
@@ -189,7 +193,11 @@ console.log('name',name)
           <TabPanel value="9"><ActivityLogs/></TabPanel>
 
 
-          <TabPanel value="11"><LiveData handleClose={handleClose} 
+          <TabPanel
+          
+          value="11"><LiveData
+           subscriberId={subscriberId}
+          handleClose={handleClose} 
           name={name}
           package_name={package_name}
           /></TabPanel>

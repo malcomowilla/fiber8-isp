@@ -28,6 +28,7 @@ import {
 } from 'react-icons/bs';
 import MaterialTable from 'material-table'
 import { RiDeleteBin5Line } from "react-icons/ri";
+import { VscGitPullRequestCreate } from "react-icons/vsc";
 
 
 
@@ -84,7 +85,9 @@ const [registrations, setRegistrations] = useState({
       case 'configuration':
         return <FaCog className="text-blue-500" />;
       case 'security':
-        return <FaShieldAlt className="text-purple-500" />;
+        return <FaShieldAlt className="text-red-500" />;
+        case 'create':
+          return <VscGitPullRequestCreate className="text-purple-500" />; 
         case 'delete':
         return <RiDeleteBin5Line className="text-red-500" />;
       default:

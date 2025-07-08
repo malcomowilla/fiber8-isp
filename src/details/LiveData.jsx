@@ -25,7 +25,9 @@ import { FaUser, FaKey, FaClock, FaChartLine, FaDownload, FaUpload } from "react
 import { GiNetworkBars } from "react-icons/gi";
 import { useState, useEffect, useCallback } from "react";
 
-const LiveData = ({ onlineSessions = [], name,package_name }) => {
+const LiveData = ({ onlineSessions = [], name,package_name,
+  subscriberId
+ }) => {
 
   const [stats, setStats] = useState([]);
   // Sample data - replace with your actual data
@@ -75,7 +77,7 @@ const LiveData = ({ onlineSessions = [], name,package_name }) => {
 
 
       try {
-        const response = await fetch('/api/pppoe_stats',
+        const response = await fetch(`/api/get_active_pppoe_users?subscriber_id=${subscriberId}`,
           {
             headers: { 'X-Subdomain': subdomain },
           }
@@ -106,7 +108,7 @@ useEffect(() => {
   // Set up interval for polling
   const intervalId = setInterval(() => {
     getPPOEstats();
-  }, 10000);
+  }, 8000);
 
   return () => clearInterval(intervalId);
 

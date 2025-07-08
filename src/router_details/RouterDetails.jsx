@@ -10,6 +10,11 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import TrafficStatsGraph from './TrafficData';
+import toast, { Toaster } from 'react-hot-toast';
+import { IoWarningOutline } from "react-icons/io5";
+import { useNavigate } from 'react-router-dom';
+
+
 
 
 
@@ -25,6 +30,8 @@ const [routerInfo, setRouterInfo] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [routerInterface, setRouterInterface] = useState([]);
   const [routerInterfaceForm, setRouterInterfaceForm] = useState('');
+  const [showSucessReboot, setShowSucessReboot] = useState(false);
+  const navigate = useNavigate()
 
 
   
@@ -214,9 +221,70 @@ const [freeHdd, setFreeHdd] = useState(0)
 const [totalHdd, setTotalHdd] = useState(0)
 const [routerVersion, setRouterVersion] = useState(0)
 
+const [showRebootConfirm, setShowRebootConfirm] = useState(false);
 
 
 
+const rebootRouter = async(e) => {
+  e.preventDefault()
+
+    
+  if (!showRebootConfirm) {
+    setShowRebootConfirm(true);
+    return;
+  }
+
+  try {
+    
+  const response = await fetch(`/api/reboot_router?id=${id}`, {
+    method: 'POST',
+              headers: { 'X-Subdomain': window.location.hostname.split('.')[0] },
+
+  })
+
+  const newData = await response.json()
+
+
+  if (response.status === 402) {
+    setTimeout(() => {
+      window.location.href = '/license-expired';
+     }, 1800);
+    
+  }
+  
+  if (response.ok) {
+    toast.success('Router is rebooting', {
+      position: "top-center",
+      duration: 5000,
+    });
+        setShowSucessReboot(true);
+
+     setTimeout(() => {
+      navigate('/admin/nas')
+     }, 2500);
+  } else {
+
+
+
+    toast.error(
+      newData.error,{
+        position: "top-center",
+        duration: 5000,
+      }
+    )
+  }
+  } catch (error) {
+    toast.error(
+      'Failed to reboot router server error',{
+        position: "top-center",
+        duration: 5000,
+      }
+    )
+  }
+  
+
+
+}
 
 
 
@@ -337,6 +405,8 @@ useEffect(() => {
     
   return (
     <div>
+      <Toaster />
+
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 
 <div className='bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 border-l-4 border-blue-500'>
@@ -377,8 +447,50 @@ useEffect(() => {
                 <div className='flex flex-col'>
                 <span className='flex gap-2'>BOARD NAME: <p>{routerInfo}</p> </span>
                 <span className='flex gap-2'>ROUTER OS: <p>{routerVersion}</p> </span></div>
+               
                 </div>
+{showSucessReboot ? (
 
+<div className="flex items-center p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+  <svg className="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+  </svg>
+  <span className="sr-only">Info</span>
+  <div>
+    <span className="font-medium">Success</span> Router is rebooting please wait for a few minutes...
+  </div>
+</div>
+): null}
+
+
+        {showRebootConfirm ? (
+      <div className='flex space-x-2'>
+        <button 
+          onClick={rebootRouter}
+          className='bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700'
+        >
+          Confirm Reboot
+        </button>
+        <button 
+          onClick={() => setShowRebootConfirm(false)}
+          className='bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600'
+        >
+          Cancel
+        </button>
+      </div>
+    ) : (
+      <button 
+        onClick={rebootRouter}
+        className='bg-red-500 text-white py-2 px-4
+        rounded-lg hover:bg-red-600 disabled:bg-gray-500 disabled:text-white
+        '
+      >
+        Reboot
+                <IoWarningOutline className='w-5 h-5 text-white' />
+
+      </button>
+    )}
+    
 
        <Box 
        

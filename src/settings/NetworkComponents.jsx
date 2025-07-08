@@ -6,6 +6,7 @@ import {useApplicationSettings} from '../settings/ApplicationSettings'
 import {useEffect, useCallback, useState} from 'react'
 import toast,{Toaster} from 'react-hot-toast'
 import { useLocation } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom'
 
 
 
@@ -20,7 +21,7 @@ const {pingStatus, setPingStatus,
 const [serviceStatus, setServiceStatus] = useState({ freeradius: {}, wireguard: {} });
 const [showRebootConfirm, setShowRebootConfirm] = useState(false);
 
-
+const navigate = useNavigate()
 // const navigate = useNavigate()
 const location = useLocation()
 
@@ -143,22 +144,28 @@ useEffect(() => {
 
 
 
-    {
-        name: "MikroTik",
-        status:  pingStatus?.reachable,
-        icon: <img src='/images/mikrotik.svg' className="w-10 h-10" />,
-        description: "a network device, or rather a router and wireless access point, that runs the RouterOS operating system, based on Linux, and is known for its flexibility, advanced features, and ability to handle a wide range of networking tasks ",
-        color: "bg-white",
-        button: true,
-        checked_at: pingStatus?.checked_at
-      },
-    {
-      name: "OpenVPN",
-      status: "offline",
-      icon: <SiOpenvpn className="text-green-500 text-4xl" />,
-      description: "Full-featured open source VPN solution",
-      color: "bg-green-100"
-    }
+    // {
+    //     name: "MikroTik",
+    //     status:  pingStatus?.reachable,
+    //     icon: <img src='/images/mikrotik.svg' className="w-10 h-10" />,
+    //     description: "a network device, or rather a router and wireless access point, that runs the RouterOS operating system, based on Linux, and is known for its flexibility, advanced features, and ability to handle a wide range of networking tasks ",
+    //     color: "bg-white",
+    //     button: true,
+    //     checked_at: pingStatus?.checked_at
+    //   },
+
+
+
+
+
+
+    // {
+    //   name: "OpenVPN",
+    //   status: "offline",
+    //   icon: <SiOpenvpn className="text-green-500 text-4xl" />,
+    //   description: "Full-featured open source VPN solution",
+    //   color: "bg-green-100"
+    // }
   ];
 
 
@@ -166,48 +173,6 @@ useEffect(() => {
 
 
 
-  const getPingStatus = useCallback(
-    async() => {
-      
-
-      const response = await fetch('/api/router_ping_response',{
-        headers: {
-          'X-Subdomain': subdomain,
-        },
-      })
-      const newData = await response.json()
-      if (response.ok) {
-        setPingStatus(newData)
-        console.log('router ping status fetch', newData)
-        // setTableData((prevData) => ({
-        //   ...prevData, 
-        //   ...newData // This will overwrite existing keys if they exist
-        // }));
-        console.log('router ping status', newData)
-      
-      }else{
-        // toast.error('failed to get router ping status something went wrong', {
-        //   position: "top-center",
-        //   duration: 5000,
-        // })
-      }
-    },
-    [],
-  )
-  
-
-
-
-  useEffect(() => {
-    getPingStatus(); // Initial fetch
-  
-     const intervalId = setInterval(() => {
-      getPingStatus();
-    }, 35000); // Fetch every 60 seconds
-    return () => clearInterval(intervalId);
-  
-  }, [getPingStatus]); 
-  
   
 
 

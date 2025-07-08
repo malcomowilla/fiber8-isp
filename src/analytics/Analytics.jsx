@@ -128,50 +128,50 @@ const [routerInfo, setRouterInfo] = useState(null);
 
 
 
-  const fetchUbuntuStats = useCallback(async () => {
-    try {
-      const response = await fetch("/api/system_status", {
-        headers: {
-          'X-Subdomain': subdomain,
-        }
-      }); // Replace with your backend endpoint
-      const data = await response.json();
+  // const fetchUbuntuStats = useCallback(async () => {
+  //   try {
+  //     const response = await fetch("/api/system_status", {
+  //       headers: {
+  //         'X-Subdomain': subdomain,
+  //       }
+  //     }); // Replace with your backend endpoint
+  //     const data = await response.json();
 
-      if (response.ok) {
+  //     if (response.ok) {
 
-        if (data.system_metrics && data.system_metrics.length > 0) {
-          const item = data.system_metrics[0]; // Assuming you need the latest entry
+  //       if (data.system_metrics && data.system_metrics.length > 0) {
+  //         const item = data.system_metrics[0]; // Assuming you need the latest entry
 
-          setUbuntuStats({
+  //         setUbuntuStats({
            
-              cpuUsage: item.cpu_usage,
-          memoryUsage: item.memory_total,
-          diskUsage: item.disk_total,
-          available_memory: item.memory_free,
-          uptime: item.uptime,
-          available_disk: item.disk_free,
-          memory_used: item.memory_used,
-          disk_used: item.disk_used,
-          });
-        }
+  //             cpuUsage: item.cpu_usage,
+  //         memoryUsage: item.memory_total,
+  //         diskUsage: item.disk_total,
+  //         available_memory: item.memory_free,
+  //         uptime: item.uptime,
+  //         available_disk: item.disk_free,
+  //         memory_used: item.memory_used,
+  //         disk_used: item.disk_used,
+  //         });
+  //       }
         
     
         
-      } else {
-        console.error("Failed to fetch Ubuntu stats");
-      }
-    } catch (error) {
-      console.error("Error fetching Ubuntu stats:", error);
-    } finally {
-      setLoadingUbuntuStats(false);
-    }
-  }, []);
+  //     } else {
+  //       console.error("Failed to fetch Ubuntu stats");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching Ubuntu stats:", error);
+  //   } finally {
+  //     setLoadingUbuntuStats(false);
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    fetchUbuntuStats();
-    const intervalId = setInterval(fetchUbuntuStats, 5000); // Refresh every 5 seconds
-    return () => clearInterval(intervalId);
-  }, [fetchUbuntuStats]);
+  // useEffect(() => {
+  //   fetchUbuntuStats();
+  //   const intervalId = setInterval(fetchUbuntuStats, 5000); // Refresh every 5 seconds
+  //   return () => clearInterval(intervalId);
+  // }, [fetchUbuntuStats]);
 
 
   useEffect(() => {
@@ -183,38 +183,38 @@ const [routerInfo, setRouterInfo] = useState(null);
 
   const subdomain = window.location.hostname.split('.')[0];
 
-  const fetchRouterInfo = useCallback(async () => {
-    try {
-      const response = await fetch("/api/router_info", {
-        headers: {
-          'X-Subdomain': subdomain,
-        },
-      });
-      const data = await response.json();
+  // const fetchRouterInfo = useCallback(async () => {
+  //   try {
+  //     const response = await fetch("/api/router_info", {
+  //       headers: {
+  //         'X-Subdomain': subdomain,
+  //       },
+  //     });
+  //     const data = await response.json();
 
-      if (response.ok) {
-        setLoading(false);
-        setRouterData(data);
-      } else {
-        setRouterData(null); 
-        setLoading(false);// Set routerData to null if the response is not OK
-      }
-    } catch (error) {
-      setRouterData(null);
-      setLoading(false); // Set routerData to null if there's an error
-    } finally {
-      setLoading(false); // Ensure loading is set to false regardless of success or failure
-    }
-  }, []);
+  //     if (response.ok) {
+  //       setLoading(false);
+  //       setRouterData(data);
+  //     } else {
+  //       setRouterData(null); 
+  //       setLoading(false);// Set routerData to null if the response is not OK
+  //     }
+  //   } catch (error) {
+  //     setRouterData(null);
+  //     setLoading(false); // Set routerData to null if there's an error
+  //   } finally {
+  //     setLoading(false); // Ensure loading is set to false regardless of success or failure
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    fetchRouterInfo();
+  // useEffect(() => {
+  //   fetchRouterInfo();
 
-    const intervalId = setInterval(() => {
-      fetchRouterInfo();
-    }, 9000); // Fetch every 60 seconds
-    return () => clearInterval(intervalId);
-  }, [fetchRouterInfo]);
+  //   const intervalId = setInterval(() => {
+  //     fetchRouterInfo();
+  //   }, 9000); // Fetch every 60 seconds
+  //   return () => clearInterval(intervalId);
+  // }, [fetchRouterInfo]);
 
 
   
@@ -414,40 +414,6 @@ useEffect(() => {
 
 
 
-
-
-    const fetchRouterInfoo = useCallback(async () => {
-        try {
-          setLoading(true);
-          setError(null);
-          
-          const response = await fetch("/api/router_info", {
-            headers: { 'X-Subdomain': window.location.hostname.split('.')[0] },
-          });
-          
-          if (!response.ok) throw new Error('Failed to fetch router info');
-          
-          const data = await response.json();
-          setRouterInfo(data.board_name);
-          setUptime(data.uptime);
-          
-          const matchedRouter = mikotik.find(router => router.name === data.board_name);
-          setCurrentRouterImage(matchedRouter?.image || null);
-          
-        } catch (err) {
-          setError(err.message);
-          setRouterInfo(null);
-          setUptime(null);
-        } finally {
-          setLoading(false);
-        }
-      }, []);
-    
-      useEffect(() => {
-        fetchRouterInfoo();
-        const intervalId = setInterval(fetchRouterInfoo, 300000);
-        return () => clearInterval(intervalId);
-      }, [fetchRouterInfoo]);
 
 
 
