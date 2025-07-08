@@ -58,6 +58,8 @@ export default defineConfig({
 
   build: {
     outDir: 'dist', // This is the build output directory
+        sourcemap: false,
+
     assetsDir: 'assets', // Directory for assets inside outDir
     emptyOutDir: true, // Empty the output directory before building
     commonjsOptions: {
