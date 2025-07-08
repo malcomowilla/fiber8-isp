@@ -422,7 +422,7 @@ const [loading, setLoading] = useState(false);
 
 const getOnlineStatus = useCallback(async () => {
   try {
-    const response = await fetch('/api/last_seen', {
+    const response = await fetch(`/api/last_seen?subscriber_id=${subscriberId}`, {
       headers: { 'X-Subdomain': subdomain },
     });
     const data = await response.json();
