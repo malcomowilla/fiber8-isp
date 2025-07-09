@@ -404,6 +404,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import LocalAtmIcon from "@mui/icons-material/LocalAtm";
 import SmartphoneIcon from "@mui/icons-material/Smartphone";
+import { MdCancel } from "react-icons/md";
 
 
 
@@ -419,7 +420,7 @@ const HotspotPage = () => {
  const [seeInstructions, setSeeInstructions] = useState(true)
  const [hotspotPackage, setHotspotPackage] = useState(null)
  const [packageAmount, setPackageAmount] = useState(null)
-
+const [showVoucherError, setShowVoucherError] = useState(false)
 
  
 const {companySettings, setCompanySettings,
@@ -638,6 +639,10 @@ const ip = queryParams.get('ip')
 
 const storedIp = localStorage.getItem('hotspot_mac')
 const storedMac = localStorage.getItem('hotspot_ip') 
+
+
+const [voucherError, setVoucherError] = useState('')
+const [seeVoucherError, setSeeVoucherError] = useState(false)
 const loginWithVoucher = async(e) => {
 
   e.preventDefault()
@@ -682,17 +687,20 @@ const loginWithVoucher = async(e) => {
         console.log('company settings fetched', newData)
       } else {
         setLoading(false)
+        setVoucherError(newData.error)
+        setShowVoucherError(true)
         toast.error('Voucher verification failed', {
           duration: 3000,
           position: 'top-right',
         });
   
         toast.error(newData.error, {
-          duration: 7000,
+          duration: 5000,
           position: 'top-right',
         });
       }
     } catch (error) {
+      setShowVoucherError(true)
       setLoading(false)
     }
    
@@ -1377,8 +1385,30 @@ type='submit'
                 Connect Now
               </motion.button>
               </form>
+
+
               <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Choose Your Plan</h2>
 
+{showVoucherError ? (
+ <div className="flex items-center p-4 mb-4 text-sm text-red-800
+ cursor-pointer f
+relative
+ rounded-lg bg-red-50
+  dark:bg-gray-800 dark:text-red-400" role="alert">
+  <svg className="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" 
+  fill="currentColor" viewBox="0 0 20 20">
+    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 
+    1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1
+     1 0 0 1 0 2Z"/>
+  </svg>
+  <div className='flex' onClick={() => setShowVoucherError(false)}>
+    <span className="font-bold text-lg">Danger alert! <span className='font-medium'>{voucherError || 'Voucher verification failed'}</span>
+      </span>   
+    <MdCancel className='text-black w-4 h-4 absolute right-0 '/>
+  </div>
+</div>
+): null}
+           
 
               <div className="space-y-4">
                 {packages.map((pkg, index) => (
@@ -1496,6 +1526,25 @@ type='submit'
           
 
          
+{showVoucherError ? (
+ <div className="flex items-center p-4 mb-4 text-sm text-red-800
+ cursor-pointer f
+relative
+ rounded-lg bg-red-50
+  dark:bg-gray-800 dark:text-red-400" role="alert">
+  <svg className="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" 
+  fill="currentColor" viewBox="0 0 20 20">
+    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 
+    1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1
+     1 0 0 1 0 2Z"/>
+  </svg>
+  <div className='flex' onClick={() => setShowVoucherError(false)}>
+    <span className="font-bold text-lg">Danger alert! <span className='font-medium'>{voucherError || 'Voucher verification failed'}</span>
+      </span>   
+    <MdCancel className='text-black w-4 h-4 absolute right-0 '/>
+  </div>
+</div>
+): null}
           <motion.button
             variants={buttonVariants}
             type='submit'

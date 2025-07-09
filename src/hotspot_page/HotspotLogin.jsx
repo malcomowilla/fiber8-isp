@@ -8,6 +8,8 @@ import { TiArrowBackOutline } from 'react-icons/ti';
 import toast, { Toaster } from 'react-hot-toast';
 import { CiBarcode } from "react-icons/ci";
 import { useApplicationSettings } from '../settings/ApplicationSettings';
+import { MdCancel } from "react-icons/md";
+import {useState} from 'react'
 
 
 
@@ -23,8 +25,14 @@ const HotspotLogin = () => {
     templateStates, setTemplateStates,
     settingsformData, setFormData,
     handleChangeHotspotVoucher, voucher, setVoucher,
-    loginWithVoucher
+  loading, setLoading,
+
+
   } = useApplicationSettings()
+
+const [showVoucherError, setShowVoucherError] = useState(false)
+const [voucherError, setVoucherError] = useState('')
+
 
 
   // Default template if none is selected
@@ -53,6 +61,78 @@ const HotspotLogin = () => {
 
 
   const { vouchers } = voucher
+   const subdomain = window.location.hostname.split('.')[0]
+
+const queryParams = new URLSearchParams(window.location.search);
+
+const mac = queryParams.get('mac')
+const ip = queryParams.get('ip')
+
+const storedIp = localStorage.getItem('hotspot_mac')
+const storedMac = localStorage.getItem('hotspot_ip') 
+
+  const loginWithVoucher = async(e) => {
+
+  e.preventDefault()
+  
+    try {
+      setLoading(true)
+      const response = await fetch('/api/login_with_hotspot_voucher', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+    
+        },
+  
+        body: JSON.stringify({
+          voucher: vouchers,
+          router_name: settingsformData.router_name,
+          stored_mac: storedMac,
+          stored_ip: storedIp, 
+          mac: mac,
+          ip: ip
+        })
+    
+    
+      });
+    
+    
+      const newData = await response.json();
+      if (response.ok) {
+        setsuccess(true)
+        setLoading(false)
+        // setTimeout(() => {
+        //   setsuccess(true)
+    
+        // }, 2000);
+        
+        // setPackages(newData)
+        toast.success('Voucher verified successfully', {
+          duration: 3000,
+          position: 'top-right',
+        });
+        console.log('company settings fetched', newData)
+      } else {
+        setLoading(false)
+        setVoucherError(newData.error)
+        setShowVoucherError(true)
+        toast.error('Voucher verification failed', {
+          duration: 3000,
+          position: 'top-right',
+        });
+  
+        toast.error(newData.error, {
+          duration: 5000,
+          position: 'top-right',
+        });
+      }
+    } catch (error) {
+      setShowVoucherError(true)
+      setLoading(false)
+    }
+   
+  }
 
   return (
     <>
@@ -70,6 +150,26 @@ const HotspotLogin = () => {
             <p className="text-gray-600 dotted-font">Connect and enjoy fast browsing.</p>
           </div>
 
+
+{showVoucherError ? (
+ <div className="flex items-center p-4 mb-4 text-sm text-red-800
+ cursor-pointer f
+relative
+ rounded-lg bg-red-50
+  dark:bg-gray-800 dark:text-red-400" role="alert">
+  <svg className="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" 
+  fill="currentColor" viewBox="0 0 20 20">
+    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 
+    1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1
+     1 0 0 1 0 2Z"/>
+  </svg>
+  <div className='flex' onClick={() => setShowVoucherError(false)}>
+    <span className="font-bold text-lg">Danger alert! <span className='font-medium'>{voucherError || 'Voucher verification failed'}</span>
+      </span>   
+    <MdCancel className='text-black w-4 h-4 absolute right-0 '/>
+  </div>
+</div>
+): null}
           {/* <motion.div
             className="flex justify-between items-center bg-gray-100 p-4 rounded-lg mb-4"
             whileHover={{ scale: 1.02 }}

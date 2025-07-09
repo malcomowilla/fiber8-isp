@@ -747,6 +747,8 @@ const handleGetSmsProviderSettings = useCallback(
       const newData = await response.json()
       if (response.ok) {
         setSmsProvider({...sms_provider, sms_provider: newData[0].sms_provider})
+        // localStorage.setItem('sms_provider', JSON.stringify(newData[0].sms_provider))
+
 
       } else {
         if (response.status === 402) {
@@ -808,6 +810,8 @@ const saveSmsProviderSetting = async(e) => {
       })
       console.log('updated sms settings', newData)
       setSmsProvider({...sms_provider, sms_provider: newData.sms_provider})
+              localStorage.setItem('sms_provider', JSON.stringify(newData.sms_provider))
+
     } else {
       toast.error('failed to update sms settings', {
         duration: 4000,

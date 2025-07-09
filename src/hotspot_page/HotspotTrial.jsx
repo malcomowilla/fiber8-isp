@@ -7,6 +7,8 @@ import toast, { Toaster } from 'react-hot-toast';
 const HotspotTrial = () => {
   const [timeLeft, setTimeLeft] = useState(60); // 10 minutes in seconds
   const {settingsformData, setFormData} = useApplicationSettings()
+
+
 //   settingsformData.router_name
   useEffect(() => {
     if (timeLeft === 0) return;

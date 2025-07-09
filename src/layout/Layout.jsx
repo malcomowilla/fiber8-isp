@@ -207,6 +207,7 @@ useEffect(() => {
     }
   };
 
+       const sms_provider= JSON.parse(localStorage.getItem('sms_provider')) || localStorage.getItem('sms_provider')
 
 
 const subdomain = window.location.hostname.split('.')[0];
@@ -215,7 +216,7 @@ const subdomain = window.location.hostname.split('.')[0];
     async(selectedProvider) => {
 
       try {
-        const response = await fetch(`/api/get_sms_balance?selected_provider=${selectedProvider}`, {
+        const response = await fetch(`/api/get_sms_balance?selected_provider=${sms_provider}`, {
           headers: {
             'X-Subdomain': subdomain,
           },

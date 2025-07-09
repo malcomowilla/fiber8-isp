@@ -74,12 +74,13 @@ const {api_key, api_secret, sender_id, short_code, partnerID} = smsSettingsForm
 
 const {send_voucher_template, voucher_template} = smsTemplates
 
+       const sms_provider= JSON.parse(localStorage.getItem('sms_provider')) || localStorage.getItem('sms_provider')
 
   const getSmsBalance  = useCallback(
     async(selectedProvider) => {
 
       try {
-        const response = await fetch(`/api/get_sms_balance?selected_provider=${selectedProvider}`, {
+        const response = await fetch(`/api/get_sms_balance?selected_provider=${sms_provider}`, {
           headers: {
             'X-Subdomain': subdomain,
           },
