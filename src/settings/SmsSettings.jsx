@@ -38,7 +38,8 @@ const SmsSettings = () => {
 
 const {isloading, setisloading, selectedProvider, setSelectedProvider,
   smsSettingsForm, setSmsSettingsForm,
-  smsBalance, setSmsBalance
+  smsBalance, setSmsBalance,
+  providerSms, setProviderSms
 } = useApplicationSettings()
 const [open, setOpen] = useState(false);
 const [openNotifactionSettings, setOpenSettings] = useState(false)
@@ -76,11 +77,61 @@ const {send_voucher_template, voucher_template} = smsTemplates
 
        const sms_provider= JSON.parse(localStorage.getItem('sms_provider')) || localStorage.getItem('sms_provider')
 
+
+const handleGetSmsProviderSettings = useCallback(
+  async() => {
+    
+
+
+    try {
+      const response = await fetch(`/api/sms_provider_settings`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+        },
+      });
+
+      const newData = await response.json()
+      if (response.ok) {
+               setProviderSms(newData[0].sms_provider)
+
+       
+
+      } else {
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+ 
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
+       
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  [],
+)
+
+
+useEffect(() => {
+  handleGetSmsProviderSettings()
+  
+}, [handleGetSmsProviderSettings]);
+
   const getSmsBalance  = useCallback(
     async(selectedProvider) => {
 
       try {
-        const response = await fetch(`/api/get_sms_balance?selected_provider=${sms_provider}`, {
+        const response = await fetch(`/api/get_sms_balance?selected_provider=${providerSms}`, {
           headers: {
             'X-Subdomain': subdomain,
           },

@@ -73,7 +73,8 @@ const [ticketForm, setTicketForm] = useState({
 const [search, setSearch] = useState('')
 const [searchInput] = useDebounce(search, 1000)
 const [isSearching, setIsSearching] = useState(false); // New state for search loading
-
+const [seeTicketError, setSeeTicketError] = useState(false)
+const [ticketError, setTicketError] = useState('')
 
 console.log('customer phone number',agentRole)
 const handleCloseDeleteTicketAlert = ()=> {
@@ -345,6 +346,8 @@ toaster.success('Ticket created successfully!', {
                   setloading(false)
                   setIsOpen(false)
                   setOpenLoad(false)
+                  setSeeTicketError(true)
+                  setTicketError(newData.error)
 toaster.error(newData.error, {
     position: "top-center",
     duration: 5000,
@@ -384,11 +387,7 @@ toaster.error('eror creating ticket', {
                   }
                 }
               } catch (error) {
-//                 setSnackbar({ open: true, message: 
-//                   'something went wrong, please try again', severity: 'error' ,
-//                   vertical: 'top',
-// horizontal: 'center',
-//                 });
+                setSeeTicketError(true)
                 console.log(error)
                 toaster.error('error creating tickets', {
                     position: "top-center",
@@ -582,13 +581,20 @@ toaster.error('eror creating ticket', {
 
      <TicketForm phone={phone} customer_name={customer_name}  ticketNo={ticketNo} loading={loading} openLoad={openLoad}
      handleAddTicket={handleAddTicket} isOpen={isOpen} setIsOpen={setIsOpen} agentRole={agentRole} ticketForm={ticketForm}
-      setTicketForm={setTicketForm} handleChange={handleChange} updatedDate={updatedDate}/>
+      setTicketForm={setTicketForm} handleChange={handleChange} updatedDate={updatedDate}
+      
+       seeTicketError={seeTicketError} setSeeTicketError={setSeeTicketError}
+      ticketError={ticketError} setTicketError={setTicketError}
+      />
 
 
     <TicketSubmit  openLoad={openLoad}  isloading={loading}  handleAddTicket={handleAddTicket} handleChange={handleChange} 
      isOpenTicket={isOpenTicket} setIsOpenTicket={setIsOpenTicket}
-     customers={customers} agentRole={agentRole} ticketForm={ticketForm} setTicketForm={setTicketForm}
-      
+     customers={customers} agentRole={agentRole} ticketForm={ticketForm}
+      setTicketForm={setTicketForm}
+      seeTicketError={seeTicketError} setSeeTicketError={setSeeTicketError}
+      ticketError={ticketError} setTicketError={setTicketError}
+
     /> 
 
     <DeleteTicket  deleteTicket={deleteTicket} id={ticketForm.id} isOpenDelete={isOpenDelete} 

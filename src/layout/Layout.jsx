@@ -57,6 +57,7 @@ const {fetchCurrentUser, currentUser, companySettings,
       showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
        showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
         showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
+        providerSms, setProviderSms
 } = useApplicationSettings()
 
 const { company_name, contact_info, email_info, logo_preview} = companySettings
@@ -210,13 +211,63 @@ useEffect(() => {
        const sms_provider= JSON.parse(localStorage.getItem('sms_provider')) || localStorage.getItem('sms_provider')
 
 
+
+const handleGetSmsProviderSettings = useCallback(
+  async() => {
+    
+
+
+    try {
+      const response = await fetch(`/api/sms_provider_settings`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+        },
+      });
+
+      const newData = await response.json()
+      if (response.ok) {
+               setProviderSms(newData[0].sms_provider)
+
+       
+
+      } else {
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+ 
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
+       
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  [],
+)
+
+
+useEffect(() => {
+  handleGetSmsProviderSettings()
+  
+}, [handleGetSmsProviderSettings]);
+
 const subdomain = window.location.hostname.split('.')[0];
 
   const getSmsBalance  = useCallback(
     async(selectedProvider) => {
 
       try {
-        const response = await fetch(`/api/get_sms_balance?selected_provider=${sms_provider}`, {
+        const response = await fetch(`/api/get_sms_balance?selected_provider=${providerSms}`, {
           headers: {
             'X-Subdomain': subdomain,
           },

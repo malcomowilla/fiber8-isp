@@ -49,6 +49,8 @@ const ApplicationSettings = ({children}) => {
           account_number_starting_value: 0,
           enable_customer_portal: false,
           installation_fee: 0,
+          send_welcome_message: false,
+          subscriber_welcome_message: false
 
 
         }
@@ -302,6 +304,7 @@ const [openNasTable, setOpenNasTable] = useState(true)
 const [loginWithPasskey, setLoginWithPasskey] = useState(false)
 const [useEmailAuthentication, setUseEmailAuthentication] = useState(false)
 const [usePhoneNumberAuthentication, setUsePhoneNumberAuthentication] = useState(false)
+const [providerSms, setProviderSms] = useState(false)
 
 //   const handleChange = (e) => {
 //     const {type, name, checked, value} = e.target
@@ -594,6 +597,59 @@ const loginWithVoucher = async(e) => {
     }
    
   }
+
+
+
+
+
+const handleGetSmsProviderSettings = useCallback(
+  async() => {
+    
+
+
+    try {
+      const response = await fetch(`/api/sms_provider_settings`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+        },
+      });
+
+      const newData = await response.json()
+      if (response.ok) {
+               setProviderSms(newData[0].sms_provider)
+
+       
+
+      } else {
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+if (response.status === 401) {
+ 
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
+      
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  [],
+)
+
+
+useEffect(() => {
+  handleGetSmsProviderSettings()
+  
+}, [handleGetSmsProviderSettings]);
   return (
     <>
     <Toaster />
@@ -628,7 +684,7 @@ const loginWithVoucher = async(e) => {
         formDataGeneralSettings, setFormDataGeneralSettings,
         currentCustomer, setCurrentCustomer,fetchCurrentCustomer,
         routerName, setRouterName,openNasTable, setOpenNasTable,
-        openRouterDetails, setOpenRouterDetails
+        openRouterDetails, setOpenRouterDetails,providerSms, setProviderSms
      }}  >
     {children}
    </GeneralSettingsContext.Provider>
