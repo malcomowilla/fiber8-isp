@@ -59,10 +59,16 @@ const [registrations, setRegistrations] = useState({
 
 
 {/* <Route path='/admin/this-week-subscribers' element={<ThisWeekRegisteredSubscribers/>}/> */}
+const subdomain = window.location.hostname.split('.')[0];
 
  const fetchLogs = async () => {
     try {
-      const response = await fetch('/api/activty_logs');
+      const response = await fetch('/api/activty_logs', {
+        method: 'GET',
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      });
       const data = await response.json();
       setLogs(data);
       setIsLoading(false);
@@ -129,7 +135,6 @@ const [registrations, setRegistrations] = useState({
   }, []);
 
 
-const subdomain = window.location.hostname.split('.')[0];
   const fetchtotalSubscribers = useCallback(
     async() => {
       try {
