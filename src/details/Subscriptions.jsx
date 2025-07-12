@@ -414,7 +414,7 @@ useEffect(() => {
   // Set up interval for polling
   const intervalId = setInterval(() => {
     getOnlineStatus();
-  }, 10000);
+  }, 8000);
 
   // Clean up interval on unmount
   return () => clearInterval(intervalId);

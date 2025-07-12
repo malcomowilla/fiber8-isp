@@ -90,7 +90,8 @@ const [routerInfo, setRouterInfo] = useState(null);
     available_disk: 0,
   });
   const [loadingUbuntuStats, setLoadingUbuntuStats] = useState(true);
-
+const [totalBandwidth, setTotalBandwidth] = useState(0);
+const [totalOnlineUsers, setTotalOnlineUsers] = useState(0);
 
 
   // const fetchUbuntuStats = useCallback(async () => {
@@ -146,8 +147,50 @@ const [routerInfo, setRouterInfo] = useState(null);
     return () => clearTimeout(timeout);
   }, []);
 
-  const subdomain = window.location.hostname.split('.')[0];
+ const subdomain = window.location.hostname.split('.')[0];
 
+  const getPPOEstats = useCallback(
+    async() => {
+
+
+      try {
+        const response = await fetch(`/api/get_total_bandwidth_and_online_users`,
+          {
+            headers: { 'X-Subdomain': subdomain },
+          }
+        );
+        const data = await response.json();
+        
+        if (response.ok) {
+          setTotalOnlineUsers(data.active_user_count)
+          setTotalBandwidth(data.total_bandwidth)
+          
+        } else {
+          
+        }
+      } catch (error) {
+        
+      }
+    },
+    [],
+  )
+
+
+
+
+
+useEffect(() => {
+  // Initial call
+  getPPOEstats();
+  
+  // Set up interval for polling
+  const intervalId = setInterval(() => {
+    getPPOEstats();
+  }, 7000);
+
+  return () => clearInterval(intervalId);
+
+}, [getPPOEstats]);
   // const fetchRouterInfo = useCallback(async () => {
   //   try {
   //     const response = await fetch("/api/router_info", {
@@ -246,136 +289,6 @@ useEffect(() => {
 
 
 
-
-
-
-
-
-    const [mikotik, setMikotik] = useState([
-        {
-            "id": 1,
-            "name": "hAP ax lite",
-            "image": '/images/hAP_ax_lite.png'
-        },
-
-        {
-            "id": 2,
-            "name": "RB951Ui-2HnD",
-            "image": '/images/RB951Ui-2HnD.png'
-        },
-        {
-            "id": 3,
-            "name": "hAP ac²",
-            "image": '/images/hAP_ac².png'
-        },
-        {
-            "id": 4,
-            "name": "cAP ac",
-            "image": '/images/cAP_ac.png'
-        },
-        {
-            "id": 5,
-            "name": "hAP ac",
-            "image": '/images/'
-        },
-        {
-            "id": 6,
-            "name": "hEX lite",
-            "image": '/images/hEX_lite.png'
-        },
-        {
-            "id": 7,
-            "name": "hEX",
-            "image": '/images/hEX.png'
-        },
-        {
-            "id": 8,
-            "name": "hEX PoE lite",
-            "image": '/images/hEX_PoE_lite.png'
-        },
-        {
-            "id": 9,
-            "name": "RB4011iGS+RM",
-            "image": '/images/RB4011iGS+RM.png'
-        },
-        {
-            "id": 10,
-            "name": "CCR2004-16G-2S+",
-        "image": '/images/CCR2004-16G-2S+.png'
-        },
-        {
-            "id": 11,
-            "name": "CCR2004-16G-2S+PC",
-            "image": '/images/CCR2004-16G-2S+PC.png'
-        },
-        {
-            "id": 12,
-            "name": "CCR2004-1G-12S+2XS",
-            "image": '/images/CCR2004-1G-12S+2XS.png'
-        },
-        {
-            "id": 13,
-            "name": "CCR2116-12G-4S+",
-            "image": '/images/CCR2116-12G-4S+.png'
-        },
-        {
-            "id": 14,
-            "name": "CCR2216-1G-12XS-2XQ",
-            "image": '/images/CCR2216-1G-12XS-2XQ.png'
-        },
-        {
-            "id": 15,
-            "name": "L009UiGS-RM",
-            "image": '/images/L009UiGS-RM.png'
-        }, 
-        {
-            "id": 16,
-            "name": "RB5009UG+S+IN",
-            "image": '/images/RB5009UG+S+IN.png'
-        },
-        {
-            "id": 17,
-            "name": "hEX refresh",
-            "image": '/public/images/hEX_refresh.png'
-        },
-        {
-            "id": 18,
-            "name": "hAP ac³",
-            "image": '/images/hAP_ac³.png'
-        },{
-            "id": 19,
-            "name": "hAP ac lite",
-            "image": '/images/hAP_ac_lite.png'
-        }, {
-            "id": 20,
-            "name": "hAP ac lite TC",
-            "image": '/images/hAP_ac_lite_TC.png'
-        }, {
-            "id": 21,
-            "name": "cAP",
-            "image": '/images/cAP.png'
-        }, {
-            "id": 22,
-            "name": "RB4011iGS+5HacQ2HnD-IN",
-            "image": '/images/RB4011iGS+5HacQ2HnD-IN.png'
-
-        }, {
-            "id": 23,
-            "name": "hAP ax lite LTE6",
-            "image": '/public/images/hAP_ax_lite_LTE6.png'
-        },
-        {
-            "id": 24,
-            "name": "L009UiGS-2HaxD-IN",
-            "image": '/images/L009UiGS-2HaxD-IN.png'
-        },
-        {
-            "id": 25,
-            "name": "RB2011UiAS-2HnD-IN",
-            "image": '/images/RB2011UiAS-2HnD-IN.png'
-        }
-
-    ])
 
 
 
@@ -486,7 +399,7 @@ useEffect(() => {
   {/* Subscribers Online Card */}
   <StatCard 
           title="Clients Online"
-          value={subscribersOnline}
+          value={totalOnlineUsers || 0}
           icon={<MdOutlineOnlinePrediction size={24} className='text-black' />} 
           trend={{ value: 8, label: 'vs yesterday' }}
           color="secondary"
@@ -520,7 +433,7 @@ useEffect(() => {
         <Typography variant="subtitle2" color="textSecondary">
           <p className='text-black roboto-condensed-light '>Data (24H)</p>
         </Typography>
-        
+        {totalBandwidth || 0}
       </div>
       
         < MdMobiledataOff

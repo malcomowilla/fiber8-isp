@@ -89,7 +89,7 @@ useEffect(() => {
   // Set up interval for polling
   const intervalId = setInterval(() => {
     getPPOEstats();
-  }, 8000);
+  }, 7000);
 
   return () => clearInterval(intervalId);
 
@@ -214,7 +214,7 @@ const fetchPackages = useCallback(
                   {session?.ip_address}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {session?.startTime}
+                  {session?.start_time}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-red-500 font-medium">
                   {session?.upload}
