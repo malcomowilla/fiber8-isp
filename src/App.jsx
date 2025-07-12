@@ -147,6 +147,7 @@ const PrivateNetwork = lazy(() => import('./network/PrivateNetwork'))
 const ProtectAuthClient = lazy(() => import('./Auth/ProtectAuthClient'))
 const QrCodeDisplay = lazy(() => import('./qr_code/QrCodeDisplay'))
 const RouterDetails = lazy(() => import('./router_details/RouterDetails'))
+import { block } from 'million/react';
 
 
 
