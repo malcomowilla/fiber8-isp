@@ -230,20 +230,20 @@ const fetchPackages = useCallback(
                   <span className="bg-gray-100 px-2 py-1 rounded">{session.password}</span>
                 </td> */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-600 font-mono">
-                  {session?.address}
+                  {session?.ip_address}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {session?.startTime}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-red-500 font-medium">
-                  {session?.upload_speed}
+                  {session?.upload}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-green-500 font-medium">
-                  {session?.download_speed}
+                  {session?.download}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                   <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                    {session?.uptime}
+                    {session?.up_time}
                   </span>
                 </td>
               </tr>
