@@ -629,13 +629,13 @@ const handleGetSmsProviderSettings = useCallback(
          }, 1800);
         
       }
-if (response.status === 401) {
+// if (response.status === 401) {
  
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
+//    setTimeout(() => {
+//           // navigate('/license-expired')
+//           window.location.href='/signin'
+//          }, 1900);
+// }
       
       }
     } catch (error) {
