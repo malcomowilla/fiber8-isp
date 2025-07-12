@@ -54,16 +54,16 @@ const PPPoEPackages = () => {
         }));
         console.log('company settings fetched', newData);
       } else {
-         if (response.status === 401) {
-  toast.error(newData.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
+//          if (response.status === 401) {
+//   toast.error(newData.error, {
+//     position: "top-center",
+//     duration: 4000,
+//   })
+//    setTimeout(() => {
+//           // navigate('/license-expired')
+//           window.location.href='/signin'
+//          }, 1900);
+// }
         console.log('failed to fetch company settings');
       }
     } catch (error) {
@@ -99,16 +99,16 @@ const PPPoEPackages = () => {
         console.log('package', data);
         setPackages(data);
       } else {
-         if (response.status === 401) {
-  toast.error(data.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
+//          if (response.status === 401) {
+//   toast.error(data.error, {
+//     position: "top-center",
+//     duration: 4000,
+//   })
+//    setTimeout(() => {
+//           // navigate('/license-expired')
+//           window.location.href='/signin'
+//          }, 1900);
+// }
         console.error('Failed to fetch packages');
       }
     } catch (error) {

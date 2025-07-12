@@ -390,7 +390,7 @@ if (formData.id) {
   const deleteSubscriber = async(id)=> {
 
 try {
-  const response = await fetch(`/api/delete_subscriber/${id}?router_name=${settingsformData.router_name}`, {
+  const response = await fetch(`/api/delete_subscriber/${id}`, {
     method: "DELETE",
     headers: {
       'X-Subdomain': subdomain,
@@ -448,7 +448,18 @@ toast.error('failed to delete subscriber', {
     {title: 'Date Registered', field: 'registration_date',  headerClassName: 'dark:text-black' , 
        },
   
-    
+    {title: 'status', field: 'status',  headerClassName: 'dark:text-black',
+
+      render: (rowData) => {
+       
+
+        return (
+          <>
+            {rowData?.status === 'active' ? <p className='text-green-500'> {rowData.status}</p> : <p className='text-red-700'> {rowData.status}</p>}
+          </>
+        )
+      }
+    },
     {title: 'phone_number', field: 'phone_number',  headerClassName: 'dark:text-black'},
     {title: 'Location', field: 'location',  headerClassName: 'dark:text-black'},
     {title: 'package', field: 'package_name',
@@ -474,22 +485,7 @@ className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-5
         {title: 'Node', field:'node',  headerClassName: 'dark:text-black'},
 
   
-    {title: 'Status', field:'status',  headerClassName: 'dark:text-black',  
-      render: (rowData) => {
-        const statusInfo = status.find(item => 
-          item?.ppoe_username || item?.ppoe_password === rowData?.ref_no
-        ) || { status: 'offline' };
-       
-        
-        return <span className={`flex items-center px-3 py-1 rounded-full ${
-          statusInfo?.status === 'online' ? 'bg-green-100 text-green-800' 
-          : 'bg-red-100 text-red-800'
-        }`}>
-          {statusInfo?.status === 'online' ? 'active' : 'offline'}
-        </span>
-      }
-        
-    },
+    
     {title: 'Action', field:'Action',  headerClassName: 'dark:text-black',
     render: (params) =>  
     

@@ -362,20 +362,6 @@ useEffect(() => {
 }, [handleGetCompanySettings])
 
 
-
-
-
-
-
-
-
-    // const packages = [
-    //     { name: 'Basic Package', speed: '5 Mbps', data: '10 GB', price: 'ksh20' },
-    //     { name: 'Standard Package', speed: '10 Mbps', data: '50 GB', price: 'ksh50' },
-    //     { name: 'Premium Package', speed: '50 Mbps', data: 'Unlimited', price: 'ksh100' },
-    //     { name: 'Family Package', speed: '70 Mbps', data: 'Unlimited', price: 'ksh100' },
-    //   ];
-
       const packageVariants = {
         hidden: { opacity: 0, scale: 0.8 },
         visible: { opacity: 1, scale: 1 }
@@ -434,63 +420,6 @@ useEffect(() => {
 
 
   
-// login_with_hotspot_voucher
-
-// const loginWithVoucher = async(e) => {
-
-// e.preventDefault()
-
-//   try {
-//     setLoading(true)
-//     const response = await fetch('/api/login_with_hotspot_voucher', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'X-Subdomain': subdomain,
-  
-//       },
-
-//       body: JSON.stringify({
-//         voucher: vouchers,
-//         router_name: settingsformData.router_name
-//       })
-  
-  
-//     });
-  
-  
-//     const newData = await response.json();
-//     if (response.ok) {
-//       setLoading(false)
-//       setTimeout(() => {
-//         setsuccess(true)
-  
-//       }, 2000);
-      
-//       // setPackages(newData)
-//       toast.success('Voucher verified successfully', {
-//         duration: 3000,
-//         position: 'top-right',
-//       });
-//       console.log('company settings fetched', newData)
-//     } else {
-//       setLoading(false)
-//       toast.error('Voucher verification failed', {
-//         duration: 3000,
-//         position: 'top-right',
-//       });
-
-//       toast.error(newData.error, {
-//         duration: 7000,
-//         position: 'top-right',
-//       });
-//     }
-//   } catch (error) {
-//     setLoading(false)
-//   }
- 
-// }
-
 
 if (success) {
   return (
