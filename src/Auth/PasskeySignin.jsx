@@ -1,7 +1,7 @@
 import {Link, useNavigate,  useParams, useLocation} from  'react-router-dom'
 import {useState, useEffect, useCallback} from 'react'
 
-import { motion ,  useMotionValue, useTransform } from "framer-motion"
+import { motion ,} from "framer-motion"
 
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { IoArrowUndoSharp } from "react-icons/io5";
@@ -10,12 +10,10 @@ import toast, { Toaster } from 'react-hot-toast';
 
 import Lottie from 'react-lottie';
 import Backdrop from '@mui/material/Backdrop';
-import { RiArrowGoBackFill } from "react-icons/ri";
 import { MdFingerprint } from "react-icons/md";
 import LoadingAnimation from '../loader/loading_animation.json'
-import { TextField, Button, IconButton , InputAdornment,} from "@mui/material";
-import { Email, Phone, Person, Business, Lock, Edit, Close } from '@mui/icons-material';
-import { MdOutlineCancel } from "react-icons/md";
+import { TextField, InputAdornment,} from "@mui/material";
+import { Email,} from '@mui/icons-material';
 
 
 

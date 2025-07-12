@@ -1,41 +1,14 @@
-import {Button} from '../components/ui/button'
-import { ReloadIcon } from "@radix-ui/react-icons"
 import {Link} from 'react-router-dom'
 import {ApplicationContext} from '../context/ApplicationContext'
 import {useNavigate} from 'react-router-dom'
 import { useApplicationSettings } from '../settings/ApplicationSettings';
-import {  Visibility, VisibilityOff } from "@mui/icons-material";
 
 
-// import {
-//   InputOTP,
-//   InputOTPGroup,
-//   InputOTPSeparator,
-//   InputOTPSlot,
-// } from "@/components/ui/input-otp"
-
-import Loader from '../loader/Loader'
 import { useContext, useState, useEffect, useCallback} from 'react'
 
-import Alert from '@mui/material/Alert';
-import Stack from '@mui/material/Stack';
 import toast, { Toaster } from 'react-hot-toast';
-import { IoKeyOutline } from "react-icons/io5";
-import {
-  TextField,
-  Box,
-  IconButton,
-  InputAdornment,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  CircularProgress,
-  Modal,
-  Typography,
-} from '@mui/material';
+
 import { motion } from 'framer-motion';
-import { Email, Phone, Person, Business, Lock, Edit, Close } from '@mui/icons-material';
 import { MdOutlineCancel } from "react-icons/md";
 
 

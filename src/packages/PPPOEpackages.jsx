@@ -1,9 +1,5 @@
 import DeleteIcon from '@mui/icons-material/Delete';
-// import {useState} from 'react'
-// import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
-
-import ActionCable from 'actioncable';
 import { makeStyles } from '@mui/styles';
 
 import { IconButton } from '@mui/material';
@@ -13,14 +9,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 
 import GetAppIcon from '@mui/icons-material/GetApp';
-// import {  useState} from 'react'
-import {ApplicationContext} from '../context/ApplicationContext'
 
 import DeletePackage from '../delete/DeletePackage'
 import MaterialTable from 'material-table'
 import EditPackage from '../edit/EditPackage'
-import { useContext, useState, useEffect, useMemo, useRef, useCallback, useNavigate} from 'react'
-import {CableContext} from '../context/CableContext'
+import { useState, useEffect, useCallback,} from 'react'
 import PackageNotification  from '.././notification/PackageNotification'
 import DeletePackageNotification from '.././notification/DeletePackageNotification'
 import Alert from '@mui/material/Alert';
@@ -47,8 +40,6 @@ const PPPOEpackages = () => {
   const classes = useStyles();
 
 
-  // const navigate = useNavigate()
-  // const cableContext = useContext(CableContext)
   const [open, setOpen] = useState(false);
   const [loading, setloading] = useState(false)
   const [tableData, setTableData] = useState([])

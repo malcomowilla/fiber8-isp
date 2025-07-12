@@ -3,16 +3,14 @@
 import { useContext} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 import {Profile} from '../profile/Profile'
-import {useState, useEffect} from 'react'
+import {useState,} from 'react'
 import ArrowBackSharpIcon from '@mui/icons-material/ArrowBackSharp';
 import EastSharpIcon from '@mui/icons-material/EastSharp';
-import {useApplicationSettings} from '../settings/ApplicationSettings'
 
 
 
 
 
-// handleThemeSwitch
 
 
 

@@ -1,11 +1,10 @@
 
 
-import React, { useEffect, useState, useCallback } from "react";
+import  { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 
 
-// Statistic Card Component
 const StatCard = ({ title, value, icon, color }) => {
   const [animatedValue, setAnimatedValue] = useState(0);
   const {companySettings, setCompanySettings,

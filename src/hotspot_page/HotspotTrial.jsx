@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from "react";
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import toast, { Toaster } from 'react-hot-toast';
 

@@ -12,7 +12,6 @@ import {
     Slide,
     useTheme,
     useMediaQuery,
-    Paper
   } from '@mui/material';
   import {
     Close as CloseIcon,

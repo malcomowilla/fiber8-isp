@@ -1,36 +1,21 @@
 
 import { AnimatePresence, motion } from "framer-motion";
-import { FiAlertCircle } from "react-icons/fi";
 import React, { useState, useEffect, useCallback } from "react";
 import TextField from '@mui/material/TextField';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import { Accordion } from "flowbite-react";
-import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import { CiSettings } from "react-icons/ci";
-import { IoLocationOutline } from "react-icons/io5";
-import { IoStorefrontOutline } from "react-icons/io5";
-import { LiaSearchLocationSolid } from "react-icons/lia";
-import { GrUserManager } from "react-icons/gr";
+
 import { GoPeople } from "react-icons/go";
-import { CiUser } from "react-icons/ci";
-import { TfiWallet } from "react-icons/tfi";
-import { LiaMoneyBillWaveSolid } from "react-icons/lia";
-import { CiReceipt } from "react-icons/ci";
-import { BsCalendar2Date } from "react-icons/bs";
+
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosArrowUp } from "react-icons/io";
 import Lottie from 'react-lottie';
 import LoadingAnimation from '../loader/loading_animation.json'
 import Backdrop from '@mui/material/Backdrop';
 import { MdOutlineTextsms } from "react-icons/md";
-import { CgTemplate } from "react-icons/cg";
 import { PiTicketLight } from "react-icons/pi";
-// import { useLayoutSettings } from '../settings/LayoutSettings';
-import { MdOutlineMail } from "react-icons/md";
-import { TfiStatsUp } from "react-icons/tfi";
-import { MdOutlineChat } from "react-icons/md";
+
 import { FaUserFriends } from "react-icons/fa";
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { GrUserSettings } from "react-icons/gr";

@@ -1,9 +1,6 @@
 
 import MaterialTable, {MTablePagination} from "material-table";
-import { createTheme, ThemeProvider, CssBaseline,   Snackbar,
-  Alert} from '@mui/material';
-import {useApplicationSettings} from '../settings/ApplicationSettings'
-import { Button, Box } from '@mui/material';
+
 import AddIcon from '@mui/icons-material/Add';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import TicketForm from './TicketForm'
@@ -12,15 +9,11 @@ import TicketSubmit from './TicketSubmit'
 import DeleteTicket from './DeleteTicket'
 
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
-import { makeStyles } from '@mui/styles';
 import { styled } from '@mui/material/styles';
 import {useNavigate} from 'react-router-dom'
-import dayjs from 'dayjs';
-
 import QuestionMarkAnimation from '../loader/question_mark.json'
 import Lottie from 'react-lottie';
-// import TicketAnimation from '../animation/ticket.json'
-import { ToastContainer, toast,Bounce, Slide, Zoom, } from 'react-toastify';
+import {  toast, } from 'react-toastify';
 import { useDebounce } from 'use-debounce';
 import { BsTicketDetailed } from "react-icons/bs";
 import toaster, { Toaster } from 'react-hot-toast';

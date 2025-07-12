@@ -1,28 +1,21 @@
 
-import { useContext, useCallback, useEffect, useState} from 'react'
+import { useContext, useCallback, useEffect} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 import {Link} from  'react-router-dom'
 import WifiIcon from '@mui/icons-material/Wifi';
-// import RssFeedIcon from '@mui/icons-material/RssFeed';
 import RouterIcon from '@mui/icons-material/Router';
 import SensorsIcon from '@mui/icons-material/Sensors';
 import BarChartIcon from '@mui/icons-material/BarChart';
-// import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import CellTowerIcon from '@mui/icons-material/CellTower';
 import SignalWifi3BarIcon from '@mui/icons-material/SignalWifi3Bar';
-import MessageIcon from '@mui/icons-material/Message';
 import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
 import PaymentIcon from '@mui/icons-material/Payment';
 import ReceiptIcon from '@mui/icons-material/Receipt';
-// import MoneyOffIcon from '@mui/icons-material/MoneyOff';
-import WavesIcon from '@mui/icons-material/Waves';
-import Groups2Icon from '@mui/icons-material/Groups2';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import TextsmsSharpIcon from '@mui/icons-material/TextsmsSharp';
 import ArrowBackSharpIcon from '@mui/icons-material/ArrowBackSharp';
-import GroupSharpIcon from '@mui/icons-material/GroupSharp';
 import WifiSharpIcon from '@mui/icons-material/WifiSharp';
 import KeyboardArrowUpSharpIcon from '@mui/icons-material/KeyboardArrowUpSharp';
 import KeyboardArrowDownSharpIcon from '@mui/icons-material/KeyboardArrowDownSharp';
@@ -35,13 +28,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LuTicketsPlane } from "react-icons/lu";
 import { FcOnlineSupport } from "react-icons/fc";
 import { FaUpload } from "react-icons/fa6";
-import { BsHddNetwork } from "react-icons/bs";
 import { LuLayoutTemplate } from "react-icons/lu";
 import { MdSettingsInputAntenna } from "react-icons/md";
-import { TfiDashboard } from "react-icons/tfi";
 import { CgComponents } from "react-icons/cg";
 import { TbCloudNetwork } from "react-icons/tb";
-import { MdOutlineQueryStats } from "react-icons/md";
 import { IoStatsChartOutline } from "react-icons/io5";
 import { SiPaloaltonetworks } from "react-icons/si";
 import { FaHandshake } from "react-icons/fa";

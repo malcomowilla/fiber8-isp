@@ -1,40 +1,19 @@
 
-
 import { AnimatePresence, motion } from "framer-motion";
 import { FiAlertCircle } from "react-icons/fi";
-import { useState } from "react";
 import TextField from '@mui/material/TextField';
 import { DemoContainer  } from '@mui/x-date-pickers/internals/demo';
-import dayjs from 'dayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { StaticDateTimePicker } from '@mui/x-date-pickers/StaticDateTimePicker';
 import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
-// import { useLayoutSettings } from '../settings/LayoutSettings';
 import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Button,
+ 
   Select,
   MenuItem,
   InputLabel,
   FormControl,
-  Divider,
-  Typography,
-  Grid,
-  IconButton,
-  Tooltip,
-  CircularProgress,
-  Snackbar,
-  Alert
+  
 } from '@mui/material';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import CloudIcon from '@mui/icons-material/Cloud';
-import WarningIcon from '@mui/icons-material/Warning';
-import toast, { Toaster } from 'react-hot-toast';
+
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 
 

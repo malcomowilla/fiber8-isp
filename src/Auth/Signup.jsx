@@ -1,17 +1,11 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { ApplicationContext } from '../context/ApplicationContext';
-import { Button, Alert } from '@mui/material';
 import { FaArrowTrendUp } from "react-icons/fa6";
-import { FaWifi } from "react-icons/fa";
-import { FaNetworkWired } from "react-icons/fa6";
-import { FaTicketAlt } from "react-icons/fa";
-import { FaTools } from "react-icons/fa";
+
 import { FaRegArrowAltCircleRight } from "react-icons/fa";
 import {Link} from 'react-router-dom'
 import { FaRegArrowAltCircleUp } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
-import { IoMdCheckmark } from "react-icons/io";
-
 import { MdOutlineMessage } from "react-icons/md";
 import { BsQuestionCircle } from "react-icons/bs";
 import { FaWhatsapp } from "react-icons/fa6";

@@ -1,6 +1,4 @@
 import DeleteIcon from '@mui/icons-material/Delete';
-// import {useState} from 'react'
-// import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
 import EditIcon from '@mui/icons-material/Edit';
 
@@ -8,12 +6,8 @@ import { IconButton } from '@mui/material';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import AddIcon from '@mui/icons-material/Add';
 
-import {Link} from 'react-router-dom'
 import {  useState, useEffect, useCallback} from 'react'
-import {ApplicationContext} from '../context/ApplicationContext'
-import EditNode from '../edit/EditNode'
 import MaterialTable from 'material-table'
-import { FaCircleNodes } from "react-icons/fa6";
 import { useDebounce } from 'use-debounce';
 import { FaHandshake } from "react-icons/fa";
 import DeleteLead from './DeleteLead'

@@ -1,16 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { RiArrowGoBackFill } from "react-icons/ri";
-import { FaPhone } from "react-icons/fa";
 import Lottie from 'react-lottie';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
-import { GoPasskeyFill } from "react-icons/go";
-import Tooltip from '@mui/material/Tooltip';
 import toaster, { Toaster } from 'react-hot-toast';
-import { TextField, Button, Box, Typography, Paper, 
-  Snackbar, Alert } from '@mui/material';
-  import { MdFingerprint } from "react-icons/md";
+
   import { useState } from 'react';
-  import { motion ,  useMotionValue, useTransform } from "framer-motion"
+  import { motion } from "framer-motion"
   import Backdrop from '@mui/material/Backdrop';
 
   import LoadingAnimation from '../loader/loading_animation.json'

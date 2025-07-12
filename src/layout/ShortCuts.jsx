@@ -1,5 +1,4 @@
-import React from "react";
-import { FiCreditCard, FiMail, FiUser, FiUsers } from "react-icons/fi";
+import { FiCreditCard,  FiUser, FiUsers } from "react-icons/fi";
 import {Link} from "react-router-dom";
 import { IoSettings } from "react-icons/io5";
 

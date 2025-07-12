@@ -5,17 +5,9 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-// import FormControl from '@mui/material/FormControl';
-// import FormControlLabel from '@mui/material/FormControlLabel';
-// import InputLabel from '@mui/material/InputLabel';
-// import MenuItem from '@mui/material/MenuItem';
-// import Select from '@mui/material/Select';
-// import Switch from '@mui/material/Switch';
-
 import TextField from '@mui/material/TextField';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-// import InputBase from "@material-ui/core/InputBase";
 import { makeStyles } from "@material-ui/core/styles";
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -25,39 +17,11 @@ import CloseIcon from '@mui/icons-material/Close';
 const useStyles = makeStyles({
   root: {
    
-    // "& .MuiInputLabel-root": {
-    //   color: "gray"
-    // },
-    // "&.fieldset" :{
-    //   borderColor: "red"
-    // },
-    // "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-    //   borderColor: "gray"
-    // },
-    // "&:hover .MuiOutlinedInput-input": {
-    //   color: "white"
-    // },
-   
-    // "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-    //   borderColor: "white"
-    // },
-    // "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-input:focus": {
-    //   color: "gray"
-    // },
-    // "& .MuiInputLabel-root.Mui-focused": {
-    //   color: "gray"
-    // },
     
-    // "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    //   borderColor: "black"
-    // }
+   
+    
   }
-  // '@global': {
-  //   '.css-p51h6s-MuiInputBase-input-MuiOutlinedInput-input:focus': {
-  //     boxShadow: 'none !important', // Remove the box shadow
-  //     borderColor: 'transparent !important', // Set the border color to transparent
-  //   },
-  // },
+ 
 });
 export default function MaxWidthDialog({open,handleClose}) {
   const classes = useStyles();

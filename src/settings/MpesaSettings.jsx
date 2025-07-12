@@ -1,4 +1,3 @@
-import React from "react";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -7,19 +6,16 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import { motion } from "framer-motion";
 import {
-  AccountCircle,
   VpnKey,
   Payment,
   Business,
   Lock,
-  Person,
 } from "@mui/icons-material";
 import { useEffect, useState, useCallback, lazy} from "react";
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import toast, { Toaster } from 'react-hot-toast';
 const SettingsNotification = lazy(() => import('../notification/SettingsNotification'))
 import Backdrop from '../backdrop/Backdrop'
-import { FaRegBuilding } from "react-icons/fa";
 
 
 

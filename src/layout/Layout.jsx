@@ -5,33 +5,22 @@ import Header from '../header/Header'
 import { useContext, useState, useEffect, useCallback} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 import {useApplicationSettings} from '../settings/ApplicationSettings'
-import { Button } from "@/components/ui/button"
-import Timer from '../timer/Timer'
 import ShortCuts from './ShortCuts'
 import { useLocation } from 'react-router-dom';
 import DashboardStatistics from '../hotspot_page/DashboardStatistics'
-import { APP_VERSION, APP_NAME, APP_DESCRIPTION } from '../version';
+import { APP_VERSION, APP_DESCRIPTION } from '../version';
 import TicketStatistics from '../tickets/TicketStatistics'
 import SubscriberStats from '../subscribers/SubscriberStats'
-import { FaSms } from 'react-icons/fa';
 import { IoWarningOutline } from "react-icons/io5";
-import { motion } from "framer-motion";
-import VerifiedIcon from '@mui/icons-material/Verified';
 import { 
   Cable as CableIcon,
   Wifi as WifiIcon,
   CalendarMonth as CalendarMonthIcon
 } from '@mui/icons-material';
 
-import { IoSparklesOutline } from "react-icons/io5";
 
-import { 
-  IoCheckmarkCircleOutline, 
-  IoCloseCircleOutline 
-} from 'react-icons/io5';
 import CurrentPlans from './CurrentPlans'
 
-import SmsBalance from './SmsBalance'
 
 import License from './License'
 import Updates from './Updates'

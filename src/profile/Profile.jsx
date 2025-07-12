@@ -1,9 +1,7 @@
 import {
-    Github,
     LogOut,
     Mail,
     MessageSquare,
-    Plus,
     PlusCircle,
     Settings,
     User,
@@ -32,7 +30,6 @@ import {
   import {Link} from 'react-router-dom'
   import { GoPasskeyFill } from "react-icons/go";
   import {useApplicationSettings} from '../settings/ApplicationSettings'
-  import { IoPersonOutline } from "react-icons/io5";
   import { TbPasswordFingerprint } from "react-icons/tb";
 import toast, { Toaster } from 'react-hot-toast';
 

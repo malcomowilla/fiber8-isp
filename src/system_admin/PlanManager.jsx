@@ -9,13 +9,7 @@ import {
   InputLabel,
   FormControl,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Chip,
+  
   CircularProgress,
   Autocomplete
 } from '@mui/material';
@@ -24,28 +18,17 @@ import MaterialTable from 'material-table';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CloudIcon from '@mui/icons-material/Cloud';
-import WarningIcon from '@mui/icons-material/Warning';
 
 import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Divider,
-  Grid,
+ 
   IconButton,
   Tooltip,
-  Snackbar,
-  Alert
+  
 } from '@mui/material';
 import { FaRegBuilding } from "react-icons/fa";
 import EditPlan from './EditPlan';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-
-// 0x011A68747470733a2f2f74723036392e616974656368732e636f2e6b65020561646d696e030561646d696e
-// Predefined plans for dropdown selection only
 const PREDEFINED_PPPOE_PLANS = [
   { name: "Pro", maximum_pppoe_subscribers: 100 },
   { name: "Standard", maximum_pppoe_subscribers: 180 },

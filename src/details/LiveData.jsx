@@ -1,27 +1,8 @@
 
-// import { MdOutlineOnlinePrediction } from "react-icons/md";
 
-
-// const LiveData = () => {
-//   return (
-//     <div >
-      
-//       <div className='flex  gap-x-3 mt-4'>
-//       <p>
-// online sessions
-//         </p>
-
-//         <MdOutlineOnlinePrediction className='text-orange-500 animate-ping cursor-pointer'/>
-
-//         </div>
-//     </div>
-//   )
-// }
-
-// export default LiveData
 
 import { MdOutlineOnlinePrediction } from "react-icons/md";
-import { FaUser, FaKey, FaClock, FaChartLine, FaDownload, FaUpload } from "react-icons/fa";
+import { FaUser,FaClock, FaChartLine, FaDownload, FaUpload } from "react-icons/fa";
 import { GiNetworkBars } from "react-icons/gi";
 import { useState, useEffect, useCallback } from "react";
 

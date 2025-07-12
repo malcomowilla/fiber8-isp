@@ -1,35 +1,19 @@
 
 
-// import { Chart as ChartJS,   BarElement, CategoryScale,  LinearScale, Title, Tooltip, Legend } from "chart.js";
-// import {  Bar } from "react-chartjs-2"; 
-import {linearChartData} from './HotspotLinearChartData'
-import WifiOffIcon from '@mui/icons-material/WifiOff';
-import WifiIcon from '@mui/icons-material/Wifi';
-
-import RouterIcon from '@mui/icons-material/Router';
-
 import { LuUsers } from "react-icons/lu";
-import { LineChart, Line,BarChart, Bar , XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area , 
+import { LineChart, Line,BarChart, Bar , XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
     ResponsiveContainer,
-    AreaChart} from 'recharts';
+    } from 'recharts';
 
-// ChartJS.register(   BarElement, CategoryScale,  LinearScale, Title, Tooltip, Legend);
 import {motion } from 'framer-motion'
 
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 
 import MaterialTable from "material-table";
-import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
 import { Box, Button, Chip, Typography, useTheme  } from '@mui/material';
-import { useState, useCallback, useEffect } from 'react';
 import { Add as AddIcon, GetApp as GetAppIcon } from '@mui/icons-material';
-import { MdOutlineSupportAgent } from "react-icons/md";
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { useDebounce } from 'use-debounce';
-import { LiaSmsSolid } from "react-icons/lia";
+
 import { FaRegCheckCircle, FaRegTimesCircle, FaRegClock } from "react-icons/fa";
-import { formatDistanceToNow } from 'date-fns';
 
 import { format } from 'date-fns';
 import { LuDollarSign, LuClock, LuCalendar } from "react-icons/lu";

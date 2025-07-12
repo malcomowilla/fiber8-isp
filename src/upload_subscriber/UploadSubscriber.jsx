@@ -1,8 +1,5 @@
 
-
-import React from 'react'
 import {motion} from 'framer-motion'
-import {Link} from 'react-router-dom'
 import {useState} from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 import {useApplicationSettings} from '../settings/ApplicationSettings'

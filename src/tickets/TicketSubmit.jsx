@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import {
   Dialog,
   DialogContent,
@@ -20,7 +20,6 @@ import {
   useTheme,
   useMediaQuery,
   Paper,
-  Divider,
   Slide,
   Chip,
   Avatar,
@@ -41,22 +40,16 @@ import {
   ArrowBack as ArrowBackIcon,
   Update as UpdateIcon,
 } from '@mui/icons-material';
-import { motion, AnimatePresence } from 'framer-motion';
 import Lottie from 'react-lottie';
 import LoadingAnimation from '../loader/loading_animation.json';
-// import { useLayoutSettings } from '../settings/LayoutSettings';
 import {
-  DialogTitle,
   InputLabel,
   Select,
   MenuItem,
   
-  SwipeableDrawer,
-  List,
   ListItem,
   ListItemText,
   ListItemIcon,
-  Fab,
   
 } from '@mui/material';
 

@@ -1,11 +1,9 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { FiAlertCircle } from "react-icons/fi";
-import { useState, useEffect } from "react";
+import { useState,} from "react";
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from 'dayjs';
 import { ImSpinner9 } from "react-icons/im";
 import { LuCalendarDays } from "react-icons/lu";
 import { CiBellOn } from "react-icons/ci";
@@ -13,35 +11,17 @@ import { MdOutlineEdit } from "react-icons/md";
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import TextField from '@mui/material/TextField';
 import { FaRegHandPointLeft } from "react-icons/fa6";
-// import { useLayoutSettings } from '../settings/LayoutSettings';
 
 import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 
 import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Button,
+ 
   Select,
   MenuItem,
   InputLabel,
   FormControl,
-  Divider,
-  Typography,
-  Grid,
-  IconButton,
-  Tooltip,
-  CircularProgress,
-  Snackbar,
-  Alert
+ 
 } from '@mui/material';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import CloudIcon from '@mui/icons-material/Cloud';
-import WarningIcon from '@mui/icons-material/Warning';
-import toast, { Toaster } from 'react-hot-toast';
 
 const DeleteCalendarEvent = ({ isOpenDelete,handleChange, calendarEventForm, setisOpenDelete, loading, start, end, 
    eventId, handleUpdateEvent, handleChangeDateTime1, handleDeleteEvent, handleChangeDateTime2}) => {

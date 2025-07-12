@@ -1,38 +1,17 @@
 
 import { Box, TextField, Autocomplete, Stack, InputAdornment, Button, } from '@mui/material';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-// import InputLabel from '@mui/material/InputLabel';
-// import MenuItem from '@mui/material/MenuItem';
-// import FormControl from '@mui/material/FormControl';
-// import Select from '@mui/material/Select';
-import AutorenewIcon from '@mui/icons-material/Autorenew';
-import LoadingButton from '@mui/lab/LoadingButton';
-import CloseIcon from '@mui/icons-material/Close';
-
 import {useApplicationSettings} from '../settings/ApplicationSettings'
-import {  useState, useEffect, useMemo, useRef, useCallback} from 'react'
+import {  useState, useEffect,useCallback} from 'react'
 import { useDebounce } from 'use-debounce';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
-import MyLocationIcon from '@mui/icons-material/MyLocation';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { useMapEvents } from 'react-leaflet';
-import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { MdOutlineMailOutline } from "react-icons/md";
-import { MdOutlinePerson } from "react-icons/md";
 import { FaRegUser } from "react-icons/fa";
 import { TbLockPassword } from "react-icons/tb";
-import { FaHouseChimneyUser } from "react-icons/fa6";
-import { FaRegBuilding } from "react-icons/fa";
 import { GiCycle } from "react-icons/gi";
 import { MdOutlineBlock } from "react-icons/md";
 
@@ -45,33 +24,25 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
-  Divider,
   Typography,
-  Grid,
   IconButton,
   Tooltip,
   CircularProgress,
-  Snackbar,
-  Alert
 } from '@mui/material';
 
 import { MdOutlineNetworkPing } from "react-icons/md";
 import MaterialTable from 'material-table';
 
 
-import { FaRandom } from "react-icons/fa";
-import { FaCheckCircle } from "react-icons/fa";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CloudIcon from '@mui/icons-material/Cloud';
 import WarningIcon from '@mui/icons-material/Warning';
 
 import { MdNetworkPing } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
 import { FaCalendarAlt } from "react-icons/fa";
 import { IoWarningOutline } from "react-icons/io5";
-import { MdOutlineOnlinePrediction } from "react-icons/md";
 
 
 

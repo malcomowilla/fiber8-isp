@@ -1,12 +1,9 @@
 import * as React from 'react';
-// import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
-// import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
 import Box from '@mui/material/Box';
-// import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import SubscriberDetails from '../details/SubscriberDetails';
 import Subscriptions from '../details/Subscriptions';
@@ -18,12 +15,10 @@ import Address from '../details/Address';
 import TabPanel from '@mui/lab/TabPanel';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
-import {useState, useEffect} from 'react'
 import LiveData from '../details/LiveData';
 import ActivityLogs from '../details/ActivityLogs';
 
 import {
-  Tabs,
   useMediaQuery,
   useTheme,
 } from '@mui/material';

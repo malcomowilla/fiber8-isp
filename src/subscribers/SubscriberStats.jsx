@@ -1,47 +1,13 @@
 import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend, ArcElement } from "chart.js";
-import { Bar, Pie } from "react-chartjs-2";
-// import { linearChartData } from './linearChartData';
-// import { linearChartData2 } from './linearChataData2';
-import WifiOffIcon from '@mui/icons-material/WifiOff';
-import WifiIcon from '@mui/icons-material/Wifi';
+
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 import { useState, useEffect, useCallback } from 'react';
-import { LiaUserSolid } from "react-icons/lia";
 import { motion } from 'framer-motion';
-import Lottie from 'react-lottie';
-import RouterNotFound from '../loader/router_not_found_animation.json';
 import LoadingAnimation from '../loader/loading_animation.json'
-import { GoCpu } from "react-icons/go";
-import { PiMemory } from "react-icons/pi";
-import { PiFloppyDiskBack } from "react-icons/pi";
-import { MdOutlineTimer } from "react-icons/md";
-import { IoEyeOutline } from "react-icons/io5";
-import {Link} from 'react-router-dom'
-
-
-
-
-
-import RouterIcon from '@mui/icons-material/Router';
-
 import { LuUsers } from "react-icons/lu";
-
-// ChartJS.register(   BarElement, CategoryScale,  LinearScale, Title, Tooltip, Legend);
-
-import MaterialTable from "material-table";
-import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
 import { Box, Button, Chip, Typography, useTheme  } from '@mui/material';
 import { Add as AddIcon, GetApp as GetAppIcon } from '@mui/icons-material';
-import { MdOutlineSupportAgent } from "react-icons/md";
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { useDebounce } from 'use-debounce';
-import { LiaSmsSolid } from "react-icons/lia";
-import { FaRegCheckCircle, FaRegTimesCircle, FaRegClock } from "react-icons/fa";
-import { formatDistanceToNow } from 'date-fns';
 
-import { format } from 'date-fns';
-import { LuDollarSign, LuClock, LuCalendar } from "react-icons/lu";
 import { MdOutlineOnlinePrediction } from "react-icons/md";
 import { IoCloudOfflineOutline } from "react-icons/io5";
 

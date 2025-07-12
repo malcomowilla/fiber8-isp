@@ -3,15 +3,9 @@
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton } from '@mui/material';
-// import {useState} from 'react'
-// import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+
 import EditIcon from '@mui/icons-material/Edit';
 import  EditPayment from '../edit/EditPayment'
-
-import {Link} from 'react-router-dom'
-import {useState} from 'react'
-import { useContext} from 'react'
-import {ApplicationContext} from '../context/ApplicationContext'
 
 import AddIcon from '@mui/icons-material/Add';
 

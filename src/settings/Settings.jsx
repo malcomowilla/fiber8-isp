@@ -1,13 +1,7 @@
 import {useState, useTransition, lazy, Suspense} from 'react'
-
-
-// import GeneralSettings from './GeneralSettings'
-
 const GeneralSettings = lazy(() => import('./GeneralSettings'))
-// import MpesaSettings from './MpesaSettings'
 const MpesaSettings = lazy(() => import('./MpesaSettings'))
 import EmailSettings from './EmailSettings'
-// import SmsSettings from './SmsSettings'
 const SmsSettings = lazy(() => import('./SmsSettings'))
 const SupportSettings = lazy(() => import('./SupportSettings'))
 const  RadiusSettings = lazy(() => import('./RadiusSettings'))

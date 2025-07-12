@@ -9,22 +9,8 @@ import { useState, useEffect, useCallback,lazy, Suspense } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { Button } from "@/components/ui/button" 
 
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Tooltip from '@mui/material/Tooltip';
 import Backdrop from '../backdrop/Backdrop'
-import Alert from '@mui/material/Alert';
-import Stack from '@mui/material/Stack';
-import AlertTitle from '@mui/material/AlertTitle';
-import Autocomplete from '@mui/material/Autocomplete';
-import { useDebounce } from 'use-debounce';
+
 import UiLoader from '../uiloader/UiLoader'
 
 

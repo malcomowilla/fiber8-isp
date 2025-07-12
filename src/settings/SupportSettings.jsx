@@ -1,4 +1,3 @@
-import React from "react";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -9,10 +8,8 @@ import { motion } from "framer-motion";
 import styled from "styled-components";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent"; // Import the SupportAgent icon
 import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-import {useState, useEffect, useCallback, lazy, Suspense, } from 'react'
+import {useState, useEffect, useCallback, lazy,  } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
-import UiLoader from '../uiloader/UiLoader'
 import Backdrop from '../backdrop/Backdrop'
 
 

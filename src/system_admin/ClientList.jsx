@@ -1,37 +1,16 @@
 
-import React, { useEffect, useState } from 'react';
-// import { fetchClients, blockClient } from './api';
+import React, {useState } from 'react';
 import { motion } from 'framer-motion';
 import { Box, Card, CardContent, Typography, Button, TextField, InputAdornment } from '@mui/material';
 import { IoPeople } from "react-icons/io5";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
-import AddIcon from '@mui/icons-material/Add';
-import GetAppIcon from '@mui/icons-material/GetApp';
 import MaterialTable from "material-table";
 
 const ClientList = () => {
   const [clients, setClients] = useState([]);
   const [search, setSearch] = useState('');
 
-//   useEffect(() => {
-//     const getClients = async () => {
-//       const data = await fetchClients();
-//       setClients(data);
-//     };
-//     getClients();
-//   }, []);
-
-//   const handleBlock = async (clientId) => {
-//     await blockClient(clientId);
-//     setClients(clients.filter(client => client.id !== clientId));
-//   };
-
-
-
-//   const filteredClients = clients.filter(client => 
-//     client.company_name.toLowerCase().includes(search.toLowerCase())
-//   );
 
   return (
     <motion.div

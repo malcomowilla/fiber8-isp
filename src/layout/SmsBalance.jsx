@@ -1,6 +1,3 @@
-import React from 'react'
-import { FaSms } from 'react-icons/fa';
-
 
 
 

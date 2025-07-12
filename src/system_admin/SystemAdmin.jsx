@@ -1,11 +1,7 @@
 
-import {  ThemeProvider } from '@mui/material';
 import { useApplicationSettings } from '../settings/ApplicationSettings';
-import { IoKeyOutline, IoLockClosedOutline } from "react-icons/io5";
-import Backdrop from '@mui/material/Backdrop';
-// import LoadingAnimation from '../animation/loading_animation.json'
-import Lottie from 'react-lottie';
-import {useState, useCallback, useEffect,useMemo} from 'react'
+import {  IoLockClosedOutline } from "react-icons/io5";
+import {useState, useCallback, useEffect} from 'react'
 import { MdOutlineMarkEmailRead } from "react-icons/md";
 import toast, { Toaster } from 'react-hot-toast';
 import {useNavigate} from 'react-router-dom'

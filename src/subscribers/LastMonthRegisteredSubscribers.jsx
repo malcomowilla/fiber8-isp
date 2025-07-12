@@ -9,13 +9,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
 
 import AddIcon from '@mui/icons-material/Add';
-import {useState, useMemo,useEffect, useCallback, useNavigate} from'react'
+import {useState,useEffect, useCallback} from'react'
 import EditSubscriber from '../edit/EditSubscriber'
 import dayjs from 'dayjs';
 import SubscriberNotification from '../notification/SubscriberNotification'
 import { IoPeople } from "react-icons/io5";
-import {motion} from 'framer-motion'
-import { Button, Tooltip, Box,  Chip, Typography, useTheme } from '@mui/material';
+import { Tooltip, } from '@mui/material';
 import { FaPhoneVolume } from "react-icons/fa6";
 
 import LoadingAnimation from '../loader/loading_animation.json'
@@ -25,13 +24,11 @@ import DeleteSubscriber from '../delete/DeleteSubscriber'
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 import toast, { Toaster } from 'react-hot-toast';
 
-// import Autocomplete from '@mui/material/Autocomplete';
 
 
 
 const LastMonthRegisteredSubscribers = () => {
   const { settingsformData } = useApplicationSettings();
-  // const navigate = useNavigate()
 
   const intialValue = {
     name: '',

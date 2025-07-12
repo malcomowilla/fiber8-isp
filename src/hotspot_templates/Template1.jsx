@@ -1,13 +1,8 @@
-// import React from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
-import { FaWifi, FaLock, FaCheckCircle } from 'react-icons/fa'
+import { FaWifi,} from 'react-icons/fa'
 import { FaPhone } from "react-icons/fa6";
 import toast, { Toaster } from 'react-hot-toast';
 import { useEffect, useState, useCallback } from 'react';
-import { TiArrowBackOutline } from "react-icons/ti";
-import { SlNotebook } from "react-icons/sl";
-import { HiMiniArrowLeftEndOnRectangle } from "react-icons/hi2";
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 import { useNavigate, useLocation } from 'react-router-dom';
 

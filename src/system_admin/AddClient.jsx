@@ -1,31 +1,18 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   TextField,
   Button,
   Box,
   Slide,
-  Backdrop,
   IconButton,
   Tooltip,
-  CircularProgress,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl
+ 
 } from '@mui/material';
-import Lottie from 'react-lottie';
-import LoadingAnimation from '../loader/loading_animation.json';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import MaterialTable from "material-table";
-import toaster,{ Toaster } from 'react-hot-toast';
-import DeleteClient from './DeleteClient';
-import DeleteIcon from '@mui/icons-material/Delete';
-import  EditClient from './EditClient'
-import EditIcon from '@mui/icons-material/Edit';
+
 
 
 
@@ -33,17 +20,11 @@ import EditIcon from '@mui/icons-material/Edit';
 
 
 import {
-  InputAdornment,
   Modal,
-  Typography,
 } from '@mui/material';
-import { Email, Phone, Person, Business, Lock, Edit, Close } from '@mui/icons-material';
 import 'react-toastify/dist/ReactToastify.css';
 
 
-
-// fetchingClients={fetchingClients} setFetchingClients={setFetchingClients}
-// loading={loading} clients={clients} setClients={setClients}
 
 const AddClient = ({
 

@@ -1,14 +1,9 @@
 import DeleteIcon from '@mui/icons-material/Delete';
-// import {useState} from 'react'
-// import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
 import EditIcon from '@mui/icons-material/Edit';
 
 import { IconButton } from '@mui/material';
-// import GetAppIcon from '@mui/icons-material/GetApp';
-// import {Link} from 'react-router-dom'
-// import {  useState} from 'react'
-// import {ApplicationContext} from '../context/ApplicationContext'
+
 import AddIcon from '@mui/icons-material/Add';
 import { FaUsers } from "react-icons/fa6";
 import { useDebounce } from 'use-debounce';
@@ -20,22 +15,6 @@ import CircularProgress from "@mui/material/CircularProgress"; // Import Circula
 import EditUserGroups from '../edit/EditUserGroups'
 import toast,{Toaster} from 'react-hot-toast'
 import DeleteUser from '../delete/DeleteUserGroup'
-
-
-// const rows = [
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   // Add more rows as needed
-// ];
-
-// userGroups, handleChangeUserGroups,
-//     createUserGroups, setUserGroups
 
 
 

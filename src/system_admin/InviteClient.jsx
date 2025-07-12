@@ -1,24 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
 import {
-  TextField,
-  Button,
+
   Box,
-  Slide,
   Backdrop,
   IconButton,
   Tooltip,
-  CircularProgress,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl
+ 
 } from '@mui/material';
 import Lottie from 'react-lottie';
 import LoadingAnimation from '../loader/loading_animation.json';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import MaterialTable from "material-table";
 import toaster,{ Toaster } from 'react-hot-toast';
 import DeleteClient from './DeleteClient';
@@ -26,7 +18,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import  EditClient from './EditClient'
 import EditIcon from '@mui/icons-material/Edit';
 import AddClient from './AddClient';
-import { FaRegBuilding } from "react-icons/fa";
 
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 

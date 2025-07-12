@@ -1,4 +1,3 @@
-import React from 'react'
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import {useState, useEffect} from 'react'
 import { createAvatar } from '@dicebear/core';
@@ -13,15 +12,8 @@ import { FiKey, FiShield, FiCheck } from 'react-icons/fi';
 import { Tooltip } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import {
-  Github,
   LogOut,
-  Mail,
-  MessageSquare,
-  Plus,
-  PlusCircle,
-  Settings,
-  User,
-  UserPlus,
+ 
 } from "lucide-react"
 
 

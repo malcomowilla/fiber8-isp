@@ -18,10 +18,8 @@ const TaskSettings = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-//   const { enqueueSnackbar } = useSnackbar();
 
 const subdomain = window.location.hostname.split('.')[0]
-  // Fetch existing settings on component mount
   useEffect(() => {
     const fetchSettings = async () => {
       try {

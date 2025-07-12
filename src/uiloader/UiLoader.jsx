@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-import Button from '@mui/material/Button';
 
   function  UiLoader() {
   const [open, setOpen] = React.useState(true);
@@ -14,7 +13,6 @@ import Button from '@mui/material/Button';
 
   return (
     <div>
-      {/* <Button onClick={handleOpen} sx={{ color: 'black', }} className='text-black'>Show backdrop</Button> */}
       <Backdrop
         sx={{ color: 'red', zIndex: (theme) => theme.zIndex.drawer + 20 }}
         open={open}

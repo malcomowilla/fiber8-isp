@@ -1,13 +1,10 @@
 
-import React from 'react';
 import { Box, Typography, Avatar, Button, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
-import { createAvatar } from '@dicebear/core';
-import { lorelei } from '@dicebear/collection';
 import { FiKey, FiShield, FiCheck } from 'react-icons/fi';
 import { Tooltip, Backdrop } from '@mui/material';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import Lottie from 'react-lottie';
 import LoadingAnimation from '../loader/loading_animation.json';

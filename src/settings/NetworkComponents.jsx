@@ -1,9 +1,7 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { FaServer, FaShieldAlt, FaLock } from 'react-icons/fa';
-import { SiWireguard, SiOpenvpn } from 'react-icons/si';
+import { SiWireguard, } from 'react-icons/si';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
-import {useEffect, useCallback, useState} from 'react'
+import {useEffect,useState} from 'react'
 import toast,{Toaster} from 'react-hot-toast'
 import { useLocation } from 'react-router-dom';
 import {useNavigate} from 'react-router-dom'

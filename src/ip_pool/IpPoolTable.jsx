@@ -1,17 +1,13 @@
 
 
-// import {useState} from 'react'
-// import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton } from '@mui/material';
-// import  EditPayment from '../edit/EditPayment'
-import {useState, lazy, Suspense, useEffect, useCallback} from 'react'
+import {useState, Suspense, useEffect, useCallback} from 'react'
 
 import toast, { Toaster } from 'react-hot-toast';
 
-// import {Link} from 'react-router-dom'
 import UiLoader from '../uiloader/UiLoader'
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 

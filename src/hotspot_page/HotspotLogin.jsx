@@ -1,8 +1,6 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaWifi, FaKey } from 'react-icons/fa';
-import { FaPerson } from "react-icons/fa6";
+import { FaWifi,} from 'react-icons/fa';
 
 import { TiArrowBackOutline } from 'react-icons/ti';
 import toast, { Toaster } from 'react-hot-toast';

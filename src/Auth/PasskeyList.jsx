@@ -3,8 +3,7 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { motion } from "framer-motion"
 import { createAvatar } from '@dicebear/core';
 import { lorelei } from '@dicebear/collection';
-import { TiArrowBackOutline } from "react-icons/ti";
-import { FiUserX } from 'react-icons/fi';
+
 import {useCallback, useEffect, useState} from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 import { GoKey } from "react-icons/go";

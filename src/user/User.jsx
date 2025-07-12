@@ -1,47 +1,25 @@
 import DeleteIcon from '@mui/icons-material/Delete';
-// import {useState} from 'react'
-// import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+
 
 import EditIcon from '@mui/icons-material/Edit';
 
 import { IconButton, Tooltip } from '@mui/material';
 import { FaPhoneVolume } from "react-icons/fa6";
 
-// import GetAppIcon from '@mui/icons-material/GetApp';
-// import {Link} from 'react-router-dom'
-// import {  useState} from 'react'
-// import {ApplicationContext} from '../context/ApplicationContext'
 import AddIcon from '@mui/icons-material/Add';
 
 import { IoPeople } from "react-icons/io5";
 
 import MaterialTable from 'material-table'
 
-import {useState, useEffect, useCallback, Link} from 'react'
+import {useState, useEffect, useCallback} from 'react'
 import InvitationForm from  './InvitationForm'
 import toast,{Toaster} from 'react-hot-toast'
 import DeleteUser from '../delete/DeleteUser'
 import { useDebounce } from 'use-debounce';
 import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading animation
-import Backdrop from '@mui/material/Backdrop';
 
 import { LuDot } from "react-icons/lu";
-
-
-// const rows = [
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   // Add more rows as needed
-// ];
-
-
-
 
 
 const User = () => {

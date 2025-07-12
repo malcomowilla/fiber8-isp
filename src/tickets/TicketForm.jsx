@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import {
   Dialog,
-  DialogTitle,
-  DialogContent,
+  
   TextField,
   Box,
   Stack,
@@ -11,7 +10,6 @@ import {
   Paper,
   Button,
   IconButton,
-  Divider,
   CircularProgress,
   Chip,
   Slide,
@@ -28,7 +26,6 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Fab,
   Snackbar,
   Alert
 } from '@mui/material';
@@ -45,10 +42,7 @@ import {
   Save as SaveIcon,
   ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
-import { motion } from 'framer-motion';
-// import { useLayoutSettings } from '../settings/LayoutSettings';
 import toast, { Toaster } from 'react-hot-toast';
-import { ImCancelCircle } from "react-icons/im";
 
 
 

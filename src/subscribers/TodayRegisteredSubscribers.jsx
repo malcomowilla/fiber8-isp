@@ -8,13 +8,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
 
 import AddIcon from '@mui/icons-material/Add';
-import {useState, useMemo,useEffect, useCallback, useNavigate} from'react'
+import {useState, useEffect, useCallback} from'react'
 import EditSubscriber from '../edit/EditSubscriber'
 import dayjs from 'dayjs';
 import SubscriberNotification from '../notification/SubscriberNotification'
 import { IoPeople } from "react-icons/io5";
-import {motion} from 'framer-motion'
-import { Button, Tooltip, Box,  Chip, Typography, useTheme } from '@mui/material';
+import { Tooltip,  } from '@mui/material';
 import { FaPhoneVolume } from "react-icons/fa6";
 
 import LoadingAnimation from '../loader/loading_animation.json'
@@ -24,7 +23,6 @@ import DeleteSubscriber from '../delete/DeleteSubscriber'
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 import toast, { Toaster } from 'react-hot-toast';
 
-// import Autocomplete from '@mui/material/Autocomplete';
 
 
 
@@ -498,15 +496,6 @@ className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-5
   
    </Backdrop>
 
-{/*    
-<EditSubscriber  isloading={loading}  
-showClientStatsAndSUbscriptions={showClientStatsAndSUbscriptions} setShowClientStatsAndSubscriptions={setShowClientStatsAndSubscriptions}
-packageName={formData.package_name} 
-  open={open} handleClose={handleClose}  formData={formData}  setFormData={setFormData}  createSubscriber={createSubscriber} 
-handleChangeForm={handleChange}
-        
-            />
-           */}
 {open && (
   <EditSubscriber
     isloading={loading}

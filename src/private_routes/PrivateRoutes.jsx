@@ -5,7 +5,6 @@ import LoadingAnimation from '../loader/loading_animation.json'
 import Lottie from 'react-lottie';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 
-import Backdrop from '@mui/material/Backdrop';
 
 
 

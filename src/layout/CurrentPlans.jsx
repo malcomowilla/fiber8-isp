@@ -17,12 +17,6 @@ import {
   CalendarMonth as CalendarMonthIcon
 } from '@mui/icons-material';
 
-import { IoSparklesOutline } from "react-icons/io5";
-
-import { 
-  IoCheckmarkCircleOutline, 
-  IoCloseCircleOutline 
-} from 'react-icons/io5';
 
 
 const CurrentPlans = ({currentPPOEPlan, currentHotspotPlan}) => {

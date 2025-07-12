@@ -5,8 +5,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { useState, useEffect, useCallback,lazy, Suspense } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import { Button } from "@/components/ui/button" 
-import { useDebounce } from 'use-debounce';
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { useApplicationSettings } from '../settings/ApplicationSettings';

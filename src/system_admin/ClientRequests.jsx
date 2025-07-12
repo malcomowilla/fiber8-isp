@@ -1,28 +1,20 @@
 
 import MaterialTable, {MTablePagination} from "material-table";
-import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
+import { ThemeProvider, CssBaseline } from '@mui/material';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { Button, Box } from '@mui/material';
 import {useState, useCallback, useEffect,} from 'react'
 import AddIcon from '@mui/icons-material/Add';
 import GetAppIcon from '@mui/icons-material/GetApp';
-// import CustomerRegistrationForm from '../registration/CustomerRegitrationForm'
-import dayjs from 'dayjs';
 
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import { ImSpinner9 } from "react-icons/im";
-// import AccessDenied from './AccessDenied'
-// import { requestPermission } from '../firebase/firebasePermission';
+// impo
 import {useNavigate} from 'react-router-dom'
 
-import { ToastContainer, toast,Bounce, Slide, Zoom, } from 'react-toastify';
 
 import QuestionMarkAnimation from '../loader/question_mark.json'
 import Lottie from 'react-lottie';
 import LoadingAnimation from '../loader/loading_animation.json'
 import Backdrop from '@mui/material/Backdrop';
-import { createConsumer } from '@rails/actioncable';
 import { useDebounce } from 'use-debounce';
 import { IoPeople } from "react-icons/io5";
 import DeleteRequests from './DeleteRequests'

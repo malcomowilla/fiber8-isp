@@ -1,28 +1,18 @@
 
 import {
-  createBrowserRouter,
-  RouterProvider,
-  createRoutesFromElements,
+ 
   Route,
   Routes
 } from "react-router-dom";
 
 
-// import {ResetPassword} from './Auth/ResetPassword'
 import {useState, useEffect, lazy, Suspense, useCallback} from 'react'
 import {ApplicationContext} from './context/ApplicationContext'
 import UiLoader from './uiloader/UiLoader'
-// import Signup from './Auth/Signup'
-// import NotFound from './404/NotFound'
-// import {InputOTPWithSeparator} from './Auth/InputOTPWithSeparator'
-// import PrivateRoutes  from './private_routes/PrivateRoutes'
-// import AdminDashboard from './admindashboard/AdminDashboard'
+
 const AdminDashboard = lazy(()=> import ('./admindashboard/AdminDashboard'))
-// import Sidebar from './sidebar/Sidebar'
-// import Layout from './layout/Layout'
+
 import {CableProvider} from './context/CableContext'
-import { redirect } from "react-router-dom";
-import toast, { Toaster } from 'react-hot-toast';
 
 //  import PPPOEpackages from './packages/PPPOEpackages'
 
@@ -77,10 +67,8 @@ const HotspotSettings = lazy(()=> import('./settings/HotspotSettings'))
 import ProtectAuth from './Auth/ProtectAuth'
 import HotspotPayments from './payments/HotspotPayments'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import  ApplicationSettings from './settings/ApplicationSettings'
 // import SignupNotification from './notification/SignupNotification'
 const SignupNotification = lazy(()=> import('./notification/SignupNotification'))
-import GeneralSettings from './settings/GeneralSettings'
 // import HotspotLogin from './hotspot_page/HotspotLogin'
 const HotspotLogin = lazy(()=> import('./hotspot_page/HotspotLogin'))
 const PasskeySignin = lazy(()=> import('./Auth/PasskeySignin'))
@@ -124,7 +112,6 @@ const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
 
  const UploadSubscriber = lazy(() => import('./upload_subscriber/UploadSubscriber') )
  const IpPool = lazy(() => import('./ip_pool/IpPool') )
- const GoogleAuth = lazy(() => import('./Auth/GoogleAuth') )
 const TodayRegisteredSubscribers = lazy(() => import('./subscribers/TodayRegisteredSubscribers') )
 const ThisWeekRegisteredSubscribers = lazy(() => import('./subscribers/ThisWeekRegisteredSubscribers') )
 const ThisMonthRegisteredSubscribers = lazy(() => import('./subscribers/ThisMonthRegisteredSubscribers') )
@@ -139,7 +126,6 @@ import {useApplicationSettings} from './settings/ApplicationSettings'
  const PPPoEPackages = lazy(() => import('./wifi_page/PPPoEPackages') )
 const HotspotTemplates = lazy(() => import('./hotspot_templates/HotspotTemplates') )
 const HotspotDashboard = lazy(() => import('./hotspot_page/HotspotDashboard.jsx') )
-import { APP_VERSION, APP_NAME, APP_DESCRIPTION } from './version';
 import ClientLogin from './client_portal/ClientLogin'
 import ClientPortal from './client_portal/ClientPortal'
 import NetworkComponents from './settings/NetworkComponents'
@@ -162,97 +148,6 @@ const ProtectAuthClient = lazy(() => import('./Auth/ProtectAuthClient'))
 const QrCodeDisplay = lazy(() => import('./qr_code/QrCodeDisplay'))
 const RouterDetails = lazy(() => import('./router_details/RouterDetails'))
 
-// const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages')
-// )
-
-// const PPPOEsubscribers = lazy(()=> import('./subscribers/PPPOEsubscribers')
-// )
-
-// const FixedPayments = lazy(()=> import('./payments/FixedPayments')
-// )
-
-// const  PPPOEsubscriptions = lazy(()=> import('./subscriptions/PPPOEsubscriptions')
-// )
-
-// const EditPackage = lazy(()=> import('./edit/EditPackage'))
-
-
-// const HotspotPayments = lazy(()=> import('./payments/HotspotPayments')
-// )
-
-
-
-// const router = createBrowserRouter(
-//   createRoutesFromElements(
-//     <>
-//       <Route index path='/'  element={<Signup/>}/>
-//       <Route  path='/reset-password' element={<ResetPassword/>}/>
-//       <Route  path='/hotspot-page' element={<HotspotPage/>}/>
-//       <Route  path='/hotspot-login' element={<HotspotLogin/>}/>
-//     <Route path='/system-admin-login' element={<SystemAdminLogin/>}/>
-//     <Route path='/sms-sent' element={<SmsSent/>}/>   
-
-// <Route element={<ProtectAuthSystemAdmin  />}>
-//     <Route path='/system-admin-dashboard' element={<DashboardSytemAdmin/>}/> 
-
-
-//     </Route>  
-
-  
-// {/* 
-// <Route path='/admin-dashboard' element={<PrivateRoutes>
-//   <AdminDashboard/>
-// </PrivateRoutes>}>
-// </Route> */}
-// <Route element={<ProtectAuth />}>
-// {/* <ProtectAuth> <Layout/> </ProtectAuth> */}
-// <Route  path='/admin'  element={ 
-//       <Layout/> 
-// }>
-
-  
-// <Route path='/admin/date' element={<DatePicker/>}/>
-// <Route 
-//  path='/admin/admin-dashboard' element={  <AdminDashboard/>
-// }/>
-// <Route/>
-// <Route path='/admin/side-bar' element={<Sidebar/>}/> 
-// <Route path='/admin/profile' element={<AdminProfile/>}/>
-// <Route path='/admin/pppoe-packages' element={< PPPOEpackages/>}/>
-// <Route path='/admin/pppoe-subscribers' element={< PPPOEsubscribers/>}/>
-// <Route path='/admin/fixed-payments' element={<FixedPayments/>}/>
-// <Route path='/admin/edit-package' element={<EditPackage/>}/>
-// <Route path='/admin/pppoe-subscriptions' element={<PPPOEsubscriptions/>}/>
-// <Route path='/admin/hotspot-payments' element={<HotspotPayments/>}/>
-// <Route  path='/admin/hotspot-package' element={<HotspotPackage/>}/>
-// <Route  path='/admin/hotspot-subscriptions' element={<HotspotSubscriptions/>}/>
-// <Route path='/admin/sms' element={<Sms/>}/>
-// <Route path='/admin/zones' element={<Zones/>}/>
-// <Route path='/admin/nodes' element={<Nodes/>}/>
-// <Route path='/admin/user' element={<User/>}/>
-// <Route path='/admin/user-group' element={<UserGroup/>}/>
-// <Route path='/admin/analytics' element={<Analytics/>}/>
-// <Route path='/admin/hotspot_anlytics' element={<Hotspotanalytics/>}/>
-// <Route path='/admin/settings' element={<Settings/>}/>
-// <Route path='/admin/date' element={<DatePicker/>}></Route>
-// <Route path='/admin/nas' element={<Nas/>}/>
-// <Route path='/admin/passkeys' element={<PasskeyList/>}/>
-// </Route>
-
-// </Route >
-
-//       <Route  path='/signin' element={<InputOTPWithSeparator/>}/>
-//       <Route  path='/passkey-signin' element={<PasskeySignin/>}/>
-      
-//      <Route path="*" element={<NotFound />}/>
-
-//       </>
-      
-
-//   )
-// )
-
-
 
 
 const App = ({client}) => {
@@ -274,12 +169,8 @@ const [username, setUsername] = useState('')
 const [preferDarkMode, setPreferDarkMode] = useState(true)
 const [openSignupNotification, setOpenNotification] = useState(false);
 
-// const mysubdomain = 'fiber8.aitechs.co.ke'
-// const s = mysubdomain.split('.')[0]
-
 const subdomain = window.location.hostname.split('.')[0]
 
-// const domain = window.location.hostname.split('.')[1]
 
 
 const {companySettings, setCompanySettings,
@@ -378,14 +269,6 @@ useEffect(() => {
 
 
 
-// useEffect(() => {
-//   const intervalId = setTimeout(() => {
-//     setShowLoader(false); // Hide the loader after the interval
-//   }, 5);
-
-//   // Clear the interval when the component unmounts
-//   return () => clearInterval(intervalId);
-// }, []);
 
 
 useEffect(() => {
@@ -463,17 +346,12 @@ try {
 
   }
   if (users.ok) {
-    // const actualUserDataInJson = await users.json
   
     setShowErrors(false)
     setOpenNotification(true);
 
     setloading(false)
     setOfflineError(false)
-
-// return redirect('/signin')
-    // localStorage.setItem("jwt", actualUserDataInJson.jwt);
-    // console.log(actualUserDataInJson)
 
   } else {
     setErroraData(actualUserDataInJson.errors)
@@ -581,7 +459,6 @@ const handleGetCompanySettings = useCallback(
       })
       const newData = await response.json()
       if (response.ok) {
-        // setcompanySettings(newData)
         const { contact_info, company_name, email_info, logo_url,
           customer_support_phone_number,agent_email ,customer_support_email
          } = newData
@@ -599,7 +476,6 @@ const handleGetCompanySettings = useCallback(
         console.log('failed to fetch company settings')
       }
     } catch (error) {
-          // toast.error('internal servere error  while fetching company settings')
  console.log(error)   
     }
   },
@@ -613,14 +489,6 @@ useEffect(() => {
 }, [handleGetCompanySettings])
 
 const hostname = window.location.hostname;
-
-
-
-
-
-
-
-
 
 
 
@@ -650,17 +518,9 @@ const hostname = window.location.hostname;
     <main>
 
 
-{/*           
-<img
-className="w-24 h-24 mx-auto rounded-full"
-  src={logo_preview || "/images/aitechs.png"}
-  alt={company_name || "Aitechs"}
-  onError={(e) => { e.target.src = "/images/aitechs.png"; }}
-/> */}
 
 <Helmet>
                 <meta charSet="utf-8" />
-                {/* <title>My Title</title> */}
                 <link rel="icon" type="image/svg+xml" href={logo_preview} 
                 onError={(e) => { e.target.src = "/images/aitechs.png"; }}
                 />
@@ -686,10 +546,6 @@ className="w-24 h-24 mx-auto rounded-full"
    isExpanded6, setIsExpanded6, isExpanded7, setIsExpanded7, isExpanded8, setIsExpanded8, client,
    materialuitheme, setMaterialuiTheme
     }}>
-
-{/* <GeneralSettings> */}
-{/* <RouterProvider router={router} /> */}
-{/* </GeneralSettings> */}
 
 
 <div>

@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Modal,
   Box,
@@ -7,7 +6,6 @@ import {
   Stack,
   Divider,
   Chip,
-  Avatar
 } from '@mui/material';
 import { Edit, Delete, Close, CalendarToday, Schedule, } from '@mui/icons-material';
 import dayjs from 'dayjs';

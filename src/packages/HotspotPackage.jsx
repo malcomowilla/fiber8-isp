@@ -1,14 +1,10 @@
 import DeleteIcon from '@mui/icons-material/Delete';
-// import {useState} from 'react'
-// import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
 import EditIcon from '@mui/icons-material/Edit';
 
 import { IconButton } from '@mui/material';
 import GetAppIcon from '@mui/icons-material/GetApp';
-import {Link} from 'react-router-dom'
-import {  useState, useNavigate} from 'react'
-import {ApplicationContext} from '../context/ApplicationContext'
+import {  useState} from 'react'
 import LoadingAnimation from '../loader/loading_animation.json'
 import Lottie from 'react-lottie';
 
@@ -30,23 +26,6 @@ import CircularProgress from "@mui/material/CircularProgress"; // Import Circula
 
 
 
-
-// const rows = [
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   {  Speed: '4M/4M', Name: '4MBPS', Price: 1500, Validity: 30 },
-//   {  Speed: '10M/10M', Name: '10MBPS', Price: 4000, Validity: 30 },
-//   // Add more rows as needed
-// ];
-
-
-
-
-// settingsformData
 const HotspotPackage = () => {
 
   const [open, setOpen] = useState(false);

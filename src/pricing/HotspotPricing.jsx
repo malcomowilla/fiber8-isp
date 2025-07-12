@@ -1,8 +1,6 @@
-import React from 'react';
-import { FaRegArrowAltCircleRight } from "react-icons/fa";
 import { FaRegArrowAltCircleLeft } from "react-icons/fa";
 
-import {Link, useNavigate} from 'react-router-dom'
+import {useNavigate} from 'react-router-dom'
 import {motion} from 'framer-motion'
 
 const HotspotPricing = () => {

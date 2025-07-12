@@ -1,4 +1,3 @@
-import React from 'react';
 import MaterialTable from 'material-table';
 import { ThemeProvider, createTheme } from '@mui/material';
 

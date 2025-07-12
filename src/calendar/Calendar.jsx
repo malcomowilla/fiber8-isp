@@ -1,8 +1,4 @@
 
-
-
-// import { Scheduler } from "@aldabil/react-scheduler";
-
 import '../custom-scheduler.css';
 import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 import  { useEffect, useState, useCallback, } from 'react';
@@ -11,18 +7,14 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import CalendarEvent from './CalendarEvent'
 import FullCalendar from '@fullcalendar/react'
 import DeleteCalendarEvent from './DeleteCalendarEvent'
-// import CalendarEventAddAlert from '../Alert/CalendarEventAddAlert'
-// import CalendarErrorAlert from '../Alert/CalendarErrorAlert'
+
 import dayjs from 'dayjs';
 import Lottie from 'react-lottie';
 import LoadingAnimation from '../loader/loading_animation.json'
 import Backdrop from '@mui/material/Backdrop';
-// import CalendarEventUpdate from '../Alert/CalendarEventUpdate'
-// import CalendarEventDeleteAlert from '../Alert/CalendarEventDeleteAlert'
+
 import { requestPermission } from '../firebase/firebasePermission';
-// import addNotification from 'react-push-notification';
 import {useNavigate} from 'react-router-dom'
-import { ToastContainer,Bounce, Slide, Zoom, } from 'react-toastify';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import toast, { Toaster } from 'react-hot-toast';
 
