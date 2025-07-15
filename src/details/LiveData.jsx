@@ -7,7 +7,7 @@ import { GiNetworkBars } from "react-icons/gi";
 import { useState, useEffect, useCallback } from "react";
 
 const LiveData = ({ onlineSessions = [], name,package_name,
-  subscriberId
+  subscriberId, formData
  }) => {
 
   const [stats, setStats] = useState([]);
@@ -50,7 +50,7 @@ const LiveData = ({ onlineSessions = [], name,package_name,
 
   const data = onlineSessions.length > 0 ? onlineSessions : sampleData;
 
-
+console.log('formData servcie type livedata', formData)
   const subdomain = window.location.hostname.split('.')[0];
 
   const getPPOEstats = useCallback(

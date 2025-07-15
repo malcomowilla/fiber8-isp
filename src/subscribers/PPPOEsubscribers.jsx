@@ -24,6 +24,8 @@ import { useApplicationSettings } from '../settings/ApplicationSettings';
 import toast, { Toaster } from 'react-hot-toast';
 import { useDebounce } from 'use-debounce';
 import CircularProgress from "@mui/material/CircularProgress"; 
+import { motion } from 'framer-motion';
+import { FaCircle } from 'react-icons/fa';
 
 
 
@@ -450,15 +452,36 @@ toast.error('failed to delete subscriber', {
   
     {title: 'status', field: 'status',  headerClassName: 'dark:text-black',
 
-      render: (rowData) => {
-       
-
-        return (
-          <>
-            {rowData?.status === 'active' ? <p className='text-green-500'> {rowData.status}</p> : <p className='text-red-700'> {rowData.status}</p>}
-          </>
-        )
-      }
+     render: (rowData) => {
+  return (
+    <div className="flex items-center gap-2">
+      {rowData?.status === 'online' ? (
+        <>
+          <motion.div
+            animate={{
+              scale: [1, 1.1, 1],
+              opacity: [0.8, 1, 0.8]
+            }}
+            transition={{
+              duration: 0.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <FaCircle className="text-green-500 text-xs" />
+          </motion.div>
+          <span className="text-green-500">Online</span>
+        </>
+      ) : (
+        <>
+        
+          <FaCircle className="text-red-700 text-xs" />
+          <span className="text-red-700">Offline</span>
+        </>
+      )}
+    </div>
+  );
+}
     },
     {title: 'phone_number', field: 'phone_number',  headerClassName: 'dark:text-black'},
     {title: 'Location', field: 'location',  headerClassName: 'dark:text-black'},

@@ -28,6 +28,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import toast, { Toaster } from 'react-hot-toast';
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 
+import Autocomplete from '@mui/material/Autocomplete';
 
 
 
@@ -437,45 +438,74 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Subnet Mask</InputLabel>
-                <Select
-                  name="subnet_mask"
-                    className='myTextField'
-                  value={formData.subnet_mask}
-                  onChange={handleInputChange}
-                  label="Subnet Mask"
-                  required
-                >
-                  {subnetOptions.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+             <Autocomplete
+  fullWidth
+  options={subnetOptions}
+  value={subnetOptions.find(option => option.value === formData.subnet_mask) || null}
+  onChange={(event, newValue) => {
+    handleInputChange({
+      target: {
+        name: "subnet_mask",
+        value: newValue?.value || ''
+      }
+    });
+  }}
+  getOptionLabel={(option) => option.label}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Subnet Mask"
+      required
+      className="myTextField"
+    />
+  )}
+  disableClearable
+  isOptionEqualToValue={(option, value) => option.value === value.value}
+  sx={{
+    '& .MuiAutocomplete-inputRoot': {
+      padding: '8px 14px',
+    },
+    mt: 2 // Add margin if needed
+  }}
+/>
             </Grid>
             <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>NAS Router</InputLabel>
-                <Select
-                  name="nas"
-                  value={formData.nas}
-                  onChange={handleInputChange}
-                  // onChange={(e) => {
-                  //   const selectedNas = nas.find(n => n.id === e.target.value);
-                  //   setFormData(prev => ({ ...prev, nas: selectedNas }));
-                  // }}
-                  label="NAS Router"
-                  required
-                >
-                  {nas.map(nas => (
-                    <MenuItem key={nas.id} value={nas.name}>
-                      {nas.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+             <Autocomplete
+  fullWidth
+  className='myTextField'
+  options={nas} // Your NAS array
+  value={nas.find(n => n.name === formData.nas) || null}
+  onChange={(event, newValue) => {
+    handleInputChange({
+      target: {
+        name: "nas",
+        value: newValue?.name || '' // Store the name (or use id if preferred)
+      }
+    });
+    
+    // OR if you need the full NAS object:
+    // setFormData(prev => ({ ...prev, nas: newValue?.name || '' }));
+  }}
+  getOptionLabel={(option) => option.name}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="NAS Router"
+      required
+      InputProps={{
+        ...params.InputProps,
+        // Custom input styling if needed
+      }}
+    />
+  )}
+  isOptionEqualToValue={(option, value) => option.id === value?.id}
+  sx={{
+    '& .MuiAutocomplete-inputRoot': {
+      padding: '9px 14px', // Match Select component padding
+    },
+    mt: 2
+  }}
+/>
             </Grid>
             <Grid item xs={12}>
               <Divider sx={{ my: 2 }} />

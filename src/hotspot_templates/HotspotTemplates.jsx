@@ -1,9 +1,4 @@
 
-
-
-
-
-
 import React, { useState, useCallback, useEffect, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -154,9 +149,10 @@ const [isloading, setisloading] = useState(false)
 
   // Sample template data
   const imageTemplates = [
-    { id: 1, name: 'default_template', image: '/images/template_image/default_template.png' },
-    { id: 2, name: 'sleekspot', image: '/images/template_image/sleek_deesighn.png' },
-    { id: 3, name: 'attractive', image: '/images/template_image/attractive.png.png' },
+    { id: 1, name: 'default_template', image: '/images/template_image/default.png' },
+    { id: 2, name: 'sleekspot', image: '/images/template_image/sleek.png'
+     },
+    { id: 3, name: 'attractive', image: '/images/template_image/attractive.png' },
     { id: 4, name: 'flat', image: '/images/template_image/flat.png' },
     { id: 5, name: 'minimal', image: '/images/template_image/minimal.png' },
     { id: 6, name: 'simple', image: '/images/template_image/simple.png' },
@@ -323,6 +319,7 @@ const newData = await response.json();
                 </h2>
                 <img
                   src={template.image}
+                 
                   alt="template image"
                   onClick={() => handleImageClick(template.image, template.name)}
                   className="w-full h-auto rounded-xl"

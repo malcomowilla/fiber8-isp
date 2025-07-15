@@ -193,9 +193,12 @@ console.log('name',name)
           value="11"><LiveData
            subscriberId={subscriberId}
           handleClose={handleClose} 
+          formData={formData}
           name={name}
           package_name={package_name}
           /></TabPanel>
+
+
           <TabPanel value="7"><Subscriptions
            handleClose={handleClose}
            setOnlyShowSubscription={setOnlyShowSubscription} 

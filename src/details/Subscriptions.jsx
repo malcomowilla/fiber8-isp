@@ -1,5 +1,16 @@
 
-import { Box, TextField, Autocomplete, Stack, InputAdornment, Button, } from '@mui/material';
+import { Box, TextField, Autocomplete, Stack, InputAdornment, Button,
+
+
+  Typography,
+  IconButton,
+  Tooltip,
+  CircularProgress,
+ } from '@mui/material';
+ import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import {  useState, useEffect,useCallback} from 'react'
 import { useDebounce } from 'use-debounce';
@@ -14,37 +25,26 @@ import { FaRegUser } from "react-icons/fa";
 import { TbLockPassword } from "react-icons/tb";
 import { GiCycle } from "react-icons/gi";
 import { MdOutlineBlock } from "react-icons/md";
-
 import { MdErrorOutline } from "react-icons/md";
-
-
-import { 
-   
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  Typography,
-  IconButton,
-  Tooltip,
-  CircularProgress,
-} from '@mui/material';
-
 import { MdOutlineNetworkPing } from "react-icons/md";
 import MaterialTable from 'material-table';
-
-
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import WarningIcon from '@mui/icons-material/Warning';
-
 import { MdNetworkPing } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
 import { FaCalendarAlt } from "react-icons/fa";
 import { IoWarningOutline } from "react-icons/io5";
-
-
+import DnsIcon from '@mui/icons-material/Dns';
+import WifiIcon from '@mui/icons-material/Wifi'; // Alternative icon for PPPoE
+import FingerprintIcon from '@mui/icons-material/Fingerprint';  // For unique identifier concept
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
+import { DemoContainer  } from '@mui/x-date-pickers/internals/demo';
 
 
 
@@ -59,14 +59,14 @@ const Subscriptions = ({
 }) => {
 
   const {settingsformData, subscriberSettings, setSubscriberSettings} = useApplicationSettings()
+  
   const {name, ref_no , ppoe_password,  ppoe_username,  phone_number, email, second_phone_number,
-     package_name, installation_fee, subscriber_discount, date_registered, router_name,
-     latitude, longitude, house_number, building_name
+      installation_fee, subscriber_discount, date_registered, router_name,
+     latitude, longitude, house_number, building_name, 
     }= formData
 
 
 
-  const [poe_package,] = useDebounce(package_name, 1000)
   const [ routerName] = useDebounce( router_name, 1000)
 
   const [packageName, setPackageName] = useState([])
@@ -77,7 +77,7 @@ const Subscriptions = ({
 
     const [networks, setNetworks] = useState([]);
     const [ipAssigned, setIpAssigned] = useState(false);
-    const [ipAddress, setIpAddress] = useState('');
+    const [ip_address, setIpAddress] = useState('');
     const [showMaterialTable, setShowMaterialTable] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [ips, setIps] = useState([])
@@ -85,11 +85,42 @@ const Subscriptions = ({
     const [onlineStatusData, setOnlineStatusData] = useState([]);
     const [blockLoading, setBlockLoading] = useState(false);
     const [blockedSubscriptions, setBlockedSubscriptions] = useState([]);
-
+const [service_type, setServiceType] = useState('pppoe')
+const [mac_address, setMacAdress] = useState('')
+const [network_name, setNetworkName] = useState('')
+const [package_name, setPackagesName] = useState('')
 
 const subdomain = window.location.hostname.split('.')[0];
+ const [age, setAge] = useState('');
+   const [poe_package,] = useDebounce(package_name, 1000)
+   const [expiration_date,  setExpirationDate] = useState('')
 
 
+
+    const handleChangeDate = (date)=> {
+    setExpirationDate(date)
+  }
+
+
+
+  const handleChange = (event) => {
+    setAge(event.target.value);
+  };
+
+const serviceTypeOptions = [
+  { 
+    value: 'dhcp', 
+    label: 'DHCP (Automatic IP)',
+    icon: <DnsIcon sx={{ mr: 1, color: 'primary.main' }} />
+  },
+  { 
+    value: 'pppoe', 
+    label: 'PPPoE (Dial-up)',
+    icon: <WifiIcon sx={{ mr: 1, color: 'info.main' }} />
+    // Alternative icon: <FiberManualRecordIcon sx={{ mr: 1, color: 'warning.main' }} />
+  },
+ 
+];
 
 
 const handleBlockService = async (subscriptionData) => {
@@ -132,7 +163,6 @@ const handleBlockService = async (subscriptionData) => {
     setBlockLoading(false);
   }
 };
-
 
 
 const fetchPackages = useCallback(
@@ -273,19 +303,24 @@ const handleChangeIpAddress =(e)=> {
     };
 
 
-    
 
 
 const handleRowClick = (event, rowData) => {
-console.log('rowData subscription add',rowData)
+// console.log('rowData subscription add',rowData)
 getIps(rowData.network_name)
 // setShowClientStatsAndSubscriptions(false)
 // formData.id = rowData.id
 // formData.network_name = rowData.network_name 
 // formData.ip_address = rowData.ip_address
 
+setExpirationDate(dayjs(rowData.expiration_date));
 
+
+  setNetworkName(rowData.network_name)
   setFormData(rowData)
+  setIpAddress(rowData.ip_address)
+  setMacAdress(rowData.mac_address)
+  setServiceType(rowData.service_type)
   setFormData({
     ...rowData,
     // id: rowData.id,
@@ -314,10 +349,15 @@ getIps(rowData.network_name)
 }
 
 
-
 const createSubscription = async(e) => {
   e.preventDefault()
-
+const payload = {
+  ...formData,
+  service_type: service_type, // or just service_type, using shorthand
+  network_name: network_name,
+  ip_address: ip_address,
+  expiration_date: expiration_date
+};
   try {
         const method = formData.id ? 'PUT' : 'POST'
     const url = formData.id ? `/api/subscriptions/${formData.id}?subscriber_id=${subscriberId}` : `/api/subscriptions?subscriber_id=${subscriberId}`
@@ -327,7 +367,7 @@ const createSubscription = async(e) => {
         'Content-Type': 'application/json',
         'X-Subdomain': subdomain
       },
-      body: JSON.stringify({ subscription: formData }) // Must be wrapped under `subscription`
+      body: JSON.stringify({ subscription: payload }) // Must be wrapped under `subscription`
     })
 
  const newData = await response.json()
@@ -377,11 +417,11 @@ const createSubscription = async(e) => {
 const handleIpChange = (event) => {
   const selectedIp = event.target.value;
   console.log('Changing IP to:', selectedIp); // Debug
-  
-  setFormData(prev => ({
-    ...prev,
-    ip_address: selectedIp
-  }));
+  setIpAddress(selectedIp)
+  // setFormData(prev => ({
+  //   ...prev,
+  //   ip_address: selectedIp
+  // }));
 };
 
 
@@ -480,6 +520,15 @@ const handleDeleteConfirm = async () => {
     setNetworkToDelete(null);
   }
 };
+
+
+
+
+const validityUnits = [
+  { value: 'days', label: 'Days' },
+  { value: 'hours', label: 'Hours' }
+  // Add more units if needed
+];
   return (
     <>
 {showMaterialTable && (
@@ -574,14 +623,28 @@ const handleDeleteConfirm = async () => {
             }
           },
           { 
-            title: 'Type', 
-            field: 'type',
+            title: 'Service Type', 
+            field: 'service_type',
             headerStyle: {
               color: 'black',
               fontWeight: 'bold',
               fontSize: '14px'
             }
           },
+
+ { 
+            title: 'Network Name', 
+            field: 'network_name',
+            headerStyle: {
+              color: 'black',
+              fontWeight: 'bold',
+              fontSize: '14px'
+            }
+          },
+
+
+
+
           { title: 'Package', field: 'package' ,
             headerStyle: { color: 'black' } 
           },
@@ -596,7 +659,7 @@ const handleDeleteConfirm = async () => {
               </p>
             ),
           },
-          { title: 'Node', field: 'node',  headerStyle: { color: 'black' }  },
+          // { title: 'Node', field: 'node',  headerStyle: { color: 'black' }  },
           {
             title: 'MAC Address',
             field: 'mac_adress',
@@ -671,11 +734,11 @@ const handleDeleteConfirm = async () => {
               </p>
             ),
           },
-          { title: 'Expiry', field: 'expiry' ,
+          { title: 'Expiry', field: 'expiration_date' ,
 
             render: rowData => (
               <p style={{ color: 'black', fontSize: '15px' }}>
-                {rowData.expiry}
+                {rowData.expiration_date}
                 <FaCalendarAlt className='text-orange-500 cursor-pointer'/>
               </p>
             ),
@@ -737,6 +800,8 @@ const handleDeleteConfirm = async () => {
           }
         }}
       />
+
+      
  <button onClick={(e) => {
               e.preventDefault()
               handleClose()
@@ -769,8 +834,44 @@ const handleDeleteConfirm = async () => {
       
       {/* Credentials Section */}
       <form onSubmit={createSubscription}>
-      <Stack spacing={3} sx={{ mb: 3 }}>
-        {subscriberSettings.use_autogenerated_number_as_ppoe_username && (
+ <Box sx={{ mb: 3 }} fullWidth>
+  <InputLabel sx={{ fontSize: '18px', mb: 1 }}>Change Service Type</InputLabel>
+  <Autocomplete
+  className='myTextField'
+    options={serviceTypeOptions}
+    value={serviceTypeOptions.find(option => option.value === service_type) || null}
+    onChange={(event, newValue) => {
+      setServiceType(newValue?.value || '');
+      console.log('service_type',newValue?.value)
+    }}
+    getOptionLabel={(option) => option.label}
+    renderOption={(props, option) => (
+      <Box component="li" {...props} sx={{ display: 'flex', alignItems: 'center' }}>
+        {option.icon}
+        {option.label}
+      </Box>
+    )}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        label="Select service type"
+        required
+        sx={{
+          '& .MuiInputBase-root': {
+            padding: '8px 14px',
+            fontSize: '16px'
+          }
+        }}
+      />
+    )}
+    fullWidth
+    disableClearable
+    isOptionEqualToValue={(option, value) => option.value === value.value}
+  />
+</Box>
+
+{service_type === 'pppoe' ?  (
+   <Stack spacing={3} sx={{ mb: 3 }}>
           <motion.div whileHover={{ scale: 1.01 }}>
             <TextField
               fullWidth
@@ -789,28 +890,9 @@ const handleDeleteConfirm = async () => {
               }}
             />
           </motion.div>
-        )}
 
-        {!subscriberSettings.use_autogenerated_number_as_ppoe_username && (
           <>
-            <motion.div whileHover={{ scale: 1.01 }}>
-              <TextField
-                fullWidth
-                className='myTextField'
-                id="ppoe_password"
-                onChange={handleChangeForm}
-                value={ppoe_password}
-                label="PPPoE Password"
-                variant="outlined"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <TbLockPassword className="text-blue-500" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </motion.div>
+          
 
             <motion.div whileHover={{ scale: 1.01 }}>
               <TextField
@@ -831,9 +913,37 @@ const handleDeleteConfirm = async () => {
               />
             </motion.div>
           </>
-        )}
       </Stack>
-
+):   <Box sx={{ mt: 2 }}>
+      <TextField
+        label="MAC Address"
+        className='myTextField'
+        value={mac_address}
+        onChange={(e) => setMacAdress(e.target.value)}
+        // name="macAddress"
+        placeholder="00:5A:2B:3C:9D:5E"
+        fullWidth
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <FingerprintIcon 
+                sx={{ 
+                  color: 'action.active',
+                  transform: 'rotate(45deg)' // Optional rotation
+                }} 
+              />
+            </InputAdornment>
+          ),
+        }}
+        sx={{
+          '& .MuiInputBase-input': {
+            fontFamily: 'monospace', // Makes colons align better
+          }
+        }}
+      />
+    </Box>
+}
+      
       {/* IP Address Section */}
       <motion.div 
         initial={{ opacity: 0 }}
@@ -846,31 +956,51 @@ const handleDeleteConfirm = async () => {
 
 
         <Stack direction="row" spacing={2} alignItems="center">
-        <FormControl sx={{ mt: 3 }} fullWidth>
-        <InputLabel sx={{
-          fontSize: '18px',
-        }}>IPv4 Adreses</InputLabel>
-<Select
-  value={formData.ip_address || ''}
-  onChange={handleIpChange}
-  name="ip_address"
-  label="IPv4 Address"
-  required
->
-  {ips.length > 0 ? (
-    ips.map(ip => (
-      <MenuItem key={ip} value={ip}>
-        {ip}
-        {/* {formData.ip_address || 'No IPs available'} */}
-      </MenuItem>
-    ))
-  ) : (
-    <MenuItem>
-      {formData.ip_address || 'No IPs available'}
-    </MenuItem>
-  )}
-</Select>
-          </FormControl>
+       <FormControl sx={{ mt: 3 }} fullWidth>
+  <Autocomplete
+  className='myTextField'
+    options={ips}
+    value={formData.ip_address || null}
+    onChange={(event, newValue) => {
+      handleIpChange({ 
+        target: { 
+          name: "ip_address", 
+          value: newValue || '' 
+        } 
+      });
+    }}
+    freeSolo={false}
+    disableClearable
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        label="IPv4 Address"
+        sx={{
+          '& .MuiInputBase-root': {
+            fontSize: '16px',
+            padding: '12px 14px',
+          }
+        }}
+        InputLabelProps={{
+          sx: { fontSize: '18px' }
+        }}
+      />
+    )}
+    // noOptionsText={ips.length === 0 ? "No IPs available" : "No matching IP found"}
+    loadingText="Loading IP addresses..."
+    isOptionEqualToValue={(option, value) => option === value}
+    filterOptions={(options, state) => {
+      // Custom filtering to match partial IP addresses
+      const inputValue = state.inputValue.trim();
+      if (!inputValue) return options;
+      
+      return options.filter(option => 
+        option.includes(inputValue) ||
+        option.split('.').some(octet => octet.startsWith(inputValue))
+      );
+    }}
+  />
+</FormControl>
           
           {/* <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Tooltip title="Assign Random IP">
@@ -894,46 +1024,61 @@ const handleDeleteConfirm = async () => {
         transition={{ delay: 0.4 }}
         
       >
-        <FormControl sx={{ mt: 3 }} fullWidth>
-          <InputLabel>IPv4 Network</InputLabel>
-          <Select
-          value={formData.network_name}
-          onChange={handleChangeNetwork}
-          name='network_name'
-          className='myTextField'
-            label="IPv4 Network"
-            required
-            sx={{
-              '& .MuiSelect-icon': {
-                color: 'primary.main'
-              }
-            }}
-          >
-            {networks.map(network => (
-              <MenuItem 
-                key={network.id} 
-                value={network.title}
-                sx={{ display: 'flex', justifyContent: 'space-between' }}
-              >
-                <span>{network.title}</span>
-
-                <Typography sx={{
-                  p: 2,
-                  color: 'primary.main',
-                }} variant="caption" color="text.secondary">
-                  {network.network} 
-                </Typography>
-
-                <Typography sx={{
-                  p: 2,
-                  color: 'primary.main',
-                }} variant="caption" color="text.secondary">
-                  {network.total_ip_addresses} IPs available
-                </Typography>
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+       <Autocomplete
+       className='myTextField'
+  options={networks}
+  value={networks.find(network => network.title === network_name) || null}
+  onChange={(event, newValue) => {
+    const selectedNetwork = newValue?.title || '';
+    setNetworkName(selectedNetwork);
+    getIps(selectedNetwork);
+    console.log('network_name onchange', selectedNetwork);
+  }}
+  getOptionLabel={(option) => option.title}
+  renderOption={(props, option) => (
+    <Box 
+      component="li" 
+      {...props}
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        width: '100%',
+        py: 1
+      }}
+    >
+      <Box sx={{ width: '30%' }}>
+        <Typography>{option.title}</Typography>
+      </Box>
+      <Box sx={{ width: '30%' }}>
+        <Typography variant="body2" color="text.secondary">
+          {option.network}
+        </Typography>
+      </Box>
+      <Box sx={{ width: '40%' }}>
+        <Typography variant="body2" color="primary">
+          {option.total_ip_addresses} IPs available
+        </Typography>
+      </Box>
+    </Box>
+  )}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="IPv4 Network"
+      required
+      sx={{
+        '& .MuiInputBase-root': {
+          padding: '8px 14px',
+        },
+        mt: 3
+      }}
+    />
+  )}
+  fullWidth
+  disableClearable
+  isOptionEqualToValue={(option, value) => option.title === value.title}
+  groupBy={(option) => option.category} // Optional: if you want to group networks
+/>
           {/* Package and Date */}
           <div className="mt-4">
             <Box className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 myTextField'
@@ -957,27 +1102,25 @@ const handleDeleteConfirm = async () => {
               }}
             >
               <Autocomplete
-                value={packageName.find((pkg) => pkg.name === formData.package_name) || null}
+               onChange={(event, newValue) => {
+                  console.log('package_name onchange',newValue.name)
+                  setPackagesName((prev) => ({ ...prev, package_name: newValue ? newValue.name : '' }));
+                }}
+                value={packageName.find((pkg) => pkg.name === package_name) || packageName.find((pkg) => pkg.name === package_name)}
                 options={packageName}
                 getOptionLabel={(option) => option.name}
                 renderInput={(params) => (
                   <TextField className='myTextField' {...params} label="Select Package" variant="outlined" fullWidth />
                 )}
-                onChange={(event, newValue) => {
-                  setFormData({ ...formData, package_name: newValue ? newValue.name : '' });
-                }}
+               
                 sx={{ mb: 2 }}
               />
-               <Box
-      sx={{
-        '& > :not(style)': { m: 1, },
-      }}>
-            <TextField fullWidth label='validity-period'   sx={{
 
+
+              
+           <DemoContainer  sx={{
 '& label.Mui-focused': {
-  color: 'black',
-  fontSize:'16px'
-
+  color: 'black'
   },
 '& .MuiOutlinedInput-root': {
 "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
@@ -989,50 +1132,24 @@ const handleDeleteConfirm = async () => {
 
 }
 },
-         
-        }}    className='myTextField' value={formData.validity}   
-            id='validity' 
-        onChange={handleChangeForm}   placeholder='validity-period...' type='number' ></TextField>
-
-</Box>
+    }}  components={['TimePicker', 'TimePicker']}>
 
 
+      <DateTimePicker  viewRenderers={{
+    hours: renderTimeViewClock,
+    minutes: renderTimeViewClock,
+    seconds: renderTimeViewClock,
+  }}     className='myTextField'
+        label="Extend Subscription"
+     
+value={expiration_date ? dayjs(expiration_date) : null}
+     onChange={(date) => {
+      handleChangeDate(date)
+     }}
+      />
+     
+    </DemoContainer>
 
-<FormControl  
-
-
-  sx={{
-    '& > :not(style)': { m: 1,  },
-
-'& label.Mui-focused': {
-  color: 'black',
-  fontSize:'16px'
-  },
-'& .MuiOutlinedInput-root': {
-"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-  borderColor: "black",
-  borderWidth: '3px'
-  },
-'&.Mui-focused fieldset':  {
-  borderColor: 'black', // Set border color to transparent when focused
-
-}
-},
-         
-        }}   >
-        <InputLabel id="validity_period_units">Validity period units</InputLabel>
-        <Select
-          id="validity_period_units"
-          label="Validity-period-units"
-          
-          value={formData.validity_period_units}
-          onChange={e=> setFormData({...formData, validity_period_units: e.target.value})}
-
-        >
-          <MenuItem value={'days'}>days</MenuItem>
-          <MenuItem value={'hours'}>hours</MenuItem>
-        </Select>
-      </FormControl>
             </Box>
           </div>
           <div className="flex gap-4 mt-6">
@@ -1129,3 +1246,7 @@ const handleDeleteConfirm = async () => {
 }
 
 export default Subscriptions
+
+
+
+

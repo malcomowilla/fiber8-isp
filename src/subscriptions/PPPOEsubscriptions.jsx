@@ -95,8 +95,8 @@ actions={[
 
 options={{
   paging: true,
-  pageSizeOptions:[5, 10, 20, 25, 50, 100],
-  pageSize: 10,
+  pageSizeOptions:[5, 10, 15],
+  pageSize: 15,
   search: false,
   searchFieldAlignment:'right',
 

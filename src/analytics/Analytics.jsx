@@ -14,7 +14,9 @@ import { MdOutlineOnlinePrediction } from "react-icons/md";
 import { IoCloudOfflineOutline } from "react-icons/io5";
 import { LuUsers } from "react-icons/lu";
 import { MdMobiledataOff } from "react-icons/md";
-
+import { FaArrowUp } from "react-icons/fa6";
+import { FaArrowDown } from "react-icons/fa6";
+import { Link } from 'react-router-dom';
 
 
 
@@ -92,6 +94,8 @@ const [routerInfo, setRouterInfo] = useState(null);
   const [loadingUbuntuStats, setLoadingUbuntuStats] = useState(true);
 const [totalBandwidth, setTotalBandwidth] = useState(0);
 const [totalOnlineUsers, setTotalOnlineUsers] = useState(0);
+const [totalDownload, setTotalDownload] = useState(0);
+const [totalUpload, setTotalUpload] = useState(0);
 
 
   // const fetchUbuntuStats = useCallback(async () => {
@@ -164,6 +168,8 @@ const [totalOnlineUsers, setTotalOnlineUsers] = useState(0);
         if (response.ok) {
           setTotalOnlineUsers(data.active_user_count)
           setTotalBandwidth(data.total_bandwidth)
+          setTotalDownload(data.total_download)
+          setTotalUpload(data.total_upload)
           
         } else {
           
@@ -295,7 +301,7 @@ useEffect(() => {
 
 
 
-      const StatCard = ({ title, value, icon, trend, color }) => (
+      const StatCard = ({ title, value, icon, trend, color, view , to}) => (
   <motion.div 
     variants={cardVariants}
     className={`p-6 rounded-xl shadow-md bg-white 
@@ -318,6 +324,7 @@ useEffect(() => {
         {icon}
       </Box>
     </div>
+    
     {trend && (
       <Typography 
         variant="caption" 
@@ -326,7 +333,13 @@ useEffect(() => {
         {trend.value > 0 ? '↑' : '↓'} {Math.abs(trend.value)}% {trend.label}
       </Typography>
     )}
+<div className='bg-gray-100 hover:bg-gray-400 p-2 rounded-lg hover:text-white'>
+  <Link to={to}>
+    <p className='dark:text-black'>{view}</p>
+    </Link>
+    </div>
   </motion.div>
+
 );
     
   return (
@@ -383,8 +396,11 @@ useEffect(() => {
           title="All Clients" 
           value={totalSubscribers}
           icon={<LuUsers size={24} className='text-black' />} 
-          trend={{ value: 8, label: <p className=''>vs yesterday</p> }}
+          // trend={{ value: 8, label: <p className=''>vs yesterday</p> }}
           color="secondary"
+          view="view"
+          to="/admin/pppoe-subscribers"
+
         />
 
 
@@ -403,6 +419,8 @@ useEffect(() => {
           icon={<MdOutlineOnlinePrediction size={24} className='text-black' />} 
           trend={{ value: 8, label: 'vs yesterday' }}
           color="secondary"
+                    view="view"
+
         />
 
 
@@ -417,6 +435,8 @@ useEffect(() => {
           icon={<IoCloudOfflineOutline  size={24} className='text-black' />} 
           trend={{ value: 8, label: 'vs yesterday' }}
           color="secondary"
+                    view="view"
+
         />
   
     </div>
@@ -433,10 +453,32 @@ useEffect(() => {
         <Typography variant="subtitle2" color="textSecondary">
           <p className='text-black roboto-condensed-light '>Data (24H)</p>
         </Typography>
-        {totalBandwidth || 0}
+        <p className='dark:text-black'>{totalBandwidth || 0}</p>
+
+
+        <div className='flex items-center mt-4'>
+          <div className='flex dark:text-black '>
+        <FaArrowDown
+          size={20}
+          className='text-black'
+
+        />
+        {totalDownload || 0}
+        </div>
+
+        <div className='flex dark:text-black'>
+<FaArrowUp
+          size={20}
+          className='text-black'
+        />
+        {totalUpload || 0}
+        </div>
+        </div>
+
       </div>
       
         < MdMobiledataOff
+        className='dark:text-black'
  />
     </div>
    
