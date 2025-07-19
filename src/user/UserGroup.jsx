@@ -27,6 +27,7 @@ const [userGroups, setUserGroups] = useState([])
 const [name, setName] = useState('')
 const [openDelete, setOpenDelete] = useState(false)
 const [nameId, setNameId] = useState('')
+const [editUserGroup, setEditUserGroup] = useState(false)
 
 const handleCloseDelete = () => {
   setOpenDelete(false)
@@ -39,6 +40,7 @@ setName(e.target.value)
 
 const handleRowAdd = (event,rowData) =>{
 
+  setEditUserGroup(true)
   setName(rowData)
   setNameId(rowData.id)
   console.log('name=>',rowData)
@@ -249,7 +251,6 @@ const createUserGroups = async(e) => {
 
 }
 
-console.log('name id',nameId)
   return (
     <div className=''>
       <Toaster />
@@ -258,7 +259,10 @@ console.log('name id',nameId)
       <EditUserGroups handleClose={handleClose} open={open}
        handleChangeUserGroups={handleChangeUserGroups}
        name={name}
-       createUserGroups={createUserGroups} />
+       createUserGroups={createUserGroups} 
+       setEditUserGroup={setEditUserGroup}
+       editUserGroup={editUserGroup}
+       />
          
          <div className="flex items-center max-w-sm mx-auto p-3">  
      
@@ -348,7 +352,10 @@ console.log('name id',nameId)
       
     actions={[
         {
-          icon:()=><AddIcon  onClick={handleAdd}/>,
+          icon:()=><AddIcon  onClick={() => {
+            setEditUserGroup(false)
+            handleAdd()
+          }}/>,
           tooltip: 'Add User Group',
           isFreeAction: true 
         }

@@ -26,6 +26,15 @@ import { useDebounce } from 'use-debounce';
 import CircularProgress from "@mui/material/CircularProgress"; 
 import { motion } from 'framer-motion';
 import { FaCircle } from 'react-icons/fa';
+import { CiLocationOn } from "react-icons/ci";
+import { FaRegBuilding } from "react-icons/fa";
+import { FaCalendarCheck } from "react-icons/fa";
+import { FaShareNodes } from "react-icons/fa6";
+import { MdOutlinePhoneForwarded } from "react-icons/md";
+import { GoPaperclip } from "react-icons/go";
+
+
+
 
 
 
@@ -87,6 +96,7 @@ const [searchInput] = useDebounce(search, 1000)
 const [isSearching, setIsSearching] = useState(false); // New state for search loading
 
 const [subscriberId, setSubscriberId] = useState('')
+const [editingSubscriber, setEditingSubscriber] = useState(false)
   const handleClickOpen = () => {
     setOpen(true);
     
@@ -98,6 +108,7 @@ const [subscriberId, setSubscriberId] = useState('')
 
   const handleCLickAdd = () => {
     setOpen(true);
+    setEditingSubscriber(false)
     setFormData(intialValue)
     setShowClientStatsAndSubscriptions(false)
   }
@@ -146,8 +157,10 @@ const handleClickRow = () => {
   const handleRowClick = (event, rowData) => {
     setOnlyShowSubscription(true)
     console.log('subscribers',rowData)
+    setEditingSubscriber(true)
    console.log('showClientStatsAndSUbscriptions',showClientStatsAndSUbscriptions)
     setShowClientStatsAndSubscriptions(true)
+    setSelectedLocations(rowData.location)
     setSubscriberId(rowData.id)
 setFormData({
   ...rowData,
@@ -445,9 +458,24 @@ toast.error('failed to delete subscriber', {
 
 
   const columns = [
-    {title: 'name', field: 'name', headerClassName: 'dark:text-black ', defaultSort: 'asc'},
+    {title: 'name', field: 'name', headerClassName: 'dark:text-black ', defaultSort: 'asc', 
+      render: (rowData) => {
+        return<> {rowData.name  && <div
+          onClick={() => {
+            setOpen(true)
+          }}
+          className='flex gap-2'> <GoPaperclip  className='text-black w-6 h-6
+         dark:text-white cursor-pointer
+         hover:text-green-700'/> {rowData.name}</div> } </>
+      }
+    },
     {title: 'ref_no', field: 'ref_no',  headerClassName: 'dark:text-black' ,  sorting: true, defaultSort: 'asc'},
     {title: 'Date Registered', field: 'registration_date',  headerClassName: 'dark:text-black' , 
+      render: (rowData) => {
+        return <>{rowData.registration_date && <div className='flex gap-2'> <FaCalendarCheck className='text-black w-6 h-6
+         dark:text-white cursor-pointer
+         hover:text-green-700'/> {rowData.registration_date}</div> }</> 
+      }
        },
   
     {title: 'status', field: 'status',  headerClassName: 'dark:text-black',
@@ -483,8 +511,21 @@ toast.error('failed to delete subscriber', {
   );
 }
     },
-    {title: 'phone_number', field: 'phone_number',  headerClassName: 'dark:text-black'},
-    {title: 'Location', field: 'location',  headerClassName: 'dark:text-black'},
+    {title: 'phone_number', field: 'phone_number',  headerClassName: 'dark:text-black', 
+      render: (rowData) => {
+        return <> {rowData.phone_number &&  <div className='flex gap-2'> <MdOutlinePhoneForwarded className='text-black w-4 h-4
+         dark:text-white cursor-pointer
+         hover:text-green-700'/> {rowData.phone_number}</div>} </>
+      }
+    },
+
+    {title: 'Location', field: 'location',  headerClassName: 'dark:text-black', 
+      render: (rowData) => {
+        return <>  {rowData.location && <div className='flex'> <CiLocationOn className='text-black w-6 h-6
+         dark:text-white cursor-pointer
+         hover:text-green-700'/> {rowData.location}</div>} </> 
+      }
+    },
     {title: 'package', field: 'package_name',
        type: 'numeric', headerClassName: 'dark:text-black', align: 'left', 
       render: (rowData) => {
@@ -504,8 +545,21 @@ className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-5
       }
       },
     {title: 'House Number', field:'house_number',  headerClassName: 'dark:text-black'},
-    {title: ' Building', field:'building_name',  headerClassName: 'dark:text-black'},
-        {title: 'Node', field:'node',  headerClassName: 'dark:text-black'},
+    {title: 'Building', field:'building_name',  headerClassName: 'dark:text-black', 
+      render: (rowData) => {
+        
+        return <> {rowData.building_name && <div className='flex gap-2'> <FaRegBuilding className='text-black w-4 h-4
+         dark:text-white cursor-pointer
+         hover:text-green-700'/> {rowData.building_name}</div> } </>
+      }
+    },
+        {title: 'Node', field:'node',  headerClassName: 'dark:text-black', 
+          render: (rowData) => {
+            return <> {rowData.node && <div className='flex gap-2'> <FaShareNodes className='text-black w-6 h-6
+             dark:text-white cursor-pointer
+             hover:text-green-700'/> {rowData.node}</div>} </> 
+          }
+        },
 
   
     
@@ -596,6 +650,7 @@ handleChangeForm={handleChange}
     onlyShowSubscription={onlyShowSubscription} setOnlyShowSubscription={setOnlyShowSubscription}
     showClientStatsAndSUbscriptions={showClientStatsAndSUbscriptions}
     setShowClientStatsAndSubscriptions={setShowClientStatsAndSubscriptions}
+    
     packageName={formData.package_name}
     open={open}
     name={formData.name}
@@ -609,6 +664,8 @@ handleChangeForm={handleChange}
     handleChangeForm={handleChange}
     selectedLocations={selectedLocations}
      setSelectedLocations={setSelectedLocations}
+     editingSubscriber={editingSubscriber}
+     setEditingSubscriber={setEditingSubscriber}
   />
 )}
 
@@ -617,14 +674,7 @@ handleChangeForm={handleChange}
     <label htmlFor="simple-search" className="sr-only">Search</label>
     <div className="relative w-full">
         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-            {/* <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-             xmlns="http://www.w3.org/2000/svg"
-             fill="none" viewBox="0 0 18 20">
-                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-                 strokeWidth="2" d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"/>
-            </svg> */}
             <IoPeople className='text-black'/>
-            
         </div>
 
 

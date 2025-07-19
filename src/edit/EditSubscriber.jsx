@@ -30,7 +30,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const EditSubscriber = ({handleClose, open, formData , createSubscriber,
   setShowClientStatsAndSubscriptions, showClientStatsAndSUbscriptions,
    handleChangeForm, packageNamee, setFormData, isloading,
-  
+  editingSubscriber, setEditingSubscriber,
    name,
    package_name,
    onlyShowSubscription,setOnlyShowSubscription,
@@ -177,6 +177,8 @@ console.log('name',name)
               handleChangeForm={handleChangeForm}
               selectedLocations={selectedLocations}
               setSelectedLocations={setSelectedLocations}
+              editingSubscriber={editingSubscriber}
+              setEditingSubscriber={setEditingSubscriber}
 
             />
           </TabPanel>
@@ -203,7 +205,7 @@ console.log('name',name)
            handleClose={handleClose}
            setOnlyShowSubscription={setOnlyShowSubscription} 
            subscriberId={subscriberId}
-           
+           setShowClientStatsAndSubscriptions={setShowClientStatsAndSubscriptions}
            onlyShowSubscription={onlyShowSubscription}
            isloading={isloading}
            formData={formData}

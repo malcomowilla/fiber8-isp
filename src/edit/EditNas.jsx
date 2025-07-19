@@ -21,7 +21,7 @@ import { TbLockPassword } from "react-icons/tb";
 import { FaUserEdit } from "react-icons/fa";
 
 
-function EditNas({ open, handleClose, handleSubmit, nasformData, setnasFormData, isloading }) {
+function EditNas({ open, handleClose, handleSubmit, nasformData, setnasFormData, isloading , editingRouter}) {
   const { name, username, ip_address, password } = nasformData;
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState('lg');
@@ -242,8 +242,8 @@ InputProps={{
 <motion.button 
  whileHover={{ scale: 1.05 }}
  whileTap={{ scale: 0.95 }}
-className={`px-5 py-3  font-medium 
-         text-gray-700 rounded-2xl transition-all
+className={`  font-medium p-4
+         text-white rounded-lg transition-all
              hover:bg-red-500 bg-red-500`}
              onClick={ (e)=> {
               e.preventDefault()
@@ -255,7 +255,20 @@ className={`px-5 py-3  font-medium
        whileHover={{ scale: 1.05 }}
        whileTap={{ scale: 0.95 }}
       >
-                <LoadingButton
+
+
+        <motion.button
+        type='submit'
+        whileHover={{ scale: 1.05 }}
+ whileTap={{ scale: 0.95 }}
+className={`  font-medium p-4
+         text-white rounded-lg transition-all
+             hover:bg-green-600 bg-green-500`}
+            
+        >
+          {editingRouter ? 'Update' : 'Save'}
+        </motion.button>
+                {/* <LoadingButton
                   type="submit"
                   variant="contained"
                   startIcon={<AutorenewIcon />}
@@ -264,7 +277,7 @@ className={`px-5 py-3  font-medium
                   sx={{ borderRadius: '8px', background: '#4CAF50' }}
                 >
                   Save
-                </LoadingButton>
+                </LoadingButton> */}
                 </motion.div>
               </motion.div>
             </DialogActions>

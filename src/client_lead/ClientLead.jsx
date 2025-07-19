@@ -50,6 +50,7 @@ const ClientLead = () => {
 const [openDelete, setOpenDelete] = useState(false);
 const [openEdit, setOpenEdit] = useState(false);
 const [clientName, setClientName] = useState('');
+const [editLead, setEditLead] = useState(false)
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,6 +75,7 @@ const [clientName, setClientName] = useState('');
         console.log('leads',rowData)
     setFormData(rowData)    
     setClientName(rowData.name)
+    setEditLead(true)
 }
 
 const subdomain = window.location.hostname.split('.')[0];
@@ -308,7 +310,9 @@ const handleCloseDelete = () => {
  />
 
     <EditLead  setOpen={setOpenEdit} open={openEdit} 
-     loading={loading} formData={formData}  createLead={createLead} setFormData={setFormData}/>
+     loading={loading} formData={formData}  createLead={createLead} setFormData={setFormData}
+     editLead={editLead} setEditLead={setEditLead}
+     />
     <div 
     onClick={() => {
       setShowMenu1(false)
@@ -378,6 +382,7 @@ const handleCloseDelete = () => {
       {
         icon: () => <AddIcon onClick={()=> {
             setOpenEdit(true)
+            setEditLead(false)
             setFormData('')
         }} />,
         isFreeAction: true, // This makes the action always visible

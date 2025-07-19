@@ -30,7 +30,9 @@ const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const EditLead = ({ open, setOpen, formData, setFormData, createLead }) => {
+const EditLead = ({ open, setOpen, formData, setFormData, createLead,
+  editLead
+ }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [loading, setLoading] = useState(false);
@@ -225,7 +227,7 @@ const EditLead = ({ open, setOpen, formData, setFormData, createLead }) => {
               }
             }}
           >
-            {loading ? 'Saving...' : 'Save Changes'}
+            {loading ? 'Saving...' : <p>{editLead ? 'Update Lead' : 'Save Lead'} </p>}
           </Button>
         </DialogActions>
       </Box>

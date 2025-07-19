@@ -54,6 +54,7 @@ const HotspotSubscriptions = () => {
   const [searchInput] = useDebounce(search, 1000)
   const [isSearching, setIsSearching] = useState(false); // New state for search loading
   const [openSendVoucher, setOpenSendVoucher] = useState(false);
+  const [editVoucher, setEditVoucher] = useState(false);
   
 
 
@@ -121,6 +122,7 @@ setVoucherForm((prevState) => ({
     console.log('vouchers',rowData)
    setVoucher(rowData.voucher)
     setVoucherForm(rowData)
+    setEditVoucher(true)
 
 
   }
@@ -468,6 +470,7 @@ deleteVoucher={deleteVoucher} id={voucherForm.id} loading={loading}/>
     voucherForm={voucherForm} createVoucher={createVoucher}
     setVoucherForm={setVoucherForm}
     handleChangeVoucher={handleChangeVoucher}
+    editVoucher={editVoucher}
 
     />
 
@@ -556,7 +559,10 @@ data={vouchers}
 
 actions={[
  {
-  icon: ()=> <AddIcon onClick={handleClickOpen}/>,
+  icon: ()=> <AddIcon onClick={() => {
+    handleClickOpen()
+     setEditVoucher(false)
+  }}/>,
     isFreeAction: true,
     tooltip: 'Add Voucher',
   

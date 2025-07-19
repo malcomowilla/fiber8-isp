@@ -27,6 +27,7 @@ const Nas = () => {
 
 const navigate = useNavigate()
   const [open, setOpen] = useState(false);
+  const [editingRouter, setEditingRouter] = useState(false)
 
 const [loading, setloading] = useState(false)
 const [offlineerror, setofflineerror] = useState(false)
@@ -70,6 +71,7 @@ const handleCloseDelete = () => {
   const handleClickOpen = () => {
     setOpen(true);
     setnasFormData(initialValueNas)
+    setEditingRouter(false)
 
   };
 
@@ -162,6 +164,7 @@ const subdomain = window.location.hostname.split('.')[0];
     setnasFormData(rowData);
     console.log('router row data', rowData)
     setRouterName(rowData.id)
+    setEditingRouter(true)
   
     // Add your custom logic here, such as opening a modal or updating state
   };
@@ -585,7 +588,9 @@ const handleCloseLoading = () => {
      </button>
  </div>
 <EditNas open={open} handleClose={handleClose} tableData={tableDataNas} handleSubmit={handleSubmit}   nasformData={nasformData}
- setnasFormData={setnasFormData}  isloading={loading}/>
+ setnasFormData={setnasFormData}  isloading={loading}
+ editingRouter={editingRouter} setEditingRouter={setEditingRouter}
+ />
 
 
 <DeleteRouter loading={loading}  deleteRouter={deleteRouter} id={nasformData.id}  handleCloseDelete ={handleCloseDelete}  openDelete={openDelete}/>

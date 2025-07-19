@@ -1,15 +1,12 @@
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-
 import {useState,useMemo, useEffect, useCallback} from 'react'
 import * as React from 'react';
-
 import {
   renderTimeViewClock,
 } from '@mui/x-date-pickers/timeViewRenderers';
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
-
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -24,11 +21,16 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import PackageNotification  from '.././notification/PackageNotification'
 import {useApplicationSettings} from '../settings/ApplicationSettings'
-
 import { useDebounce } from 'use-debounce';
 import { Autocomplete} from '@mui/material';
-
 import toast, { Toaster } from 'react-hot-toast';
+import { PiMoneyThin } from "react-icons/pi";
+import { CiWifiOn } from "react-icons/ci";
+import { FaLongArrowAltUp } from "react-icons/fa";
+import { FaLongArrowAltDown } from "react-icons/fa";
+import { IoMdTime } from "react-icons/io";
+import { PiNumberOne } from "react-icons/pi";
+import { MdOutlineAttachMoney } from "react-icons/md";
 
 
 
@@ -37,9 +39,10 @@ const EditPackage = ({open, handleClose, formData, loading, setFormData, showNot
   uploadBurstSpeedError, downloadBurstSpeedError,
   priceError, uploadLimitError, downloadLimitError,
   createPackage,offlineerror,isloading, validityPeriodUnitError,
+  editPackage
   
    }) => {
-
+console.log('edit package pakage', editPackage)
 const [error, setError] = useState('')
 const [message, setMessage] = useState('')
 const [routers, setRouters]= useState ([])
@@ -116,7 +119,7 @@ const fetchRouters = useMemo(() => async ()=> {
 
 
 const onChange = (e) =>{
-  console.log('formData,',formData)
+  console.log('formData onchage edit package,',formData)
   // const {value, id} = e.target
   setFormData({ ...formData, [e.target.id]: e.target.value });
 
@@ -229,51 +232,16 @@ const onChange = (e) =>{
 },
          
         }}   id='name'  className='myTextField' 
+         InputProps={{
+                startAdornment: <CiWifiOn  className='mr-2 w-6 h-6'/>,
+              }}
           value={formData.name} onChange={(e)=> onChange(e) } 
-             placeholder='enter name...' label='package-name' fullWidth   ></TextField>
+             placeholder='enter name...' label='package-name' fullWidth ></TextField>
+
+
 
             </Box>
-{settingsformData.use_radius ? (
-null
-): <>
 
-
-<Autocomplete
-            
-            value={ipPool.find((pkg) => pkg.pool_name === formData.ip_pool) || null}
-            options={ipPool}
-            getOptionLabel={(option) => option.pool_name || ""}  // Ensure string label
-
-            // getOptionLabel={(option) => option.name}
-            renderInput={(params) => (
-              <TextField  className='myTextField' {...params} label="ip pool" variant="outlined" fullWidth />
-            )}
-            onChange={(event, newValue) => {
-              setFormData({ ...formData, ip_pool: newValue ? newValue.pool_name : '' });
-            }}
-            sx={{
-              mt: 4,
-
-              '& label.Mui-focused': {
-                color: 'black',
-                fontSize: '17px'
-              
-                },
-              '& .MuiOutlinedInput-root': {
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "black",
-                borderWidth: '3px'
-                },
-              '&.Mui-focused fieldset':  {
-                borderColor: 'black', 
-                
-              
-              }
-              },
-                       
-                      }}
-          />
-</>}
            
 
             <div className='flex  gap-3 mt-4'>
@@ -295,10 +263,25 @@ null
 }
 },
          
-        }}   value={formData.price} className='myTextField'      id='price'
+        }
+      
+      } 
+        
+         InputProps={{
+                startAdornment: <PiMoneyThin  className='mr-2 w-6 h-6'/>,
+              }}
+        value={formData.price} className='myTextField'      id='price'
             onChange={e =>onChange(e)  }  type='number' fullWidth></TextField>
 
-            <TextField label='upload-speed-limit(mbps)' id='upload_limit'  sx={{
+
+
+            <TextField label='upload-speed-limit(mbps)'
+              InputProps={{
+                startAdornment: <FaLongArrowAltUp  className='mr-2 w-5 h-5'/>,
+              }}
+            
+              
+            id='upload_limit'  sx={{
 
 '& label.Mui-focused': {
   color: 'black'
@@ -316,7 +299,13 @@ null
          
         }}   value={formData.upload_limit}         className='myTextField' onChange={e =>onChange(e)} 
             type='number' placeholder='upload-speed-limit(mbps)...' fullWidth></TextField>
-            <TextField  label='download-speed-limit(mbps)'   id='download_limit'   sx={{
+
+
+            <TextField  label='download-speed-limit(mbps)'
+             InputProps={{
+                startAdornment: <FaLongArrowAltDown  className='mr-2 w-5 h-5'/>,
+              }}
+            id='download_limit'   sx={{
 
 '& label.Mui-focused': {
   color: 'black'
@@ -335,19 +324,52 @@ null
         }}   className='myTextField' value={formData.download_limit}    
             onChange={e =>onChange(e)} type='number' 
       fullWidth></TextField>
+
+
+
+
+             <TextField   
+              
+               InputProps={{
+                startAdornment:<> <PiNumberOne className='mr-2 w-5 h-5'/> <p 
+                className='text-black dark:text-white'
+                >:</p> </>,
+              }}
+              sx={{
+  
+  '& label.Mui-focused': {
+    color: 'black'
+    },
+  '& .MuiOutlinedInput-root': {
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+  '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
+  
+  }
+  },
+           
+          }}   label='Aggregation'
+  
+             onChange={e => onChange(e)}
+           value={formData.aggregation}
+                 className='myTextField'  id='aggregation'
+             fullWidth></TextField>
             </div>
            
-           <div className='flex '>
+          
 
-           <Box
-      sx={{
-        '& > :not(style)': { m: 1, width: '40ch' },
-      }}>
-{settingsformData.use_radius ? (
-  <>
-  <TextField  label='upload-burst-speed(mbps)' 
+          
+          <div className='mt-2'>
+ <TextField  label='daily charge'
+   InputProps={{
+                startAdornment: <MdOutlineAttachMoney  className='mr-2 w-5 h-5'/>,
+              }}
              onChange={e => onChange(e)}
-               value={formData.upload_burst_limit}    
+
+               value={formData.daily_charge}
                     sx={{
   
   '& label.Mui-focused': {
@@ -365,8 +387,123 @@ null
   },
            
           }}  
-               type='number'  fullWidth id='upload_burst_limit' className='myTextField'></TextField>
-              <TextField    sx={{
+                 fullWidth id='daily_charge' className='myTextField'></TextField>
+
+
+
+          </div>
+         
+
+
+<div className='flex  gap-3 mt-4'>
+  <TextField  label='Burst Threshold Download(mbps)'
+   InputProps={{
+                startAdornment: <FaLongArrowAltDown  className='mr-2 w-5 h-5'/>,
+              }}
+             onChange={e => onChange(e)}
+
+               value={formData.burst_threshold_download}
+                    sx={{
+  
+  '& label.Mui-focused': {
+    color: 'black'
+    },
+  '& .MuiOutlinedInput-root': {
+  "&.Mui-focused .2MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+  '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
+  
+  }
+  },
+           
+          }}  
+                 fullWidth id='burst_threshold_download' className='myTextField'></TextField>
+
+
+
+        <TextField  label='Burst Threshold Upload(mbps)'
+   InputProps={{
+                startAdornment: <FaLongArrowAltUp  className='mr-2 w-5 h-5'/>,
+              }}
+             onChange={e => onChange(e)}
+
+               value={formData.burst_threshold_upload}
+                    sx={{
+  
+  '& label.Mui-focused': {
+    color: 'black'
+    },
+  '& .MuiOutlinedInput-root': {
+  "&.Mui-focused .2MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+  '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
+  
+  }
+  },
+           
+          }}  
+                 fullWidth id='burst_threshold_upload' className='myTextField'></TextField>
+</div>
+           <Stack sx={{ width: '100%', mt: 2 }} spacing={2}>
+      
+      <Alert severity="info">
+        <AlertTitle>Speed Boost</AlertTitle>
+        You can provide your customers with boosted speeds during off-peak hours. The boosted speeds will apply between the specified hours 
+        and revert to regular limits during other hours
+      </Alert>
+      
+    
+    </Stack>
+
+            <div className='flex  mt-2'>
+
+           <Box
+      sx={{
+        '& > :not(style)': { m: 1, width: '40ch' },
+      }}>
+
+        
+  <>
+  <TextField  label='upload-burst-speed(mbps)' 
+   InputProps={{
+                startAdornment: <FaLongArrowAltUp  className='mr-2 w-5 h-5'/>,
+              }}
+             onChange={e => onChange(e)}
+
+               value={formData.burst_upload_speed}    
+                    sx={{
+  
+  '& label.Mui-focused': {
+    color: 'black'
+    },
+  '& .MuiOutlinedInput-root': {
+  "&.Mui-focused .2MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+  '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
+  
+  }
+  },
+           
+          }}  
+                 fullWidth id='burst_upload_speed' className='myTextField'></TextField>
+
+
+
+              <TextField   
+              
+               InputProps={{
+                startAdornment: <FaLongArrowAltDown className='mr-2 w-5 h-5'/>,
+              }}
+              sx={{
   
   '& label.Mui-focused': {
     color: 'black'
@@ -384,225 +521,58 @@ null
            
           }}   label='download-burst-speed(mbps)'    onChange={e =>onChange(e)}
   
-           value={formData.download_burst_limit}      
-                type='number' className='myTextField'  id='download_burst_limit'
+           value={formData.burst_download_speed}      
+                 className='myTextField'  id='burst_download_speed'
              fullWidth></TextField>
+
+
+
+              <TextField   
+              
+               InputProps={{
+                startAdornment: <IoMdTime className='mr-2 w-5 h-5'/>,
+              }}
+              sx={{
+  
+  '& label.Mui-focused': {
+    color: 'black'
+    },
+  '& .MuiOutlinedInput-root': {
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+  '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
+  
+  }
+  },
+           
+          }}   label='burst time(s)'
+  
+           value={formData.burst_time}
+            onChange={e => onChange(e)}
+                type='number' className='myTextField'  id='burst_time'
+             fullWidth></TextField>
+
+
+
+
+
+
   
   </>
-): null}
            
 
-           {settingsformData.use_radius ? (
-             <>
-
-             <TextField label='burst-period(s)'   sx={{
-             
-             '& label.Mui-focused': {
-               color: 'black'
-               },
-             '& .MuiOutlinedInput-root': {
-             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-               borderColor: "black",
-               borderWidth: '3px'
-               },
-             '&.Mui-focused fieldset':  {
-               borderColor: 'black', // Set border color to transparent when focused
-             
-             }
-             },
-                      
-                     }}    type='number'  placeholder='burst-period(s)...' 
-                      className='myTextField'  id='' fullWidth></TextField>
-                         <TextField label='burst-threshhold(mbps)'   sx={{
-             
-             '& label.Mui-focused': {
-               color: 'black'
-               },
-             '& .MuiOutlinedInput-root': {
-             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-               borderColor: "black",
-               borderWidth: '3px'
-               },
-             '&.Mui-focused fieldset':  {
-               borderColor: 'black', // Set border color to transparent when focused
-             
-             }
-             },
-                      
-                     }}    placeholder='burst-threshhold(mbps)...'   className='myTextField'  fullWidth></TextField>
-                        
-                         </>
-           ): null}
 
 </Box> 
 
            </div>
-         
-
-           <Stack sx={{ width: '100%' }} spacing={2}>
-      
-      <Alert severity="info">
-        <AlertTitle>Speed Boost</AlertTitle>
-        You can provide your customers with boosted speeds during off-peak hours. The boosted speeds will apply between the specified hours 
-        and revert to regular limits during other hours
-      </Alert>
-      
     
-    </Stack>
-
-              <div className='flex gap-3 mt-2 justify-center'>
-
-
-           {settingsformData.use_radius  ? (
- <>
- <TextField label='boosted-upload-speed-limit'   sx={{
-
-'& label.Mui-focused': {
-color: 'black'
-},
-'& .MuiOutlinedInput-root': {
-"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-borderColor: "black",
-borderWidth: '3px'
-},
-'&.Mui-focused fieldset':  {
-borderColor: 'black', // Set border color to transparent when focused
-
-}
-},
-       
-      }}   type='number'  className='myTextField' placeholder='boosted-upload-speed-limit...' ></TextField>
-          <TextField label='boosted-download-speed-limit'     sx={{
-
-'& label.Mui-focused': {
-color: 'black'
-},
-'& .MuiOutlinedInput-root': {
-"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-borderColor: "black",
-borderWidth: '3px'
-},
-'&.Mui-focused fieldset':  {
-borderColor: 'black', // Set border color to transparent when focused
-
-}
-},
-       
-      }}   type='number' className='myTextField'  placeholder='boosted-download-speed-limit...'></TextField>
-          <DemoContainer components={['TimePicker']}    sx={{
-
-'& label.Mui-focused': {
-color: 'black'
-},
-'& .MuiOutlinedInput-root': {
-"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-borderColor: "black",
-borderWidth: '3px'
-},
-'&.Mui-focused fieldset':  {
-borderColor: 'black', // Set border color to transparent when focused
-
-}
-},
-       
-      }}  >
-     <TimePicker          viewRenderers={{
-          hours: renderTimeViewClock,
-          minutes: renderTimeViewClock,
-          seconds: renderTimeViewClock,
-        }}   className='dark:text-black myTextField'
-label="Boost Start Time" />
-
-<TimePicker       viewRenderers={{
-          hours: renderTimeViewClock,
-          minutes: renderTimeViewClock,
-          seconds: renderTimeViewClock,
-        }}      className='dark:text-black myTextField'
-label="Boost End Time" />
-
-
-  </DemoContainer>
-          </>
-           ): ''}
-
-           
-              </div>
-       
-
-            <div className='mt-4 flex  flex-wrap'>
-            <Box
-      sx={{
-        '& > :not(style)': { m: 1, width: '80ch' },
-      }}>
-            <TextField label='validity-period'   sx={{
-
-'& label.Mui-focused': {
-  color: 'black',
-  fontSize:'16px'
-
-  },
-'& .MuiOutlinedInput-root': {
-"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-  borderColor: "black",
-  borderWidth: '3px'
-  },
-'&.Mui-focused fieldset':  {
-  borderColor: 'black', // Set border color to transparent when focused
-
-}
-},
-         
-        }}    className='myTextField' value={formData.validity}   
-            id='validity' 
-        onChange={e =>onChange(e)}   placeholder='validity-period...' type='number' ></TextField>
-
-</Box>
-
-
-
-<FormControl  
-
-
-  sx={{
-    '& > :not(style)': { m: 1, width: '50ch' },
-
-'& label.Mui-focused': {
-  color: 'black',
-  fontSize:'16px'
-  },
-'& .MuiOutlinedInput-root': {
-"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-  borderColor: "black",
-  borderWidth: '3px'
-  },
-'&.Mui-focused fieldset':  {
-  borderColor: 'black', // Set border color to transparent when focused
-
-}
-},
-         
-        }}   >
-        <InputLabel id="validity_period_units">Validity period units</InputLabel>
-        <Select
-          id="validity_period_units"
-          label="Validity-period-units"
-          
-          value={formData.validity_period_units}
-          onChange={e=> setFormData({...formData, validity_period_units: e.target.value})}
-
-        >
-          <MenuItem value={'days'}>days</MenuItem>
-          <MenuItem value={'hours'}>hours</MenuItem>
-        </Select>
-      </FormControl>
-            </div>
-
-
 
            
             <DialogActions>
 
-{/* <Button  className='dotted-font p-5'    variant='outlined' onClick={handleClose}  >Cancel</Button> */}
 
 
 <button   onClick={(e)=> {
@@ -614,31 +584,13 @@ e.preventDefault()
 
             Cancel
           </button>
-{/* 
-<Button  
 
-  type='submit'  
-  color={`${formData.name && formData.validity && formData.upload_limit && formData
-    .download_limit && formData.price && formData.upload_burst_limit && formData.download_burst_limit !== null ? 'success' : 'primary'}`}
-  variant='outlined'  
-  disabled={!formComplete || submitting} >
-  {submitting ? 'Submitting...' : 'Save'}
-</Button>  */}
-
-
-
-
-{/* 
-<Button variant='outline'  type='submit' className='dotted-font p-5' >Save
-            <ReloadIcon className={`ml-2 h-4 w-4  ${isloading ? 'animate-spin' : 'hidden'}  `} />
-
-            </Button> */}
 
 <button className='bg-black text-white rounded-3xl px-4 py-2
           transform hover:scale-110 transition duration-500 hover:bg-green-500
           text-lg' type="submit">
 
-            Save
+            {editPackage ? 'Update' : 'Save'}
           </button>
 
 </DialogActions>

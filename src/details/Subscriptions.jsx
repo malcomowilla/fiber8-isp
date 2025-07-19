@@ -7,12 +7,12 @@ import { Box, TextField, Autocomplete, Stack, InputAdornment, Button,
   Tooltip,
   CircularProgress,
  } from '@mui/material';
+ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
  import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
-import {  useState, useEffect,useCallback} from 'react'
+import {  useState, useEffect,useCallback, useRef} from 'react'
 import { useDebounce } from 'use-debounce';
 import { motion } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
@@ -40,13 +40,20 @@ import DnsIcon from '@mui/icons-material/Dns';
 import WifiIcon from '@mui/icons-material/Wifi'; // Alternative icon for PPPoE
 import FingerprintIcon from '@mui/icons-material/Fingerprint';  // For unique identifier concept
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import { DemoContainer  } from '@mui/x-date-pickers/internals/demo';
 
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import ClearIcon from '@mui/icons-material/Clear';
+import DialogContentText from '@mui/material/DialogContentText';
+import Modal from '@mui/material/Modal';
+import Popper from '@mui/material/Popper';
+import Paper from '@mui/material/Paper';
 
+
+
+dayjs.extend(customParseFormat);
 
 const Subscriptions = ({
   packageNamee,
@@ -93,8 +100,72 @@ const [package_name, setPackagesName] = useState('')
 const subdomain = window.location.hostname.split('.')[0];
  const [age, setAge] = useState('');
    const [poe_package,] = useDebounce(package_name, 1000)
-   const [expiration_date,  setExpirationDate] = useState('')
+   const [expiration_date,  setExpirationDate] = useState(dayjs())
+   const [editing, setEditing] = useState(false);
+const [subscriptionId, setSubscriptionId] = useState('');
 
+
+
+const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const iconRef = useRef(null);
+
+  const handleClick = (event, rowData) => {
+    setSelectedRow(rowData);
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClosePopper = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'mac-address-popper' : undefined;
+
+
+
+
+
+
+
+const confirmClearMac = async () => {
+  try {
+    // 1. Delete radcheck entry
+    const response = await fetch('/api/delete_radcheck', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+
+       },
+      body: JSON.stringify({
+        username: selectedRow.ppoe_username,
+      })
+    });
+
+    if (!response.ok) throw new Error('Failed to delete radcheck');
+
+    // 2. Update local state
+    const updatedSubscriptions = subscriptions.map(sub => 
+      sub.id === selectedRow.id ? { ...sub, mac_address: null } : sub
+    );
+    setSubscriptions(updatedSubscriptions);
+
+    // 3. Update onlineStatusData if needed
+    const updatedStatusData = onlineStatusData.map(item =>
+      item.ppoe_username === selectedRow.ppoe_username 
+        ? { ...item, mac_address: null }
+        : item
+    );
+    setOnlineStatusData(updatedStatusData);
+
+    toast.success('MAC address cleared successfully!');
+  } catch (error) {
+    toast.error(`Error: ${error.message}`);
+  } finally {
+    setOpenConfirmDialog(false);
+  }
+};
 
 
     const handleChangeDate = (date)=> {
@@ -308,13 +379,17 @@ const handleChangeIpAddress =(e)=> {
 const handleRowClick = (event, rowData) => {
 // console.log('rowData subscription add',rowData)
 getIps(rowData.network_name)
+setEditing(true)
+setSubscriptionId(rowData.id)
 // setShowClientStatsAndSubscriptions(false)
 // formData.id = rowData.id
 // formData.network_name = rowData.network_name 
 // formData.ip_address = rowData.ip_address
+  const parsedDate = dayjs(rowData.expiration_date, 'MMMM D, YYYY [at] hh:mm A');
 
-setExpirationDate(dayjs(rowData.expiration_date));
-
+setExpirationDate(parsedDate)
+console.log('row data expiration date subscription', parsedDate)
+setPackagesName(rowData.package_name)
 
   setNetworkName(rowData.network_name)
   setFormData(rowData)
@@ -356,11 +431,12 @@ const payload = {
   service_type: service_type, // or just service_type, using shorthand
   network_name: network_name,
   ip_address: ip_address,
-  expiration_date: expiration_date
+  expiration_date: expiration_date,
+  package_name: package_name,
 };
   try {
-        const method = formData.id ? 'PUT' : 'POST'
-    const url = formData.id ? `/api/subscriptions/${formData.id}?subscriber_id=${subscriberId}` : `/api/subscriptions?subscriber_id=${subscriberId}`
+        const method = subscriptionId ? 'PATCH' : 'POST'
+    const url = subscriptionId ? `/api/subscriptions/${subscriptionId}?subscriber_id=${subscriberId}&?update` : `/api/subscriptions?subscriber_id=${subscriberId}&?create`
         const response = await fetch(url, {
       method: method,
       headers: {
@@ -376,7 +452,7 @@ const payload = {
   
 
 
-  if (formData.id) {
+  if (subscriptionId) {
 
   toast.success('Subscription updated successfully', {position: "top-center", duration: 3000 })
     setSubscriptions(subscriptions.map(item => item.id === newData.id ? newData : item))
@@ -523,20 +599,56 @@ const handleDeleteConfirm = async () => {
 
 
 
-
-const validityUnits = [
-  { value: 'days', label: 'Days' },
-  { value: 'hours', label: 'Hours' }
-  // Add more units if needed
-];
   return (
     <>
 {showMaterialTable && (
   <>
   
         {/* <CloudIcon sx={{ mr: 2, color: 'primary.main' }} /> */}
+         <Popper
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        placement="right-start"
+      
+        sx={{
+          zIndex: 9999, // Ensure it's above everything
+          '&[data-popper-placement*="right"]': {
+            marginLeft: '8px !important',
+          }
+        }}
+      >
+        <Paper elevation={3} sx={{ p: 2, border: '1px solid #eee' }}>
+          <Typography variant="body2" sx={{ mb: 1 }}>
+            Clear MAC address for <b>{selectedRow?.ppoe_username}</b>?
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+            <Button 
+              size="small" 
+              variant="outlined" 
+              onClick={handleClosePopper}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="small"
+              color="warning"
+              variant="contained"
+              onClick={() => {
+                console.log('Clearing MAC for:', selectedRow);
+                // handleClosePopper();
+                confirmClearMac();
+              }}
+            >
+              Clear
+            </Button>
+          </Box>
+        </Paper>
+      </Popper>
 
 <Toaster/>
+
+
       <MaterialTable
 
 
@@ -645,7 +757,7 @@ const validityUnits = [
 
 
 
-          { title: 'Package', field: 'package' ,
+          { title: 'Package', field: 'package_name' ,
             headerStyle: { color: 'black' } 
           },
           {
@@ -662,6 +774,7 @@ const validityUnits = [
           // { title: 'Node', field: 'node',  headerStyle: { color: 'black' }  },
           {
             title: 'MAC Address',
+            
             field: 'mac_adress',
             headerStyle: { 
               color: 'black',
@@ -708,6 +821,21 @@ const validityUnits = [
                       {macAddress}
                     </span>
                   </Tooltip>
+
+ 
+ <Tooltip
+ 
+ title="Clear MAC address" arrow>
+          <IconButton 
+         ref={iconRef}
+              aria-describedby={id}
+              onClick={(e) => handleClick(e, rowData)}
+              size="small"
+              sx={{ p: 0.5 }}
+          >
+            <ClearIcon color="warning" fontSize="small" />
+          </IconButton>
+        </Tooltip>
                 </div>
               );
             }
@@ -753,9 +881,17 @@ const validityUnits = [
                    onClick={()=> {
                     setShowMaterialTable(false)
                     setShowForm(true)
-                    setFormData({...formData, id: ''})
+                    setEditing(false)
                     
                     setShowClientStatsAndSubscriptions(false)
+
+setExpirationDate(dayjs())
+setPackagesName('')
+
+  setNetworkName('')
+  setIpAddress('')
+  setMacAdress('')
+  setServiceType('')
 
                   }}
                   fontSize="large" />
@@ -787,7 +923,9 @@ const validityUnits = [
 
             // onClick: (event, rowData) => handleDelete(rowData.id)
             // onClick: (event, rowData) => handleDeleteClick(rowData.id)
-          }
+          },
+
+
         ]}
         options={{
           actionsColumnIndex: -1,
@@ -800,8 +938,7 @@ const validityUnits = [
           }
         }}
       />
-
-      
+ 
  <button onClick={(e) => {
               e.preventDefault()
               handleClose()
@@ -820,11 +957,14 @@ const validityUnits = [
 
 {showForm && (
   <>
- <div className='p-4 flex'>
+  {editing ? (
+<div className='p-4 flex bg-yellow-50 rounded-lg shadow-sm'>
    <IoWarningOutline className='text-orange-600 text-2xl' />
 
    <span className='flex text-lg text-orange-400'>Note- <p className=''>Editing subscription details will affect the current connected session.</p> </span>
     </div>
+  ): null}
+ 
  <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -1104,7 +1244,7 @@ const validityUnits = [
               <Autocomplete
                onChange={(event, newValue) => {
                   console.log('package_name onchange',newValue.name)
-                  setPackagesName((prev) => ({ ...prev, package_name: newValue ? newValue.name : '' }));
+                  setPackagesName(newValue.name);
                 }}
                 value={packageName.find((pkg) => pkg.name === package_name) || packageName.find((pkg) => pkg.name === package_name)}
                 options={packageName}
@@ -1118,37 +1258,36 @@ const validityUnits = [
 
 
               
-           <DemoContainer  sx={{
-'& label.Mui-focused': {
-  color: 'black'
-  },
-'& .MuiOutlinedInput-root': {
-"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-  borderColor: "black",
-  borderWidth: '3px'
-  },
-'&.Mui-focused fieldset':  {
-  borderColor: 'black', // Set border color to transparent when focused
-
-}
-},
-    }}  components={['TimePicker', 'TimePicker']}>
-
-
-      <DateTimePicker  viewRenderers={{
-    hours: renderTimeViewClock,
-    minutes: renderTimeViewClock,
-    seconds: renderTimeViewClock,
-  }}     className='myTextField'
-        label="Extend Subscription"
-     
-value={expiration_date ? dayjs(expiration_date) : null}
-     onChange={(date) => {
-      handleChangeDate(date)
-     }}
-      />
-     
-    </DemoContainer>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <DemoContainer
+        sx={{
+          '& label.Mui-focused': { color: 'black' },
+          '& .MuiOutlinedInput-root': {
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'black',
+              borderWidth: '3px',
+            },
+            '&.Mui-focused fieldset': { borderColor: 'black' },
+          },
+        }}
+        components={['TimePicker']}
+      >
+        <DateTimePicker
+          label="Extend Subscription"
+          className="myTextField"
+          viewRenderers={{
+            hours: renderTimeViewClock,
+            minutes: renderTimeViewClock,
+            seconds: renderTimeViewClock,
+          }}
+          value={expiration_date}
+          onChange={(newValue) => {
+            setExpirationDate(dayjs(newValue))
+            console.log('newValue expiration_date subscr', dayjs(newValue))
+          }}
+        />
+      </DemoContainer>
+    </LocalizationProvider>
 
             </Box>
           </div>
@@ -1157,7 +1296,7 @@ value={expiration_date ? dayjs(expiration_date) : null}
           <button  className='bg-black text-white rounded-3xl px-4 py-2
           transform hover:scale-110 transition duration-500 hover:bg-green-500
           text-lg' type="submit">
-              Save
+              {editing ? 'Update' : 'Save'}
             </button>
 
             <button onClick={(e) => {

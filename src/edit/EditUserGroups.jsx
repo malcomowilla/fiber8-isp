@@ -23,7 +23,7 @@ import { CiUser } from "react-icons/ci";
 
 const EditUserGroups = ({
     open, handleClose,userGroups, handleChangeUserGroups,
-    createUserGroups, setUserGroups, name
+    createUserGroups, setUserGroups, name, editUserGroup
 }) => {
 
 
@@ -73,7 +73,7 @@ const EditUserGroups = ({
   <DialogActions>
     <Button onClick={handleClose}  color="error">Cancel</Button>
     <Button  type='submit' variant="contained" color="success">
-      Save
+      {editUserGroup ? "Update" : "Create"}
     </Button>
   </DialogActions>
   </form>

@@ -241,7 +241,7 @@ className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                 formatter={(value) => [`KSh ${value}`, value === value ? 'Revenue' : 'Users']}
               />
               <Legend />
-              <Bar dataKey="revenue" fill="#8884d8" name="Revenue (KSh)" />
+              <Bar dataKey="revenue" fill="green" name="Revenue" />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>

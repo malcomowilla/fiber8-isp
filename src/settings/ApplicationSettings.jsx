@@ -50,7 +50,8 @@ const ApplicationSettings = ({children}) => {
           enable_customer_portal: false,
           installation_fee: 0,
           send_welcome_message: false,
-          subscriber_welcome_message: false
+          subscriber_welcome_message: false,
+          lock_account_to_mac: false,
 
 
         }

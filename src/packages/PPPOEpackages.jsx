@@ -23,6 +23,7 @@ import { useDebounce } from 'use-debounce';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { FaWifi } from "react-icons/fa6";
 import toast, { Toaster } from 'react-hot-toast';
+import { PiNumberOne } from "react-icons/pi";
 
 
 const useStyles = makeStyles({
@@ -63,14 +64,20 @@ const initialValue = {
   name: '',
   validity: '',
   validity_period_units: '',
-
   download_limit: '',
   upload_limit: '',
   price:  '',
   upload_burst_limit: '',
   download_burst_limit: '',
 router_name: settingsformData.router_name,
-ip_pool: ''
+ip_pool: '',
+daily_charge: '',
+burst_threshold_download: '',
+burst_threshold_upload: '',
+burst_time: '',
+burst_upload_speed: '',
+burst_download_speed: '',
+aggregation: '',
 
 }
 
@@ -86,13 +93,15 @@ const [validityError, setValidityError]= useState(false)
 const [uploadBurstSpeedError, setUploadBurstSpeedError] = useState(false)
 const [downloadBurstSpeedError, setDownloadBurstSpeedError] = useState(false)
 const [validityPeriodUnitError, setUnitsError] = useState(false)
+const [editPackage, setEditPackage] = useState(false)
 
 
 const [search, setSearch] = useState('')
 const [searchchInput] = useDebounce(search, 1000)
 const handleRowClick = (event, rowData) => {
   setFormData(rowData);
-  console.log('ip pool', rowData)
+  setEditPackage(true)
+ 
 
   // Add your custom logic here, such as opening a modal or updating state
 };
@@ -118,6 +127,7 @@ const handleCloseDelete = () => {
 const handleClickOpen = () => {
   setOpen(true);
   setFormData(initialValue)
+  setEditPackage(false)
 
 };
 
@@ -404,112 +414,6 @@ useEffect(() => {
   fetchPackages()
 }, [fetchPackages]);
 
-// useEffect(() => {
-  
-//  const fetchPackages = async() => {
-// const response = await fetch('/api/get_package', {
-//   signal: controller.signal,  
-
-// }
-
-
-
-
-
-// )
-// clearTimeout(id);
-
-// const data = await response.json()
-// setTableData(data)
-//  }
-
-//  fetchPackages()
-// }, []);
-
-
-
-
-
-// useEffect(() => {
-//   const cable = ActionCable.createConsumer('ws://localhost:3000/cable');
-
-//    cable.subscriptions.create('PpoePackagesChannel', {
-//     received: (data) => {
-//       setTableData(data);
-//       setFormData(data)
-
-//       console.log(data )
-//     },
-
-    
-//   }, []);
-
-
-
-
-  
-//   // Cleanup function to disconnect when component unmounts
-//   // return () => {
-//   //   cableContext.cable.disconnect();
-//   // };
-// }, []);
-
-
-
-// useEffect(() => {
-//   const cable = ActionCable.createConsumer('ws://localhost:3000/cable');
-
-//    cable.subscriptions.create(
-//     { channel: 'PpoePackagesChannel',
-  
-  
-  
-//         headers: {
-//           credentials: 'include'
-//         },
-  
-//   },
-    
-//     {
-//       received: (data) => {
-//         console.log('Received data:', data);
-//          setData1(data);
-//         console.log(data.packages)
-//       },
-//       connected: () => {
-//         console.log('Connected to PpoePackagesChannel');
-//       },
-//       disconnected: () => {
-//         console.log('Disconnected from PpoePackagesChannel');
-//       },
-//       rejected: () => {
-//         console.log('Subscription to PpoePackagesChannel rejected');
-//       },
-//     }
-//   );
-
-//   // return () => {
-//   //   cable.subscriptions.remove(subscription);
-//   // };
-// }, []);
-
-
-
-// useEffect(() => {
-  
-
-
-// const fetchData = async () => {
-// const data = await fetch('/api/packages') 
-// // const packages = await data
-// console.log( data)
-
-
-// }  
-
-// fetchData()
-
-// }, []);
 
 const deletePackage = async (id) => {
 
@@ -576,11 +480,35 @@ const DeleteButton = ({ id }) => (
       );
 
 const columns = [
-  {title: 'name', field: 'name',   },
-  {title: 'price', field: 'price',  },
+  {title: 'name', field: 'name',  
+
+    
+   },
+  {title: 'price', field: 'price', 
+
+    render: (rowData) => {
+      {
+return <div>{rowData.price} ksh</div>
+      }
+    }
+   },
+  {title: 'Aggregation', field: 'aggregation',  
+
+    render: (rowData) => {
+      {
+        return rowData.aggregation && <div className='flex'><PiNumberOne className='text-black mt-[1px] dark:text-white' />:{rowData.aggregation}</div>
+      }
+    }
+  },
+  {title: 'Subscriptions', field: 'subscription',
+     render: (rowData) => {
+      return rowData.subscription && <div className='text-green-600'>{rowData.subscription}</div>
+    },
+
+  },
 
 
-  {title: 'validity', field: 'valid', },
+  // {title: 'validity', field: 'valid', },
   {title: 'speed(Up/Down)', field: 'speed'},
 
   {title: 'Action', field:'Action',
@@ -628,15 +556,18 @@ const columns = [
           isloading={loading} priceError={priceError}  validityPeriodUnitError={validityPeriodUnitError}
         createPackage={createPackage}   offlineerror={offlineerror} 
        showNotification={showNotification}   setofflineerror={setofflineerror}  setFormData={setFormData} 
-       tableData={tableData} routerName={routerName} setRouterName={setRouterName}/>
+       tableData={tableData} routerName={routerName} setRouterName={setRouterName}
+        editPackage={editPackage} setEditPackage={setEditPackage}
+       />
+
+
+
+
     <DeletePackage  openDelete={openDelete} handleCloseDelete={handleCloseDelete} 
-    deletePackage={deletePackage} id={formData.id} loading={loading}/>
+    deletePackage={deletePackage} id={formData.id} loading={loading}
+   
+    />
 
-{/* 
-
-      <div className=' relative sm:left-[400px] max-md:left-[380px] max-sm:left-[210px]  z-50 top-9'>
-<AddIcon onClick={handleClickOpen} />
-      </div>  */}
 
 
 <div className="flex items-center max-w-sm mx-auto p-3">  
@@ -644,12 +575,7 @@ const columns = [
     <label htmlFor="simple-search" className="sr-only">Search</label>
     <div className="relative w-full">
         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-            {/* <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-             xmlns="http://www.w3.org/2000/svg"
-             fill="none" viewBox="0 0 18 20">
-                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-                 strokeWidth="2" d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"/>
-            </svg> */}
+           
             <FaWifi className='text-black'/>
             
         </div>
@@ -676,19 +602,7 @@ const columns = [
       title='PPPoe Packages'
 
       data={tableData}
-      
-// icons={{
-//   Add:()=><AddIcon onClick={handleClickOpen}/>,
-// }}
-
-//     actions={[
-//         {
-//           icon:()=><GetAppIcon/>,
-//           tooltip: 'import'
-//         }
-//     ]}
-
-// onRowDelete={deletePackage}
+   
 
 icons={{
   Add: () => <AddIcon onClick={handleClickOpen} />,

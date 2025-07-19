@@ -33,7 +33,7 @@ function LocationMarker({ position, setPosition }) {
 
 export default function Node({ open, handleClose,
   mapReady, setMapReady, name, setName, position, setPosition,
-  createNode
+  createNode, editingNode
  }) {
   const mapRef = useRef();
 
@@ -195,7 +195,7 @@ console.log('position', position);
             '&:disabled': { bgcolor: 'grey.300' },
           }}
         >
-          Save Location
+          {editingNode ? 'Update Location' : 'Save Location'}
         </Button>
       </DialogActions>
       </form>

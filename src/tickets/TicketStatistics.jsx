@@ -73,7 +73,7 @@ const StatCard = ({ title, value, icon, color, extratext }) => {
       value: 0,
       icon: <IoCheckmarkDoneOutline />,
       extratext: <p className='text-white'> Ticket resolved(issue resolved)</p>,
-      color: "bg-blue-500",
+      color: "bg-green-500",
     },
     {
       title: <p className='text-black'>High Priority Tickets</p>,

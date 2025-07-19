@@ -21,7 +21,7 @@ import { FaUsers } from "react-icons/fa"; // Import user icon
 
 
 function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
-    createVoucher, setVoucherForm
+    createVoucher, setVoucherForm, editVoucher  
  }) {
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState("lg");
@@ -29,6 +29,7 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
   const [dateTimeValue, setDateTimeValue] = useState(dayjs(new Date()));
   const [newDate, setNewDate] = React.useState(null);
   const [pppoePackages, setPppoePackages] = useState([]); // State to store PPPoE packages
+
 
 
   const [isSave, setIsSave] = useState(true);
@@ -224,22 +225,10 @@ e.preventDefault()
       whileHover={{ scale: 1.05 }} // Hover animation
       whileTap={{ scale: 0.95 }} // Tap animation
       key={isSave ? "save" : "send"} // Key prop for animation reset
-      initial={{ opacity: 0, y: 10 }} // Initial animation state
-      animate={{ opacity: 1, y: 0 }} // Animate in
-      exit={{ opacity: 0, y: -10 }} // Animate out
+     
       transition={{ duration: 0.3 }} // Animation duration
     >
-      {isSave ? (
-        <>
-          <FaSave className="w-5 h-5" /> {/* Save icon */}
-          <span>Save</span>
-        </>
-      ) : (
-        <>
-          <FaPaperPlane className="w-5 h-5" /> {/* Send icon */}
-          <span>Send</span>
-        </>
-      )}
+      {editVoucher ? <p className='text-white'>Update Voucher</p> : <p>Add Voucher</p>}
     </motion.button>
         </DialogActions>
         </form>

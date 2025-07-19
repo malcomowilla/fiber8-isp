@@ -32,6 +32,7 @@ const Nodes = () => {
   const [position, setPosition] = useState(null);
   const [mapReady, setMapReady] = useState(false);
   const [nodeId, setNodeId] = useState('');
+  const [editingNode, setEditingNode] = useState(false)
 
   const {showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
@@ -39,6 +40,7 @@ const Nodes = () => {
         showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,} = useApplicationSettings();
   const handleClickOpen = () => {
       setOpen(true);
+      setEditingNode(false)
     };
     
     const handleClose = () => {
@@ -63,6 +65,7 @@ const Nodes = () => {
     // setPosition(rowData?.latitude, rowData?.longitude)
     setName(rowData?.name)
     setNodeId(rowData?.id)
+    setEditingNode(true)
   }
 
   
@@ -158,7 +161,7 @@ const columns = [
      <>
       
        <DeleteButton id={rowData.id} />
-       <EditButton />
+       <EditButton  />
       
        </>
 
@@ -197,7 +200,7 @@ const columns = [
          <EditNode  open={open} handleClose={handleClose}
          name={name} setName={setName} position={position} setPosition={setPosition}
          mapReady={mapReady} setMapReady={setMapReady}
-         createNode={createNode}
+         createNode={createNode} editingNode={editingNode} setEditingNode={setEditingNode}
          />
        
        

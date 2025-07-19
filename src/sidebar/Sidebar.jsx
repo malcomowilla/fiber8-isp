@@ -781,28 +781,7 @@ className="flex items-center  w-full p-2 text-white transition
 
 
 
-                  <motion.li
-                  onClick={() => {
-                    if (window.innerWidth < 962) {
-                      setSeeSideBar(true);
-                    }
-                  }}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.2 , delay: 0.2 }}
-                  >
-                    <div className='flex items-center gap-x-4 w-full p-2 
-                  transition duration-75 rounded-lg pl-11 group text-black hover:bg-gray-700'>
-                     <Link to='/admin/zones' className="flex items-center w-full p-2 ttext-black
-                     transition duration-75 rounded-lg group  
-                       gap-x-3">
-                              <img src="/images/icons8-map.gif" className='rounded-full h-8 w-8' alt="" />
-                        Zones</Link>
-
-                        </div>
-                  </motion.li>
-
+                  
 
 
 
@@ -1060,29 +1039,7 @@ className="flex items-center  w-full p-2 text-white transition
 
 
 
-                  <motion.li
-                  onClick={() => {
-                    if (window.innerWidth < 962) {
-                      setSeeSideBar(true);
-                    }
-                  }}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.2 , delay: 0.2 }}
-                  >
-                    <div className='flex items-center gap-x-4 w-full p-2 
-                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
-                     <Link to='/admin/zones' className="flex items-center w-full p-2 text-white
-                     transition duration-75 rounded-lg group  dark:text-white
-                       gap-x-3">
-                              <img src="/images/icons8-map.gif" className='rounded-full h-8 w-8' alt="" />
-                        Zones</Link>
-
-                        </div>
-                  </motion.li>
-
-
+                
 
 
 

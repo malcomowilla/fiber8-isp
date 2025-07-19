@@ -81,9 +81,10 @@ const License = ({expiry, condition, status, expiry2, condition2, status2, calcu
       {/* SMS Balance Card */}
       <motion.div
         whileHover={{ y: -2 }}
-        className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border-t-4 border-t-blue-600"
+        className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 rounded-lg 
+        shadow-sm border-t-4 border-t-green-600"
       >
-        <LuBotMessageSquare className="text-blue-600 dark:text-blue-300 text-xl" />
+        <LuBotMessageSquare className="text-green-600 dark:text-blue-300 text-xl" />
         <div className="flex-1">
           <div className="flex items-center gap-1">
             <span className="font-bold text-gray-800 dark:text-gray-200">SMS Balance</span>
