@@ -43,7 +43,7 @@ import {
   ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
 import toast, { Toaster } from 'react-hot-toast';
-
+import Autocomplete from '@mui/material/Autocomplete';
 
 
 const TicketForm = ({
@@ -255,254 +255,356 @@ const TicketForm = ({
           <List sx={{ p: 0 }}>
             <ListItem>
               <FormControl fullWidth>
-                <InputLabel>Category</InputLabel>
-                <Select
-                className='myTextField'
-                sx={{
-                  width: '100%',
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black',
-                    transition: 'border-color 0.2s ease-in-out'
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black !important',
-                    borderWidth: '2px'
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black !important',
-                    borderWidth: '2px'
-                  },
-                  '& .MuiSelect-icon': {
-                    color: 'green'
-                  },
-                  '& .MuiInputBase-input': {
-                    color: '#333'
-                  }
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      '& .MuiMenuItem-root': {
-                        '&:hover': {
-                          backgroundColor: 'rgba(0, 128, 0, 0.08)'
-                        },
-                        '&.Mui-selected': {
-                          backgroundColor: 'rgba(0, 128, 0, 0.16)',
-                          '&:hover': {
-                            backgroundColor: 'rgba(0, 128, 0, 0.24)'
-                          }
-                        }
-                      }
-                    }
-                  }
-                }}
-                  value={ticket_category}
-                  label="Category"
-                  name="ticket_category"
-                  onChange={handleChange}
-                >
-                  {ticketCategory.map((category, index) => (
-                    <MenuItem key={index} value={category.title}>
-                      <ListItemIcon>
-                        <CategoryIcon />
-                      </ListItemIcon>
-                      <ListItemText primary={category.title} />
-                    </MenuItem>
-                  ))}
-                </Select>
+               <Autocomplete
+  options={ticketCategory}
+  getOptionLabel={(option) => option.title}
+  value={ticketCategory.find(cat => cat.title === ticket_category) || null}
+  onChange={(event, newValue) => {
+    handleChange({
+      target: {
+        name: "ticket_category",
+        value: newValue?.title || ""
+      }
+    });
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Category"
+      className='myTextField'
+      sx={{
+        width: '100%',
+        '& .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'black',
+          transition: 'border-color 0.2s ease-in-out'
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'black !important',
+          borderWidth: '2px'
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'black !important',
+          borderWidth: '2px'
+        },
+        '& .MuiInputBase-input': {
+          color: '#333'
+        }
+      }}
+    />
+  )}
+  renderOption={(props, option) => (
+    <MenuItem 
+      {...props}
+      sx={{
+        '&:hover': {
+          backgroundColor: 'rgba(0, 128, 0, 0.08)'
+        },
+        '&.Mui-selected': {
+          backgroundColor: 'rgba(0, 128, 0, 0.16)',
+          '&:hover': {
+            backgroundColor: 'rgba(0, 128, 0, 0.24)'
+          }
+        }
+      }}
+    >
+      <ListItemIcon>
+        <CategoryIcon />
+      </ListItemIcon>
+      <ListItemText primary={option.title} />
+    </MenuItem>
+  )}
+  PaperComponent={(props) => (
+    <Paper 
+      {...props}
+      sx={{
+        '& .MuiMenuItem-root': {
+          '&:hover': {
+            backgroundColor: 'rgba(0, 128, 0, 0.08)'
+          },
+          '&.Mui-selected': {
+            backgroundColor: 'rgba(0, 128, 0, 0.16)',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 128, 0, 0.24)'
+            }
+          }
+        }
+      }}
+    />
+  )}
+  isOptionEqualToValue={(option, value) => option.title === value?.title}
+  disableClearable
+  fullWidth
+/>
+
               </FormControl>
             </ListItem>
 
             <ListItem>
               <FormControl fullWidth>
-                <InputLabel>Priority</InputLabel>
-                <Select
-                 sx={{
-                  width: '100%',
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black',
-                    transition: 'border-color 0.2s ease-in-out'
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black !important',
-                    borderWidth: '2px'
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black !important',
-                    borderWidth: '2px'
-                  },
-                  '& .MuiSelect-icon': {
-                    color: 'green'
-                  },
-                  '& .MuiInputBase-input': {
-                    color: '#333'
-                  }
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      '& .MuiMenuItem-root': {
-                        '&:hover': {
-                          backgroundColor: 'rgba(0, 128, 0, 0.08)'
-                        },
-                        '&.Mui-selected': {
-                          backgroundColor: 'rgba(0, 128, 0, 0.16)',
-                          '&:hover': {
-                            backgroundColor: 'rgba(0, 128, 0, 0.24)'
-                          }
-                        }
-                      }
-                    }
-                  }
-                }}
-
-                className='myTextField'
-                  value={priority}
-                  label="Priority"
-                  name="priority"
-                  onChange={handleChange}
-                >
-                  {ticketPriority.map((p, index) => (
-                    <MenuItem key={index} value={p.ticket}>
-                      <ListItemIcon>
-                        <PriorityIcon color={p.color} />
-                      </ListItemIcon>
-                      <ListItemText primary={p.ticket} />
-                    </MenuItem>
-                  ))}
-                </Select>
+              <Autocomplete
+  options={ticketPriority}
+  getOptionLabel={(option) => option.ticket}
+  value={ticketPriority.find(p => p.ticket === priority) || null}
+  onChange={(event, newValue) => {
+    handleChange({
+      target: {
+        name: "priority",
+        value: newValue?.ticket || ""
+      }
+    });
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Priority"
+      className='myTextField'
+      sx={{
+        width: '100%',
+        '& .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'black',
+          transition: 'border-color 0.2s ease-in-out'
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'black !important',
+          borderWidth: '2px'
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'black !important',
+          borderWidth: '2px'
+        },
+        '& .MuiInputBase-input': {
+          color: '#333'
+        }
+      }}
+    />
+  )}
+  renderOption={(props, option) => (
+    <MenuItem 
+      {...props}
+      sx={{
+        '&:hover': {
+          backgroundColor: 'rgba(0, 128, 0, 0.08)'
+        },
+        '&.Mui-selected': {
+          backgroundColor: 'rgba(0, 128, 0, 0.16)',
+          '&:hover': {
+            backgroundColor: 'rgba(0, 128, 0, 0.24)'
+          }
+        }
+      }}
+    >
+      <ListItemIcon>
+        <PriorityIcon color={option.color} />
+      </ListItemIcon>
+      <ListItemText primary={option.ticket} />
+    </MenuItem>
+  )}
+  PaperComponent={(props) => (
+    <Paper 
+      {...props}
+      sx={{
+        '& .MuiMenuItem-root': {
+          '&:hover': {
+            backgroundColor: 'rgba(0, 128, 0, 0.08)'
+          },
+          '&.Mui-selected': {
+            backgroundColor: 'rgba(0, 128, 0, 0.16)',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 128, 0, 0.24)'
+            }
+          }
+        }
+      }}
+    />
+  )}
+  isOptionEqualToValue={(option, value) => option.ticket === value?.ticket}
+  disableClearable
+  fullWidth
+/>
               </FormControl>
             </ListItem>
 
             <ListItem>
               <FormControl fullWidth>
-                <InputLabel>Assign Agent</InputLabel>
-                <Select
-                 sx={{
-                  width: '100%',
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black',
-                    transition: 'border-color 0.2s ease-in-out'
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black !important',
-                    borderWidth: '2px'
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black !important',
-                    borderWidth: '2px'
-                  },
-                  '& .MuiSelect-icon': {
-                    color: 'green'
-                  },
-                  '& .MuiInputBase-input': {
-                    color: '#333'
-                  }
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      '& .MuiMenuItem-root': {
-                        '&:hover': {
-                          backgroundColor: 'rgba(0, 128, 0, 0.08)'
-                        },
-                        '&.Mui-selected': {
-                          backgroundColor: 'rgba(0, 128, 0, 0.16)',
-                          '&:hover': {
-                            backgroundColor: 'rgba(0, 128, 0, 0.24)'
-                          }
-                        }
-                      }
-                    }
-                  }
-                }}
-
-                className='myTextField'
-                  value={agent}
-                  label="Assign Agent"
-                  name="agent"
-                  onChange={handleChange}
-                >
-                  {agentRole.filter(Boolean).map((a, index) => (
-                    <MenuItem key={index} value={a.name}>
-                      <ListItemIcon>
-                        <AgentIcon />
-                      </ListItemIcon>
-                      <ListItemText primary={a.name} />
-                    </MenuItem>
-                  ))}
-                </Select>
+               <Autocomplete
+  options={agentRole.filter(Boolean)}
+  getOptionLabel={(option) => option.name}
+  value={agentRole.find(a => a.name === agent) || null}
+  onChange={(event, newValue) => {
+    handleChange({
+      target: {
+        name: "agent",
+        value: newValue?.name || ""
+      }
+    });
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Assign Agent"
+      className='myTextField'
+      sx={{
+        width: '100%',
+        '& .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'black',
+          transition: 'border-color 0.2s ease-in-out'
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'black !important',
+          borderWidth: '2px'
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'black !important',
+          borderWidth: '2px'
+        },
+        '& .MuiInputBase-input': {
+          color: '#333'
+        }
+      }}
+    />
+  )}
+  renderOption={(props, option) => (
+    <MenuItem 
+      {...props}
+      sx={{
+        '&:hover': {
+          backgroundColor: 'rgba(0, 128, 0, 0.08)'
+        },
+        '&.Mui-selected': {
+          backgroundColor: 'rgba(0, 128, 0, 0.16)',
+          '&:hover': {
+            backgroundColor: 'rgba(0, 128, 0, 0.24)'
+          }
+        }
+      }}
+    >
+      <ListItemIcon>
+        <AgentIcon />
+      </ListItemIcon>
+      <ListItemText primary={option.name} />
+    </MenuItem>
+  )}
+  PaperComponent={(props) => (
+    <Paper 
+      {...props}
+      sx={{
+        '& .MuiMenuItem-root': {
+          '&:hover': {
+            backgroundColor: 'rgba(0, 128, 0, 0.08)'
+          },
+          '&.Mui-selected': {
+            backgroundColor: 'rgba(0, 128, 0, 0.16)',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 128, 0, 0.24)'
+            }
+          }
+        }
+      }}
+    />
+  )}
+  isOptionEqualToValue={(option, value) => option.name === value?.name}
+  disableClearable={true}
+  fullWidth
+/>
               </FormControl>
             </ListItem>
 
             <ListItem>
               <FormControl fullWidth>
-                <InputLabel>Status</InputLabel>
-                <Select
-                 sx={{
-                  width: '100%',
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black',
-                    transition: 'border-color 0.2s ease-in-out'
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black !important',
-                    borderWidth: '2px'
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black !important',
-                    borderWidth: '2px'
-                  },
-                  '& .MuiSelect-icon': {
-                    color: 'green'
-                  },
-                  '& .MuiInputBase-input': {
-                    color: '#333'
-                  }
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      '& .MuiMenuItem-root': {
-                        '&:hover': {
-                          backgroundColor: 'rgba(0, 128, 0, 0.08)'
-                        },
-                        '&.Mui-selected': {
-                          backgroundColor: 'rgba(0, 128, 0, 0.16)',
-                          '&:hover': {
-                            backgroundColor: 'rgba(0, 128, 0, 0.24)'
-                          }
-                        }
-                      }
-                    }
-                  }
-                }}
-
-
-                className='myTextField'
-                  value={status}
-                  label="Status"
-                  name="status"
-                  onChange={handleChange}
-                >
-                  {ticketStatus.map((s, index) => (
-                    <MenuItem key={index} value={s.ticketStatus}>
-                      <ListItemIcon>
-                        <UpdateIcon color={s.color} />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={s.ticketStatus}
-                        secondary={
-                          <Chip 
-                            size="small" 
-                            label={s.ticketStatus}
-                            color={s.color}
-                          />
-                        }
-                      />
-                    </MenuItem>
-                  ))}
-                </Select>
+               <Autocomplete
+  options={ticketStatus}
+  getOptionLabel={(option) => option.ticketStatus}
+  value={ticketStatus.find(s => s.ticketStatus === status) || null}
+  onChange={(event, newValue) => {
+    handleChange({
+      target: {
+        name: "status",
+        value: newValue?.ticketStatus || ""
+      }
+    });
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Status"
+      className='myTextField'
+      sx={{
+        width: '100%',
+        '& .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'black',
+          transition: 'border-color 0.2s ease-in-out'
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'black !important',
+          borderWidth: '2px'
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'black !important',
+          borderWidth: '2px'
+        },
+        '& .MuiInputBase-input': {
+          color: '#333'
+        }
+      }}
+    />
+  )}
+  renderOption={(props, option) => (
+    <MenuItem 
+      {...props}
+      sx={{
+        '&:hover': {
+          backgroundColor: 'rgba(0, 128, 0, 0.08)'
+        },
+        '&.Mui-selected': {
+          backgroundColor: 'rgba(0, 128, 0, 0.16)',
+          '&:hover': {
+            backgroundColor: 'rgba(0, 128, 0, 0.24)'
+          }
+        }
+      }}
+    >
+      <ListItemIcon>
+        <UpdateIcon color={option.color} />
+      </ListItemIcon>
+      <ListItemText 
+        primary={option.ticketStatus}
+        secondary={
+          <Chip 
+            size="small" 
+            label={option.ticketStatus}
+            color={option.color}
+            sx={{ 
+              mt: 0.5,
+              color: 'white',
+              backgroundColor: `${option.color}.main`
+            }}
+          />
+        }
+      />
+    </MenuItem>
+  )}
+  PaperComponent={(props) => (
+    <Paper 
+      {...props}
+      sx={{
+        '& .MuiMenuItem-root': {
+          '&:hover': {
+            backgroundColor: 'rgba(0, 128, 0, 0.08)'
+          },
+          '&.Mui-selected': {
+            backgroundColor: 'rgba(0, 128, 0, 0.16)',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 128, 0, 0.24)'
+            }
+          }
+        }
+      }}
+    />
+  )}
+  isOptionEqualToValue={(option, value) => option.ticketStatus === value?.ticketStatus}
+  disableClearable
+  fullWidth
+/>
               </FormControl>
             </ListItem>
 

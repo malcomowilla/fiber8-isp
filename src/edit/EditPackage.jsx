@@ -42,7 +42,6 @@ const EditPackage = ({open, handleClose, formData, loading, setFormData, showNot
   editPackage
   
    }) => {
-console.log('edit package pakage', editPackage)
 const [error, setError] = useState('')
 const [message, setMessage] = useState('')
 const [routers, setRouters]= useState ([])

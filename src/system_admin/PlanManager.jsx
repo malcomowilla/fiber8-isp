@@ -4,9 +4,7 @@ import {
   Button,
   TextField,
   Typography,
-  Select,
-  MenuItem,
-  InputLabel,
+  
   FormControl,
   Paper,
   
@@ -30,24 +28,27 @@ import EditPlan from './EditPlan';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const PREDEFINED_PPPOE_PLANS = [
-  { name: "Pro", maximum_pppoe_subscribers: 100 },
-  { name: "Standard", maximum_pppoe_subscribers: 180 },
-  { name: "Enterprise", maximum_pppoe_subscribers: 2000 },
-  { name: "Bronze", maximum_pppoe_subscribers: 1000 },
-  { name: "Startup", maximum_pppoe_subscribers: 300 },
-  { name: "Basic", maximum_pppoe_subscribers: 50 },
-  { name: "Silver", maximum_pppoe_subscribers: 500 },
-  {name: 'Free', maximum_pppoe_subscribers: 'unlimited'}
+  { name: "Pro", maximum_pppoe_subscribers: 100, price: 2700, expiry_days: 30 },
+  { name: "Standard", maximum_pppoe_subscribers: 180, price: 3200, expiry_days: 30 },
+  { name: "Enterprise", maximum_pppoe_subscribers: 2000, price: 8000, expiry_days: 30 },
+  { name: "Bronze", maximum_pppoe_subscribers: 1000, price: 6000, expiry_days: 30 },
+  { name: "Startup", maximum_pppoe_subscribers: 300 , price: 3500, expiry_days: 30 },
+  { name: "Basic", maximum_pppoe_subscribers: 50, price: 1500, expiry_days: 30 },
+  { name: "Silver", maximum_pppoe_subscribers: 500 , price: 4500, expiry_days: 30 },
+  {name: 'Free', maximum_pppoe_subscribers: 'unlimited', price: 0, expiry_days: 365},
+  { name: "Free Trial", maximum_pppoe_subscribers: 'unlimited', price: 0, expiry_days: 3}
 ];
 
 const PREDEFINED_HOTSPOT_PLANS = [
-  { name: "Starter", hotspot_subscribers: 50 },
-  { name: "Pro", hotspot_subscribers: 200 },
-  { name: "Gold Hotspot", hotspot_subscribers: 1000 },
-  { name: "Business", hotspot_subscribers: 2000 },
-  { name: "Startup", hotspot_subscribers: 300 },
-  { name: "Silver", hotspot_subscribers: 500 },
-  {name: 'Free', hotspot_subscribers: 'unlimited'}
+  { name: "Starter", hotspot_subscribers: 50, price: 1500, expiry_days: 30 },
+  { name: "Pro", hotspot_subscribers: 200, price: 2500, expiry_days: 30 },
+  { name: "Gold Hotspot", hotspot_subscribers: 1000, price: 5000, expiry_days: 30 },
+  { name: "Business", hotspot_subscribers: 2000, price: 10000, expiry_days: 30 },
+  { name: "Startup", hotspot_subscribers: 300 , price: 3500, expiry_days: 30 },
+  { name: "Silver", hotspot_subscribers: 500, price: 4500, expiry_days: 30 },
+  {name: 'Free', hotspot_subscribers: 'unlimited', price: 0, expiry_days: 365},
+    { name: "Free Trial", maximum_pppoe_subscribers: 'unlimited', price: 0, expiry_days: 3}
+
 ];
 
 const PlanManager = () => {
@@ -144,12 +145,22 @@ const PlanManager = () => {
     }
   };
 
+
+
+
+
+const planOptions = [
+  { value: 'pppoe', label: 'PPPoE Plan' },
+  { value: 'hotspot', label: 'Hotspot Plan' },
+];
+
+
   // Get predefined options for dropdown based on plan type
   const getPredefinedOptions = () => {
     return (planType === 'pppoe' ? PREDEFINED_PPPOE_PLANS : PREDEFINED_HOTSPOT_PLANS)
       .map(plan => ({
         label:  `${plan.name} ${plan.maximum_pppoe_subscribers || plan.hotspot_subscribers}
-         ${planType === 'pppoe' ?  'PPPoE Subscribers' : 'Hotspot Subscribers'}/${plan.name === 'Free' ? 365 : 30} Days`,
+         ${planType === 'pppoe' ?  'PPPoE Subscribers' : 'Hotspot Subscribers'}/${plan.name === 'Free' ? 365 : plan.name === 'Free Trial' ? 3 : 30} Days`,
         value: plan.name,
         plan: {
           name: plan.name,
@@ -242,20 +253,37 @@ const PlanManager = () => {
       <Paper sx={{ p: 3, mb: 4 }}>
         <form onSubmit={handleSubmit}>
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Plan Type</InputLabel>
-            <Select
-              value={planType}
-              onChange={(e) => {
-                setPlanType(e.target.value);
-                resetForm();
-              }}
-              label="Plan Type"
-            >
-              <MenuItem value="pppoe">PPPoE Plan</MenuItem>
-              <MenuItem value="hotspot">Hotspot Plan</MenuItem>
-            </Select>
-
-
+           <Autocomplete
+           className='myTextField'
+  options={planOptions}
+  value={planOptions.find(option => option.value === planType) || null}
+  onChange={(event, newValue) => {
+    setPlanType(newValue?.value || '');
+    resetForm();
+  }}
+  getOptionLabel={(option) => option.label}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Plan Type"
+      variant="outlined"
+    />
+  )}
+  sx={{ 
+    '& .MuiAutocomplete-inputRoot': {
+      padding: '8px 14px',
+    },
+    '& .MuiOutlinedInput-root': {
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: 'primary.main',
+        borderWidth: '2px'
+      }
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: 'primary.main'
+    }
+  }}
+/>
 
           <TextField 
           InputProps={{
@@ -286,37 +314,7 @@ const PlanManager = () => {
           />
           
 
-            <>
-              {/* <TextField
-                label="Plan Name"
-                value={selectedPlan?.name}
-                onChange={(e) => setSelectedPlan({...selectedPlan, name: e.target.value})}
-                fullWidth
-                required
-                sx={{ mb: 2 }}
-              /> */}
-
-              {/* <TextField
-                label={planType === 'pppoe' ? 'Max PPPoE Subscribers' : 'Max Hotspot Users'}
-                type="number"
-                value={maxSubscribers}
-                onChange={(e) => setMaxSubscribers(Number(e.target.value))}
-                fullWidth
-                required
-                sx={{ mb: 2 }}
-              /> */}
-
-              {/* <TextField
-                label="Expiry Days"
-                type="number"
-                value={expiryDays}
-                onChange={(e) => setExpiryDays(Number(e.target.value))}
-                fullWidth
-                required
-                sx={{ mb: 2 }}
-              /> */}
-            </>
-
+           
 
 
           <Box sx={{ display: 'flex', gap: 2 }}>
@@ -501,7 +499,6 @@ open={openPlanManager} onClose={() => setOpenPlanManager(false)}
            title={<p className='text-black'>PPPoE Plans</p>}
            columns={[
             { title: 'Maximum Subscribers', field: 'maximum_pppoe_subscribers' },
-            { title: 'Expiry Days', field: 'expiry_days' },
             {title: 'Company Name', field: 'account.subdomain'},
             { title: 'Billing Cycle', field: 'billing_cycle' },
             {title: 'Status', field: 'status'},

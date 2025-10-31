@@ -343,8 +343,10 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
         setShowMenu12(false)
       }}
        variant="h4" gutterBottom sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
-        <CloudIcon sx={{ mr: 2, color: 'primary.main' }} />
-        <p className='roboto-condensed'>Private Routes Management </p>
+        <CloudIcon sx={{ mr: 2, color: 'success.main' }} />
+        <p className='roboto-condensed   bg-gradient-to-r from-green-600 via-blue-400 to-cyan-500 bg-clip-text
+  
+  text-transparent font-bold '>Private Routes Management </p>
       </Typography>
 
       <MaterialTable

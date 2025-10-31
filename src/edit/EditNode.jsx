@@ -98,12 +98,12 @@ console.log('position', position);
       }}
     >
       <form onSubmit={createNode}>
-      <DialogTitle sx={{ bgcolor: 'transparent', color: 'white', fontSize: '1.5rem', fontWeight: 'bold' }}>
+      <DialogTitle sx={{ bgcolor: 'transparent', color: 'white',  fontWeight: 'bold' }}>
         <p className='dark:text-white text-black'>Node Location</p>
       </DialogTitle>
 
 
-      <DialogContent sx={{ pt: 30 }}>
+      <DialogContent >
         <Stack spacing={3}>
           <TextField
             fullWidth
@@ -112,7 +112,7 @@ console.log('position', position);
             value={name}
             onChange={(e) => setName(e.target.value)}
             sx={{
-              
+              mt: 2,
               '& label.Mui-focused': {
                 color: 'primary.main',
               },

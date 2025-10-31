@@ -8,6 +8,7 @@ const  RadiusSettings = lazy(() => import('./RadiusSettings'))
 const LicenseSettings = lazy(() => import('./LicenseSettings'))
 const TaskSettings = lazy(() => import('./TaskSettings'))
 import {useApplicationSettings} from './ApplicationSettings'
+const GoogleMapSetting = lazy(() => import('./GoogleMapSetting'))
 
 
 import UiLoader from '../uiloader/UiLoader'
@@ -56,9 +57,9 @@ const Settings = () => {
       transition-all duration-300 hover:text-black '>SMS</p>
 
 
-
+{/* 
 <p   onClick={()=> selectTab('RADIUS')} className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300
-      transition-all duration-300 hover:text-black '>RADIUS</p>
+      transition-all duration-300 hover:text-black '>RADIUS</p> */}
 
 
 <p   onClick={()=> selectTab('LICENSE')} className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300
@@ -71,8 +72,8 @@ const Settings = () => {
 
 
        
-      <p className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300 transition-all
-       duration-300 hover:text-black'>WEBSITE</p>
+      <p onClick={()=> selectTab('MAP')} className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300 transition-all
+       duration-300 hover:text-black'>MAP</p>
       <p 
       onClick={()=> selectTab('SUPPORT')}
       className='hover:dark:bg-gray-200 p-2 h-10 rounded-lg hover:bg-blue-300
@@ -112,6 +113,7 @@ const Settings = () => {
 {selectedTab === 'SUPPORT' && <SupportSettings/>}
 
 {selectedTab === 'TASK' && <TaskSettings/>}
+{selectedTab === 'MAP' && <GoogleMapSetting/>}  
 {/* {selectedTab && <Sms/>}
 {selectedTab && <Mpesa/>}
 {selectedTab && <Website/>}

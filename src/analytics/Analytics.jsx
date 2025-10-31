@@ -17,6 +17,14 @@ import { MdMobiledataOff } from "react-icons/md";
 import { FaArrowUp } from "react-icons/fa6";
 import { FaArrowDown } from "react-icons/fa6";
 import { Link } from 'react-router-dom';
+import { createConsumer } from "@rails/actioncable";
+import { GiWifiRouter } from "react-icons/gi";
+import { TbRouterOff } from "react-icons/tb";
+
+import UiLoader from '../uiloader/UiLoader'
+import { Suspense } from "react";
+
+const cable = createConsumer(`wss://${window.location.hostname}/cable`);
 
 
 
@@ -98,51 +106,6 @@ const [totalDownload, setTotalDownload] = useState(0);
 const [totalUpload, setTotalUpload] = useState(0);
 
 
-  // const fetchUbuntuStats = useCallback(async () => {
-  //   try {
-  //     const response = await fetch("/api/system_status", {
-  //       headers: {
-  //         'X-Subdomain': subdomain,
-  //       }
-  //     }); // Replace with your backend endpoint
-  //     const data = await response.json();
-
-  //     if (response.ok) {
-
-  //       if (data.system_metrics && data.system_metrics.length > 0) {
-  //         const item = data.system_metrics[0]; // Assuming you need the latest entry
-
-  //         setUbuntuStats({
-           
-  //             cpuUsage: item.cpu_usage,
-  //         memoryUsage: item.memory_total,
-  //         diskUsage: item.disk_total,
-  //         available_memory: item.memory_free,
-  //         uptime: item.uptime,
-  //         available_disk: item.disk_free,
-  //         memory_used: item.memory_used,
-  //         disk_used: item.disk_used,
-  //         });
-  //       }
-        
-    
-        
-  //     } else {
-  //       console.error("Failed to fetch Ubuntu stats");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching Ubuntu stats:", error);
-  //   } finally {
-  //     setLoadingUbuntuStats(false);
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   fetchUbuntuStats();
-  //   const intervalId = setInterval(fetchUbuntuStats, 5000); // Refresh every 5 seconds
-  //   return () => clearInterval(intervalId);
-  // }, [fetchUbuntuStats]);
-
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -151,8 +114,112 @@ const [totalUpload, setTotalUpload] = useState(0);
     return () => clearTimeout(timeout);
   }, []);
 
+
+  // useEffect(() => {
+  //   const subscription = cable.subscriptions.create(
+  //     { channel: "OnlineStatsChannel" ,
+  // }, // must match your Rails channel class
+  //     {
+  //       received(data) {
+  //          console.log('received data from online stats chanel', data)
+  //          setTotalOnlineUsers(data.active_user_count)
+  //         setTotalBandwidth(data.total_bandwidth)
+  //         setTotalDownload(data.total_download)
+  //         setTotalUpload(data.total_upload)
+  //       },
+  //       connected() {
+  //         console.log("Connected to OnlineStatsChannel");
+  //       },
+  //       disconnected() {
+  //         console.log("Disconnected from OnlineStatsChannel");
+  //       },
+  //     }
+  //   );
+
+  //   return () => {
+  //     subscription.unsubscribe();
+  //   };
+  // }, []);
+
+
+  
+
  const subdomain = window.location.hostname.split('.')[0];
 
+
+
+
+
+
+
+
+ useEffect(() => {
+    const subscription = cable.subscriptions.create(
+      { channel: "RadacctChannel" , 
+        "X-Subdomain": subdomain
+  }, // must match your Rails channel class
+      {
+        received(data) {
+           console.log('received data from radacct channel', data)
+            setTotalOnlineUsers(data.online_radacct)
+           
+          
+         
+        },
+        connected() {
+          console.log("Connected to RadacctChannel");
+        },
+        disconnected() {
+          console.log("Disconnected from RadacctChannel");
+        },
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [subdomain]);
+
+
+
+
+
+
+ useEffect(() => {
+    const subscription = cable.subscriptions.create(
+      { channel: "BandwidthChannel" , 
+        "X-Subdomain": subdomain
+  }, // must match your Rails channel class
+      {
+        received(data) {
+           console.log('received data from bandwidth channel', data)
+            setTotalBandwidth(data.total_bandwidth)
+            setTotalDownload(data.total_download)
+            setTotalUpload(data.total_upload)
+          
+         
+        },
+        connected() {
+          console.log("Connected to BandwidthChannel");
+        },
+        disconnected() {
+          console.log("Disconnected from BandwidthChannel");
+        },
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [subdomain]);
+
+
+
+
+
+
+
+  
   const getPPOEstats = useCallback(
     async() => {
 
@@ -166,7 +233,7 @@ const [totalUpload, setTotalUpload] = useState(0);
         const data = await response.json();
         
         if (response.ok) {
-          setTotalOnlineUsers(data.active_user_count)
+          // setTotalOnlineUsers(data.active_user_count)
           setTotalBandwidth(data.total_bandwidth)
           setTotalDownload(data.total_download)
           setTotalUpload(data.total_upload)
@@ -189,14 +256,18 @@ useEffect(() => {
   // Initial call
   getPPOEstats();
   
-  // Set up interval for polling
-  const intervalId = setInterval(() => {
-    getPPOEstats();
-  }, 7000);
+  // const intervalId = setInterval(() => {
+  //   getPPOEstats();
+  // }, 7000);
 
-  return () => clearInterval(intervalId);
+  // return () => clearInterval(intervalId);
 
 }, [getPPOEstats]);
+
+
+
+
+
   // const fetchRouterInfo = useCallback(async () => {
   //   try {
   //     const response = await fetch("/api/router_info", {
@@ -296,6 +367,34 @@ useEffect(() => {
 
 
 
+  const fetchtotalSubscribersOffline = useCallback(
+    async() => {
+      try {
+        const response = await fetch('/api/subscribers_offline', {
+          headers: {
+            'X-Subdomain': subdomain,
+          },
+        });
+
+        const newData = await response.json();
+
+        if (response.ok) {
+          setSubscribersOffline(newData.total_subscribers)
+        } else {
+          console.log('failed to fetch total subscribers')
+        }
+      } catch (error) {
+        console.log('failed to fetch total subscribers')
+      }
+      
+    },
+    [],
+  )
+  
+useEffect(() => {
+  fetchtotalSubscribersOffline()
+  
+}, [fetchtotalSubscribersOffline]);
 
 
 
@@ -304,6 +403,7 @@ useEffect(() => {
       const StatCard = ({ title, value, icon, trend, color, view , to}) => (
   <motion.div 
     variants={cardVariants}
+    whileHover={{ y: -5, scale: 1.02 }}
     className={`p-6 rounded-xl shadow-md bg-white 
       hover:shadow-xl cursor-pointer transition-shadow duration-300 ease-in-out
       roboto-condensed-light`}
@@ -314,7 +414,7 @@ useEffect(() => {
           <p className='text-black roboto-condensed-light '>{title}</p>
         </Typography>
         <Typography variant="h4" className="mt-1 font-bold">
-          <p className='text-black '>{value}</p>
+          <p className='text-black text-4xl'>{value}</p>
         </Typography>
       </div>
       <Box 
@@ -333,6 +433,7 @@ useEffect(() => {
         {trend.value > 0 ? '↑' : '↓'} {Math.abs(trend.value)}% {trend.label}
       </Typography>
     )}
+    
 <div className='bg-gray-100 hover:bg-gray-400 p-2 rounded-lg hover:text-white'>
   <Link to={to}>
     <p className='dark:text-black'>{view}</p>
@@ -344,6 +445,8 @@ useEffect(() => {
     
   return (
     <>
+
+    
       <div
       onClick={() => {
         setShowMenu1(false)
@@ -368,6 +471,13 @@ useEffect(() => {
 
      
 
+  <Suspense
+            fallback={
+              <div className="flex h-full items-center justify-center">
+                <UiLoader />
+              </div>
+            }
+          >
  <motion.div 
     onClick={() => {
       setShowMenu1(false)
@@ -383,14 +493,16 @@ useEffect(() => {
       setShowMenu11(false)  
       setShowMenu12(false)
     }}
-    className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700"
+    className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg border
+     border-gray-200 dark:border-gray-700
+     grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 align-center
+     "
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.3 }}
   >
 
 
- <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 align-center'>
           
           <StatCard 
           title="All Clients" 
@@ -412,34 +524,70 @@ useEffect(() => {
 
 
 
+
   {/* Subscribers Online Card */}
   <StatCard 
           title="Clients Online"
           value={totalOnlineUsers || 0}
-          icon={<MdOutlineOnlinePrediction size={24} className='text-black' />} 
+          icon={<MdOutlineOnlinePrediction size={24} className='
+          text-green-600
+           animate-[ping_2.0s_ease-in-out_infinite]
+          ' />} 
           trend={{ value: 8, label: 'vs yesterday' }}
           color="secondary"
                     view="view"
+                    to="/admin/subscribers-online"
 
         />
 
 
 
+<StatCard 
+          title="Routers Online"
+          value={totalOnlineUsers || 0}
+          icon={<GiWifiRouter size={24} className='
+          text-green-600
+          ' />} 
+          color="secondary"
+                    view="view"
+                    to="/admin/subscribers-online"
 
+        />
+
+
+
+<StatCard 
+          title="Routers Offline"
+          value={totalOnlineUsers || 0}
+          icon={<TbRouterOff size={24} className='
+          text-red-600
+          ' />} 
+          color="secondary"
+                    view="view"
+                    to="/admin/subscribers-online"
+
+        />
 
   {/* Subscribers Offline Card */}
   
   <StatCard 
           title="Clients Offline"
-          value={subscribersOffline}
-          icon={<IoCloudOfflineOutline  size={24} className='text-black' />} 
+          value={<p className=''>{subscribersOffline}</p>}
+          icon={<IoCloudOfflineOutline  size={24} className='
+          text-red-600
+           animate-[ping_2.0s_ease-in-out_infinite]
+          ' />} 
           trend={{ value: 8, label: 'vs yesterday' }}
           color="secondary"
                     view="view"
+                    to="/admin/subscribers-offline"
 
         />
   
-    </div>
+
+
+
+  
 
 
 <motion.div 
@@ -453,23 +601,24 @@ useEffect(() => {
         <Typography variant="subtitle2" color="textSecondary">
           <p className='text-black roboto-condensed-light '>Data (24H)</p>
         </Typography>
-        <p className='dark:text-black'>{totalBandwidth || 0}</p>
+        <p className='dark:text-black text-4xl'>{totalBandwidth || 0}</p>
 
 
-        <div className='flex items-center mt-4'>
+        <div className='flex items-center mt-4 font-light'>
           <div className='flex dark:text-black '>
         <FaArrowDown
           size={20}
-          className='text-black'
+          className='text-gray-500'
 
         />
         {totalDownload || 0}
         </div>
 
+
         <div className='flex dark:text-black'>
 <FaArrowUp
           size={20}
-          className='text-black'
+          className='text-gray-500'
         />
         {totalUpload || 0}
         </div>
@@ -484,7 +633,10 @@ useEffect(() => {
    
   </motion.div>
     
+
+    
   </motion.div>
+  </Suspense>
 
     </>
   );

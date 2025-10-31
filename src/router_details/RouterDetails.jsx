@@ -1,6 +1,6 @@
 
 import { FcAlarmClock } from "react-icons/fc";
-import { GoCpu } from "react-icons/go";
+import { GoCpu, GoServer  } from "react-icons/go";
 import { useCallback, useEffect, useState } from "react";
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { useSearchParams } from 'react-router-dom';
@@ -13,12 +13,20 @@ import TrafficStatsGraph from './TrafficData';
 import toast, { Toaster } from 'react-hot-toast';
 import { IoWarningOutline } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
+import { MdMemory } from "react-icons/md";  // Using MdMemory from material design icons instead
+
+import { FiHardDrive } from "react-icons/fi";
+import { FcAreaChart, FcBarChart, FcDonate, FcLandscape } from "react-icons/fc";
+import Lottie from 'react-lottie';
+import animationData from '../lotties/Connection error.json';
+
+import { motion } from "framer-motion";
 
 
 
 
 
-const RouterDetails = () => {
+const RouterDetails = ({message = "Connection to router failed"}) => {
 const {openNasTable, setOpenNasTable,
         openRouterDetails, setOpenRouterDetails} = useApplicationSettings()
 const [routerData, setRouterData] = useState(null);
@@ -34,6 +42,8 @@ const [routerInfo, setRouterInfo] = useState(null);
   const navigate = useNavigate()
 
 
+
+  
   
   const handleChange = (event) => {
     setRouterInterfaceForm(event.target.value);
@@ -42,6 +52,21 @@ const [routerInfo, setRouterInfo] = useState(null);
   };
 
 const [trafficData, setTrafficData] = useState([]);
+
+
+
+
+
+
+ const defaultOptions = {
+      loop: true,
+      autoplay: true,
+      animationData: animationData,
+      rendererSettings: {
+        preserveAspectRatio: "xMidYMid slice"
+      }
+    };
+
 
  const fetchTrafficStats = useCallback(async (routerInterfaceForm) => {
         try {
@@ -87,6 +112,18 @@ const [trafficData, setTrafficData] = useState([]);
   const [loadingUbuntuStats, setLoadingUbuntuStats] = useState(true);
   
 
+
+
+
+
+
+
+
+
+
+
+
+  
 const id = searchParams.get('id')
     const [mikotik, setMikotik] = useState([
         {
@@ -210,7 +247,13 @@ const id = searchParams.get('id')
             "id": 25,
             "name": "RB2011UiAS-2HnD-IN",
             "image": '/images/RB2011UiAS-2HnD-IN.png'
-        }
+        },
+
+         {
+            "id": 26,
+            "name": "RB4011iGS+",
+            "image": '/images/RB4011iGS+RM.png'
+        },
 
     ])
 
@@ -222,6 +265,7 @@ const [totalHdd, setTotalHdd] = useState(0)
 const [routerVersion, setRouterVersion] = useState(0)
 
 const [showRebootConfirm, setShowRebootConfirm] = useState(false);
+const [archiTecture, setArchiTecture] = useState(null)
 
 
 
@@ -310,6 +354,8 @@ const rebootRouter = async(e) => {
           setFreeHdd(data.disk_usage.free);
           setTotalHdd(data.disk_usage.total);
           setRouterVersion(data.version);
+          setArchiTecture(data.architecture_name)
+          
           
           const matchedRouter = mikotik.find(router => router.name === data.board_name);
           setCurrentRouterImage(matchedRouter?.image || null);
@@ -402,126 +448,303 @@ useEffect(() => {
   handleGetSystemGeneralSettings()
  
 }, [handleGetSystemGeneralSettings]);
+
+const status = searchParams.get('status')
+
+const StatCard = ({ icon, title, value, unit, color = "blue", children }) => {
+  const colors = {
+    blue: "from-blue-500 to-blue-600",
+    green: "from-green-500 to-green-600",
+    orange: "from-orange-500 to-orange-600",
+    purple: "from-purple-500 to-purple-600",
+    red: "from-red-500 to-red-600"
+  };
+
+  return (
+    <div className={`bg-gradient-to-br ${colors[color]} rounded-xl shadow-lg overflow-hidden text-white`}>
+      <div className="p-5">
+        <div className="flex justify-between items-center">
+          <div className="text-2xl font-bold">
+            {value} {unit && <span className="text-sm opacity-80">{unit}</span>}
+          </div>
+          <div className="p-3 rounded-full bg-white/20">
+            {icon}
+          </div>
+        </div>
+        <div className="mt-2 text-sm font-medium opacity-90">{title}</div>
+        {children && <div className="mt-3">{children}</div>}
+      </div>
+    </div>
+  );
+};
+
+const ProgressBar = ({ value, max = 100, color = "blue" }) => {
+  const colors = {
+    blue: "bg-blue-400",
+    green: "bg-green-400",
+    orange: "bg-orange-400",
+    purple: "bg-purple-400",
+    red: "bg-red-400"
+  };
+
+  const percentage = Math.min(100, (value / max) * 100);
+
+  return (
+    <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+      <div 
+        className={`h-2.5 rounded-full ${colors[color]}`} 
+        style={{ width: `${percentage}%` }}
+      ></div>
+    </div>
+  );
+};
+
+
+
+
+
     
   return (
     <div>
+  {/* <Lottie 
+	    options={defaultOptions}
+        height={400}
+        width={400}
+      /> */}
+
+{status === 'Reachable' ? (
+ <div className="space-y-6">
       <Toaster />
+      
+      {/* Main Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Uptime Card */}
+        <StatCard 
+          icon={<FcAlarmClock className="w-6 h-6" />} 
+          title="System Uptime" 
+          value={uptime || "N/A"}
+          color="purple"
+        />
+        
+        {/* CPU Card */}
+        <StatCard 
+          icon={<GoCpu className="w-6 h-6" />} 
+          title="CPU Load" 
+          value={cpuLoad || "0"} 
+          unit="%"
+          color="orange"
+        >
+          <ProgressBar value={parseFloat(cpuLoad) || 0} color="orange" />
+        </StatCard>
+        
+        {/* Memory Card */}
+        <StatCard 
+          icon={<MdMemory className="w-6 h-6" />} 
+          title="Memory Usage" 
+          value={`${((totalMemory - freeMemory) / totalMemory * 100)}`} 
+          unit="%"
+          color="blue"
+        >
+          <div className="text-xs mb-1">
+            {freeMemory} free of {totalMemory}
+          </div>
+          <ProgressBar 
+            value={((totalMemory - freeMemory) / totalMemory * 100)} 
+            color="blue" 
+          />
+        </StatCard>
+        
+        {/* Disk Card */}
+        <StatCard 
+          icon={<FiHardDrive className="w-6 h-6" />} 
+          title="Disk Usage" 
+          value={`${((totalHdd - freeHdd) / totalHdd * 100).toFixed(1)}`} 
+          unit="%"
+          color="green"
+        >
+          <div className="text-xs mb-1">
+            {freeHdd} free of {totalHdd}
+          </div>
+          <ProgressBar 
+            value={((totalHdd - freeHdd) / totalHdd * 100)} 
+            color="green" 
+          />
+        </StatCard>
+      </div>
+      
+      {/* Router Info Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Router Board Card */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden 
+        border border-gray-200 dark:border-gray-700">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <GoServer className="text-blue-500" />
+                Router Board
+              </h3>
+              {currentRouterImage && (
+                <img 
+                  src={currentRouterImage} 
+                  alt="router" 
+                  className="w-16 h-16 object-contain" 
+                />
+              )}
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Model:</span>
+                <span className="font-medium">{routerInfo || "N/A"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Version:</span>
+                <span className="font-medium">{routerVersion || "N/A"}</span>
+              </div>
 
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 
-<div className='bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 border-l-4 border-blue-500'>
-    <p className='font-bold'>SYSTEM DATE AND TIME</p>
-        <span className='flex gap-2'>UPTIME: <p>{uptime}</p> </span>
-                <span className='flex gap-2'>TIMEZONE: <p>{timezone}</p> </span>
-
-<FcAlarmClock className='w-7 h-7' />
-</div>
-
-
-
-
-<div className='bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 border-l-4 border-blue-500'>
-        <p className='font-bold'>SYSTEM RESOURCES</p>
-                <span className='flex gap-2'>CPU LOAD: <p>{cpuLoad}</p> </span>
-                <span className='flex gap-2'>FREE MEMORY: <p>{freeMemory}</p> </span>
-                <span className='flex gap-2'>TOTAL MEMORY: <p>{totalMemory}</p> </span>
-                <span className='flex gap-2'>FREE HDD: <p>{freeHdd}</p> </span>
-                <span className='flex gap-2'>TOTAL HDD: <p>{totalHdd}</p> </span>
-
-
-<GoCpu className='w-7 h-7'/>
-</div>
-
-
-
-
-
-
-
-<div className='bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 border-l-4 border-blue-500'>
-        <p className='font-bold'>ROUTERBOARD</p>
-
-       <div className='flex'>       
-<img src={currentRouterImage} alt="router" className='w-20 h-20 object-contain' />
-
-                <div className='flex flex-col'>
-                <span className='flex gap-2'>BOARD NAME: <p>{routerInfo}</p> </span>
-                <span className='flex gap-2'>ROUTER OS: <p>{routerVersion}</p> </span></div>
-               
+              <div className="flex justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Architecture:</span>
+                <span className="font-medium">{archiTecture || "N/A"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Timezone:</span>
+                <span className="font-medium">{timezone || "N/A"}</span>
+              </div>
+            </div>
+            
+            <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+              {showRebootConfirm ? (
+                <div className="flex gap-3">
+                  <button 
+                    onClick={rebootRouter}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    Confirm Reboot
+                  </button>
+                  <button 
+                    onClick={() => setShowRebootConfirm(false)}
+                    className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 py-2 px-4 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
                 </div>
-{showSucessReboot ? (
-
-<div className="flex items-center p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
-  <svg className="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-  </svg>
-  <span className="sr-only">Info</span>
-  <div>
-    <span className="font-medium">Success</span> Router is rebooting please wait for a few minutes...
-  </div>
-</div>
-): null}
-
-
-        {showRebootConfirm ? (
-      <div className='flex space-x-2'>
-        <button 
-          onClick={rebootRouter}
-          className='bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700'
-        >
-          Confirm Reboot
-        </button>
-        <button 
-          onClick={() => setShowRebootConfirm(false)}
-          className='bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600'
-        >
-          Cancel
-        </button>
-      </div>
-    ) : (
-      <button 
-        onClick={rebootRouter}
-        className='bg-red-500 text-white py-2 px-4
-        rounded-lg hover:bg-red-600 disabled:bg-gray-500 disabled:text-white
-        '
-      >
-        Reboot
-                <IoWarningOutline className='w-5 h-5 text-white' />
-
-      </button>
-    )}
+              ) : (
+                <button 
+                  onClick={rebootRouter}
+                  className="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  Reboot Router
+                  <IoWarningOutline className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+        
+{/* Traffic Stats Card */}
+<div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg
+ overflow-hidden border border-gray-200 dark:border-gray-700 lg:col-span-2">
+  <div className="p-6">
+    <h3 className="text-lg font-bold flex items-center gap-2 mb-4">
+      <FcAreaChart className="w-6 h-6" />
+      Network Traffic
+    </h3>
     
-
-       <Box 
-       
-       sx={{ minWidth: 120 , 
-
-        mt: 2
-
-        }} >
-      <FormControl sx={{ minWidth: 120 }} >
-        <InputLabel id="demo-simple-select-label">Interface</InputLabel>
-        <Select
-          id="demo-simple-select"
-          value={routerInterfaceForm}
-          label="Interface"
-          onChange={handleChange}
-        >
-          {routerInterface.map((option) => (
-            <MenuItem key={option.id} value={option.name}>
-              {option.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Box>
-</div>
-      </div>
-
-
-     <div className="mt-8">
+    <div className="mb-4">
+      <select
+        value={routerInterfaceForm}
+        onChange={(e) => {
+          setRouterInterfaceForm(e.target.value);
+          localStorage.setItem('routerInterfaceForm', e.target.value);
+          fetchTrafficStats(e.target.value);
+        }}
+        className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg
+         focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700
+          dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+      >
+        {routerInterface.map((option) => (
+          <option key={option.id} value={option.name}>
+            {option.name}
+          </option>
+        ))}
+      </select>
+    </div>
+    
+    {/* Modified graph container with more height and padding */}
+    <div className="h-80 pb-8">  {/* Increased from h-64 and added pb-8 */}
       <TrafficStatsGraph trafficData={trafficData} />
     </div>
+  </div>
+</div>        
+      </div>
+      
+      {/* Reboot Success Message */}
+      {showSucessReboot && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-bounce">
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Router is rebooting. Please wait...
+          </div>
+        </div>
+      )}
+    </div>
+):  <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col items-center justify-center p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-red-100 dark:border-red-900 max-w-md mx-auto"
+    >
+      {/* Lottie Animation */}
+      <div className="relative mb-6">
+        <Lottie 
+          options={defaultOptions}
+          height={200}
+          width={200}
+        />
+        
+        {/* Red alert circle around animation */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-48 h-48 rounded-full border-4 border-red-200 dark:border-red-800 opacity-60 animate-pulse"></div>
+        </div>
+      </div>
+
+      {/* Error Message */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        className="text-center"
+      >
+        <h3 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-3">
+          Connection Failed
+        </h3>
+        
+        <p className="text-gray-600 dark:text-gray-300 mb-6 text-lg">
+          {message}
+        </p>
+
+        {/* Action Buttons */}
+       
+
+        {/* Additional Help Text */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
+          className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg"
+        >
+          <p className="text-sm text-red-700 dark:text-red-300">
+            💡 Check if the router is powered on and connected to the network
+          </p>
+        </motion.div>
+      </motion.div>
+    </motion.div>  
+
+}
+     
     </div>
   )
 }

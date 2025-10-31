@@ -676,10 +676,11 @@ useEffect(() => {
             handleChangeDateTime2={handleChangeDateTime2}  
         setisOpenDelete={setisOpenDelete} handleUpdateEvent={handleUpdateEvent}/>
 
-        <p>Task Manager</p>
+        <p className='bg-gradient-to-r from-green-600 via-blue-400
+         to-cyan-500 bg-clip-text text-transparent text-2xl font-bold inline-block mb-2'>Task Manager</p>
 
         <div className="flex justify-between items-center mb-4">
-  <h2 className="text-2xl font-semibold">Calendar</h2>
+  {/* <h2 className="text-2xl font-semibold">Calendar</h2> */}
   <button
     onClick={() => setIsOpen(true)} // Open the create form
     className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow"

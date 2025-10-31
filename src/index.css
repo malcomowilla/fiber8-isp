@@ -77,6 +77,22 @@ input[type="text"]:not(:placeholder-shown) ~ .input-text {
   @apply border-teal-600 transform -translate-y-[34px] -translate-x-[-10px] bg-white   ;
 }
 
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-content, .printable-content * {
+    visibility: visible;
+  }
+  .printable-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+  }
+}
 
 input[type="text"]:focus ~ .input-text2,
 input[type="text"]:not(:placeholder-shown) ~ .input-text2 {
@@ -106,6 +122,20 @@ input[type="text"]:not(:placeholder-shown) ~ .input-text2 {
 
 .animate-fade-in {
   animation: fadeIn 1s ease-in-out;
+}
+
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-left-color: #10b981; /* Tailwind green-500 */
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .animate-slide-up {

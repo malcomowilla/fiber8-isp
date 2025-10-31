@@ -9,6 +9,7 @@ import {useApplicationSettings} from '../settings/ApplicationSettings'
 const UploadSubscriber = () => {
     const [file, setFile] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [loading, setloading] = useState(false)
     const {settingsformData,
 showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
@@ -48,8 +49,10 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
     const subdomain = window.location.hostname.split('.')[0];
     const handleFileUpload = async (e) => {
         e.preventDefault();
+        setloading(true)
         if (!file) {
             toast.error('please select a file first')
+            setloading(false)
           return;
         }
     
@@ -67,8 +70,10 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
     
           const newData = await response.json();
           if (response.ok) {
+            setloading(false)
             toast.success('Subscribers imported successfully!');
           } else {
+            setloading(false)
             toast.error('Failed to import subscribers.');
             toast.error(newData.error, {
               position: "top-center",
@@ -76,6 +81,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
             });
           }
         } catch (error) {
+          setloading(false)
           toast.error('Error importing subscribers:', error);
         }
       };
@@ -108,7 +114,9 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
         transition={{ duration: 0.5 }}
       >
         <h1 className="text-2xl font-bold mb-6 text-gray-800
-        font-montserat
+        font-montserat  bg-gradient-to-r from-green-600 via-blue-400 to-cyan-500 bg-clip-text
+  
+  text-transparent
         "
         
         >
@@ -164,7 +172,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
             whileTap={{ scale: 0.9 }}
             
           >
-            Upload Now
+            {loading ?  'Uploading.....' : 'Upload Now'}
           </motion.button>
         )}
       </motion.div>

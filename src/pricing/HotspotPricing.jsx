@@ -27,7 +27,7 @@ const HotspotPricing = () => {
             Stay Connected Anywhere
           </h1>
           <p className="text-xl text-gray-300 mb-8">
-            Affordable and reliable Wi-Fi hotspot plans for individuals and businesses. Browse, stream, and work seamlessly on the go.
+            Affordable and reliable Wi-Fi hotspot plans for businesses. Browse, stream, and work seamlessly on the go.
           </p>
           {/* <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-8 rounded-lg hover:scale-105 transition-transform duration-300">
             Get Started
@@ -77,9 +77,9 @@ damping: 15,
            viewport={{ once: true, amount: 0.5 }}
           className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-green-500 transition-all duration-300 hover:scale-105 animate-fade-in-up">
             <h3 className="text-2xl font-bold mb-4 text-green-500">Starter</h3>
-            <p className="text-gray-400 mb-6">up to 50 paying hotspot users.</p>
+            <p className="text-gray-400 mb-6">up to 50 hotspot users.</p>
             <p className="text-4xl font-bold mb-6">
-              KES 1500<span className="text-lg text-gray-400">/month</span>
+              KES 1000<span className="text-lg text-gray-400">/month</span>
             </p>
             <ul className="text-gray-400 mb-8">
               <li className="mb-2">✅ Your Own Sudomain</li>
@@ -97,6 +97,42 @@ damping: 15,
           </motion.div>
 
 
+
+  <motion.div 
+           initial={{ opacity: 0, scale: 0.9 }}
+           whileInView={{
+             opacity: 1,
+             
+             scale: 1.05, 
+             transition: {
+              duration: 0.3,
+               type: "spring",
+               stiffness: 120, // Controls how stiff the animation is
+               damping: 15, // Reduces the bounciness
+             },
+           }}
+
+           viewport={{ once: true, amount: 0.5 }}
+          className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-green-500 transition-all duration-300 hover:scale-105 animate-fade-in-up">
+            <h3 className="text-2xl font-bold mb-4 text-green-500">Startup</h3>
+            <p className="text-gray-400 mb-6">up to 100 hotspot users.</p>
+            <p className="text-4xl font-bold mb-6">
+              KES 1500<span className="text-lg text-gray-400">/month</span>
+            </p>
+            <ul className="text-gray-400 mb-8">
+              <li className="mb-2">✅ Your Own Sudomain</li>
+              <li className="mb-2">✅Bulk SMS & Email Intergration</li>
+              <li className="mb-2">✅ 24/7 Email Support</li>
+              <li className="mb-2">✅ MPesa Intergration</li>
+              <li className="mb-2">✅ Centralized Hotspot Admin Dashboard Management</li>
+              <li className="mb-2">✅ Customizable Hotspot Plans</li>
+
+
+            </ul>
+            <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-8 rounded-lg w-full hover:scale-105 transition-transform duration-300">
+              Choose Plan
+            </button>
+          </motion.div>
 
           {/* Pro Plan */}
           <motion.div 

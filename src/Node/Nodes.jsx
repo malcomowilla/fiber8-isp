@@ -15,6 +15,7 @@ import { useDebounce } from 'use-debounce';
 import toast,{  Toaster } from 'react-hot-toast';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 
+import DeleteNode from '../delete/DeleteNode'
 
 
 
@@ -33,11 +34,22 @@ const Nodes = () => {
   const [mapReady, setMapReady] = useState(false);
   const [nodeId, setNodeId] = useState('');
   const [editingNode, setEditingNode] = useState(false)
+  const [openDeleteNode, setOpenDeleteNode] = useState(false);
 
+
+
+
+  const handleCloseDelete = () => {
+
+
+    setOpenDeleteNode(false);
+  }
   const {showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
        showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
         showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,} = useApplicationSettings();
+
+
   const handleClickOpen = () => {
       setOpen(true);
       setEditingNode(false)
@@ -48,7 +60,7 @@ const Nodes = () => {
     };
 
   const DeleteButton = ({ id }) => (
-        <IconButton style={{ color: '#8B0000' }}>
+        <IconButton style={{ color: '#8B0000' }} onClick={() => setOpenDeleteNode(true)}>
           <DeleteIcon />
         </IconButton>
       );
@@ -69,7 +81,44 @@ const Nodes = () => {
   }
 
   
+const deleteNode = async() => {
 
+  try {
+    const response = await fetch(`/api/nodes/${nodeId}`, {
+      method: "DELETE",
+      headers: {
+        'X-Subdomain': subdomain,
+      },
+
+
+    })
+
+    if (response.ok) {
+      toast.success('node deleted successfully', {
+        position: "top-center",
+        duration: 5000,
+      })
+      setNodes((prevData) => prevData.filter((node) => node.id !== nodeId));
+      setOpenDeleteNode(false)
+      // setloading(false)
+      
+    } else {
+      setOpenDeleteNode(false)
+      toast.error('failed to delete node', {
+        position: "top-center",
+        duration: 5000,
+      })
+    }
+  } catch (error) {
+    
+    setOpenDeleteNode(false)
+    toast.error('failed to delete node server error', {
+      position: "top-center",
+      duration: 5000,
+    })
+  }
+}
+  
   const createNode = async(e) => {
     e.preventDefault();
 
@@ -107,9 +156,28 @@ const newData = await response.json()
             
           })
         }
+      }else{
+        if (nodeId) {
+          
+          toast.error('failed to update node', {
+            position: "top-center",
+            duration: 4000,
+            
+          })
+        } else {
+          
+          toast.error('failed to create node', {
+            position: "top-center",
+            duration: 4000,
+            
+          })
+        }
       }
     } catch (error) {
-      
+      toast.error('failed to create node server error', {
+        position: "top-center",
+        duration: 4000,
+      })
     }
 
 
@@ -203,7 +271,9 @@ const columns = [
          createNode={createNode} editingNode={editingNode} setEditingNode={setEditingNode}
          />
        
-       
+           <DeleteNode handleCloseDelete={handleCloseDelete} openDeleteNode={openDeleteNode}
+            id={nodeId} deleteNode={deleteNode}  />
+
 
 
          <div className="flex items-center max-w-sm mx-auto p-3">   
@@ -244,7 +314,9 @@ const columns = [
 
       <MaterialTable columns={columns}
       
-      title='Nodes'
+      title={<p className='bg-gradient-to-r from-green-600 via-blue-400 to-cyan-500 bg-clip-text
+  
+  text-transparent font-bold text-2xl'>Nodes</p>}
       
        data={nodes}
 

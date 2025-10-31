@@ -11,10 +11,12 @@ import { MdOutlinePhonePaused } from "react-icons/md";
 const SystemAdminLogin = () => {
   const [loading, setloading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [error, setError] = useState('')
+  const [seeError, setSeeError] = useState(false)
+
   
   const [phoneNumberVerified, setPhoneNumberVerified] = useState(false)
   const [emailVerified, setEmailVerified] = useState(false)
-
   const {formData, setFormDataSystemAdmin, setLoginWithPasskey, setUseEmailAuthentication,
      setUsePhoneNumberAuthentication, useEmailAuthentication, usePhoneNumberAuthentication,
      loginWithPasskey
@@ -167,27 +169,26 @@ const SystemAdminLogin = () => {
       navigate('/system-admin-dashboard')
      
   
-        // setTimeout(() => {
-        //   // setDone(true);
-        //   // setloading(false);
-        //   setTimeout(() => {
-        //     navigate('/admin/location')
-        //   }, 1000);
-        // }, 2500);
       } else {
         toast.error('something went wrong', {
           duration: 8000,
           position: "top-center",
         })
+       setSeeError(true)
+setError(newData.error)
+if (response.status === 401) {
+      toast.error(newData.error, {
+        duration: 3000,
+        position: 'top-center',
+      })
+} 
         // setRegistrationError(options.errors);
         setOpenLoad(false);
-  toast.error(newData.error, {
-    duration: 6000,
-    position: "top-center",
-  })
+ 
         console.log(`passkey error =>${newData.error}`)
       }
     } catch (err) {
+      setError('something went wrong internal server error')
       toast.error('something went wrong', {
         duration: 8000,
         position: "top-center",
@@ -196,6 +197,7 @@ const SystemAdminLogin = () => {
       console.error('Error during WebAuthn credential creation:', err);
     }
   }catch (err) {
+
       toast.error('something went wrong', {
         duration: 8000,
         position: "top-center",
@@ -350,16 +352,22 @@ const systemAdminLogin = async(e) => {
         duration: 3000,
         position: 'top-center',
       })
+         const newData = await response.json()
 
-
-const newData = await response.json()
+setSeeError(true)
+setError(newData.error)
+if (response.status === 401) {
       toast.error(newData.error, {
         duration: 3000,
         position: 'top-center',
       })
+} 
+
     }
   } catch (error) {
     setloading(false)
+    setSeeError(true)
+    setError('internal server error something went wrong')
     toast.error('internal server error something went wrong', {
       duration: 3000,
       position: 'top-center',
@@ -528,6 +536,30 @@ useEffect(() => {
               )}
             </button>
           </form>
+
+{seeError ? (
+<div id="alert-border-2" className="flex items-center p-4 mb-4 text-red-800 border-t-4 border-red-300 bg-red-50 dark:text-red-400 dark:bg-gray-800 dark:border-red-800" role="alert">
+    <svg className="shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+    </svg>
+    <div className="ms-3 text-sm font-medium">
+       <a href="#" className="font-semibol
+      d underline hover:no-underline"></a>{error} 
+    </div>
+    <button type="button"
+    onClick={() => {
+      setSeeError(false)
+    }}
+    className="ms-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700"  data-dismiss-target="#alert-border-2" aria-label="Close">
+      <span className="sr-only">Dismiss</span>
+      <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+      </svg>
+    </button>
+</div>
+): null}
+
+
 
           <p className="mt-6 text-sm text-black
            dark:text-white">

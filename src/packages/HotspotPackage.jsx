@@ -56,7 +56,7 @@ const [hotspotPackage, setHotspotPackage] = useState({
 
 })
 
-
+const [editing, setEditing] = useState(false);
 // const navigate = useNavigate()
 
 const handleWeekdayChange = (day) => {
@@ -72,6 +72,7 @@ const handleWeekdayChange = (day) => {
 
 const handleClickOpen = (rowData) => {
   setOpen(true);
+  setEditing(false)
   setHotspotPackage(rowData);
 
 };
@@ -165,8 +166,7 @@ const defaultOptions = {
 
 const handleRowClick = (event, rowData) => {
   setHotspotPackage(rowData);
-  console.log('hotspot package ',rowData )
-console.log('hotspot package row data', rowData.valid_from)
+  setEditing(true)
 setHotspotPackage({
   ...rowData,
   valid_from: rowData.valid_from ? dayjs(rowData.valid_from, 'hh:mm A') : dayjs(),
@@ -432,6 +432,7 @@ const deleteHotspotPackage = async (id) => {
     loading={loading} hotspotPackage={hotspotPackage} setHotspotPackage={setHotspotPackage}
     createHotspotPackage={createHotspotPackage}
     handleWeekdayChange={handleWeekdayChange}
+    editing={editing}
     />
 
 
@@ -519,7 +520,8 @@ const deleteHotspotPackage = async (id) => {
 
       <MaterialTable columns={columns}
       onRowClick={handleRowClick}
-      title='Hotspot Packages'
+      title={<p className='bg-gradient-to-r from-green-600 via-blue-400
+         to-cyan-500 bg-clip-text text-transparent text-2xl font-bold'>Hotspot Packages </p>}
       
       data={packages}
 

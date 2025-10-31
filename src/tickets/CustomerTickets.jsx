@@ -32,7 +32,6 @@ const CustomerTickets = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenTicket, setIsOpenTicket] = useState(false);
-const [customers, setCustomers] = useState([])
 const [agentRole, setAgentRole] = useState([])
 const [ticket, setTicket] = useState([])
 const [loading, setloading] = useState(false)
@@ -42,6 +41,8 @@ const [openCreateTicketAlert, setopenCreateTicketAlert] = useState(false)
 const [openUpdateTicketAlert, setopenUpdateTicketAlert] = useState(false)
 const [openDeleteTicketAlert, setopenDeleteTicketAlert] = useState(false)
 const [phone, setPhone] = useState('')
+const [customers, setCustomers] = useState([])
+
 const [customer_name, setName] = useState('')
 const [ticketNo, setTicketNo] = useState('') 
 const [updatedDate, setUpdatedDate] = useState('')
@@ -572,8 +573,10 @@ toaster.error('eror creating ticket', {
 
 
 
-     <TicketForm phone={phone} customer_name={customer_name}  ticketNo={ticketNo} loading={loading} openLoad={openLoad}
-     handleAddTicket={handleAddTicket} isOpen={isOpen} setIsOpen={setIsOpen} agentRole={agentRole} ticketForm={ticketForm}
+     <TicketForm phone={phone} customer_name={customer_name}  ticketNo={ticketNo} loading={loading}
+      openLoad={openLoad}
+     handleAddTicket={handleAddTicket} isOpen={isOpen} setIsOpen={setIsOpen} agentRole={agentRole}
+      ticketForm={ticketForm}
       setTicketForm={setTicketForm} handleChange={handleChange} updatedDate={updatedDate}
       
        seeTicketError={seeTicketError} setSeeTicketError={setSeeTicketError}

@@ -12,13 +12,18 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
 import { useApplicationSettings } from "../settings/ApplicationSettings";
 import { Button } from "../components/ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
+import Autocomplete from '@mui/material/Autocomplete';
+import { IoWifiOutline } from "react-icons/io5";
+import { FaLongArrowAltUp } from "react-icons/fa";
+import { FaLongArrowAltDown } from "react-icons/fa";
+import { LuCalendar1 } from "react-icons/lu";
+
+
+
 
 const EditHotspotPackage = ({
   handleClose,
@@ -30,6 +35,7 @@ const EditHotspotPackage = ({
   handleChangeTimeFrom,
   handleChangeTimeUntil,
   handleWeekdayChange,
+  editing,
 }) => {
   const {
     name,
@@ -78,6 +84,9 @@ const EditHotspotPackage = ({
               }}
             >
               <TextField
+              InputProps={{
+                startAdornment: <IoWifiOutline className="mr-2" />,  
+              }}
                 sx={{
                   "& label.Mui-focused": {
                     color: "black",
@@ -105,6 +114,9 @@ const EditHotspotPackage = ({
 
             <div className="flex gap-3 mt-4">
               <TextField
+              InputProps={{
+                startAdornment: <p>Ksh</p>,
+              }}
                 label="bundle-price"
                 sx={{
                   "& label.Mui-focused": {
@@ -130,6 +142,9 @@ const EditHotspotPackage = ({
               ></TextField>
 
               <TextField
+              InputProps={{
+                startAdornment: < FaLongArrowAltUp className="mr-2" />,
+              }}
                 label="upload-speed-limit(mbps)"
                 value={upload_limit}
                 onChange={handleChangeHotspotPackage}
@@ -155,6 +170,9 @@ const EditHotspotPackage = ({
               ></TextField>
 
               <TextField
+               InputProps={{
+                startAdornment: < FaLongArrowAltDown className="mr-2" />,
+              }}
                 value={download_limit}
                 onChange={handleChangeHotspotPackage}
                 label="download-speed-limit(mbps)"
@@ -179,39 +197,7 @@ const EditHotspotPackage = ({
               ></TextField>
             </div>
 
-            {/* Shared Users Field */}
-            {/* <div className="flex gap-3 mt-4">
-              <TextField
-                label="Shared Users"
-                value={shared_users}
-                name='shared_users'
-                onChange={handleChangeHotspotPackage}
-                id="shared_users"
-                sx={{
-                  "& label.Mui-focused": {
-                    color: "black",
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "black",
-                      borderWidth: "3px",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "black",
-                    },
-                  },
-                }}
-                className="myTextField"
-                type="number"
-                placeholder="Number of shared users..."
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <FaUsers className="mr-2 text-gray-500" /> // Add user icon
-                  ),
-                }}
-              ></TextField>
-            </div> */}
+           
 
             <div className="mt-4 flex flex-wrap">
               <Box
@@ -239,6 +225,9 @@ const EditHotspotPackage = ({
                   className="myTextField"
                   id="validity"
                   value={validity}
+                  InputProps={{
+                    startAdornment: <LuCalendar1 className="mr-2" />,
+                  }}
                   onChange={handleChangeHotspotPackage}
                   placeholder="validity-period..."
                   type="number"
@@ -287,7 +276,7 @@ const EditHotspotPackage = ({
               </DemoContainer>
 
               <div className="flex justify-center items-center flex-col space-y-4">
-                <p className="text-xl font-thin text-green-600 mb-4">Valid Days</p>
+                <p className="text-xl  text-black ">Valid Days</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
                   {[
                     "Monday",
@@ -332,33 +321,33 @@ const EditHotspotPackage = ({
                   },
                 }}
               >
-                <InputLabel id="validity_period_units">
-                  Validity period units
-                </InputLabel>
-                <Select
-                  value={validity_period_units}
-                  onChange={(e) =>
-                    setHotspotPackage({
-                      ...hotspotPackage,
-                      validity_period_units: e.target.value,
-                    })
-                  }
-                  id="validity_period_units"
-                  label="Validity-period-units"
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  <MenuItem value={"days"}>days</MenuItem>
-                  <MenuItem value={"hours"}>hours</MenuItem>
-                  <MenuItem value={"minutes"}>minutes</MenuItem>
-                </Select>
+               
+               <Autocomplete
+               className='myTextField'
+  id="validity_period_units"
+  options={['days', 'hours', 'minutes']}
+  value={validity_period_units}
+  onChange={(event, newValue) => {
+    setHotspotPackage({
+      ...hotspotPackage,
+      validity_period_units: newValue,
+    });
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Validity period units"
+      variant="outlined"
+    />
+  )}
+  sx={{ width: '100%' }}
+/>
               </FormControl>
             </div>
 
             <DialogActions>
               <button
-                className="dotted-font p-2 bg-red-700 rounded-md text-white"
+                className=" p-2 bg-red-700 rounded-md text-white"
                 onClick={(e) => {
                   e.preventDefault();
                   handleClose();
@@ -370,9 +359,9 @@ const EditHotspotPackage = ({
               <Button
                 variant="outline"
                 type="submit"
-                className="dotted-font p-5"
+                className=" p-5"
               >
-                Save
+                {editing ? 'Update' : 'Save'}
                 <ReloadIcon
                   className={`ml-2 h-4 w-4  ${
                     loading ? "animate-spin" : "hidden"

@@ -3,6 +3,10 @@
 import  { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useApplicationSettings } from '../settings/ApplicationSettings';
+import { createConsumer } from "@rails/actioncable";
+const cable = createConsumer(`wss://${window.location.hostname}/cable`);
+
+
 
 
 const StatCard = ({ title, value, icon, color }) => {
@@ -26,10 +30,16 @@ const StatCard = ({ title, value, icon, color }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`p-6 rounded-lg shadow-2xl ${color} text-white`}
+      // initial={{ opacity: 0, y: 50 }}
+      // animate={{ opacity: 1, y: 0 }}
+      // transition={{ duration: 0.5 }}
+      // className={`p-6 rounded-lg shadow-2xl ${color} text-white`}
+     initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        whileHover={{ scale: 1.03 }}
+        className={`bg-gradient-to-br ${color}
+         rounded-xl shadow-lg p-6 overflow-hidden text-white`}
     >
       <div className="flex items-center justify-between">
         <div>
@@ -91,60 +101,121 @@ const fetchRouters = useCallback(
   }, [fetchRouters]);
 
  
-const getActiveHotspotUsers = useCallback(
-  async() => {
 
-    try {
-      const response = await fetch(`/api/get_active_hotspot_users?router_name=${settingsformData.router_name}
-        `,
 
-        {
-          headers: {
-            'X-Subdomain': subdomain,
-          },
-        }
+
+// const getActiveHotspotUsers = useCallback(
+//   async() => {
+
+//     try {
+//       const response = await fetch(`/api/get_active_hotspot_users?router_name=${settingsformData.router_name}
+//         `,
+
+//         {
+//           headers: {
+//             'X-Subdomain': subdomain,
+//           },
+//         }
       
       
-      )
-      const newData = await response.json()
-      if (response.ok) {
-        // setPackages(newData)
-        const { hotspot_users } = newData
-        setOnlineUsers(newData.active_user_count)
-        console.log('hotspot users fetched', newData)
-        setTotalBandwidth(newData.total_bandwidth)
-      }else{
-        // toast.error('failed to get active users', {
-        //   position: "top-center",
-        //   duration: '5000'
+//       )
+//       const newData = await response.json()
+//       if (response.ok) {
+//         // setPackages(newData)
+//         const { hotspot_users } = newData
+//         setOnlineUsers(newData.active_user_count)
+//         console.log('hotspot users fetched', newData)
+//         setTotalBandwidth(newData.total_bandwidth)
+//       }else{
+//         // toast.error('failed to get active users', {
+//         //   position: "top-center",
+//         //   duration: '5000'
           
-        // })
-      }
-    } catch (error) {
-      // toast.error('failed to get active users', {
-      //   position: "top-center",
-      //   duration: '5000'
+//         // })
+//       }
+//     } catch (error) {
+//       // toast.error('failed to get active users', {
+//       //   position: "top-center",
+//       //   duration: '5000'
         
-      // })
-    }
-  },
-  [],
-)
+//       // })
+//     }
+//   },
+//   [],
+// )
+
+
+// useEffect(() => {
+
+//   const interval = setInterval(() => {
+//     getActiveHotspotUsers()
+//   }, 8000);
+//   return () => clearInterval(interval);
+  
+// }, [getActiveHotspotUsers]);
+
+
 
 
 useEffect(() => {
+    const subscription = cable.subscriptions.create(
+      { channel: "HotspotChannel" ,
+        "X-Subdomain": subdomain
+  }, // must match your Rails channel class
+      {
+        received(data) {
+           console.log('received data from hotspot channel', data)
+           setOnlineUsers(data.active_user_count)
+            setTotalBandwidth(data.total_bandwidth)
+            // setTotalDownload(data.total_download)
+         
+        },
+        connected() {
+          console.log("Connected to Hotspot Chanel");
+        },
+        disconnected() {
+          console.log("Disconnected from Hotspot Chanel");
+        },
+      }
+    );
 
-  const interval = setInterval(() => {
-    getActiveHotspotUsers()
-  }, 8000);
-  return () => clearInterval(interval);
-  
-}, [getActiveHotspotUsers]);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [subdomain]);
 
 
 
 
 
+
+
+useEffect(() => {
+    const subscription = cable.subscriptions.create(
+      { channel: "VoucherChannel" ,
+        "X-Subdomain": subdomain
+  }, // must match your Rails channel class
+      {
+        received(data) {
+           console.log('received data from voucher chanel', data)
+         setActiveVouchers(data.active)
+          setExpiredVouchers(data.expired)
+          // setUsedVouchers(data.used)
+         
+        },
+        connected() {
+          console.log("Connected to voucher Chanel");
+        },
+        disconnected() {
+          console.log("Disconnected from voucher Chanel");
+        },
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [subdomain]);
 
 
 const getActiveVouchers = useCallback(
@@ -258,10 +329,13 @@ const getExpiredVouchers = useCallback(async () => {
   ];
 
   return (
-    <div className="min-h-sm bg-gradient-to-r  p-2">
-      <h1 className="text-4xl  text-black dark:text-white  
-      
-      mb-8">Hotspot Statistics</h1>
+    <>
+      <h1 className="text-3xl  
+      bg-gradient-to-r from-green-600 via-blue-400
+         to-cyan-500 bg-clip-text text-transparent font-bold 
+      mb-8 inline-block">Hotspot Statistics</h1>
+    <div className="min-h-sm   p-2">
+    
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {stats.map((stat, index) => (
           <StatCard
@@ -274,6 +348,7 @@ const getExpiredVouchers = useCallback(async () => {
         ))}
       </div>
     </div>
+    </>
   );
 };
 

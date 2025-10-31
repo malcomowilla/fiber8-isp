@@ -8,16 +8,42 @@ import { useApplicationSettings } from '../settings/ApplicationSettings';
 import { useState, useEffect, useCallback,lazy, Suspense } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { Button } from "@/components/ui/button" 
-
 import Backdrop from '../backdrop/Backdrop'
-
 import UiLoader from '../uiloader/UiLoader'
+import Autocomplete from '@mui/material/Autocomplete';
+import { IoIosKey } from "react-icons/io";
+import { FaIdBadge } from "react-icons/fa6";
+import { FaRegIdCard } from "react-icons/fa6";
+import { LiaUserSecretSolid } from "react-icons/lia";
+import { TbCircleDashedNumber4 } from "react-icons/tb";
+
+
 
 
 
 const SettingsNotification = lazy(() => import('../notification/SettingsNotification'))
 
 
+
+
+const PROVIDER_OPTIONS = [
+  { label: 'SMS leopard', value: 'SMS leopard' },
+  { label: 'Africastalking', value: 'Africastalking' },
+  { label: 'Advanta', value: 'Advanta' },
+  { label: 'Mobitech Bulk', value: 'Mobitech Bulk' },
+  { label: 'Afrokatt', value: 'Afrokatt' },
+  { label: 'Afrinet', value: 'Afrinet' },
+  { label: 'EgoSMS', value: 'EgoSMS' },
+  { label: 'BlessedTexts', value: 'BlessedTexts' },
+  { label: 'TextSms', value: 'TextSms' },
+  { label: 'Mobiweb', value: 'Mobiweb' },
+  { label: 'Mobivas', value: 'Mobivas' },
+  { label: 'MoveSMS', value: 'MoveSMS' },
+  { label: 'HostPinnacle', value: 'HostPinnacle' },
+  { label: 'Bytewave', value: 'Bytewave' },
+  { label: 'CrowdComm', value: 'CrowdComm' },
+  { label: 'Ujumbe', value: 'Ujumbe' }
+];
 
 const SmsSettings = () => {
 
@@ -692,7 +718,7 @@ console.log('selected provider',selectedProvider)
 <FormControl  sx={{ m: 1, width:'80ch',
   '& label.Mui-focused': {
     color: 'black',
-    fontSize: '23px'
+    fontSize: '17px'
     
     },
 '& .MuiOutlinedInput-root': {
@@ -705,35 +731,41 @@ console.log('selected provider',selectedProvider)
 
   }
 }, }}>
-        <InputLabel id="demo-simple-select-autowidth-label">Provider</InputLabel>
-        <Select
-        value={selectedProvider}
-        onChange={(e) => setSelectedProvider(e.target.value)}
-          labelId="demo-simple-select-autowidth-label"
-          id="demo-simple-select-autowidth"
-          autoWidth
-          label="User Group"
-        >
-                   <MenuItem value='SMS leopard' >SMS leopard</MenuItem>
-
-                   {/* c1cfc43f3e5c8b4c05d4e1b6f5be8fec */}
-          <MenuItem  value='Africastalking'>Africastalking</MenuItem>
-          <MenuItem  value='Advanta' >Advanta</MenuItem>
-          <MenuItem value='Mobitech Bulk' >Mobitech Bulk</MenuItem>
-          <MenuItem value='Afrokatt' >Afrokatt</MenuItem>
-          <MenuItem  value='Afrinet'>Afrinet</MenuItem>
-          <MenuItem value='EgoSMS' >EgoSMS</MenuItem>
-          <MenuItem value='BlessedTexts'>BlessedTexts</MenuItem>
-          <MenuItem value='TextSms'>TextSms</MenuItem>
-          <MenuItem  value='Mobiweb'>Mobiweb</MenuItem>
-          <MenuItem value='Mobivas'>Mobivas</MenuItem>
-          <MenuItem value='MoveSMS' >MoveSMS</MenuItem>
-          <MenuItem value='HostPinnacle'>HostPinnacle</MenuItem>
-          <MenuItem value='Bytewave'>Bytewave</MenuItem>
-          <MenuItem value='CrowdComm'>CrowdComm</MenuItem>
-          <MenuItem  value='Ujumbe'>Ujumbe</MenuItem>
-
-        </Select>
+      <Autocomplete
+      className='myTextField'
+  options={PROVIDER_OPTIONS}
+  value={PROVIDER_OPTIONS.find(option => option.value === selectedProvider) || null}
+  onChange={(event, newValue) => {
+    setSelectedProvider(newValue?.value || '');
+  }}
+  getOptionLabel={(option) => option.label}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label={ <p className=''> Provider </p>}
+      variant="outlined"
+      sx={{
+        width: '80ch',
+        '& label.Mui-focused': {
+          color: 'black',
+          fontSize: '23px'
+        },
+        '& .MuiOutlinedInput-root': {
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'black',
+            borderWidth: '3px'
+          },
+          '&.Mui-focused fieldset': {
+            borderColor: 'black'
+          }
+        }
+      }}
+    />
+  )}
+  sx={{ m: 1 }}
+  disableClearable // Remove if you want the clear (X) button
+  isOptionEqualToValue={(option, value) => option.value === value.value}
+/>
       </FormControl>
 
 
@@ -795,23 +827,40 @@ console.log('selected provider',selectedProvider)
       noValidate>
 
 
-<TextField label='API key'  value={api_key} onChange={handleChange} name='api_key'>
+<TextField label='API key'
+InputProps={{
+  startAdornment: <IoIosKey className='mr-3 w-5 h-5' />,
+}}
+value={api_key} onChange={handleChange} name='api_key'>
 
 </TextField>
 
 {selectedProvider === 'TextSms' ?   
-   <TextField label='Partner Id' value={partnerID} onChange={handleChange}  name='partnerID' >
+   <TextField label='Partner Id'
+   InputProps={{
+     startAdornment: <FaIdBadge className='mr-3 w-5 h-5' />,
+   }}
+   value={partnerID} onChange={handleChange}  name='partnerID' >
 
 </TextField>:  
 
 <>
 
-<TextField label='API secret' value={api_secret} onChange={handleChange}  name='api_secret'> 
+<TextField label='API secret' 
+InputProps={{
+  startAdornment: <LiaUserSecretSolid className='mr-3 w-5 h-5' />,
+}}
+
+value={api_secret} onChange={handleChange}  name='api_secret'> 
 
 </TextField>
 
         
-<TextField label='Short Code' value={short_code} onChange={handleChange} name='short_code'>
+<TextField label='Short Code' value={short_code} 
+InputProps={{
+  startAdornment: <TbCircleDashedNumber4 className='mr-3 w-5 h-5' />,
+}}
+onChange={handleChange} name='short_code'>
   
 
 </TextField>
@@ -823,7 +872,13 @@ console.log('selected provider',selectedProvider)
 
 
 
-<TextField label='Sender ID' value={sender_id} onChange={handleChange} name='sender_id'>
+<TextField label='Sender ID' value={sender_id} onChange={handleChange}
+
+
+InputProps={{
+  startAdornment: <FaRegIdCard className='mr-3 w-5 h-5' />,
+}}
+name='sender_id'>
   
 
 </TextField>

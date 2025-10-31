@@ -20,7 +20,7 @@ import { FaFulcrum } from "react-icons/fa";
 
 import { useNavigate } from 'react-router-dom';
 import Loading from './Loading'
-
+import FreeRadiusLogo from "../../public/images/free_radius.svg";
 
 
 const Nas = () => {
@@ -267,8 +267,8 @@ duration: 4000,
 
 
 
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), 6000);
+  // const controller = new AbortController();
+  // const id = setTimeout(() => controller.abort(), 6000);
 
 const handleSubmit = async (e)=> {
 
@@ -285,11 +285,11 @@ const handleSubmit = async (e)=> {
                 'X-Subdomain': subdomain,
                 
             },
-            signal: controller.signal,
+            // signal: controller.signal,
             body: JSON.stringify(nasformData),
         })
 
-          clearTimeout(id)
+          // clearTimeout(id)
         
         const newData = await res.json()
         if (res.ok) {
@@ -355,7 +355,6 @@ const handleSubmit = async (e)=> {
       setnasFormData(newSelectedRouter !== null ? rowData : initialValueNas);
 
     };
-        console.log('selected rowdata', selectedRouter)
 
 
 
@@ -449,7 +448,7 @@ const mergedTableData = tableDataNas.map((nasRouter) => {
 
 
   const DeleteButton = () => (
-        <IconButton style={{ color: '#8B0000' }}  onClick={ handleClickOpenDelete}>
+        <IconButton style={{ color: '#8B0000' }}  onClick={handleClickOpenDelete}>
           <DeleteIcon />
         </IconButton>
       );
@@ -499,28 +498,38 @@ const columns = [
 
    },
   {title: 'username', field: 'username', },
-  {title: 'password', field: 'password', },
+  // {title: 'password', field: 'password', },
 
   {title: 'Action', field:'Action',
 
   render: (rowData) =>  
     
      <>
-      <div className='flex flex-row'>
+      <div className='flex flex-row gap-4'>
        <DeleteButton  id={rowData.id} />
        <EditButton />
 
+
        <Tooltip 
-        onClick={() => {
-                   setOpenLoading(true);
-                    setTimeout(() => {
-                       navigate(`/admin/router_details?id=${routerName}`);
-                    }, 2000);
-                  }}
+       
        title="View Traffic" className='text-green-700 w-6 h-6'>
                   <FaFulcrum 
+                   onClick={() => {
+                   setOpenLoading(true);
+                   setRouterName(rowData.id)
+                    setTimeout(() => {
+                       navigate(`/admin/router_details?id=${rowData.id} &status=${rowData.reachable}`);
+                    }, 2000);
+                  }}
                  
                   fontSize="large" />
+              </Tooltip>
+
+
+              <Tooltip title='radius' onClick={() => {
+                 navigate(`/admin/radius-settings?id=${rowData.id} &ip_address=${rowData.ip_address} &l=${rowData.password} &short_code=${rowData.shortcode}`);
+              }}>
+<img src={FreeRadiusLogo} className="w-6 h-6" alt="FreeRADIUS" />
               </Tooltip>
    </div>
        </>
@@ -537,6 +546,9 @@ const handleCloseLoading = () => {
     <Loading openLoading={openLoading} setOpenLoading={setOpenLoading}
     handleClose={handleCloseLoading}
     />
+
+
+
     <div  
     onClick={() => {
       setShowMenu1(false)
@@ -593,10 +605,12 @@ const handleCloseLoading = () => {
  />
 
 
-<DeleteRouter loading={loading}  deleteRouter={deleteRouter} id={nasformData.id}  handleCloseDelete ={handleCloseDelete}  openDelete={openDelete}/>
+<DeleteRouter loading={loading}  deleteRouter={deleteRouter} id={nasformData.id} 
+ handleCloseDelete ={handleCloseDelete}  openDelete={openDelete}/>
       <MaterialTable columns={columns}
       
-      title='NAS (Mikrotik Routers with PPPoE/Hotspot)'
+      title= { <p className='bg-gradient-to-r from-green-600 via-blue-400
+         to-cyan-500 bg-clip-text text-transparent font-bold text-2xl'>NAS (Mikrotik Routers with PPPoE/Hotspot) </p> }
       
       
       data={mergedTableData}

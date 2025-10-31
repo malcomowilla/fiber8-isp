@@ -81,7 +81,7 @@ const ContactUs = () => {
         <p className='font-extrabold text-4xl mb-2'>
           Get in Touch
         </p>
-        <p className='font-thin text-xl text-gray-600'>
+        <p className='font-thin text-xl text-black'>
           We'll get back to you ASAP.
         </p>
       </div>
@@ -217,7 +217,7 @@ const ContactUs = () => {
         <div className='flex items-start'> 
           <MdOutlineEmail className='text-blue-700 w-10 h-10 mr-2 flex-shrink-0' />
           <div>
-            <p className='font-thin text-gray-600'>Contact us</p>
+            <p className='text-black'>Contact us</p>
             <a href="mailto:malcomowilla@gmail.com" className="text-blue-600 hover:underline">
               malcomowilla@gmail.com
             </a>
@@ -227,7 +227,7 @@ const ContactUs = () => {
         <div className='flex items-start'> 
           <FaRegClock className='text-blue-700 w-10 h-10 mr-2 flex-shrink-0' />
           <div>
-            <p className='font-thin text-gray-600'>Business Hours</p>
+            <p className='text-black'>Business Hours</p>
             <p className='font-light'>Mon - Fri: 7:00am - 5:00pm</p>
             <p className='font-light'>Sat - Sun: 8:00am - 4:00pm</p>
           </div>
@@ -236,7 +236,7 @@ const ContactUs = () => {
         <div className='flex items-start'> 
           <FaPhoneVolume className='text-blue-700 w-10 h-10 mr-2 flex-shrink-0' />
           <div>
-            <p className='font-thin text-gray-600'>Call us</p>
+            <p className=' text-black'>Call us</p>
             <a href="tel:+254791568852" className="text-blue-600 hover:underline">
               +254 791 568 852
             </a>

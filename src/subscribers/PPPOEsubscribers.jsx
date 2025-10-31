@@ -1,24 +1,18 @@
 
-
 import MaterialTable from 'material-table'
 import DeleteIcon from '@mui/icons-material/Delete';
-
 import EditIcon from '@mui/icons-material/Edit';
-
 import { IconButton } from '@mui/material';
-
 import AddIcon from '@mui/icons-material/Add';
 import {useState,useEffect, useCallback,} from'react'
-import EditSubscriber from '../edit/EditSubscriber'
 import dayjs from 'dayjs';
 import SubscriberNotification from '../notification/SubscriberNotification'
 import { IoPeople } from "react-icons/io5";
 import { Tooltip,} from '@mui/material';
 import { FaPhoneVolume } from "react-icons/fa6";
-
 import LoadingAnimation from '../loader/loading_animation.json'
 import Lottie from 'react-lottie';
-import Backdrop from '@mui/material/Backdrop';
+import Backdrop from '@mui/material/Backdrop'
 import DeleteSubscriber from '../delete/DeleteSubscriber'
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 import toast, { Toaster } from 'react-hot-toast';
@@ -32,7 +26,7 @@ import { FaCalendarCheck } from "react-icons/fa";
 import { FaShareNodes } from "react-icons/fa6";
 import { MdOutlinePhoneForwarded } from "react-icons/md";
 import { GoPaperclip } from "react-icons/go";
-
+import {useNavigate} from 'react-router-dom'
 
 
 
@@ -46,43 +40,14 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
        showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
         showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
-
+formDataSubscriber, setFormDataSubscriber,intialValueSubscriber,handleChangeSubscriber,
+selectedLocations, setSelectedLocations,editingSubscriber, setEditingSubscriber,
+tableDataSubscriber, setTableDataSubscriber,
    } = useApplicationSettings();
   // const navigate = useNavigate()
 
-  const intialValue = {
-    name: '',
-    latitude: '',
-    longitude: '',
-    house_number: '',
-    building_name: '',
-    phone_number: '',
-    ppoe_username: '',
-    ppoe_password: '',
-    ref_no: '',
-    network_name: '',
-    validity: '',
-    validity_period_units: '',
-    
-  
-    ip_address: '',
-    package_name: '',
-    installation_fee: '',
-    subscriber_discount: '',
-    second_phone_number: '',
-    node: '',
-    location: '',
-    date_registered: dayjs(),
-    email: '',
-    router_name: '',
-    check_update_username: settingsformData.check_update_username,
-    check_update_password: settingsformData.check_update_password
-    
-
-  }
   const [open, setOpen] = useState(false);
-const [formData,  setFormData] = useState(intialValue)
-const [tableData, setTableData] = useState([])
+// const [tableData, setTableData] = useState([])
 const [loading, setloading] = useState(false)
 const [savedNotification, setSavedNotification] = useState(false)
 const [search, setSearch] = useState('')
@@ -90,26 +55,46 @@ const [openLoad, setOpenLoad] = useState(false)
 const [openDelete, setOpenDelete] = useState(false)
 const [showClientStatsAndSUbscriptions, setShowClientStatsAndSubscriptions] = useState(false)
 const [onlyShowSubscription, setOnlyShowSubscription] = useState(false)
-    const [selectedLocations, setSelectedLocations] = useState([]);
 
 const [searchInput] = useDebounce(search, 1000)
 const [isSearching, setIsSearching] = useState(false); // New state for search loading
 
 const [subscriberId, setSubscriberId] = useState('')
-const [editingSubscriber, setEditingSubscriber] = useState(false)
+
+
+
+// const handleChange = (e)=> {
+
+//     const {id, value} = e.target
+//     setFormDataSubscriber({...formDataSubscriber, [id]: value})
+//   }
   const handleClickOpen = () => {
-    setOpen(true);
-    
+    // setOpen(true);
+    setEditingSubscriber(true)
     // setFormData(intialValue)
     setShowClientStatsAndSubscriptions(true)
 
-
+// navigate(`/admin/subscriber-details?id=${encodeURIComponent(subscriberId)}
+//  &formData=${encodeURIComponent(formData)}
+//  &createSubscriber=${encodeURIComponent(createSubscriber)}
+  
+//  &name=${encodeURIComponent(formData.name)}
+//  &packageName=${encodeURIComponent(formData.package_name)}
+//  &package_name=${encodeURIComponent(formData.package_name)}
+//    &setFormData=${encodeURIComponent(setFormData)} 
+//     &selectedLocations=${encodeURIComponent(selectedLocations)}
+//      &setSelectedLocations=${encodeURIComponent(setSelectedLocations)}
+//       &editingSubscriber=${encodeURIComponent(editingSubscriber)}
+//        &setEditingSubscriber=${encodeURIComponent(setEditingSubscriber)}`)
   };
+
+
+  const navigate = useNavigate()
 
   const handleCLickAdd = () => {
     setOpen(true);
     setEditingSubscriber(false)
-    setFormData(intialValue)
+    setFormDataSubscriber(intialValueSubscriber)
     setShowClientStatsAndSubscriptions(false)
   }
 
@@ -143,11 +128,7 @@ const [editingSubscriber, setEditingSubscriber] = useState(false)
   
 
 
-  const handleChange = (e)=> {
-
-    const {id, value} = e.target
-    setFormData({...formData, [id]: value})
-  }
+  
 
 
 const handleClickRow = () => {
@@ -156,13 +137,12 @@ const handleClickRow = () => {
 
   const handleRowClick = (event, rowData) => {
     setOnlyShowSubscription(true)
-    console.log('subscribers',rowData)
     setEditingSubscriber(true)
    console.log('showClientStatsAndSUbscriptions',showClientStatsAndSUbscriptions)
     setShowClientStatsAndSubscriptions(true)
     setSelectedLocations(rowData.location)
     setSubscriberId(rowData.id)
-setFormData({
+setFormDataSubscriber({
   ...rowData,
   date_registered: dayjs(rowData.date_registered), 
 
@@ -192,13 +172,15 @@ setFormData({
     
       const newData = await response.json()
     if (response.ok) {
-      // setTableData(newData)
+      // setTableDataSubscriber(newData)
       setIsSearching(false)
-  setTableData(newData.filter((subscriber)=> {
+  setTableDataSubscriber(newData.filter((subscriber)=> {
      return search.toLowerCase() === '' ? subscriber : subscriber.name.toLowerCase().includes(search) || subscriber.ref_no.toLowerCase().includes(search) || subscriber.location?.some(loc => 
       typeof loc === 'string' && loc.toLowerCase().includes(search.toLowerCase())
   );
                       }))
+
+
     } else {
       if (response.status === 402) {
         setTimeout(() => {
@@ -303,104 +285,7 @@ if (response.status === 401) {
     }, [getSubscriptions]);
 
 
-  const createSubscriber = async (e) => {
-    setOpenLoad(true)
-e.preventDefault()
-    try {
-      setloading(true)
-
-      const url = formData.id ? `/api/update_subscriber/${formData.id}` : '/api/subscriber';
-      const method = formData.id ? 'PATCH' : 'POST';
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-"Content-Type" : "application/json",
-        'X-Subdomain': subdomain,
-        },
-        body: JSON.stringify({...formData, 
-          location: selectedLocations,
-          router_name:
-          
-           settingsformData.router_name, use_radius: settingsformData.use_radius})
-      }
-    )
-
-
-    const newData = await response.json()
-
-
-
-    if (response.status === 402) {
-      setTimeout(() => {
-        // navigate('/license-expired')
-        window.location.href='/license-expired';
-       }, 1800);
-      
-    }
-
-
-if (response.ok) {
-  setOpen(false)
-  setOpenLoad(false)
- 
-  setloading(false)
-  setSavedNotification(true)
-  setTimeout(() => {
-    setSavedNotification(false)
-
-  }, 10000);
-
-
-if (formData.id) {
-  setTableData(tableData.map(item => item.id === newData.id ? newData : item))
-  toast.success('Subscriber updated successfully', {
-    position: "top-center",
-    duration: 4000,
-    
-  })
-} else {
-  setTableData([...tableData, newData])
-  toast.success('Subscriber created successfully', {
-    position: "top-center",
-    duration: 4000,
-    
-  })
-}
-
-
   
-} else {
-  setOpenLoad(false)
-  console.log('failed to fetch')
-  setloading(false)
-  toast.error('Failed to create subscriber', {
-    position: "top-center",
-    duration: 4000,
-    
-  })
-
-  toast.error(newData.error, {
-    position: "top-center",
-    duration: 4000,
-    
-  })
-}
-    } catch (error) {
-      console.log(error)
-      setloading(false)
-      setOpenLoad(false)
-      toast.error(
-        'Failed to create subscriber',
-        {
-          position: 'top-center',
-          duration: 4000,
-        }
-      )
-    }
-
-  }
-
 
   const deleteSubscriber = async(id)=> {
 
@@ -425,7 +310,7 @@ if (response.status === 402) {
 }
 
 if (response.ok) {
-setTableData((tableData)=> tableData.filter(item => item.id !== id))
+setTableDataSubscriber((tableData)=> tableData.filter(item => item.id !== id))
 toast.success('subscriber deleted successfully', {
   position: "top-center",
   duration: 4000,
@@ -462,7 +347,9 @@ toast.error('failed to delete subscriber', {
       render: (rowData) => {
         return<> {rowData.name  && <div
           onClick={() => {
-            setOpen(true)
+            navigate(`/admin/subscriber-details?id=${encodeURIComponent(rowData.id)} `)
+
+            // setOpen(true)
           }}
           className='flex gap-2'> <GoPaperclip  className='text-black w-6 h-6
          dark:text-white cursor-pointer
@@ -470,11 +357,11 @@ toast.error('failed to delete subscriber', {
       }
     },
     {title: 'ref_no', field: 'ref_no',  headerClassName: 'dark:text-black' ,  sorting: true, defaultSort: 'asc'},
-    {title: 'Date Registered', field: 'registration_date',  headerClassName: 'dark:text-black' , 
+    {title: 'Date Registered', field: 'date_registered',  headerClassName: 'dark:text-black' , 
       render: (rowData) => {
-        return <>{rowData.registration_date && <div className='flex gap-2'> <FaCalendarCheck className='text-black w-6 h-6
+        return <>{rowData.date_registered && <div className='flex gap-2'> <FaCalendarCheck className='text-black w-6 h-6
          dark:text-white cursor-pointer
-         hover:text-green-700'/> {rowData.registration_date}</div> }</> 
+         hover:text-green-700'/> {rowData.date_registered}</div> }</> 
       }
        },
   
@@ -483,7 +370,7 @@ toast.error('failed to delete subscriber', {
      render: (rowData) => {
   return (
     <div className="flex items-center gap-2">
-      {rowData?.status === 'online' ? (
+      {rowData?.status === 'active' ? (
         <>
           <motion.div
             animate={{
@@ -496,15 +383,15 @@ toast.error('failed to delete subscriber', {
               ease: "easeInOut"
             }}
           >
-            <FaCircle className="text-green-500 text-xs" />
+            {/* <FaCircle className="text-green-500 text-xs" /> */}
           </motion.div>
-          <span className="text-green-500">Online</span>
+          <span className="text-green-500">Active</span>
         </>
       ) : (
         <>
         
           <FaCircle className="text-red-700 text-xs" />
-          <span className="text-red-700">Offline</span>
+          <span className="text-red-700">{rowData.status}</span>
         </>
       )}
     </div>
@@ -513,7 +400,8 @@ toast.error('failed to delete subscriber', {
     },
     {title: 'phone_number', field: 'phone_number',  headerClassName: 'dark:text-black', 
       render: (rowData) => {
-        return <> {rowData.phone_number &&  <div className='flex gap-2'> <MdOutlinePhoneForwarded className='text-black w-4 h-4
+        return <> {rowData.phone_number &&  <div className='flex gap-2'> <MdOutlinePhoneForwarded 
+          className='text-black w-4 h-4
          dark:text-white cursor-pointer
          hover:text-green-700'/> {rowData.phone_number}</div>} </>
       }
@@ -527,28 +415,18 @@ toast.error('failed to delete subscriber', {
       }
     },
     {title: 'package', field: 'package_name',
-       type: 'numeric', headerClassName: 'dark:text-black', align: 'left', 
-      render: (rowData) => {
-        const statusInfo = status?.find(item => 
-          item?.ppoe_username || item?.ppoe_password === rowData?.ref_no
-        ) || { status: 'offline' };
-
-        return (
-          <>
-<p
-className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-500'
-        } `}
->{statusInfo?.package} </p>
-        </>
-        )
-        
-      }
+       headerClassName: 'dark:text-black', align: 'left', 
+       render: (rowData) => {
+        return <div className='flex gap-2'> {rowData.package_name } </div>     
+         }
+     
       },
     {title: 'House Number', field:'house_number',  headerClassName: 'dark:text-black'},
     {title: 'Building', field:'building_name',  headerClassName: 'dark:text-black', 
       render: (rowData) => {
         
-        return <> {rowData.building_name && <div className='flex gap-2'> <FaRegBuilding className='text-black w-4 h-4
+        return <> {rowData.building_name && <div className='flex gap-2'> <FaRegBuilding className='text-black
+           w-4 h-4
          dark:text-white cursor-pointer
          hover:text-green-700'/> {rowData.building_name}</div> } </>
       }
@@ -590,6 +468,7 @@ className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-5
      </IconButton>
      </Tooltip>
 
+
      <Tooltip title="Delete">
       <IconButton >
       <DeleteButton {...params} />
@@ -598,8 +477,14 @@ className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-5
 
 
       <Tooltip title="Edit">
-        <IconButton >
-      <EditButton {...params}/>
+        <IconButton onClick={() => {
+          handleClickOpen()
+navigate(`/admin/subscriber-details?id=${encodeURIComponent(params.id)}
+   `);
+
+          console.log('rowData clicked', params)
+        }}>
+      <EditButton {...params} />
       </IconButton>
       </Tooltip>
      </div>
@@ -616,8 +501,8 @@ className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-5
       <DeleteIcon />
     </IconButton>
   );
-  const EditButton = () => (
-    <IconButton style={{color: 'green'}} onClick={handleClickOpen} >
+  const EditButton = ({rowData}) => (
+    <IconButton style={{color: 'green'}}  >
       <EditIcon />
     </IconButton>
   )
@@ -627,7 +512,7 @@ className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-5
     <div>
 
     <DeleteSubscriber  openDelete={openDelete} handleCloseDelete={handleCloseDelete} 
-    deleteSubscriber={deleteSubscriber} id={formData.id} loading={loading}/>
+    deleteSubscriber={deleteSubscriber} id={formDataSubscriber.id} loading={loading}/>
       <Toaster />
       <Backdrop open={openLoad} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
   
@@ -640,34 +525,10 @@ className={`${statusInfo?.status === 'active' ? 'text-emerald-500' : 'text-red-5
 showClientStatsAndSUbscriptions={showClientStatsAndSUbscriptions} setShowClientStatsAndSubscriptions={setShowClientStatsAndSubscriptions}
 packageName={formData.package_name} 
   open={open} handleClose={handleClose}  formData={formData}  setFormData={setFormData}  createSubscriber={createSubscriber} 
-handleChangeForm={handleChange}
         
             />
            */}
-{open && (
-  <EditSubscriber
-    isloading={loading}
-    onlyShowSubscription={onlyShowSubscription} setOnlyShowSubscription={setOnlyShowSubscription}
-    showClientStatsAndSUbscriptions={showClientStatsAndSUbscriptions}
-    setShowClientStatsAndSubscriptions={setShowClientStatsAndSubscriptions}
-    
-    packageName={formData.package_name}
-    open={open}
-    name={formData.name}
-    package_name={formData.package_name}
-    handleClose={handleClose}
-    formData={formData}
-    setFormData={setFormData}
-    setSubscriberId={setSubscriberId}
-    subscriberId={subscriberId}
-    createSubscriber={createSubscriber}
-    handleChangeForm={handleChange}
-    selectedLocations={selectedLocations}
-     setSelectedLocations={setSelectedLocations}
-     editingSubscriber={editingSubscriber}
-     setEditingSubscriber={setEditingSubscriber}
-  />
-)}
+
 
 <div className="flex items-center max-w-sm mx-auto p-3">  
      
@@ -695,7 +556,7 @@ handleChangeForm={handleChange}
     </button>
 </div>
 
-
+{/* 
  {isSearching ? (
   
   <div className="absolute inset-0 flex justify-center cursor-pointer items-center  
@@ -722,12 +583,15 @@ handleChangeForm={handleChange}
       />
     </svg>
     </div>
-  )} 
+  )}  */}
 
 
 <MaterialTable columns={columns}
-data={tableData}
-title='PPPoe Subcribers'
+isLoading={isSearching}
+data={tableDataSubscriber}
+title={<p className='bg-gradient-to-r from-green-600 via-blue-400 to-cyan-500 bg-clip-text
+  
+  text-transparent font-bold text-xl'>PPPoe Subcribers</p>}
 
 onRowClick={(event, rowData)=>handleRowClick(event, rowData)}
 icons={{
@@ -735,7 +599,11 @@ icons={{
 }}
 actions={[
   {
-    icon: () => <AddIcon onClick={handleCLickAdd} />,
+    icon: () => <AddIcon onClick={() => {
+      setFormDataSubscriber('')
+      setEditingSubscriber(false)
+      navigate('/admin/create-subscriber')
+    }} />,
     isFreeAction: true, // This makes the action always visible
     tooltip: 'Add Subscribers',
   },
@@ -744,8 +612,8 @@ actions={[
 
 options={{
   sorting: true,
-  pageSizeOptions:[2, 5, 10],
-  pageSize: 10,
+  pageSizeOptions:[2, 5, 10, 20],
+  pageSize: 30,
   paginationPosition: 'bottom',
 exportButton: true,
 exportAllData: true,

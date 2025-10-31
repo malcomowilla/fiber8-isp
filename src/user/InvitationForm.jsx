@@ -41,27 +41,6 @@ import { GiMeshNetwork } from "react-icons/gi";
 import { TbNetwork } from "react-icons/tb";
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const InvitationForm = ({ isOpen, setIsOpen,permissionAndRoles, 
   setPermissionAndRoles, userDetails,
   setuserDetails,
@@ -112,6 +91,9 @@ const [seeItem, setSeeItem] = useState({
   wireguardConfiguration: false,
 privateIps: false,
 ipNetworks: false,
+invoice: false,
+equipment: false,
+
 
 
   
@@ -229,6 +211,10 @@ console.log('newpermision role read', newPermission[role].read)
       can_manage_hotspot_voucher: newPermission.hotspotVoucher.readWrite,
       can_manage_hotspot_settings: newPermission.hotspotSettings.readWrite,
       can_read_hotspot_settings: newPermission.hotspotSettings.read,
+      can_manage_invoice: newPermission.invoice.readWrite,
+      can_read_invoice: newPermission.invoice.read,
+      can_manage_equipment: newPermission.equipment.readWrite,
+      can_read_equipment: newPermission.equipment.read,
     }));
 
     return newPermission;
@@ -304,378 +290,191 @@ const [userRoles, setUserRoles] = useState([])
 
   return (
     <>
-    
-    {loading &&    <Backdrop open={openLoad} sx={{ color:'#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-  
-  <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
-    
-     </Backdrop>
-  }
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-       
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          
-          className="bg-slate-900/20 backdrop-blur p-8 fixed inset-0 
-          z-50 grid place-items-center  overflow-y-scroll
-           cursor-pointer"
-        >
-          <motion.div
-            initial={{ scale: 0, rotate: "12.5deg" }}
-            animate={{ scale: 1, rotate: "0deg" }}
-            exit={{ scale: 0, rotate: "0deg" }}
-            className={`bg-white text-black rounded-lg   p-6 w-full 
-            max-w-[600px]
-             shadow-xl cursor-default relative `}
-          >
-           
-
-<ImCancelCircle 
-onClick={()=>{
-  setIsOpen(false)
-
-}}
-className=" rotate-12 text-[40px] dark:text-white
-            absolute z-0 -top-[10px] -left-[30px] cursor-pointer"  />            
-
-            <div className="relative z-10">
-              
-              <h3 className="text-3xl  font-bold
-               text-center mb-2 roboto-condensed">
-                Invite Users
-              </h3>
-<form onSubmit={inviteUser}>
-             
-<div className='group w-full'>
-<label className='relative' htmlFor="">
-    
-<input
-  onChange={(e) => handleUserDetailsFormDataChange(e)}
-  type="text"
-  name="username"
-  value={userPermisions.username}
-  className=" w-full rounded-lg border-2 border-black border-opacity-50
-  focus:border-teal-600 myTextField transition duration-300
-  outline-none h-[58px] overflow-visible text-black"
-/>
-<span className='text-opacity-80
-absolute top-[-5px] transition-all duration-300
- left-0 px-3 py-2 text-sm text-black input-text
-'>Your Name </span>
-</label>
-  <p className='text-red-800 playwrite-de-grund'>{seeUsernameError && usernameError}</p>
-  <p className='text-red-800 playwrite-de-grund'>{seeUsernameError2 && usernameError2}</p>
-</div>
-
-
-
-
-
-              <div className='flex justify-around p-2 mt-8'>
-
-<div className='flex flex-col gap-2 relative'>
-<label htmlFor="">
-<input
-name='phone_number'
-onChange={(e) =>handleUserDetailsPhoneNumber(e)}
-  type="text"
-  value={userPermisions.phone_number}
-  className=" w-full rounded-lg border-2 border-black border-opacity-50
-  focus:border-teal-600 myTextField transition duration-300
-  outline-none h-[58px]   text-black" />
-
-<span className='text-opacity-80
-absolute top-[-5px] transition-all duration-300
- left-0 px-3 py-2 text-sm text-black input-text2
-'>Your Phone </span>
-  </label>
-</div>
-
-
-<div className='flex flex-col gap-2 relative mt-8'>
-  
-<label htmlFor="">
-
-<input
-onChange={(e) =>handleUserDetailsFormDataChange(e)}
-name='email'
-value={userPermisions.email}
-  type="text"
-
-  className=" w-full rounded-lg border-2 border-black border-opacity-50
-  focus:border-teal-600 myTextField transition duration-300
-  outline-none h-[58px]   text-black" />
-
-
-<span className='text-opacity-80
-absolute top-[-5px] transition-all duration-300
- left-0 px-3 py-2 text-sm text-black input-text2
-'>Email </span>
-   
-  </label>
-
-
-  <p className='text-red-800 playwrite-de-grund'>{seeEmailError && emailError} </p>
-<p className='text-red-800 playwrite-de-grund'>{seeEmailError2 && emailError2}</p>
-
-<p className='text-red-800 playwrite-de-grund'>{seeStrictEmailError && strictEmailError}</p>
-</div>
-              </div>
-
-
-
-              <div className='p-4 '>
-             
-<Autocomplete
-
-// value={userPermisions.user_role}
-
-value={userRoles.find((permission) => {
-  if (permission.name === userPermisions.role) {
-   return permission.name
-  } else {
-    return null
-  }
-})}
-
-
-// value={Array.isArray(userRoles) ? userRoles.find((permission) => {
-//   return permission.name === userPermisions.role;
-// }) || null : null}  //
-
-getOptionLabel={(option) => option.name}
-                      
-                      sx={{
-                        m: 1,width: {
-                          xs: '40%',
-                          sm: '80%',
-                          md: '50%',
-                          lg: '70%',
-                          xl: '70%',
-
-              
-              
-              
-                      },
-                        '& label.Mui-focused': {
-                          color: 'black',
-                          fontSize:'16px'
-                          },
-                        '& .MuiOutlinedInput-root': {
-                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "black",
-                          borderWidth: '3px'
-                          },
-                        '&.Mui-focused fieldset':  {
-                          borderColor: 'black', // Set border color to transparent when focused
-                        
-                        }
-                        },
-                                 
-                                }} 
-                    
-                                
-                                      // getOptionLabel={'4MBPS'}
-                    
-                            options={userRoles}
-                            
-                                    renderInput={(params) => (
-                                      <TextField
-                                      id="user_group"
-                    
-                                      className='myTextField'
-                                        {...params}
-                                        label="Select User Roles"
-                                      
-                    
-                                       
-                                      />
-                                    )}
-                                  
-                                
-                                    
-                                    onChange={(event, newValue) => {
-                                      console.log('Before Update:', userPermisions.role);
-                                      setUserPermisions((prevData) => {
-                                        const updatedData = {
-                                          ...prevData,
-                                          role: newValue ? newValue.name : '', 
-                                        };
-                                        console.log('After Update:', updatedData.role);
-                                        return updatedData;
-                                      });
-                                    }}
-                                  />
-              </div>
-             
-            
-
- <div className='p-8'>
-
-
-            <div className='flex justify-around font-bold text-lg p-2'>
-            <p >Item</p>
-            <p>Permisions</p>
-            </div>
-   
-   
-
-{Object.keys(seeItem).map((user_role, index)=> (
-  <React.Fragment key={user_role}>
-  {/* {console.log('user_role', user_role)} */}
-<div key={index}>
-
-
-
-<h2  id={`accordion-open-heading-${index}`} onClick={()=> handleSeeItem(user_role)}>
-
-
-<button type="button"    className="flex items-center justify-between 
-w-full p-5 font-medium rtl:text-right
-  border border-b-0 border-gray-200 rounded-t-xl 
-  text-black 
-  focus:ring-4 focus:ring-gray-200
-  dark:focus:ring-gray-800 
-  dark:border-gray-700 dark:text-gray-900 hover:dark:text-white hover:text-black hover:bg-gray-100
-   dark:hover:bg-gray-800 gap-3"
-   data-accordion-target={`#accordion-open-body-${index}`}
-   aria-expanded="true"
-   aria-controls={`accordion-open-body-${index}`}
-   >
-  <span className="flex items-center gap-3">    
-                        {user_role === 'userSettings' && <GrUserSettings className='w-5 h-5'/>}
-                          {user_role === 'sms' && <MdOutlineTextsms className='w-5 h-5'/>}
-                          {user_role === 'tickets' && <PiTicketLight className='w-5 h-5' />}
-                          {user_role === 'user' && <FaUserFriends className='w-5 h-5'/>}
-                          {user_role === 'emailSettings' && <RiMailSettingsLine className='w-5 h-5'/>}
-                          {user_role === 'smsSettings' && <  RiChatSettingsLine className='w-5 h-5'/>}
-                          {user_role === 'ticketSettings' && <TbFileSettings className='w-5 h-5' />}
-                          {user_role === 'routerSettings' && <GiSettingsKnobs className='w-5 h-5' />}
-                          {user_role === 'subscriberSettings' && <RiUserSettingsFill className='w-5 h-5' />}
-                          {user_role === 'companySettings' && <RiUserSettingsFill className='w-5 h-5' />}
-                          {user_role === 'pool' && <LuSettings2 className='w-5 h-5' />}
-                          {user_role === 'router' && <BsRouter className='w-5 h-5' />}
-                          {user_role === 'subscriber' && <GoPeople className='w-5 h-5' />}
-                          {user_role === 'package' && <FcPackage className='w-5 h-5' />}
-                          {user_role === 'hotspotPackage' && <FcPackage className='w-5 h-5' />}
-                          {user_role === 'subscription' && <PiNetwork className='w-5 h-5' />}
-                          {user_role === 'freeRadius' && <img src='/images/free_radius.svg' className='w-5 h-5' />}
-                          {user_role === 'mpesaSettings' && <img src='/images/mpesa-logo.png' className='w-7 h-7' />}
-                          {user_role === 'rebootRouter' && <TbRouter className='w-5 h-5' />}
-                          {user_role === 'userGroup' && <FaUsers className='w-5 h-5' />}
-                          {user_role === 'hotspotTemplate' && <LuLayoutTemplate className='w-5 h-5' />}
-                          {user_role === 'hotspotVoucher' &&   <p>🎫 </p>}
-              {user_role === 'hotspotSettings' &&   <p><RiHotspotLine className='w-5 h-5'/></p>}
-                 {user_role === 'clientLead' &&   <p><FaHandshakeSimple className='w-5 h-5'/></p>}
-                 {user_role === 'calendarEvent' &&   <p><MdEventAvailable className='w-5 h-5'/></p>}
-                 {user_role === 'uploadSubscriber' &&   <p><GoUpload className='w-5 h-5'/></p>}
-                 {user_role === 'wireguardConfiguration' &&   <p><FcDataConfiguration
-                  className='w-5 h-5'/></p>}
-
-                  {user_role === 'ipNetworks' &&   <p><GiMeshNetwork className='w-5 h-5'/></p>}
-                 {user_role === 'privateIps' &&   <p><TbNetwork className='w-5 h-5'/></p>}
-
-
-                          
-
-  
-  
-  
-   {user_role}
-  </span>
-  {seeItem[user_role] ?   <IoIosArrowUp /> : <IoIosArrowDown />}
-  
-  
-</button>
-</h2>
-
-
-<motion.div variants={variantDiv} transition={{duration:0.1, ease: "easeInOut",
-  }} initial='hidden' animate={seeItem[user_role] ? "visible" : "hidden"} className='flex justify-between'>
-<p>Item</p>
-<p>Read</p>
-<p>Read/Write</p>
-            </motion.div> 
-
-
-<motion.div variants={variantDiv} transition={{duration:0.1, ease: "easeInOut",
-  }} initial='hidden' animate={seeItem[user_role] ? "visible" : "hidden"} className='flex justify-between'>
-            <p className="dark:text-black text-black ">
-            {user_role}
-          </p>
-
-      <FormControlLabel control={<Checkbox checked={permissionAndRoles[user_role]?.read} color='success' 
-       onChange={(event)=>handleUserRoleFormDataChange(user_role, event)} />}   name='read'  />
-
-
-      <FormControlLabel 
-      
-      control={<Checkbox color='success' checked={permissionAndRoles[user_role]?.readWrite}
-       onChange={(event)=>handleUserRoleFormDataChange(user_role, event)} />}   name='readWrite'  />
-            </motion.div>
-
-            </div>
-
-  </ React.Fragment>
-))}
-
-    </div>
-
-<div className='flex justify-center gap-7'>
-<motion.button 
-whileTap={{scale: 0.95,
-
-    backgroundColor: 'green',
-}}
-type='submit'  className={`
- flex-1 flex items-center justify-center  gap-2 px-6 py-3.5 font-medium 
-                        bg-secondary text-black rounded-2xl dark:bg-teal-400 transition-all
-                         hover:bg-green-500 duration-300 border-2
-                          border-green-500 disabled:opacity-50 disabled:cursor-not-allowed
-  `}>
-    update
-      </motion.button>
-
-      <button   onClick={(e) =>{
-            e.preventDefault()
-            setIsOpen(false)
-
-          } } className={`flex-1 px-6 py-3.5 font-medium 
-                   text-gray-700 rounded-2xl transition-all
-                       duration-300 
-                       hover:bg-red-500 border-2 border-red-700`}>
-        Cancel
-      </button>
-
-
-{/*   
-<button type='submit' className="btn ">invite</button>
-
-
-        <button
-          onClick={(e) =>{
-            e.preventDefault()
-            setIsOpen(false)
-
-          } }
-          className="btn btn-error"
-        >
-          cancel
-        </button> */}
-     
-    
-      </div>
-</form>
-
-    
-            </div>
-          </motion.div>
-        </motion.div>
+      {loading && (
+        <Backdrop open={openLoad} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+          <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
+        </Backdrop>
       )}
-    </AnimatePresence>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center
+             p-4 bg-slate-900/20 backdrop-blur"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative bg-white rounded-lg shadow-xl w-full
+               max-w-3xl max-h-[90vh] flex flex-col"
+            >
+              <div className="sticky top-0 z-10 bg-white p-6 border-b border-gray-200 rounded-t-lg">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-2xl font-bold text-gray-800">
+                    Invite Users
+                  </h3>
+                  <button 
+                    onClick={() => setIsOpen(false)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <ImCancelCircle className="text-2xl" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="overflow-y-auto p-6 flex-1">
+                <form onSubmit={inviteUser} className="space-y-6">
+                  {/* User Details Section */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <TextField
+                        fullWidth
+                        label="Your Name"
+                        variant="outlined"
+                        name="username"
+                        value={userPermisions.username}
+                        onChange={handleUserDetailsFormDataChange}
+                        error={seeUsernameError || seeUsernameError2}
+                        helperText={(seeUsernameError && usernameError) || (seeUsernameError2 && usernameError2)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <TextField
+                        fullWidth
+                        label="Your Phone"
+                        variant="outlined"
+                        name="phone_number"
+                        value={userPermisions.phone_number}
+                        onChange={handleUserDetailsPhoneNumber}
+                      />
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
+                      <TextField
+                        fullWidth
+                        label="Email"
+                        variant="outlined"
+                        name="email"
+                        value={userPermisions.email}
+                        onChange={handleUserDetailsFormDataChange}
+                        error={seeEmailError || seeEmailError2 || seeStrictEmailError}
+                        helperText={
+                          (seeEmailError && emailError) || 
+                          (seeEmailError2 && emailError2) || 
+                          (seeStrictEmailError && strictEmailError)
+                        }
+                      />
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
+                      <Autocomplete
+                        value={userRoles.find(permission => permission.name === userPermisions.role)}
+                        options={userRoles}
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, newValue) => {
+                          setUserPermisions(prev => ({
+                            ...prev,
+                            role: newValue ? newValue.name : ''
+                          }));
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Select User Role"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Permissions Section */}
+                  <div className="border rounded-lg overflow-hidden">
+                    <div className="bg-gray-50 p-4 border-b">
+                      <div className="grid grid-cols-12 gap-4 font-medium">
+                        <div className="col-span-6">Item</div>
+                        <div className="col-span-3 text-center">Read</div>
+                        <div className="col-span-3 text-center">Read/Write</div>
+                      </div>
+                    </div>
+
+                    <div className="divide-y max-h-[300px] overflow-y-auto">
+                      {Object.keys(seeItem).map((user_role, index) => (
+                        <div key={index} className="hover:bg-gray-50 transition-colors">
+                          <button
+                            type="button"
+                            onClick={() => handleSeeItem(user_role)}
+                            className="w-full p-4 text-left grid grid-cols-12 gap-4 items-center"
+                          >
+                            <div className="col-span-6 flex items-center gap-3">
+                              {/* Icons based on user_role */}
+                              {user_role === 'userSettings' && <GrUserSettings className="w-5 h-5" />}
+                              {user_role === 'sms' && <MdOutlineTextsms className="w-5 h-5" />}
+                              {/* Add all other icons similarly */}
+                              <span className="capitalize">{user_role.replace(/([A-Z])/g, ' $1').trim()}</span>
+                            </div>
+                            <div className="col-span-3 flex justify-center">
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={permissionAndRoles[user_role]?.read}
+                                    onChange={(event) => handleUserRoleFormDataChange(user_role, event)}
+                                    name="read"
+                                    color="primary"
+                                  />
+                                }
+                                label=""
+                              />
+                            </div>
+                            <div className="col-span-3 flex justify-center">
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={permissionAndRoles[user_role]?.readWrite}
+                                    onChange={(event) => handleUserRoleFormDataChange(user_role, event)}
+                                    name="readWrite"
+                                    color="primary"
+                                  />
+                                }
+                                label=""
+                              />
+                            </div>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex justify-end gap-4 pt-4">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsOpen(false);
+                      }}
+                      className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      type="submit"
+                      className="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+                    >
+                      Invite User
+                    </motion.button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

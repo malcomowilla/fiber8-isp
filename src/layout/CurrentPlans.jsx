@@ -5,7 +5,6 @@ import {ApplicationContext} from '../context/ApplicationContext'
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { Button } from "@/components/ui/button"
 import { useLocation } from 'react-router-dom';
-import TicketStatistics from '../tickets/TicketStatistics'
 import SubscriberStats from '../subscribers/SubscriberStats'
 import { FaSms } from 'react-icons/fa';
 import { IoWarningOutline } from "react-icons/io5";

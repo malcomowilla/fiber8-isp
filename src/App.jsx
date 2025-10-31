@@ -8,7 +8,12 @@ import {
 
 import {useState, useEffect, lazy, Suspense, useCallback} from 'react'
 import {ApplicationContext} from './context/ApplicationContext'
+
+
+
 import UiLoader from './uiloader/UiLoader'
+
+
 
 const AdminDashboard = lazy(()=> import ('./admindashboard/AdminDashboard'))
 
@@ -62,7 +67,7 @@ import {DatePicker} from './date-picker/Date'
 import LocalizeDate from './date-picker/LocalizeDate'
 // import Sms from './sms/Sms'
 const Sms = lazy(()=> import('./sms/Sms'))
-const HotspotSettings = lazy(()=> import('./settings/HotspotSettings'))
+const HotspotSettings = lazy(()=> import('./settings/HotspotSettings'));
 
 import ProtectAuth from './Auth/ProtectAuth'
 import HotspotPayments from './payments/HotspotPayments'
@@ -102,27 +107,23 @@ const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
  const PasskeyList = lazy(()=> import ('./Auth/PasskeyList')
  )
  const SystemAdminLogin = lazy(()=> import ('./system_admin/SystemAdmin'))
-
  const ProtectAuthSystemAdmin = lazy(()=> import('./Auth/ProtectAuthSystemAdmin'))
-
  const SmsSent = lazy(()=> import('./system_admin/SmsSent'))
  const HotspotTrial = lazy(()=> import('./hotspot_page/HotspotTrial'))
  const EmailSent = lazy(()=> import('./system_admin/EmailSent'))
  const HowDidYouHear = lazy(()=> import('./how/HowDidYouHear'))
-
  const UploadSubscriber = lazy(() => import('./upload_subscriber/UploadSubscriber') )
  const IpPool = lazy(() => import('./ip_pool/IpPool') )
 const TodayRegisteredSubscribers = lazy(() => import('./subscribers/TodayRegisteredSubscribers') )
 const ThisWeekRegisteredSubscribers = lazy(() => import('./subscribers/ThisWeekRegisteredSubscribers') )
 const ThisMonthRegisteredSubscribers = lazy(() => import('./subscribers/ThisMonthRegisteredSubscribers') )
-
 const CustomerTickets = lazy(() => import('./tickets/CustomerTickets') )
 const AccountLocked = lazy(()=> import('./account_locked/AccountLocked'))
 const Calendar = lazy(() => import('./calendar/Calendar'))
-import {Helmet} from "react-helmet";
+// import {Helmet} from "react-helmet";
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+
 import {useApplicationSettings} from './settings/ApplicationSettings'
-
-
  const PPPoEPackages = lazy(() => import('./wifi_page/PPPoEPackages') )
 const HotspotTemplates = lazy(() => import('./hotspot_templates/HotspotTemplates') )
 const HotspotDashboard = lazy(() => import('./hotspot_page/HotspotDashboard.jsx') )
@@ -147,9 +148,31 @@ const PrivateNetwork = lazy(() => import('./network/PrivateNetwork'))
 const ProtectAuthClient = lazy(() => import('./Auth/ProtectAuthClient'))
 const QrCodeDisplay = lazy(() => import('./qr_code/QrCodeDisplay'))
 const RouterDetails = lazy(() => import('./router_details/RouterDetails'))
-import { block } from 'million/react';
-
-
+const Invoice = lazy(() => import('./invoice/Invoice'))
+const InvoicePage = lazy(() => import('./invoice/InvoicePage'))
+const UserLicense = lazy(() => import('./license/UserLicense'))
+const PePeaPreview = lazy(() => import('./hotspot_page/PePeaPreview'))
+const SubscribersOnline = lazy(() => import('./subscribers/SubscribersOnline'))
+const SubscribersOffline = lazy(() => import('./subscribers/SubscribersOffline'))
+const FinanceStats = lazy(() => import('./admindashboard/FinanceStats.jsx'))
+const PreventDDoS = lazy(() => import('./Ddos/PreventDDoS'))
+const OpenTickets = lazy(() => import('./tickets/OpenTickets'))
+const SolvedTickets = lazy(() => import('./tickets/SolvedTickets'))
+const UrgentTickets = lazy(() => import('./tickets/UrgentTickets'))
+const RedirectIfAuthenticated = lazy(() => import('./Auth/RedirectIfAuthenticated'))
+const Equipment = lazy(() => import('./equipment/Equipment'))
+const CallCenterInterface = lazy(() => import('./call_center/CallCenterInterface'))
+const Devices = lazy(() => import('./devices/Devices'))
+const OnuDetails = lazy(() => import('./devices/OnuDetails'))
+const EditSubscriber = lazy(() => import('./subscribers/EditSubscriber'))
+const  CreateSubscriber = lazy(() => import('./subscribers/CreateSubscriber'))
+const TicketStats = lazy(() => import('./tickets/TicketStats'))
+const RadiusSettings = lazy(() => import('./NAS_IDENTIFIER/RadiusSettings.jsx'))
+import { useLocation } from 'react-router-dom';
+import TourGuide from './guide/TourGuide';
+// import License from './license/license'
+const License = lazy(() => import('./license/license'))
+const Map = lazy(() => import('./map/Map'))
 
 const App = ({client}) => {
 
@@ -189,7 +212,7 @@ const handleClose = () => {
 
 
 
-
+const {company_name} = companySettings
 const formData = {
   password_confirmation: passwordConfirmation,
     email: email,
@@ -237,6 +260,10 @@ const [isExpanded5, setIsExpanded5] = useState(false)
 const [isExpanded6, setIsExpanded6] = useState(false)
 const [isExpanded7, setIsExpanded7] = useState(false)
 const [isExpanded8, setIsExpanded8] = useState(false)
+const [isExpanded9, setIsExpanded9] = useState(false)
+const [isExpanded10, setIsExpanded10] = useState(false)
+
+
 
 // const isLogedIn = window.localStorage.getItem('user')
 // const [formData, setFormData] = useState({
@@ -515,13 +542,23 @@ const hostname = window.location.hostname;
     console.log('Message received:', payload);
   });
 
+  const location = useLocation();
+
+
+  useEffect(() => {
+    // Extract title from route, fallback if none
+    const pageTitle = location.pathname.split("/")[2] || `${company_name || 'Aitechs'} | ${location.pathname.split("/")[1]}` || `Aitechs | ${location.pathname.split("/")[1]}`;
+    document.title = pageTitle;
+  }, [location]);
+
   return (
     <main>
 
-
+<TourGuide />
 
 <Helmet>
                 <meta charSet="utf-8" />
+
                 <link rel="icon" type="image/svg+xml" href={logo_preview} 
                 onError={(e) => { e.target.src = "/images/aitechs.png"; }}
                 />
@@ -533,7 +570,6 @@ const hostname = window.location.hostname;
 <SignupNotification  openSignupNotification={openSignupNotification} handleClose={handleClose} />
           <ThemeProvider theme={materialuitheme}>
 
-      <Suspense fallback={<div className='flex justify-center items-center '>{ <UiLoader/> }</div>}>
       <LocalizeDate>
       <CableProvider>
         
@@ -579,7 +615,17 @@ hostname.endsWith('.aitechs.co.ke')
       <Route  path='/hotspot-login' element={<HotspotLogin/>}/>
       <Route  path='/hotspot-trial' element={< HotspotTrial />}/>
       <Route  path='/hotspot-pricing' element={< HotspotPricing />}/>
-    <Route path='/system-admin-login' element={<SystemAdminLogin/>}/>
+
+
+    {/* <Route path='/system-admin-login' element={<SystemAdminLogin/>}/> */}
+
+
+{hostname === 'aitechs.co.ke' ? (
+         <Route path='/system-admin-login' element={<SystemAdminLogin/>}/>
+
+    ) : null}
+
+
     <Route path='/sms-sent' element={<SmsSent/>}/>
     <Route path='/email-sent' element={<EmailSent/>}/>
     <Route path='/how-did-you-hear' element={<HowDidYouHear/>}/>
@@ -587,6 +633,7 @@ hostname.endsWith('.aitechs.co.ke')
     <Route path='/service-expired' element={<ServiceExpired/>}/>
     <Route  path='/license-expired' element={<LicenseExpired/>}/>
     <Route path='/two-factor-auth' element={<TwoFactorAuthVerification/>}/>
+    <Route  path='/pepea' element={<PePeaPreview/>}/>
     <Route path='/contact-us' element={<ContactUs/>}/>
 
 <Route element={<ProtectAuthSystemAdmin  />}>
@@ -600,7 +647,7 @@ hostname.endsWith('.aitechs.co.ke')
 </PrivateRoutes>}>
 </Route> */}
 <Route element={<ProtectAuth />}>
-{/* <ProtectAuth> <Layout/> </ProtectAuth> */}
+
 <Route  path='/admin'  element={ 
       <Layout/> 
 }>
@@ -623,6 +670,16 @@ hostname.endsWith('.aitechs.co.ke')
 
 
 <Route path='/admin/this-week-subscribers' element={<ThisWeekRegisteredSubscribers/>}/>
+
+<Route  path='/admin/map' element={<Map/>}/>
+<Route exact path='/admin/license' element={
+   <Suspense fallback={<UiLoader />}>
+  <License/>
+  
+  </Suspense>
+  }/>
+
+
 <Route path='/admin/fixed-payments' element={<FixedPayments/>}/>
 <Route path='/admin/edit-package' element={<EditPackage/>}/>
 <Route path='/admin/pppoe-subscriptions' element={<PPPOEsubscriptions/>}/>
@@ -656,12 +713,47 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/ip_networks' element={<IpNetworks/>}/>
 <Route path='/admin/google-authenticator' element={<GoogleAuthenticatorSetup/>}/>
 <Route path='/admin/client-leads' element={<ClientLead/>}/>
+<Route path='/admin/invoice' element={<Invoice/>}/>
 <Route path='/admin/private-network' element={<PrivateNetwork/>}/>
+<Route  path='/admin/invoice-page' element={<InvoicePage/>}/>
+<Route path='/admin/user-license' element={<UserLicense/>}/>
+<Route path='/admin/subscribers-online' element={<SubscribersOnline/>}/>
+<Route path='/admin/subscribers-offline' element={<SubscribersOffline/>}/>
+<Route path='/admin/finance-stats' element={<FinanceStats/>}/>
+<Route path='/admin/prevent-ddos' element={<PreventDDoS/>}/>
+<Route path='/admin/open-tickets' element={<OpenTickets/>}/>
+<Route path='/admin/solved-tickets' element={<SolvedTickets/>}/>
+<Route path='/admin/urgent-tickets' element={<UrgentTickets/>}/>
+<Route path='/admin/equipment' element={<Equipment/>}/>
+<Route path='/admin/call-center' element={<CallCenterInterface/>}/>
+<Route path='/admin/devices' element={<Devices/>}/>
+<Route path='/admin/onu-details' element={<OnuDetails/>}/>
+<Route path='/admin/subscriber-details' element={<EditSubscriber/>}/>
+<Route path='/admin/create-subscriber' element={<CreateSubscriber/>}/>
+<Route path='/admin/ticket-stats' element={<TicketStats/>}/> 
+<Route path='/admin/radius-settings' element={<RadiusSettings/>}/>
+
+
 </Route>
 
 </Route >
 
-      <Route  path='/signin' element={<InputOTPWithSeparator/>}/>
+      {/* <Route element={<RedirectIfAuthenticated />}>
+<Route  path='/signin' element={<InputOTPWithSeparator/>}/>
+
+</Route> */}
+      
+      <Route
+  path="/signin"
+  element={
+    <RedirectIfAuthenticated>
+      <InputOTPWithSeparator />
+
+      
+    </RedirectIfAuthenticated>
+  }
+/>
+      
       <Route  path='/passkey-signin' element={<PasskeySignin/>}/>
       <Route  path='/client-login' element={<ClientLogin/>}/>
       <Route path='/qr-code-display' element={<QrCodeDisplay/>}/>
@@ -679,7 +771,6 @@ hostname.endsWith('.aitechs.co.ke')
 
       </CableProvider>
 </ LocalizeDate  >
-</Suspense>
 </ThemeProvider>
 {/* <footer>
       <p>{APP_DESCRIPTION} - Version {APP_VERSION}</p>

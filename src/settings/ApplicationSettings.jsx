@@ -1,5 +1,7 @@
 import { useState, createContext, useContext, useEffect, useCallback } from "react"
 import toast, { Toaster } from 'react-hot-toast';
+import dayjs from 'dayjs';
+
 
 const GeneralSettingsContext = createContext(null)
 
@@ -55,12 +57,44 @@ const ApplicationSettings = ({children}) => {
 
 
         }
+      const [settingsformData, setFormData]= useState(initialValue)
 
+
+  const intialValueSubscriber = {
+    name: '',
+    latitude: '',
+    longitude: '',
+    house_number: '',
+    building_name: '',
+    phone_number: '',
+    ppoe_username: '',
+    // ppoe_password: '',
+    ref_no: '',
+    network_name: '',
+    validity: '',
+    validity_period_units: '',
+    
+  
+    ip_address: '',
+    package_name: '',
+    installation_fee: '',
+    subscriber_discount: '',
+    second_phone_number: '',
+    node: '',
+    location: '',
+    date_registered: dayjs(),
+    email: '',
+    router_name: '',
+    check_update_username: settingsformData.check_update_username,
+    check_update_password: settingsformData.check_update_password
+    
+
+  }
+const [formDataSubscriber, setFormDataSubscriber] = useState(intialValueSubscriber)
 
         const  [nasformData, setnasFormData] = useState(initialValueNas)
         const [welcomeMessage, setWelcomeMessage] =  useState('')
 const [welcome, setWelcome] = useState(false)
-      const [settingsformData, setFormData]= useState(initialValue)
       const [tableDataNas, setTableData] = useState([])
       const [currentUser, setCurrentUser] = useState('')
       const [currentEmail, setCurentEmail] = useState('')
@@ -207,7 +241,7 @@ const [openNasTable, setOpenNasTable] = useState(true)
 
         // const captlalName = value.charAt(0).toUpperCase() + value.slice(1)
         const capitalizedName = value.toUpperCase() 
-
+console.log('subscriber settings', subscriber_settings)
         setSubscriberSettings((prevFormData) => ({
           ...prevFormData,
           [name]: type === "checkbox" ? checked : capitalizedName,
@@ -280,6 +314,20 @@ const [openNasTable, setOpenNasTable] = useState(true)
           }else if (name === 'login_with_otp_email'){
             updatedSettings.enable_2fa_for_admin = true
           
+          }else if (name === 'checkinactiveminutes'){
+
+            updatedSettings.checkinactivehrs = ''
+            updatedSettings.checkinactivedays = ''
+
+          }else if (name === 'checkinactivehrs'){
+
+            updatedSettings.checkinactiveminutes = ''
+            updatedSettings.checkinactivedays = ''
+          }else if (name === 'checkinactivedays'){
+
+            updatedSettings.checkinactiveminutes = ''
+            updatedSettings.checkinactivehrs = ''
+
           }
       
           // Update the value for the changed field
@@ -306,6 +354,8 @@ const [loginWithPasskey, setLoginWithPasskey] = useState(false)
 const [useEmailAuthentication, setUseEmailAuthentication] = useState(false)
 const [usePhoneNumberAuthentication, setUsePhoneNumberAuthentication] = useState(false)
 const [providerSms, setProviderSms] = useState(false)
+const [hotspotPhoneNumber, setHotspotPhoneNumber] = useState('')
+const [hotspotEmail, setHotspotEmail] = useState('')
 
 //   const handleChange = (e) => {
 //     const {type, name, checked, value} = e.target
@@ -365,7 +415,7 @@ console.log(error)
 
 const fetchCurrentUser = useCallback(
   async() => {
-    document.title = subdomain
+    // document.title = subdomain
 
     try {
       const response = await fetch('/api/currently_logged_in_user', {
@@ -623,13 +673,13 @@ const handleGetSmsProviderSettings = useCallback(
        
 
       } else {
-        if (response.status === 402) {
-        setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/license-expired'
-         }, 1800);
+      //   if (response.status === 402) {
+      //   setTimeout(() => {
+      //     // navigate('/license-expired')
+      //     window.location.href='/license-expired'
+      //    }, 1800);
         
-      }
+      // }
 // if (response.status === 401) {
  
 //    setTimeout(() => {
@@ -651,6 +701,29 @@ useEffect(() => {
   handleGetSmsProviderSettings()
   
 }, [handleGetSmsProviderSettings]);
+
+
+
+const handleChangeSubscriber = (e)=> {
+    const {id, value} = e.target
+    setFormDataSubscriber({...formDataSubscriber, [id]: value})
+  }
+
+      const [selectedLocations, setSelectedLocations] = useState([]);
+      const [editingSubscriber, setEditingSubscriber] = useState(false)
+      const [openLoad, setOpenLoad] = useState(false)
+      const [tableDataSubscriber, setTableDataSubscriber] = useState([])
+
+       const [mapForm, setMapForm] = useState({
+        api_key: '',
+
+    })
+      // const [loading, setloading] = useState(false)
+
+
+
+
+
   return (
     <>
     <Toaster />
@@ -685,7 +758,11 @@ useEffect(() => {
         formDataGeneralSettings, setFormDataGeneralSettings,
         currentCustomer, setCurrentCustomer,fetchCurrentCustomer,
         routerName, setRouterName,openNasTable, setOpenNasTable,
-        openRouterDetails, setOpenRouterDetails,providerSms, setProviderSms
+        openRouterDetails, setOpenRouterDetails,providerSms, setProviderSms,
+        hotspotPhoneNumber, setHotspotPhoneNumber,hotspotEmail, setHotspotEmail,
+        formDataSubscriber, setFormDataSubscriber,intialValueSubscriber,handleChangeSubscriber,
+        selectedLocations, setSelectedLocations,editingSubscriber, setEditingSubscriber,
+        tableDataSubscriber, setTableDataSubscriber,mapForm, setMapForm
      }}  >
     {children}
    </GeneralSettingsContext.Provider>
@@ -693,20 +770,5 @@ useEffect(() => {
    </>
   )
 }
-
 export default ApplicationSettings
-export const useApplicationSettings = (()=> useContext(GeneralSettingsContext ))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export const useApplicationSettings = (()=> useContext(GeneralSettingsContext))

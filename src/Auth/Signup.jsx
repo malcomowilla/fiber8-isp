@@ -268,7 +268,6 @@ const scrollIntoViewRefTop = useRef(null)
 
 
         <div className="relative   max-w-4xl px-6 
-        grid lg:grid-cols-2 grid-cols-1 gap-8
         animate-fade-in">
 
 
@@ -288,6 +287,7 @@ const scrollIntoViewRefTop = useRef(null)
             Empower your business with our cutting-edge SaaS platform for seamless internet management. Fast, reliable, and scalable.
           </p>
 <Link to='/contact-us'>
+<div className='flex justify-center'>
           <button 
           // onClick={() => window.open('https://wa.me/254791568852?text=Hello%20I%20am%20interested%20in%20your%20services', '_blank')}
 
@@ -295,18 +295,24 @@ const scrollIntoViewRefTop = useRef(null)
            text-white font-semibold py-3 px-8 rounded-lg hover:scale-105 transition-transform duration-300">
             Contact Us
           </button>
+          </div>
 </Link>
           </div>
          
-          <div className=" ">
-      <img 
-        src="/images/aitechs-image.png" // Replace with your image path
-        alt="Revolutionize Your Internet Experience"
-        className="w-full  rounded-lg shadow-lg"
-      />
-    </div>
+    
         
         </div>
+
+              <div className=" flex flex-col justify-center items-center mt-10">
+      <img 
+        // src="/images/aitechs-image.png" // Replace with your image path
+         src="/images/billing_system.png"
+        alt="Revolutionize Your Internet Experience"
+        className="w-screen max-w-2xl h-[350px]   rounded-lg shadow-lg
+        
+        "
+      />
+    </div>
       </motion.section>
 
 
@@ -340,28 +346,7 @@ damping: 15,
 
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
 
-          <motion.div
-         initial={{ opacity: 0, scale: 0.9 }}
-         whileInView={{
-           opacity: 1,
-           
-           scale: 1.05, 
-           transition: {
-            duration: 0.3,
-             type: "spring",
-             stiffness: 120, // Controls how stiff the animation is
-             damping: 15, // Reduces the bounciness
-           },
-         }}
-         viewport={{ once: true, amount: 0.5 }}
-        
-          className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-purple-500 transition-all 
-          duration-300 hover:scale-105 animate-fade-in-up">
-            <div className="text-4xl mb-4 text-purple-500">🚀</div>
-            <h3 className="text-2xl font-bold mb-4">Blazing Fast Speeds</h3>
-            <p className="text-gray-400">Experience ultra-fast internet with speeds up to 10Gbps.</p>
-          </motion.div>
-
+       
 
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
@@ -380,7 +365,7 @@ damping: 15,
            transition-all duration-300 hover:scale-105 animate-fade-in-up delay-200">
             <div className="text-4xl mb-4 text-orange-500">🔒</div>
             <h3 className="text-2xl font-bold mb-4">99.99% Uptime</h3>
-            <p className="text-gray-400">Our network ensures maximum reliability with 99.99% uptime.</p>
+            <p className="text-gray-400">Our team ensures maximum reliability with 99.99% uptime.</p>
           </motion.div>
 
 
@@ -817,7 +802,7 @@ damping: 15,
             <h3 className="text-2xl font-bold mb-4 text-green-500">Basic</h3>
             <p className="text-gray-400 mb-6">up to 50 ppoe subscribers</p>
             <p className="text-4xl font-bold mb-6">
-              KES1500<span className="text-lg text-gray-400">/month</span>
+              KES1000<span className="text-lg text-gray-400">/month</span>
             </p>
             <ul className="text-gray-400 mb-8">
               <li className="mb-2">✅ Your Own Sudomain</li>
@@ -863,7 +848,7 @@ damping: 15,
           animate-fade-in-up delay-200">
 
             <h3 className="text-2xl font-bold mb-4 text-purple-500">Pro</h3>
-            <p className="text-gray-400 mb-6">up to 100 ppoe subscribers</p>
+            <p className="text-gray-400 mb-6">up to 150 ppoe subscribers</p>
             <p className="text-4xl font-bold mb-6">
               KES 2700<span className="text-lg text-gray-400">/month</span>
             </p>
@@ -901,9 +886,9 @@ damping: 15,
           cursor-pointer
           border-gray-800 hover:border-blue-500 transition-all duration-300 hover:scale-105 animate-fade-in-up">
             <h3 className="text-2xl font-bold mb-4 text-blue-500">Standard</h3>
-            <p className="text-gray-400 mb-6">up to 180 ppoe subscribers</p>
+            <p className="text-gray-400 mb-6">up to 200 ppoe subscribers</p>
             <p className="text-4xl font-bold mb-6">
-              KES32000<span className="text-lg text-gray-400">/month</span>
+              KES3200<span className="text-lg text-gray-400">/month</span>
             </p>
             <ul className="text-gray-400 mb-8">
               <li className="mb-2">✅ Your Own Sudomain</li>

@@ -67,6 +67,12 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
     { value: '24', label: '/24 (254 hosts)' },
     { value: '32', label: '/32 (1 host)' },
     {value: '20', label: '/20 (4096 host)'},
+        {value: '21', label: '/21 (2046 host)'},
+        {value: '22', label: '/22 (1022 host)'},
+        {value: '26', label: '/26 (62 host)'},
+        {value: '25', label: '/25 (126 host)'},
+        {value: '17', label: '/17 (32766 host)'},
+
     { value: '30', label: '/30 (2 hosts)' },
   ];
 
@@ -172,7 +178,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
     try {
       setLoading(true);
       const url = editing ? `/api/ip_networks/${currentNetwork.id}` : '/api/ip_networks';
-      const method = editing ? 'PUT' : 'POST';
+      const method = editing ? 'PATCH' : 'POST';
 
       const response = await fetch(url, {
         method,
@@ -240,7 +246,14 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
   const calculateTotalIps = (subnet) => {
     if (subnet === '8') return 16777214;
     if (subnet === '16') return 65534;
-    if (subnet === '24') return 254;
+    if (subnet === '24') return 256;
+    if (subnet === '20') return 4096;
+    if (subnet === '17') return 32766;
+    if (subnet === '21') return 2046;
+    if (subnet === '22') return 1022;
+    if (subnet === '26') return 62;
+    if (subnet === '25') return 126;
+
     if (subnet === '30') return 2;
     return 0;
   };
@@ -314,8 +327,9 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
         setShowMenu12(false)
       }}
        variant="h4" gutterBottom sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
-        <CloudIcon sx={{ mr: 2, color: 'primary.main' }} />
-        <p className='roboto-condensed'>IP Networks Management </p>
+        <CloudIcon sx={{ mr: 2, color: 'success.main' }} />
+        <p className='roboto-condensed bg-gradient-to-r from-green-600 via-blue-400
+         to-cyan-500 bg-clip-text text-transparent font-bold '>IP Networks Management </p>
       </Typography>
 
       <MaterialTable
@@ -469,6 +483,8 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
   }}
 />
             </Grid>
+
+            
             <Grid item xs={12}>
              <Autocomplete
   fullWidth
@@ -515,9 +531,9 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
               <Typography>
                 <strong>Total IP Addresses:</strong> {calculateTotalIps(formData.subnet_mask)}
               </Typography>
-              <Typography>
+              {/* <Typography>
                 <strong>Client Host Range:</strong> {calculateHostRange(formData.network, formData.subnet_mask)}
-              </Typography>
+              </Typography> */}
             </Grid>
           </Grid>
         </DialogContent>

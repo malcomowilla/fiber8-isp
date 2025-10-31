@@ -10,6 +10,10 @@ import { Add as AddIcon, GetApp as GetAppIcon } from '@mui/icons-material';
 
 import { MdOutlineOnlinePrediction } from "react-icons/md";
 import { IoCloudOfflineOutline } from "react-icons/io5";
+import {Link} from 'react-router-dom'
+import { createConsumer } from "@rails/actioncable";
+const cable = createConsumer(`wss://${window.location.hostname}/cable`);
+
 
 
 
@@ -74,9 +78,69 @@ useEffect(() => {
 
 
 
+  const fetchtotalSubscribersOffline = useCallback(
+    async() => {
+      try {
+        const response = await fetch('/api/subscribers_offline', {
+          headers: {
+            'X-Subdomain': subdomain,
+          },
+        });
+
+        const newData = await response.json();
+
+        if (response.ok) {
+          setSubscribersOffline(newData.total_subscribers)
+        } else {
+          console.log('failed to fetch total subscribers')
+        }
+      } catch (error) {
+        console.log('failed to fetch total subscribers')
+      }
+      
+    },
+    [],
+  )
+  
+useEffect(() => {
+  fetchtotalSubscribersOffline()
+  
+}, [fetchtotalSubscribersOffline]);
 
 
-const StatCard = ({ title, value, icon, trend, color }) => (
+
+
+
+
+  useEffect(() => {
+    const subscription = cable.subscriptions.create(
+      { channel: "SubscriberChannel" ,
+        "X-Subdomain": subdomain
+  }, // must match your Rails channel class
+      {
+        received(data) {
+           console.log('received data from subscribers channel', data)
+            setTotalSubscribers(data.subscriber_count)
+         
+        },
+        connected() {
+          console.log("Connected to Subscriber Chanel");
+        },
+        disconnected() {
+          console.log("Disconnected from Subscriber Chanel");
+        },
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [subdomain,setTotalSubscribers ]);
+
+
+
+
+const StatCard = ({ title, value, icon, trend, color, to, view }) => (
   <motion.div 
     variants={cardVariants}
     className={`p-6 rounded-xl shadow-md bg-white 
@@ -98,15 +162,13 @@ const StatCard = ({ title, value, icon, trend, color }) => (
       >
         {icon}
       </Box>
+     
     </div>
-    {trend && (
-      <Typography 
-        variant="caption" 
-        className={`mt-2 flex items-center ${trend.value > 0 ? 'text-green-600' : 'text-red-600'}`}
-      >
-        {trend.value > 0 ? '↑' : '↓'} {Math.abs(trend.value)}% {trend.label}
-      </Typography>
-    )}
+    <div className='bg-gray-100 hover:bg-gray-400 p-2 rounded-lg hover:text-white'>
+  <Link to={to}>
+    <p className='text-black hover:text-white'>{view}</p>
+    </Link>
+    </div>
   </motion.div>
 );
   return (
@@ -129,13 +191,16 @@ const StatCard = ({ title, value, icon, trend, color }) => (
 
 
 
-  {/* Subscribers Online Card */}
   <StatCard 
           title="Subscribers Online"
           value={subscribersOnline}
-          icon={<MdOutlineOnlinePrediction size={24} className='text-black' />} 
+          icon={<MdOutlineOnlinePrediction size={24} className='text-green-600
+           animate-[ping_2.0s_ease-in-out_infinite]
+          ' />} 
           trend={{ value: 8, label: 'vs yesterday' }}
           color="secondary"
+          to='/admin/subscribers-online'
+          view='view'
         />
 
 
@@ -147,9 +212,13 @@ const StatCard = ({ title, value, icon, trend, color }) => (
   <StatCard 
           title="Subscribers Offline"
           value={subscribersOffline}
-          icon={<IoCloudOfflineOutline  size={24} className='text-black' />} 
+          icon={<IoCloudOfflineOutline  size={24} className='text-red-600
+          animate-[ping_2.0s_ease-in-out_infinite]
+          ' />} 
           trend={{ value: 8, label: 'vs yesterday' }}
           color="secondary"
+          view='view'
+          to='/admin/subscribers-offline'
         />
   
     </div>

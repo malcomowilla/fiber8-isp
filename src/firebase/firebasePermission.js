@@ -50,13 +50,14 @@ console.log('fcm_token1=>', fcm_token)
 
 
 
-
+const subdomain = window.location.hostname.split('.')[0]
 const sendTokenToServer = async (fcm_token) => {
   try {
     const response = await fetch('/api/save_fcm_token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Subdomain': subdomain
       },
       body: JSON.stringify({ fcm_token})
     });

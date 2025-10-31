@@ -663,21 +663,7 @@ toast.error(newData.error, {
     />
     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
   </div>
-<div className="absolute inset-0 opacity-20">
-    {[...Array(20)].map((_, i) => (
-      <div 
-        key={i}
-        className="absolute rounded-full bg-blue-400 animate-spin"
-        style={{
-          width: `${Math.random() * 10 + 5}px`,
-          height: `${Math.random() * 10 + 5}px`,
-          left: `${Math.random() * 100}%`,
-          top: `${Math.random() * 100}%`,
-          animationDuration: `${Math.random() * 5 + 3}s`
-        }}
-      />
-    ))}
-  </div>
+
   <div className="flex flex-col items-center justify-center min-h-screen px-4">
     {/* Logo Section */}
    

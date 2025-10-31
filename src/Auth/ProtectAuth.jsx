@@ -6,9 +6,10 @@ import { Navigate, Outlet } from "react-router-dom";
 
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 
+import animationData from '../lotties/loading_gray.json';
 
-import LoadingAnimation from '../loader/loading_animation.json'
 import Lottie from 'react-lottie';
+import Backdrop from '@mui/material/Backdrop';
 
 
 
@@ -22,7 +23,7 @@ const ProtectAuth = ({children}) => {
   const defaultOptions = {
     loop: true,
     autoplay: true,
-    animationData: LoadingAnimation,
+    animationData: animationData,
     rendererSettings: {
       preserveAspectRatio: 'xMidYMid slice',
     },
@@ -54,8 +55,16 @@ const ProtectAuth = ({children}) => {
 
   if (loading) {
     return <>
-        <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
-    
+  <Backdrop
+        sx={{ color: 'red', zIndex: (theme) => theme.zIndex.drawer + 20 }}
+        open={open}
+      >
+         <Lottie 
+          options={defaultOptions}
+          height={200}
+          width={200}
+        />
+      </Backdrop>    
      </>
   }
   if (isAuthenticated) {

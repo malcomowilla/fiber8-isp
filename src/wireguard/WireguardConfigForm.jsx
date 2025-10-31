@@ -30,6 +30,11 @@ import CheckIcon from '@mui/icons-material/Check';
 import QrCode2Icon from '@mui/icons-material/QrCode2';
 import toast, { Toaster } from 'react-hot-toast';
 import { useApplicationSettings } from '../settings/ApplicationSettings';
+import { Autocomplete } from '@mui/material';
+
+
+
+
 
 const ConfigPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -214,12 +219,29 @@ function WireguardConfigForm() {
   return (
     <>
       <Toaster />
-      <Box onClick={closeAllMenus} sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
-        <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
-          WireGuard Configuration Tools
+
+        <Typography variant="h4" gutterBottom sx={{
+
+
+display: 'flex',
+justifyContent: 'center',
+         }}>
+         <p className='bg-gradient-to-r from-green-600 via-blue-400
+         to-cyan-500 bg-clip-text text-transparent font-bold '> WireGuard Configuration  </p>
         </Typography>
 
-        <Grid container spacing={3}>
+
+      <Box onClick={closeAllMenus} sx={{ maxWidth: 1200, mx: 'auto', p: 3 ,
+
+display: 'flex',
+justifyContent: 'center',
+flexDirection: 'column',
+
+      }}>
+      
+        <div
+       className='flex flex-col gap-4 p-4 max-w-xl mx-auto'
+       >
           {/* Configuration Generator */}
           <Grid item xs={12} md={6}>
             <ActionCard>
@@ -230,6 +252,7 @@ function WireguardConfigForm() {
                 <form onSubmit={handleGenerateConfig}>
                   <Box sx={{ display: 'grid', gap: 2 }}>
                     <TextField
+                    className='myTextField'
                       label="Network Address"
                       name="networkAddress"
                       value={formData.networkAddress}
@@ -239,25 +262,40 @@ function WireguardConfigForm() {
                     />
 
                     <FormControl fullWidth>
-                      <InputLabel>Subnet Mask</InputLabel>
-                      <Select
-                        name="subnetMask"
-                        value={formData.subnetMask}
-                        label="Subnet Mask"
-                        onChange={handleChange}
-                        required
-                      >
-                        {subnetOptions.map(option => (
-                          <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                      <Autocomplete
+                      className='myTextField'
+  options={subnetOptions}
+  getOptionLabel={(option) => option.label}
+  value={subnetOptions.find(option => option.value === formData.subnetMask) || null}
+  onChange={(event, newValue) => {
+    handleChange({
+      target: {
+        name: "subnetMask",
+        value: newValue ? newValue.value : ""
+      }
+    });
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Subnet Mask"
+      variant="outlined"
+      required
+    />
+  )}
+  renderOption={(props, option) => (
+    <MenuItem {...props} key={option.value}>
+      {option.label}
+    </MenuItem>
+  )}
+  isOptionEqualToValue={(option, value) => option.value === value.value}
+/>
                     </FormControl>
 
                     <TextField
                       label="Custom IP (optional)"
                       name="customIp"
+                      className='myTextField'
                       value={formData.customIp}
                       onChange={handleChange}
                       fullWidth
@@ -291,6 +329,7 @@ function WireguardConfigForm() {
                 
                 <Box sx={{ display: 'grid', gap: 2 }}>
                   <TextField
+                  className='myTextField'
                     label="Private Key (optional)"
                     name="privateKey"
                     value={qrFormData.privateKey}
@@ -301,6 +340,7 @@ function WireguardConfigForm() {
                   
                   <TextField
                     label="Client IP (optional)"
+                      className='myTextField'
                     name="clientIp"
                     value={qrFormData.clientIp}
                     onChange={handleQrFormChange}
@@ -309,6 +349,7 @@ function WireguardConfigForm() {
                   />
                   
                   <TextField
+                    className='myTextField'
                     label="Server Public Key (optional)"
                     name="serverPublicKey"
                     value={qrFormData.serverPublicKey}
@@ -400,7 +441,7 @@ function WireguardConfigForm() {
               </ConfigPaper>
             )}
           </Grid>
-        </Grid>
+        </div>
       </Box>
 
       {/* QR Code Dialog */}

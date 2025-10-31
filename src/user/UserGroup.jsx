@@ -28,6 +28,7 @@ const [name, setName] = useState('')
 const [openDelete, setOpenDelete] = useState(false)
 const [nameId, setNameId] = useState('')
 const [editUserGroup, setEditUserGroup] = useState(false)
+const [loading, setloading] = useState(false)
 
 const handleCloseDelete = () => {
   setOpenDelete(false)
@@ -197,6 +198,7 @@ const handleAdd = () => {
 
 const createUserGroups = async(e) => {
   e.preventDefault()
+  setloading(true)
 
   try {
     const method = nameId ? 'PATCH' : 'POST';
@@ -207,18 +209,25 @@ const createUserGroups = async(e) => {
         'Content-Type': 'application/json',
         'X-Subdomain': subdomain,
       },
-      body: JSON.stringify({  
-        name: name,
-      })
+      //  body: JSON.stringify(ticketForm),
+        body: JSON.stringify(
+{
+  user_group: {
+    name: name,
+  }
+}
+        ),
+
     })
 
     const newData = await response.json()
     if (response.ok) {
       setOpen(false)
+      setloading(false)
       if (nameId) {
         toast.success('user group updated succesfuly', {
           position: "top-center",
-          duration: 4000,
+          duration: 5000,
         })
         setUserGroups(userGroups.map((item) =>
           item.id === nameId ? newData : item
@@ -227,25 +236,27 @@ const createUserGroups = async(e) => {
         setUserGroups([...userGroups, newData])
         toast.success('user group aded succesfuly', {
           position: "top-center",
-          duration: 4000,
+          duration: 5000,
         })
       }
     } else {
+      setloading(false)
       setOpen(false)
       if (nameId) {
         toast.error('user group update failed', {
           position: "top-center",
-          duration: 4000,
+          duration: 5000,
         })
       } else {
         toast.error('user group addition failed', {
           position: "top-center",
-          duration: 4000,
+          duration: 5000,
         })
       }
      
     }
   } catch (error) {
+    setloading(false)
     setOpen(false)
   }
 
@@ -258,7 +269,7 @@ const createUserGroups = async(e) => {
        handleCloseDelete={handleCloseDelete} deleteUserGroup={deleteUserGroup} />
       <EditUserGroups handleClose={handleClose} open={open}
        handleChangeUserGroups={handleChangeUserGroups}
-       name={name}
+       name={name} loading={loading}
        createUserGroups={createUserGroups} 
        setEditUserGroup={setEditUserGroup}
        editUserGroup={editUserGroup}
@@ -345,7 +356,8 @@ const createUserGroups = async(e) => {
       <MaterialTable columns={columns}
       onRowClick={handleRowAdd}
       
-      title='UserGroup'
+      title={<p className='bg-gradient-to-r from-green-600 via-blue-400
+         to-cyan-500 bg-clip-text text-transparent text-2xl font-bold'>User Groups</p>}
       
        data={userGroups}
 

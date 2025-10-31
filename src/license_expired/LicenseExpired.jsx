@@ -1,13 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle, FiClock, FiRefreshCw, FiMail } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { FaPhoneVolume } from "react-icons/fa";
+
 
 const LicenseExpired = () => {
 
 
     const [expiry, setExpiry] = useState('No license')
 const [expiry2, setExpiry2] = useState('No license')
-
+const navigate = useNavigate()
 
 
 
@@ -93,7 +96,8 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 
+    flex items-center justify-center p-4">
       <AnimatePresence>
         <motion.div
           initial="hidden"
@@ -106,6 +110,7 @@ useEffect(() => {
             variants={itemVariants}
             className="bg-red-500/10 p-6 flex items-center gap-4 border-b border-red-500/20"
           >
+          
             <motion.div
               variants={pulseVariants}
               animate="pulse"
@@ -146,6 +151,9 @@ useEffect(() => {
             </div>
 
             <motion.button
+            onClick={() => {
+              navigate('/admin/user-license')
+            }}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
               className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-3 px-6 rounded-lg font-medium shadow-lg hover:shadow-red-500/20 transition-all"
@@ -155,16 +163,33 @@ useEffect(() => {
           </motion.div>
 
           {/* Footer */}
+          
           <motion.div
             variants={itemVariants}
-            className="bg-gray-50 dark:bg-gray-700/50 p-4 text-center"
+            className="bg-gray-50 dark:bg-gray-700/50
+            flex flex-col items-center justify-center
+            p-4 text-center"
           >
+             <p className='font-bold'>Contact Support </p>
+
             <a
-              href="mailto:support@yourcompany.com"
-              className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-500 transition-colors"
+              href="mailto:owillamalcom@gmail.com"
+              className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400
+               hover:text-green-500 transition-colors"
             >
-              <FiMail /> Contact Support
+              <FiMail className=''/>
+              <p className='text-sm text-black'>owillamalcom@gmail.com</p>
             </a>
+
+
+<div
+onClick={()=>{window.location.href = `tel:0791568852`}}
+ className='flex gap-2 cursor-pointer' >
+            <FaPhoneVolume className='mt-2' />
+              <p className='text-sm mt-2 text-black '>+2547 9156 88 52</p>
+</div>
+
+ 
           </motion.div>
         </motion.div>
       </AnimatePresence>

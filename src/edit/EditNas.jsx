@@ -51,7 +51,7 @@ function EditNas({ open, handleClose, handleSubmit, nasformData, setnasFormData,
           transition={{ duration: 0.3 }}
         >
           <DialogTitle sx={{ fontSize: '24px', fontWeight: 'bold', color: '#333' }}>
-            <p className='font-thin'>Edit Device</p>
+            <p className='font-thin'>  {editingRouter ? 'Edit Router' : 'Add Router'}</p>
           </DialogTitle>
         </motion.div>
 
@@ -87,7 +87,7 @@ function EditNas({ open, handleClose, handleSubmit, nasformData, setnasFormData,
   },
 }}
 className="myTextField"
-label= { <p className='dark:text-black text-black'>IP Address</p>}
+label= { <p className='dark:text-black text-black'>Nas IP Address</p>}
 id="ip_address"
 value={ip_address}
 onChange={onChange}
@@ -159,7 +159,7 @@ InputProps={{
                     id="password"
                     value={password}
                     onChange={onChange}
-                    label= { <p className='dark:text-black text-black'>Password</p>}
+                    label= { <p className='dark:text-black text-black'>Nas Password</p>}
                     fullWidth
                     InputProps={{
                       startAdornment: (
@@ -203,7 +203,7 @@ InputProps={{
                   id="username"
                   value={username}
                   onChange={onChange}
-                  label="Username"
+                  label="Nas Username"
                   fullWidth
                   InputProps={{
                     startAdornment: (

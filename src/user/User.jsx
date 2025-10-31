@@ -73,6 +73,9 @@ const [permissionAndRoles, setPermissionAndRoles] = useState({
   wireguardConfiguration :{read: false, readWrite: false},
   ipNetworks :{read: false, readWrite: false},
   privateIps :{read: false, readWrite: false},
+  invoice: {read: false, readWrite: false},
+  equipment: {read: false, readWrite: false},
+
 });
 
 
@@ -236,6 +239,15 @@ console.log('rowData users', rowData)
       readWrite: rowData.can_manage_private_ips,
     },
 
+    invoice: {
+      read: rowData.can_read_invoice,
+      readWrite: rowData.can_manage_invoice,
+    },
+    equipment: {
+      read: rowData.can_read_equipment,
+      readWrite: rowData.can_manage_equipment,
+    },
+
 
   });
 }
@@ -274,6 +286,8 @@ const handleAddButton = ()=> {
     wireguardConfiguration: {read: false, readWrite: false},
     ipNetworks: {read: false, readWrite: false},
     privateIps: {read: false, readWrite: false},
+    invoice: {read: false, readWrite: false},
+    equipment: {read: false, readWrite: false},
 
     
 
@@ -620,6 +634,12 @@ const fetchAdmins = useCallback(
             read: newData[0].can_read_user_group,
             readWrite: newData[0].can_manage_user_group,
           },
+
+
+          invoice: {
+            read: newData[0].can_read_invoice,
+            readWrite: newData[0].can_manage_invoice,
+          },
         });
       }else{
         if (response.status === 402) {
@@ -756,7 +776,8 @@ useEffect(() => {
 
       <MaterialTable columns={columns}
       onRowClick={handleRowAdd}
-      title='Users'
+      title={<p className='bg-gradient-to-r from-green-600 via-blue-400
+         to-cyan-500 bg-clip-text text-transparent text-2xl font-bold'>Users </p>}
       className='relative'
        data={users}
 

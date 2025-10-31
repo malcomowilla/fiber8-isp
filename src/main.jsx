@@ -8,6 +8,7 @@ import { persistQueryClient } from '@tanstack/react-query-persist-client'
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
 import { BrowserRouter as Router } from 'react-router-dom';
 import ApplicationSettings from './settings/ApplicationSettings'
+import { HelmetProvider } from 'react-helmet-async';
 
 
 
@@ -32,6 +33,8 @@ persistQueryClient({
   key: 'tableData',
 })
 
+const startupLoader = document.getElementById("startup-loader");
+if (startupLoader) startupLoader.remove();
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -40,8 +43,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <ApplicationSettings>
     < Router >
       <QueryClientProvider   client={queryClient} contextSharing={true}>
+  <HelmetProvider>
 
       <App client={queryClient}/>
+      </HelmetProvider>
       </QueryClientProvider>
 </Router>
 </ApplicationSettings>

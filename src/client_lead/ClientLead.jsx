@@ -372,7 +372,8 @@ const handleCloseDelete = () => {
 
       <MaterialTable columns={columns}
       onRowClick={handleRowClick}
-      title='Lead List'
+      title={<p className='bg-gradient-to-r from-green-600 via-blue-400
+         to-cyan-500 bg-clip-text text-transparent text-2xl font-bold'>Lead List</p>}
       
        data={leads}
 

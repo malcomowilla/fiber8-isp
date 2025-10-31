@@ -13,11 +13,13 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import MaterialTable from 'material-table'
 import { MdOutlineWifi } from "react-icons/md";
 import { useApplicationSettings } from '../settings/ApplicationSettings';
+import { createConsumer } from "@rails/actioncable";
+const cable = createConsumer(`wss://${window.location.hostname}/cable`);
 
 
 import toast, { Toaster } from 'react-hot-toast';
 
-
+import {motion} from 'framer-motion'
 
 
 
@@ -61,6 +63,7 @@ const columns = [
   {title: 'up time', field: 'up_time'},
   {title: 'download', field: 'download',   },
   {title: 'upload', field: 'upload' },
+  {title: 'mac_address', field: 'mac_address',   },
 
 
 //   {title: 'Action', field:'Action', align: 'right',
@@ -120,49 +123,78 @@ const newData = await response.json()
  }, [fetchRouters]);
 
 
- 
-const getActiveHotspotUsers = useCallback(
-  async() => {
 
-    try {
-      const response = await fetch(`/api/get_active_hotspot_users?router_name=${settingsformData.router_name}`, {
-        headers: {
-          'X-Subdomain': subdomain,
+
+ useEffect(() => {
+    const subscription = cable.subscriptions.create(
+      { channel: "HotspotChannel" ,
+        "X-Subdomain": subdomain
+  }, // must match your Rails channel class
+      {
+        received(data) {
+           console.log('received data from hotspot channel', data)
+           setStats(data.users)
+            // setTotalDownload(data.total_download)
+         
         },
-      })
-      const newData = await response.json()
-      if (response.ok) {
-        // setPackages(newData)
-        const { hotspot_users } = newData
-        setStats(newData.users)
-        console.log('hotspot users fetched', newData)
-      }else{
-        // toast.error('failed to get active users', {
-        //   position: "top-center",
-        //   duration: '5000'
-          
-        // })
+        connected() {
+          console.log("Connected to Hotspot Chanel");
+        },
+        disconnected() {
+          console.log("Disconnected from Hotspot Chanel");
+        },
       }
-    } catch (error) {
-      // toast.error('failed to get active users', {
-      //   position: "top-center",
-      //   duration: '5000'
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [subdomain]);
+
+
+ 
+// const getActiveHotspotUsers = useCallback(
+//   async() => {
+
+//     try {
+//       const response = await fetch(`/api/get_active_hotspot_users?router_name=${settingsformData.router_name}`, {
+//         headers: {
+//           'X-Subdomain': subdomain,
+//         },
+//       })
+//       const newData = await response.json()
+//       if (response.ok) {
+//         // setPackages(newData)
+//         const { hotspot_users } = newData
+//         setStats(newData.users)
+//         console.log('hotspot users fetched', newData)
+//       }else{
+//         // toast.error('failed to get active users', {
+//         //   position: "top-center",
+//         //   duration: '5000'
+          
+//         // })
+//       }
+//     } catch (error) {
+//       // toast.error('failed to get active users', {
+//       //   position: "top-center",
+//       //   duration: '5000'
         
-      // })
-    }
-  },
-  [],
-)
+//       // })
+//     }
+//   },
+//   [],
+// )
 
 
-useEffect(() => {
+// useEffect(() => {
 
-  const interval = setInterval(() => {
-    getActiveHotspotUsers()
-  }, 10000);
-  return () => clearInterval(interval);
+//   const interval = setInterval(() => {
+//     getActiveHotspotUsers()
+//   }, 10000);
+//   return () => clearInterval(interval);
   
-}, [getActiveHotspotUsers]);
+// }, [getActiveHotspotUsers]);
 
 
 

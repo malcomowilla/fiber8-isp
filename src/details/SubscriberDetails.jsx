@@ -72,6 +72,7 @@ const SubscriberDetails = ({handleClose,
   const {settingsformData, subscriberSettings, setSubscriberSettings,
     locationInput, setLocationInput, allLocations, setAllLocations
   } = useApplicationSettings()
+  
   const {name, ref_no , ppoe_password,  ppoe_username,  phone_number, email, second_phone_number,
      package_name, installation_fee, subscriber_discount, date_registered, router_name,
      latitude, longitude, house_number, building_name,location,node
@@ -1112,3 +1113,10 @@ rounded-md mt-4 cursor-pointer'>
 }
 
 export default SubscriberDetails
+
+
+
+
+
+
+

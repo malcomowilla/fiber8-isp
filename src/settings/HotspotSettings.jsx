@@ -8,14 +8,25 @@ import { useApplicationSettings } from "../settings/ApplicationSettings";
 
 import LoadingAnimation from '../loader/loading_animation.json'
 import Lottie from 'react-lottie';
+import { GrConfigure } from "react-icons/gr";
+import HotspotScript from './HotspotScript'
+
+
+
 
 const HotspotSettings = () => {
   
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
+  const [open, setOpen] = useState(false);
+
+
+  const handleClose = () => {
+    setOpen(false);
+  }
 
 const {phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setHotspotInfo,
-  email, setEmail,
+  email, setEmail,hotspotPhoneNumber, setHotspotPhoneNumber,hotspotEmail, setHotspotEmail,
   hotspotBanner, setHotspotBanner,hotspotBannerPreview, setHotspotBannerPreview} = useApplicationSettings()
 
   // Handle image selection
@@ -42,10 +53,10 @@ const {phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setH
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("phone_number", phoneNumber);
+    formData.append("phone_number", hotspotPhoneNumber);
     formData.append("hotspot_name", hotspotName);
     formData.append("hotspot_info", hotspotInfo);
-    formData.append("email", email);
+    formData.append("email", hotspotEmail);
     if (hotspotBanner) {
       formData.append("hotspot_banner", hotspotBanner); // Append the file
     }
@@ -73,10 +84,10 @@ const {phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setH
 
       if (response.ok) {
         setLoading(false);
-        setPhoneNumber(newData.phone_number);
+        setHotspotPhoneNumber(newData.phone_number);
         setHotspotName(newData.hotspot_name);
         setHotspotInfo(newData.hotspot_info);
-        setEmail(newData.email);
+        setHotspotEmail(newData.email);
         // setHotspotBanner(newData.hotspot_banner);
         toast.success('Hotspot settings saved successfully', {
           duration: 5000,
@@ -128,10 +139,10 @@ const {phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setH
         if (response.ok) {
           console.log('hotspot settings fetched', newData);
           const { phone_number, hotspot_name, hotspot_info, hotspot_banner, email } = newData;
-          setPhoneNumber(phone_number);
+          setHotspotPhoneNumber(phone_number);
           setHotspotName(hotspot_name);
           setHotspotInfo(hotspot_info);
-          setEmail(email)
+          setHotspotEmail(email)
           // setHotspotBanner(hotspot_banner);
           if (hotspot_banner) {
             setHotspotBannerPreview(hotspot_banner); // Set preview URL if banner exists
@@ -190,12 +201,23 @@ if (response.status === 401) {
     tap: { scale: 0.95 },
   };
 
+
+
   return (
     <>
+    <HotspotScript handleClose={handleClose} open={open}/>
+
+
       {loading ? <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} /> : null}
       <Toaster />
-      <div className="min-h-screen bg-gray-100 p-6">
-        <h1 className="text-2xl text-gray-800 mb-6 font-light">Hotspot Settings</h1>
+        <h1 className="text-2xl 
+        
+        mb-6 font-bold  
+      bg-gradient-to-r from-green-600 via-blue-400
+         to-cyan-500 bg-clip-text text-transparent inline-block
+      ">Hotspot Settings</h1>
+
+
         <motion.form
           onSubmit={handleSubmit}
           className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md"
@@ -211,8 +233,8 @@ if (response.status === 401) {
             <motion.input
               type="text"
               id="phoneNumber"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              value={hotspotPhoneNumber}
+              onChange={(e) => setHotspotPhoneNumber(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Enter phone number"
               whileHover="hover"
@@ -231,8 +253,8 @@ if (response.status === 401) {
             <motion.input
               type="text"
               id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={hotspotEmail}
+              onChange={(e) => setHotspotEmail(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Enter email"
               whileHover="hover"
@@ -331,8 +353,29 @@ if (response.status === 401) {
           >
             Save Settings
           </motion.button>
+
+
+
+         
         </motion.form>
-      </div>
+
+<div className='flex justify-center '>
+           <motion.button
+            onClick={() => setOpen(true)}
+            className="w-fit bg-green-500 text-white  flex
+            justify-center items-center
+            py-2 px-4  mt-2 gap-2
+            rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2  focus:ring-green-500"
+            whileHover="hover"
+            whileTap="tap"
+            variants={buttonVariants}
+          >
+            configure
+            <GrConfigure className=""/>
+
+          </motion.button>
+
+          </div>
     </>
   );
 };

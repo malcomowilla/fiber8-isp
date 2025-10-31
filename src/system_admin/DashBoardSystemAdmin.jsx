@@ -31,7 +31,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import ResetPassword from './ResetPassword';
 import ResetPasswordSystemAdmin from './ResetPasswordSystemAdmin'
 import UptimeDisplay from './UptimeDisplay';
-import UptimeStats from './UptimeStats';
 import SystemAdminProfile from './SystemAdminProfile';
 import { createAvatar } from '@dicebear/core';
 import { lorelei } from '@dicebear/collection';
@@ -46,7 +45,9 @@ import CompanyLeads from './CompanyLeads'
 import { FaHandshake } from "react-icons/fa";
 import { GiRecycle } from "react-icons/gi";
 import WriteChanges from './WriteChanges'
-
+import UbuntuStats from './UbuntuStats'
+import { MdDevicesOther } from "react-icons/md";
+import NetworkComponents from './NetworkComponents'
 
 
 
@@ -80,6 +81,9 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
 
   const subdomain = window.location.hostname.split('.')[0];
 
+
+
+
   const handleLogout = async () => {
     const response = await fetch('/api/logout_system_admin', {
       method: 'DELETE',
@@ -110,6 +114,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
       case 6: return "Client Requests";
       case 7: return "Passkeys";
       case 8: return "Plan Manager";
+      case 9: return "System Components";
       default: return "Dashboard";
     }
   };
@@ -132,6 +137,8 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
 
 
     { label: <p className='text-black'>Company Leads</p>, icon: <FaHandshake  className='w-6 h-6 rounded-full'/>, value: 9 },
+    { label: <p className='text-black'>System Components</p>, icon: <MdDevicesOther 
+       className='w-6 h-6 rounded-full'/>, value: 11 },
   ];
 
   const pageTransitionVariants = {
@@ -343,7 +350,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {value === 0 && <UptimeStats />}
+                  {value === 0 && <UbuntuStats />}
                   {value === 1 && <ClientList />}
                   {value === 2 && <Settings />}
                   {value === 3 && <InviteClient />}
@@ -354,6 +361,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
                   {value === 8 && <PlanManager />}
                   {value === 9 && <CompanyLeads />}
                   {value === 10 && <WriteChanges />}
+                  {value === 11 && <NetworkComponents />}
 
                 </motion.div>
               )}  

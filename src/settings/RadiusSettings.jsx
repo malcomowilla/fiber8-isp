@@ -15,6 +15,17 @@ import FreeRadiusLogo from "../../public/images/free_radius.svg";
 import { IoGitNetwork } from "react-icons/io5";
 import { CiUser } from "react-icons/ci";
 import { RiLockPasswordLine } from "react-icons/ri";
+import { 
+  FaCopy, 
+  FaServer, 
+  FaKey, 
+  FaUserAlt,
+  FaNetworkWired,
+  FaShieldAlt
+} from 'react-icons/fa';
+import {
+  Button
+} from '@mui/material';
 
 
 const RadiusSettings = () => {
@@ -28,7 +39,8 @@ const RadiusSettings = () => {
 
 
       const {shortname, ipaddr, secret} = radiusSettings
-
+ const [mikrotikConfig, setMikrotikConfig] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
       const onChange = (e) => {
         const { type, name, checked, value } = e.target;
@@ -37,6 +49,29 @@ const RadiusSettings = () => {
     [name]:  value,
   }));
       }
+
+
+
+
+  const generateMikrotikConfig = () => {
+    setIsGenerating(true);
+    const config = `
+/radius incoming seta accept=yes port=3799
+/radius add service=ppp,hotspot \\
+  address=${'10.2.0.1'} \\
+  secret=${secret || 'your_secret'} \\
+  protocol=udp
+    `.trim();
+    setMikrotikConfig(config);
+    setTimeout(() => setIsGenerating(false), 800);
+  };
+
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(mikrotikConfig);
+    toast.success('Copied to clipboard!');
+  };
+
     const iconVariants = {
         hover: {
           scale: 1.2,
@@ -183,199 +218,163 @@ useEffect(() => {
 }, [getRadiusSettings]);
 
   return (
-    <form onSubmit={saveRadiusSettings}>
-        <Toaster />
-        
-       <Accordion
-          sx={{
-            backgroundColor: "transparent",
-            boxShadow: "none",
-          }}
-        >
+     <div className="max-w-4xl mx-auto p-4">
+      <Toaster />
+      <form onSubmit={saveRadiusSettings}>
+        <Accordion defaultExpanded sx={{ 
+          backgroundColor: 'rgba(0, 0, 0, 0.03)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+          borderRadius: '12px !important',
+          overflow: 'hidden',
+          mb: 3
+        }}>
           <AccordionSummary
-            expandIcon={
-              <ArrowDownwardIcon
-                className="dark:text-white text-black"
-                sx={{ transition: "transform 0.3s" }}
-              />
-            }
-            aria-controls="panel1-content"
-            id="panel1-header"
+            expandIcon={<ArrowDownwardIcon className="text-gray-600 dark:text-white" />}
             sx={{
-              backgroundColor: "rgba(0, 0, 0, 0.05)",
-              borderRadius: "10px",
-              color: "black",
+              backgroundColor: 'rgba(0, 0, 0, 0.05)',
+              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.08)' }
             }}
           >
-            <Typography variant="h6">
-              <motion.div
-                style={{ display: "flex", alignItems: "center", gap: "10px" }}
-              >
-                <motion.div
-                  variants={iconVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                >
-                  {/* <SupportAgentIcon
-                    sx={{ fontSize: "2rem", color: "#ff6f61" }}
-                  /> */}
-
-<img src={FreeRadiusLogo}  className='w-12 h-12' alt="FreeRADIUS Logo" />
-                </motion.div>
-                <p className="dark:text-white roboto-condensed text-black">
-                Radius Settings
-                </p>
-              </motion.div>
-            </Typography>
+            <div className="flex items-center gap-3">
+              <img src={FreeRadiusLogo} className="w-10 h-10" alt="FreeRADIUS" />
+              <Typography variant="h6" className="font-bold text-gray-800 dark:text-white">
+                RADIUS Server Configuration
+              </Typography>
+            </div>
           </AccordionSummary>
 
-          <AccordionDetails
-            sx={{
-              backgroundColor: "rgba(0, 0, 0, 0.05)",
-              borderRadius: "10px",
-              marginTop: "10px",
-              padding: "20px",
-            }}
-          >
-          <Typography variant="body1" sx={{ mb: 2 }}>
-  <strong className='roboto-condensed-light'>What does this setting do?</strong>
-  <br />
- <p className='roboto-condensed'> Configure RADIUS server settings for MikroTik, including user authentication, 
-  rate limits, session timeouts, and burst limits. </p>
-</Typography>
+          <AccordionDetails sx={{ pt: 3 }}>
+            <Typography paragraph className="mb-6 text-gray-700 dark:text-white ">
+              Configure your RADIUS server settings for MikroTik authentication. 
+              These settings will be used for PPP and Hotspot services.
+            </Typography>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <TextField
+                name="shortname"
+                 className='myTextField'
+                value={shortname}
+                onChange={onChange}
+                label="RADIUS Username"
+                variant="outlined"
+                fullWidth
+                InputProps={{
+                  startAdornment: <FaUserAlt className="mr-3 text-gray-500" />
+                }}
+                helperText="Optional display name"
+                sx={{ mb: 2 }}
+              />
 
+              <TextField
+                name="ipaddr"
+                 className='myTextField'
+                value={ipaddr}
+                onChange={onChange}
+                label="IP Address"
+                variant="outlined"
+                fullWidth
+                InputProps={{
+                  startAdornment: <FaNetworkWired className="mr-3 text-gray-500" />
+                }}
+                sx={{ mb: 2 }}
+              />
 
+              <TextField
+              className='myTextField'
+                name="secret"
+                value={secret}
+                onChange={onChange}
+                label="Shared Secret"
+                variant="outlined"
+                fullWidth
+                type="password"
+                InputProps={{
+                  startAdornment: <FaKey className="mr-3 text-gray-500" />
+                }}
+                sx={{ mb: 2 }}
+              />
+            </div>
 
-<TextField  
-name='shortname'
-value={shortname}
-onChange={(e) => onChange(e)}
-
-helperText={
-    <p className='dark:text-white text-black text-lg md:w-full 
-    md:text-sm  text-wrap w-[140px]'>(optional)</p>}
-className='myTextField'
-  sx={{
-    width: '100%',
-    mt:2,
-
-    '& label.Mui-focused': {
-      color: 'black',
-      fontSize:'16px'
-    },
-    '& .MuiOutlinedInput-root': {
-      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-        borderColor: "black",
-        borderWidth: '3px'
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: 'black',
-      }
-    },
-  }}
-fullWidth  label='Radius Username' 
-
-InputProps={{
-    startAdornment: <CiUser className="mr-2 text-black" />,
-  }}
-/>
-
-
-
-
-<TextField  
-name='secret'
-value={secret}
-onChange={(e) => onChange(e)}
-
-className='myTextField'
-  sx={{
-    width: '100%',
-    mt:2,
-
-    '& label.Mui-focused': {
-      color: 'black',
-      fontSize:'16px'
-    },
-    '& .MuiOutlinedInput-root': {
-      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-        borderColor: "black",
-        borderWidth: '3px'
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: 'black',
-      }
-    },
-  }}
-fullWidth  label='Radius Secret' 
-
-InputProps={{
-    startAdornment: <RiLockPasswordLine className="mr-2" />,
-  }}
-/>
-
-
-
-
-
-
-<TextField 
-name='ipaddr'
-value={ipaddr}
-onChange={(e) => onChange(e)}
-
-className='myTextField'
-sx={{
-    width: '100%',
-    mt:2,
-
-    '& label.Mui-focused': {
-      color: 'black',
-      fontSize:'16px'
-    },
-    '& .MuiOutlinedInput-root': {
-      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-        borderColor: "black",
-        borderWidth: '3px'
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: 'black',
-      }
-    },
-  }}
-fullWidth
-label='ip adress'
-
-InputProps={{
-    startAdornment: <IoGitNetwork className="mr-2" />,
-  }}
-
-/>
-            {/* Interactive Update Button */}
-            <Tooltip title="Update ticket settings system-wide">
+            <div className="flex flex-wrap gap-3 mt-4">
               <Button
                 type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+                startIcon={<FaShieldAlt />}
                 sx={{
-                  marginTop: "20px",
-                  padding: "10px 20px",
-                  backgroundColor: "#ff6f61",
-                  color: "white",
-                  borderRadius: "25px",
-                  "&:hover": {
-                    backgroundColor: "#ff4a3d",
-                  },
+                  borderRadius: '8px',
+                  px: 4,
+                  py: 1.5,
+                  textTransform: 'none',
+                  fontSize: '1rem'
                 }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                component={motion.button}
               >
-                Update Settings
+                Save Settings
               </Button>
-            </Tooltip>
+
+              <Button
+                variant="outlined"
+                color="secondary"
+                size="large"
+                startIcon={<FaServer />}
+                onClick={generateMikrotikConfig}
+                disabled={isGenerating}
+                sx={{
+                  borderRadius: '8px',
+                  px: 4,
+                  py: 1.5,
+                  textTransform: 'none',
+                  fontSize: '1rem'
+                }}
+              >
+                {isGenerating ? 'Generating...' : 'Generate MikroTik Config'}
+              </Button>
+            </div>
           </AccordionDetails>
         </Accordion>
-    </form>
+      </form>
+
+      {mikrotikConfig && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-6 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700"
+        >
+          <div className="p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
+            <Typography variant="h6" className="font-bold flex items-center gap-2">
+              <FaNetworkWired className="text-blue-500" />
+              MikroTik Configuration
+            </Typography>
+            <Tooltip title="Copy to clipboard">
+              <Button 
+                variant="text" 
+                startIcon={<FaCopy />}
+                onClick={copyToClipboard}
+                size="small"
+              >
+                Copy
+              </Button>
+            </Tooltip>
+          </div>
+
+          <div className="p-4 bg-gray-900 overflow-x-auto">
+            <pre className="text-green-400 font-mono text-sm">
+              {mikrotikConfig.split('\n').map((line, i) => (
+                <div key={i} className="flex">
+                  <span className="text-gray-500 select-none mr-4 w-6 text-right">{i + 1}</span>
+                  <code>{line}</code>
+                </div>
+              ))}
+            </pre>
+          </div>
+
+          <div className="p-3 bg-gray-100 dark:bg-gray-700 text-sm text-gray-600 dark:text-gray-300">
+            <p>Copy these commands to your MikroTik router terminal</p>
+          </div>
+        </motion.div>
+      )}
+    </div>
   )
 }
 

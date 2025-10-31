@@ -27,6 +27,8 @@ import {
   Alert,
   InputAdornment
 } from '@mui/material';
+
+
 import {
   Close as CloseIcon,
   Person as PersonIcon,
@@ -372,6 +374,7 @@ const TicketSubmit = ({
                       }}
                     />
 
+
                     
                   )}
 
@@ -386,8 +389,17 @@ const TicketSubmit = ({
 
 
 
+
+
+
               </Paper>
             )}
+
+
+
+
+
+
 
             <Paper elevation={0} sx={{ 
               p: 2, 
@@ -406,6 +418,19 @@ const TicketSubmit = ({
                   }
                 }
               }}>
+
+
+
+
+
+
+
+
+
+
+
+
+
                 <Autocomplete
                   options={ticketCategories}
                   getOptionLabel={(option) => option.title}

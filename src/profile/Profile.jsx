@@ -32,6 +32,8 @@ import {
   import {useApplicationSettings} from '../settings/ApplicationSettings'
   import { TbPasswordFingerprint } from "react-icons/tb";
 import toast, { Toaster } from 'react-hot-toast';
+import { MdSupportAgent } from "react-icons/md";
+
 
 
 
@@ -112,9 +114,9 @@ console.log(user)
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
 
-            <DropdownMenuItem>
+            <DropdownMenuItem className=''>
               
-              <User className="mr-2 h-4 w-4" />
+              <User className="mr-2 h-4 w-4 " />
               <Link to='/admin/profile'>
               <span>Profile</span>
               </Link>
@@ -155,6 +157,14 @@ console.log(user)
               <Link to='/admin/settings'><span >Settings</span></Link>
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>
+
+
+
+              <DropdownMenuItem className='cursor-pointer'>
+              <MdSupportAgent className="mr-2 h-4 w-4 cursor-pointer" />
+              <a href="https://wa.me/254791568852"><span >Contact Support</span></a>
+              <DropdownMenuShortcut>⌘CS</DropdownMenuShortcut>
+            </DropdownMenuItem>
            
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
@@ -165,6 +175,8 @@ console.log(user)
                 <UserPlus className="mr-2 h-4 w-4" />
                 <span>Invite users</span>
               </DropdownMenuSubTrigger>
+
+              
               <DropdownMenuPortal>
                 <DropdownMenuSubContent>
                   <DropdownMenuItem>

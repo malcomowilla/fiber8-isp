@@ -189,7 +189,10 @@ onClick={() => {
 className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header */}
       <div>
-        <Typography variant="h4" className="font-bold">Hotspot Analytics Dashboard</Typography>
+        <Typography variant="h4" className="font-bold
+        bg-gradient-to-r from-green-600 via-blue-400
+         to-cyan-500 bg-clip-text text-transparent 
+        ">Hotspot Analytics Dashboard</Typography>
         <Typography variant="body2" color="textSecondary">Monitor your hotspot performance and revenue</Typography>
       </div>
 

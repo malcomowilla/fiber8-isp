@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa"; // Import user icon
 
+import { Autocomplete,  } from '@mui/material';
 
 
 
@@ -127,25 +128,33 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
                 },
               }}
             >
-              <InputLabel >Package</InputLabel>
-              <Select
-                // labelId="demo-simple-select-autowidth-label"
-                name="package"
-                autoWidth
-                label="Package"
-                value={voucherForm.package}
-                onChange={(e)=>handleChangeVoucher(e)}
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                {/* Map through the fetched PPPoE packages */}
-                {pppoePackages.map((pkg) => (
-                  <MenuItem key={pkg.id}  value={pkg.name}>
-                    {pkg.name} - {pkg.speed} Mbps
-                  </MenuItem>
-                ))}
-              </Select>
+             <Autocomplete
+             className='myTextField'
+  options={pppoePackages}
+  getOptionLabel={(option) => `${option.name} - ${option.speed || 'unlimited'} Mbps`}
+  value={pppoePackages.find(pkg => pkg.name === voucherForm.package) || null}
+  onChange={(event, newValue) => {
+    handleChangeVoucher({
+      target: {
+        name: "package",
+        value: newValue ? newValue.name : ""
+      }
+    });
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Package"
+      variant="outlined"
+    />
+  )}
+  renderOption={(props, option) => (
+    <MenuItem {...props} key={option.id}>
+      {option.name} - {option.speed} Mbps
+    </MenuItem>
+  )}
+  isOptionEqualToValue={(option, value) => option.name === value.name}
+/>
 
               <TextField
               name='phone'

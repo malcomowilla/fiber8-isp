@@ -23,19 +23,6 @@ const [openNotifactionSettings, setOpenSettings] = useState(false)
 const [isloading, setisloading] = useState(false)
 
   
-  // State for checkboxes
-  // const [templateStates, setTemplateStates] = useState({
-  //   clean: false,
-  //   sleekspot: false,
-  //   attractive: false,
-  //   flat: false,
-  //   minimal: false,
-  //   simple: false,
-  //   default: false,
-  //   sleek: false, 
-  // });
-
-  // Handle image click for preview
   const handleImageClick = (image, title) => {
     setPreviewImage(image);
     setIsModalOpen(true);
@@ -69,12 +56,7 @@ const [isloading, setisloading] = useState(false)
 
     // const templateName = event.target.value;
     if (value === 'default_template' && checked) {
-      // templateStates.sleek = false;
-      // templateStates.attractive = false;
-      // templateStates.flat = false;
-      // templateStates.minimal = false;
-      // templateStates.simple = false;
-      // templateStates.clean = false;
+     
       setTemplateStates({
         ...templateStates,
         sleek: false,
@@ -86,6 +68,8 @@ const [isloading, setisloading] = useState(false)
         minimal: false,
         simple: false,
         clean: false,
+        pepea: false,
+        
       });
       
     }else if(value === 'sleekspot' && checked){
@@ -98,6 +82,7 @@ const [isloading, setisloading] = useState(false)
         minimal: false,
         simple: false,
         clean: false,
+        pepea: false,
       });
     }else if(value === 'attractive' && checked){
       setTemplateStates({
@@ -105,6 +90,22 @@ const [isloading, setisloading] = useState(false)
         sleekspot: false,
         default_template: false,
         attractive: true,
+        flat: false,
+        minimal: false,
+        simple: false,
+        clean: false,
+        pepea: false,
+      });
+    }
+
+
+    else if(value === 'pepea' && checked){
+      setTemplateStates({
+        ...templateStates,
+        sleekspot: false,
+        pepea: true,
+        default_template: false,
+        attractive: false,
         flat: false,
         minimal: false,
         simple: false,
@@ -119,41 +120,15 @@ const [isloading, setisloading] = useState(false)
 
 
 
-  // const handleCheckboxChange = (event, templateName) => {
-  //   const { checked, value } = event.target;
-  
-  //   setTemplateStates((prevState) => {
-  //     const updatedStates = {
-  //       ...prevState,
-  //       [templateName]: checked,
-  //     };
-  
-  //     if (value === 'default' && checked) {
-  //       // Uncheck other templates if 'default' is selected
-  //       return {
-  //         ...updatedStates,
-  //         sleek: false,
-  //         attractive: false,
-  //         flat: false,
-  //         minimal: false,
-  //         simple: false,
-  //         clean: false,
-  //       };
-  //     }
-  
-  //     return updatedStates;
-  //   });
-  
-  //   console.log('checkbox', templateStates[templateName]);
-  // };
-
-  // Sample template data
   const imageTemplates = [
     { id: 1, name: 'default_template', image: '/images/template_image/default.png' },
     { id: 2, name: 'sleekspot', image: '/images/template_image/sleek.png'
      },
     { id: 3, name: 'attractive', image: '/images/template_image/attractive.png' },
+            {id: 8, name: 'pepea', image: '/images/template_image/pepea.png'},
+
     { id: 4, name: 'flat', image: '/images/template_image/flat.png' },
+
     { id: 5, name: 'minimal', image: '/images/template_image/minimal.png' },
     { id: 6, name: 'simple', image: '/images/template_image/simple.png' },
     { id: 7, name: 'clean', image: '/images/template_image/clean.png' },
@@ -202,7 +177,7 @@ setOpen(false)
 setOpenSettings(true)
 
         const { attractive, flat,
-           minimal, simple, clean, default_template, sleekspot} = newData
+           minimal, simple, clean, default_template, sleekspot, pepea} = newData
 
         setTemplateStates({
           ...templateStates,
@@ -213,6 +188,7 @@ setOpenSettings(true)
           minimal: minimal,
           simple: simple,
           clean: clean,
+          pepea: pepea,
         });
           
       } else {
@@ -259,7 +235,7 @@ const newData = await response.json();
       if (response.ok) {
         
         const { attractive, flat,
-          minimal, simple, clean, default_template, sleekspot} = newData[0]
+          minimal, simple, clean, default_template, sleekspot, pepea} = newData[0]
 
        setTemplateStates({
          ...templateStates,
@@ -270,6 +246,7 @@ const newData = await response.json();
          minimal: minimal,
          simple: simple,
          clean: clean,
+         pepea: pepea,
        });
       } else {
         toast.error('failed to get hotspot templates settings', {
@@ -301,9 +278,10 @@ const newData = await response.json();
 <SettingsNotification open={openNotifactionSettings} handleClose={ handleCloseNotifaction }/>
 
       <div className="min-h-screen p-8">
-        <h1 className="text-4xl roboto-condensed-bold font-thin text-center mb-8
-        
-        text-black dark:text-white">
+        <h1 className="text-4xl   text-center mb-8
+        bg-gradient-to-r from-green-600 via-blue-400
+         to-cyan-500 bg-clip-text text-transparent inline-block
+        ">
           Choose a Hotspot Template
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">

@@ -6,6 +6,9 @@ import { useContext, useState, useEffect, useCallback} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import ShortCuts from './ShortCuts'
+
+import UiLoader from '../uiloader/UiLoader'
+import { Suspense } from "react";
 import { useLocation } from 'react-router-dom';
 import DashboardStatistics from '../hotspot_page/DashboardStatistics'
 import { APP_VERSION, APP_DESCRIPTION } from '../version';
@@ -17,14 +20,10 @@ import {
   Wifi as WifiIcon,
   CalendarMonth as CalendarMonthIcon
 } from '@mui/icons-material';
-
-
 import CurrentPlans from './CurrentPlans'
-
-
 import License from './License'
 import Updates from './Updates'
-
+import  WelcomeMessage from './WelcomeMessage'
 
 const Layout = () => {
 
@@ -67,10 +66,7 @@ const [currentPPOEPlan, setCurrentPPOEPlan] = useState(null)
 const [date, setDate] = useState(new Date().toLocaleTimeString('en-US', { hour: 'numeric', 
   minute: 'numeric', second: 'numeric', hour12: true }))
 
-  const refreshPage = ()=> {
-    window.location.reload(false);
-    setloading(true)
-  }
+  
   useEffect(() => {
    setSeeButton(true)
   }, [seeButton]);
@@ -101,6 +97,7 @@ const [date, setDate] = useState(new Date().toLocaleTimeString('en-US', { hour: 
         if (newData.length === 0) {
           setExpiry2('No license')
           setStatus2('Not Active')
+           setStatus2(newData[0]?.status)
         } else {
           console.log('current hotspot plan', newData)
         setExpiry2(newData[0]?.expiry)
@@ -358,7 +355,7 @@ useEffect(() => {
     const diffMs = expiryDate - now;
     
     // If already expired
-    if (diffMs <= 0) return 'today (license expired)';
+    if (diffMs <= 0) return '(license expired)';
   
     // Calculate time components
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -384,12 +381,13 @@ useEffect(() => {
     }
   
     // If less than 1 minute remains
-    if (result === '') return 'in less than 1 minute';
+    if (result === '') return 'expires in less than 1 minute';
   
-    return `in ${result?.trim()}`;
+    return `expires in ${result?.trim()}`;
   }
   return (
     <>
+    
     <div onClick={() => {
             setShowMenu1(false)
             setShowMenu2(false)
@@ -415,18 +413,51 @@ useEffect(() => {
     >
       <div className="flex-grow p-4 overflow-x-hidden">
         <div className={`p-4 h-full`}>
-          <div className="p-2">
-            <p className="font-extrabold dark:text-white text-black text-xl welcome-message">
-              <span>{getTimeBasedGreeting()}, {company_name || 'Aitechs'},</span>
-            </p>
-            <p className="dark:text-white text-black text-sm mt-1 welcome-message">
-              {getWelcomeMessage()}
-            </p>
-          </div>
+          {location.pathname !== '/admin/pppoe-packages'
+           && location.pathname !== '/admin/pppoe-subscribers' &&
+            location.pathname !== '/admin/upload-subscriber'
+             && location.pathname !== '/admin/nodes' &&
+             location.pathname !== '/admin/private-network' &&
+             location.pathname !== '/admin/subscriber-details' && 
+             location.pathname !== '/admin/create-subscriber' &&
+             location.pathname !== '/admin/customer-tickets' &&
+             location.pathname !== '/admin/user' &&
+             location.pathname !== '/admin/user-group' &&
+             location.pathname !== '/admin/invoice' &&
+             location.pathname !== '/admin/invoice-page' &&
+             location.pathname !== '/admin/network-components' &&
+             location.pathname !== '/admin/scheduler' &&
+             location.pathname !== '/admin/prevent-ddos' &&
+             location.pathname !== '/admin/equipment' &&
+             location.pathname !== '/admin/settings' &&
+             location.pathname !== '/admin/devices' &&
+             location.pathname !== '/admin/hotspot-dashboard' &&
+              location.pathname !== '/admin/hotspot-package' &&
+              location.pathname !== '/admin/hotspot-subscriptions' &&
+              location.pathname !== '/admin/hotspot-templates' &&
+              location.pathname !== '/admin/hotspot_settings' &&
+              location.pathname !== '/admin/hotspot_anlytics' &&
+              location.pathname !== '/admin/send-sms' &&
+              location.pathname !== '/admin/messages' &&
+              location.pathname !== '/admin/bulk-messages' &&
+              location.pathname !== '/admin/nas' &&
+              
+              location.pathname !== '/admin/onu-details' &&
+              location.pathname !== '/admin/urgent-tickets' &&
+              location.pathname !== '/admin/google-authenticator' &&
 
-          <p className="capitalize mb-10 dark:text-white text-black text-2xl">
-            {date}
-          </p>
+
+              location.pathname !== '/admin/ip_networks' &&
+              location.pathname !== '/admin/profile' &&
+              location.pathname !== '/admin/subscribers-online' &&
+               location.pathname !== '/admin/client-leads' &&
+               location.pathname !== '/admin/user-license' &&
+               location.pathname !== '/admin/radius-settings' &&
+               location.pathname !== '/admin/license' &&
+               location.pathname !== '/admin/map' &&
+              <WelcomeMessage/>
+ }
+
          
 {location.pathname !== '/admin/hotspot_anlytics' &&
  location.pathname !== '/admin/admin-dashboard'  && location.pathname !== '/admin/pppoe-subscribers' 
@@ -450,10 +481,26 @@ useEffect(() => {
 location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers' &&
 location.pathname !== '/admin/scheduler' && location.pathname !== '/admin/private-network' &&
 location.pathname !== '/admin/analytics' && location.pathname !== '/admin/router_details' &&
+location.pathname !== '/admin/invoice' && location.pathname !== '/admin/invoice-page' &&
+location.pathname !== '/admin/user-license' && location.pathname !== '/admin/subscribers-online' &&
+ location.pathname !== '/admin/subscribers-offline' && location.pathname !== '/admin/finance-stats' &&
+ location.pathname !== '/admin/prevent-ddos' &&  location.pathname !== '/admin/open-tickets' &&
+
+location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/urgent-tickets' &&
+location.pathname !== '/admin/equipment' && location.pathname !== '/admin/call-center' &&
+location.pathname !== '/admin/devices' && location.pathname !== '/admin/onu-details' &&
+location.pathname !== '/admin/ip_networks'
 
 
-
-
+ && 
+ 
+ location.pathname !== '/admin/subscriber-details'
+  &&
+location.pathname !== '/admin/create-subscriber' &&
+location.pathname !== '/admin/passkeys' && location.pathname !== '/admin/ticket-stats' &&
+ location.pathname !== '/admin/radius-settings' &&
+ location.pathname !== '/admin/license' &&
+ location.pathname !== '/admin/map' &&
 
 <div
  onClick={() => {
@@ -533,8 +580,22 @@ currentPPOEPlan={currentPPOEPlan} currentHotspotPlan={currentHotspotPlan}
   location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers'  &&
  location.pathname !== '/admin/upload-subscriber' &&
 location.pathname !== '/admin/scheduler' && location.pathname !== '/admin/private-network' &&
-location.pathname !== '/admin/router_details' &&
-<div
+location.pathname !== '/admin/router_details' && location.pathname !== '/admin/invoice' &&
+location.pathname !== '/admin/invoice-page' && location.pathname !== '/admin/user-license' &&
+location.pathname !== '/admin/subscribers-online' && location.pathname !== '/admin/subscribers-offline' &&
+location.pathname !== '/admin/open-tickets' && location.pathname !== '/admin/solved-tickets' &&
+location.pathname !== '/admin/urgent-tickets' && location.pathname !== '/admin/equipment' &&
+location.pathname !== '/admin/call-center' && location.pathname !== '/admin/devices' &&
+location.pathname !== '/admin/settings' &&  location.pathname !== '/admin/prevent-ddos' &&
+location.pathname !== '/admin/onu-details' && location.pathname !== '/admin/nodes' &&
+ location.pathname !== '/admin/subscriber-details' &&
+    location.pathname !== '/admin/passkeys' &&
+   location.pathname !== '/admin/google-authenticator' 
+
+  && location.pathname !== '/admin/create-subscriber' && location.pathname !== '/admin/ticket-stats' &&
+   location.pathname !== '/admin/radius-settings' &&
+   location.pathname !== '/admin/license' && location.pathname !== '/admin/map' &&
+<div 
  onClick={() => {
             setShowMenu1(false)
             setShowMenu2(false)
@@ -598,10 +659,23 @@ className='mt-4'>
            location.pathname !== '/admin/this-week-subscribers' && 
            location.pathname !== '/admin/this-month-subscribers' && location.pathname !== '/admin/scheduler'
 
-           &&
+           && location.pathname !== '/admin/invoice-page' &&
 
-location.pathname !== '/admin/router_details' 
-           
+location.pathname !== '/admin/router_details' && location.pathname !== '/admin/user-license' &&
+ location.pathname !== '/admin/invoice' && location.pathname !== '/admin/subscribers-online' &&
+ location.pathname !== '/admin/subscribers-offline' && location.pathname !== '/admin/analytics' &&
+ location.pathname !== '/admin/prevent-ddos' && location.pathname !== '/admin/open-tickets' &&
+location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/urgent-tickets'
+           && location.pathname !== '/admin/networks-wireguard-config' &&
+            location.pathname !== '/admin/admin-dashboard' && location.pathname !== '/admin/equipment'
+            && location.pathname !== '/admin/call-center' && location.pathname !== '/admin/devices' 
+            && location.pathname !== '/admin/onu-details' && location.pathname !== '/admin/pppoe-packages' &&
+            location.pathname !== '/admin/private-network' && location.pathname !== '/admin/ip_networks' &&
+            location.pathname !== '/admin/nas' && location.pathname !== '/admin/hotspot-subscriptions' 
+            && location.pathname !== '/admin/subscriber-details' && 
+            location.pathname !== '/admin/create-subscriber'
+            && location.pathname !== '/admin/radius-settings'
+            && location.pathname !== '/admin/license' && location.pathname !== '/admin/map'
            && <div
             onClick={() => {
             setShowMenu1(false)
@@ -648,7 +722,7 @@ location.pathname !== '/admin/router_details'
           </div>
           }
 
-          {location.pathname === '/admin/customer-tickets' && 
+          {location.pathname === '/admin/ticket-stats' && 
           <div
            onClick={() => {
             setShowMenu1(false)
@@ -671,7 +745,7 @@ location.pathname !== '/admin/router_details'
 
 
           
-          {location.pathname === '/admin/pppoe-subscribers' 
+          {!location.pathname === '/admin/pppoe-subscribers' 
             && <div
              onClick={() => {
             setShowMenu1(false)
@@ -755,6 +829,9 @@ location.pathname !== '/admin/router_details'
             }
 
 </div>
+
+
+
           <div className="mt-8" onClick={() => {
             setShowMenu1(false)
             setShowMenu2(false)
@@ -769,10 +846,17 @@ location.pathname !== '/admin/router_details'
             setShowMenu11(false)  
             setShowMenu12(false)
           }}>
+             <Suspense fallback={<UiLoader />}>
             <Outlet />
+             </Suspense>
+            
           </div>
         </div>
       </div>
+
+
+
+
 
       <div className="flex flex-col p-4 font-mono">
         <Sidebar />

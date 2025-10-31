@@ -1,6 +1,5 @@
 
 import { motion } from 'framer-motion';
-
 import { useState, useEffect, useCallback } from 'react';
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 import {
@@ -18,7 +17,6 @@ import {
   SiIos
 } from 'react-icons/si';
 import { FaWindows } from "react-icons/fa6";
-
 import {
   BsBrowserChrome,
   BsBrowserEdge,
@@ -29,7 +27,10 @@ import MaterialTable from 'material-table'
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { VscGitPullRequestCreate } from "react-icons/vsc";
 // import { block } from "million/react";
+import { IoCreateOutline } from "react-icons/io5";
 
+import UiLoader from '../uiloader/UiLoader'
+import { Suspense } from "react";
 
 
 const AdminDashboard = () => {
@@ -92,6 +93,9 @@ const subdomain = window.location.hostname.split('.')[0];
         return <FaCog className="text-blue-500" />;
       case 'security':
         return <FaShieldAlt className="text-red-500" />;
+          case 'update':
+         return <IoCreateOutline className="text-green-600" />; 
+  
         case 'create':
           return <VscGitPullRequestCreate className="text-purple-500" />; 
         case 'delete':
@@ -198,7 +202,13 @@ useEffect(() => {
    <>
    
    
-   
+   <Suspense
+            fallback={
+              <div className="flex h-full items-center justify-center">
+                <UiLoader />
+              </div>
+            }
+          >
    
 
   
@@ -344,7 +354,7 @@ onClick={() => {
     </motion.div>
    
 
-
+ </Suspense>
 
 
 

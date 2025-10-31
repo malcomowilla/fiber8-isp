@@ -15,7 +15,6 @@ import PaymentIcon from '@mui/icons-material/Payment';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import TextsmsSharpIcon from '@mui/icons-material/TextsmsSharp';
-import ArrowBackSharpIcon from '@mui/icons-material/ArrowBackSharp';
 import WifiSharpIcon from '@mui/icons-material/WifiSharp';
 import KeyboardArrowUpSharpIcon from '@mui/icons-material/KeyboardArrowUpSharp';
 import KeyboardArrowDownSharpIcon from '@mui/icons-material/KeyboardArrowDownSharp';
@@ -38,6 +37,17 @@ import { FaHandshake } from "react-icons/fa";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { AiOutlineWhatsApp } from "react-icons/ai";
 import { PiNetworkSlashLight } from "react-icons/pi";
+import { TbLicense } from "react-icons/tb";
+import { CiMoneyCheck1 } from "react-icons/ci";
+import { MdOutlineSecurity } from "react-icons/md";
+import { MdMenuOpen } from "react-icons/md";
+import { MdDevices } from "react-icons/md";
+import { FaPhoneVolume } from "react-icons/fa";
+import { RiRouterLine } from "react-icons/ri";
+import { ImStatsDots } from "react-icons/im";
+import { GrLicense } from "react-icons/gr";
+
+
 
 
 
@@ -50,6 +60,8 @@ const {isExpanded, setIsExpanded, isExpanded1, setIsExpanded1 , isExpanded2, set
   
   isExpanded3, setIsExpanded3, isExpanded4, setIsExpanded4, isExpanded5, setIsExpanded5, seeSidebar, 
   setSeeSideBar, isExpanded6, setIsExpanded6, isExpanded7, setIsExpanded7,
+  setIsExpanded9, isExpanded9
+
 
 
 } = useContext(ApplicationContext);
@@ -59,6 +71,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
        showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
         showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
+        showMenu13, setShowMenu13
 
 } = useApplicationSettings()
   
@@ -148,15 +161,19 @@ const handleGetCompanySettings = useCallback(
    
  }, [handleGetCompanySettings])
  
-//  /admin/hotspot-dashboard
 
+ 
   return (
 
 
     <>
     
 
-<aside  className={`fixed top-0 left-0 z-50  w-64 h-screen transition-all duration-300 ease-in-out 
+<aside 
+id='sidebar-multi-level-sidebar'
+className={`fixed top-0 left-0 
+
+w-64 h-screen transition-all duration-300 ease-in-out 
   bg-[#042f2e]       mogra-regular shadow-xl   
   lg:block ${seeSidebar ? 'w-[58px]' : 'w-[240px] '}    
 `}aria-label="Sidebar">
@@ -187,12 +204,10 @@ const handleGetCompanySettings = useCallback(
 
 
       {!seeSidebar &&  
-        <ArrowBackSharpIcon
-        sx={{
-          width: 30,
-          height: 30
-        }}
-        className='cursor-pointer'
+      <div id='sidebar-toggle'>
+        <MdMenuOpen
+      
+        className='cursor-pointer w-7 h-7'
          onClick={()=> {
           setSeeSideBar(!seeSidebar)
           if (!seeSidebar) {
@@ -205,7 +220,14 @@ const handleGetCompanySettings = useCallback(
             setIsExpanded7(false)
 
           }
-         }}/>
+         }}
+         
+         
+         />
+</div>
+
+         
+
 }
 
 
@@ -254,7 +276,6 @@ const handleGetCompanySettings = useCallback(
                      whitespace-nowrap text-black
                      bg-white shadow-lg rounded-lg
                      ">
-                      <p className='text-center'>Dashboard </p>
                      
                        <motion.li
               onClick={() => {
@@ -320,7 +341,18 @@ const handleGetCompanySettings = useCallback(
 ):  <button 
          
        
-         onClick={()=> setIsExpanded5(!isExpanded5)} type="button" className="flex 
+         onClick={()=> {
+          setIsExpanded5(!isExpanded5)
+          setIsExpanded6(false)  
+          setIsExpanded7(false)
+          setIsExpanded4(false)
+          setIsExpanded3(false)
+          setIsExpanded2(false)
+          setIsExpanded1(false)
+          setIsExpanded(false)
+
+
+         }} type="button" className="flex 
          flex-row mt-[50px]  hover:bg-black transition-colors dark:bg-white dark:hover:text-black
           items-center w-full p-2 text-base  
              text-white  duration-700  rounded-lg group hover:
@@ -409,7 +441,25 @@ const handleGetCompanySettings = useCallback(
 
 
 
-
+ <motion.li
+              onClick={() => {
+                if (window.innerWidth < 962) {
+                  setSeeSideBar(true);
+                }
+              }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2, delay: 0.1 }}
+              >
+                <Link
+                  to="/admin/finance-stats"
+                  className="flex items-center gap-x-4 w-full p-2 transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700"
+                >
+                 <CiMoneyCheck1 className='w-7 h-7'/>
+                  Money Check
+                </Link>
+              </motion.li>
 
 
 
@@ -540,7 +590,16 @@ className="flex items-center  w-full p-2 text-black transition
                      </>
 }
             </button>
-):   <button   onClick={()=> setIsExpanded(!isExpanded)} type="button" className="flex items-center w-full p-2 
+):   <button   onClick={()=> {
+   setIsExpanded6(false)  
+          setIsExpanded7(false)
+          setIsExpanded4(false)
+          setIsExpanded5(false)
+          setIsExpanded3(false)
+          setIsExpanded2(false)
+          setIsExpanded1(false)
+          setIsExpanded(!isExpanded)
+}} type="button" className="flex items-center w-full p-2 
             text-base  dark:hover:bg-white dark:hover:text-black hover:bg-black
                   transition-colors duration-700      
               rounded-lg group 
@@ -884,16 +943,38 @@ className="flex items-center  w-full p-2 text-white transition
                   transition={{ duration: 0.2 , delay: 0.2 }}
                   >
                     
+                  
+                  </motion.li>
+
+
+
+
+
+
+                   <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 , delay: 0.2 }}
+                  >
+                    
                     <div className='flex items-center gap-x-4 w-full p-2 
                   transition duration-75 rounded-lg pl-11 group text-black hover:bg-gray-700'>
-                     <Link to='/admin/network-components' className="flex items-center w-full p-2
+                     <Link to='/admin/devices' className="flex items-center w-full p-2
                       text-black
                      transition duration-75 rounded-lg group  
                        gap-x-3">
                         <div>
-                              <CgComponents className='rounded-full h-7 w-7' />
+                              <RiRouterLine className='text-orange-500
+                              
+                              h-7 w-7' />
                               </div>
-                        components</Link>
+                        ONU</Link>
 
 
                         </div>
@@ -913,7 +994,7 @@ className="flex items-center  w-full p-2 text-white transition
 
                     <div className='flex items-center gap-x-4 w-full p-2 
                   transition duration-75 rounded-lg pl-11 group text-black hover:bg-gray-700'>
-                     <Link  className="flex items-center w-full p-2 text-black
+                     <Link  to='/admin/map' className="flex items-center w-full p-2 text-black
                      transition duration-75 rounded-lg  group 
                         gap-x-3">
                         <img src="/images/icons8-map (1).gif" className='w-8 h-8 rounded-full' alt="" />
@@ -974,7 +1055,16 @@ className="flex items-center  w-full p-2 text-white transition
                      </>
 }
             </button>
-):  <button   onClick={()=> setIsExpanded4(!isExpanded4)} type="button" className="flex items-center w-full p-2
+):  <button   onClick={()=> {
+  setIsExpanded6(false)  
+          setIsExpanded7(false)
+          setIsExpanded5(false)
+          setIsExpanded3(false)
+          setIsExpanded2(false)
+          setIsExpanded1(false)
+          setIsExpanded4(!isExpanded4)
+           setIsExpanded(false)
+}} type="button" className="flex items-center w-full p-2
           text-base transition-colors duration-700
              text-white  rounded-lg group dark:hover:bg-white dark:hover:text-black
               hover:bg-black
@@ -1068,6 +1158,36 @@ className="flex items-center  w-full p-2 text-white transition
                         </div>
                   </motion.li>
                
+
+
+
+
+
+
+
+  <motion.li
+                  onClick={() => {
+                    if (window.innerWidth < 962) {
+                      setSeeSideBar(true);
+                    }
+                  }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 , delay: 0.2 }}
+                  >
+                    <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-black hover:bg-gray-700'>
+                     <Link to='/admin/devices' className="flex items-center w-full p-2 ttext-black
+                     transition duration-75 rounded-lg group  
+                       gap-x-3">
+                              <RiRouterLine
+                              className='w-8 h-8 text-orange-600'
+ />
+                        <p className='text-white'>ONU</p></Link>
+
+                        </div>
+                  </motion.li>
                
 
 
@@ -1131,31 +1251,7 @@ className="flex items-center  w-full p-2 text-white transition
 
 
 
-                  <motion.li
-                  onClick={() => {
-                    if (window.innerWidth < 962) {
-                      setSeeSideBar(true);
-                    }
-                  }}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.2 , delay: 0.2 }}
-                  >
-                    
-                    <div className='flex items-center gap-x-4 w-full p-2 
-                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
-                     <Link to='/admin/network-components' className="flex items-center w-full p-2 text-white
-                     transition duration-75 rounded-lg group  dark:text-white
-                       gap-x-3">
-                        <div>
-                              <CgComponents className='rounded-full h-7 w-7' />
-                              </div>
-                        components</Link>
 
-
-                        </div>
-                  </motion.li>
 
                   <motion.li
                   onClick={() => {
@@ -1171,7 +1267,7 @@ className="flex items-center  w-full p-2 text-white transition
 
                     <div className='flex items-center gap-x-4 w-full p-2 
                   transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
-                     <Link  className="flex items-center w-full p-2 text-white
+                     <Link to='/admin/map' className="flex items-center w-full p-2 text-white
                      transition duration-75 rounded-lg  group 
                       dark:text-white  gap-x-3">
                         <img src="/images/icons8-map (1).gif" className='w-8 h-8 rounded-full' alt="" />
@@ -1593,7 +1689,16 @@ transition={{ duration: 0.2, delay: 0.1 }}
                             
 
             </button>
-          ):  <button   onClick={()=> setIsExpanded2(!isExpanded2)} type="button" className="flex 
+          ):  <button   onClick={()=>{
+            setIsExpanded6(false)  
+          setIsExpanded7(false)
+          setIsExpanded4(false)
+          setIsExpanded5(false)
+          setIsExpanded3(false)
+          setIsExpanded1(false)
+          setIsExpanded2(!isExpanded2)
+           setIsExpanded(false)
+          }} type="button" className="flex 
          items-center w-full
           p-2 text-base
              text-white transition duration-75 rounded-lg group dark:hover:bg-white
@@ -1669,12 +1774,12 @@ transition={{ duration: 0.2, delay: 0.1 }}
                      transition duration-75 rounded-lg pl-11 group cursor-pointer  dark:text-white gap-x-4
                       " >
 
-                        <div className='flex items-center gap-x-4 w-full p-2 
+                        <Link to='/admin/send-sms' className='flex items-center gap-x-4 w-full p-2 
                   transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                         <TextsmsSharpIcon/>
-                    <Link to='/admin/send-sms' >SMS</Link>
+                    SMS
 
-                    </div>
+                    </Link>
                   </motion.li>
 
 
@@ -1699,6 +1804,8 @@ transition={{ duration: 0.2, delay: 0.1 }}
                     </div>
                   </motion.li>
 
+
+
                   <motion.li
                   onClick={() => {
                     if (window.innerWidth < 962) {
@@ -1710,13 +1817,16 @@ transition={{ duration: 0.2, delay: 0.1 }}
                    exit={{ opacity: 0, x: -20 }}
                    transition={{ duration: 0.2 , delay: 0.2 }}
                   className="flex items-center w-full p-2 text-white
-                     transition duration-75 rounded-lg pl-11 group  dark:text-white gap-x-4
+                     transition cursor-pointer
+                      duration-75 rounded-lg pl-11 group  dark:text-white gap-x-4
                       " >
-                        <div className='flex items-center gap-x-4 w-full p-2 
-                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
+                        <Link
+                        className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'
+                        to='/admin/bulk-messages' >
                         <TextsmsSharpIcon/>
-                    <Link to='/admin/bulk-messages' >Bulk</Link>  
-                    </div>
+                    Bulk
+                    </Link>  
                   </motion.li>
 
                   <motion.li 
@@ -1938,7 +2048,16 @@ onClick={() => {
                   
             </button>
 
-):  <button   onClick={()=> setIsExpanded3(!isExpanded3)} type="button" className="flex items-center w-full p-2 text-base
+):  <button   onClick={()=> {
+  setIsExpanded6(false)  
+          setIsExpanded7(false)
+          setIsExpanded5(false)
+          setIsExpanded4(false)
+          setIsExpanded2(false)
+          setIsExpanded1(false)
+          setIsExpanded3(!isExpanded3)
+           setIsExpanded(false)
+}} type="button" className="flex items-center w-full p-2 text-base
              text-white transition duration-75 rounded-lg group 
               dark:text-white dark:hover:bg-white dark:hover:text-black hover:bg-black " aria-controls="dropdown-example"
                data-collapse-toggle="dropdown-example">
@@ -2188,7 +2307,16 @@ className="flex-1 ms-3 text-left rtl:text-right
                    <li  
                   
                    
-                   onClick={()=> setIsExpanded6(!isExpanded6)} type="button" className="flex
+                   onClick={()=> {
+  setIsExpanded3(false)
+setIsExpanded7(false)
+          setIsExpanded5(false)
+          setIsExpanded4(false)
+          setIsExpanded2(false)
+          setIsExpanded1(false)
+          setIsExpanded6(!isExpanded6)
+           setIsExpanded(false)
+                   }} type="button" className="flex
                     items-center p-2 text-white
              rounded-lg dark:text-white hover:cursor-pointer group
              dark:hover:bg-white dark:hover:text-black hover:bg-black"
@@ -2222,9 +2350,22 @@ onClick={() => {
                   transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
                      <Link to='/admin/customer-tickets' className='flex items-center gap-x-2
                       text-black'>
-                     <LuTicketsPlane className='w-5 h-5 text-red-600'/>
+                     <LuTicketsPlane className='w-5 h-5 text-yellow-500'/>
 
                      Tickets
+                     </Link>
+                     </div>
+
+
+
+
+                     <div className='flex items-center gap-x-4 w-full p-2 
+                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
+                     <Link to='/admin/ticket-stats' className='flex items-center gap-x-2
+                      text-black'>
+                     <ImStatsDots className='w-5 h-5 text-green-500'/>
+
+                     Ticket Stats
                      </Link>
                      </div>
                   </motion.li>
@@ -2236,12 +2377,21 @@ onClick={() => {
 
 
 
-):  <li   onClick={()=> setIsExpanded6(!isExpanded6)} type="button" className="flex items-center p-2 text-white
+):  <li   onClick={() =>{
+  setIsExpanded6(!isExpanded6)
+  setIsExpanded7(false)
+  setIsExpanded4(false)
+  setIsExpanded5(false)
+  setIsExpanded3(false)
+  setIsExpanded2(false)
+  setIsExpanded1(false)
+  setIsExpanded(false)
+}} type="button" className="flex items-center p-2 text-white
              rounded-lg dark:text-white hover:cursor-pointer group
              dark:hover:bg-white dark:hover:text-black hover:bg-black"
                aria-controls="dropdown-example"
                data-collapse-toggle="dropdown-example">
-                {!seeSidebar &&    < FcOnlineSupport className='w-5 h-5'/>
+                {!seeSidebar &&    <FcOnlineSupport className='w-5 h-5'/>
 }
 
 {!seeSidebar &&    <span className="flex-1 ms-3 text-left rtl:text-right
@@ -2297,16 +2447,31 @@ onClick={() => {
                   {/* <ion-icon name="logo-twitch" ></ion-icon> */}
 
 
-<div className='flex items-center gap-x-4 w-full p-2 
-                  transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
+<div className='flex items-center gap-x-4 w-full 
+                  transition duration-75 rounded-lg  group text-white '>
                      <Link to='/admin/customer-tickets' className='flex items-center gap-x-2 text-white'>
-                     {!seeSidebar &&    <LuTicketsPlane className='w-5 h-5 text-red-600'/>}
+                     {!seeSidebar &&    <LuTicketsPlane className='w-5 h-5 text-yellow-500'/>}
 
 {!seeSidebar &&    <p>Tickets</p>}
                      
                      </Link>
                      </div>
+
+
+
+
+<div className='flex items-center gap-x-4 w-full 
+                  transition duration-75 rounded-lg group text-white '>
+                     <Link to='/admin/ticket-stats' className='flex items-center gap-x-2 text-white'>
+                     {!seeSidebar &&    <ImStatsDots className='w-5 h-5 text-blue-500'/>}
+
+{!seeSidebar &&    <p>Ticket Stats</p>}
+                     
+                     </Link>
+                     </div>
                   </motion.li>
+
+
 
 
 
@@ -2374,7 +2539,7 @@ onClick={() => {
                 bg-white rounded-lg shadow-lg
                 ">
                   
-                  <p className='text-black text-center roboto-condensed-bold'>Userss </p>
+                  <p className='text-black text-center roboto-condensed-bold'>Users </p>
                 
 <motion.li 
 // onClick={() => {
@@ -2441,7 +2606,20 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
          </li>
 ):   <li    className="flex items-center p-2 text-white
              rounded-lg dark:text-white hover:cursor-pointer group
-             dark:hover:bg-white dark:hover:text-black hover:bg-black" onClick={()=> setIsExpanded7(!isExpanded7)}>
+             dark:hover:bg-white dark:hover:text-black
+              hover:bg-black" onClick={()=> {
+                setIsExpanded7(!isExpanded7)
+
+
+                setIsExpanded3(false)
+          setIsExpanded5(false)
+          setIsExpanded4(false)
+          setIsExpanded2(false)
+          setIsExpanded1(false)
+          setIsExpanded6(false)
+           setIsExpanded(false)
+              }
+             }>
             
                <svg className="flex-shrink-0 w-5 h-5 text-white transition duration-75
                  group-hover:dark:text-black  " 
@@ -2451,7 +2629,7 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
                   0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 
                   0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z"/>
                </svg>
-               {!seeSidebar && <span className="flex-1 ms-3 whitespace-nowrap ">Users</span>}
+               {!seeSidebar && <span className="flex-1 ms-3 whitespace-nowrap ">User</span>}
                  {isExpanded ? (
                      <KeyboardArrowUpSharpIcon/>
 
@@ -2496,12 +2674,14 @@ onClick={() => {
  transition={{ duration: 0.2, delay: 0.1 }}
 className=' rounded-lg  space-x-2  text-white p-2 flex'>
 
-  <div className='flex items-center gap-x-4 w-full p-2 cursor-pointer
+  <Link
+  to='/admin/user'
+  className='flex items-center gap-x-4 w-full p-2 cursor-pointer
                   transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
 <img src="/images/icons8-male-user.gif" className='rounded-full w-8 h-8' alt="user" />
-     <Link to='/admin/user'> User </Link>
+     User 
 
-</div>
+</Link>
       </motion.li>
 
 
@@ -2517,16 +2697,12 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
        transition={{ duration: 0.2, delay: 0.2 }}
       className=' rounded-lg  text-white  space-x-3  p-2 flex'>
 
-        <div className='flex items-center gap-x-4 w-full p-2  cursor-pointer
+        <Link to='/admin/user-group' className='flex items-center gap-x-4 w-full p-2  cursor-pointer
                   transition duration-75 rounded-lg pl-11 group text-white hover:bg-gray-700'>
-                    <Link to='/admin/user-group'>
       <img src="/images/icons8-people.gif" className='rounded-full w-8 h-8' alt="" />
-      </Link>
 
-   <Link to='/admin/user-group'>
       User Group
       </Link>
-      </div>
 
        </motion.li>
    </>
@@ -2539,39 +2715,52 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
 
         
 {seeSidebar ? (
- <li  className="flex items-center p-2 mt-6 text-white rounded-lg
+ <Link  to='/admin/invoice' className="flex items-center p-2 mt-6 text-white rounded-lg
              dark:text-white hover:cursor-pointer translate-y-[-1.4rem]
               dark:hover:bg-white dark:hover:text-black hover:bg-black  group">
            
            <ReceiptIcon/>
-               {!seeSidebar && <span className="flex-1 ms-3 whitespace-nowrap">Invoices</span>}
+               {!seeSidebar &&  <span className="flex-1
+                 ms-3 whitespace-nowrap">Invoices</span>
+               }
+         </Link>
 
-               <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                     <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
-                  </svg>
-            
-         </li>
-):  <li  className="flex items-center p-2 text-white rounded-lg
+
+):  <Link
+
+onClick={() => {
+   setIsExpanded7(false)
+
+
+                setIsExpanded3(false)
+          setIsExpanded5(false)
+          setIsExpanded4(false)
+          setIsExpanded2(false)
+          setIsExpanded1(false)
+          setIsExpanded6(false)
+           setIsExpanded(false)
+}}
+to='/admin/invoice'  className="flex items-center p-2 text-white rounded-lg
              dark:text-white hover:cursor-pointer translate-y-[-1.4rem]
               dark:hover:bg-white dark:hover:text-black
                hover:bg-black  group mt-10">
            
            <ReceiptIcon/>
-               {!seeSidebar && <span className="flex-1 ms-3
+               {!seeSidebar &&<span className="flex-1 ms-3
                
-               whitespace-nowrap ">Invoices</span>}
+               whitespace-nowrap ">Invoices</span> }
 
-               <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                     <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
-                  </svg>
             
-         </li>}
+            
+         </Link>}
         
          
 
 
+
 {seeSidebar ? (
-    <li
+    <Link
+    to='/admin/user-license'
     onMouseEnter={() => {
       setShowMenu10(true)
       setShowMenu11(false)
@@ -2598,21 +2787,74 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
              hover:bg-black'>
 
 
-            <Link  to='/admin/client-leads' className='flex ' >
-                  <FaHandshake className='w-6 h-6'/>
+          
+                  <TbLicense className='w-6 h-6'/>
                   {showMenu10 && <span 
                   onMouseLeave={()=> {
                     setShowMenu10(false)
                   }}
                   className="flex-1 ms-3 whitespace-nowrap bg-white rounded-lg *:
                   text-black px-2 py-[-2px]
-                  ">Leads</span>}
-            </Link>
-         </li>
+                  ">Plan</span>}
+         </Link>
 
 
-):   <li
 
+
+
+):   <Link
+
+to='/admin/user-license'
+         onClick={() => {
+           setIsExpanded7(false)
+
+
+                setIsExpanded3(false)
+          setIsExpanded5(false)
+          setIsExpanded4(false)
+          setIsExpanded2(false)
+          setIsExpanded1(false)
+          setIsExpanded6(false)
+           setIsExpanded(false)
+          if (window.innerWidth < 962) {
+            setSeeSideBar(true);
+            
+          }
+        }}
+         className='dark:hover:bg-white  p-2  flex items-center 
+             text-white rounded-lg dark:text-white   group dark:hover:text-black
+             
+             cuursor-pointer
+             hover:bg-black'>
+
+
+            
+                  <TbLicense className='w-6 h-6'/>
+                  {!seeSidebar && <span className="flex-1 ms-3 whitespace-nowrap">Plan</span>}
+         </Link>
+
+}
+
+
+
+
+{seeSidebar ? (
+    <Link
+    to='/admin/client-leads'
+    onMouseEnter={() => {
+      setShowMenu10(true)
+      setShowMenu11(false)
+      setShowMenu12(false)
+      setShowMenu9(false)
+      setShowMenu8(false)
+      setShowMenu7(false)
+      setShowMenu6(false)
+      setShowMenu5(false)
+      setShowMenu4(false)
+      setShowMenu3(false)
+      setShowMenu2(false)
+      setShowMenu1(false)
+    }}
          onClick={() => {
           if (window.innerWidth < 962) {
             setSeeSideBar(true);
@@ -2625,19 +2867,68 @@ className=' rounded-lg  space-x-2  text-white p-2 flex'>
              hover:bg-black'>
 
 
-            <Link  to='/admin/client-leads' className='flex ' >
+          
+                  <FaHandshake className='w-6 h-6'/>
+                  {showMenu10 && <span 
+                  onMouseLeave={()=> {
+                    setShowMenu10(false)
+                  }}
+                  className="flex-1 ms-3 whitespace-nowrap bg-white rounded-lg *:
+                  text-black px-2 py-[-2px]
+                  ">Leads</span>}
+         </Link>
+
+
+):   
+
+<Link
+to='/admin/client-leads'
+         onClick={() => {
+          if (window.innerWidth < 962) {
+            setSeeSideBar(true);
+          }
+ setIsExpanded7(false)
+
+
+                setIsExpanded3(false)
+          setIsExpanded5(false)
+          setIsExpanded4(false)
+          setIsExpanded2(false)
+          setIsExpanded1(false)
+          setIsExpanded6(false)
+           setIsExpanded(false)
+          
+        }}
+         className='dark:hover:bg-white  p-2  flex items-center 
+             text-white rounded-lg dark:text-white   group dark:hover:text-black
+             
+             cursor-pointer
+             hover:bg-black'>
+
+
+            
                   <FaHandshake className='w-6 h-6'/>
                   {!seeSidebar && <span className="flex-1 ms-3 whitespace-nowrap">Leads</span>}
-            </Link>
-         </li>
+         </Link>
 
 }
+
+
+
+
+
+
+
+
+
+
+
        
 
 {seeSidebar ? (
  
-  <li
-
+  <Link
+to='/admin/scheduler'
 onMouseEnter={() => {
       setShowMenu9(false)
       setShowMenu10(false)
@@ -2665,7 +2956,6 @@ onMouseEnter={() => {
              hover:bg-black'>
 
 
-            <Link  to='/admin/scheduler' className='flex ' >
                   <FaRegCalendarAlt  className='w-6 h-6'/>
                    {showMenu11 && <span 
                   onMouseLeave={()=> {
@@ -2674,9 +2964,66 @@ onMouseEnter={() => {
                   className="flex-1 ms-3 whitespace-nowrap bg-white rounded-lg *:
                   text-black px-2 py-[-2px]
                   ">Events</span>}
-            </Link>
-         </li>
-):  <li
+         </Link>
+
+
+
+):
+
+<Link
+to='/admin/scheduler'
+         onClick={() => {
+          if (window.innerWidth < 962) {
+            setSeeSideBar(true);
+          }
+           setIsExpanded7(false)
+
+
+                setIsExpanded3(false)
+          setIsExpanded5(false)
+          setIsExpanded4(false)
+          setIsExpanded2(false)
+          setIsExpanded1(false)
+          setIsExpanded6(false)
+           setIsExpanded(false)
+        }}
+         className='dark:hover:bg-white  p-2  flex items-center 
+             text-white rounded-lg dark:text-white   group dark:hover:text-black
+             
+             cuursor-pointer
+             hover:bg-black'>
+
+
+                  <FaRegCalendarAlt  className='w-6 h-6'/>
+                  {!seeSidebar && <span className="flex-1 ms-3 whitespace-nowrap">Scheduler</span>}
+         </Link>}
+ 
+
+
+
+
+
+
+
+{seeSidebar ? (
+ 
+  <Link
+to='/admin/prevent-ddos'
+onMouseEnter={() => {
+      setShowMenu9(false)
+      setShowMenu10(false)
+      setShowMenu11(true)
+      setShowMenu12(false)
+      setShowMenu9(false)
+      setShowMenu8(false)
+      setShowMenu7(false)
+      setShowMenu6(false)
+      setShowMenu5(false)
+      setShowMenu4(false)
+      setShowMenu3(false)
+      setShowMenu2(false)
+      setShowMenu1(false)
+    }}
          onClick={() => {
           if (window.innerWidth < 962) {
             setSeeSideBar(true);
@@ -2689,17 +3036,214 @@ onMouseEnter={() => {
              hover:bg-black'>
 
 
-            <Link  to='/admin/scheduler' className='flex ' >
-                  <FaRegCalendarAlt  className='w-6 h-6'/>
-                  {!seeSidebar && <span className="flex-1 ms-3 whitespace-nowrap">Scheduler</span>}
-            </Link>
-         </li>}
+                  <MdOutlineSecurity  className='w-6 h-6'/>
+                   {showMenu11 && <span 
+                  onMouseLeave={()=> {
+                    setShowMenu11(false)
+                  }}
+                  className="flex-1 ms-3 whitespace-nowrap bg-white rounded-lg *:
+                  text-black px-2 py-[-2px]
+                  ">DDOS</span>}
+         </Link>
+): 
+
+
+<Link
+to='/admin/prevent-ddos'
+         onClick={() => {
+          if (window.innerWidth < 962) {
+            setSeeSideBar(true);
+          }
+
+           setIsExpanded7(false)
+
+
+                setIsExpanded3(false)
+          setIsExpanded5(false)
+          setIsExpanded4(false)
+          setIsExpanded2(false)
+          setIsExpanded1(false)
+          setIsExpanded6(false)
+           setIsExpanded(false)
+        }}
+         className='dark:hover:bg-white  p-2  flex items-center 
+             text-white rounded-lg dark:text-white   group dark:hover:text-black
+             
+             cursor-pointer
+             hover:bg-black'>
+
+
+                  <MdOutlineSecurity  className='w-6 h-6'/>
+                  {!seeSidebar && <span className="flex-1 ms-3 whitespace-nowrap">DDOS</span>}
+         </Link>}
  
 
 
-{seeSidebar ? (
-<li
 
+
+
+{seeSidebar ? (
+ 
+  <Link
+  to='/admin/equipment'
+
+onMouseEnter={() => {
+      setShowMenu9(false)
+      setShowMenu10(false)
+      setShowMenu11(false)
+      setShowMenu12(false)
+      setShowMenu13(true)
+      setShowMenu9(false)
+      setShowMenu8(false)
+      setShowMenu7(false)
+      setShowMenu6(false)
+      setShowMenu5(false)
+      setShowMenu4(false)
+      setShowMenu3(false)
+      setShowMenu2(false)
+      setShowMenu1(false)
+    }}
+         onClick={() => {
+          if (window.innerWidth < 962) {
+            setSeeSideBar(true);
+          }
+        }}
+         className='dark:hover:bg-white  p-2  flex items-center 
+             text-white rounded-lg dark:text-white   group dark:hover:text-black
+             
+             cursor-pointer
+             hover:bg-black'>
+
+
+                  <MdDevices  className='w-6 h-6'/>
+                   {showMenu11 && <span 
+                  onMouseLeave={()=> {
+                    setShowMenu13(false)
+                  }}
+                  className="flex-1 ms-3 whitespace-nowrap bg-white rounded-lg *:
+                  text-black px-2 py-[-2px]
+                  ">Equipment</span>}
+         </Link>
+): 
+
+
+<Link
+to='/admin/equipment'
+         onClick={() => {
+          if (window.innerWidth < 962) {
+            setSeeSideBar(true);
+          }
+
+           setIsExpanded7(false)
+setIsExpanded9(false)
+
+                setIsExpanded3(false)
+          setIsExpanded5(false)
+          setIsExpanded4(false)
+          setIsExpanded2(false)
+          setIsExpanded1(false)
+          setIsExpanded6(false)
+           setIsExpanded(false)
+        }}
+         className='dark:hover:bg-white  p-2  flex items-center 
+             text-white rounded-lg dark:text-white   group dark:hover:text-black
+             
+             cursor-pointer
+             hover:bg-black'>
+
+
+                  <MdDevices  className='w-6 h-6'/>
+                  {!seeSidebar && <span className="flex-1 ms-3 whitespace-nowrap">Equipments</span>}
+         </Link>}
+
+
+
+
+
+
+
+
+
+
+{seeSidebar ? (
+ 
+  <Link
+  to='/admin/license'
+
+onMouseEnter={() => {
+      setShowMenu9(false)
+      setShowMenu10(false)
+      setShowMenu11(false)
+      setShowMenu12(false)
+      setShowMenu13(true)
+      setShowMenu9(false)
+      setShowMenu8(false)
+      setShowMenu7(false)
+      setShowMenu6(false)
+      setShowMenu5(false)
+      setShowMenu4(false)
+      setShowMenu3(false)
+      setShowMenu2(false)
+      setShowMenu1(false)
+    }}
+         onClick={() => {
+          if (window.innerWidth < 962) {
+            setSeeSideBar(true);
+          }
+        }}
+         className='dark:hover:bg-white  p-2  flex items-center 
+             text-white rounded-lg dark:text-white   group dark:hover:text-black
+             
+             cursor-pointer
+             hover:bg-black'>
+
+
+                  <GrLicense  className='w-6 h-6'/>
+                   {showMenu11 && <span 
+                  onMouseLeave={()=> {
+                    setShowMenu13(false)
+                  }}
+                  className="flex-1 ms-3 whitespace-nowrap bg-white rounded-lg *:
+                  text-black px-2 py-[-2px]
+                  ">License</span>}
+         </Link>
+): 
+
+
+<Link
+to='/admin/license'
+         onClick={() => {
+          
+          if (window.innerWidth < 962) {
+            setSeeSideBar(true);
+          }
+
+           setIsExpanded7(false)
+setIsExpanded9(false)
+
+                setIsExpanded3(false)
+          setIsExpanded5(false)
+          setIsExpanded4(false)
+          setIsExpanded2(false)
+          setIsExpanded1(false)
+          setIsExpanded6(false)
+           setIsExpanded(false)
+        }}
+         className='dark:hover:bg-white  p-2  flex items-center 
+             text-white rounded-lg dark:text-white   group dark:hover:text-black
+             
+             cursor-pointer
+             hover:bg-black'>
+
+
+                  <GrLicense  className='w-6 h-6'/>
+                  {!seeSidebar && <span className="flex-1 ms-3 whitespace-nowrap">License</span>}
+         </Link>}
+
+
+{seeSidebar ? (
+<Link
+to='/admin/settings'
 onMouseEnter={() => {
       setShowMenu9(false)
       setShowMenu10(false)
@@ -2722,7 +3266,6 @@ onMouseEnter={() => {
         }}
          className='dark:hover:bg-white  p-2  flex items-center 
              text-white rounded-lg dark:text-white   group dark:hover:text-black hover:bg-black'>
-            <Link  to='/admin/settings' >
                   <PermDataSettingIcon/>
                    {showMenu12 && <span 
                   onMouseLeave={()=> {
@@ -2731,21 +3274,35 @@ onMouseEnter={() => {
                   className="flex-1 ms-3 whitespace-nowrap bg-white rounded-lg *:
                   text-black px-2 py-[-2px]
                   ">Settings</span>}
-            </Link>
-         </li>
-): <li
+         </Link>
+
+
+):
+
+
+<Link
+to='/admin/settings'
          onClick={() => {
           if (window.innerWidth < 962) {
             setSeeSideBar(true);
           }
+
+           setIsExpanded7(false)
+
+
+                setIsExpanded3(false)
+          setIsExpanded5(false)
+          setIsExpanded4(false)
+          setIsExpanded2(false)
+          setIsExpanded1(false)
+          setIsExpanded6(false)
+           setIsExpanded(false)
         }}
          className='dark:hover:bg-white  p-2  flex items-center 
              text-white rounded-lg dark:text-white   group dark:hover:text-black hover:bg-black'>
-            <Link  to='/admin/settings' >
                   <PermDataSettingIcon/>
                   {!seeSidebar && <span className="flex-1 ms-3 whitespace-nowrap">Settings</span>}
-            </Link>
-         </li>}
+         </Link>}
          
       </ul>
    </div>

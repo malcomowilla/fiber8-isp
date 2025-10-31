@@ -23,6 +23,11 @@ import SmartphoneIcon from "@mui/icons-material/Smartphone";
 import { MdCancel } from "react-icons/md";
 
 
+import { FaLongArrowAltRight } from "react-icons/fa";
+import { FaPhoneVolume } from "react-icons/fa6";
+import { FaLongArrowAltLeft } from "react-icons/fa";
+
+
 
 
 
@@ -51,13 +56,13 @@ const {companySettings, setCompanySettings,
 
   hotspotName, setHotspotName,hotspotInfo, setHotspotInfo,
   hotspotBanner, setHotspotBanner,hotspotBannerPreview, setHotspotBannerPreview,email,
-  setEmail
+  setEmail,hotspotPhoneNumber, setHotspotPhoneNumber,hotspotEmail, setHotspotEmail
 } = useApplicationSettings()
 
  const {company_name, contact_info, email_info, logo_preview} = companySettings
 
  const {attractive, flat,
-  minimal, simple, clean, default_template, sleekspot,} = templateStates
+  minimal, simple, clean, default_template, sleekspot, pepea} = templateStates
 
   const [error, setError] = useState(false);
  const navigate = useNavigate();
@@ -68,7 +73,6 @@ const {companySettings, setCompanySettings,
  const selectedTemplate = location.state?.template;
 
 
- // Default template if none is selected
  const template = selectedTemplate || {
    background: 'bg-gradient-to-r from-blue-500 to-teal-500',
    iconColor: 'text-teal-200',
@@ -79,7 +83,6 @@ const {companySettings, setCompanySettings,
 const { vouchers } = voucher
 
 
-//  allow_get_hotspot_templates 
 
 
 
@@ -87,9 +90,7 @@ const { vouchers } = voucher
               
  const subdomain = window.location.hostname.split('.')[0]
 
-const onChangePhoneNumber = (e) => {
-  setPhoneNumber(e.target.value);
-}
+
 
  const makeHotspotPayment = async (e) => {
   e.preventDefault();
@@ -136,26 +137,16 @@ const onChangePhoneNumber = (e) => {
       if (response.ok) {
         console.log('hotspot settings fetched', newData);
         const { phone_number, hotspot_name, hotspot_info, hotspot_banner, email } = newData;
-        setPhoneNumber(phone_number);
+        setHotspotPhoneNumber(phone_number);
         setHotspotName(hotspot_name);
         setHotspotInfo(hotspot_info);
-        setEmail(email)
-        // setHotspotBanner(hotspot_banner);
-        // if (hotspot_banner) {
-        //   setHotspotBannerPreview(hotspot_banner); // Set preview URL if banner exists
-        // }
+        setHotspotEmail(email)
+       
       } else {
         console.log('failed to fetch hotspot settings');
       }
     } catch (error) {
-      // toast.error('internal server error while fetching hotspot settings', {
-      //   duration: 5000,
-      //   position: "top-right",
-      //   style: {
-      //     background: "#eb5757",
-      //     color: "#fff",
-      //   },
-      // });
+      
     }
   },
   [],
@@ -219,7 +210,7 @@ const newData = await response.json();
     if (response.ok) {
       
       const { attractive, flat,
-        minimal, simple, clean, default_template, sleekspot} = newData[0]
+        minimal, simple, clean, default_template, sleekspot, pepea} = newData[0]
 
      setTemplateStates({
        ...templateStates,
@@ -230,6 +221,7 @@ const newData = await response.json();
        minimal: minimal,
        simple: simple,
        clean: clean,
+       pepea: pepea,
      });
     } else {
       toast.error('failed to get hotspot templates settings', {
@@ -252,10 +244,73 @@ const queryParams = new URLSearchParams(window.location.search);
 
 const mac = queryParams.get('mac')
 const ip = queryParams.get('ip')
+const username = queryParams.get('username')
+
 
 const storedIp = localStorage.getItem('hotspot_mac')
 const storedMac = localStorage.getItem('hotspot_ip') 
 
+
+
+
+
+
+const voucherAutoLogin = useCallback(async () => {
+  try {
+    const sessionResponse = await fetch(`/api/check_session?username=${username} &mac=${mac} &ip=${ip}`);
+    const sessionData = await sessionResponse.json();
+
+    if (sessionResponse.ok && sessionData.session_active) {
+      const loginResponse = await fetch('/api/login_with_hotspot_voucher', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+        },
+        body: JSON.stringify({
+          voucher: sessionData.username,
+          stored_mac: storedMac,
+          stored_ip: storedIp,
+          mac: mac,
+          ip: sessionData.ip,
+        }),
+      });
+
+      const loginData = await loginResponse.json();
+
+      if (loginResponse.ok) {
+        setsuccess(true);
+        setLoading(false);
+
+        toast.success('Voucher verified successfully', {
+          duration: 3000,
+          position: 'top-right',
+        });
+
+        console.log('company settings fetched', loginData);
+      } else {
+        setLoading(false);
+        toast.error('Voucher login failed');
+        console.error('Login error:', loginData);
+      }
+    } else {
+      setLoading(false);
+      toast.error('No active session found');
+      navigate('/hotspot-page')
+    }
+  } catch (error) {
+    setLoading(false);
+    toast.error('An error occurred during auto login');
+    console.error('Auto login error:', error);
+  }
+}, []);
+
+
+
+useEffect(() => {
+  voucherAutoLogin() 
+  
+}, [voucherAutoLogin]);
 
 const [voucherError, setVoucherError] = useState('')
 const [seeVoucherError, setSeeVoucherError] = useState(false)
@@ -485,6 +540,269 @@ if (loading) {
     <>
 
 
+
+{pepea ? (
+  <>
+
+<Toaster />
+
+  {seePackages ? (
+    <div>
+<section className='bg-yellow-300 flex  flex-col justify-center'>
+
+<div>
+    <p className='text-center text-xl'>{hotspotName} </p>
+    <FaWifi className='text-yellow-500 w-[55px] h-[55px] mx-auto mb-4' />
+    <p className='text-center text-xl'>WIFI</p>
+    <p className='text-center'>IS AVAILABLE NOW</p>
+</div>
+
+<div className='flex flex-row gap-2 items-center justify-center'>
+     <div className="grid place-content-center bg-emerald-950 px-4 py-2 text-yellow-50">
+      <h1 className="max-w-2xl text-center text-xl leading-snug">
+        Wacha Stress Za Bundles Kuisha Jisort Na {" "}
+        <span className="relative">
+          {hotspotName}
+          <svg
+            viewBox="0 0 286 73"
+            fill="none"
+            className="absolute -left-2 -right-2 -top-2 bottom-0 translate-y-1"
+          >
+            <motion.path
+              initial={{ pathLength: 0 }}
+              whileInView={{ pathLength: 1 }}
+              transition={{
+                duration: 1.25,
+                ease: "easeInOut",
+              }}
+              d="M142.293 1C106.854 16.8908 6.08202 7.17705 1.23654 43.3756C-2.10604 68.3466 29.5633 73.2652 122.688 71.7518C215.814 70.2384 316.298 70.689 275.761 38.0785C230.14 1.37835 97.0503 24.4575 52.9384 1"
+              stroke="#FACC15"
+              strokeWidth="3"
+            />
+          </svg>
+        </span>{" "}
+      </h1>
+    </div>
+</div>
+
+
+<div className='flex flex-row gap-2 items-center justify-center mt-4'>
+<div className='grid grid-cols-3 gap-3 px-4 py-2 text-black rounded-lg'>
+
+
+
+
+ {packages.map((pkg, index) => (
+    <motion.div
+      key={index}
+      className="bg-white p-4 rounded-lg shadow-lg"
+      variants={packageVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <h3 className="text-xl font-bold text-gray-900">{pkg.name}</h3>
+      <p className="text-gray-600">Valid For {pkg.valid}</p>
+      <p className="text-black font-bold mt-2"> Price: {pkg.price} bob</p>
+      
+<button 
+  onClick={() => {
+
+
+          setHotspotPackage(pkg.name)
+          setPackageAmount(pkg.price)
+          setSeePackages(false);
+          setSeeForm(true);
+          setSeeInstructions(false);
+        }}
+className='bg-yellow-300 text-white rounded-lg px-4 py-2 font-bold flex gap-2'>
+    <p>Buy Plan </p>
+    <FaLongArrowAltRight />
+</button>
+      
+    </motion.div>
+  ))}
+</div>
+</div>
+
+{showVoucherError ? (
+ <div className="flex items-center p-4 mb-4 text-sm text-red-800
+ cursor-pointer f
+relative
+ rounded-lg bg-red-50
+  dark:bg-gray-800 dark:text-red-400" role="alert">
+  <svg className="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" 
+  fill="currentColor" viewBox="0 0 20 20">
+    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 
+    1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1
+     1 0 0 1 0 2Z"/>
+  </svg>
+  <div className='flex' onClick={() => setShowVoucherError(false)}>
+    <span className="font-bold text-lg">Danger alert! <span className='font-medium'>{voucherError || 'Voucher verification failed'}</span>
+      </span>   
+    <MdCancel className='text-black w-4 h-4 absolute right-0 '/>
+  </div>
+</div>
+): null}
+<div className='flex flex-col gap-2 items-center justify-center mt-4'>
+  <form onSubmit={loginWithVoucher}>
+   <input
+ onChange={(e) => handleChangeHotspotVoucher(e)}
+            value={vouchers}
+              name="vouchers"
+              className="  bg-gray-100 rounded-lg p-4 focus:outline-none"
+              placeholder="Enter your voucher code"
+            />
+
+              <div>
+                <p>please login to use the hotspot</p>
+              </div>
+            <button className='bg-yellow-400 text-white rounded-lg px-4 py-2 font-bold flex gap-2'>
+              <p>connect</p>
+            </button>
+            </form>
+
+</div>
+</section>
+
+
+
+
+
+<section className="bg-white shadow-lg rounded-xl p-6 max-w-md w-full border border-gray-100">
+  <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
+    How to Purchase
+  </h3>
+  
+  <ul className="space-y-3">
+    <li className="flex items-start">
+      <span className="bg-blue-100 text-yellow-600 rounded-full p-1 mr-3">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+      </span>
+      <span className="text-gray-700">Tap the package you want to purchase</span>
+    </li>
+    
+    <li className="flex items-start">
+      <span className="bg-blue-100 text-yellow-600 rounded-full p-1 mr-3">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+      </span>
+      <span className="text-gray-700">Enter Your Phone Number</span>
+    </li>
+    
+    <li className="flex items-start">
+      <span className="bg-blue-100 text-yellow-600 rounded-full p-1 mr-3">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+      </span>
+      <span className="text-gray-700">Click <strong className="text-yellow-600">Connect Now</strong></span>
+    </li>
+    
+    <li className="flex items-start">
+      <span className="bg-blue-100 text-yellow-600 rounded-full p-1 mr-3">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+      </span>
+      <span className="text-gray-700">Enter your Mobile PIN in the prompt and wait a few seconds to complete the process</span>
+    </li>
+  </ul>
+
+  <div className="mt-6 text-center">
+    <p className="text-sm text-gray-500">
+      Need help? <a href="#" className="text-yellow-600 hover:underline"><FaPhoneVolume /> 
+      Call us at <strong className="text-yellow-600">{hotspotPhoneNumber}</strong></a>
+    </p>
+  </div>
+</section>
+    </div>
+  ): null}
+    
+
+
+
+
+{seeForm ? (
+    <div className='bg-yellow-300 flex flex-col justify-center 
+    h-screen
+    items-center p-4 rounded-lg'>
+      <form onSubmit={makeHotspotPayment}>
+        <input
+value={phoneNumber}
+onChange={(e) => setPhoneNumber(e.target.value)}
+              // type="password"
+              className="  bg-gray-100 rounded-lg p-4 focus:outline-none"
+              placeholder="Enter your phone number"
+            />
+
+              
+            <button className='bg-yellow-400 text-white rounded-lg px-4 py-2 font-bold flex gap-2'>
+              <p>subscribe</p>
+            </button>
+            <FaLongArrowAltLeft className='w-7 h-7 cursor-pointer'
+            onClick={() => {
+                setSeeForm(false)
+                setSeePackages(true)
+            }}
+            />
+            </form>
+
+   {isloading && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mt-4 text-center text-gray-700 flex items-center"
+        >
+          <SmartphoneIcon className="mr-2" />
+          You will be prompted for M-Pesa PIN on your phone (STK).
+        </motion.div>
+      )}
+
+             {issuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mt-4 text-center text-green-600 flex items-center"
+        >
+          <CheckCircleIcon className="mr-2" />
+          Payment initiated successfully! Check your phone.
+        </motion.div>
+      )}
+
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mt-4 text-center text-red-600 flex items-center"
+        >
+          <ErrorIcon className="mr-2" />
+          Something went wrong. Please try again.
+        </motion.div>
+      )}
+    </div>
+): null}
+  </>
+): null}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {default_template ? (
 
 <>
@@ -538,10 +856,10 @@ text-white p-10 rounded-md cursor-pointer'  >
         </h3>
         <div className="mt-2 space-y-2">
           <p className="dotted-font font-thin text-gray-900 dark:text-white">
-              <span className='font-bold'>Email: </span> {email === null ? 'Not Available' : email}
+              <span className='font-bold'>Email: </span> {hotspotEmail === null ? 'Not Available' : hotspotEmail}
           </p>
           <p className="dotted-font font-thin text-gray-900 dark:text-white">
-            <span className='font-bold'>Phone Number: </span> {phoneNumber === null ? 'Not Available' : phoneNumber}
+            <span className='font-bold'>Phone Number: </span> {hotspotPhoneNumber === null ? 'Not Available' : hotspotPhoneNumber}
           </p>
         </div>
       </div>
@@ -565,7 +883,7 @@ text-white p-10 rounded-md cursor-pointer'  >
 <form onSubmit={makeHotspotPayment}>
 <motion.div
 className="max-w-md w-full bg-white rounded-xl shadow-lg p-6"
-variants={containerVariants}
+// variants={containerVariants}
 initial="hidden"
 animate="visible"
 >
@@ -665,6 +983,7 @@ focus:outline-none dotted-font font-thin"
           Something went wrong. Please try again.
         </motion.div>
       )}
+
     </motion.div>
 
 <div className='flex justify-center items-center cursor-pointer' onClick={()=>  {
@@ -675,12 +994,7 @@ setSeeInstructions(true)
 <TiArrowBackOutline className="mt-6 text-center w-8 h-8"/>
 
 </div>
-{/* 
-<div className="mt-6 text-center">
-<Link to="/terms" className="text-blue-500 hover:underline">
- Terms & Conditions
-</Link>
-</div> */}
+
 </motion.div>
 </form>
 
@@ -691,44 +1005,6 @@ setSeeInstructions(true)
 
 
 
-    {/* Packages Section */}
-
-{/*         
-{seePackages  ? (
-<motion.div className="max-w-md w-full mx-auto text-center">
-<h2 className="text-2xl  text-white mb-4 dotted-font font-thin">Choose Your Plan</h2>
-<div className="grid grid-cols-1 gap-6">
-{packages.map((pkg, index) => (
-  <motion.div
-    key={index}
-    className="bg-white p-4 rounded-lg shadow-lg"
-    variants={packageVariants}
-    initial="hidden"
-    animate="visible"
-  >
-    <h3 className="text-xl font-bold text-gray-900">{pkg.name}</h3>
-    <p className="text-gray-600">Speed: {pkg?.speed}</p>
-    <p className="text-gray-600">Valid For {pkg.valid}</p>
-    <p className="text-blue-500 font-bold mt-2"> Price: Ksh{pkg.price}</p>
-
-    <button onClick={()=> {
-      setSeePackages(false)
-      setSeeForm(true)
-      setSeeInstructions(false)
-    } } className='p-2 bg-blue-500 mt-2 rounded-md cursor-pointer
-    dotted-font font-thin
-    '>subscribe</button>
-
-  </motion.div>
-))}
-
-
-
-</div>
-
-
-</motion.div>
-) : null} */}
   
 
   {seePackages && (
@@ -746,7 +1022,6 @@ grid grid-cols-1 gap-6">
       animate="visible"
     >
       <h3 className="text-xl font-bold text-gray-900">{pkg.name}</h3>
-      {/* <p className="text-gray-600">Speed: {pkg?.speed}</p> */}
       <p className="text-gray-600">Valid For {pkg.valid}</p>
       <p className="text-blue-500 font-bold mt-2"> Price: Ksh{pkg.price}</p>
       <button
@@ -984,10 +1259,10 @@ relative
         </h3>
         <div className="mt-2 space-y-2">
           <p className="dotted-font font-thin text-gray-900 dark:text-white">
-              <span className='font-bold'>Email: </span> {email}
+              <span className='font-bold'>Email: </span> {hotspotEmail}
           </p>
           <p className="dotted-font font-thin text-gray-900 dark:text-white">
-            <span className='font-bold'>Phone Number: </span> {phoneNumber}
+            <span className='font-bold'>Phone Number: </span> {hotspotPhoneNumber}
           </p>
         </div>
       </div>
@@ -1124,10 +1399,10 @@ relative
         </h3>
         <div className="mt-2 space-y-2">
           <p className="dotted-font font-thin text-gray-900 dark:text-white">
-              <span className='font-bold'>Email: </span> {email}
+              <span className='font-bold'>Email: </span> {hotspotEmail}
           </p>
           <p className="dotted-font font-thin text-gray-900 dark:text-white">
-            <span className='font-bold'>Phone Number: </span> {phoneNumber}
+            <span className='font-bold'>Phone Number: </span> {hotspotPhoneNumber}
           </p>
         </div>
       </div>

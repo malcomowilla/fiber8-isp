@@ -50,40 +50,44 @@ const ModalImage = ({ isModalOpen, setIsModalOpen, previewImage, title }) => {
 
   return (
    
-     <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        closeAfterTransition
-          BackdropProps={{
-    invisible: true
-  }}
-        // slots={{ backdrop: Backdrop }}
-      slotProps={{
-    backdrop: {
-      timeout: 500,
-      style: {
-        backgroundColor: 'rgba(0,0,0,0.2)' // Lighter black
-      }
-    }
-  }}
-      >
-          <Box sx={style}>
-          <motion.div
-          className="bg-white p-6 rounded-lg shadow-lg relative flex flex-col"
-          style={{ height: '100%' }}
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.3, opacity: 0 }}
-          transition={{ duration: 0.2 }}
+    
+         
+          <AnimatePresence>
+      {isModalOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setIsModalOpen(false)}
+          className="bg-slate-900/20  p-2 fixed inset-0 z-50 
+          grid place-items-center overflow-y-scroll cursor-pointer"
         >
-          {/* Modal Header */}
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl text-gray-800">{title} Preview</h2>
+         
+         
+
+          {/* Modal Content - Scrollable Image Container */}
+          <div className="flex-1 overflow-auto rounded-lg bg-gray-100 p-2 
+          flex items-center justify-center relative ">
+
+          
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="max-w-full  max-h-[65vh] object-scale-down"
+              style={{ width: 'auto', height: 'auto' }}
+            />
+
+             
+          </div>
+
+<div className="flex justify-between items-center  absolute bottom-[550px]
+xl:bottom-[100px]
+lg:bottom-[400px] 
+ md:bottom-[400px]  ">
+            <h2 className="text-2xl text-white">{title} Preview</h2>
             <button
               onClick={() => setIsModalOpen(false)}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-white hover:text-gray-700"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -96,29 +100,18 @@ const ModalImage = ({ isModalOpen, setIsModalOpen, previewImage, title }) => {
               </svg>
             </button>
           </div>
-
-          {/* Modal Content - Scrollable Image Container */}
-          <div className="flex-1 overflow-auto rounded-lg bg-gray-100 p-4 flex items-center justify-center">
-            <img
-              src={previewImage}
-              alt="Preview"
-              className="max-w-full max-h-[65vh] object-scale-down"
-              style={{ width: 'auto', height: 'auto' }}
-            />
-          </div>
-
           {/* Modal Footer */}
-          <div className="mt-6 flex justify-end">
+          {/* <div className=" flex justify-end">
             <button
               onClick={() => setIsModalOpen(false)}
               className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300"
             >
               Close
             </button>
-          </div>
+          </div> */}
         </motion.div>
-            </Box>
-                </Modal>
+      )}
+    </AnimatePresence>
 
 
   );
