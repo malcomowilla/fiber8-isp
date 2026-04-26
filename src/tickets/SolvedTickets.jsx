@@ -100,7 +100,6 @@ const defaultOptions = {
 const handleChange = (e)=> {
 const {name,  value} = e.target
 setTicketForm((prev)=> ({...prev, [name]: value}))
-console.log('ticket form', ticketForm)
 } 
 
 
@@ -138,7 +137,6 @@ const fetchSubscribers = useCallback(
     setCustomers(newData)
 
   } else {
-    console.log('failed to fetch routers')
      if (response.status === 401) {
   toast.error(newData.error, {
     position: "top-center",
@@ -159,11 +157,10 @@ toast.error(
   }
   
   } catch (error) {
-    toast.error('Failed to get subscribers internal server error', {
+    toast.error('Failed to get subscribers, We’re having trouble completing this request', {
       position: 'top-center',
-      duration: 4000,
+      duration: 3000,
     })
-    console.log(error)
   
   }
   },
@@ -205,7 +202,6 @@ toast.error(
                      
                 if (response.ok) {
                   
-                  console.log('tickets created:', newData)
               setOpenLoad(false)
                   if (ticketForm.id) {
                     setloading(false)
@@ -238,7 +234,6 @@ toaster.success('Ticket created successfully!', {
               setloading(false)
                   }
                 } else {
-                  console.log('error')
                   setloading(false)
                   setIsOpen(false)
                   setOpenLoad(false)
@@ -263,7 +258,7 @@ toaster.error(newData.error, {
 }
 
 
-toaster.error('eror creating ticket', {
+toaster.error('error creating ticket', {
     position: "top-center",
     duration: 5000,
 })
@@ -284,10 +279,9 @@ toaster.error('eror creating ticket', {
                 }
               } catch (error) {
                 setSeeTicketError(true)
-                console.log(error)
                 toaster.error('error creating tickets', {
                     position: "top-center",
-                    duration: 5000,
+                    duration: 4000,
                 })  
                 setOpenLoad(false)
                 setloading(false)
@@ -328,12 +322,11 @@ toaster.error('eror creating ticket', {
                       setTicket(newData.filter((my_ticket)=> {
                         return search.toLowerCase() === '' ? my_ticket.status === 'Resolved' : my_ticket.ticket_number.toLowerCase().includes(search)
                       }))
-                      console.log('ticket data', newData)
                     } else {
                        if (response.status === 401) {
-  toast.error(newData.error, {
+  toast.error('failed to search ticket', {
     position: "top-center",
-    duration: 4000,
+    duration: 3000,
   })
    setTimeout(() => {
           // navigate('/license-expired')
@@ -345,16 +338,14 @@ toaster.error('eror creating ticket', {
                         position: 'top-right',
                         duration: 5000,
                       })
-                      console.log('error')
               
                     }
                   } catch (error) {
                     setIsSearching(false)
-                    toaster.error('Failed to Search Ticket server error', {
+                    toaster.error('Failed to Search Ticket, We’re having trouble completing this request', {
                         position: 'top-right',
                         duration: 4000,
                       })
-                    console.log(error)
               
                   }
                 },
@@ -393,7 +384,6 @@ toaster.error('eror creating ticket', {
                     position: 'top-right',
                     duration: 4000,
                   })
-                  console.log('failed to delete')
                   setloading(false)
                   setisOpenDelete(false)
                 }
@@ -402,7 +392,6 @@ toaster.error('eror creating ticket', {
                     position: 'top-right',
                     duration: 4000,
                   })
-                  console.log(error)
                   setisOpenDelete(false)
                   setloading(false)
                   
@@ -412,7 +401,6 @@ toaster.error('eror creating ticket', {
               
 
 
-              console.log('my customer', customers)
 
         const handleAddButton = ()=> {
           // setIsOpen(true)
@@ -423,7 +411,6 @@ toaster.error('eror creating ticket', {
 
         const handleRowClick = (event, rowData)=> {
           const customerData = customers.find(my_customer => my_customer.name === rowData.customer);
-          console.log(' row data', rowData) 
   // setPhone(customerData.phone_number)
     setPhone(rowData.phone_number)
 

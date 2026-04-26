@@ -163,7 +163,6 @@ const handleUserRoleFormDataChange = (role, event) => {
         newPermission[role].read = false;
       }
     }
-console.log('newpermision role read', newPermission[role].read)
     setUserPermisions((prevUserPermissions) => ({
       ...prevUserPermissions,
       can_manage_subscriber: newPermission.subscriber.readWrite,
@@ -258,10 +257,8 @@ const [userRoles, setUserRoles] = useState([])
           setUserRoles(newData)
          
         } else {
-          console.error(newData)
         }
       } catch (error) {
-        console.log(error)
       }
     },
     [],
@@ -333,6 +330,7 @@ const [userRoles, setUserRoles] = useState([])
                     <div className="space-y-2">
                       <TextField
                         fullWidth
+                        className='myTextField'
                         label="Your Name"
                         variant="outlined"
                         name="username"
@@ -347,6 +345,7 @@ const [userRoles, setUserRoles] = useState([])
                       <TextField
                         fullWidth
                         label="Your Phone"
+                        className='myTextField'
                         variant="outlined"
                         name="phone_number"
                         value={userPermisions.phone_number}
@@ -359,6 +358,7 @@ const [userRoles, setUserRoles] = useState([])
                         fullWidth
                         label="Email"
                         variant="outlined"
+                        className='myTextField'
                         name="email"
                         value={userPermisions.email}
                         onChange={handleUserDetailsFormDataChange}
@@ -373,7 +373,14 @@ const [userRoles, setUserRoles] = useState([])
 
                     <div className="space-y-2 md:col-span-2">
                       <Autocomplete
-                        value={userRoles.find(permission => permission.name === userPermisions.role)}
+                        // value={userRoles.find(permission => permission.name === userPermisions.role || 'super_administrator')}
+                        value={
+  userRoles.find(
+    permission =>
+      permission.name === (userPermisions.role || 'super_administrator')
+  )
+}
+
                         options={userRoles}
                         getOptionLabel={(option) => option.name}
                         onChange={(event, newValue) => {
@@ -384,6 +391,7 @@ const [userRoles, setUserRoles] = useState([])
                         }}
                         renderInput={(params) => (
                           <TextField
+                          className='myTextField'
                             {...params}
                             label="Select User Role"
                             variant="outlined"

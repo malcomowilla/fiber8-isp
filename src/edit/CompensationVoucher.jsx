@@ -10,11 +10,16 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import dayjs from "dayjs";
+import Box from "@mui/material/Box";
+
 import TextField from '@mui/material/TextField';
 import { FaSave, FaPaperPlane } from "react-icons/fa"; // Import icons
 import { motion } from "framer-motion";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa"; // Import user icon
+import { LuCalendar1 } from "react-icons/lu";
+import Autocomplete from '@mui/material/Autocomplete';
+
 
 
 
@@ -31,7 +36,6 @@ function CompensationVoucher({ open, handleClose,voucherForm, handleChangeVouche
   const [newDate, setNewDate] = React.useState(null);
   const [pppoePackages, setPppoePackages] = useState([]); // State to store PPPoE packages
 
-
   const [isSave, setIsSave] = useState(true);
 
   // Toggle between "Save" and "Send" every 5 seconds
@@ -46,6 +50,8 @@ function CompensationVoucher({ open, handleClose,voucherForm, handleChangeVouche
 
   const subdomain = window.location.hostname.split('.')[0]
 
+const options=['days', 'hours', 'minutes']
+const [validity_period_units, setValidity_period_units] = useState(options[2])
 
 
   const fetchPppoePackages =useCallback(
@@ -99,7 +105,7 @@ function CompensationVoucher({ open, handleClose,voucherForm, handleChangeVouche
       <Dialog fullWidth={fullWidth} maxWidth={maxWidth} open={open} onClose={handleClose}>
       <form onSubmit={createVoucher}>
 
-        <DialogTitle>Compensation Voucher</DialogTitle>
+        <DialogTitle>Compensate Vouchers</DialogTitle>
 
 
         <DialogContent>
@@ -147,29 +153,54 @@ function CompensationVoucher({ open, handleClose,voucherForm, handleChangeVouche
                 ))}
               </Select>
 
-              {/* <TextField
-              name='phone'
-               value={voucherForm.phone}
-              onChange={(e)=> setVoucherForm({...voucherForm, phone: e.target.value})}
-              // type='number'
-              className='myTextField' 
-              sx={{
-            mt:2
-              }}
-              label='Phone Number'  fullWidth /> */}
+             
             </FormControl>
           </div>
 
-          <div className="flex gap-3 mt-4">
-              <TextField
-                label="Shared Users"
-                value={voucherForm.shared_users}
-                name='shared_users'
-                onChange={(e)=> setVoucherForm({...voucherForm, shared_users: e.target.value})}
-                id="shared_users"
+
+<div className='flex'>
+   <Box
                 sx={{
+                  "& > :not(style)": { m: 1, width: "80ch" },
+                }}
+              >
+                <TextField
+                  label="Compensate Duration"
+                  sx={{
+                    "& label.Mui-focused": {
+                      color: "black",
+                      fontSize: "16px",
+                    },
+                    "& .MuiOutlinedInput-root": {
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "black",
+                        borderWidth: "3px",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "black",
+                      },
+                    },
+                  }}
+                  className="myTextField"
+                  id="validity"
+                  // value={validity}
+                  InputProps={{
+                    startAdornment: <LuCalendar1 className="mr-2" />,
+                  }}
+                  // onChange={handleChangeHotspotPackage}
+                  placeholder="validity-period..."
+                  type="number"
+                ></TextField>
+              </Box>
+
+
+
+               <FormControl
+                sx={{
+                  "& > :not(style)": { m: 1, width: "50ch" },
                   "& label.Mui-focused": {
                     color: "black",
+                    fontSize: "16px",
                   },
                   "& .MuiOutlinedInput-root": {
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
@@ -181,17 +212,33 @@ function CompensationVoucher({ open, handleClose,voucherForm, handleChangeVouche
                     },
                   },
                 }}
-                className="myTextField"
-                type="number"
-                placeholder="Number of shared users..."
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <FaUsers className="mr-2 text-gray-500" /> // Add user icon
-                  ),
-                }}
-              ></TextField>
-            </div>
+              >
+               
+               <Autocomplete
+               className='myTextField'
+  id="validity_period_units"
+  options={options}
+  value={validity_period_units}
+  // onChange={(event, newValue) => {
+  //   setHotspotPackage({
+  //     ...hotspotPackage,
+  //     validity_period_units: newValue,
+  //   });
+  // }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Compensate Duration Units"
+      variant="outlined"
+    />
+  )}
+  sx={{ width: '100%' }}
+/>
+              </FormControl>
+
+</div>
+
+         
         </DialogContent>
         <DialogActions>
           <button

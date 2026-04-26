@@ -2,9 +2,27 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import EditIcon from '@mui/icons-material/Edit';
 
-import { IconButton } from '@mui/material';
+import { IconButton, Typography,
+  Box,
+  Button, 
+  Divider, 
+   Card,
+  CardContent,
+  Grid, } from '@mui/material';
+  import {
+  Payment as PaymentIcon,
+  Description as DescriptionIcon,
+  LocationOn as LocationIcon,
+  Assignment as AssignmentIcon,
+  Search as SearchIcon,
+  FilterList as FilterIcon,
+  Save as SaveIcon,
+  Close as CloseIcon,
+  CheckCircle as CheckCircleIcon,
+  Cancel as CancelIcon
+} from '@mui/icons-material';
 import GetAppIcon from '@mui/icons-material/GetApp';
-import {  useState} from 'react'
+import {  useState, useCallback} from 'react'
 import LoadingAnimation from '../loader/loading_animation.json'
 import Lottie from 'react-lottie';
 
@@ -52,11 +70,15 @@ const [hotspotPackage, setHotspotPackage] = useState({
   shared_users: '',
   download_burst_limit: '',
   validity_period_units: '',
-  weekdays: [] // <-- Add weekdays array
+  weekdays: [] ,
+  location: ''
 
 })
 
 const [editing, setEditing] = useState(false);
+        const [nodes, setNodes] = useState([])
+
+
 // const navigate = useNavigate()
 
 const handleWeekdayChange = (day) => {
@@ -122,19 +144,20 @@ const columns = [
     //  },
      
 
-  {title: 'Speed(Up/Down)', field: 'speed',   defaultSort: 'asc',
+  {title: 'Speed(Up/Down)', field: 'package_speed',   defaultSort: 'asc',
 
 
     render: (rowData) => 
       <>
-        {rowData.speed === null ||  rowData.speed === 'null' || rowData.speed === '' 
+        {rowData.package_speed === null ||  rowData.package_speed === 'null' || rowData.package_speed === '' 
           ? <p>unlimited </p>
-          : rowData.speed }
+          : rowData.package_speed }
       </>
    },
 
   // {title: 'Validity', field: 'Validity', type: 'numeric',  align: 'right'},
   {title: 'validity', field: 'valid', },
+  {title: 'Assigned Location', field: 'location'  },
   {title: 'Action', field:'Action', align: 'right',
 
   render: (params) =>  
@@ -185,6 +208,40 @@ setHotspotPackage({
 };
 
 const subdomain = window.location.hostname.split('.')[0]
+
+
+
+
+
+
+ const getNodes = useCallback(
+    async() => {
+     
+      
+      try {
+        const response = await fetch('/api/nodes', {
+          headers: { 'X-Subdomain': subdomain },
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setNodes(data)
+          
+        } else {
+
+        }
+      } catch (error) {
+        
+      }
+    },
+    [],
+  )
+  
+
+  useEffect(() => {
+    getNodes()
+   
+  }, [getNodes]);
+
 
 useEffect(() => {
   
@@ -390,23 +447,19 @@ const deleteHotspotPackage = async (id) => {
       setisOpenDelete(false)
       setPackages((tableData)=> tableData.filter(item => item.id !== id))
     toast.success('package deleted successfully', {
-            duration: 7000,
+            duration: 5000,
             position: "top-center",
           });
     
     } else {
       setisOpenDelete(false)
       toast.error('failed to delete package', {
-            duration: 7000,
+            duration: 5000,
             position: "top-center",
           });
 
 
-          toast.error('failed to delete package', {
-            duration: 7000,
-            position: "top-center",
-          });
-      console.log('failed to delete')
+         
     
     
     }
@@ -431,7 +484,7 @@ const deleteHotspotPackage = async (id) => {
     handleChangeTimeFrom={handleChangeTimeFrom} handleChangeTimeUntil={handleChangeTimeUntil}
     loading={loading} hotspotPackage={hotspotPackage} setHotspotPackage={setHotspotPackage}
     createHotspotPackage={createHotspotPackage}
-    handleWeekdayChange={handleWeekdayChange}
+    handleWeekdayChange={handleWeekdayChange} nodes={nodes} setNodes={setNodes}
     editing={editing}
     />
 
@@ -449,11 +502,22 @@ const deleteHotspotPackage = async (id) => {
             
           
 
-
+<Grid item xs={12} sm={6} md={3}>
+          <Card elevation={2}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <LocationIcon color="success" sx={{ mr: 1 }} />
+                <Typography variant="h6">{nodes.length}</Typography>
+              </Box>
+              <Typography variant="body2" color="textSecondary">
+                Total Locations
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
 
     <div className="flex items-center max-w-sm mx-auto p-3">  
      
-     <label htmlFor="simple-search" className="sr-only">Search</label>
      <div className="relative w-full">
          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
              {/* <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"

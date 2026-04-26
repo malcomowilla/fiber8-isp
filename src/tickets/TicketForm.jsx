@@ -27,7 +27,9 @@ import {
   ListItemText,
   ListItemIcon,
   Snackbar,
-  Alert
+  Alert,
+    InputAdornment
+
 } from '@mui/material';
 import {
   Phone as PhoneIcon,
@@ -44,6 +46,15 @@ import {
 } from '@mui/icons-material';
 import toast, { Toaster } from 'react-hot-toast';
 import Autocomplete from '@mui/material/Autocomplete';
+import { LuMessageSquareText } from "react-icons/lu";
+import { 
+   RefreshCw,
+  BarChart3, TrendingDown, Download, Upload
+} from 'lucide-react';
+
+
+
+
 
 
 const TicketForm = ({
@@ -68,6 +79,7 @@ const TicketForm = ({
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const [loadSendingTicket, setLoadSendingTicket] = useState(false) 
 //   const { settings, borderRadiusClasses } = useLayoutSettings();
 
 
@@ -144,6 +156,62 @@ const TicketForm = ({
     };
     // return radiusMap[borderRadiusClasses[settings.borderRadius]] || '0px';
   }
+
+const subdomain = window.location.hostname.split('.')[0];
+
+  const sendTicket = async (e) => {
+// e.preventDefault()
+setLoadSendingTicket(true)
+
+
+    try {
+      const response = await fetch('/api/send_ticket', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain
+        },
+        body: JSON.stringify({
+          support_ticket: {
+            agent: agent,
+            ticket_number: ticketNo,
+            ticket_category: ticket_category,
+            agent_review: agent_review,
+            customer_name: customer_name,
+          }
+        })
+
+        
+      })
+
+      if (response.ok) {
+      
+        toast.success('Ticket sent successfully to agent', {
+          position: "top-center",
+          duration: 4000, 
+
+            })  
+            setLoadSendingTicket(false)
+      }else{
+        toast.error('Failed to send ticket', {  
+          position: "top-center",
+          duration: 4000,
+
+        })
+        setLoadSendingTicket(false)
+      }
+    } catch (error) {
+      toast.error('Failed to send ticket servere error', {  
+          position: "top-center",
+          duration: 4000,
+          
+        })
+        setLoadSendingTicket(false)
+    }
+  }
+
+
+
 
   return (
 
@@ -248,7 +316,7 @@ const TicketForm = ({
               {issue_description}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              Last updated: {updatedDate}
+             <div className='flex gap-2'> Last updated: <p className='font-bold'>{updatedDate} </p> </div>
             </Typography>
           </Paper>
 
@@ -426,86 +494,43 @@ const TicketForm = ({
 
             <ListItem>
               <FormControl fullWidth>
-               <Autocomplete
-  options={agentRole.filter(Boolean)}
-  getOptionLabel={(option) => option.name}
-  value={agentRole.find(a => a.name === agent) || null}
-  onChange={(event, newValue) => {
-    handleChange({
-      target: {
-        name: "agent",
-        value: newValue?.name || ""
-      }
-    });
-  }}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="Assign Agent"
-      className='myTextField'
-      sx={{
-        width: '100%',
-        '& .MuiOutlinedInput-notchedOutline': {
-          borderColor: 'black',
-          transition: 'border-color 0.2s ease-in-out'
-        },
-        '&:hover .MuiOutlinedInput-notchedOutline': {
-          borderColor: 'black !important',
-          borderWidth: '2px'
-        },
-        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-          borderColor: 'black !important',
-          borderWidth: '2px'
-        },
-        '& .MuiInputBase-input': {
-          color: '#333'
-        }
-      }}
-    />
-  )}
-  renderOption={(props, option) => (
-    <MenuItem 
-      {...props}
-      sx={{
-        '&:hover': {
-          backgroundColor: 'rgba(0, 128, 0, 0.08)'
-        },
-        '&.Mui-selected': {
-          backgroundColor: 'rgba(0, 128, 0, 0.16)',
-          '&:hover': {
-            backgroundColor: 'rgba(0, 128, 0, 0.24)'
-          }
-        }
-      }}
-    >
-      <ListItemIcon>
-        <AgentIcon />
-      </ListItemIcon>
-      <ListItemText primary={option.name} />
-    </MenuItem>
-  )}
-  PaperComponent={(props) => (
-    <Paper 
-      {...props}
-      sx={{
-        '& .MuiMenuItem-root': {
-          '&:hover': {
-            backgroundColor: 'rgba(0, 128, 0, 0.08)'
-          },
-          '&.Mui-selected': {
-            backgroundColor: 'rgba(0, 128, 0, 0.16)',
-            '&:hover': {
-              backgroundColor: 'rgba(0, 128, 0, 0.24)'
-            }
-          }
-        }
-      }}
-    />
-  )}
-  isOptionEqualToValue={(option, value) => option.name === value?.name}
-  disableClearable={true}
-  fullWidth
-/>
+              
+                 <Autocomplete
+                  options={agentRole.filter(Boolean)}
+                  getOptionLabel={(option) => option.username}
+                  value={agentRole.find(a => a.username === agent) || null}
+                  renderOption={(props, option) => (
+                    <Box component="li" {...props}>
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Avatar sx={{ bgcolor: 'primary.main' }}>
+                          {option.username.charAt(0)}
+                        </Avatar>
+                        <Typography>{option.username}</Typography>
+                      </Stack>
+                    </Box>
+                  )}
+                  renderInput={(params) => (
+                    <TextField
+                    className='myTextField'
+                      {...params}
+                      label="Assign Agent"
+                      InputProps={{
+                        ...params.InputProps,
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <AgentIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  )}
+                  onChange={(event, newValue) => {
+                    setTicketForm((prev) => ({
+                      ...prev,
+                      agent: newValue?.username || ''
+                    }));
+                  }}
+                />
               </FormControl>
             </ListItem>
 
@@ -690,10 +715,14 @@ const TicketForm = ({
                 },
               }}
               variant="outlined"
-              startIcon={<NoteIcon />}
-              onClick={() => setActiveNote(!activeNote)}
+              startIcon={<LuMessageSquareText />}
+              onClick={() => {
+                sendTicket()
+                // handleClose()
+              }}
             >
-              Add Note
+            {loadSendingTicket ? <RefreshCw className='animate-spin
+             text-white w-5 h-5 mx-auto ' /> : <p>Send Ticket To Agent </p>}
             </Button>
             <Button
             sx={{

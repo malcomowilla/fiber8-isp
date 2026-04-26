@@ -44,7 +44,9 @@ const PREDEFINED_PPPOE_PLANS = [
 ];
 
 const PREDEFINED_HOTSPOT_PLANS = [
-  { name: "Starter", hotspot_subscribers: 50, price: 1500,  expiry_days: 30 },
+  { name: "Starter", hotspot_subscribers: 50, price: 1000,  expiry_days: 30 },
+    { name: "Improved", hotspot_subscribers: 100, price: 1500,  expiry_days: 30 },
+
   { name: "Pro", hotspot_subscribers: 200, price: 2500,  expiry_days: 30 },
   { name: "Gold Hotspot", hotspot_subscribers: 1000, price: 5000 ,  expiry_days: 30 },
   { name: "Business", hotspot_subscribers: 2000, price: 10000,  expiry_days: 30 },
@@ -113,7 +115,7 @@ const subdomain = window.location.hostname.split('.')[0]
     setSelectedPlan(null);
   };
 
-  console.log('selected plan', selectedPlan)
+  // console.log('selected plan', selectedPlan)
   const plans = planType === 'pppoe' ? PREDEFINED_PPPOE_PLANS : PREDEFINED_HOTSPOT_PLANS;
 
   return (

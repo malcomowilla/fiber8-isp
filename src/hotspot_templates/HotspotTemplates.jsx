@@ -10,6 +10,8 @@ import Backdrop from '../backdrop/Backdrop'
 
 
 
+
+
 const HotspotTemplates = () => {
   const navigate = useNavigate();
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -42,7 +44,6 @@ const [isloading, setisloading] = useState(false)
   // Handle template selection
   const handleTemplateSelect = (template) => {
     setSelectedTemplate(template);
-    console.log('template', template);
     navigate('/hotspot-page', { state: { template } });
   };
 
@@ -51,8 +52,7 @@ const [isloading, setisloading] = useState(false)
     const { checked, value } = event.target;
     setTemplateStates(event.target.checked);
     // console.log('templatename', templateStates[templateName]);
-    console.log('checkbox', event.target.checked);
-    console.log('checkbox target', event.target);
+    
 
     // const templateName = event.target.value;
     if (value === 'default_template' && checked) {
@@ -69,6 +69,8 @@ const [isloading, setisloading] = useState(false)
         simple: false,
         clean: false,
         pepea: false,
+        premium: false,
+
         
       });
       
@@ -83,6 +85,7 @@ const [isloading, setisloading] = useState(false)
         simple: false,
         clean: false,
         pepea: false,
+        premium: false,
       });
     }else if(value === 'attractive' && checked){
       setTemplateStates({
@@ -95,6 +98,7 @@ const [isloading, setisloading] = useState(false)
         simple: false,
         clean: false,
         pepea: false,
+        premium: false,
       });
     }
 
@@ -110,6 +114,23 @@ const [isloading, setisloading] = useState(false)
         minimal: false,
         simple: false,
         clean: false,
+        premium: false,
+      });
+    }
+
+
+    else if(value === 'premium' && checked){
+      setTemplateStates({
+        ...templateStates,
+        sleekspot: false,
+        pepea: false,
+        default_template: false,
+        attractive: false,
+        flat: false,
+        minimal: false,
+        simple: false,
+        clean: false,
+        premium: true,
       });
     }
   };
@@ -121,13 +142,22 @@ const [isloading, setisloading] = useState(false)
 
 
   const imageTemplates = [
-    { id: 1, name: 'default_template', image: '/images/template_image/default.png' },
-    { id: 2, name: 'sleekspot', image: '/images/template_image/sleek.png'
+    { id: 1, name: 'default_template',
+      //  image: '/images/template_image/default.png'
+      
+       },
+    { id: 2, name: 'sleekspot', 
+      image: '/images/template_image/sleek.png'
      },
-    { id: 3, name: 'attractive', image: '/images/template_image/attractive.png' },
+    { id: 3, name: 'attractive', 
+      
+      image: '/images/template_image/Attractive.png'
+    
+    },
             {id: 8, name: 'pepea', image: '/images/template_image/pepea.png'},
 
-    { id: 4, name: 'flat', image: '/images/template_image/flat.png' },
+    { id: 8, name: 'flat', image: '/images/template_image/flat.png' },
+     { id: 4, name: 'premium', image: '/images/template_image/premium.png' },
 
     { id: 5, name: 'minimal', image: '/images/template_image/minimal.png' },
     { id: 6, name: 'simple', image: '/images/template_image/simple.png' },
@@ -159,9 +189,9 @@ e.preventDefault()
 
       if (response.ok) {
 
-        setTimeout(() => {
-          navigate('/hotspot-page');
-        }, 2000);
+        // setTimeout(() => {
+        //   navigate('/hotspot-page');
+        // }, 2000);
         toast.success('Hotspot Templates Saved Successfully', {
           duration: 3000,
           position: 'top-right',
@@ -177,7 +207,7 @@ setOpen(false)
 setOpenSettings(true)
 
         const { attractive, flat,
-           minimal, simple, clean, default_template, sleekspot, pepea} = newData
+           minimal, simple, clean, default_template, sleekspot, pepea, premium} = newData
 
         setTemplateStates({
           ...templateStates,
@@ -189,6 +219,7 @@ setOpenSettings(true)
           simple: simple,
           clean: clean,
           pepea: pepea,
+          premium: premium,
         });
           
       } else {
@@ -217,7 +248,6 @@ setOpenSettings(false)
     }
   }
 
-  console.log('default', templateStates.default_template)
 
 
   const getHotspotTemplates = useCallback(
@@ -235,7 +265,7 @@ const newData = await response.json();
       if (response.ok) {
         
         const { attractive, flat,
-          minimal, simple, clean, default_template, sleekspot, pepea} = newData[0]
+          minimal, simple, clean, default_template, sleekspot, pepea, premium} = newData[0]
 
        setTemplateStates({
          ...templateStates,
@@ -247,6 +277,7 @@ const newData = await response.json();
          simple: simple,
          clean: clean,
          pepea: pepea,
+         premium: premium,
        });
       } else {
         toast.error('failed to get hotspot templates settings', {

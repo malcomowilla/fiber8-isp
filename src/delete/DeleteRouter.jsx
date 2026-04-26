@@ -43,32 +43,6 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   return (
     <React.Fragment>
      
-      {/* <Dialog
-        fullWidth={fullWidth}
-        maxWidth={maxWidth}
-        open={openDelete}
-        onClose={handleCloseDelete}
-      >
-        <DialogTitle sx={{
-            fontWeight: 'bold'
-        }}>Delete Package</DialogTitle>
-        <DialogContent>
-         
-        <p className='font-mono'>Are you sure want to delete this router</p>
-        </DialogContent>
-        <DialogActions>
-        <Stack direction={{ xs: 'column', sm: 'row'}}  spacing={{xs: 1, sm: 2, md: 4}}>
-
-          <Button onClick={handleCloseDelete} color='error'>Cancel</Button>
-          <Button onClick={handleDelete} variant='outlined' startIcon={<CloseIcon/>}   color='error'>Delete</Button>
-          </Stack>
-
-        </DialogActions>
-      </Dialog> */}
-
-
-
-
 <Dialog
         fullScreen={fullScreen}
         open={openDelete}

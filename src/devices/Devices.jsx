@@ -21,6 +21,11 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import { CircularProgress } from '@mui/material';
+import { Construction, Code, Rocket, Clock } from 'lucide-react';
+import { CiCircleInfo } from "react-icons/ci";
+import { FaLocationDot } from "react-icons/fa6";
+
+
 
 const Devices = () => {
   const theme = useTheme();
@@ -42,15 +47,14 @@ const Devices = () => {
       const newData = await response.json();
       if (response.ok) {
         setOnus(newData);
-        console.log('devices fetched', newData);
       } else {
-        console.log('failed to fetch devices');
       }
     } catch (error) {
-      console.error('Error fetching devices:', error);
     }
   }, [subdomain]);
 
+
+  
   useEffect(() => {
     getDevices();
   }, [getDevices]);
@@ -128,6 +132,22 @@ const Devices = () => {
       render: rowData => (
         <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
           {rowData.ipAddress}
+        </Typography>
+      )
+    },
+
+
+    {
+
+      title: 'Location',
+      field: 'location',
+      render: rowData => (
+        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+          {rowData.location && <FaLocationDot className='text-black w-5 h-5 dark:text-white
+         
+        '/>}
+         
+          {rowData.location}
         </Typography>
       )
     },
@@ -223,28 +243,62 @@ const Devices = () => {
       <Toaster />
       
     
-
-      {/* Material Table with proper title */}
+      <div className="flex flex-col items-center justify-center"> 
+        <div className="text-6xl">🚧</div> <h1 className="text-2xl 
+        font-bold mt-4">Under Development</h1> <p className="text-gray-500">This
+         
+        feature is still in development, You Can Experiment With It, But remember still in development</p> </div>
       <p className='bg-gradient-to-r from-green-600 via-blue-400
-         to-cyan-500 bg-clip-text text-transparent font-bold text-3xl inline-block'>Device Management </p>
+         to-cyan-500 bg-clip-text text-transparent font-bold text-3xl inline-block'> TR069 Device Management </p>
+
+         <div role="alert" className="alert alert-info bg-green-500
+          rounded-lg w-fit
+          p-2 flex items-center gap-2 justify-center mb-3">
+ <CiCircleInfo className='text-white text-xl '/>
+  <span className='text-white'>The only vendor we support for now is huawei.</span>
+</div>
+
       <MaterialTable
-        title={<p className='bg-gradient-to-r from-green-600 via-blue-400
-         to-cyan-500 bg-clip-text text-transparent font-bold text-3xl'>Device Management </p>}
+      title=""
+        // title={<p className='bg-gradient-to-r from-green-600 via-blue-400
+        //  to-cyan-500 bg-clip-text text-transparent font-bold text-3xl'>TR069 
+        //  Device
+        //   Management </p>}
         columns={columns}
         data={onus}
-       options={{
-          search: true,
-          actionsColumnIndex: -1,
-          pageSize: 5,
-          pageSizeOptions: [5, 10, 20],
-          showTitle: false,
-          toolbar: true,
-          // emptyRowsWhenPaging: false,
-          // headerStyle: {
-          //   backgroundColor: '#f5f5f5',
-          //   fontWeight: 'bold'
-          // }
-        }}
+      
+localization={{
+                body: {
+                  emptyDataSourceMessage: 'No devices found. Create your first device to get started!'
+                },
+               
+              
+              
+              }}
+
+
+options={{
+  sorting: true,
+  actionsColumnIndex: -1,
+  pageSizeOptions:[2, 5, 10],
+  pageSize: 10,
+
+  
+exportButton: true,
+exportAllData: true,
+
+
+  emptyRowsWhenPaging: false,
+
+
+headerStyle:{
+  fontFamily: 'bold',
+  textTransform: 'uppercase'
+  } ,
+  
+  
+  fontFamily: 'mono'
+}}
         actions={[
           {
             icon: () => (

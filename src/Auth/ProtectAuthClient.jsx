@@ -8,7 +8,7 @@ import {useApplicationSettings} from '../settings/ApplicationSettings'
 
 import LoadingAnimation from '../loader/loading_animation.json'
 import Lottie from 'react-lottie';
-
+import {RefreshCw} from 'lucide-react';
 
 
 
@@ -53,7 +53,8 @@ const ProtectAuthClient = ({children}) => {
 
   if (loading) {
     return <>
-        <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
+              <RefreshCw className='animate-spin text-blue-500 w-12 h-12 mx-auto ' />
+
     
      </>
   }

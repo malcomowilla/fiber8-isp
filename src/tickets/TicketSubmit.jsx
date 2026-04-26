@@ -80,7 +80,8 @@ const TicketSubmit = ({
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  const { name, email, phone_number, priority, issue_description, agent, ticket_category,
+  const { name, email, phone_number, priority, issue_description,
+     agent, ticket_category,
     status
    } = ticketForm;
 //   const { settings, borderRadiusClasses } = useLayoutSettings();
@@ -343,7 +344,7 @@ const TicketSubmit = ({
                         <Stack>
                           <Typography variant="subtitle2">{option.name}</Typography>
                           <Typography variant="caption" color="text.secondary">
-                            {option.customer_code}
+                            {option.ppoe_username}
                           </Typography>
                         </Stack>
                       </Stack>
@@ -373,8 +374,6 @@ const TicketSubmit = ({
                         ),
                       }}
                     />
-
-
                     
                   )}
 
@@ -418,17 +417,6 @@ const TicketSubmit = ({
                   }
                 }
               }}>
-
-
-
-
-
-
-
-
-
-
-
 
 
                 <Autocomplete
@@ -501,14 +489,14 @@ const TicketSubmit = ({
 
                 <Autocomplete
                   options={agentRole.filter(Boolean)}
-                  getOptionLabel={(option) => option.name}
+                  getOptionLabel={(option) => option.username}
                   renderOption={(props, option) => (
                     <Box component="li" {...props}>
                       <Stack direction="row" spacing={2} alignItems="center">
                         <Avatar sx={{ bgcolor: 'primary.main' }}>
-                          {option.name.charAt(0)}
+                          {option.username.charAt(0)}
                         </Avatar>
-                        <Typography>{option.name}</Typography>
+                        <Typography>{option.username}</Typography>
                       </Stack>
                     </Box>
                   )}
@@ -529,10 +517,13 @@ const TicketSubmit = ({
                   onChange={(event, newValue) => {
                     setTicketForm((prev) => ({
                       ...prev,
-                      agent: newValue?.name || ''
+                      agent: newValue?.username || ''
                     }));
                   }}
                 />
+
+
+                
 
                 <TextField
                   fullWidth
@@ -566,74 +557,97 @@ const TicketSubmit = ({
 </div>
 ): null}
           <ListItem>
-              <FormControl fullWidth>
-                <InputLabel>Status</InputLabel>
-                <Select
-                 sx={{
-                  width: '100%',
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black',
-                    transition: 'border-color 0.2s ease-in-out'
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black !important',
-                    borderWidth: '2px'
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'black !important',
-                    borderWidth: '2px'
-                  },
-                  '& .MuiSelect-icon': {
-                    color: 'green'
-                  },
-                  '& .MuiInputBase-input': {
-                    color: '#333'
-                  }
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      '& .MuiMenuItem-root': {
-                        '&:hover': {
-                          backgroundColor: 'rgba(0, 128, 0, 0.08)'
-                        },
-                        '&.Mui-selected': {
-                          backgroundColor: 'rgba(0, 128, 0, 0.16)',
-                          '&:hover': {
-                            backgroundColor: 'rgba(0, 128, 0, 0.24)'
-                          }
-                        }
-                      }
-                    }
-                  }
-                }}
-
-
-                className='myTextField'
-                  value={status}
-                  label="Status"
-                  name="status"
-                  onChange={handleChange}
-                >
-                  {ticketStatus.map((s, index) => (
-                    <MenuItem key={index} value={s.ticketStatus}>
-                      <ListItemIcon>
-                        <UpdateIcon color={s.color} />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={s.ticketStatus}
-                        secondary={
-                          <Chip 
-                            size="small" 
-                            label={s.ticketStatus}
-                            color={s.color}
-                          />
-                        }
-                      />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+             <Autocomplete
+  fullWidth
+  value={ticketStatus.find(option => option.ticketStatus === status) || null}
+  onChange={(event, newValue) => {
+    if (newValue) {
+      handleChange({
+        target: {
+          name: "status",
+          value: newValue.ticketStatus
+        }
+      });
+    }
+  }}
+  options={ticketStatus}
+  getOptionLabel={(option) => option.ticketStatus}
+  renderInput={(params) => (
+    <TextField
+    className='myTextField'
+      {...params}
+      label="Status"
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          '& fieldset': {
+            borderColor: 'black',
+            transition: 'border-color 0.2s ease-in-out'
+          },
+          '&:hover fieldset': {
+            borderColor: 'black !important',
+            borderWidth: '2px'
+          },
+          '&.Mui-focused fieldset': {
+            borderColor: 'black !important',
+            borderWidth: '2px'
+          }
+        },
+        '& .MuiInputLabel-root': {
+          color: '#333',
+          '&.Mui-focused': {
+            color: 'black'
+          }
+        },
+        '& .MuiInputBase-input': {
+          color: '#333'
+        }
+      }}
+    />
+  )}
+  renderOption={(props, option) => (
+    <Box component="li" {...props}>
+      <ListItemIcon>
+        <UpdateIcon color={option.color} />
+      </ListItemIcon>
+      <ListItemText 
+        primary={option.ticketStatus}
+        secondary={
+          <Chip 
+            size="small" 
+            label={option.ticketStatus}
+            color={option.color}
+            sx={{ ml: 1 }}
+          />
+        }
+      />
+    </Box>
+  )}
+  sx={{
+    '& .MuiAutocomplete-endAdornment': {
+      '& .MuiSvgIcon-root': {
+        color: 'green'
+      }
+    }
+  }}
+  PaperComponent={(props) => (
+    <Paper 
+      {...props}
+      sx={{
+        '& .MuiAutocomplete-option': {
+          '&:hover': {
+            backgroundColor: 'rgba(0, 128, 0, 0.08)'
+          },
+          '&[aria-selected="true"]': {
+            backgroundColor: 'rgba(0, 128, 0, 0.16)',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 128, 0, 0.24)'
+            }
+          }
+        }
+      }}
+    />
+  )}
+/>
             </ListItem>
 
 

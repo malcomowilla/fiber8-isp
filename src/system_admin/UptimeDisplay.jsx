@@ -81,9 +81,11 @@ const UptimeDisplay = () => {
           <TimerIcon sx={{ color: '#1976d2' }} />
         </motion.div>
         <Box>
-          {timeUnit(uptime.hours, 'h')}:
-          {timeUnit(uptime.minutes, 'm')}:
-          {timeUnit(uptime.seconds, 's')}
+          <div className='flex'>
+         <p className='text-black'> {timeUnit(uptime.hours, 'h')}</p>
+          <p className='text-black'>{timeUnit(uptime.minutes, 'm')}</p>
+          <p className='text-black'>{timeUnit(uptime.seconds, 's')}</p>
+          </div>
         </Box>
       </Box>
     </motion.div>

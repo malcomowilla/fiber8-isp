@@ -59,7 +59,6 @@ const [openEdit, setOpenEdit] = useState(false);
 
 
     const handleRowClick = (event, rowData) => {
-        console.log('leads',rowData)
     setFormData(rowData)    
 }
 
@@ -121,7 +120,7 @@ const createLead = async(e) => {
         
         toast.error('Failed to create lead', {
           position: "top-center",
-          duration: 4000,
+          duration: 3000,
           })
     }
 

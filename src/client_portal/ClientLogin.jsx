@@ -6,6 +6,7 @@ import { useApplicationSettings } from '../settings/ApplicationSettings';
 import { FaExclamationTriangle, FaEnvelope, FaPhone } from 'react-icons/fa';
 
 
+
 const ClientLogin = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -120,7 +121,9 @@ useEffect(() => {
       if (response.ok) {
         // Simply redirect on successful login
         // Backend will handle session/token in cookies
-        navigate('/client-portal');
+        // navigate('/client-portal');
+        navigate('/client-widget')
+
       } else {
         const data = await response.json();
         setError(data.message || 'Login failed. Please try again.');
@@ -132,6 +135,19 @@ useEffect(() => {
       setIsLoading(false);
     }
   };
+
+
+
+  // company_name: '',
+  // contact_info: '',
+  // email_info: '',
+  // logo: null, 
+  // logo_preview: null ,
+  // agent_email: '',
+  // customer_support_email: '',
+  // customer_support_phone_number: '',
+
+console.log('company settings', companySettings)
 
   const handleGetCompanySettings = useCallback(async () => {
     try {
@@ -149,6 +165,12 @@ useEffect(() => {
           ...prev,
           ...newData,
           logo_preview: newData.logo_url,
+          company_name: newData.company_name,
+          contact_info: newData.contact_info,
+          email_info: newData.email_info,
+          customer_support_email: newData.customer_support_email,
+          customer_support_phone_number: newData.customer_support_phone_number,
+          agent_email: newData.agent_email,
         }));
       }
     } catch (error) {
@@ -164,41 +186,40 @@ useEffect(() => {
     <>
     {enable_customer_portal ? (
       
-    <div className='flex items-center justify-center min-h-screen bg-white'>
+    <div 
+    style={{background: "#16131f"}}
+    className='flex items-center justify-center min-h-screen '>
       <div className="absolute inset-0 z-0">
         <img
           src="/images/Telecommunications-Aitechs.jpg"
           alt="Network Background"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
       </div>
 
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
+        style={{background: "#E5F0FF"}}
         transition={{ duration: 0.8 }}
-        className='w-full max-w-md p-6 z-10 bg-white rounded-lg shadow-xl'
+        className='w-full max-w-md p-6 z-10 rounded-xl shadow-xl'
       >
         <div className='flex justify-center mb-6'>
-          <motion.img
-            className='w-24 h-24 rounded-full'
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            src={logo_preview || "/images/aitechs.png"}
-            alt={company_name || "Aitechs"}
-            onError={(e) => { e.target.src = "/images/aitechs.png"; }}
-          />
+         <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <div style={{ width: 56, height: 56, borderRadius: 16, 
+            background: "black",
+             display: "flex", alignItems: "center", 
+             justifyContent: "center", fontWeight: 800, fontSize: 24, color: "#fff", margin: "0 auto 14px" }}>N</div>
+          <h1 style={{ fontSize: 26, fontWeight: 800, 
+            color: "black", margin: "0 0 6px",
+           
+               }}>{companySettings.company_name}</h1>
+          
+          <p style={{ fontSize: 16, color: "#6b7280", margin: 0 }}>Sign in to your customer portal</p>
+        </div>
         </div>
 
-        <motion.h1
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
-          className='text-3xl font-bold text-center text-gray-800 mb-6'
-        >
-          Customer Network
-        </motion.h1>
+       
 
         {error && (
           <div className="mb-4 p-2 bg-red-100 text-red-700 rounded text-center">
@@ -226,7 +247,8 @@ useEffect(() => {
           </div>
 
           <div className='mb-6'>
-            <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='password'>
+            <label className='block text-gray-700 text-sm
+             font-bold mb-2' htmlFor='password'>
               Password
             </label>
             <div className='relative'>
@@ -242,12 +264,18 @@ useEffect(() => {
               />
             </div>
           </div>
+            <div className='mb-2 text-end'>
+          <a href='#forgot-password' className='text-black hover:underline text-sm'>
+            Forgot Password?
+          </a>
+        </div>
 
           <motion.button
             type='submit'
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className='w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all flex justify-center items-center'
+            className='w-full bg-black
+             text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all flex justify-center items-center'
             disabled={isLoading}
           >
             {isLoading ? (
@@ -264,11 +292,13 @@ useEffect(() => {
           </motion.button>
         </form>
 
-        <div className='mt-6 text-center'>
-          <a href='#forgot-password' className='text-blue-600 hover:underline text-sm'>
-            Forgot Password?
+            <div className='mb-2 text-center'>
+          <a href='#forgot-password' className='text-black hover:underline 
+          text-sm'>
+             Need help? Call 0800 720 999
           </a>
         </div>
+     
       </motion.div>
     </div>
     ): <motion.div 

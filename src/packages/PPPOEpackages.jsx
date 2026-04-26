@@ -1,15 +1,9 @@
 import DeleteIcon from '@mui/icons-material/Delete';
-
 import { makeStyles } from '@mui/styles';
-
 import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-
-
 import AddIcon from '@mui/icons-material/Add';
-
 import GetAppIcon from '@mui/icons-material/GetApp';
-
 import DeletePackage from '../delete/DeletePackage'
 import MaterialTable from 'material-table'
 import EditPackage from '../edit/EditPackage'
@@ -81,7 +75,6 @@ aggregation: '',
 
 }
 
-console.log('router_nameee',settingsformData.router_name)
 const [formData, setFormData] = useState(initialValue)
 
 const [offlineerror, setofflineerror] = useState(false)
@@ -453,7 +446,6 @@ if (response.ok) {
       duration: 4000,
     }
   )
-  console.log('failed to delete')
 
 }
 } catch (error) {
@@ -628,37 +620,40 @@ actions={[
 
 
     onRowClick={handleRowClick} 
-  
+
+
+
+localization={{
+                body: {
+                  emptyDataSourceMessage: 'No packages found. Create your first package to get started!'
+                },
+               
+              
+              
+              }}
+
+
 options={{
-        paging: true,
-       pageSizeOptions:[5, 10],
-       pageSize: 10,
-       search: false,
-       searchFieldAlignment:'right',
-  
-
-showSelectAllCheckbox: false,
-showTextRowsSelected: false,
-hover: true, 
-selection: true,
-paginationType: 'stepped',
-
-
-paginationPosition: 'bottom',
+  sorting: true,
+  pageSizeOptions:[2, 5, 10, 20],
+  pageSize: 20,
+  paginationPosition: 'bottom',
 exportButton: true,
 exportAllData: true,
-exportFileName: 'PPPOE packages',
-
+selection: true,
+search:false,
+searchAutoFocus: true,
+showSelectAllCheckbox: false,
+showTextRowsSelected: false,
+  emptyRowsWhenPaging: false,
 headerStyle:{
-fontFamily: 'bold',
-textTransform: 'uppercase'
-} ,
-
-
-
-fontFamily: 'mono'
-
-}}     
+  fontFamily: 'bold',
+  textTransform: 'uppercase'
+  } ,
+  
+  
+  fontFamily: 'mono'
+}}
       
       
       

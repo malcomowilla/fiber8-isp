@@ -92,7 +92,7 @@ const [onlyShowSubscription, setOnlyShowSubscription] = useState(false)
   const regDate = dayjs(subscriber.registration_date, format);
 
   if (!regDate.isValid()) {
-    console.warn('Invalid date:', subscriber.registration_date);
+    // console.warn('Invalid date:', subscriber.registration_date);
     return false;
   }
 
@@ -152,8 +152,9 @@ const handleClickRow = () => {
 
   const handleRowClick = (event, rowData) => {
     setOnlyShowSubscription(true)
-    console.log('subscribers',rowData)
-   console.log('showClientStatsAndSUbscriptions',showClientStatsAndSUbscriptions)
+  //   console.log('subscribers',rowData)
+  //  console.log('showClientStatsAndSUbscriptions',showClientStatsAndSUbscriptions)
+
     setShowClientStatsAndSubscriptions(true)
 setFormData({
   ...rowData,
@@ -209,7 +210,7 @@ setFormData({
         position: 'top-center',
         duration: 4000,
       })
-      console.log(error)
+      // console.log(error)
     
     }
     },
@@ -242,7 +243,7 @@ setFormData({
           // setSubscriptions(data)
         }
         catch (error) {
-          console.log(error)
+          // console.log(error)
         }
       },
       [subdomain]
@@ -322,7 +323,7 @@ if (formData.id) {
   
 } else {
   setOpenLoad(false)
-  console.log('failed to fetch')
+  // console.log('failed to fetch')
   setloading(false)
   toast.error('Failed to create subscriber', {
     position: "top-center",
@@ -337,7 +338,7 @@ if (formData.id) {
   })
 }
     } catch (error) {
-      console.log(error)
+      // console.log(error)
       setloading(false)
       setOpenLoad(false)
       toast.error(

@@ -127,17 +127,14 @@ const fetchPackages = useCallback(
   )
     const newData = await response.json()
   if (response.ok) {
-    console.log('package',newData)
     setPackages(newData.package)
 
   } else {
-    console.log('failed to fetch routers')
 
   }
   
   } catch (error) {
     
-    console.log(error)
   
   }
   },

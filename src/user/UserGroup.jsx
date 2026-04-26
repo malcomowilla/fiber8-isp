@@ -15,6 +15,7 @@ import CircularProgress from "@mui/material/CircularProgress"; // Import Circula
 import EditUserGroups from '../edit/EditUserGroups'
 import toast,{Toaster} from 'react-hot-toast'
 import DeleteUser from '../delete/DeleteUserGroup'
+import {RefreshCw} from 'lucide-react';
 
 
 
@@ -138,7 +139,6 @@ if (response.status === 401) {
       }
     } catch (error) {
       setIsSearching(false)
-      console.log(error)
     }
   },
   [searchInput],
@@ -296,7 +296,7 @@ const createUserGroups = async(e) => {
           className="p-2.5 ms-2 text-sm font-medium text-white bg-green-700 rounded-lg border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
         >
           {isSearching ? (
-            <CircularProgress size={20} color="inherit" /> // Show spinner when searching
+            < RefreshCw className='animate-spin text-blue-500 w-12 h-12 mx-auto ' />
           ) : (
             <svg
               className="w-4 h-4"
@@ -327,7 +327,7 @@ const createUserGroups = async(e) => {
 
 <div className="absolute inset-0 flex justify-center cursor-pointer items-center  
  bg-opacity-70 z-[2] mb-[50rem]">
-    <CircularProgress size={90} color="inherit" className='text-black dark:text-white' /> 
+    <RefreshCw className='animate-spin text-blue-500 w-12 h-12 mx-auto ' /> 
     
     </div>
   
@@ -374,38 +374,37 @@ const createUserGroups = async(e) => {
     ]}
 
 
+localization={{
+                body: {
+                  emptyDataSourceMessage: 'No user groups found. Create your first user group to get started!'
+                },
+               
+              
+              
+              }}
+
+
 options={{
-        paging: true,
-       pageSizeOptions:[5, 10],
-       search: false,
-searchFieldStyle: {
-  borderColor: 'red'
-},
+  sorting: true,
+  pageSizeOptions:[2, 5, 10],
+  pageSize: 10,
+  paginationPosition: 'bottom',
+exportButton: true,
+exportAllData: true,
+selection: true,
+search:false,
 searchAutoFocus: true,
 showSelectAllCheckbox: false,
 showTextRowsSelected: false,
-
-selection: true,
-paginationType: 'stepped',
-
-// rowStyle:{
-//   backgroundColor: 'dark'
-// },
-
-paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-exportFileName: 'User Group',
-
+  emptyRowsWhenPaging: false,
 headerStyle:{
   fontFamily: 'bold',
   textTransform: 'uppercase'
   } ,
   
- 
   
   fontFamily: 'mono'
-}}     
+}}    
       
       
       

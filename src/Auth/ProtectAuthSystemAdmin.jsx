@@ -5,6 +5,8 @@ import Lottie from 'react-lottie';
 import Backdrop from '@mui/material/Backdrop';
 import LoadingAnimation from '../loader/loading_animation.json'
 import {useApplicationSettings} from '../settings/ApplicationSettings'
+import {RefreshCw} from 'lucide-react';
+
 
 
 const ProtectAuthSystemAdmin = () => {
@@ -41,7 +43,9 @@ const ProtectAuthSystemAdmin = () => {
   if (loading) {
     return <>
       <Backdrop open={openLoad} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
+
+  <RefreshCw className='animate-spin text-blue-500 w-12 h-12 mx-auto ' />
+
       </Backdrop>
     
      </>

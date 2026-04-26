@@ -11,7 +11,15 @@ import {
   CircularProgress,
   Alert
 } from '@mui/material';
-const TaskSettings = () => {
+import { Construction, Code, Rocket, Clock } from 'lucide-react';
+
+
+const TaskSettings = ({
+  featureName = "This feature",
+  estimatedDate,
+  description,
+  compact = false 
+}) => {
   const [settings, setSettings] = useState({
     start_in_hours: '',    // Default 9 AM
     start_in_minutes: ''   // Default 0 minutes
@@ -19,6 +27,12 @@ const TaskSettings = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+
+
+
+
+
+  
 const subdomain = window.location.hostname.split('.')[0]
   useEffect(() => {
     const fetchSettings = async () => {
@@ -40,7 +54,6 @@ const subdomain = window.location.hostname.split('.')[0]
           }
         }
       } catch (err) {
-        console.error('Error fetching settings:', err);
         setError('Failed to load settings');
       } finally {
         setLoading(false);
@@ -79,7 +92,6 @@ const subdomain = window.location.hostname.split('.')[0]
           
           }
       
-      console.log("start in hours or minutes=>", updatedSettings );
           return updatedSettings;
 
         });
@@ -114,12 +126,11 @@ const subdomain = window.location.hostname.split('.')[0]
         throw new Error(errorData.message || 'Failed to save settings');
       }
     } catch (err) {
-      console.error('Error saving settings:', err);
       setError(err.message);
     //   enqueueSnackbar(err.message, { variant: 'error' });
-    toast.error(err.message, {
+    toast.error('Failed to save calendar settings, Please retry in a moment', {
       position: "top-center",
-      duration: 4000,
+      duration: 3000,
     })
     } finally {
       setLoading(false);
@@ -139,12 +150,17 @@ const subdomain = window.location.hostname.split('.')[0]
   return (
     <>
     <Toaster />
+    <div className="flex flex-col items-center justify-center "> <div className="text-6xl">🚧</div> 
+    <h1 className="text-2xl font-bold mt-4">Under Development</h1> 
+    <p className="text-gray-500">This feature is still in development. Please check back later.</p> </div>
+
+    
     <Paper elevation={3} sx={{ p: 4, maxWidth: 600, mx: 'auto' }}>
       <Typography variant="h5" gutterBottom>
         <p className='roboto-condensed'>Task Settings</p>
       </Typography>
       <Typography variant="body1" color="text.secondary" mb={4}>
-        <p className='text-black roboto-condensed '>Configure time before the event 
+        <p className='text-black roboto-condensed dark:text-white '>Configure time before the event 
             starts to send notification to users of the task ahead, default will be thirty minutes (minutes or hours)</p>
       </Typography>
 
@@ -219,10 +235,10 @@ const subdomain = window.location.hostname.split('.')[0]
       <Box sx={{ mt: 4, bgcolor: 'grey.100', p: 2, borderRadius: 1 }}>
         <Typography variant="subtitle2">
             
-            <p  className='roboto-condensed-light'>Preview: </p>
+            <p  className='roboto-condensed-light dark:text-black'>Preview: </p>
             </Typography>
         <Typography>
-          <p className='roboto-condensed'>Default event start notification will be
+          <p className='roboto-condensed dark:text-black'>Default event start notification will be
              (30 minutes) before the scheduled time </p>
         </Typography>
       </Box>

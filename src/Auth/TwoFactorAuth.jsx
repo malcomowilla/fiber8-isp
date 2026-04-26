@@ -18,19 +18,16 @@ const TwoFactorAuthVerification = ({ onVerify, onBack}) => {
   const navigate = useNavigate();
   const { email } = location.state || {};
 
-  // Handle input change
   const handleChange = (index, value) => {
-    if (/^\d*$/.test(value)) { // Fixed: Added missing parenthesis
+    if (/^\d*$/.test(value)) { 
       const newCode = [...code];
       newCode[index] = value;
       setCode(newCode);
       
-      // Auto-focus next input
       if (value && index < 5) {
         inputRefs.current[index + 1].focus();
       }
       
-      // Auto-submit if last digit entered
       if (index === 5 && value) {
         handleSubmit(newCode.join(''));
       }
@@ -53,7 +50,6 @@ const TwoFactorAuthVerification = ({ onVerify, onBack}) => {
 
 
 
-  // If email isn't passed, handle appropriately
   if (!email) {
     return (
       <div className="text-center p-8">
@@ -77,14 +73,12 @@ const TwoFactorAuthVerification = ({ onVerify, onBack}) => {
 
 
 
-  // Handle backspace
   const handleKeyDown = (index, e) => {
     if (e.key === 'Backspace' && !code[index] && index > 0) {
       inputRefs.current[index - 1].focus();
     }
   };
 
-  // Handle paste
   const handlePaste = (e) => {
     e.preventDefault();
     const pasteData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
@@ -97,7 +91,6 @@ const TwoFactorAuthVerification = ({ onVerify, onBack}) => {
   };
 
   const subdomain = window.location.hostname.split('.')[0];
-  // Submit verification
   const handleSubmit = async (fullCode) => {
     if (fullCode.length !== 6) return;
     
@@ -128,7 +121,6 @@ const TwoFactorAuthVerification = ({ onVerify, onBack}) => {
         }, 2800);
        
         setIsLoading(false);
-        // onVerify(fullCode);
       }else{
         setError('Invalid verification code. Please try again.');
         toast.error(newData.error, {
@@ -138,7 +130,6 @@ const TwoFactorAuthVerification = ({ onVerify, onBack}) => {
       }
     } catch (err) {
       setError('Invalid verification code. Please try again.');
-      // Clear inputs on error
       setCode(['', '', '', '', '', '']);
       inputRefs.current[0].focus();
     } finally {
@@ -146,7 +137,6 @@ const TwoFactorAuthVerification = ({ onVerify, onBack}) => {
     }
   };
 
-  // Countdown timer for code refresh
   useEffect(() => {
     if (countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -176,7 +166,6 @@ const TwoFactorAuthVerification = ({ onVerify, onBack}) => {
         </p>
       </div>
 
-      {/* Countdown indicator */}
       <div className="flex justify-center mb-6">
         <div className="relative w-16 h-16">
           <svg className="w-full h-full" viewBox="0 0 36 36">
@@ -205,7 +194,6 @@ const TwoFactorAuthVerification = ({ onVerify, onBack}) => {
         </div>
       </div>
 
-      {/* Code inputs */}
       <div className="flex justify-center space-x-3 mb-6">
         {code.map((digit, index) => (
           <motion.input
@@ -227,7 +215,6 @@ const TwoFactorAuthVerification = ({ onVerify, onBack}) => {
         ))}
       </div>
 
-      {/* Error message */}
       {error && (
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
@@ -238,7 +225,6 @@ const TwoFactorAuthVerification = ({ onVerify, onBack}) => {
         </motion.div>
       )}
 
-      {/* Submit button */}
       <motion.button
         onClick={() => handleSubmit(code.join(''))}
         disabled={isLoading || code.join('').length !== 6}
@@ -262,7 +248,6 @@ const TwoFactorAuthVerification = ({ onVerify, onBack}) => {
         )}
       </motion.button>
 
-      {/* Alternative options */}
       <div className="mt-6 text-center text-sm text-gray-500">
         <p className="mb-2">Having trouble?</p>
         <div className="flex justify-center space-x-4">

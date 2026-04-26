@@ -12,6 +12,8 @@ const GoogleMapSetting = lazy(() => import('./GoogleMapSetting'))
 
 
 import UiLoader from '../uiloader/UiLoader'
+import {RefreshCw} from 'lucide-react';
+
 
 const Settings = () => {
     const [selectedTab, setSelectedTab] = useState('GENERAL')
@@ -29,7 +31,7 @@ const Settings = () => {
       })
     }
   return (
-    <Suspense fallback={<div className='flex justify-center items-center '>{ <UiLoader/> }</div>}>
+    <Suspense fallback={<div className='flex justify-center items-center '>{ <RefreshCw className='animate-spin text-blue-500 w-12 h-12 mx-auto ' /> }</div>}>
     <div className= 'w-full h-screen'
     onClick={() => {
       setShowMenu1(false)

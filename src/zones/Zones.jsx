@@ -71,10 +71,6 @@ const handleRowClick =(event,rowData)=>{
   };
 
 
-// const handleRenderCode = ()=> {
-//       setRenderCode([...renderCode, { zoneCode: '' }]);
-
-// }
 
 
   const handleCreateZone = async(e)=> {

@@ -31,7 +31,7 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
   const [newDate, setNewDate] = React.useState(null);
   const [pppoePackages, setPppoePackages] = useState([]); // State to store PPPoE packages
 
-
+console.log("voucherForm=>", voucherForm)
 
   const [isSave, setIsSave] = useState(true);
 
@@ -155,7 +155,7 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
   )}
   isOptionEqualToValue={(option, value) => option.name === value.name}
 />
-
+{/* 
               <TextField
               name='phone'
                value={voucherForm.phone}
@@ -165,17 +165,18 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
               sx={{
             mt:2
               }}
-              label='Phone Number'  fullWidth />
+              label='Phone Number'  fullWidth /> */}
             </FormControl>
           </div>
 
           <div className="flex gap-3 mt-4">
               <TextField
-                label="Shared Users"
-                value={voucherForm.shared_users}
-                name='shared_users'
-                onChange={(e)=> setVoucherForm({...voucherForm, shared_users: e.target.value})}
-                id="shared_users"
+                label="Number Of Vouchers"
+                // value={voucherForm.number_of_vouchers}
+                value={voucherForm.number_of_vouchers ?? '1'}
+                // name='number_of_vouchers'
+                onChange={(e)=> setVoucherForm({...voucherForm, number_of_vouchers: e.target.value})}
+                // id="number_of_vouchers"
                 sx={{
                   "& label.Mui-focused": {
                     color: "black",
@@ -194,11 +195,11 @@ function EditVoucher({ open, handleClose,voucherForm, handleChangeVoucher,
                 type="number"
                 placeholder="Number of shared users..."
                 fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <FaUsers className="mr-2 text-gray-500" /> // Add user icon
-                  ),
-                }}
+                // InputProps={{
+                //   startAdornment: (
+                //     <FaUsers className="mr-2 text-gray-500" /> // Add user icon
+                //   ),
+                // }}
               ></TextField>
             </div>
         </DialogContent>

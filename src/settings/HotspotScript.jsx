@@ -45,26 +45,43 @@ function HotspotScript({ open, handleClose }) {
     {
       title: "Basic Hotspot Setup",
       commands: [
-        "/ip hotspot setup",
-        "Select interface: ether2",
-        "Enter address of local hotspot interface: 192.168.88.1/16",
-        "Masquerade network: yes",
-        "Select address pool for network: 192.168.88.0/16",
-        "select certificate: none",
-        "Enter IP address of SMTP server: 0.0.0.0",
-        "Enter DNS servers: 8.8.8.8",
-        "Enter DNS name of local hotspot server: hotspot.local",
-        "Create local hotspot user: admin",
-        "Enter password for the user: ********",
-      ]
+        
+        `
+  
+ /interface bridge add name=bridge-hotspot comment="Owitech Hotspot"
+    /interface/bridge/port add interface=ether5 bridge=bridge-hotspot
+    /ip pool
+    add name=hotspot-pool ranges=10.3.0.2-10.3.0.254 comment="Hotspot IP Pool Owitech"
+
+    /ip address
+add address=10.3.0.1/24 comment="hotspot network Owitech" interface=bridge-hotspot
+/ip dhcp-server
+add address-pool=hotspot-pool disabled=no interface=bridge-hotspot lease-time=40m name=hotspot-dhcp comment="Hotspot DHCP Owitech"
+
+/ip dhcp-server network
+add address=10.3.0.0/24 comment="hotspot network Owitech" gateway=10.3.0.1 netmask=255.255.255.0 dns-s=8.8.8.8
+    /ip hotspot profile add name=hsprof1 hotspot-address=10.3.0.1 use-radius=yes radius-accounting=yes radius-interim-update=10s
+    
+
+  /ip hotspot add name=hotspot1 interface=bridge-hotspot profile=hsprof1 address-pool=hotspot-pool disabled=no 
+
+/ip dns
+set allow-remote-requests=yes
+
+# Walled Garden for AITechs
+/ip hotspot walled-garden ip add action=accept dst-host=${window.location.hostname.split('.')[0]}.owitech.co.ke
+/ip hotspot walled-garden add action=allow dst-host="^:${window.location.hostname.split('.')[0]}.owitech.co.ke path=:/hotspot-page\\$"
+
+
+
+    /ip firewall nat add chain=srcnat action=masquerade out-interface=bridge-hotspot comment="Hotspot Owitech"
+
+`
+      ],
+
+
     },
-    {
-      title: "Advanced Hotspot Configuration",
-      commands: [
-        `/ip hotspot walled-garden ip add action=accept dst-host=${window.location.hostname.split('.')[0]}.aitechs.co.ke`,
-        `/ip hotspot walled-garden add action=allow dst-host="^:${window.location.hostname.split('.')[0]}.aitechs.co.ke path=:/hotspot-page\\$"`,
-      ]
-    },
+    
   ];
 
   const subdomain = window.location.hostname.split('.')[0];
@@ -84,10 +101,10 @@ function HotspotScript({ open, handleClose }) {
           setSelectedRouter(routersData[0].id);
         }
       } else {
-        console.log('Failed to fetch routers');
+        // console.log('Failed to fetch routers');
       }
     } catch (error) {
-      console.log('Error fetching routers:', error);
+      // console.log('Error fetching routers:', error);
       toast.error('Failed to fetch routers list');
     }
   }, [subdomain]);
@@ -105,7 +122,7 @@ function HotspotScript({ open, handleClose }) {
       setSnackbarMessage('Command copied to clipboard!');
       setSnackbarOpen(true);
     } catch (err) {
-      console.error('Failed to copy: ', err);
+      // console.error('Failed to copy: ', err);
     }
   };
 
@@ -177,6 +194,7 @@ function HotspotScript({ open, handleClose }) {
         headers: {
           'Content-Type': 'application/json',
           'X-Subdomain': subdomain,
+          'X-Domain': window.location.hostname,
         },
         body: JSON.stringify({
           router_id: selectedRouter,
@@ -207,11 +225,11 @@ function HotspotScript({ open, handleClose }) {
     } catch (error) {
         setloading(false)
         setShowRouterSelection(false);
-      toast.error('Internal server error: Something went wrong with uploading hotspot configuration file', {
-        duration: 4000,
+      toast.error('Something went wrong with uploading hotspot configuration file, Please retry in a moment.', {
+        duration: 3000,
         position: 'top-center',
       });
-      setSnackbarMessage('Internal server error: Something went wrong with uploading hotspot configuration file');
+      setSnackbarMessage('Something went wrong with uploading hotspot configuration file, Please retry in a moment.');
     }
   };
 
@@ -220,28 +238,33 @@ function HotspotScript({ open, handleClose }) {
 # Generated on ${new Date().toLocaleDateString()}
 # AITechs Hotspot System
 
-# Basic Hotspot Setup
-/ip hotspot setup
-/ip hotspot profile add name=hotspot1
+ /interface bridge add name=bridge-hotspot comment="Owitech Hotspot"
+    /interface/bridge/port add interface=ether5 bridge=bridge-hotspot
+    /ip pool
+    add name=hotspot-pool ranges=10.3.0.2-10.3.0.254 comment="Hotspot IP Pool Owitech"
 
-# Network Configuration
-/ip pool add name=hotspot-pool ranges=192.168.100.10-192.168.100.254
-/ip hotspot add name=hotspot1 interface=ether2 profile=hotspot1 address-pool=hotspot-pool
+    /ip address
+add address=10.3.0.1/24 comment="hotspot network Owitech" interface=bridge-hotspot
+/ip dhcp-server
+add address-pool=hotspot-pool disabled=no interface=bridge-hotspot lease-time=40m name=hotspot-dhcp comment="Hotspot DHCP Owitech"
+
+/ip dhcp-server network
+add address=10.3.0.0/24 comment="hotspot network Owitech" gateway=10.3.0.1 netmask=255.255.255.0 dns-n=8.8.8.8
+    /ip hotspot profile add name=hsprof1 hotspot-address=10.3.0.1 use-radius=yes radius-accounting=yes radius-interim-update=10s
+    
+
+  /ip hotspot add name=hotspot1 interface=bridge-hotspot profile=hsprof1 idle-timeout=00:20:00 keep-alive-timeout=00:20:00 address-pool=hotspot-pool disabled=no 
+
+/ip dns
+set allow-remote-requests=yes
 
 # Walled Garden for AITechs
-/ip hotspot walled-garden ip add action=accept dst-host=${window.location.hostname.split('.')[0]}.aitechs.co.ke
-/ip hotspot walled-garden add action=allow dst-host="^:${window.location.hostname.split('.')[0]}.aitechs.co.ke path=:/hotspot-page\\$"
+/ip hotspot walled-garden ip add action=accept dst-host=${window.location.hostname.split('.')[0]}.owitech.co.ke
+/ip hotspot walled-garden add action=allow dst-host="^:${window.location.hostname.split('.')[0]}.owitech.co.ke path=:/hotspot-page\\$"
 
-# User Management
-/ip hotspot user add name=admin password=admin123 profile=hotspot1
-/ip hotspot user add name=guest password=guest123 profile=hotspot1 limit-uptime=01:00:00
 
-# Firewall Rules
-/ip firewall filter add chain=forward action=accept place-before=0 src-address=192.168.100.0/24
-/ip firewall nat add chain=srcnat action=masquerade out-interface=ether1
 
-# Bandwidth Limitation
-/queue simple add name=hotspot-limit target=192.168.100.0/24 max-limit=10M/10M
+    /ip firewall nat add chain=srcnat action=masquerade out-interface=bridge-hotspot comment="Hotspot Owitech"
 
 echo "Hotspot configuration completed successfully"`;
 
@@ -249,7 +272,7 @@ echo "Hotspot configuration completed successfully"`;
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `hotspot-config-${new Date().getTime()}.rsc`;
+    a.download = `hotspot-config-${new Date().getTime()}.pdf`;
     a.click();
     URL.revokeObjectURL(url);
 
@@ -281,6 +304,8 @@ echo "Hotspot configuration completed successfully"`;
           },
         }}
       >
+
+        
         <DialogTitle>
           <div className="flex items-center gap-3">
             <SiGoogleappsscript className="text-2xl text-green-500" />
@@ -585,3 +610,13 @@ echo "Hotspot configuration completed successfully"`;
 }
 
 export default HotspotScript;
+
+
+
+
+
+
+
+
+
+

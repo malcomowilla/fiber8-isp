@@ -5,11 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import { useCallback, useEffect } from 'react';
 import { useApplicationSettings } from "../settings/ApplicationSettings";
-
 import LoadingAnimation from '../loader/loading_animation.json'
 import Lottie from 'react-lottie';
 import { GrConfigure } from "react-icons/gr";
 import HotspotScript from './HotspotScript'
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import {RefreshCw} from 'lucide-react';
 
 
 
@@ -19,6 +21,11 @@ const HotspotSettings = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
   const [open, setOpen] = useState(false);
+const options = ['Numeric', 'Words', 'Mixed'];
+const expiryOptions = ['Expiry After Creation', 'Expiry After Login'];
+  const [voucherType, setVoucherType] = useState(options[0]);
+  const [voucher_expiration, setVoucherExpiration] = useState(expiryOptions[0]);
+
 
 
   const handleClose = () => {
@@ -57,6 +64,8 @@ const {phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setH
     formData.append("hotspot_name", hotspotName);
     formData.append("hotspot_info", hotspotInfo);
     formData.append("email", hotspotEmail);
+    formData.append("voucher_type", voucherType);
+    formData.append("voucher_expiration", voucher_expiration);
     if (hotspotBanner) {
       formData.append("hotspot_banner", hotspotBanner); // Append the file
     }
@@ -88,9 +97,11 @@ const {phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setH
         setHotspotName(newData.hotspot_name);
         setHotspotInfo(newData.hotspot_info);
         setHotspotEmail(newData.email);
+        setVoucherType(newData.voucher_type);
+        setVoucherExpiration(newData.voucher_expiration);
         // setHotspotBanner(newData.hotspot_banner);
         toast.success('Hotspot settings saved successfully', {
-          duration: 5000,
+          duration: 4000,
           position: "top-right",
           style: {
             background: "#22c55e",
@@ -102,7 +113,7 @@ const {phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setH
         toast.error(
           'Failed to save hotspot settings, please try again later',
           {
-            duration: 5000,
+            duration: 4000,
             position: "top-right",
             style: {
               background: "#eb5757",
@@ -116,7 +127,7 @@ const {phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setH
       toast.error(
         'Failed to save hotspot settings, please try again later',
         {
-          duration: 5000,
+          duration: 4000,
           position: "top-right",
           style: {
             background: "#eb5757",
@@ -137,12 +148,18 @@ const {phoneNumber, setPhoneNumber,hotspotName, setHotspotName,hotspotInfo, setH
         });
         const newData = await response.json();
         if (response.ok) {
-          console.log('hotspot settings fetched', newData);
-          const { phone_number, hotspot_name, hotspot_info, hotspot_banner, email } = newData;
+          const { phone_number, hotspot_name, hotspot_info, 
+            hotspot_banner, email, voucher_type, voucher_expiration } = newData;
           setHotspotPhoneNumber(phone_number);
           setHotspotName(hotspot_name);
           setHotspotInfo(hotspot_info);
           setHotspotEmail(email)
+            setVoucherType(voucher_type);
+            if (voucher_expiration === null) {
+              setVoucherExpiration(expiryOptions[0]);
+              
+            }
+            setVoucherExpiration(voucher_expiration);
           // setHotspotBanner(hotspot_banner);
           if (hotspot_banner) {
             setHotspotBannerPreview(hotspot_banner); // Set preview URL if banner exists
@@ -165,11 +182,10 @@ if (response.status === 401) {
           window.location.href='/signin'
          }, 1900);
 }
-          console.log('failed to fetch hotspot settings');
         }
       } catch (error) {
-        toast.error('internal server error while fetching hotspot settings', {
-          duration: 5000,
+        toast.error('The operation failed while fetching hotspot settings.Please retry in a moment', {
+          duration: 3000,
           position: "top-right",
           style: {
             background: "#eb5757",
@@ -208,7 +224,7 @@ if (response.status === 401) {
     <HotspotScript handleClose={handleClose} open={open}/>
 
 
-      {loading ? <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} /> : null}
+      {/* {loading ? <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} /> : null} */}
       <Toaster />
         <h1 className="text-2xl 
         
@@ -225,6 +241,8 @@ if (response.status === 401) {
           initial="hidden"
           animate="visible"
         >
+
+          
           {/* Contact Us Phone Number */}
           <motion.div className="mb-4" variants={containerVariants}>
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phoneNumber">
@@ -246,7 +264,7 @@ if (response.status === 401) {
 
 
 
-          <motion.div className="mb-4" variants={containerVariants}>
+          {/* <motion.div className="mb-4" variants={containerVariants}>
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phoneNumber">
               Contact Us Email
             </label>
@@ -261,7 +279,35 @@ if (response.status === 401) {
               whileFocus="focus"
               variants={inputVariants}
             />
-          </motion.div>
+          </motion.div> */}
+
+
+
+<motion.div className="mb-4" variants={containerVariants}>
+  <label className="block text-gray-700 text-sm font-bold mb-2"
+   htmlFor="hotspotInfo">
+              Voucher Expiration
+            </label>
+
+
+              <Autocomplete
+        value={voucher_expiration}
+        className='myTextField'
+        onChange={(event, newValue) => {
+          setVoucherExpiration(newValue);
+        }}
+        // inputValue={inputValue}
+        // onInputChange={(event, newInputValue) => {
+        //   (newInputValue);
+        // }}
+        options={expiryOptions}
+        // sx={{ width: 300 }}
+        renderInput={(params) => <TextField {...params}
+        />}
+      />
+
+
+</motion.div>
 
           {/* Hotspot Name */}
           <motion.div className="mb-4" variants={containerVariants}>
@@ -280,6 +326,35 @@ if (response.status === 401) {
               variants={inputVariants}
             />
           </motion.div>
+
+
+<motion.div className="mb-4" variants={containerVariants}>
+  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="hotspotInfo">
+              Voucher Type
+            </label>
+
+
+              <Autocomplete
+        value={voucherType}
+        className='myTextField'
+        onChange={(event, newValue) => {
+          setVoucherType(newValue);
+        }}
+        // inputValue={inputValue}
+        // onInputChange={(event, newInputValue) => {
+        //   (newInputValue);
+        // }}
+        id="controllable-states-demo"
+        options={options}
+        // sx={{ width: 300 }}
+        renderInput={(params) => <TextField {...params}
+         />}
+      />
+
+
+</motion.div>
+
+
 
           {/* Hotspot Info */}
           <motion.div className="mb-4" variants={containerVariants}>
@@ -344,24 +419,15 @@ if (response.status === 401) {
           </motion.div>
 
           {/* Submit Button */}
-          <motion.button
-            type="submit"
-            className="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
-            whileHover="hover"
-            whileTap="tap"
-            variants={buttonVariants}
-          >
-            Save Settings
-          </motion.button>
 
 
-
-         
-        </motion.form>
-
-<div className='flex justify-center '>
+<div className='flex flex-row gap-2 justify-center'>
            <motion.button
-            onClick={() => setOpen(true)}
+            onClick={(e) => {
+              setOpen(true)
+              e.preventDefault()
+
+            }}
             className="w-fit bg-green-500 text-white  flex
             justify-center items-center
             py-2 px-4  mt-2 gap-2
@@ -375,7 +441,28 @@ if (response.status === 401) {
 
           </motion.button>
 
+        
+
+          <motion.button
+            type="submit"
+            className="w-fit bg-green-500 text-white  flex
+            justify-center items-center
+            py-2 px-4  mt-2 gap-2
+            rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2  focus:ring-green-500"
+            whileHover="hover"
+            whileTap="tap"
+            variants={buttonVariants}
+          >
+            {loading ?<> <RefreshCw className='animate-spin text-white w-5 h-5 mx-auto ' /> Saving... </> : <p>Save Settings</p>}
+            {/* <RefreshCw className={`${loading ? 'animate-spin text-white w-5 h-5 mx-auto ' : 'text-white w-5 h-5'}`} /> */}
+          </motion.button>
           </div>
+
+
+
+         
+        </motion.form>
+
     </>
   );
 };

@@ -43,7 +43,8 @@ const ClientLead = () => {
     email: '',
     company_name: '',
     message: '',
-    phone_number: ''
+    phone_number: '',
+    location: ''
   });
   const [openConfirmLeadConversion, setOpenConfirmLeadConversion] = useState(false);
 
@@ -221,7 +222,7 @@ const columns = [
     {title: 'Lead', field: 'name',  },
 
   {title: 'Email', field: 'email',    },
-  {title: 'Company', field: 'company_name',    },
+  {title: 'Location', field: 'location',    },
   {title: 'Phone Number', field: 'phone_number',    },
 
   {title: 'Action', field:'Action', align: 'right',
@@ -350,9 +351,11 @@ const handleCloseDelete = () => {
         </div>
         <input type="text" value={search} onChange={(e)=> setSearch(e.target.value)}
          className="bg-gray-50 border border-gray-300 text-gray-900 
-        text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full ps-10 p-2.5 
+        text-sm rounded-lg focus:ring-green-500
+         focus:border-green-500 block w-full ps-10 p-2.5 
           dark:border-gray-600 dark:placeholder-gray-400 dark:text-black
-          dark:focus:ring-green-500 dark:focus:border-green-500" placeholder="search for leads..."  />
+          dark:focus:ring-green-500
+           dark:focus:border-green-500" placeholder="search for leads..."  />
     </div>
     
     <button type="" className="p-2.5 ms-2 text-sm font-medium text-white bg-green-700 
@@ -397,31 +400,37 @@ const handleCloseDelete = () => {
     ]}
 
 
+localization={{
+                body: {
+                  emptyDataSourceMessage: 'No leads found. Create your first lead to get started!'
+                },
+               
+              
+              
+              }}
+
+
 options={{
-        paging: true,
-       pageSizeOptions:[5, 10],
-       pageSize: 10,
-       search: false,
-searchFieldStyle: {
-  borderColor: 'red'
-},
+  sorting: true,
+  pageSizeOptions:[2, 5, 10],
+  pageSize: 10,
+  paginationPosition: 'bottom',
+exportButton: true,
+exportAllData: true,
+selection: true,
+search:false,
 searchAutoFocus: true,
 showSelectAllCheckbox: false,
 showTextRowsSelected: false,
-
-selection: true,
-paginationType: 'stepped',
-
-// rowStyle:{
-//   backgroundColor: 'dark'
-// },
-
-paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-exportFileName: 'Nodes'
-}}     
-      
+  emptyRowsWhenPaging: false,
+headerStyle:{
+  fontFamily: 'bold',
+  textTransform: 'uppercase'
+  } ,
+  
+  
+  fontFamily: 'mono'
+}}  
       
       
       

@@ -56,15 +56,11 @@ const { settingsformData } = useApplicationSettings()
 useEffect(() => {
   
   setRouter(router_name)
-  console.log('router_name',router_name )
 
 }, [router_name]);
-// const {price, download_limit, upload_limit, validity, name, upload_burst_limit, download_burst_limit,
-//   validity_period_units, tx_rate_limit, rx_rate_limit} = formData
 
 const [routerName] = useDebounce(router_name, 1000)
 
-console.log(routerName)
 const subdomain = window.location.hostname.split('.')[0]
 
 
@@ -86,7 +82,6 @@ const fetchRouters = useMemo(() => async ()=> {
   
     const newData = await response.json()
   if (response.ok) {
-    console.log('router',newData)
     setRouters(newData)
 
   } else {
@@ -96,7 +91,6 @@ const fetchRouters = useMemo(() => async ()=> {
   
   } catch (error) {
     
-    console.log(error)
   
   }
   
@@ -118,17 +112,7 @@ const fetchRouters = useMemo(() => async ()=> {
 
 
 const onChange = (e) =>{
-  console.log('formData onchage edit package,',formData)
-  // const {value, id} = e.target
   setFormData({ ...formData, [e.target.id]: e.target.value });
-
-//   const isComplete = name && price && upload_limit && download_limit && validity && validity_period_units && upload_burst_speed
-//  && download_burst_speed ;
-
-
-
-
-
 
   }
 
@@ -149,7 +133,6 @@ const onChange = (e) =>{
   
       const newData = await response.json()
       if (response.ok) {
-  console.log('ip pools',newData)
   setIpPool(newData)
     
       }else{

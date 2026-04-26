@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -26,6 +26,11 @@ import {
 import { FaRegBuilding } from "react-icons/fa";
 import EditPlan from './EditPlan';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import DeleteHotspotPlan from './DeleteHotspotPlan';
+import DeletePPPOEPlan from './DeletePPPOEPlan';
+
+
+
 
 const PREDEFINED_PPPOE_PLANS = [
   { name: "Pro", maximum_pppoe_subscribers: 100, price: 2700, expiry_days: 30 },
@@ -35,18 +40,19 @@ const PREDEFINED_PPPOE_PLANS = [
   { name: "Startup", maximum_pppoe_subscribers: 300 , price: 3500, expiry_days: 30 },
   { name: "Basic", maximum_pppoe_subscribers: 50, price: 1500, expiry_days: 30 },
   { name: "Silver", maximum_pppoe_subscribers: 500 , price: 4500, expiry_days: 30 },
-  {name: 'Free', maximum_pppoe_subscribers: 'unlimited', price: 0, expiry_days: 365},
+  {name: 'Free PPPoe', maximum_pppoe_subscribers: 'unlimited', price: 0, expiry_days: 365},
   { name: "Free Trial", maximum_pppoe_subscribers: 'unlimited', price: 0, expiry_days: 3}
 ];
 
 const PREDEFINED_HOTSPOT_PLANS = [
-  { name: "Starter", hotspot_subscribers: 50, price: 1500, expiry_days: 30 },
+  { name: "Starter", hotspot_subscribers: 50, price: 1000, expiry_days: 30 },
+  { name: "Improved", hotspot_subscribers: 100, price: 1500, expiry_days: 30 },
   { name: "Pro", hotspot_subscribers: 200, price: 2500, expiry_days: 30 },
   { name: "Gold Hotspot", hotspot_subscribers: 1000, price: 5000, expiry_days: 30 },
   { name: "Business", hotspot_subscribers: 2000, price: 10000, expiry_days: 30 },
   { name: "Startup", hotspot_subscribers: 300 , price: 3500, expiry_days: 30 },
   { name: "Silver", hotspot_subscribers: 500, price: 4500, expiry_days: 30 },
-  {name: 'Free', hotspot_subscribers: 'unlimited', price: 0, expiry_days: 365},
+  {name: 'Free Hotspot', hotspot_subscribers: 'unlimited', price: 0, expiry_days: 365},
     { name: "Free Trial", maximum_pppoe_subscribers: 'unlimited', price: 0, expiry_days: 3}
 
 ];
@@ -155,18 +161,19 @@ const planOptions = [
 ];
 
 
+
   // Get predefined options for dropdown based on plan type
   const getPredefinedOptions = () => {
     return (planType === 'pppoe' ? PREDEFINED_PPPOE_PLANS : PREDEFINED_HOTSPOT_PLANS)
       .map(plan => ({
-        label:  `${plan.name} ${plan.maximum_pppoe_subscribers || plan.hotspot_subscribers}
-         ${planType === 'pppoe' ?  'PPPoE Subscribers' : 'Hotspot Subscribers'}/${plan.name === 'Free' ? 365 : plan.name === 'Free Trial' ? 3 : 30} Days`,
+        label:  `${plan.name}  Ksh ${plan.price}  ${plan.maximum_pppoe_subscribers || plan.hotspot_subscribers} 
+         ${planType === 'pppoe' ?  'PPPoE Subscribers' : 'Hotspot Subscribers'}/${plan.name === 'Free PPPoe' || plan.name === 'Free Hotspot' ? 365 : plan.name === 'Free Trial' ? 3 : 30} Days`,
         value: plan.name,
         plan: {
           name: plan.name,
           [planType === 'pppoe' ? 'maximum_pppoe_subscribers' : 'hotspot_subscribers']: 
             planType === 'pppoe' ? plan.maximum_pppoe_subscribers : plan.hotspot_subscribers,
-          expiry_days: plan.name === 'Free' ? 365 : 30,
+          expiry_days: plan.name === 'Free PPPoe' || plan.name === 'Free Hotspot' ? 365 : 30,
           billing_cycle: 'monthly'
         }
       }));
@@ -222,7 +229,7 @@ const planOptions = [
         // resetForm();
       } else {
         const errorData = await res.json();
-        toast.error(errorData.message || 'Failed to save plan');
+        toast.error('Failed to save plan');
       }
     } catch (err) {
       toast.error('Network error');
@@ -238,7 +245,8 @@ const planOptions = [
 
   const currentPlans = planType === 'pppoe' ? plans : hotspotPlans;
   const predefinedOptions = getPredefinedOptions();
-  console.log('selected plan', selectedPlan)
+
+
 
 
   return (
@@ -364,6 +372,9 @@ const planOptions = [
           // plans={currentPlans} 
           plans={plans} 
           companyName={companyName}
+          setHotspotPlans={setHotspotPlans}
+          setPlans={setPlans}
+          
           setCompanyName={setCompanyName}
           selectedPlan={selectedPlan}
           handlePlanSelect={handlePlanSelect}
@@ -388,13 +399,111 @@ const planOptions = [
   );
 };
 
-const PlanTable = ({ plans, type, onEdit, planType, planCategory, hotspotPlans,
 
+
+
+
+
+
+
+
+
+
+
+
+const PlanTable = ({ plans, type, onEdit, planType, planCategory, hotspotPlans,
+setHotspotPlans,
+setPlans,
   
 companyName, setCompanyName,selectedPlan,handlePlanSelect,
 openPlanManager, setOpenPlanManager
  }) => {
 
+const [openDeleteHotspotPlan, setOpenDeleteHotspotPlan] = useState(false);
+const [openDeletePPPOEPlan, setOpenDeletePPPOEPlan] = useState(false);
+  const [companyNameDelete, setCompanyNameDelete] = useState('');
+  const [companyId, setCompanyId] = useState('');
+  const [ppoePlanId, setPpoePlanId] = useState('');
+
+
+
+const handleCloseDeletePPPOEPlan = () => {
+  setOpenDeletePPPOEPlan(false);
+}
+
+
+
+
+const deletePPPOEPlan = async () => {
+  try {
+      const response = await fetch(`/api/pppoe_plans/${ppoePlanId}?company_name=${companyNameDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+
+        },
+        body: JSON.stringify({
+          company_name: companyNameDelete
+        }),
+      });
+
+      if (response.ok) {
+       setOpenDeletePPPOEPlan(false);
+        toast.success('Pppoe plan deleted successfully');
+        setPlans(plans.filter(plan => plan.id !== ppoePlanId))
+        
+      } else {
+        toast.error('Failed to delete pppoe plan');
+
+        setOpenDeletePPPOEPlan(false);
+      }
+    } catch (error) {
+      
+      toast.error('Failed to delete pppoe plan server error');
+     setOpenDeletePPPOEPlan(false);
+    }
+
+}
+
+
+
+
+const deleteHotspotPlan = async () => {
+    try {
+      const response = await fetch(`/api/hotspot_plans/${companyId}?company_name=${companyNameDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+
+        },
+        body: JSON.stringify({
+          company_name: companyNameDelete
+        }),
+      });
+
+      if (response.ok) {
+        setOpenDeleteHotspotPlan(false);
+        toast.success('Hotspot plan deleted successfully');
+        setHotspotPlans(hotspotPlans.filter(plan => plan.id !== companyId))
+        
+      } else {
+        toast.error('Failed to delete hotspot plan');
+
+        setOpenDeleteHotspotPlan(false);
+      }
+    } catch (error) {
+      
+      toast.error('Failed to delete hotspot plan,We’re having trouble completing this request');
+      setOpenDeleteHotspotPlan(false);
+    }
+}
+
+
+
+
+const handleCloseDeleteHotspotPlan = () => {
+  setOpenDeleteHotspotPlan(false);
+}
 
 
   const defaultMaterialTheme = createTheme({
@@ -444,52 +553,17 @@ openPlanManager, setOpenPlanManager
 
 
 
-
   return (
-    // <TableContainer component={Paper}>
-    //   <Table>
-    //     <TableHead>
-    //       <TableRow>
-    //         <TableCell>Name</TableCell>
-    //         <TableCell>
-    //           {type === 'pppoe' ? 'Max Subscribers' : 'Hotspot Users'}
-    //         </TableCell>
-    //         <TableCell>Expiry Days</TableCell>
-    //         <TableCell>Billing Cycle</TableCell>
-    //         <TableCell>Actions</TableCell>
-    //       </TableRow>
-    //     </TableHead>
-    //     <TableBody>
-    //       {plans.map((plan) => (
-    //         <TableRow key={plan.id}>
-    //           <TableCell>{plan.name}</TableCell>
-    //           <TableCell>
-    //             {type === 'pppoe' 
-    //               ? plan.maximum_pppoe_subscribers 
-    //               : plan.hotspot_subscribers}
-    //           </TableCell>
-    //           <TableCell>{plan.expiry_days || 30}</TableCell>
-    //           <TableCell>{plan.billing_cycle || 'monthly'}</TableCell>
-    //           <TableCell>
-    //             <Button 
-    //               size="small" 
-    //               onClick={() => onEdit(plan)}
-    //               variant="outlined"
-    //             >
-    //               Edit
-    //             </Button>
-    //           </TableCell>
-    //         </TableRow>
-    //       ))}
-    //     </TableBody>
-    //   </Table>
-    // </TableContainer>
-
+    
     <>
 
 <EditPlan companyName={companyName} setCompanyName={setCompanyName}
 planType={planType} selectedPlan={selectedPlan} handlePlanSelect={handlePlanSelect}
 open={openPlanManager} onClose={() => setOpenPlanManager(false)}
+/>
+<DeletePPPOEPlan openDeletePPPOEPlan={openDeletePPPOEPlan} 
+handleCloseDeletePPPOEPlan={handleCloseDeletePPPOEPlan}
+deletePPPOEPlan={deletePPPOEPlan}  
 />
 
         {planType === 'pppoe' ? (
@@ -499,8 +573,8 @@ open={openPlanManager} onClose={() => setOpenPlanManager(false)}
            title={<p className='text-black'>PPPoE Plans</p>}
            columns={[
             { title: 'Maximum Subscribers', field: 'maximum_pppoe_subscribers' },
-            {title: 'Company Name', field: 'account.subdomain'},
-            { title: 'Billing Cycle', field: 'billing_cycle' },
+            {title: 'Company Name', field: 'company_name'},
+            // { title: 'Billing Cycle', field: 'billing_cycle' },
             {title: 'Status', field: 'status'},
              { title: 'Plan Name', field: 'name' 
              },
@@ -512,13 +586,11 @@ open={openPlanManager} onClose={() => setOpenPlanManager(false)}
            actions={[
              {
                icon: () => (
-                 <Tooltip title="Add PPoe Plan">
                    <IconButton color="primary">
                      <AddCircleIcon fontSize="large" />
                    </IconButton>
-                 </Tooltip>
                ),
-               tooltip: 'Add PPOe Plan',
+               tooltip: 'Add PPPOe Plan',
                isFreeAction: true,
                // onClick: handleOpenAddDialog
              },
@@ -530,6 +602,12 @@ open={openPlanManager} onClose={() => setOpenPlanManager(false)}
              {
                icon: () => <DeleteIcon color="error" />,
                tooltip: 'Delete PPOe Plan',
+
+            onClick: (event, rowData) => {
+              setOpenDeletePPPOEPlan(true)
+              setCompanyNameDelete(rowData.company_name)
+              setPpoePlanId(rowData.id)
+            }
                // onClick: (event, rowData) => handleDelete(rowData.id)
                // onClick: (event, rowData) => handleDeleteClick(rowData.id)
              }
@@ -550,14 +628,19 @@ open={openPlanManager} onClose={() => setOpenPlanManager(false)}
 
 
         ) : 
+        <>
+        <DeleteHotspotPlan   handleCloseDeleteHotspotPlan={handleCloseDeleteHotspotPlan}
+        openDeleteHotspotPlan={openDeleteHotspotPlan}
+       deleteHotspotPlan={deleteHotspotPlan}
+        />
         <ThemeProvider theme={materialuitheme}>
         <MaterialTable
         title="Hotspot Plans"
         columns={[
           { title: 'Maximum Hotspot Subscribers', field: 'hotspot_subscribers' },
             { title: 'Expiry Days', field: 'expiry_days' },
-            {title: 'Company Name', field: 'account.subdomain'},
-            { title: 'Billing Cycle', field: 'billing_cycle' },
+            {title: 'Company Name', field: 'company_name'},
+            // { title: 'Billing Cycle', field: 'billing_cycle' },
             {title: 'Expiry', field: 'expiry'},
             {title: 'Status', field: 'status'},
              { title: 'Plan Name', field: 'name' 
@@ -568,28 +651,34 @@ open={openPlanManager} onClose={() => setOpenPlanManager(false)}
         actions={[
           {
             icon: () => (
-              <Tooltip title="Add Network">
                 <IconButton color="primary">
                   <AddCircleIcon fontSize="large" />
                 </IconButton>
-              </Tooltip>
             ),
-            tooltip: 'Add Network',
+            tooltip: 'Add Hotspot Plan',
             isFreeAction: true,
             // onClick: handleOpenAddDialog
           },
           {
             icon: () => <EditIcon color="primary" />,
-            tooltip: 'Edit Network',
+            tooltip: 'Edit Hotspot Plan',
             // onClick: (event, rowData) => handleOpenEditDialog(rowData)
           },
           {
-            icon: () => <DeleteIcon color="error" />,
-            tooltip: 'Delete Network',
-            // onClick: (event, rowData) => handleDelete(rowData.id)
+            icon: (event, rowData) => <DeleteIcon color="error" onClick={() =>
+               setOpenDeleteHotspotPlan(true)} />,
+            tooltip: 'Delete Hotspot Plan',
+
+            onClick: (event, rowData) => {
+              setOpenDeleteHotspotPlan(true)
+              setCompanyNameDelete(rowData.company_name)
+              setCompanyId(rowData.id)
+            }
             // onClick: (event, rowData) => handleDeleteClick(rowData.id)
           }
         ]}
+
+
         options={{
           actionsColumnIndex: -1,
           pageSize: 10,
@@ -602,6 +691,7 @@ open={openPlanManager} onClose={() => setOpenPlanManager(false)}
         }}
       />
       </ThemeProvider>
+      </>
       }
 
       

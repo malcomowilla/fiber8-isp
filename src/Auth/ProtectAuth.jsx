@@ -10,6 +10,8 @@ import animationData from '../lotties/loading_gray.json';
 
 import Lottie from 'react-lottie';
 import Backdrop from '@mui/material/Backdrop';
+import {RefreshCw} from 'lucide-react';
+
 
 
 
@@ -59,11 +61,7 @@ const ProtectAuth = ({children}) => {
         sx={{ color: 'red', zIndex: (theme) => theme.zIndex.drawer + 20 }}
         open={open}
       >
-         <Lottie 
-          options={defaultOptions}
-          height={200}
-          width={200}
-        />
+       <RefreshCw className='animate-spin text-blue-500 w-12 h-12 mx-auto ' />
       </Backdrop>    
      </>
   }

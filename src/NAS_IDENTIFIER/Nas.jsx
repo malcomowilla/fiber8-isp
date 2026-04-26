@@ -15,6 +15,8 @@ import toast, { Toaster } from 'react-hot-toast';
 import DeleteRouter from '../delete/DeleteRouter'
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { LuRouter } from "react-icons/lu";
+import { LuChartNetwork } from "react-icons/lu";
+
 
 import { FaFulcrum } from "react-icons/fa";
 
@@ -47,7 +49,7 @@ const [selectedRouterInfo, setSelectedRouterInfo] = useState(null);
 const [search ,setSearch] = useState('')
 
 
-const [tableDataNas, setTableDataNas] = useState([]); // Stores routers
+const [tableDataNas, setTableDataNas] = useState([]); 
 
 
   const [openLoading, setOpenLoading] = useState(false);
@@ -57,7 +59,6 @@ const [selectedRouterId, setSelectedRouterId] = useState(() => {
   const savedRouterId = localStorage.getItem('selectedCheckedRouter');
   return savedRouterId ? parseInt(savedRouterId, 10) : null;
 });
-// console.log('nas data', nasformData)
 const handleClickOpenDelete = () => {
   setOpenDelete(true);
 };
@@ -154,7 +155,6 @@ const subdomain = window.location.hostname.split('.')[0];
         position: "top-center",
         duration: 7000,
       })
-      console.log('failed to delete')
     }
   }
 
@@ -238,7 +238,6 @@ if (response.status === 401) {
           window.location.href='/signin'
          }, 1900);
 }
-    console.log('failed to fetch routers')
 toast.error(newData.error,{
 position: 'top-center',
 duration: 5000,
@@ -253,7 +252,6 @@ duration: 4000,
   
   } catch (error) {
     
-    console.log(error)
   
   }
   
@@ -319,7 +317,7 @@ const handleSubmit = async (e)=> {
         } else {
           toast.error('failed to add router', {
             position: "top-center",
-            duration: 7000,
+            duration: 6000,
           })
             setloading(false)
 
@@ -327,7 +325,7 @@ const handleSubmit = async (e)=> {
     } catch (error) {
       toast.error('failed to add router something went wrong', {
         position: "top-center",
-        duration: 7000,
+        duration: 6000,
       })
         setloading(false);
 
@@ -351,7 +349,7 @@ const handleSubmit = async (e)=> {
     const handleCheckboxChange = (event, rowData) => {
       const newSelectedRouter = rowData.id === selectedRouter ? null : rowData.id;
       setSelectedRouter(newSelectedRouter);
-      localStorage.setItem('selectedCheckedRouter', newSelectedRouter !== null ? newSelectedRouter : '');
+      // localStorage.setItem('selectedCheckedRouter', newSelectedRouter !== null ? newSelectedRouter : '');
       setnasFormData(newSelectedRouter !== null ? rowData : initialValueNas);
 
     };
@@ -372,12 +370,10 @@ const handleSubmit = async (e)=> {
             const newData = await response.json()
             if (response.ok) {
               setPingStatus(newData)
-              console.log('router ping status fetch array', newData[0])
               // setTableData((prevData) => ({
               //   ...prevData, 
               //   ...newData // This will overwrite existing keys if they exist
               // }));
-              console.log('router ping status', newData)
             
             }else{
               toast.error('failed to get router ping status something went wrong', {
@@ -428,7 +424,6 @@ const mergedTableData = tableDataNas.map((nasRouter) => {
   const routerPingStatus = pingStatus.find(
     (status) => status?.ip === nasRouter.ip_address
   );
-  console.log('routerPingStatus', routerPingStatus)
   // Extract ping time if available
   const response = routerPingStatus?.response || "";
   const pingTimeMatch = response.match(/time[=<](\d+\.?\d*ms)/i); // More robust regex
@@ -466,7 +461,7 @@ const columns = [
 
   {
     title: 'ping',
-    field: 'ping',
+    field: 'response',
     render: rowData => (
       <span style={{ 
         // color: pingStatus.router_status?.response ? 'green' : 'red', 
@@ -474,7 +469,7 @@ const columns = [
         color: rowData.reachable === 'Reachable' ? 'green' : 'red', 
         fontWeight: 'bold' 
       }}>
-{rowData.response.match(/time[=<](\d+\.?\d*\s*ms)/i)?.[1] ?? 'N/A'}
+        {rowData.response?.substring(14, 35) || 'N/A'}
 
       </span>
     )
@@ -494,9 +489,9 @@ const columns = [
     )
   },
   {title: 'ip_address', field: 'ip_address',
-
-
    },
+
+   {title: 'Location', field: 'location'},
   {title: 'username', field: 'username', },
   // {title: 'password', field: 'password', },
 
@@ -510,10 +505,9 @@ const columns = [
        <EditButton />
 
 
-       <Tooltip 
-       
-       title="View Traffic" className='text-green-700 w-6 h-6'>
-                  <FaFulcrum 
+                  <LuChartNetwork
+                  className='text-black w-6 h-6 sm:w-10 
+                  sm:h-10 cursor-pointer lg:w-7 lg:h-7'
                    onClick={() => {
                    setOpenLoading(true);
                    setRouterName(rowData.id)
@@ -522,12 +516,11 @@ const columns = [
                     }, 2000);
                   }}
                  
-                  fontSize="large" />
-              </Tooltip>
+                   />
 
 
               <Tooltip title='radius' onClick={() => {
-                 navigate(`/admin/radius-settings?id=${rowData.id} &ip_address=${rowData.ip_address} &l=${rowData.password} &short_code=${rowData.shortcode}`);
+                 navigate(`/admin/radius-settings?id=${encodeURIComponent(rowData.id)}&ip_address=${encodeURIComponent(rowData.ip_address)}&l=${encodeURIComponent(rowData.password)}&short_code=${encodeURIComponent(rowData.shortcode)}`);
               }}>
 <img src={FreeRadiusLogo} className="w-6 h-6" alt="FreeRADIUS" />
               </Tooltip>
@@ -609,8 +602,10 @@ const handleCloseLoading = () => {
  handleCloseDelete ={handleCloseDelete}  openDelete={openDelete}/>
       <MaterialTable columns={columns}
       
-      title= { <p className='bg-gradient-to-r from-green-600 via-blue-400
-         to-cyan-500 bg-clip-text text-transparent font-bold text-2xl'>NAS (Mikrotik Routers with PPPoE/Hotspot) </p> }
+      title= { <p className='
+        
+         font-bold text-2xl'>NAS (Mikrotik Routers 
+         with PPPoE/Hotspot) </p> }
       
       
       data={mergedTableData}
@@ -629,40 +624,37 @@ const handleCloseLoading = () => {
     ]}
 
 
+localization={{
+                body: {
+                  emptyDataSourceMessage: 'No NAS found. Create your first NAS to get started!'
+                },
+               
+              
+              
+              }}
+
+
 options={{
-        paging: true,
-       pageSizeOptions:[5, 10, 20],
-       pageSize: 20,
-       search: false,
-searchFieldStyle: {
-  borderColor: 'red'
-},
+  sorting: true,
+  pageSizeOptions:[2, 5, 10],
+  pageSize: 10,
+  paginationPosition: 'bottom',
+exportButton: true,
+exportAllData: true,
+selection: true,
+search:false,
 searchAutoFocus: true,
 showSelectAllCheckbox: false,
 showTextRowsSelected: false,
-
-selection: true,
-paginationType: 'stepped',
-
-// rowStyle:{
-//   backgroundColor: 'dark'
-// },
-
-paginationPosition: 'bottom',
-
-
+  emptyRowsWhenPaging: false,
 headerStyle:{
   fontFamily: 'bold',
   textTransform: 'uppercase'
   } ,
   
-  // rowStyle:(data, index)=> index % 2 === 0 ? {
-  // background: 'gray'
-  // }: null,
   
   fontFamily: 'mono'
-}}     
-      
+}}  
       
       
       

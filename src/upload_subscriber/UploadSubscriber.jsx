@@ -3,6 +3,9 @@ import {motion} from 'framer-motion'
 import {useState} from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
+import { IoInformationCircleOutline } from "react-icons/io5";
+
+
 
 
 
@@ -90,6 +93,18 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
 
     <>
       <Toaster />
+
+      <div role="alert" className="alert alert-info bg-green-500 rounded-lg w-fit
+          p-2 flex items-center gap-2 justify-center mb-3">
+ <IoInformationCircleOutline className='text-white text-xl '/>
+  <span className='text-white'>
+
+     Upload your existing subscribers to the system to continue where you left off.
+      You can upload a CSV or JSON file.
+
+  </span>
+</div>
+
       <div className="flex relative justify-center  min-h-screen bg-gradient-to-r "
       onClick={()=> {
         setShowMenu1(false)

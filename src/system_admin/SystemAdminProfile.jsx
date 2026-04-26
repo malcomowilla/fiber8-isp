@@ -171,7 +171,6 @@ const SystemAdminProfile = () => {
   const subdomain = window.location.hostname.split('.')[0]
 
   const subdomain_aitechs = window.location.host
-console.log('subdomain_aitechs', subdomain_aitechs)
   function arrayBufferToBase64Url(buffer) {
     const bytes = new Uint8Array(buffer);
     let binary = '';
@@ -247,7 +246,6 @@ console.log('subdomain_aitechs', subdomain_aitechs)
       options.challenge = Uint8Array.from(atob(base64UrlToBase64(options.challenge)), c => c.charCodeAt(0));
     }
   
-    console.log('options.challenge:',options.challenge )
   
     try {
       const credential = await navigator.credentials.create({ publicKey: options });
@@ -293,7 +291,6 @@ console.log('subdomain_aitechs', subdomain_aitechs)
   
         
       } else {
-        console.log('signup failed');
         // setRegistrationError(options.errors);
         setOpenLoad(false);
         setLoading(false);
@@ -303,12 +300,10 @@ console.log('subdomain_aitechs', subdomain_aitechs)
       toast.error('An error occurred. Please try again later2.');
       setOpenLoad(false);
       setLoading(false);
-      console.error('Error during WebAuthn credential creation:', err);
     }
   }
   
   
-  // create_system_admin_settings  
 
 
 
@@ -349,7 +344,7 @@ console.log('subdomain_aitechs', subdomain_aitechs)
       setLoading(false);
         setOpenLoad(false);
         toast.error('Failed to update login with passkey', {
-          duration: 7000,
+          duration: 3000,
           position: "top-center",
           style: {
             background: "linear-gradient(to right, #ff6384, #36a2eb)",
@@ -381,7 +376,7 @@ console.log('subdomain_aitechs', subdomain_aitechs)
         setUsePhoneNumberAuthentication(data[0].use_sms_authentication)
        }
      } catch (error) {
-       console.error('Error fetching login with passkey:', error);
+      
      }
    };
    getSystemAdminSettings() 

@@ -13,24 +13,23 @@ const [expiry2, setExpiry2] = useState('No license')
 const navigate = useNavigate()
 
 
-
 const subdomain = window.location.hostname.split('.')[0];
 
 const getCurrentHotspotPlan = useCallback(
     async() => {
-      const response = await fetch('/api/allow_get_current_hotspot_plan', {
+      const response = await fetch('/api/get_hotspot_and_dial_plan', {
         headers: {
           'X-Subdomain': subdomain,
         },
       })
       const newData = await response.json()
       if (response.ok) {
-        console.log('current hotspot plan', newData)
+        // console.log('current hotspot plan', newData)
         setExpiry2(newData[0].expiry)
         // setCurrentPPOEPlan(newData.message)
       }
     },
-    [],
+    [subdomain],
   )
 
 useEffect(() => {
@@ -40,27 +39,22 @@ useEffect(() => {
 
 
 
-  const getCurrentPPOEPlan = useCallback(
-    async() => {
-      const response = await fetch('/api/allow_get_current_pppoe_plan', {
-        headers: {
-          'X-Subdomain': subdomain,
-        },
-      })
-      const newData = await response.json()
-      if (response.ok) {
-        console.log('current pppoe plan', newData)
-        setExpiry(newData[0].expiry)
-        // setCurrentPPOEPlan(newData.message)
-      }
-    },
-    [],
-  )
 
-  useEffect(() => {
-    getCurrentPPOEPlan()
-   
-  }, [getCurrentPPOEPlan]);
+
+const today = new Date();
+
+
+let clean = expiry.replace(" at ", " ");
+let clean2 = expiry2.replace(" at ", " ");
+
+let dateExpiryPPOE = new Date(clean);
+let dateExpiryHotspot = new Date(clean2);
+ const isExpiredHotspot = dateExpiryHotspot < today;
+
+
+
+// console.log('isEXpiredPpoe', isExpiredPoe)
+// console.log('isExpiredHotspot', isExpiredHotspot)
 
 
   // Animation variants
@@ -131,9 +125,12 @@ useEffect(() => {
               <div>
                 <h3 className="font-semibold text-gray-800 dark:text-gray-200 ">Subscription Ended</h3>
                 <p className="text-gray-600 dark:text-gray-400 flex flex-col">
-                   <span className="font-medium"> Your license expired on - <span className='font-bold'>{expiry}</span> </span>
+                 
 
-                  <span className="font-medium">  Hotspot License - Expired on  <span className='font-bold'>{expiry2} </span> </span>
+                  {isExpiredHotspot ? (                   
+                    <span className="font-medium"> Hotspot And PPPOE license expired on - <span className='font-bold'>{expiry2} </span> </span>
+                  ) : null}
+
                 </p>
 
 
@@ -152,7 +149,7 @@ useEffect(() => {
 
             <motion.button
             onClick={() => {
-              navigate('/admin/user-license')
+              navigate('/admin/invoice')
             }}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}

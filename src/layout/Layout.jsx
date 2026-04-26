@@ -1,12 +1,10 @@
 import {Outlet} from 'react-router-dom'
 import Sidebar from '../sidebar/Sidebar'
 import Header from '../header/Header'
-
 import { useContext, useState, useEffect, useCallback} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import ShortCuts from './ShortCuts'
-
 import UiLoader from '../uiloader/UiLoader'
 import { Suspense } from "react";
 import { useLocation } from 'react-router-dom';
@@ -24,6 +22,9 @@ import CurrentPlans from './CurrentPlans'
 import License from './License'
 import Updates from './Updates'
 import  WelcomeMessage from './WelcomeMessage'
+import {RefreshCw} from 'lucide-react';
+
+
 
 const Layout = () => {
 
@@ -45,19 +46,14 @@ const {fetchCurrentUser, currentUser, companySettings,
       showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
        showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
         showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
-        providerSms, setProviderSms
+        providerSms, setProviderSms,expiry, setExpiry, expiry2, setExpiry2, condition, setCondition,
+        condition2, setCondition2, status, setStatus, status2, setStatus2,
+        currentHotspotPlan, setCurrentHotspotPlan, currentPPOEPlan, 
+        setCurrentPPOEPlan,calculateTimeRemaining
 } = useApplicationSettings()
 
 const { company_name, contact_info, email_info, logo_preview} = companySettings
 const [datetime, setdateTime] = useState(true)
-const [expiry, setExpiry] = useState('No license')
-const [expiry2, setExpiry2] = useState('No license')
-const [condition, setCondition] = useState(false)
-const [condition2, setCondition2] = useState(false)
-const [status, setStatus] = useState('Not Active')
-const [status2, setStatus2] = useState('Not Active')
-const [currentHotspotPlan, setCurrentHotspotPlan] = useState(null)
-const [currentPPOEPlan, setCurrentPPOEPlan] = useState(null)
 
 
 
@@ -86,7 +82,7 @@ const [date, setDate] = useState(new Date().toLocaleTimeString('en-US', { hour: 
 
   const getCurrentHotspotPlan = useCallback(
     async() => {
-      const response = await fetch('/api/get_current_hotspot_plan', {
+      const response = await fetch('/api/get_hotspot_and_dial_plan', {
         headers: {
           'X-Subdomain': subdomain,
         },
@@ -99,7 +95,6 @@ const [date, setDate] = useState(new Date().toLocaleTimeString('en-US', { hour: 
           setStatus2('Not Active')
            setStatus2(newData[0]?.status)
         } else {
-          console.log('current hotspot plan', newData)
         setExpiry2(newData[0]?.expiry)
         setCondition2(newData[0]?.condition)
         setStatus2(newData[0]?.status)
@@ -120,7 +115,7 @@ useEffect(() => {
 
   const getCurrentPPOEPlan = useCallback(
     async() => {
-      const response = await fetch('/api/get_current_pppoe_plan', {
+      const response = await fetch('/api/get_hotspot_and_dial_plan', {
         headers: {
           'X-Subdomain': subdomain,
         },
@@ -194,7 +189,7 @@ useEffect(() => {
     }
   };
 
-       const sms_provider= JSON.parse(localStorage.getItem('sms_provider')) || localStorage.getItem('sms_provider')
+      //  const sms_provider= JSON.parse(localStorage.getItem('sms_provider')) || localStorage.getItem('sms_provider')
 
 
 
@@ -235,7 +230,7 @@ if (response.status === 401) {
        
       }
     } catch (error) {
-      console.log(error)
+
     }
   },
   [],
@@ -270,10 +265,8 @@ const subdomain = window.location.hostname.split('.')[0];
 setSmsBalance(newData.message)
         }else{
          
-            console.log('failed to fetch sms balance')
         }
       } catch (error) {
-        console.log('error', error)
       }
 
     },
@@ -308,10 +301,8 @@ setSmsBalance(newData.message)
       const newData = data.length > 0 
         ? data.reduce((latest, item) => new Date(item.sms_setting_updated_at) > new Date(latest.sms_setting_updated_at) ? item : latest, data[0])
         : null;
-        console.log('newdata updated at', newData)
   
       if (response.ok) {
-        console.log('Fetched saved  SMS settings:', newData);
         const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID } = newData;
         // setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID });
         setSelectedProvider(sms_provider);
@@ -348,43 +339,9 @@ useEffect(() => {
 }, [fetchSavedSmsSettings]);
 
 
-  function calculateTimeRemaining(expiryDateString) {
-    // Parse the expiry date (format: "June 07, 2025 at 05:12 PM")
-    const expiryDate = new Date(expiryDateString?.replace(' at ', ' '));
-    const now = new Date();
-    const diffMs = expiryDate - now;
-    
-    // If already expired
-    if (diffMs <= 0) return '(license expired)';
   
-    // Calculate time components
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-  
-    // Build human-readable string
-    let result = '';
-    if (diffDays > 0) {
-      const weeks = Math.floor(diffDays / 7);
-      const days = diffDays % 7;
-      
-      if (weeks > 0) result += `${weeks} week${weeks !== 1 ? 's' : ''} `;
-      if (days > 0) result += `${days} day${days !== 1 ? 's' : ''} `;
-    }
-    
-    if (diffHours > 0 && diffDays < 2) {
-      result += `${diffHours} hour${diffHours !== 1 ? 's' : ''} `;
-    }
-    
-    if (diffMinutes > 0 && diffDays === 0) {
-      result += `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`;
-    }
-  
-    // If less than 1 minute remains
-    if (result === '') return 'expires in less than 1 minute';
-  
-    return `expires in ${result?.trim()}`;
-  }
+
+
   return (
     <>
     
@@ -407,8 +364,9 @@ useEffect(() => {
 
     
     <div
-      className={`h-screen flex flex-col overflow-y-scroll transition-all duration-500 ease-in-out ${
-        seeSidebar ? 'ml-10' : 'sm:ml-64'
+      className={`h-screen flex flex-col overflow-y-scroll transition-all 
+        duration-500 ease-in-out ${
+        seeSidebar ? 'ml-16' : 'sm:ml-64'
       }`}
     >
       <div className="flex-grow p-4 overflow-x-hidden">
@@ -455,6 +413,20 @@ useEffect(() => {
                location.pathname !== '/admin/radius-settings' &&
                location.pathname !== '/admin/license' &&
                location.pathname !== '/admin/map' &&
+               location.pathname !== '/admin/hotspot-marketing-dashboard' &&
+                location.pathname !== '/admin/add-settings' &&
+                location.pathname !== '/admin/financial-dashboard' &&
+                location.pathname !== '/admin/hotspot_anlytics' &&
+                location.pathname !== '/admin/subscriber-payment-analytics' &&
+                location.pathname !== '/admin/unpaid-invoices' &&
+                location.pathname !== '/admin/ip-pool' &&
+                location.pathname !== '/admin/template-assignment' &&
+                location.pathname !== '/admin/subscriber-invoice-page' &&
+                location.pathname !== '/admin/analytics' &&
+                location.pathname !== '/admin/hotspot-payments' &&
+                location.pathname !== '/admin/partners-management' &&
+                location.pathname !== '/admin/pppoe-payments' &&
+                location.pathname !== '/admin/access-point' &&
               <WelcomeMessage/>
  }
 
@@ -501,6 +473,18 @@ location.pathname !== '/admin/passkeys' && location.pathname !== '/admin/ticket-
  location.pathname !== '/admin/radius-settings' &&
  location.pathname !== '/admin/license' &&
  location.pathname !== '/admin/map' &&
+  location.pathname !== '/admin/hotspot-marketing-dashboard' &&
+  location.pathname !== '/admin/add-settings' &&
+   location.pathname !== '/admin/financial-dashboard' &&
+   location.pathname !== '/admin/subscriber-payment-analytics' &&
+   location.pathname !== '/admin/unpaid-invoices' &&
+   location.pathname !== '/admin/ip-pool' &&
+   location.pathname !== '/admin/template-assignment' &&
+   location.pathname !== '/admin/subscriber-invoice-page' &&
+   location.pathname !== '/admin/hotspot-payments' &&
+   location.pathname !== '/admin/partners-management' &&
+   location.pathname !== '/admin/pppoe-payments' &&
+   location.pathname !== '/admin/access-point' &&
 
 <div
  onClick={() => {
@@ -577,7 +561,7 @@ currentPPOEPlan={currentPPOEPlan} currentHotspotPlan={currentHotspotPlan}
   location.pathname !== '/admin/messages' &&
   location.pathname !== '/admin/bulk-messages' &&  
   location.pathname !== '/admin/pppoe-packages' && location.pathname !== '/admin/today-subscribers' &&
-  location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers'  &&
+  location.pathname !== '/admin/this-week-subscribers' && location.pathname !== '/admin/this-month-subscribers' &&
  location.pathname !== '/admin/upload-subscriber' &&
 location.pathname !== '/admin/scheduler' && location.pathname !== '/admin/private-network' &&
 location.pathname !== '/admin/router_details' && location.pathname !== '/admin/invoice' &&
@@ -595,6 +579,21 @@ location.pathname !== '/admin/onu-details' && location.pathname !== '/admin/node
   && location.pathname !== '/admin/create-subscriber' && location.pathname !== '/admin/ticket-stats' &&
    location.pathname !== '/admin/radius-settings' &&
    location.pathname !== '/admin/license' && location.pathname !== '/admin/map' &&
+   location.pathname !== '/admin/hotspot-marketing-dashboard' &&
+   location.pathname !== '/admin/add-settings' && location.pathname !== '/admin/finance-stats' &&
+    location.pathname !== '/admin/financial-dashboard' &&
+    location.pathname !== '/admin/subscriber-payment-analytics' &&
+    location.pathname !== '/admin/unpaid-invoices' &&
+    location.pathname !== '/admin/ip-pool' &&
+    location.pathname !== '/admin/template-assignment' &&
+    location.pathname !== '/admin/hotspot-package' &&
+    location.pathname !== '/admin/subscriber-invoice-page' &&
+    location.pathname !== '/admin/analytics' &&
+    location.pathname !== '/admin/admin-dashboard' &&
+    location.pathname !== '/admin/hotspot-payments' &&
+    location.pathname !== '/admin/partners-management' &&
+    location.pathname !== '/admin/pppoe-payments' &&
+    location.pathname !== '/admin/access-point' &&
 <div 
  onClick={() => {
             setShowMenu1(false)
@@ -675,7 +674,21 @@ location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/u
             && location.pathname !== '/admin/subscriber-details' && 
             location.pathname !== '/admin/create-subscriber'
             && location.pathname !== '/admin/radius-settings'
-            && location.pathname !== '/admin/license' && location.pathname !== '/admin/map'
+            && location.pathname !== '/admin/license' && location.pathname !== '/admin/map' &&
+             location.pathname !== '/admin/hotspot-marketing-dashboard' &&
+              location.pathname !== '/admin/add-settings' && location.pathname !== '/admin/finance-stats' &&
+               location.pathname !== '/admin/financial-dashboard' &&
+                location.pathname !== '/admin/subscriber-payment-analytics' &&
+                 location.pathname !== '/admin/unpaid-invoices' &&
+                  location.pathname !== '/admin/ip-pool' &&
+                  location.pathname !== '/admin/template-assignment' &&
+                  location.pathname !== '/admin/subscriber-invoice-page'
+                  && location.pathname !== '/admin/hotspot-payments'
+                  && location.pathname !== '/admin/user-group'
+                  && location.pathname !== '/admin/upload-subscriber'
+                  && location.pathname !== '/admin/partners-management'
+                  && location.pathname !== '/admin/pppoe-payments'
+                  && location.pathname !== '/admin/access-point'
            && <div
             onClick={() => {
             setShowMenu1(false)
@@ -846,7 +859,9 @@ location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/u
             setShowMenu11(false)  
             setShowMenu12(false)
           }}>
-             <Suspense fallback={<UiLoader />}>
+             <Suspense fallback={<RefreshCw 
+             className='animate-spin
+              text-blue-500 w-12 h-12 mx-auto' />}>
             <Outlet />
              </Suspense>
             

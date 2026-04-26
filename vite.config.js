@@ -4,66 +4,50 @@ import path from "path"
 import MillionLint from "@million/lint";
 
 
-// https://vitejs.dev/config/
+
 export default defineConfig({
   plugins: [react(),
      MillionLint.vite({ auto: true })
   ],
   server: {
-    // host: '0.0.0.0',
-    // port: 3000,
+    
     proxy: {
       '/api': {
-        // target: 'http://localhost:4000',
-        // target: 'https://fiber8.aitechs.co.ke',
+        target: 'http://localhost:4000',
         // // target: 'http://0.0.0.0:3000',
         // changeOrigin: true,
         // rewrite: (path) => path.replace(/^\/api/, ''),
 
         
-        target: (req) => {
-          const host = req.headers.host; // Get the request hostname
+        // target: (req) => {
+        //   const host = req.headers.host; 
       
-          if (host === 'aitechs.co.ke' || host.endsWith('.aitechs.co.ke')) {
-            return `https://${host}`; // Proxy dynamically based on the request domain
-          }
-          return 'http://0.0.0.0:3000'; // Default target if not matching
-        },
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        //   if (host === 'aitechs.co.ke' || host.endsWith('.aitechs.co.ke')) {
+        //     return `https://${host}`; 
+        //   }else{
+        //    host.endsWith('.owitech.co.ke') 
+        //   }
+        //   return 'http://0.0.0.0:3000'; 
+        // },
+        // changeOrigin: true,
+        // rewrite: (path) => path.replace(/^\/api/, ''),
 
         
-      },
-    },
+      }
+    }
 
     
 
-
-    // proxy: {
-    //   '/api': {
-    //     // target: 'http://192.168.1.69:4000',
-    //     target: 'https://fiber8.aitechs.co.ke',
-    //     changeOrigin: true,
-    //     rewrite: (path) => path.replace(/^\/api/, ''),
-    //     configure: (proxy) => {
-    //       proxy.on('proxyReq', (proxyReq, req, res, options) => {
-    //         proxyReq.setHeader('X-Original-Host', req.headers.host);
-    //       });
-    //     },
-    //   },
-    
-    
-    // },
   },
 
 
 
   build: {
-    outDir: 'dist', // This is the build output directory
+    outDir: 'dist', 
         sourcemap: false,
 
-    assetsDir: 'assets', // Directory for assets inside outDir
-    emptyOutDir: true, // Empty the output directory before building
+    assetsDir: 'assets', 
+    emptyOutDir: true, 
     commonjsOptions: {
       include: [/node_modules/],
       transformMixedEsModules: true

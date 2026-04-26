@@ -513,12 +513,16 @@ const {contact_info, company_name, email_info, logo_url,
     window.open(`https://wa.me/254791568852?text=Hi,%20I%20need%20help%20with%20${encodeURIComponent(company_name)}%20system`, '_blank');
   };
 
+
+
   const handleViewDocs = () => {
     handleClose();
     window.open('/docs', '_blank');
   };
 
-  return location.pathname.includes('/admin') ? (
+
+
+  return location.pathname.includes('/admin/analytics') || location.pathname.includes('/admin/finance-stats') || location.pathname.includes('/admin/admin-dashboard') ? (
     <>
     <Toaster />
       <Tooltip title="Help & Resources">

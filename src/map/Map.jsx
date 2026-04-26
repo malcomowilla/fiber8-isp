@@ -10,6 +10,9 @@ import MyMapComponent from './MyMapComponent';
 import MarkerEditor from './MarkerEditor';
 import { MarkerDetailsPanel } from './MarkerDetailsPanel';
   import { ToastContainer, toast } from 'react-toastify';
+import { Construction, Code, Rocket, Clock } from 'lucide-react';
+
+
 
 // Custom styles for an eye-catching map
 
@@ -19,7 +22,10 @@ const Maps = () => {
   const { api_key } = mapForm
   const mapRef = useRef(null)
 const map = useMap()
-  // const [map, setMap] = useState(null); // Use state instead of useMap hook
+
+
+
+// const [map, setMap] = useState(null); // Use state instead of useMap hook
 
   const [currentLocation, setCurrentLocation] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -27,7 +33,7 @@ const map = useMap()
   const [mapType, setMapType] = useState('hybrid')
   const [is3DEnabled, setIs3DEnabled] = useState(false)
   const [drawingMode, setDrawingMode] = useState(null)
-  const [markers, setMarkers] = useState([])
+  const [markersi, setMarkers] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [showStreetView, setShowStreetView] = useState(false)
   const [terrainEnabled, setTerrainEnabled] = useState(true)
@@ -152,7 +158,6 @@ const {
         }
       }
     } catch (error) {
-      console.error('Error fetching map settings:', error)
     }
   }, [subdomain, setMapForm])
 
@@ -258,7 +263,8 @@ const {
         }
       })
     } catch (error) {
-      console.error('Error searching location:', error)
+
+
     }
   }, [searchQuery])
 
@@ -321,21 +327,16 @@ const {
   const handleZoomChanged = useCallback((event) => {
     setZoom(event.detail.zoom)
   }, [])
-//  const handleMapLoad = useCallback((mapInstance) => {
-//     console.log('🎯 Map loaded:', mapInstance);
-    
-//   }, []);
+
 
  useEffect(() => {
     if (!map) {
-      console.log('🚨 Map not loaded yet');
       return;
 
 
 
     }
     
-    console.log('🎯 Map loaded:', map);
 
     // here you can interact with the imperative maps API
   }, [map]);
@@ -352,10 +353,8 @@ const {
       if (response.ok) {
         setSubscribers(newData)
       } else {
-        console.log('Failed to fetch subscribers')
       }
     } catch (error) {
-      console.log(error)
     }
   }, [subdomain])
 
@@ -378,18 +377,16 @@ const {
 
 
 useEffect(() => {
-  console.log('🔄 Map ref updated:', mapRef.current);
 }, []);
 
 
 
  const handleGoToCurrentLocation = () => {
-    console.log('=== My Location Clicked ===');
-    console.log('currentLocation:', currentLocation);
-    console.log('map instance from useMap:', map);
+    // console.log('=== My Location Clicked ===');
+    // console.log('currentLocation:', currentLocation);
+    // console.log('map instance from useMap:', map);
     
     if (currentLocation && map) {
-      console.log('Moving map to current location:', currentLocation);
       map.panTo(currentLocation);
       map.setCenter(currentLocation);
       map.setZoom(15);
@@ -400,7 +397,6 @@ useEffect(() => {
     }
   };
 
-console.log('currentLocation', currentLocation)
   const handleDragStart = () => {
     setUserInteracting(true);
   };
@@ -452,6 +448,9 @@ console.log('currentLocation', currentLocation)
       <div className="w-full h-full">
         {/* Control Panel */}
 
+<div className="flex flex-col items-center justify-center "> <div className="text-4xl">🚧</div> 
+<h1 className="text-2xl font-bold mt-4">Under Development</h1> <p className="text-gray-500">This feature 
+  is still in development. Please check back later.</p> </div>
 
       
         <div className="bg-white p-4 shadow-lg rounded-lg mb-4">

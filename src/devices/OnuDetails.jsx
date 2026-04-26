@@ -39,15 +39,19 @@ import {
   Grid,
   IconButton,
   Snackbar,
-  Alert
+  Alert,
+  InputAdornment,
+ Button,
+ Chip
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 
 import { VscPulse } from "react-icons/vsc";
-
-
-
-
+import { FaLocationDot } from "react-icons/fa6";
+import { 
+   RefreshCw,
+  BarChart3, TrendingDown, Download, Upload
+} from 'lucide-react';
 const SettingsNotification = lazy(() => import('../notification/SettingsNotification'))
 
 
@@ -104,13 +108,15 @@ const OnuDetails = () => {
     setRebootConfirmOpen(true);
   };
 
-  const handleRebootConfirm = () => {
-    rebootDevice();
-  };
+  
 
   const handleRebootCancel = () => {
     setRebootConfirmOpen(false);
   };
+
+
+      const [nodes, setNodes] = useState([])
+
 
 
     const [ticketForm, setTicketForm] = useState({
@@ -267,6 +273,39 @@ const getAlternativeStandardName2 = (standard) => {
   }));
     }
 
+
+
+
+
+
+ const getNodes = useCallback(
+    async() => {
+     
+      
+      try {
+        const response = await fetch('/api/nodes', {
+          headers: { 'X-Subdomain': subdomain },
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setNodes(data)
+          
+        } else {
+          
+
+        }
+      } catch (error) {
+        
+      }
+    },
+    [],
+  )
+  
+
+  useEffect(() => {
+    getNodes()
+   
+  }, [getNodes]);
 
 
 
@@ -472,9 +511,69 @@ const [dhcp_server_dns_servers, setDhcpServerDnsServers] = useState('')
 const [lease_time, setLeaseTime] = useState('')
 const [clients_domain_name, setClientsDomainName] = useState('')
 const [reserved_ip_address, setReservedIpAddress] = useState('')
-
-
+const [location, setLocation] = useState('')
+const [loadUpdate, setLoadUpdate] = useState(false)
 const onu_id = searchParams.get('onu_id')
+
+
+
+
+const updateLocation = async(e) => {
+e.preventDefault()
+setLoadUpdate(true)
+ 
+
+try {
+  const response = await fetch(`/api/update_onu_location/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Subdomain': subdomain,
+      },
+      body: JSON.stringify({
+        location: location
+      })
+      
+    })
+    const newData = await response.json()
+
+    if (response.ok) {
+      setLocation(newData.location)
+      setLoadUpdate(false)
+         toast.success(
+  <span>
+    Location updated successfully
+  </span>,
+  {
+    icon: <FaLocationDot />,
+  }
+);
+      
+      
+    } else {
+      setLoadUpdate(false)
+      toast.error('Failed to update location', {
+        position: "top-center",
+        duration: 4000,
+        
+        
+      })  
+
+
+   
+      
+    }
+} catch (error) {
+  setLoadUpdate(false)
+  toast.error('Failed to update location', {  
+    position: "top-center",
+    duration: 4000,
+  })
+}
+}
+
+
+
 
 const changeWirelessLan1 = async (e) => {
   e.preventDefault();
@@ -533,14 +632,12 @@ const changeWirelessLan1 = async (e) => {
         duration: 4000,
       })
     } 
-    console.log("WirelessLAN1 updated:", data);
   } catch (error) {
     toast.error('error changing WirelessLAN1 server error', {
       position: "top-center",
       duration: 6000,
     })
     setLoading(false);
-    console.error("Error changing WirelessLAN1:", error);
   }
 };
 
@@ -630,7 +727,6 @@ const changeDhcpServerSettings = async (e) => {
       duration: 6000,
     })
     setLoadingDhcpServer(false);
-    console.error("Error changing WirelessLAN1:", error);
   }
 };
 
@@ -649,7 +745,6 @@ const changeDhcpServerSettings = async (e) => {
         if (response.ok) {
           const data = await response.json()
           // setDevice(data)
-          console.log('data from get device tr069', data)
           setManufacturer(data.manufacturer)
           setProductClass(data.product_class)
           setSerialNumber(data.serial_number)
@@ -700,6 +795,7 @@ const changeDhcpServerSettings = async (e) => {
           setTotalAssociations1(data.total_associations1)
           setStandard1(data.standard1)
           setAutochannel1(data.autochannel1)
+          setLocation(data.location)
 
 
 
@@ -1391,6 +1487,134 @@ helperText={
 
 
 
+
+
+
+
+
+<div className='mt-2'>
+      <form onSubmit={updateLocation}>
+        <Accordion
+          sx={{
+            backgroundColor: "transparent",
+            boxShadow: "none",
+          }}
+        >
+          <AccordionSummary
+            expandIcon={
+              <ArrowDownwardIcon
+                className="dark:text-white text-black"
+                sx={{ transition: "transform 0.3s" }}
+              />
+            }
+            aria-controls="panel1-content"
+            id="panel1-header"
+            sx={{
+              backgroundColor: "rgba(0, 0, 0, 0.05)",
+              borderRadius: "10px",
+              color: "black",
+            }}
+          >
+            <Typography variant="h6">
+              <motion.div
+                style={{ display: "flex", alignItems: "center", gap: "10px" }}
+              >
+                <motion.div
+                  variants={iconVariants}
+                  whileHover="hover"
+                  whileTap="tap"
+                >
+                  <FaLocationDot
+                   className='dark:text-white'
+                  />
+                </motion.div>
+                <p className="dark:text-white text-black roboto-condensed">
+                  Location
+                </p>
+              </motion.div>
+            </Typography>
+          </AccordionSummary>
+
+          <AccordionDetails
+            sx={{
+              backgroundColor: "rgba(0, 0, 0, 0.05)",
+              borderRadius: "10px",
+              marginTop: "10px",
+              padding: "20px",
+            }}
+          >
+            
+
+
+
+     <Autocomplete
+  fullWidth
+  id="node-autocomplete"
+  options={nodes}
+  getOptionLabel={(option) => option.name}
+  value={nodes.find(n => n.name === location) || null}
+  onChange={(event, newValue) => {
+   
+  setLocation(newValue?.name || '')
+
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Location"
+      variant="outlined"
+      InputProps={{
+        ...params.InputProps,
+        className: 'myTextField',
+      }}
+    />
+  )}
+  renderOption={(props, option) => (
+    <li {...props} key={option.id}>
+      <p className='text-black'>{option.name}</p>
+    </li>
+  )}
+  sx={{
+    '& .MuiAutocomplete-inputRoot': {
+      padding: '8px 14px',
+    },
+    '& .MuiOutlinedInput-root': {
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: 'black',
+        borderWidth: '2px'
+      }
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: 'black',
+      fontSize: '18px'
+    }
+  }}
+/>
+
+
+            {/* Interactive Update Button */}
+              <Button
+                type="submit"
+                sx={{
+                  marginTop: "20px",
+                  padding: "10px 20px",
+                  backgroundColor: "#ff6f61",
+                  color: "white",
+                  borderRadius: "25px",
+                  "&:hover": {
+                    backgroundColor: "#ff4a3d",
+                  },
+                }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                component={motion.button}
+              >
+                {loadUpdate ? <div className='flex gap-x-2'><RefreshCw className='animate-spin'/>  <p> Updating...</p></div> : 'Update location'}
+              </Button>
+          </AccordionDetails>
+        </Accordion>
+      </form>
+    </div>
 
 
 

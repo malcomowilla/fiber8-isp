@@ -20,11 +20,13 @@ import { useDebounce } from 'use-debounce';
 import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading animation
 
 import { LuDot } from "react-icons/lu";
+import {RefreshCw} from 'lucide-react';
 
 
 const User = () => {
 const [search, setSearch] = useState('')
 const [searchInput] = useDebounce(search, 1000)
+const [role, setRole] = useState('')
 const [isSearching, setIsSearching] = useState(false); // New state for search loading
 
 const [userPermisions, setUserPermisions] = useState({
@@ -90,7 +92,7 @@ const handleCloseDelete = () => {
 
 
 const handleRowAdd = (event, rowData)=> {
-  
+ 
 console.log('rowData users', rowData)
   setUserPermisions((prevData) => {
     
@@ -105,7 +107,7 @@ console.log('rowData users', rowData)
   
 
 
-  
+   setRole(rowData.role)
 
   setUserPermisions(rowData)
   setPermissionAndRoles({
@@ -385,11 +387,6 @@ const columns = [
 
 
 
-// get_all_admins
-// invite_client
-// update_client
-
-
 
 const subdomain = window.location.hostname.split('.')[0]
 const inviteUser = async(e) => {
@@ -425,7 +422,7 @@ const inviteUser = async(e) => {
 
 if (response.status === 403) {
   toast.error('permision denied to create or update user', {
-    duration: 6000, 
+    duration: 4000, 
   })
 }
 
@@ -433,7 +430,7 @@ if (response.status === 403) {
         setloading(false);
        
         toast.success('User Updated Successfully', {
-          duration: 5000, // Duration in milliseconds (3 seconds)
+          duration: 4000, // Duration in milliseconds (3 seconds)
         })
         setIsOpen(false);
         setUsers(users.map((item) =>
@@ -467,22 +464,20 @@ if (response.status === 403) {
         
       } else {
         // Handle other types of errors (network, unexpected responses)
-        console.log(newData.role_error)
-        console.error('Unexpected error:', newData.error || 'Unknown error');
+        
         // Display a generic error message to the user
       }
       setIsOpen(true); // Ensure the form remains open to show errors
     }
   } catch (error) {
     toast.error(
-      'An unexpected error occurred while creating or updating user',
+      'An unexpected error while creating or updating user',
       {
 
-        duration: 4000,
+        duration: 3000,
         position: 'top-center',
       }
     )
-    console.error('Network error:', error);
     setloading(false);
     
     setIsOpen(false);
@@ -666,8 +661,8 @@ toast.error('Failed to get admins', {
       }
     } catch (error) {
       setIsSearching(false); // Stop loading animation
-      toast.error('Failed to get admins server error', {
-        duration: 5000, 
+      toast.error('Failed to get admins, We’re having trouble completing this request.', {
+        duration: 3000, 
       })
     }
   },
@@ -696,6 +691,7 @@ useEffect(() => {
          setPermissionAndRoles={setPermissionAndRoles} userPermisions={userPermisions} 
           loading={loading} inviteUser={inviteUser}
           setUserPermisions={setUserPermisions}
+          role={role}
          />
          <div className="flex items-center max-w-sm mx-auto p-3">  
      
@@ -718,7 +714,7 @@ useEffect(() => {
           className="p-2.5 ms-2 text-sm font-medium text-white bg-green-700 rounded-lg border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
         >
           {isSearching ? (
-            <CircularProgress size={20} color="inherit" /> // Show spinner when searching
+            <RefreshCw className='animate-spin text-blue-500 w-12 h-12 mx-auto ' />
           ) : (
             <svg
               className="w-4 h-4"
@@ -749,7 +745,7 @@ useEffect(() => {
 
 <div className="absolute inset-0 flex justify-center cursor-pointer items-center  
  bg-opacity-70 z-[2] mb-[50rem]">
-    <CircularProgress size={90} color="inherit" /> 
+     <RefreshCw className='animate-spin text-blue-500 w-12 h-12 mx-auto ' />
     
     </div>
   
@@ -791,40 +787,37 @@ useEffect(() => {
     ]}
 
 
+localization={{
+                body: {
+                  emptyDataSourceMessage: 'No users found. Create your first user to get started!'
+                },
+               
+              
+              
+              }}
+
+
 options={{
-        paging: true,
-       pageSizeOptions:[5, 10],
-       pageSize: 10,
-       search: false,
-searchFieldStyle: {
-  borderColor: 'red'
-},
+  sorting: true,
+  pageSizeOptions:[2, 5, 10],
+  pageSize: 10,
+  paginationPosition: 'bottom',
+exportButton: true,
+exportAllData: true,
+selection: true,
+search:false,
 searchAutoFocus: true,
 showSelectAllCheckbox: false,
 showTextRowsSelected: false,
-
-selection: true,
-paginationType: 'stepped',
-
-// rowStyle:{
-//   backgroundColor: 'dark'
-// },
-
-paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-exportFileName: 'Users',
-
+  emptyRowsWhenPaging: false,
 headerStyle:{
   fontFamily: 'bold',
   textTransform: 'uppercase'
   } ,
   
- 
   
   fontFamily: 'mono'
-}}     
-      
+}}
       
       
       

@@ -52,7 +52,6 @@ const WriteChanges = () => {
 
 
         const changesArray = changes.split('\n').filter(change => change.trim() !== '');
-console.log('changesArray', changesArray);
 
 
   const handleSubmit = async (e) => {

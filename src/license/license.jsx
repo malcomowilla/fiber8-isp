@@ -20,6 +20,8 @@ import {
 import UiLoader from '../uiloader/UiLoader'
 import { Suspense } from "react"
 import {useApplicationSettings} from '../settings/ApplicationSettings'
+import toast, { Toaster } from 'react-hot-toast';
+import {RefreshCw} from 'lucide-react';
 
 
 
@@ -40,7 +42,6 @@ const [pppoePLanName, setPppoePLanName] = useState('NA')
 const [hotspotStatus, setHotspotStatus] = useState('NA')
 const [pppoeStatus, setPppoeStatus] = useState('NA')
     const {companySettings, setCompanySettings,} = useApplicationSettings()
-
 
 
 const { contact_info, company_name, email_info, logo_preview} = companySettings
@@ -69,9 +70,9 @@ const handleGetCompanySettings = useCallback(
            logo_preview: logo_url
          }))
  
-         console.log('company settings fetched', newData)
+        //  console.log('company settings fetched', newData)
        }else{
-         console.log('failed to fetch company settings')
+        //  console.log('failed to fetch company settings')
        }
      } catch (error) {
       //  toast.error('internal servere error  while fetching company settings')
@@ -101,7 +102,7 @@ const handleGetCompanySettings = useCallback(
   const getCurrentHotspotPlan = useCallback(async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/get_current_hotspot_plan', {
+      const response = await fetch('/api/get_hotspot_and_dial_plan', {
         headers: {
           'X-Subdomain': subdomain,
         },
@@ -114,41 +115,33 @@ const handleGetCompanySettings = useCallback(
         setHotspotPLanName(newData[0].name)
         setHotspotStatus(newData[0].status)
         
+      }else{
+        if (response.status === 401) {
+  toast.error(newData.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
       }
     } catch (error) {
-      console.error('Error fetching hotspot plan:', error)
+      // console.error('Error fetching hotspot plan:', error)
     } finally {
       setLoading(false)
     }
   }, [])
 
-  const getCurrentPPOEPlan = useCallback(async () => {
-    try {
-      const response = await fetch('/api/get_current_pppoe_plan', {
-        headers: {
-          'X-Subdomain': subdomain,
-        },
-      })
-      const newData = await response.json()
-      if (response.ok && newData.length > 0) {
-        setLicenseData(newData[0])
-        setLicenseTypepppoe(newData[0].maximum_pppoe_subscribers)
-        setExpiryPppoe(newData[0].expiry)
-        setPppoePLanName(newData[0].name)
-        setPppoeStatus(newData[0].status)
-      }
-    } catch (error) {
-      console.error('Error fetching PPPoE plan:', error)
-    }
-  }, [])
+  
 
   useEffect(() => {
     getCurrentHotspotPlan()
-    getCurrentPPOEPlan()
-  }, [getCurrentHotspotPlan, getCurrentPPOEPlan])
+  }, [getCurrentHotspotPlan])
 
   if (loading) {
-    return <UiLoader />
+    return <RefreshCw className='animate-spin text-blue-500 w-12 h-12 mx-auto ' />
   }
 
   if (!licenseData) {
@@ -165,6 +158,7 @@ const handleGetCompanySettings = useCallback(
 
   return (
     <>
+      <Toaster />
       <Box sx={{ p: 3, maxWidth: 600, margin: 'auto' }}>
       <Card elevation={3} sx={{ borderRadius: 3, overflow: 'hidden' }}>
         {/* Status Header */}
@@ -190,15 +184,15 @@ const handleGetCompanySettings = useCallback(
           <Box display="grid" gap={3}>
             <Box display="flex" justifyContent="space-between" alignItems="center">
               <Typography variant="body2" color="textSecondary">Product:</Typography>
-              <Typography variant="body1" fontWeight="bold">Hotspot</Typography>
+              <Typography variant="body1" fontWeight="bold">Hotspot And PPPOE</Typography>
             </Box>
 
-            <Box display="flex" justifyContent="space-between" alignItems="center">
+            {/* <Box display="flex" justifyContent="space-between" alignItems="center">
               <Typography variant="body2" color="textSecondary">License Type:</Typography>
               <Typography variant="body1" fontWeight="bold">
                 {licenseTypeHotspot} Users license
               </Typography>
-            </Box>
+            </Box> */}
 
             <Box display="flex" justifyContent="space-between" alignItems="center">
               <Typography variant="body2" color="textSecondary">Registered to:</Typography>
@@ -242,75 +236,6 @@ const handleGetCompanySettings = useCallback(
 
 
 
-
-
-     <Box sx={{ p: 3, maxWidth: 600, margin: 'auto' }}>
-      <Card elevation={3} sx={{ borderRadius: 3, overflow: 'hidden' }}>
-        {/* Status Header */}
-        <Box 
-          sx={{ 
-            p: 2, 
-             backgroundColor: pppoeStatus === 'active' ? 'success.main' : 'error.main',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1
-          }}
-        >
-          <CheckCircle />
-          <Typography variant="h6" fontWeight="bold">
-           
-            {pppoeStatus === 'active' ? '  Activated - License is up to date' : ' - Inactive- License is out of date'}
-          </Typography>
-        </Box>
-
-        <CardContent sx={{ p: 3 }}>
-          {/* License Details Grid */}
-          <Box display="grid" gap={3}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="body2" color="textSecondary">Product:</Typography>
-              <Typography variant="body1" fontWeight="bold">PPPoE</Typography>
-            </Box>
-
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="body2" color="textSecondary">License Type:</Typography>
-              <Typography variant="body1" fontWeight="bold">
-                {licenseTypepppoe} Users license
-              </Typography>
-            </Box>
-
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="body2" color="textSecondary">Registered to:</Typography>
-              <Typography variant="body1" fontWeight="bold">{company_name}</Typography>
-            </Box>
-
-
-
-
-
-
-
-             <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="body2" color="textSecondary">Name:</Typography>
-              <Typography variant="body1" fontWeight="bold">{pppoePLanName}</Typography>
-            </Box>
-
-                        <Divider />
-
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="body2" color="textSecondary">Expiry:</Typography>
-              <Typography 
-                variant="body1" 
-                fontWeight="bold" 
-                color={pppoeStatus === 'active' ? 'success.main' : 'warning.main'}
-              >
-                {expiryPppoe}
-              </Typography>
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
-    </Box>
 
     </>
   )

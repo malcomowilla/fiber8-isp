@@ -18,7 +18,6 @@ const ConfirmResetPassword = () => {
 
     const navigate = useNavigate()
     
-    // const { token } = useParams();
     const { search } = useLocation()
     const token = new URLSearchParams(search).get('token');
     const {
@@ -200,11 +199,10 @@ const [openFailedPasswordAlert, setopenFailedPasswordAlert] = useState(false)
     async(abortController) => {
       try {
         const response = await fetch('/api/get_company_settings', {
-          signal: abortController.signal // Add the abort signal to the fetch
+          signal: abortController.signal 
         })
         const newData = await response.json()
         if (response.ok) {
-          // setcompanySettings(newData)
   
           const { contact_info, company_name, email_info, logo_url } = newData
           setcompanySettings((prevData)=> ({...prevData, 
@@ -213,15 +211,11 @@ const [openFailedPasswordAlert, setopenFailedPasswordAlert] = useState(false)
             logo_preview: logo_url
           }))
   
-          console.log('company settings fetched', newData)
         }else{
-          console.log('failed to fetch company settings')
         }
       } catch (error) {
         if (error.name === 'AbortError') {
-          console.log('Fetch aborted')
         } else {
-          console.log("error fetching company settings", error)
         }
       }
     },
@@ -234,7 +228,6 @@ const [openFailedPasswordAlert, setopenFailedPasswordAlert] = useState(false)
     handleGetCompanySettings(abortController)
     
     return () => {
-      // This cleanup function runs when component unmounts
       abortController.abort()
     }
   }, [handleGetCompanySettings])
@@ -298,7 +291,6 @@ const [openFailedPasswordAlert, setopenFailedPasswordAlert] = useState(false)
           variants={itemVariants}
           className="w-full max-w-md space-y-8"
         >
-          {/* Logo Section */}
           <motion.div 
             className="text-center space-y-4"
             whileHover={{ scale: 1.02 }}
@@ -320,14 +312,12 @@ const [openFailedPasswordAlert, setopenFailedPasswordAlert] = useState(false)
             </h2>
           </motion.div>
 
-          {/* Form Section */}
           <motion.div 
             variants={itemVariants}
             className="bg-white dark:bg-gray-800 px-6 py-8 rounded-2xl shadow-xl 
               space-y-6 backdrop-blur-xl backdrop-filter"
           >
             <form onSubmit={handleResetPassword} className="space-y-6">
-              {/* Password Input */}
               <motion.div variants={itemVariants}>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   New Password
@@ -355,7 +345,6 @@ const [openFailedPasswordAlert, setopenFailedPasswordAlert] = useState(false)
                 </div>
               </motion.div>
 
-              {/* Confirm Password Input */}
               <motion.div variants={itemVariants}>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Confirm Password
@@ -383,7 +372,6 @@ const [openFailedPasswordAlert, setopenFailedPasswordAlert] = useState(false)
                 </div>
               </motion.div>
 
-              {/* Action Buttons */}
               <motion.div variants={itemVariants} className="space-y-4 pt-4">
                 <motion.button
                   whileTap={{ scale: 0.98 }}

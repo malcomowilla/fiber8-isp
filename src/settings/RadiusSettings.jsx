@@ -151,7 +151,7 @@ const saveRadiusSettings = async(e) => {
             })
         }
     } catch (error) {
-        toast.error('failed to save radius settings server error', {
+        toast.error('failed to save radius settings. Please retry in a moment', {
             position: "top-center",
             duration: 4000,
         })
@@ -205,7 +205,7 @@ if (response.status === 401) {
             })
         }
     } catch (error) {
-        console.log(error)
+        // console.log(error)
     }
   },
   [],

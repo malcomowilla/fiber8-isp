@@ -12,6 +12,7 @@ import { MdOutlineSupportAgent } from "react-icons/md";
  import { useDebounce } from 'use-debounce';
  import { LiaSmsSolid } from "react-icons/lia";
  import { FaRegCheckCircle, FaRegTimesCircle } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa6";
 
 
 
@@ -272,6 +273,18 @@ const sortedMessages = [...sms].sort((a, b) => {
                                 size="small" 
                               />
                             );
+
+                             case 'Sent':
+                            return (
+                              <Chip 
+                                icon={<FaRegCheckCircle />}
+                                label="Pending"
+                                color="warning"
+                                variant="outlined"
+                                size="small"
+                              />
+                            );
+
                           case 'failed':
                             return (
                               <Chip 
@@ -285,8 +298,9 @@ const sortedMessages = [...sms].sort((a, b) => {
                           default:
                             return (
                               <Chip 
-                                label="Pending"
-                                color="warning"
+                                icon={<FaRegTimesCircle />}
+                                label="Failed"
+                                color="error"
                                 variant="outlined"
                                 size="small"
                               />
@@ -302,12 +316,12 @@ const sortedMessages = [...sms].sort((a, b) => {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Message Center</h1>
-            <p className="mt-2 text-gray-600">Manage all your SMS communications</p>
+            <h1 className="text-3xl font-bold dark:text-white ">Message Center</h1>
+            <p className="mt-2 dark:text-white text-gray-500">Manage all your SMS communications</p>
           </div>
           
           <div className="flex gap-3 w-full md:w-auto">
-            <Button
+            {/* <Button
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => setIsOpen(true)}
@@ -319,9 +333,14 @@ const sortedMessages = [...sms].sort((a, b) => {
               }}
             >
               New Message
-            </Button>
-            
-            <Button
+            </Button> */}
+             <button className='bg-blue-200 p-3 rounded-lg shadow-sm' onClick={() => navigate('/admin/send-sms')}>
+              <div className='flex items-center gap-2'>
+                    <FaPlus className='text-blue-500' size={20} />
+                    <span className="not-sr-only text-blue-500">New Message</span>
+                    </div>
+                  </button>
+            {/* <Button
               variant="outlined"
               startIcon={<GetAppIcon />}
               sx={{
@@ -333,7 +352,14 @@ const sortedMessages = [...sms].sort((a, b) => {
               }}
             >
               Import
-            </Button>
+            </Button> */}
+
+             <button className='bg-green-200 p-3 rounded-lg shadow-sm' onClick={() => navigate('/admin/bulk-messages')}>
+              <div className='flex items-center gap-2'>
+                    <FaPlus className='text-green-500' size={20} />
+                    <span className="not-sr-only text-green-500">Bulk Message</span>
+                    </div>
+                  </button>
           </div>
         </div>
 
@@ -347,7 +373,8 @@ const sortedMessages = [...sms].sort((a, b) => {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg
+               bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="Search messages..."
             />
           </div>
@@ -361,20 +388,23 @@ const sortedMessages = [...sms].sort((a, b) => {
                 title: "Message", 
                 field: "message",
                 cellStyle: { 
-                  whiteSpace: 'nowrap', 
-                  overflow: 'hidden',
+                 
                   textOverflow: 'ellipsis',
                   maxWidth: '300px'
                 },
                 headerStyle: {
                   backgroundColor: '#f9fafb',
-                }
+                },
+
+                render: (rowData) => (
+                  <span className="font-medium dark:text-white text-sm">{rowData.message}</span>
+                )
               },
               { 
                 title: "Recipients", 
                 field: "user",
                 render: (rowData) => (
-                  <span className="font-medium text-gray-700">{rowData.user}</span>
+                  <span className="font-medium dark:text-white t">{rowData.user}</span>
                 )
               },
               { 
@@ -386,7 +416,7 @@ const sortedMessages = [...sms].sort((a, b) => {
                 title: "Date", 
                 field: "date",
                 render: (rowData) => (
-                  <span className="text-gray-500">
+                  <span className="dark:text-white t">
                   {rowData.date}
                   </span>
                 )
@@ -397,7 +427,7 @@ const sortedMessages = [...sms].sort((a, b) => {
                 render: (rowData) => (
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <MdOutlineSupportAgent className="text-indigo-600" />
-                    <span className="text-gray-700">{rowData.system_user}</span>
+                    <span className="dark:text-white ">{rowData.system_user}</span>
                   </Box>
                 )
               },

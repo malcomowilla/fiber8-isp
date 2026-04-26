@@ -1,7 +1,5 @@
 
 import { Box, TextField, Autocomplete, Stack, InputAdornment, Button,
-
-
   Typography,
   IconButton,
   Tooltip,
@@ -14,6 +12,9 @@ import FormControl from '@mui/material/FormControl';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import {  useState, useEffect,useCallback, useRef} from 'react'
 import { useDebounce } from 'use-debounce';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import { motion } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
 import 'leaflet/dist/leaflet.css';
@@ -43,7 +44,6 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
 import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import { DemoContainer  } from '@mui/x-date-pickers/internals/demo';
-
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import ClearIcon from '@mui/icons-material/Clear';
 import DialogContentText from '@mui/material/DialogContentText';
@@ -68,15 +68,16 @@ const Subscriptions = ({
 
   const {settingsformData, subscriberSettings, setSubscriberSettings,
     setFormDataSubscriber,handleChangeSubscriber,
-formDataSubscriber
+formDataSubscriber,
   } = useApplicationSettings()
   
-  const {name, ref_no , ppoe_password,  ppoe_username,  phone_number, email, second_phone_number,
-      installation_fee, subscriber_discount, date_registered, router_name,
+  const {name, ref_no , ppoe_password,  ppoe_username, 
+     phone_number, email, second_phone_number,
+      subscriber_discount, date_registered, router_name,
      latitude, longitude, house_number, building_name, 
     }= formDataSubscriber
 
-const {lock_account_to_mac} = subscriberSettings
+const {lock_account_to_mac, installation_fee} = subscriberSettings
 
   const [ routerName] = useDebounce( router_name, 1000)
 
@@ -90,7 +91,7 @@ const {lock_account_to_mac} = subscriberSettings
     const [ipAssigned, setIpAssigned] = useState(false);
     const [ip_address, setIpAddress] = useState('');
     const [showMaterialTable, setShowMaterialTable] = useState(true);
-    const [showForm, setShowForm] = useState(false);
+       const [showForm, setShowForm] = useState(false);
     const [ips, setIps] = useState([])
     const [subscriptions, setSubscriptions] = useState([])
     const [onlineStatusData, setOnlineStatusData] = useState([]);
@@ -111,6 +112,8 @@ const [subscriptionId, setSubscriptionId] = useState('');
 const [pppoe_password, setPppoePassword] = useState('');
 const [pppoe_username, setPpoeUsername] = useState('');
 const [loadUpdating, setLoadUpdating] = useState(false)
+const [include_installation_fee, setIncludeInstallationFee] = useState(false)
+const [seeInstallationFee, setSeeInstallationFee] = useState(false)
 
 
   const [searchParams] = useSearchParams();
@@ -121,6 +124,7 @@ const [anchorEl, setAnchorEl] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
   const [editingSubscription, setEditingSubscription] = useState(false);
   const iconRef = useRef(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleClick = (event, rowData) => {
     setSelectedRow(rowData);
@@ -130,6 +134,7 @@ const [anchorEl, setAnchorEl] = useState(null);
   const handleClosePopper = () => {
     setAnchorEl(null);
   };
+
 
   const open = Boolean(anchorEl);
   const id = open ? 'mac-address-popper' : undefined;
@@ -259,15 +264,7 @@ const confirmClearMac = async () => {
 };
 
 
-    const handleChangeDate = (date)=> {
-    setExpirationDate(date)
-  }
-
-
-
-  const handleChange = (event) => {
-    setAge(event.target.value);
-  };
+   
 
 const serviceTypeOptions = [
   { 
@@ -284,6 +281,30 @@ const serviceTypeOptions = [
  
 ];
 
+
+
+
+const billingModeOptions = [
+  { 
+    value: 'Monthly', 
+    label: 'Monthly',
+  },
+  { 
+    value: 'Weekly', 
+    label: 'Weekly',
+  },
+
+
+
+   { 
+    value: 'Daily', 
+    label: 'Daily',
+  },
+ 
+];
+
+
+const [billingMode, setBillingMode] = useState(billingModeOptions[0]);
 
 const handleBlockService = async (subscriptionData) => {
   setBlockLoading(true);
@@ -473,21 +494,10 @@ const getIps = useCallback(
   [],
 )
 
-const handleChangeNetwork =(e)=> {
-  const {value, name} = e.target 
-  console.log('network_name',value)
-  setFormDataSubscriber({...formDataSubscriber, [name]:  value})
-  getIps(value) 
-
-}
 
 
-const handleChangeIpAddress =(e)=> {
-  const {value, name} = e.target 
-  console.log('ip_address',value)
-  setFormDataSubscriber({...formDataSubscriber, [name]:  value})
 
-}
+
 
 
 
@@ -549,7 +559,6 @@ setSubscriptionId(rowData.id)
   const parsedDate = dayjs(rowData.expiration_date, 'MMMM D, YYYY [at] hh:mm A');
 
 setExpirationDate(parsedDate)
-console.log('row data expiration date subscription', parsedDate)
 setPackagesName(rowData.package_name)
 setPppoePassword(rowData.ppoe_password)
  setPpoeUsername(rowData.ppoe_username)
@@ -558,6 +567,7 @@ setPppoePassword(rowData.ppoe_password)
   setIpAddress(rowData.ip_address)
   setMacAdress(rowData.mac_address)
   setServiceType(rowData.service_type)
+  setBillingMode(rowData.billing_mode)
   setFormDataSubscriber({
     ...rowData,
     // id: rowData.id,
@@ -596,12 +606,17 @@ const payload = {
   expiration_date: expiration_date,
   package_name: package_name,
   ppoe_password: pppoe_password,
-  ppoe_username: pppoe_username
+  ppoe_username: pppoe_username,
+  installation_fee: installation_fee,
+  include_installation_fee: include_installation_fee,
+  billing_mode: billingMode
+
 
 
 };
   try {
     setLoadUpdating(true)
+    setIsSaving(true)
         const method = subscriptionId ? 'PATCH' : 'POST'
     const url = subscriptionId ? `/api/subscriptions/${subscriptionId}?subscriber_id=${subscriberId}&?update` : `/api/subscriptions?subscriber_id=${subscriberId}&?create`
         const response = await fetch(url, {
@@ -610,7 +625,10 @@ const payload = {
         'Content-Type': 'application/json',
         'X-Subdomain': subdomain
       },
-      body: JSON.stringify({ subscription: payload }) // Must be wrapped under `subscription`
+      body: JSON.stringify({
+         subscription: payload 
+        
+        }) // Must be wrapped under `subscription`
     })
 
  const newData = await response.json()
@@ -621,12 +639,16 @@ const payload = {
 
   if (subscriptionId) {
 setLoadUpdating(false)
+  setIsSaving(false)
+
+
   toast.success('Subscription updated successfully', {position: "top-center", duration: 3000 })
     setSubscriptions(subscriptions.map(item => item.id === newData.id ? newData : item))
     setShowForm(false)
   setShowMaterialTable(true)
   } else {
     setLoadUpdating(false)
+    setIsSaving(false)
 
     toast.success('Subscription added successfully', {  position: "top-center", duration: 3000 })
 
@@ -636,6 +658,8 @@ setLoadUpdating(false)
 
   }
  } else {
+
+  setIsSaving(false)
   
   toast.error(newData.error, {  position: "top-center", duration: 4000 })
 
@@ -648,10 +672,11 @@ setLoadUpdating(false)
   } catch (error) {
     
        setLoadUpdating(false)
-    toast.error('Error creating subscription server error', {  position: "top-center", duration: 3000 })
+       setIsSaving(false)
+    toast.error('Error creating subscription, We’re having trouble completing this request', 
+      {  position: "top-center", duration: 3000 })
     setShowMaterialTable(true)
     setShowForm(false)
-    console.log(error)
   }
 
 }
@@ -660,7 +685,6 @@ setLoadUpdating(false)
 
 const handleIpChange = (event) => {
   const selectedIp = event.target.value;
-  console.log('Changing IP to:', selectedIp); // Debug
   setIpAddress(selectedIp)
   // setFormData(prev => ({
   //   ...prev,
@@ -683,7 +707,6 @@ const getOnlineStatus = useCallback(async () => {
     const data = await response.json();
     setOnlineStatusData(data);
   } catch (error) {
-    console.log(error);
     // Set error status if API fails
     setOnlineStatusData([{ status: 'error' }]);
   }
@@ -795,7 +818,7 @@ const handleDeleteConfirm = async () => {
         placement="right-start"
       
         sx={{
-          zIndex: 9999, // Ensure it's above everything
+          zIndex: 9999, 
           '&[data-popper-placement*="right"]': {
             marginLeft: '8px !important',
           }
@@ -818,7 +841,7 @@ const handleDeleteConfirm = async () => {
               color="warning"
               variant="contained"
               onClick={() => {
-                console.log('Clearing MAC for:', selectedRow);
+                // console.log('Clearing MAC for:', selectedRow);
                 // handleClosePopper();
                 confirmClearMac();
               }}
@@ -1041,7 +1064,7 @@ const handleDeleteConfirm = async () => {
                         className={`${pingColor} cursor-pointer ${isOnline ? 'animate-pulse' : ''}`} 
                         onClick={() => {
                           // Add your ping action here
-                          console.log(`Pinging device with MAC: ${macAddress}`);
+                          // console.log(`Pinging device with MAC: ${macAddress}`);
                         }}
                       />
                     </div>
@@ -1138,6 +1161,7 @@ setPackagesName('')
   setPppoePassword('')
  setPpoeUsername('')
   setNetworkName('')
+  setSeeInstallationFee(true)
 
                   }}
                   fontSize="large" />
@@ -1156,6 +1180,8 @@ setPackagesName('')
               setShowMaterialTable(false)
               setEditingSubscription(true)
               setShowForm(true)
+                setSeeInstallationFee(false)
+
             }}
             color="primary" />,
             tooltip: 'Edit Network',
@@ -1220,7 +1246,6 @@ setPackagesName('')
     value={serviceTypeOptions.find(option => option.value === service_type) || null}
     onChange={(event, newValue) => {
       setServiceType(newValue?.value || '');
-      console.log('service_type',newValue?.value)
     }}
     getOptionLabel={(option) => option.label}
     renderOption={(props, option) => (
@@ -1305,7 +1330,7 @@ setPackagesName('')
         value={mac_address}
         onChange={(e) => setMacAdress(e.target.value)}
         // name="macAddress"
-        placeholder="00:5A:2B:3C:9D:5E"
+        placeholder="00:5A:Qw:3C:N1:5E"
         fullWidth
         InputProps={{
           startAdornment: (
@@ -1475,9 +1500,57 @@ setPackagesName('')
   isOptionEqualToValue={(option, value) => option.title === value.title}
   groupBy={(option) => option.category} // Optional: if you want to group networks
 />
-          {/* Package and Date */}
+
+
+  {seeInstallationFee && (
+      <FormControlLabel
+        
+        className='dark:text-white text-black'
+         name='login_with_web_auth'  control={<Checkbox
+          
+          checked={include_installation_fee}
+          onChange={(e) => setIncludeInstallationFee(e.target.checked)}
+          color="default"
+          />  } 
+        label="Add Installation Fee" />
+  )}
+      
+
+
+
+       {include_installation_fee  && (
+        <TextField
+          fullWidth
+          className='myTextField'
+          label="Installation Fee"
+          variant="outlined"
+          value={installation_fee}
+          sx={{
+            "& label.Mui-focused": {
+              color: "black",
+              fontSize: "16px",
+            },
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "black",
+                borderWidth: "3px",
+              },
+            },
+          }}
+          // InputProps={{
+          //   startAdornment: (
+          //     <InputAdornment position="start">
+          //       <MdOutlineAttachMoney className="text-green-500" />
+          //     </InputAdornment>
+          //   ),
+          // }}  
+        />
+       )}
+
+
           <div className="mt-4">
-            <Box className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 myTextField'
+            <Box className='grid grid-cols-1 md:grid-cols-2
+             gap-4 mb-3 myTextField'
               sx={{
                 '& .MuiTextField-root': {
                   marginTop: '',
@@ -1541,7 +1614,6 @@ setPackagesName('')
           value={expiration_date}
           onChange={(newValue) => {
             setExpirationDate(dayjs(newValue))
-            console.log('newValue expiration_date subscr', dayjs(newValue))
           }}
         />
       </DemoContainer>
@@ -1549,12 +1621,51 @@ setPackagesName('')
 
             </Box>
           </div>
+
+
+
+            <Box sx={{ mb: 3 }} fullWidth>
+  <InputLabel sx={{ fontSize: '16px', mb: 1 }}>Billing Mode </InputLabel>
+  <Autocomplete
+  className='myTextField'
+    options={billingModeOptions}
+    value={billingModeOptions.find(option => option.value === billingMode)}
+    onChange={(event, newValue) => {
+      setBillingMode(newValue.value);
+    }}
+    getOptionLabel={(option) => option.label}
+    renderOption={(props, option) => (
+      <Box component="li" {...props} sx={{ display: 'flex', 
+      alignItems: 'center' }}>
+        {option.label}
+      </Box>
+    )}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        label={<p className='text-black
+           dark:text-white '>Select Billing Mode</p>}
+        // required
+        sx={{
+          '& .MuiInputBase-root': {
+            padding: '8px 14px',
+            fontSize: '16px'
+          }
+        }}
+      />
+    )}
+    fullWidth
+    disableClearable
+    isOptionEqualToValue={(option, value) => option.value === value.value}
+  />
+</Box>
+
           <div className="flex gap-4 mt-6">
 
           <button  className='bg-black text-white rounded-3xl px-4 py-2
           transform hover:scale-110 transition duration-500 hover:bg-green-500
           text-lg' type="submit">
-              {editing ?  loadUpdating ? 'Updating...' : 'Update' : 'Save'}
+              {editing ?  loadUpdating ? 'Updating...' : 'Update' : isSaving ? 'Saving.....' : 'Save'}
             </button>
 
             <button onClick={(e) => {

@@ -1,190 +1,170 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-} from 'chart.js';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
+import ReactApexChart from 'react-apexcharts';
 
 const TrafficStatsGraph = ({ trafficData }) => {
   const [chartData, setChartData] = useState({
-    labels: [],
-    datasets: [
+    series: [
       {
-        label: 'Download',
+        name: 'Download Speed',
         data: [],
-        borderColor: '#4fd1c5',
-        backgroundColor: 'rgba(79, 209, 197, 0.1)',
-        borderWidth: 2,
-        tension: 0.1,
-        fill: true,
-        pointRadius: 0,
       },
       {
-        label: 'Upload',
+        name: 'Upload Speed', 
         data: [],
-        borderColor: '#9f7aea',
-        backgroundColor: 'rgba(159, 122, 234, 0.1)',
-        borderWidth: 2,
-        tension: 0.1,
-        fill: true,
-        pointRadius: 0
       }
-    ]
+    ],
+    options: {
+      chart: {
+        id: 'live-traffic',
+        height: 350,
+        type: 'line',
+        animations: {
+          enabled: true,
+          easing: 'linear',
+          dynamicAnimation: {
+            speed: 1000
+          }
+        },
+        toolbar: {
+          show: true
+        },
+        zoom: {
+          enabled: true
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        width: 3,
+        curve: 'smooth'
+      },
+      title: {
+        text: 'Network Traffic - Real Time',
+        align: 'left'
+      },
+      markers: {
+        size: 0
+      },
+      xaxis: {
+        type: 'datetime',
+        labels: {
+          datetimeUTC: false, // 👈 CRITICAL: This displays local time instead of UTC
+          formatter: function(value, timestamp, opts) {
+            // Use local time formatting
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('en-US', {
+              hour12: false,
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit'
+            });
+          }
+        }
+      },
+      yaxis: {
+        title: {
+          text: 'Speed (Mbps)'
+        },
+        min: 0
+      },
+      tooltip: {
+        x: {
+          formatter: function(value, { series, seriesIndex, dataPointIndex, w }) {
+            // Show full local time in tooltip
+            const date = new Date(value);
+            return date.toLocaleString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: true
+            });
+          }
+        }
+      },
+      colors: ['#008FFB', '#00E396'],
+      legend: {
+        position: 'top'
+      }
+    },
   });
-  
-  const chartRef = useRef(null);
+
   const dataHistory = useRef([]);
   const maxDataPoints = 30;
 
   useEffect(() => {
     if (trafficData) {
-      // Use data exactly as received from backend
+      // Use local time timestamp
+      const now = new Date();
       const newEntry = {
-        timestamp: new Date(),
-        download: trafficData.download_speed, // Use directly
-        upload: trafficData.upload_speed      // Use directly
+        timestamp: now.getTime(), // This is local time in milliseconds
+        download: trafficData.download_speed,
+        upload: trafficData.upload_speed
       };
       
       dataHistory.current = [...dataHistory.current, newEntry].slice(-maxDataPoints);
       
-      // Format timestamp only (no data manipulation)
-      const formatTime = (date) => {
-        return date.toLocaleTimeString('en-US', {
-          hour12: true,
-          hour: 'numeric',
-          minute: '2-digit',
-          second: '2-digit'
-        });
-      };
-
-      setChartData({
-        labels: dataHistory.current.map(entry => formatTime(entry.timestamp)),
-        datasets: [
+      setChartData(prev => ({
+        ...prev,
+        series: [
           {
-            ...chartData.datasets[0],
-            data: dataHistory.current.map(entry => entry.download)
+            name: 'Download Speed',
+            data: dataHistory.current.map(entry => [entry.timestamp, entry.download])
           },
           {
-            ...chartData.datasets[1],
-            data: dataHistory.current.map(entry => entry.upload)
+            name: 'Upload Speed',
+            data: dataHistory.current.map(entry => [entry.timestamp, entry.upload])
           }
         ]
-      });
-      
-      if (chartRef.current) {
-        chartRef.current.update();
-      }
+      }));
     }
   }, [trafficData]);
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: {
-      duration: 1000,
-      easing: 'linear'
-    },
-    plugins: {
-      title: {
-        display: true,
-        text: 'LIVE TRAFFIC',
-        color: '#a0aec0',
-        font: {
-          size: 16
-        }
-      },
-      legend: {
-        position: 'top',
-        labels: {
-          color: '#a0aec0',
-          font: {
-            size: 12
-          }
-        }
-      },
-      tooltip: {
-        mode: 'index',
-        intersect: false,
-        callbacks: {
-          // Display raw values in tooltip
-          label: (context) => `${context.dataset.label}: ${context.parsed.y}`
-        }
-      }
-    },
-    scales: {
-       x: {
-      grid: {
-        color: 'rgba(255, 255, 255, 0.1)', // Light gray vertical grid lines
-        drawBorder: true,
-        borderColor: 'rgba(255, 255, 255, 0.2)'
-      },
-      ticks: {
-        color: '#a0aec0',
-        maxTicksLimit: 10,
-        autoSkip: true
-      }
-    },
-     y: {
-      grid: {
-        color: 'rgba(255, 255, 255, 0.1)', // Light gray horizontal grid lines
-        drawBorder: true,
-        borderColor: 'rgba(255, 255, 255, 0.2)'
-      },
-      ticks: {
-        color: '#a0aec0',
-        callback: (value) => `${value}`
-      },
-      beginAtZero: true
-    }
-
-    
-    },
-
-    
+  // Get current local time for display
+  const getCurrentLocalTime = () => {
+    return new Date().toLocaleTimeString('en-US', {
+      hour12: true,
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZoneName: 'short'
+    });
   };
 
   return (
-    <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
-      <div className="h-64 w-full">
-        <Line 
-          ref={chartRef}
-          data={chartData} 
-          options={options} 
+    <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
+      {/* Timezone info */}
+      {/* <div className="mb-2 text-sm text-gray-600 text-center">
+        Local Time: {getCurrentLocalTime()}
+      </div> */}
+      
+      <div className="h-60 w-full">
+        <ReactApexChart 
+          options={chartData.options} 
+          series={chartData.series} 
+          type="line" 
+          height="100%"
         />
       </div>
+      
       <div className="mt-4 grid grid-cols-2 gap-4">
-        <div className="bg-gray-700 p-3 rounded-lg">
-          <p className="text-sm text-gray-300">Current Download</p>
-          <p className="text-xl font-medium text-teal-400">
+        <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+          <p className="text-sm text-gray-600">Current Download</p>
+          <p className="text-xl font-bold text-blue-600">
             {dataHistory.current.length > 0 
-              ? dataHistory.current[dataHistory.current.length - 1].download 
+              ? `${dataHistory.current[dataHistory.current.length - 1].download}` 
               : '0'}
           </p>
         </div>
-        <div className="bg-gray-700 p-3 rounded-lg">
-          <p className="text-sm text-gray-300">Current Upload</p>
-          <p className="text-xl font-medium text-purple-400">
+        <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+          <p className="text-sm text-gray-600">Current Upload</p>
+          <p className="text-xl font-bold text-green-600">
             {dataHistory.current.length > 0 
-              ? dataHistory.current[dataHistory.current.length - 1].upload 
-              : '0'}
+              ? `${dataHistory.current[dataHistory.current.length - 1].upload}` 
+              : '0 '}
           </p>
         </div>
       </div>

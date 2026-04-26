@@ -25,7 +25,6 @@ export const queryClient = new QueryClient({
 const localStoragePersister = createSyncStoragePersister({
   storage: window.localStorage,
 })
-// const sessionStoragePersister = createSyncStoragePersister({ storage: window.sessionStorage })
 
 persistQueryClient({
   queryClient: queryClient,

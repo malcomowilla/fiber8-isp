@@ -19,17 +19,6 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
-
-
-
-
-
-
-
-
-
-
-
   Box,
   Stack,
   RadioGroup,
@@ -118,7 +107,6 @@ const EditEquipment = ({openDialog, setOpenDialog,loading, setLoading, editing, 
     { value: '24', label: 'Server' },
     { value: '32', label: 'Access Point' },
   ];
-console.log('equipment fromrm type',equipmentForm.type)
 
   return (
 

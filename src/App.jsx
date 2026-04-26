@@ -5,76 +5,50 @@ import {
   Routes
 } from "react-router-dom";
 
-
 import {useState, useEffect, lazy, Suspense, useCallback} from 'react'
 import {ApplicationContext} from './context/ApplicationContext'
-
-
-
-import UiLoader from './uiloader/UiLoader'
-
-
 
 const AdminDashboard = lazy(()=> import ('./admindashboard/AdminDashboard'))
 
 import {CableProvider} from './context/CableContext'
 
-//  import PPPOEpackages from './packages/PPPOEpackages'
 
 const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages'))
-//  import HotspotPackage from './packages/HotspotPackage'
 const HotspotPackage = lazy(()=> import('./packages/HotspotPackage'))
 const AdminProfile = lazy(() => import('./profile/AdminProfile.jsx'))
  
-//  import HotspotSubscriptions from './subscriptions/HotspotSubscriptions'
 
 const HotspotSubscriptions = lazy(()=> import('./subscriptions/HotspotSubscriptions'))
-// import EditPackage from './edit/EditPackage'
 
 const EditPackage = lazy(()=> import('./edit/EditPackage'))
-// import PPPOEsubscribers from './subscribers/PPPOEsubscribers'
 const PPPOEsubscribers = lazy(()=> import('./subscribers/PPPOEsubscribers'))
 
-// import FixedPayments from './payments/FixedPayments'
 const FixedPayments = lazy(()=> import('./payments/FixedPayments'))
 
-// import PPPOEsubscriptions from './subscriptions/PPPOEsubscriptions'
 const PPPOEsubscriptions = lazy(()=> import('./subscriptions/PPPOEsubscriptions'))
 
-// import Zones from './zones/Zones'
 const Zones = lazy(()=> import('./zones/Zones'))
 
-// import Nodes from './Node/Nodes'
 const Nodes = lazy(()=> import('./Node/Nodes'))
 
-// import User from './user/User'
 const User = lazy(()=> import('./user/User'))
 
-// import UserGroup from './user/UserGroup'
 const UserGroup = lazy(()=> import('./user/UserGroup'))
-// import Nas from './NAS_IDENTIFIER/Nas'
 const Nas = lazy(()=> import('./NAS_IDENTIFIER/Nas'))
 const HotspotPricing = lazy(()=> import('./pricing/HotspotPricing.jsx'))
 
-// import Analytics from './analytics/Analytics'
 
 const Analytics = lazy(()=> import('./analytics/Analytics'))
-// import Hotspotanalytics from './analytics/HotspotAnalytics'
 const Hotspotanalytics = lazy(()=> import('./analytics/HotspotAnalytics'))
-// import Settings from './settings/Settings'
 const Settings = lazy(()=> import('./settings/Settings'))
 import {DatePicker} from './date-picker/Date'
 import LocalizeDate from './date-picker/LocalizeDate'
-// import Sms from './sms/Sms'
 const Sms = lazy(()=> import('./sms/Sms'))
 const HotspotSettings = lazy(()=> import('./settings/HotspotSettings'));
-
 import ProtectAuth from './Auth/ProtectAuth'
 import HotspotPayments from './payments/HotspotPayments'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-// import SignupNotification from './notification/SignupNotification'
 const SignupNotification = lazy(()=> import('./notification/SignupNotification'))
-// import HotspotLogin from './hotspot_page/HotspotLogin'
 const HotspotLogin = lazy(()=> import('./hotspot_page/HotspotLogin'))
 const PasskeySignin = lazy(()=> import('./Auth/PasskeySignin'))
 const DashboardSytemAdmin = lazy(()=> import('./system_admin/DashBoardSystemAdmin'))
@@ -82,28 +56,18 @@ const IpPoolTable = lazy(() => import('./ip_pool/IpPoolTable'))
 
 const ResetPassword = lazy(()=> import('./Auth/ResetPassword')
 ) 
-
-
 const Signup = lazy(()=> import('./Auth/Signup')
 )
-
 const InputOTPWithSeparator = lazy(()=> import('./Auth/InputOTPWithSeparator')
 )
-
 const NotFound = lazy(()=> import('./404/NotFound')
 )
-
 const RouterStatistics = lazy(() => import('./analytics/RouterStatistics'))
 const Layout = lazy(()=>  import('./layout/Layout')
 )
 const HotspotPage = lazy(() => import('./hotspot_page/HotspotPage'))
-
-
-// const AdminDashboard = lazy(()=> import ('./admindashboard/AdminDashboard')
-// )
 const Sidebar = lazy(()=> import ('./sidebar/Sidebar')
  )
-
  const PasskeyList = lazy(()=> import ('./Auth/PasskeyList')
  )
  const SystemAdminLogin = lazy(()=> import ('./system_admin/SystemAdmin'))
@@ -120,9 +84,7 @@ const ThisMonthRegisteredSubscribers = lazy(() => import('./subscribers/ThisMont
 const CustomerTickets = lazy(() => import('./tickets/CustomerTickets') )
 const AccountLocked = lazy(()=> import('./account_locked/AccountLocked'))
 const Calendar = lazy(() => import('./calendar/Calendar'))
-// import {Helmet} from "react-helmet";
-import { Helmet, HelmetProvider } from 'react-helmet-async';
-
+import { Helmet,  } from 'react-helmet-async';
 import {useApplicationSettings} from './settings/ApplicationSettings'
  const PPPoEPackages = lazy(() => import('./wifi_page/PPPoEPackages') )
 const HotspotTemplates = lazy(() => import('./hotspot_templates/HotspotTemplates') )
@@ -166,13 +128,36 @@ const Devices = lazy(() => import('./devices/Devices'))
 const OnuDetails = lazy(() => import('./devices/OnuDetails'))
 const EditSubscriber = lazy(() => import('./subscribers/EditSubscriber'))
 const  CreateSubscriber = lazy(() => import('./subscribers/CreateSubscriber'))
-const TicketStats = lazy(() => import('./tickets/TicketStats'))
 const RadiusSettings = lazy(() => import('./NAS_IDENTIFIER/RadiusSettings.jsx'))
 import { useLocation } from 'react-router-dom';
 import TourGuide from './guide/TourGuide';
-// import License from './license/license'
 const License = lazy(() => import('./license/license'))
 const Map = lazy(() => import('./map/Map'))
+const HotspotMarketing = lazy(() => import('./hotspot_marketing/HotspotMarketing'))
+const AddSettings = lazy(() => import('./hotspot_marketing/AddSettings'))
+const ClientWidget = lazy(() => import('./client_portal/ClientWidget.jsx'))
+const CustomerPayment = lazy(() => import('./client_portal/CustomerPayment.jsx'))
+import { 
+   RefreshCw,
+  BarChart3, TrendingDown, Download, Upload
+} from 'lucide-react';
+const FinancialDashboard = lazy(() => import('./finance/FinancialDashboard.jsx'))
+const PaymentAnalytics = lazy(() => import('./subscribers/PaymentAnaytics'))
+const UnpaidInvoice = lazy(() => import('./invoice/UnpaidInvoice'))
+const TemplateAssignment = lazy(() => import('./hotspot_templates/TemplateAssignment.jsx'))
+const HotspotRewardsDashboard = lazy(() => import('./hotspot_page/HotspotRewardDashboard.jsx'))
+const ResellerCommissionDashboard = lazy(() => import('./reseller/ResellerCommisionDashboard.jsx'))
+const MpesaDisbursementForm = lazy(() => import('./disbursement/MpesaDisbursementForm.jsx'))
+const SubscriberInvoicePage = lazy(() => import('./subscribers/SubscriberInvoicePage'))
+const PartnerPortal = lazy(() => import('./partner/PartnerPortal.jsx'))
+const PayoutManagement = lazy(() => import('./partner/PayoutManagement.jsx'))
+const PartnersManagement = lazy(() => import('./partner/PartnersManagement.jsx'))
+const PpPoePayments = lazy(() => import('./payments/PpPoePayments.jsx'))
+const AccessPoint = lazy(() => import('./access_point/AccessPoint.jsx'))
+const HotspotSignIn = lazy(() => import('./hotspot_page/HotspotSignIn.jsx'))
+const PartnerLogin = lazy(() => import('./partner/PartnerLogin.jsx'))
+
+
 
 const App = ({client}) => {
 
@@ -205,7 +190,6 @@ const {companySettings, setCompanySettings,
 
 } = useApplicationSettings()
 const {logo_preview} = companySettings
-console.log('subdomain',subdomain)
 const handleClose = () => {
   setOpenNotification(false);
 };
@@ -260,24 +244,8 @@ const [isExpanded5, setIsExpanded5] = useState(false)
 const [isExpanded6, setIsExpanded6] = useState(false)
 const [isExpanded7, setIsExpanded7] = useState(false)
 const [isExpanded8, setIsExpanded8] = useState(false)
-const [isExpanded9, setIsExpanded9] = useState(false)
-const [isExpanded10, setIsExpanded10] = useState(false)
 
 
-
-// const isLogedIn = window.localStorage.getItem('user')
-// const [formData, setFormData] = useState({
-//   passwordConfirmation: '',
-//   email: '',
-//   isPassword: ''
-// })
-
-// const handleChange = (e) => {
-// setFormData({
-//   ...formData,
-//   [e.target.id]: e.target.value
-// })
-// }
 
 useEffect(() => {
   const theme = localStorage.getItem('theme') 
@@ -349,7 +317,7 @@ try {
 
       "Content-Type": "application/json",
     }, 
-    credentials: 'include', // Include cookies in the request
+    credentials: 'include', 
     signal: controller.signal,  
 
 
@@ -389,7 +357,6 @@ try {
 
   }
 } catch (error) {
-  console.log(error.name === 'AbortError');
   setloading(false);
   setOpenNotification(false);
 
@@ -420,20 +387,20 @@ const lightTheme = createTheme({
     MuiTable: {
       styleOverrides: {
         root: {
-          backgroundColor: 'white',  // Background color for the entire DataGrid
-          color: 'black',  // Text color for the entire DataGrid
+          backgroundColor: 'white',  
+          color: 'black',  
         },
         columnHeaders: {
-          backgroundColor: 'lightgray',  // Background color for the header
-          color: 'black',  // Text color for the header
+          backgroundColor: 'lightgray',  
+          color: 'black',  
         },
         cell: {
-          backgroundColor: 'white',  // Background color for the cells
-          color: 'black',  // Text color for the cells
+          backgroundColor: 'white',  
+          color: 'black',  
         },
         footerContainer: {
-          backgroundColor: 'white',  // Background color for the footer
-          color: 'black',  // Text color for the footer
+          backgroundColor: 'white',  
+          color: 'black',  
         },
       },
     },
@@ -455,16 +422,16 @@ const darkTheme = createTheme({
             color: 'white',  // Text color for the entire DataGrid
           },
           columnHeaders: {
-            backgroundColor: 'black',  // Background color for the header
-            color: 'white',  // Text color for the header
+            backgroundColor: 'black',  
+            color: 'white', 
           },
           cell: {
-            backgroundColor: 'black',  // Background color for the cells
-            color: 'white',  // Text color for the cells
+            backgroundColor: 'black',  
+            color: 'white',  
           },
           footerContainer: {
-            backgroundColor: 'white',  // Background color for the footer
-            color: 'white',  // Text color for the footer
+            backgroundColor: 'white',  
+            color: 'white', 
           },
         },
       },
@@ -490,7 +457,6 @@ const handleGetCompanySettings = useCallback(
         const { contact_info, company_name, email_info, logo_url,
           customer_support_phone_number,agent_email ,customer_support_email
          } = newData
-         console.log(logo_url)
 
         setCompanySettings((prevData)=> ({...prevData, 
           contact_info, company_name, email_info,
@@ -499,12 +465,11 @@ const handleGetCompanySettings = useCallback(
           logo_preview: logo_url
         }))
 
-        console.log('company settings fetched', newData)
       }else{
-        console.log('failed to fetch company settings')
       }
     } catch (error) {
- console.log(error)   
+
+
     }
   },
   [],
@@ -533,23 +498,40 @@ const hostname = window.location.hostname;
 
         
       body,
-        icon: image, // Use the image URL as the icon
+        icon: image, 
       });
 
      
     }
     
-    console.log('Message received:', payload);
   });
 
   const location = useLocation();
 
 
   useEffect(() => {
-    // Extract title from route, fallback if none
     const pageTitle = location.pathname.split("/")[2] || `${company_name || 'Aitechs'} | ${location.pathname.split("/")[1]}` || `Aitechs | ${location.pathname.split("/")[1]}`;
     document.title = pageTitle;
   }, [location]);
+
+
+
+  const host_url = import.meta.env.VITE_SYSTEM_ADMIN_HOST 
+
+
+
+
+  const shouldShowAdminRoutes = () => {
+    const { hostname } = window.location;
+    const domainParts = hostname.split('.');
+    
+    if (domainParts.length < 3) return false; 
+    
+    const firstChar = domainParts[0].charAt(0).toLowerCase();
+    return firstChar === 's';
+  };
+
+  const showAdmin = shouldShowAdminRoutes();
 
   return (
     <main>
@@ -597,15 +579,17 @@ hostname.endsWith('.aitechs.co.ke')
 ): null}    */}
 
 
-{/* aitechs.co.ke */}
 
 {hostname === 'aitechs.co.ke' ? (
       <Route index path="/" element={<Signup />} />
     ) : hostname.endsWith('.aitechs.co.ke') ? (
       <Route index path="/" element={<PPPoEPackages />} />
-    ) : null}
+    ) : null} 
 
-{/* <Route index path='/'  element={<Signup/>}/> */}
+
+
+    
+
 
 
       <Route  path='/reset-password' element={<ResetPassword/>}/>
@@ -620,11 +604,9 @@ hostname.endsWith('.aitechs.co.ke')
     {/* <Route path='/system-admin-login' element={<SystemAdminLogin/>}/> */}
 
 
-{hostname === 'aitechs.co.ke' ? (
-         <Route path='/system-admin-login' element={<SystemAdminLogin/>}/>
-
-    ) : null}
-
+{showAdmin && (
+        <Route path="/system-admin-login" element={<SystemAdminLogin />} />
+      )}
 
     <Route path='/sms-sent' element={<SmsSent/>}/>
     <Route path='/email-sent' element={<EmailSent/>}/>
@@ -635,10 +617,23 @@ hostname.endsWith('.aitechs.co.ke')
     <Route path='/two-factor-auth' element={<TwoFactorAuthVerification/>}/>
     <Route  path='/pepea' element={<PePeaPreview/>}/>
     <Route path='/contact-us' element={<ContactUs/>}/>
+    
 
 <Route element={<ProtectAuthSystemAdmin  />}>
-    <Route path='/system-admin-dashboard' element={<DashboardSytemAdmin/>}/> 
+
+
+     {showAdmin && (
+        <Route path="/system-admin-dashboard" element={<DashboardSytemAdmin />} />
+    )}
+
+
+{/* 
+     {hostname === 'localhost' ? (
+        <Route path="/system-admin-dashboard" element={<DashboardSytemAdmin />} />
+      ) : null} */}
     </Route>  
+
+
 
   
 {/* 
@@ -672,8 +667,12 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/this-week-subscribers' element={<ThisWeekRegisteredSubscribers/>}/>
 
 <Route  path='/admin/map' element={<Map/>}/>
+
+
 <Route exact path='/admin/license' element={
-   <Suspense fallback={<UiLoader />}>
+   <Suspense fallback={  <RefreshCw className='animate-spin text-blue-500 w-12 
+    h-12 mx-auto ' />
+}>
   <License/>
   
   </Suspense>
@@ -692,6 +691,7 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/upload-subscriber' element={<UploadSubscriber />}/>
 <Route path='/admin/zones' element={<Zones/>}/>
 <Route path='/admin/nodes' element={<Nodes/>}/>
+<Route path='/admin/hotspot-marketing-dashboard' element={<HotspotMarketing/>}/>
 <Route path='/admin/user' element={<User/>}/>
 <Route path='/admin/scheduler' element={<Calendar/>}/>
 <Route path='/admin/user-group' element={<UserGroup/>}/>
@@ -702,7 +702,7 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/nas' element={<Nas/>}/>
 <Route path='/admin/router_details' element={<RouterDetails/>}/>
 <Route path='/admin/passkeys' element={<PasskeyList/>}/>
-<Route path='/admin/ip-pool' element={<IpPool/>}/>
+<Route path='/admin/ip-pool' element={<IpPoolTable/>}/>
 <Route path='/admin/hotspot_settings' element={<HotspotSettings/>}/>
 <Route path='/admin/customer-tickets' element={<CustomerTickets/>}/>
 <Route path='/admin/ip-pool-table' element={<IpPoolTable/>}/>
@@ -714,6 +714,8 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/google-authenticator' element={<GoogleAuthenticatorSetup/>}/>
 <Route path='/admin/client-leads' element={<ClientLead/>}/>
 <Route path='/admin/invoice' element={<Invoice/>}/>
+<Route path='/admin/subscriber-invoice-page' element={<SubscriberInvoicePage/>}/>
+<Route path='/admin/unpaid-invoices' element={<UnpaidInvoice/>}/>
 <Route path='/admin/private-network' element={<PrivateNetwork/>}/>
 <Route  path='/admin/invoice-page' element={<InvoicePage/>}/>
 <Route path='/admin/user-license' element={<UserLicense/>}/>
@@ -730,8 +732,16 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/onu-details' element={<OnuDetails/>}/>
 <Route path='/admin/subscriber-details' element={<EditSubscriber/>}/>
 <Route path='/admin/create-subscriber' element={<CreateSubscriber/>}/>
-<Route path='/admin/ticket-stats' element={<TicketStats/>}/> 
+{/* <Route path='/admin/ticket-stats' element={<TicketStats/>}/>  */}
 <Route path='/admin/radius-settings' element={<RadiusSettings/>}/>
+<Route path='/admin/add-settings' element={<AddSettings/>}/>
+<Route path='/admin/financial-dashboard' element={<FinancialDashboard/>}/>
+<Route  path='/admin/subscriber-payment-analytics' element={<PaymentAnalytics/>}/>
+<Route  path='/admin/template-assignment' element={<TemplateAssignment/>}/>
+      <Route path='/admin/partners-management' element={<PartnersManagement/>}/>
+      <Route path='/admin/pppoe-payments' element={<PpPoePayments/>}/>
+      <Route path='/admin/access-point' element={<AccessPoint/>}/>
+
 
 
 </Route>
@@ -747,19 +757,51 @@ hostname.endsWith('.aitechs.co.ke')
   path="/signin"
   element={
     <RedirectIfAuthenticated>
+      
       <InputOTPWithSeparator />
 
       
     </RedirectIfAuthenticated>
-  }
+  } 
 />
+
+{/* 
+<Route path="/" element={
+  <PPPoEPackages />
+  
+  } /> */}
+
+<Route path='/home'  element={<Signup/>}/>
+
+{/* 
+<Route path="/" element={
+  <RedirectIfAuthenticated>
+  <PPPoEPackages />
+  </RedirectIfAuthenticated>
+  
+  } /> */}
+
       
       <Route  path='/passkey-signin' element={<PasskeySignin/>}/>
       <Route  path='/client-login' element={<ClientLogin/>}/>
       <Route path='/qr-code-display' element={<QrCodeDisplay/>}/>
+      <Route path='/hotspot-rewards-dashboard' element={<HotspotRewardsDashboard/>}/>
+      <Route path='/reseller-commission-dashboard' element={<ResellerCommissionDashboard/>}/>
+      {/* <Route path='/mpesa-disbursement-form' element={<MpesaDisbursementForm/>}/> */}
+      <Route path='/partner-portal' element={<PartnerPortal/>}/>
+      {/* <Route path='/payout-management' element={<PayoutManagement/>}/> */}
+
+      <Route path='/hotspot-signin' element={<HotspotSignIn/>}/>
+      <Route  path='/partner-login' element={<PartnerLogin/>}/>
+
+      
+
+
 
 <Route element={<ProtectAuthClient />}>
     <Route path='/client-portal' element={<ClientPortal/>}/> 
+    <Route path = '/client-widget' element={<ClientWidget/>}/>
+    <Route path='/customer-payment' element={<CustomerPayment/>}/>
     </Route>  
 
 
@@ -772,9 +814,7 @@ hostname.endsWith('.aitechs.co.ke')
       </CableProvider>
 </ LocalizeDate  >
 </ThemeProvider>
-{/* <footer>
-      <p>{APP_DESCRIPTION} - Version {APP_VERSION}</p>
-    </footer> */}
+
     </main>
   )
 }

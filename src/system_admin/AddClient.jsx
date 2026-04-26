@@ -62,7 +62,6 @@ const subdomain = window.location.hostname.split('.')[0];
             toast.error('Failed to fetch clients');
           }
         } catch (error) {
-          console.error('Error fetching clients:', error);
           toast.error('Error loading clients');
         } finally {
           setFetchingClients(false);

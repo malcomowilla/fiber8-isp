@@ -64,6 +64,80 @@
     --ring: 212.7 26.8% 83.9%;
   }
 }
+
+
+
+.snowfall-flake img {
+    width: 40px !important;
+    height: 40px !important;
+    object-fit: contain;
+  }
+  
+  .react-snowfall-snowflake {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+
+
+/* Add to your global CSS */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Smooth animations */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 0.3s ease-out;
+}
+
+
+
+
+
+
  
 .nanum-gothic-coding-regular {
   font-family: "Nanum Gothic Coding", monospace , sans-serif;

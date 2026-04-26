@@ -18,7 +18,7 @@ export default function SimpleBackdrop({handleClose, open}) {
 
         <div className=' flex flex-col gap-y-10'>
             <CircularProgress color="inherit" />
-            <p className='flex flex-row gap-x-10 font-mono sm:text-5xl'> Waiting for general 
+            <p className='flex flex-row gap-x-10 font-mono sm:text-5xl'> Waiting for system...... 
                <span> <ion-icon name="settings-outline" size='large'></ion-icon></span></p>
 
           {/* <ion-icon name="settings-outline" size='large'></ion-icon> */}

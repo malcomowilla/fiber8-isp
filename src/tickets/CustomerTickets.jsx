@@ -22,7 +22,11 @@ import { IconButton } from '@mui/material';
 
 import EditIcon from '@mui/icons-material/Edit';
 import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading animation
-
+import { 
+   RefreshCw,
+  BarChart3, TrendingDown, Download, Upload
+} from 'lucide-react';
+import TicketStatistics from './TicketStatistics'
 
 
 
@@ -41,11 +45,12 @@ const [openCreateTicketAlert, setopenCreateTicketAlert] = useState(false)
 const [openUpdateTicketAlert, setopenUpdateTicketAlert] = useState(false)
 const [openDeleteTicketAlert, setopenDeleteTicketAlert] = useState(false)
 const [phone, setPhone] = useState('')
+
+const [ticketNo, setTicketNo] = useState('') 
+const [updatedDate, setUpdatedDate] = useState('')
 const [customers, setCustomers] = useState([])
 
 const [customer_name, setName] = useState('')
-const [ticketNo, setTicketNo] = useState('') 
-const [updatedDate, setUpdatedDate] = useState('')
 const [ticketForm, setTicketForm] = useState({
       customer: '',
       ticket_category: '',
@@ -70,7 +75,6 @@ const [isSearching, setIsSearching] = useState(false); // New state for search l
 const [seeTicketError, setSeeTicketError] = useState(false)
 const [ticketError, setTicketError] = useState('')
 
-console.log('customer phone number',agentRole)
 const handleCloseDeleteTicketAlert = ()=> {
   setopenDeleteTicketAlert(false)
 }
@@ -102,7 +106,6 @@ const defaultOptions = {
 const handleChange = (e)=> {
 const {name,  value} = e.target
 setTicketForm((prev)=> ({...prev, [name]: value}))
-console.log('ticket form', ticketForm)
 } 
 
 
@@ -140,7 +143,6 @@ const fetchSubscribers = useCallback(
     setCustomers(newData)
 
   } else {
-    console.log('failed to fetch routers')
      if (response.status === 401) {
   toast.error(newData.error, {
     position: "top-center",
@@ -155,17 +157,16 @@ toast.error(
   'Failed to get subscribers',
   {
     position: 'top-center',
-    duration: 4000,
+    duration: 3000,
   }
 )
   }
   
   } catch (error) {
-    toast.error('Failed to get subscribers internal server error', {
+    toast.error('Failed to get subscribers , Please retry in a moment', {
       position: 'top-center',
-      duration: 4000,
+      duration: 3000,
     })
-    console.log(error)
   
   }
   },
@@ -175,105 +176,9 @@ toast.error(
 
 
   useEffect(() => {
-    
     fetchSubscribers()
   }, [fetchSubscribers]);
 
-
-    // const {
-      
-    //     materialuitheme, adminFormSettings,setSnackbar,snackbar  } = useApplicationSettings()
-
-
-
-//             const fetchCustomers = useCallback(
-//               async() => {
-//                 try {
-//                   const response = await fetch('/api/customers')
-//                   const newData = await response.json()
-//                   if (response.ok) {
-                    
-//                     setCustomers(newData)
-//                   } else {
-//                     console.log('error?')
-//                   }
-//                 } catch (error) {
-//                   console.log('error=>', error)
-//                 }
-//               },
-//               [],
-//             )
-
-
-
-// useEffect(() => {
-//   fetchCustomers()
-  
-// }, [fetchCustomers]);
-
-
-
-
-            // const fetchAgents = useCallback(
-            //   async() => {
-            //     try {
-            //       const response = await fetch('/api/get_service_providers')
-            //       const newData = await response.json()
-
-            //       if (response.status === 401) {
-            //         if (adminFormSettings.enable_2fa_for_admin_passkeys) {
-                     
-                       
-                  
-
-            //           setSnackbar({
-            //             open: true,
-            //             message: <p className='text-lg'>Session expired please Login Again</p>,
-            //             severity: 'error'
-            //           })
-                   
-            //           navigate('/signup2fa_passkey')
-                     
-            //         }else{
-                     
-            //           setSnackbar({
-            //             open: true,
-            //             message: <p className='text-lg'>Session expired please Login Again</p>,
-            //             severity: 'error'
-            //           })
-            //            navigate('/signin')
-                    
-            //         }
-                   
-            //       }
-
-            //       if (response.ok) {
-            //         console.log('get admins', newData)
-            //         const getAgent = newData.map((theAgent)=> {
-            //           if( theAgent.role === 'agent') {
-            //             return theAgent
-            //           }
-            //         })
-
-            //         console.log('get admins agent', getAgent)
-            //         setAgentRole(newData)
-            //       } else {
-            //         console.log('error')
-            //       }
-            //     } catch (error) {
-            //       console.log('error=>', error)
-            //     }
-            //   },
-            //   [],
-            // )
-            
-
-         
-            // useEffect(() => {
-            //   fetchAgents()
-              
-            // }, [fetchAgents]);
-            
 
 
             const handleAddTicket = async (e)=> {
@@ -303,14 +208,13 @@ toast.error(
                      
                 if (response.ok) {
                   
-                  console.log('tickets created:', newData)
               setOpenLoad(false)
                   if (ticketForm.id) {
                     setloading(false)
 //   setSnackbar({ open: true, message: 'Ticket updated successfully!', severity: 'success' });
 toaster.success('Ticket updated successfully!', {
     position: "top-center",
-    duration: 5000,
+    duration: 4000,
 })
 
                     setIsOpen(false)
@@ -324,7 +228,7 @@ toaster.success('Ticket updated successfully!', {
 //   setSnackbar({ open: true, message: 'Ticket added successfully!', severity: 'success' });
 toaster.success('Ticket created successfully!', {
     position: "top-center",
-    duration: 5000,
+    duration: 4000,
 })
                     setIsOpen(false)
                     setIsOpenTicket(false)
@@ -333,21 +237,17 @@ toaster.success('Ticket created successfully!', {
                     setTicket((prevData)=> (
                     [...prevData, newData]
                     ));
+
+                    
               setloading(false)
                   }
                 } else {
-                  console.log('error')
                   setloading(false)
                   setIsOpen(false)
                   setOpenLoad(false)
                   setSeeTicketError(true)
                   setTicketError(newData.error)
-toaster.error(newData.error, {
-    position: "top-center",
-    duration: 5000,
-})
-
-
+      
 
  if (response.status === 401) {
   toast.error(newData.error, {
@@ -361,31 +261,18 @@ toaster.error(newData.error, {
 }
 
 
-toaster.error('eror creating ticket', {
+toaster.error('error creating ticket', {
     position: "top-center",
-    duration: 5000,
+    duration: 3000,
 })
-//                   setSnackbar({ open: true, message: 
-//                     newData.error, severity: 'error' ,
-//                     vertical: 'top',
-//   horizontal: 'center',
-//                   });
-                  // setSnackbar({ open: true, message: 'sth went wrong!', severity: 'error' });
-                  if (response.status === 400) {
-        
-                    // setSnackbar({ open: true, message: 
-                    //   'empty ticket submited', severity: 'error' ,
-                    
-                    // });
 
-                  }
+                 
                 }
               } catch (error) {
                 setSeeTicketError(true)
-                console.log(error)
-                toaster.error('error creating tickets', {
+                toaster.error('error creating tickets, Please retry in a moment', {
                     position: "top-center",
-                    duration: 5000,
+                    duration: 3000,
                 })  
                 setOpenLoad(false)
                 setloading(false)
@@ -426,7 +313,6 @@ toaster.error('eror creating ticket', {
                       setTicket(newData.filter((my_ticket)=> {
                         return search.toLowerCase() === '' ? my_ticket : my_ticket.ticket_number.toLowerCase().includes(search)
                       }))
-                      console.log('ticket data', newData)
                     } else {
                        if (response.status === 401) {
   toast.error(newData.error, {
@@ -439,25 +325,23 @@ toaster.error('eror creating ticket', {
          }, 1900);
 }
                       setIsSearching(false)
-                      toaster.error(newData.error, {
+                      toaster.error('Failed to Search Ticket, Please retry in a moment', {
                         position: 'top-right',
-                        duration: 5000,
+                        duration: 3000,
                       })
-                      console.log('error')
               
                     }
                   } catch (error) {
                     setIsSearching(false)
-                    toaster.error('Failed to Search Ticket server error', {
+                    toaster.error('Failed to Search Ticket, We’re having trouble completing this request', {
                         position: 'top-right',
-                        duration: 4000,
+                        duration: 3000,
                       })
-                    console.log(error)
               
                   }
                 },
                 [searchInput],
-              )
+                )
               
               
               
@@ -473,7 +357,10 @@ toaster.error('eror creating ticket', {
                   setloading(true)
                   
               const response = await fetch(`/api/support_tickets/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                  'X-Subdomain': subdomain
+                }
                 })
                 
                 
@@ -496,9 +383,9 @@ toaster.error('eror creating ticket', {
                   setisOpenDelete(false)
                 }
                 } catch (error) {
-                    toaster.error('Failed to Delete Ticket', {
+                    toaster.error('Failed to Delete Ticket, We’re having trouble completing this request', {
                     position: 'top-right',
-                    duration: 4000,
+                    duration: 3000,
                   })
                   console.log(error)
                   setisOpenDelete(false)
@@ -510,7 +397,6 @@ toaster.error('eror creating ticket', {
               
 
 
-              console.log('my customer', customers)
 
         const handleAddButton = ()=> {
           // setIsOpen(true)
@@ -521,7 +407,6 @@ toaster.error('eror creating ticket', {
 
         const handleRowClick = (event, rowData)=> {
           const customerData = customers.find(my_customer => my_customer.name === rowData.customer);
-          console.log(' row data', rowData) 
   // setPhone(customerData.phone_number)
     setPhone(rowData.phone_number)
 
@@ -547,33 +432,39 @@ toaster.error('eror creating ticket', {
           )
 
 
+        const getAgentsCustomerSupportAndTechnicians = useCallback(
+          async() => {
+            try {
+              const response = await fetch('/api/get_all_admins', {
+                headers: {
+                  'X-Subdomain': subdomain,
+                },
+              })
+              const newData = await response.json()
+              if (response.ok) {
+                setAgentRole(newData)
+              }
+            } catch (error) {
+              
+            }
+          },
+          [],
+        )
+        
+
+
+          useEffect(() => {
+            
+            getAgentsCustomerSupportAndTechnicians()
+          }, [getAgentsCustomerSupportAndTechnicians]);
+
   return (
 
     <>
     <Toaster />
-{/* 
-<Snackbar
- anchorOrigin={{ 
-  vertical: 'top', 
-  horizontal: 'center' 
-}}
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>  */}
-
-
-
-
-     <TicketForm phone={phone} customer_name={customer_name}  ticketNo={ticketNo} loading={loading}
+<TicketStatistics />
+     <TicketForm phone={phone} customer_name={customer_name}  
+     ticketNo={ticketNo} loading={loading}
       openLoad={openLoad}
      handleAddTicket={handleAddTicket} isOpen={isOpen} setIsOpen={setIsOpen} agentRole={agentRole}
       ticketForm={ticketForm}
@@ -602,12 +493,7 @@ toaster.error('eror creating ticket', {
     <label htmlFor="simple-search" className="sr-only">Search</label>
     <div className="relative w-full">
         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-            {/* <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-             xmlns="http://www.w3.org/2000/svg"
-             fill="none" viewBox="0 0 18 20">
-                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-                 strokeWidth="2" d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"/>
-            </svg> */}
+           
             <BsTicketDetailed className='text-black w-5 h-5'/>
             
         </div>
@@ -636,7 +522,7 @@ toaster.error('eror creating ticket', {
   
   <div className="absolute inset-0 flex justify-center cursor-pointer items-center  
    bg-opacity-70 z-[2] mb-[50rem]">
-      <CircularProgress size={90} color="inherit" className='text-black dark:text-white' /> 
+      <RefreshCw className='animate-spin text-blue-500 w-12 h-12 mx-auto ' />
       
       </div>
     
@@ -825,34 +711,37 @@ data={ticket}
 onRowClick={handleRowClick}
 
 
- options={{
-        paging: true,
-       pageSizeOptions:[5, 10],
-       pageSize: 10,
-       search: false,
-  
-
-showSelectAllCheckbox: false,
-showTextRowsSelected: false,
-hover: true, 
-selection: true,
-paginationType: 'stepped',
+localization={{
+                body: {
+                  emptyDataSourceMessage: 'No tickets found. Create your first ticket to get started!'
+                },
+               
+              
+              
+              }}
 
 
-paginationPosition: 'bottom',
+options={{
+  sorting: true,
+  pageSizeOptions:[1, 2, 5, 10],
+  pageSize: 10,
+  paginationPosition: 'bottom',
 exportButton: true,
 exportAllData: true,
-exportFileName: 'Customers',
-
+selection: true,
+search:false,
+searchAutoFocus: true,
+showSelectAllCheckbox: false,
+showTextRowsSelected: false,
+  emptyRowsWhenPaging: false,
 headerStyle:{
-fontFamily: 'bold',
-textTransform: 'uppercase'
-} ,
-
-
-fontFamily: 'mono'
-
-}} 
+  fontFamily: 'bold',
+  textTransform: 'uppercase'
+  } ,
+  
+  
+  fontFamily: 'mono'
+}}
     />
   </div>
   </div>

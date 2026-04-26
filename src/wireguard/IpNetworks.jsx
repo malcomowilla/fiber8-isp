@@ -76,7 +76,6 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
     { value: '30', label: '/30 (2 hosts)' },
   ];
 
-  // Fetch data from backend
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -95,13 +94,11 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
     duration: 4000,
   })
    setTimeout(() => {
-          // navigate('/license-expired')
           window.location.href='/signin'
          }, 1900);
 }
         if (response.status === 402) {
         setTimeout(() => {
-          // navigate('/license-expired')
           window.location.href='/license-expired'
          }, 1800);
         
@@ -124,11 +121,9 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       if (response.ok) {
         const result = await response.json();
         setNas(result);
-        // setFormData(prev => ({ ...prev, nas: `"${result[0].ip_address}"` }));
-        // console.log('ip',result[0].ip_address);
+      
       }
     } catch (error) {
-      console.error('Failed to fetch NAS routers:', error);
     }
   };
 
@@ -198,13 +193,12 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.errors?.join(', ') || 'Request failed');
       }
 
       showSnackbar(
         editing ? 'Network updated successfully' : 'Network created successfully'
       );
-      fetchData(); // Refresh data
+      fetchData(); 
       setOpenDialog(false);
     } catch (error) {
       showSnackbar(error.message, 'error');
@@ -226,7 +220,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       }
 
       showSnackbar('Network deleted successfully');
-      fetchData(); // Refresh data
+      fetchData(); 
     } catch (error) {
       showSnackbar(error.message, 'error');
     } finally {
@@ -283,7 +277,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       }
 
       showSnackbar('Network deleted successfully');
-      fetchData(); // Refresh data
+      fetchData();
     } catch (error) {
       showSnackbar(error.message, 'error');
     } finally {
@@ -367,15 +361,30 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
           {
             icon: () => <DeleteIcon color="error" />,
             tooltip: 'Delete Network',
-            // onClick: (event, rowData) => handleDelete(rowData.id)
             onClick: (event, rowData) => handleDeleteClick(rowData.id)
           }
         ]}
+
+
+
+localization={{
+                body: {
+                  emptyDataSourceMessage: 'No IP networks found. Create your first IP network to get started!',
+                },
+               
+              
+              
+              }}
         options={{
           actionsColumnIndex: -1,
           pageSize: 10,
           pageSizeOptions: [10, 20, 50],
           showTitle: false,
+           sorting: true,
+ emptyRowsWhenPaging: false,
+
+
+
           headerStyle: {
             backgroundColor: '#f5f5f5',
             fontWeight: 'bold'
@@ -479,7 +488,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
     '& .MuiAutocomplete-inputRoot': {
       padding: '8px 14px',
     },
-    mt: 2 // Add margin if needed
+    mt: 2 
   }}
 />
             </Grid>
@@ -489,18 +498,17 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
              <Autocomplete
   fullWidth
   className='myTextField'
-  options={nas} // Your NAS array
+  options={nas} 
   value={nas.find(n => n.name === formData.nas) || null}
   onChange={(event, newValue) => {
     handleInputChange({
       target: {
         name: "nas",
-        value: newValue?.name || '' // Store the name (or use id if preferred)
+        value: newValue?.name || ''
       }
     });
     
-    // OR if you need the full NAS object:
-    // setFormData(prev => ({ ...prev, nas: newValue?.name || '' }));
+   
   }}
   getOptionLabel={(option) => option.name}
   renderInput={(params) => (
@@ -510,14 +518,13 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       required
       InputProps={{
         ...params.InputProps,
-        // Custom input styling if needed
       }}
     />
   )}
   isOptionEqualToValue={(option, value) => option.id === value?.id}
   sx={{
     '& .MuiAutocomplete-inputRoot': {
-      padding: '9px 14px', // Match Select component padding
+      padding: '9px 14px', 
     },
     mt: 2
   }}
@@ -531,9 +538,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
               <Typography>
                 <strong>Total IP Addresses:</strong> {calculateTotalIps(formData.subnet_mask)}
               </Typography>
-              {/* <Typography>
-                <strong>Client Host Range:</strong> {calculateHostRange(formData.network, formData.subnet_mask)}
-              </Typography> */}
+              
             </Grid>
           </Grid>
         </DialogContent>
@@ -553,7 +558,6 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
@@ -571,7 +575,6 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
   );
 };
 
-// Simple IPAddress class - replace with a proper library in production
 class IPAddress {
   constructor(cidr) {
     const [ip, mask] = cidr.split('/');

@@ -92,7 +92,7 @@ console.log(user)
           throw new Error('Logout failed');
         }
       } catch (error) {
-        console.error('Error logging out:', error);
+        // console.error('Error logging out:', error);
        }
   }
 

@@ -77,15 +77,15 @@ if (response.status === 401) {
           })
             toast.error('failed to fetch map settings', {
                 position: 'top-center',
-                duration: 4000,
+                duration: 3000,
             })
         }
     } catch (error) {
         toast.error(
-            'failed to fetch map settings server error',
+            'failed to fetch map settings,Please retry in a moment',
             {
                 position: 'top-center',
-                duration: 4000,
+                duration: 3000,
             }
         )
     }

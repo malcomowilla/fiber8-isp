@@ -92,7 +92,7 @@ if (response.status === 401) {
         }
     } catch (error) {
         toast.error(
-            'failed to fetch ticket settings server error',
+            'failed to fetch ticket settings, Please retry in a moment',
             {
                 position: 'top-center',
                 duration: 4000,

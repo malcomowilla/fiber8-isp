@@ -1,12 +1,8 @@
 import DeleteIcon from '@mui/icons-material/Delete';
-
-
 import EditIcon from '@mui/icons-material/Edit';
-
 import { IconButton } from '@mui/material';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import AddIcon from '@mui/icons-material/Add';
-
 import {  useState, useEffect, useCallback} from 'react'
 import EditNode from '../edit/EditNode'
 import MaterialTable from 'material-table'
@@ -14,8 +10,9 @@ import { FaCircleNodes } from "react-icons/fa6";
 import { useDebounce } from 'use-debounce';
 import toast,{  Toaster } from 'react-hot-toast';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
-
 import DeleteNode from '../delete/DeleteNode'
+import { IoInformationCircleOutline } from "react-icons/io5";
+
 
 
 
@@ -245,8 +242,18 @@ const columns = [
   return (
     <>
     <Toaster />
-    Use nodes to group subscribers per town, neighborhood or village. Nodes are simple display separations with 
+   
+ <div role="alert" className="alert alert-info bg-green-500 rounded-lg w-fit
+          p-2 flex items-center gap-2 justify-center mb-3">
+ <IoInformationCircleOutline className='text-white text-xl '/>
+  <span className='text-white'>
+
+     Use nodes to group subscribers, router, onu device management,vouchers, per town, neighborhood or village. Nodes are simple display separations with 
     no influence on the subscriber’s traffic or settings.
+
+  </span>
+</div>
+
 
 
     <div className=''
@@ -336,30 +343,37 @@ const columns = [
     ]}
 
 
+localization={{
+                body: {
+                  emptyDataSourceMessage: 'No nodes found. Create your first node to get started!'
+                },
+               
+              
+              
+              }}
+
+
 options={{
-        paging: true,
-       pageSizeOptions:[5, 10],
-       pageSize: 10,
-       search: false,
-searchFieldStyle: {
-  borderColor: 'red'
-},
+  sorting: true,
+  pageSizeOptions:[2, 5, 10, 20],
+  pageSize: 20,
+  paginationPosition: 'bottom',
+exportButton: true,
+exportAllData: true,
+selection: true,
+search:false,
 searchAutoFocus: true,
 showSelectAllCheckbox: false,
 showTextRowsSelected: false,
-
-selection: true,
-paginationType: 'stepped',
-
-// rowStyle:{
-//   backgroundColor: 'dark'
-// },
-
-paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-exportFileName: 'Nodes'
-}}     
+  emptyRowsWhenPaging: false,
+headerStyle:{
+  fontFamily: 'bold',
+  textTransform: 'uppercase'
+  } ,
+  
+  
+  fontFamily: 'mono'
+}}
       
       
       

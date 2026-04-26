@@ -189,17 +189,19 @@ setFormDataSubscriber({
          }, 1800);
         
       }
+
+      
 if (response.status === 401) {
   toast.error(newData.error, {
     position: "top-center",
     duration: 4000,
   })
+
    setTimeout(() => {
           // navigate('/license-expired')
           window.location.href='/signin'
          }, 1900);
 }
-      console.log('failed to fetch routers')
 
       toast.error(newData.error, {
         position: 'top-center',
@@ -271,7 +273,6 @@ if (response.status === 401) {
           }
         }
         catch (error) {
-          console.log(error)
         }
       },
       [subdomain]
@@ -321,12 +322,12 @@ setOpenDelete(false)
 setOpenDelete(false)
 toast.error('failed to delete subscriber', {
   position: "top-center",
-  duration: 4000,
+  duration: 3000,
 })
 }
 } catch (error) {
   setOpenDelete(false)
-    toast.error(`failed to delete subscriber, server error`)
+    toast.error(`failed to delete subscriber,We’re having trouble completing this request.`)
 }
    
   }
@@ -343,7 +344,7 @@ toast.error('failed to delete subscriber', {
 
 
   const columns = [
-    {title: 'name', field: 'name', headerClassName: 'dark:text-black ', defaultSort: 'asc', 
+    {title: 'name', field: 'name', headerClassName: 'dark:text-black ', 
       render: (rowData) => {
         return<> {rowData.name  && <div
           onClick={() => {
@@ -356,8 +357,10 @@ toast.error('failed to delete subscriber', {
          hover:text-green-700'/> {rowData.name}</div> } </>
       }
     },
-    {title: 'ref_no', field: 'ref_no',  headerClassName: 'dark:text-black' ,  sorting: true, defaultSort: 'asc'},
-    {title: 'Date Registered', field: 'date_registered',  headerClassName: 'dark:text-black' , 
+    {title: 'Account Number', field: 'ref_no',  headerClassName: 'dark:text-black' ,  sorting: true, },
+    {title: 'Date Registered', field: 'date_registered',  
+      defaultSort: 'dsc', 
+      
       render: (rowData) => {
         return <>{rowData.date_registered && <div className='flex gap-2'> <FaCalendarCheck className='text-black w-6 h-6
          dark:text-white cursor-pointer
@@ -463,7 +466,8 @@ toast.error('failed to delete subscriber', {
     }}
     >
       <Tooltip title="Call">
-      <IconButton arrow color="primary" onClick={()=>{window.location.href = `tel:${params.phone_number}`}}>
+      <IconButton arrow color="primary" 
+      onClick={()=>{window.location.href = `tel:${params.phone_number}`}}>
      <FaPhoneVolume className='text-green-500 text-xl'/>
      </IconButton>
      </Tooltip>
@@ -482,7 +486,6 @@ toast.error('failed to delete subscriber', {
 navigate(`/admin/subscriber-details?id=${encodeURIComponent(params.id)}
    `);
 
-          console.log('rowData clicked', params)
         }}>
       <EditButton {...params} />
       </IconButton>
@@ -512,11 +515,13 @@ navigate(`/admin/subscriber-details?id=${encodeURIComponent(params.id)}
     <div>
 
     <DeleteSubscriber  openDelete={openDelete} handleCloseDelete={handleCloseDelete} 
-    deleteSubscriber={deleteSubscriber} id={formDataSubscriber.id} loading={loading}/>
+    deleteSubscriber={deleteSubscriber} id={formDataSubscriber.id}
+     loading={loading}/>
       <Toaster />
       <Backdrop open={openLoad} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
   
-<Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
+<Lottie className='relative z-50' options={defaultOptions} 
+height={400} width={400} />
   
    </Backdrop>
 
@@ -530,7 +535,7 @@ packageName={formData.package_name}
            */}
 
 
-<div className="flex items-center max-w-sm mx-auto p-3">  
+<div className="flex items-center max-w-sm mx-auto ">  
      
     <label htmlFor="simple-search" className="sr-only">Search</label>
     <div className="relative w-full">
@@ -556,42 +561,13 @@ packageName={formData.package_name}
     </button>
 </div>
 
-{/* 
- {isSearching ? (
-  
-  <div className="absolute inset-0 flex justify-center cursor-pointer items-center  
-   bg-opacity-70 z-[2] mb-[50rem]">
-      <CircularProgress size={90} color="inherit" className='text-black dark:text-white' /> 
-      
-      </div>
-    
-  ) : (
-    <div className='hidden'>
-    <svg
-      className="w-4 h-4"
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 20 20"
-    >
-      <path
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-      />
-    </svg>
-    </div>
-  )}  */}
-
 
 <MaterialTable columns={columns}
 isLoading={isSearching}
 data={tableDataSubscriber}
 title={<p className='bg-gradient-to-r from-green-600 via-blue-400 to-cyan-500 bg-clip-text
   
-  text-transparent font-bold text-xl'>PPPoe Subcribers</p>}
+  text-transparent font-bold text-xl'>PPPoe Subscribers</p>}
 
 onRowClick={(event, rowData)=>handleRowClick(event, rowData)}
 icons={{
@@ -610,10 +586,24 @@ actions={[
   
 ]}
 
+
+
+
+
+localization={{
+                body: {
+                  emptyDataSourceMessage: 'No subscribers found. Create your first subscriber to get started!'
+                },
+               
+              
+              
+              }}
+
+
 options={{
   sorting: true,
-  pageSizeOptions:[2, 5, 10, 20],
-  pageSize: 30,
+  pageSizeOptions:[2, 5, 10],
+  pageSize: 10,
   paginationPosition: 'bottom',
 exportButton: true,
 exportAllData: true,
@@ -622,7 +612,7 @@ search:false,
 searchAutoFocus: true,
 showSelectAllCheckbox: false,
 showTextRowsSelected: false,
-
+  emptyRowsWhenPaging: false,
 headerStyle:{
   fontFamily: 'bold',
   textTransform: 'uppercase'

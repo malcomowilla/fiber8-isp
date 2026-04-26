@@ -66,14 +66,12 @@ const navigate = useNavigate()
         backdrop-blur-xl 
           rounded-2xl shadow-xl p-8 space-y-6"
       >
-        {/* Logo and Company Name */}
         <motion.div 
           className="flex flex-col items-center"
           variants={itemVariants}
         >
         <div className="text-center mb-6">
         <div className="inline-flex items-center justify-center p-4 bg-blue-600/20 rounded-full">
-          {/* Shield + Network icon */}
         
 <img
 className="w-24 h-24 mx-auto rounded-full"
@@ -89,7 +87,6 @@ className="w-24 h-24 mx-auto rounded-full"
           </h1>
         </motion.div>
 
-        {/* Email Icon */}
         <motion.div
           variants={itemVariants}
           className="flex justify-center"
@@ -100,7 +97,6 @@ className="w-24 h-24 mx-auto rounded-full"
           </div>
         </motion.div>
 
-        {/* Message */}
         <motion.div
           variants={itemVariants}
           className="text-center space-y-4"
@@ -117,7 +113,6 @@ className="w-24 h-24 mx-auto rounded-full"
           </p>
         </motion.div>
 
-        {/* Action Buttons */}
         <motion.div
           variants={itemVariants}
           className="space-y-4 pt-4"

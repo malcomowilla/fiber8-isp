@@ -34,13 +34,37 @@ const ApplicationSettings = ({children}) => {
       }
 
 
+      const nasSettings = {
+        notification_when_unreachable: false,
+        unreachable_duration_minutes: '',
+        notification_phone_number: ''
+      }
+
+
+ const accessPointSettings = {
+        notification_when_unreachable: false,
+        unreachable_duration_minutes: '',
+        notification_phone_number: ''
+      }
+
+
       const initialValueNas = {
         username:'',
         password: '',
         ip_address:'',
-        name: ''
+        name: '',
+        location: '',
         }
 
+
+        const initialValueAccessPoint = {
+        
+        ip:'',
+        name: '',
+        location: '',
+        longitude: '',
+        latitude: '',
+        }
         const subscriber_settings = {
           prefix: '',
           minimum_digits: '',
@@ -54,10 +78,32 @@ const ApplicationSettings = ({children}) => {
           send_welcome_message: false,
           subscriber_welcome_message: false,
           lock_account_to_mac: false,
+          notify_user_payment_received: false,
+          invoice_created_or_paid: false,
+          expiration_reminder: false,
+          expiration_reminder_minutes: '',
+          expiration_reminder_hours: '',
+          expiration_reminder_days: '',
 
 
         }
+        const [walletBalance, setWalletBalance] = useState('0')
+
       const [settingsformData, setFormData]= useState(initialValue)
+      const [nasSettingsForm, setNasSettingsForm] = useState(nasSettings)
+
+      const [expiry, setExpiry] = useState('No license')
+const [expiry2, setExpiry2] = useState('No license')
+const [condition, setCondition] = useState(false)
+const [condition2, setCondition2] = useState(false)
+const [status, setStatus] = useState('Not Active')
+const [status2, setStatus2] = useState('Not Active')
+const [currentHotspotPlan, setCurrentHotspotPlan] = useState(null)
+const [currentPPOEPlan, setCurrentPPOEPlan] = useState(null)
+const [accessPointForm, setAccessPointForm] = useState(initialValueAccessPoint)
+const [accessPointSettingsForm, setAccessPointSettingsForm] = useState(accessPointSettings)
+
+
 
 
   const intialValueSubscriber = {
@@ -90,6 +136,16 @@ const ApplicationSettings = ({children}) => {
     
 
   }
+  const [hotspotCustomization, setHotspotCustomization] = useState({
+    customize_template_and_package_per_location: false,
+    enable_autologin: false,
+    compensation_hours: '',
+    compensation_minutes: '',
+    enable_compensation: false
+
+  })
+
+
 const [formDataSubscriber, setFormDataSubscriber] = useState(intialValueSubscriber)
 
         const  [nasformData, setnasFormData] = useState(initialValueNas)
@@ -111,6 +167,7 @@ const [welcome, setWelcome] = useState(false)
   agent_email: '',
   customer_support_email: '',
   customer_support_phone_number: '',
+  location: '',
 
       })
 
@@ -127,7 +184,8 @@ const [smsSettingsForm, setSmsSettingsForm] = useState({
   sender_id: '',
   short_code: '',
   partnerID: '',
-  // username: '',
+
+   username: '',
 });
 
 
@@ -136,6 +194,17 @@ const [hotspotMpesaSettings, setHotspotMpesaSettings] = useState({
   consumer_secret: '',
   consumer_key: '',
   passkey: '',
+  api_initiator_username: '',
+  api_initiator_password: '',
+  phone_number: '',
+  
+});
+
+
+const [dialMpesaSettings, setDialMpesaSettings] = useState({
+  consumer_secret: '',
+  consumer_key: '',
+  short_code: '',
   
 });
 
@@ -178,6 +247,46 @@ const handleChangeHotspotVoucher = (e) => {
   }))
 }
 
+
+function calculateTimeRemaining(expiryDateString) {
+    // Parse the expiry date (format: "June 07, 2025 at 05:12 PM")
+    const expiryDate = new Date(expiryDateString?.replace(' at ', ' '));
+    const now = new Date();
+    const diffMs = expiryDate - now;
+    
+    // If already expired
+    if (diffMs <= 0) return '(license expired)';
+  
+    // Calculate time components
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  
+    // Build human-readable string
+    let result = '';
+    if (diffDays > 0) {
+      const weeks = Math.floor(diffDays / 7);
+      const days = diffDays % 7;
+      
+      if (weeks > 0) result += `${weeks} week${weeks !== 1 ? 's' : ''} `;
+      if (days > 0) result += `${days} day${days !== 1 ? 's' : ''} `;
+    }
+    
+    if (diffHours > 0 && diffDays < 2) {
+      result += `${diffHours} hour${diffHours !== 1 ? 's' : ''} `;
+    }
+    
+    if (diffMinutes > 0 && diffDays === 0) {
+      result += `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`;
+    }
+  
+    // If less than 1 minute remains
+    if (result === '') return 'expires in less than 1 minute';
+  
+    return `expires in ${result?.trim()}`;
+  }
+
+
       const [formData, setFormDataSystemAdmin] = useState({
         password: '',
         phone_number: '',
@@ -193,10 +302,12 @@ const handleChangeHotspotVoucher = (e) => {
         simple: false,
         default: false,
         sleek: false, 
+        location: ''
       });
 
       const [selectedProvider, setSelectedProvider] = useState('SMS leopard'); // Default value
       const [selectedAccountTypeHotspot, setSelectedAccountTypeHotspot] = useState('Till'); // Default value
+      const [selectedAccountTypeSubscriber, setSelectedAccountTypeSubscriber] = useState('Paybill'); // Default value
 
       // const [settingsformData, setFormData] = useState(() => {
       //   const storedFormData =   localStorage.setItem("checkedtrueData", JSON.stringify(initialValue.check_update_password));
@@ -236,38 +347,109 @@ const [routerName, setRouterName] = useState(null)
 const [openRouterDetails, setOpenRouterDetails] = useState(false)
 const [openNasTable, setOpenNasTable] = useState(true)
 
+
+
+
+const handleChangeHotspotCustomization = (e) => {
+  const { type, name, checked, value } = e.target;
+  // setHotspotCustomization((prevFormData) => ({
+
+  //      ...prevFormData,
+  //   [name]: type === "checkbox" ? checked : value,
+  // }));
+
+
+
+  setHotspotCustomization((prevData) => {
+          let updatedSettings = { ...prevData, [name]: type === "checkbox" ? checked : value, };
+      
+     
+          if (name === 'compensation_minutes') {
+     
+        updatedSettings.compensation_hours = ''
+      
+          }else if (name === 'compensation_hours'){
+
+            updatedSettings.compensation_minutes = ''
+
+          }
+      
+         
+          return updatedSettings;
+
+        });      
+};
+
+
+
+
+const handleChangeNasSettings = (e) => {
+  const { type, name, checked, value } = e.target;
+  setNasSettingsForm((prevFormData) => ({
+    ...prevFormData,
+    [name]: type === "checkbox" ? checked : value,
+  }));
+};
+
+const handleChanageAccessPointSettings = (e) => {
+  const { type, name, checked, value } = e.target;
+  setAccessPointSettingsForm((prevFormData) => ({
+    ...prevFormData,
+    [name]: type === "checkbox" ? checked : value,
+  }));
+
+}
+
+
       const handleChangeSubscriberSettings = (e) => {
         const { type, name, checked, value } = e.target;
 
-        // const captlalName = value.charAt(0).toUpperCase() + value.slice(1)
-        const capitalizedName = value.toUpperCase() 
-console.log('subscriber settings', subscriber_settings)
-        setSubscriberSettings((prevFormData) => ({
-          ...prevFormData,
-          [name]: type === "checkbox" ? checked : capitalizedName,
-        }));
+        // const capitalizedName = value.toUpperCase() 
+        // setSubscriberSettings((prevFormData) => ({
+        //   ...prevFormData,
+        //   [name]: type === "checkbox" ? checked : capitalizedName,
 
+        // }));
+
+
+const capitalizedName = value.toUpperCase() 
+  setSubscriberSettings((prevData) => {
+          let updatedData = { ...prevData };
+          let updatedSettings = { ...prevData, [name]: type === "checkbox" ? checked : capitalizedName, };
+      
+     
+          if (name === 'expiration_reminder_minutes') {
+     
+        updatedSettings.expiration_reminder_hours = ''
+            updatedSettings.expiration_reminder_days = ''
+      
+          } else if (name === 'expiration_reminder_hours'){
+
+            updatedSettings.expiration_reminder_minutes = ''
+            updatedSettings.expiration_reminder_days = ''
+          }else if (name === 'expiration_reminder_days'){
+
+            updatedSettings.expiration_reminder_minutes = ''
+            updatedSettings.expiration_reminder_hours = ''
+
+          }
+      
+         
+          return updatedSettings;
+
+        });        
 
       }
 
       const handleChangeAdminSettings = (e) => {
         const { type, name, checked, value } = e.target;
-        console.log('e.target', e.target)
-        console.log('name', name)
-        console.log('checked', e.target.checked)
-
-      
-
-        // const captlalName = value.charAt(0).toUpperCase() + value.slice(1)
-        // const capitalizedName = value.toUpperCase()
-
-
+       
+  
         setAdminSettings((prevData) => {
           let updatedData = { ...prevData };
           let updatedSettings = { ...prevData, [name]: type === "checkbox" ? checked : value, };
       
-      // console.log('check_inactive_hrs', updatedData .check_inactive_hrs)
-          // Handle specific cases for check_inactive_minutes, check_inactive_hrs, and check_inactive_days
+     
           if (name === 'enable_2fa_for_admin_sms') {
 
  if (updatedSettings.enable_2fa_for_admin_sms) {
@@ -330,22 +512,12 @@ console.log('subscriber settings', subscriber_settings)
 
           }
       
-          // Update the value for the changed field
-          // updatedSettings[name] = type === 'checkbox' ? checked : value;
-      
-          // Update enable_2fa_for_admin based on the checked value
          
-      
-          // console.log("is it true or false=>", name );
-      console.log("is it true or false=>", updatedSettings );
           return updatedSettings;
 
         });
 
-        // setAdminSettings((prevFormData) => ({
-        //   ...prevFormData,
-        //   [name]: type === "checkbox" ? checked : capitalizedName,
-        // }));
+        
       }
 
     const [isloading, setisloading] = useState(false)
@@ -401,10 +573,8 @@ router_name
 })
 
 } else {
-console.log('failed to fetch')
 }
 } catch (error) {
-console.log(error)
 
 }
 }, []) 
@@ -425,12 +595,10 @@ const fetchCurrentUser = useCallback(
       })
       const newData = await response.json()
       if (response) {
-        console.log('fetched current user', newData)
         const {username, email, id, created_at, updated_at} = newData
         setCurrentUser(newData)
         setCurrentUsername(username)
         setCurentEmail(email)
-        console.log('current user', newData)
       }else{
         setCurrentUser(null) 
       }
@@ -468,13 +636,10 @@ const fetchCurrentSystemAdmin = useCallback(
       })
       const newData = await response.json()
       if (response) {
-        console.log('fetched current user', newData)
         const {user_name, email, id, created_at, updated_at, phone_number} = newData
         setCurrentSystemAdmin(newData)
-        console.log('current user', newData)
       }
     } catch (error) {
-      console.log(error)
     }
   },
   [],
@@ -487,6 +652,7 @@ useEffect(() => {
 }, [fetchCurrentSystemAdmin]);
 
 
+const [customerProfileData, setCustomerProfileData] = useState(null);
 
 
 
@@ -500,13 +666,11 @@ const fetchCurrentCustomer = useCallback(
       })
       const newData = await response.json()
       if (response) {
-        console.log('fetched current user', newData)
         // const {user_name, email, id, created_at, updated_at, phone_number} = newData
         setCurrentCustomer(newData)
-        console.log('current customer', newData)
+        setCustomerProfileData(newData)
       }
     } catch (error) {
-      console.log(error)
     }
   },
   [],
@@ -531,14 +695,13 @@ useEffect(() => {
       })
 const newData = await response.json()
       if (response) {
-        console.log('fetched router settings', newData)
         const {router_name} = newData[0]
         setFormData({...settingsformData, router_name})
       } else {
-        console.log('failed to fetch router settings')
+        // console.log('failed to fetch router settings')
       }
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
   }
   fetchRouters()
@@ -559,6 +722,11 @@ const newData = await response.json()
   
   fetchSubscriberUpdatedSettings()
  }, [fetchSubscriberUpdatedSettings, setFormData]);
+
+
+
+
+
 
 const handleChange = (e) => {
   const { type, name, checked, value } = e.target;
@@ -630,7 +798,7 @@ const loginWithVoucher = async(e) => {
           duration: 3000,
           position: 'top-right',
         });
-        console.log('company settings fetched', newData)
+        // console.log('company settings fetched', newData)
       } else {
         setLoading(false)
         toast.error('Voucher verification failed', {
@@ -639,7 +807,7 @@ const loginWithVoucher = async(e) => {
         });
   
         toast.error(newData.error, {
-          duration: 7000,
+          duration: 4000,
           position: 'top-right',
         });
       }
@@ -723,6 +891,75 @@ const handleChangeSubscriber = (e)=> {
 
 
 
+  const [adSetingsData, setAdSetingsData] = useState({
+    enabled: false,
+    to_right: false,
+    to_left: false,
+    to_top: false,
+  })
+
+
+
+
+  const [adData, setAdData] = useState({
+    title: '',
+    description: '',
+    businessName: '',
+    businessType: '',
+    offerText: '',
+    discount: '',
+    ctaText: 'Learn More',
+    backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    textColor: '#ffffff',
+    image: null,
+    imagePreview: '',
+    targetUrl: '',
+    isActive: true,
+    
+    // Business Details
+    contact: {
+      phone: '',
+      email: '',
+      website: ''
+    },
+    location: {
+      address: '',
+      city: '',
+      state: '',
+      zipCode: '',
+      coordinates: {
+        lat: '',
+        lng: ''
+      }
+    },
+    hours: {
+      monday: { open: '09:00', close: '17:00', closed: false },
+      tuesday: { open: '09:00', close: '17:00', closed: false },
+      wednesday: { open: '09:00', close: '17:00', closed: false },
+      thursday: { open: '09:00', close: '17:00', closed: false },
+      friday: { open: '09:00', close: '17:00', closed: false },
+      saturday: { open: '10:00', close: '16:00', closed: false },
+      sunday: { open: '', close: '', closed: true }
+    },
+    
+    // Services/Products
+    services: [''],
+    pricing: {
+      startingFrom: '',
+      priceRange: '',
+      currency: 'USD'
+    },
+    
+    // Business Features
+    features: [],
+    rating: 0,
+    testimonials: [''],
+    
+    schedule: {
+      startDate: '',
+      endDate: ''
+    }
+  });
 
   return (
     <>
@@ -762,7 +999,21 @@ const handleChangeSubscriber = (e)=> {
         hotspotPhoneNumber, setHotspotPhoneNumber,hotspotEmail, setHotspotEmail,
         formDataSubscriber, setFormDataSubscriber,intialValueSubscriber,handleChangeSubscriber,
         selectedLocations, setSelectedLocations,editingSubscriber, setEditingSubscriber,
-        tableDataSubscriber, setTableDataSubscriber,mapForm, setMapForm
+        tableDataSubscriber, setTableDataSubscriber,mapForm, setMapForm,adSetingsData, setAdSetingsData,
+        adData, setAdData,selectedAccountTypeSubscriber, setSelectedAccountTypeSubscriber,
+        dialMpesaSettings, setDialMpesaSettings,customerProfileData,
+        hotspotCustomization, setHotspotCustomization,handleChangeHotspotCustomization,
+        handleChangeNasSettings, nasSettingsForm, setNasSettingsForm,
+        expiry, setExpiry, expiry2, setExpiry2, condition, setCondition,
+        condition2, setCondition2, status, setStatus, status2, setStatus2,
+        currentHotspotPlan, setCurrentHotspotPlan, currentPPOEPlan, 
+        setCurrentPPOEPlan,calculateTimeRemaining,walletBalance,
+         setWalletBalance,accessPointForm,handleChanageAccessPointSettings,
+         accessPointSettingsForm, setAccessPointSettingsForm,
+         
+          setAccessPointForm,initialValueAccessPoint,
+
+
      }}  >
     {children}
    </GeneralSettingsContext.Provider>

@@ -7,7 +7,6 @@ import LoadingAnimation from '../loader/loading_animation.json'
 import { LuUsers } from "react-icons/lu";
 import { Box, Button, Chip, Typography, useTheme  } from '@mui/material';
 import { Add as AddIcon, GetApp as GetAppIcon } from '@mui/icons-material';
-
 import { MdOutlineOnlinePrediction } from "react-icons/md";
 import { IoCloudOfflineOutline } from "react-icons/io5";
 import {Link} from 'react-router-dom'
@@ -59,10 +58,10 @@ const SubscriberStats = () => {
         if (response.ok) {
           setTotalSubscribers(newData.total_subscribers)
         } else {
-          console.log('failed to fetch total subscribers')
+          // console.log('failed to fetch total subscribers')
         }
       } catch (error) {
-        console.log('failed to fetch total subscribers')
+        // console.log('failed to fetch total subscribers')
       }
       
     },
@@ -92,10 +91,10 @@ useEffect(() => {
         if (response.ok) {
           setSubscribersOffline(newData.total_subscribers)
         } else {
-          console.log('failed to fetch total subscribers')
+          // console.log('failed to fetch total subscribers')
         }
       } catch (error) {
-        console.log('failed to fetch total subscribers')
+        // console.log('failed to fetch total subscribers')
       }
       
     },
@@ -119,7 +118,7 @@ useEffect(() => {
   }, // must match your Rails channel class
       {
         received(data) {
-           console.log('received data from subscribers channel', data)
+          //  console.log('received data from subscribers channel', data)
             setTotalSubscribers(data.subscriber_count)
          
         },

@@ -170,7 +170,7 @@ const response = await fetch(`/api/delete_client_request/${id}`, {
     setIsOpenDeleteRequests(false)
     setloading(false)
     toaster.error('Failed to Delete Client Request', {
-        duration: 6000,
+        duration: 4000,
         position: "top-center",
       })
 
@@ -182,7 +182,7 @@ const response = await fetch(`/api/delete_client_request/${id}`, {
     setIsOpenDeleteRequests(false)
     setloading(false)
     toaster.error('Failed to Delete Client Request Something Went Wrong', {
-        duration: 6000,
+        duration: 4000,
         position: "top-center",
       })
 
@@ -228,9 +228,7 @@ useCallback(
         setGetCustomers(newData.filter((customer)=> {
           return search.toLowerCase() === '' ? customer : customer.name.toLowerCase().includes(search)
         }))
-        console.log('customer data', newData)
       } else {
-        console.log('error')
         setOpenOfflineAlert(false)
       }
     } catch (error) {

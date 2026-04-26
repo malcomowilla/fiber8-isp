@@ -97,7 +97,6 @@ export function useDrawingManager() {
         const data = await response.json();
         return data.drawings || data; // Handle both {drawings: []} and [] formats
       } catch (error) {
-        console.error('Error loading drawings:', error);
         return [];
       }
     },
@@ -117,8 +116,7 @@ export function useDrawingManager() {
         if (!response.ok) throw new Error('Failed to update drawing');
         return await response.json();
       } catch (error) {
-        console.error('Error updating drawing:', error);
-        throw error;
+        // console.error('Error updating drawing:', error);
       }
     },
 
@@ -153,8 +151,7 @@ theme="light"
 />
         }
       } catch (error) {
-        console.error('Error deleting drawing:', error);
-        throw error;
+        // throw error;
       }
     },
 
@@ -211,7 +208,6 @@ const createOverlayFromData = useCallback((data, map) => {
 
   const type = data.drawing_type || data.type;
   let overlay;
-  console.log('type', type)
 
   switch (type) {
      case 'marker':
@@ -297,7 +293,6 @@ const createOverlayFromData = useCallback((data, map) => {
 
         // Click event to open InfoWindow
         window.google.maps.event.addListener(overlay, 'click', (e) => {
-          console.log('Marker clicked:', data);
           infoWindow.open(map, overlay);
           
           // Add event listeners after InfoWindow opens
@@ -496,9 +491,9 @@ const updateMarkerDetails = useCallback(async (overlayId, details) => {
           : item
       ));
 
-      console.log('Marker details updated:', overlayId, details);
+      // console.log('Marker details updated:', overlayId, details);
     } catch (error) {
-      console.error('Error updating marker details:', error);
+      // console.error('Error updating marker details:', error);
     }
   }, [overlays]);
 
@@ -518,9 +513,9 @@ const updateMarkerDetails = useCallback(async (overlayId, details) => {
           item.data.id === id ? { overlay, data: { ...updatedData, id } } : item
         ));
         
-        console.log('Drawing updated successfully:', id);
+        // console.log('Drawing updated successfully:', id);
       } catch (error) {
-        console.error('Error updating drawing:', error);
+        // console.error('Error updating drawing:', error);
       }
     };
 
@@ -615,7 +610,7 @@ const updateMarkerDetails = useCallback(async (overlayId, details) => {
         try {
           // Save to Rails backend
           const savedDrawing = await drawingAPI.saveDrawing(overlayData);
-          console.log('Drawing saved to backend:', savedDrawing);
+          // console.log('Drawing saved to backend:', savedDrawing);
           
           // Add to state with the ID from backend
           const drawingWithId = { 
@@ -686,10 +681,8 @@ const updateMarkerDetails = useCallback(async (overlayId, details) => {
       return updated;
     });
     
-    console.log('Drawing deleted successfully:', id);
     toast.success('Marker deleted successfully!');
   } catch (error) {
-    console.error('Error deleting drawing:', error);
     toast.error('Failed to delete marker');
   }
 }, []);

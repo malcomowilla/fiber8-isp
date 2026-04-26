@@ -49,7 +49,6 @@ const EditLead = ({ open, setOpen, formData, setFormData, createLead }) => {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {
-      console.log('Form submitted:', formData);
       setLoading(false);
       setOpen(false);
     }, 1500);

@@ -129,8 +129,7 @@ const handleClickRow = () => {
 
   const handleRowClick = (event, rowData) => {
     setOnlyShowSubscription(true)
-    console.log('subscribers',rowData)
-   console.log('showClientStatsAndSUbscriptions',showClientStatsAndSUbscriptions)
+    
     setShowClientStatsAndSubscriptions(true)
 setFormData({
   ...rowData,
@@ -152,7 +151,6 @@ const getThisMonthsSubscribers = (subscribers) => {
     const regDate = dayjs(subscriber.registration_date, format);
 
     if (!regDate.isValid()) {
-      console.warn('Invalid date:', subscriber.registration_date);
       return false;
     }
 
@@ -185,7 +183,6 @@ const getThisMonthsSubscribers = (subscribers) => {
 
   
     } else {
-      console.log('failed to fetch routers')
 
       toast.error(newData.error, {
         position: 'top-center',
@@ -201,11 +198,10 @@ const getThisMonthsSubscribers = (subscribers) => {
     }
     
     } catch (error) {
-      toast.error('Failed to get subscribers internal server error', {
+      toast.error('Failed to get subscribers, We’re having trouble completing this request', {
         position: 'top-center',
         duration: 4000,
       })
-      console.log(error)
     
     }
     },
@@ -238,7 +234,7 @@ const getThisMonthsSubscribers = (subscribers) => {
           // setSubscriptions(data)
         }
         catch (error) {
-          console.log(error)
+          // console.log(error)
         }
       },
       [subdomain]
@@ -318,7 +314,6 @@ if (formData.id) {
   
 } else {
   setOpenLoad(false)
-  console.log('failed to fetch')
   setloading(false)
   toast.error('Failed to create subscriber', {
     position: "top-center",
@@ -333,7 +328,6 @@ if (formData.id) {
   })
 }
     } catch (error) {
-      console.log(error)
       setloading(false)
       setOpenLoad(false)
       toast.error(

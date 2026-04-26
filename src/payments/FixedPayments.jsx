@@ -12,6 +12,7 @@ import AddIcon from '@mui/icons-material/Add';
 import GetAppIcon from '@mui/icons-material/GetApp';
 
 import MaterialTable from 'material-table'
+import { GrMoney } from "react-icons/gr";
 
 
 
@@ -23,13 +24,22 @@ import MaterialTable from 'material-table'
 const FixedPayments = () => {
 
   const [open, setOpen] = useState(false);
+  const [openPpoeDetails, setOpenPpoeDetails] = useState(false);
  
   const handleClickOpen = () => {
     setOpen(true);
   };
 
+  const handleClickOpenPpoeDetails = () => {
+    setOpenPpoeDetails(true);
+  };
+
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleClosePpoeDetails = () => {
+    setOpenPpoeDetails(false);
   };
 
   
@@ -84,7 +94,9 @@ const columns = [
     <EditPayment open={open} handleClose={handleClose}/>
             
     <div className='text-end '>
-  <input type="search"  className='bg-transparent border-y-[-2]    dark:focus:border-gray-400 focus:border-black focus:border-[3px] focus:shadow 
+  <input type="search"  className='bg-transparent border-y-[-2]   
+   dark:focus:border-gray-400 focus:border-black 
+   focus:border-[3px] focus:shadow 
    focus:ring-black p-3 sm:w-[900px] rounded-md ' placeholder='search......'/>
 </div>
       <MaterialTable columns={columns}

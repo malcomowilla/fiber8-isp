@@ -17,7 +17,6 @@ const GoogleAuthenticatorSetup = ({ userEmail, onComplete }) => {
 
   const {currentUser, setCurrentUser, currentUsername, currentEmail, setOpenDropDown} = useApplicationSettings()
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 

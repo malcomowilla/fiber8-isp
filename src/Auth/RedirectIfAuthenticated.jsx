@@ -12,7 +12,7 @@ const RedirectIfAuthenticated = ({ children }) => {
   const isAuthenticated = currentUser && currentUser.id;
 
   useEffect(() => {
-    fetchCurrentUser(); // ensure we refresh auth info
+    fetchCurrentUser(); 
   }, [fetchCurrentUser]);
 
   if (isAuthenticated) {

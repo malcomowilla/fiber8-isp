@@ -10,6 +10,8 @@ import toast, { Toaster } from 'react-hot-toast';
 
 import { motion } from 'framer-motion';
 import { MdOutlineCancel } from "react-icons/md";
+import Snowfall from 'react-snowfall'
+
 
 
 
@@ -110,13 +112,9 @@ const [logoUrl, setLogoUrl] = useState('')
             logo_preview: logo_url
           }))
   
-          console.log('company settings fetched', newData)
         }else{
-          console.log('failed to fetch company settings')
         }
       } catch (error) {
-        console.log('internal servere error  while fetching company settings')
-        // toast.error('internal servere error  while fetching company settings')
       
       }
     },
@@ -147,7 +145,6 @@ const getAdminSettings = useCallback(
       })
       const newData = await response.json()
       if (response.ok) {
-        console.log('admin settings fetched', newData)
         const {enable_2fa_for_admin_email, enable_2fa_for_admin_sms, send_password_via_sms,
           send_password_via_email, check_is_inactive,
           enable_2fa_for_admin_passkeys,
@@ -161,24 +158,12 @@ const getAdminSettings = useCallback(
           send_password_via_email, check_is_inactive,
           checkinactiveminutes, checkinactivehrs,checkinactivedays
         }));
-        console.log('admin settings fetched', newData)
       }else{
 
-// toast.error(newData.error, {
-// position: "top-center",
-// duration: 5000,
-// })
 
-        // toast.error('failed to fetch admin settings', {
-        //   position: "top-center",
-        //   duration: 6000,
-        // })
       }
     } catch (error) {
-      // toast.error(`failed to fetch admin settings server error${error}`, {
-      //   position: "top-center",
-      //   duration: 4000,
-      // })
+     
     }
   },
   [setAdminSettings, subdomain],
@@ -277,11 +262,9 @@ setSeeError(false)
 
 
   try {
-    // const credentialSignin = await navigator.credentials.get({ publicKey: options });
     const credential = await navigator.credentials.get({ publicKey: publicKey });
 
 
-    // Prepare the credential response
     const credentialJson = {
       id: credential.id,
       rawId: arrayBufferToBase64Url(credential.rawId),
@@ -329,16 +312,14 @@ toast.error(newData.error, {
   duration: 6000,
   position: "top-center",
 })
-      console.log(`passkey error =>${newData.error}`)
     }
   } catch (err) {
     setSeeError(true);
     toast.error('something went wrong', {
-      duration: 8000,
+      duration: 5000,
       position: "top-center",
     })
     setOpenLoad(false);
-    console.error('Error during WebAuthn credential creation:', err);
   }
 }catch (err) {
     setSeeError(true);
@@ -348,7 +329,6 @@ toast.error(newData.error, {
     })
     setOpenLoad(false);
     setErrorMessage(err.message)
-    console.error('Error during WebAuthn credential creation:', err);
   }
 }
 
@@ -358,11 +338,7 @@ const handleSignIn = async (e) => {
 
 
   e.preventDefault()
-  // const response = await fetch('/api/csrf_token');
-  // const { csrf_token } = await response.json();
-
-  // console.log("CSRF Token:", csrf_token);
-
+  
   try {
 
     setShowErrors(false)
@@ -378,9 +354,7 @@ const handleSignIn = async (e) => {
       "Content-Type": "application/json",
 
     }, 
-    // signal: controller.signal,  
-
-    // Authorization: `Bearer ${token}`,
+   
 
     body: JSON.stringify(formData),
 
@@ -433,12 +407,9 @@ if (enable_2fa_for_admin_passkeys) {
     state: { email } 
   });
   
-// } else if (enable_2fa_google_auth) {
  ''
 }else{
- // navigate('/admin/analytics')
  navigate('/admin/analytics')
- // window.location.href='/admin/router-stats'
    setEmail('')
    setPassword('')
 }
@@ -456,7 +427,7 @@ if (enable_2fa_for_admin_passkeys) {
     setUiError(true)
    toast.error(actualUserDataInJson.error,{
     position: "top-right",
-    duration: 7000,
+    duration: 5000,
    })
 
     setShowErrors(true)
@@ -466,25 +437,24 @@ if (enable_2fa_for_admin_passkeys) {
 
   }
   } catch (error) {
-    toast.error('something went wrong internalserver eror', {
+    toast.error('we couldnt complete your request, please try again', {
       position: "top-right",
-      duration: 7000,
+      duration: 5000,
     })
-    // console.log(error.name === 'AbortError');
     setloading(false);
     setOfflineError(true);
 
 
-// setTimeout(() => {
-//   setOfflineError(false)
-// }, 8000);
-
   }
 
 }
+let snowflake1 = document.createElement('img')
+
+snowflake1.src = '/public/images/santa-hat.png'
 
 
 
+const images = [snowflake1]
 
 
   return (
@@ -496,10 +466,9 @@ if (enable_2fa_for_admin_passkeys) {
 
 
 <main className="min-h-screen flex items-center justify-center relative overflow-hidden">
-  {/* Network nodes animation */}
     <div className="absolute inset-0 z-0">
     <img
-      src="/images/Telecommunications-Aitechs.jpg" // Replace with your image path
+      src="/images/Telecommunications-Aitechs.jpg" 
       alt="Network Background"
       className="w-full h-full object-cover"
     />
@@ -507,7 +476,6 @@ if (enable_2fa_for_admin_passkeys) {
   </div>
 
 
-  {/*  */}
 
   <motion.section
     initial={{ opacity: 0, y: 20 }}
@@ -517,7 +485,6 @@ if (enable_2fa_for_admin_passkeys) {
   >
     <div className="text-center mb-8">
       <div className="flex justify-center mb-6">
-        {/* ISP Network Icon */}
         <svg 
           className="w-16 h-16 text-white" 
           fill="none" 
@@ -557,7 +524,6 @@ if (enable_2fa_for_admin_passkeys) {
     <div className="bg-white/10 backdrop-blur-md rounded-xl shadow-2xl p-8 border border-white/20">
       <div className="text-center mb-6">
         <div className="inline-flex items-center justify-center p-4 bg-blue-600/20 rounded-full">
-          {/* Shield + Network icon */}
         
 <img
 className="w-24 h-24 mx-auto rounded-full"
@@ -572,7 +538,6 @@ className="w-24 h-24 mx-auto rounded-full"
       </div>
 
       <form onSubmit={handleSignIn} className="space-y-6">
-        {/* Email Field */}
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -580,7 +545,7 @@ className="w-24 h-24 mx-auto rounded-full"
             </svg>
           </div>
           <input
-            type="email"
+            // type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -589,7 +554,6 @@ className="w-24 h-24 mx-auto rounded-full"
           />
         </div>
 
-        {/* Password Field */}
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">

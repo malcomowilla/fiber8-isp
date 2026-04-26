@@ -48,8 +48,8 @@ import WriteChanges from './WriteChanges'
 import UbuntuStats from './UbuntuStats'
 import { MdDevicesOther } from "react-icons/md";
 import NetworkComponents from './NetworkComponents'
-
-
+import  FinancialDashboard from './FinancialDashboard'
+import AssessmentIcon from '@mui/icons-material/Assessment';
 
 const DashboardSytemAdmin = () => {
   const [value, setValue] = useState(0);
@@ -120,7 +120,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
   };
 
   const navigationItems = [
-    { label: <p className='text-black'>Stats</p>, icon: <DashboardIcon />, value: 0 },
+    { label: <p className='text-black'>System Stats</p>, icon: <DashboardIcon />, value: 0 },
     // { label: "Clients", icon: <PeopleIcon />, value: 1 },
     { label: <p className='text-black'>Settings</p>, icon: <SettingsIcon />, value: 2 },
     { label: <p className='text-black'>Reset Password Client</p>, icon: <LockResetIcon />, value: -1 },
@@ -130,7 +130,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
       src={generateAvatar(systemAdminEmail)} 
     alt={`${systemAdminEmail}'s avatar`} />), value: 4 },
     { label: <p className='text-black'>Reset Password Admin</p>, icon: <LockResetIcon />, value: 5 },
-    { label: <p className='text-black'>Client Requests</p>, icon: <FaPerson  className='w-6 h-6 rounded-full'/>, value: 6 },
+    // { label: <p className='text-black'>Client Requests</p>, icon: <FaPerson  className='w-6 h-6 rounded-full'/>, value: 6 },
     { label: <p className='text-black'>Passkeys</p>, icon: <IoMdKey  className='w-6 h-6 rounded-full'/>, value: 7 },
     { label: <p className='text-black'>Plan Manager</p>, icon: <LuPackageMinus  className='w-6 h-6 rounded-full'/>, value: 8 },
     { label: <p className='text-black'>ChangeLogs</p>, icon: <GiRecycle  className='w-6 h-6 rounded-full'/>, value: 10 },
@@ -139,6 +139,8 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
     { label: <p className='text-black'>Company Leads</p>, icon: <FaHandshake  className='w-6 h-6 rounded-full'/>, value: 9 },
     { label: <p className='text-black'>System Components</p>, icon: <MdDevicesOther 
        className='w-6 h-6 rounded-full'/>, value: 11 },
+
+       {label: <p className='text-black'>Financial Dashboard </p>, icon: <AssessmentIcon  className='w-6 h-6 rounded-full'/>, value: 12 },
   ];
 
   const pageTransitionVariants = {
@@ -362,6 +364,7 @@ const {currentSystemAdmin, systemAdminEmail} = useApplicationSettings()
                   {value === 9 && <CompanyLeads />}
                   {value === 10 && <WriteChanges />}
                   {value === 11 && <NetworkComponents />}
+                  {value === 12 && <FinancialDashboard />}
 
                 </motion.div>
               )}  

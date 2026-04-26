@@ -1,8 +1,4 @@
 
-
-
-
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, TextField,CircularProgress } from "@mui/material";
@@ -72,7 +68,6 @@ function ResetPassword() {
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);
-      // setOpen(true);
     }
   };
 
@@ -136,7 +131,6 @@ function ResetPassword() {
           <div className="flex flex-col items-center">
           <div className="text-center mb-6">
         <div className="inline-flex items-center justify-center p-4 bg-blue-600/20 rounded-full">
-          {/* Shield + Network icon */}
         
 <img
 className="w-24 h-24 mx-auto rounded-full"
@@ -149,7 +143,6 @@ className="w-24 h-24 mx-auto rounded-full"
       </div>
 
             <form onSubmit={handleSignIn} className="w-full space-y-6">
-              {/* Email Input */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -163,7 +156,6 @@ className="w-24 h-24 mx-auto rounded-full"
                   },
                 }}
                   fullWidth
-                  // label="Your email"
                   type="email"
                   placeholder="Enter your email"
                   name="email"
@@ -184,7 +176,6 @@ className="w-24 h-24 mx-auto rounded-full"
                 />
               </motion.div>
 
-              {/* Back to Login Link */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -201,7 +192,6 @@ className="w-24 h-24 mx-auto rounded-full"
                 </Link>
               </motion.div>
 
-              {/* Reset Password Button */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

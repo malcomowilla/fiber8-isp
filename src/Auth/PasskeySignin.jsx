@@ -1,7 +1,7 @@
 import {Link, useNavigate,  useParams, useLocation} from  'react-router-dom'
 import {useState, useEffect, useCallback} from 'react'
 
-import { motion ,} from "framer-motion"
+import { motion} from "framer-motion"
 
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { IoArrowUndoSharp } from "react-icons/io5";
@@ -81,10 +81,6 @@ const handleGoBack = (e)=> {
   goBack(-1)
 }
 
-// api/login-admin
-
-// https://quality-smile-garbabe-collection-backend-1jcd.onrender.com/login-admin
-
 
 
 
@@ -149,7 +145,6 @@ const handleGetCompanySettings = useCallback(
       })
       const newData = await response.json()
       if (response.ok) {
-        // setcompanySettings(newData)
         const { contact_info, company_name, email_info, logo_url,
           customer_support_phone_number,agent_email ,customer_support_email
          } = newData
@@ -161,12 +156,9 @@ const handleGetCompanySettings = useCallback(
           logo_preview: logo_url
         }))
 
-        console.log('company settings fetched', newData)
       }else{
-        console.log('failed to fetch company settings')
       }
     } catch (error) {
-      // toast.error('internal servere error  while fetching company settings')
     
     }
   },
@@ -194,7 +186,6 @@ async function authenticateWebAuthn(e) {
       headers: { 'Content-Type': 'application/json',
         'X-Subdomain': subdomain,
        },
-      // signal: controller.signal,  
       body: JSON.stringify({  my_user_name, email, user_name, phone_number})
     });
 
@@ -236,7 +227,6 @@ setSeeError(false)
       setDone(false);
 }
 } catch (error) {
-  // setLoginError(true)
   setUiError(true)
   toast.error('something went wrong', {
     duration: 6000,
@@ -261,11 +251,9 @@ setSeeError(false)
 
 
   try {
-    // const credentialSignin = await navigator.credentials.get({ publicKey: options });
     const credential = await navigator.credentials.get({ publicKey: publicKey });
 
 
-    // Prepare the credential response
     const credentialJson = {
       id: credential.id,
       rawId: arrayBufferToBase64Url(credential.rawId),
@@ -310,7 +298,6 @@ if (createResponse.status === 402) {
       setSeeError(false);
       setOpenLoad(false);
       
-    // navigate('/admin/analytics')
    
 
     navigate('/admin/analytics')
@@ -332,7 +319,6 @@ toast.error(newData.error, {
   duration: 6000,
   position: "top-center",
 })
-      console.log(`passkey error =>${newData.error}`)
     }
   } catch (err) {
     setSeeError(true);
@@ -343,7 +329,6 @@ toast.error(newData.error, {
       position: "top-center",
     })
     setOpenLoad(false);
-    console.error('Error during WebAuthn credential creation:', err);
   }
 }catch (err) {
     setSeeError(true);
@@ -353,7 +338,6 @@ toast.error(newData.error, {
     })
     setOpenLoad(false);
     setErrorMessage(err.message)
-    console.error('Error during WebAuthn credential creation:', err);
   }
 }
 
@@ -392,223 +376,6 @@ toast.error(newData.error, {
 
   return (
     <>
-{/* 
-<Toaster position="top-center" />
-
-    
-
-      {isloading && (
-        <Backdrop 
-          open={openLoad} 
-          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        >
-          <Lottie  height={400} width={400} />
-        </Backdrop>
-      )}
-      
-      {done && (
-        <Backdrop 
-          open={openLoad} 
-          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        >
-          <Lottie options={defaultOptions} height={400} width={400} />
-        </Backdrop>
-      )}
-
-      {seeErrorMessage && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-3 rounded-lg bg-red-50 text-red-600 text-sm"
-        >
-          {errorMessage}
-        </motion.div>
-      )}
-      
-
-
-      <motion.section
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-        className="min-h-screen 
-     relative"
-      >
-
-
-        <div className="flex flex-col items-center justify-center min-h-screen px-4">
-
-      <div className='flex justify-center items-center w-full  '>
-      <a href="#" className="flex items-center  text-2xl font-semibold text-gray-900 dark:text-white">
-      <img className="w-40 h-40 mr-2 rounded-full mt-20" src={logo_preview} alt="logo"  />
-
-      </a>
-      </div>
-          <motion.div 
-            variants={itemVariants}
-            className="w-full max-w-md"
-          >
-            <motion.div 
-              className="flex flex-col items-center mb-8"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-            
-            </motion.div>
-
-            <motion.div
-              variants={itemVariants}
-              className="bg-white dark:bg-gray-800 dark:border-gray-700 backdrop-blur-xl rounded-3xl 
-                shadow-xl p-8 border border-gray-100  mb-[200px]"
-            >
-              <h2 className="text-4xl font-semibold text-center font-montserat tex-black  mb-6 
-                ">
-                Sign in with Passkey
-              </h2>
-
-              <form onSubmit={authenticateWebAuthn} className="space-y-6">
-                {seeError && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-3 rounded-lg bg-red-50 text-red-600 text-sm"
-                  >
-                    {registrationError}
-                  </motion.div>
-                )}
-
-                <div className="space-y-2">
-                  <label className="text-2xl font-medium text-white 
-                    dark:text-gray-300">
-                    Username
-                  </label>
-                  <motion.div 
-                    className="relative"
-                    whileFocus={{ scale: 1.02 }}
-                  >
-                    <input
-                    value={user_name}
-                    onChange={handleChange}
-                    style={{
-                      fontSize: '1.5rem'
-                    }}
-                      type="text"
-                      name="user_name"
-                      
-                   
-                      className="w-full px-4 py-3 pl-12 bg-white dark:bg-gray-700 
-                        border-2 border-gray-200 dark:border-gray-600 rounded-xl
-                        focus:ring-2 text-white
-                        text-xl
-                        focus:ring-emerald-500 focus:border-transparent
-                        transition-all duration-200"
-                      placeholder="Enter username"
-                    />
-                    <FaRegUser className="absolute left-4 top-1/2 transform 
-                      -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  </motion.div>
-                </div>
-
-                    <div className='flex justify-center items-center '>
-                    <p className='text-2xl dark:text-white font-montserat-light'>Or</p>
-                    </div>
-               
-
-
-
-                    <div className="space-y-[-50px]">
-                  <label className="text-2xl font-medium text-white 
-                    dark:text-gray-300">
-                    Email
-                  </label>
-                  <motion.div 
-                    className="relative"
-                    whileFocus={{ scale: 1.02 }}
-                  >
-                    <input
-                    style={{
-                      fontSize: '1.5rem'
-                    }}
-                      type="email"
-                      name="email"
-                      value={email}
-                      onChange={handleChange}
-                   
-                      className="w-full px-4 py-3 pl-12 bg-white dark:bg-gray-700 
-                        border-2 border-gray-200 dark:border-gray-600 rounded-xl
-                        focus:ring-2 text-white
-                        text-xl
-                        focus:ring-emerald-500 focus:border-transparent
-                        transition-all duration-200"
-                      placeholder="Enter email"
-                    />
-                    <FaRegUser className="absolute left-4 top-1/2 transform 
-                      -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  </motion.div>
-                </div>
-
-
-                <div className='flex justify-center items-center '>
-                <MdFingerprint className="text-4xl text-gray-600" />
-
-                </div>
-                <div className="space-y-4 pt-4">
-                  <motion.button
-                    whileTap={{ scale: 0.98 }}
-                    type="submit"
-                    className="w-full py-3 px-4 bg-black text-white font-medium 
-                      rounded-xl shadow-lg hover:bg-emerald-700 
-                      hover:shadow-emerald-500/25 transition-all duration-200
-                      focus:outline-none focus:ring-2 focus:ring-emerald-500 
-                      focus:ring-offset-2 disabled:opacity-50 
-                      disabled:cursor-not-allowed flex items-center justify-center 
-                      space-x-2"
-                    disabled={isloading}
-                  >
-                    {isloading ? (
-                      <>
-                        <img 
-                          src="/images/logo/iconsreload2.png" 
-                          className="w-5 h-5 animate-spin" 
-                          alt="loading" 
-                        />
-                        <span className='font-montserat-light'>Authenticating...
-                      
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <span className='text-2xl text-white font-montserat-light'>Continue with Passkey</span>
-                      </>
-                    )}
-                  </motion.button>
-
-                  <motion.button
-                    whileTap={{ scale: 0.98 }}
-                    type="button"
-                    onClick={handleGoBack}
-                    className="w-full flex items-center justify-center space-x-2 
-                      py-3 px-4 bg-gray-100 dark:bg-gray-700 text-gray-700 
-                      dark:text-gray-200 font-medium rounded-xl 
-                      hover:bg-gray-200 dark:hover:bg-gray-600 
-                      transition-all duration-200"
-                  >
-                    <IoArrowUndoSharp className="w-20 h-20 dark:text-white" />
-                    <span className='text-xl dark:text-white font-montserat-light'>Go Back</span>
-                  </motion.button>
-                </div>
-
-                <motion.div 
-                  variants={itemVariants}
-                  className="text-center pt-4"
-                >
-                  
-                </motion.div>
-              </form>
-            </motion.div>
-          </motion.div>
-        </div>
-      </motion.section> */}
 
 
 
@@ -616,7 +383,6 @@ toast.error(newData.error, {
 
 <Toaster position="top-center" />
 
-{/* Loading Backdrop */}
 {isloading && (
   <Backdrop
     open={openLoad}
@@ -626,7 +392,6 @@ toast.error(newData.error, {
   </Backdrop>
 )}
 
-{/* Success Backdrop */}
 {done && (
   <Backdrop
     open={openLoad}
@@ -636,7 +401,6 @@ toast.error(newData.error, {
   </Backdrop>
 )}
 
-{/* Error Message */}
 {seeErrorMessage && (
   <motion.div
     initial={{ opacity: 0, y: -10 }}
@@ -647,7 +411,6 @@ toast.error(newData.error, {
   </motion.div>
 )}
 
-{/* Main Section */}
 <motion.section
   initial="hidden"
   animate="visible"
@@ -657,18 +420,17 @@ toast.error(newData.error, {
 
 <div className="absolute inset-0 z-0">
     <img
-      src="/images/Telecommunications-Aitechs.jpg" // Replace with your image path
+      src="/images/Telecommunications-Aitechs.jpg"
+
       alt="Network Background"
       className="w-full h-full object-cover"
     />
     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
   </div>
 
-  <div className="flex flex-col items-center justify-center min-h-screen px-4">
-    {/* Logo Section */}
-   
 
-    {/* Passkey Card */}
+  <div className="flex flex-col items-center justify-center min-h-screen px-4">
+    
     <motion.div
       variants={itemVariants}
       className="bg-white/10 backdrop-blur-md rounded-xl shadow-2xl p-8 border border-white/20"
@@ -680,7 +442,6 @@ toast.error(newData.error, {
 
       <div className="text-center mb-6">
         <div className="inline-flex items-center justify-center p-4 bg-blue-600/20 rounded-full">
-          {/* Shield + Network icon */}
         
 <img
 className="w-24 h-24 mx-auto rounded-full"
@@ -693,30 +454,12 @@ className="w-24 h-24 mx-auto rounded-full"
       </div>
 
       <form onSubmit={authenticateWebAuthn} className="space-y-6">
-        {/* Username Input */}
         <div className="space-y-2">
           <label className="text-2xl font-medium text-white ">
             Username
           </label>
           <motion.div className="relative" whileFocus={{ scale: 1.02 }}>
-            {/* <TextField
-              fullWidth
-              name="user_name"
-              value={user_name}
-              onChange={handleChange}
-              placeholder="Enter username"
-              variant="outlined"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <FaRegUser className="text-gray-400" />
-                  </InputAdornment>
-                ),
-                style: { fontSize: "1.5rem" },
-              }}
-              className="bg-white dark:bg-gray-700 rounded-xl"
-            /> */}
-
+           
 
 
 <TextField
@@ -756,36 +499,16 @@ sx={{
           </motion.div>
         </div>
 
-        {/* Divider */}
         <div className="flex justify-center items-center">
           <p className="text-2xl text-white font-montserat-light">Or</p>
         </div>
 
-        {/* Email Input */}
         <div className="space-y-2">
           <label className="text-2xl font-medium text-white dark:text-gray-300">
             Email
           </label>
           <motion.div className="relative" whileFocus={{ scale: 1.02 }}>
-            {/* <TextField
-              fullWidth
-              name="email"
-              type="email"
-              value={email}
-              onChange={handleChange}
-              placeholder="Enter email"
-              variant="outlined"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <FaRegUser className="text-gray-400" />
-                  </InputAdornment>
-                ),
-                style: { fontSize: "1.5rem" },
-              }}
-              className="bg-white dark:bg-gray-700 rounded-xl myTextField"
-            /> */}
-
+           
 
 
 <TextField

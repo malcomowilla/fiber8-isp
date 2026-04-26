@@ -9,10 +9,11 @@ import Stack from '@mui/material/Stack';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { useMapEvents } from 'react-leaflet';
-import L from 'leaflet';  // import Leaflet
+import L from 'leaflet';  
 import 'leaflet/dist/leaflet.css'
+import toast, { Toaster } from 'react-hot-toast';
 
-// Fix for default marker icons
+
 const iconUrl = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png';
 
 function LocationMarker({ position, setPosition }) {
@@ -41,7 +42,6 @@ export default function Node({ open, handleClose,
     setMapReady(true);
   }, []);
 
-console.log('position', position);
 
   const handleGetLocationPageload = () => {
     if (navigator.geolocation) {
@@ -51,11 +51,11 @@ console.log('position', position);
           setPosition({ lat: latitude, lng: longitude });
         },
         (err) => {
-          alert(`Error getting location: ${err.message}`);
+          toast.error(`Error getting location: ${err.message}`);
         }
       );
     } else {
-      alert("Geolocation is not supported by this browser.");
+      toast.error("Geolocation is not supported by this browser.");
     }
   };
 
@@ -65,7 +65,7 @@ console.log('position', position);
 
   useEffect(() => {
     setMapReady(true);
-    handleGetLocationPageload(); // 👈 This will trigger the permission request on load
+    handleGetLocationPageload(); 
   }, []);
   
   const handleGetLocation = () => {
@@ -85,6 +85,8 @@ console.log('position', position);
   };
 
   return (
+    <>
+    <Toaster />
     <Dialog
       fullWidth={true}
       maxWidth="md"
@@ -188,7 +190,7 @@ console.log('position', position);
         <Button
           type="submit"
           variant="contained"
-          disabled={!position}
+          disabled={!name}
           sx={{
             bgcolor: 'primary.main',
             '&:hover': { bgcolor: 'primary.dark' },
@@ -200,5 +202,6 @@ console.log('position', position);
       </DialogActions>
       </form>
     </Dialog>
+    </>
   );
 }

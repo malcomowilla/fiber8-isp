@@ -16,6 +16,11 @@ import { FaRegBuilding } from "react-icons/fa";
 import { FaRegClock } from "react-icons/fa6";
 import {Link} from 'react-router-dom'
 import EditWalletBalance from './EditWalletBalance';
+import SubscriberInvoice from './SubscriberInvoice';
+import SubscriberTransactions from './SubscriberTransactions';
+import { createConsumer } from "@rails/actioncable";
+const cable = createConsumer(`wss://${window.location.hostname}/cable`);
+
 
 
 
@@ -35,6 +40,73 @@ const [walletBalance, setWalletBalance] = useState(0)
 
 const [openWalletBalance, setOpenWalletBalance] = useState(false)
 
+
+const subdomain = window.location.hostname.split('.')[0];
+
+
+
+
+ useEffect(() => {
+    const subscription = cable.subscriptions.create(
+      { channel: "SubscriberChannel" ,
+        "X-SubscriberId": subscriberId,
+  }, 
+      {
+        received(data) {
+           console.log('received data from subscriber channel', data)
+            setWalletBalance(data.amount)
+           
+          
+         
+        },
+        connected() {
+          console.log("Connected to SubscriberChannel");
+        },
+        disconnected() {
+          console.log("Disconnected from SubscriberChannel");
+        },
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [subdomain]);
+
+
+
+
+const getSubscriberWalletBlance = useCallback(
+  async() => {
+    try {
+      const response = await fetch(`/api/subscriber_wallet_balances?subscriber_id=${subscriberId}`, {
+        method: 'GET',
+        headers: {
+          'X-Subdomain': subdomain,
+          
+        },
+
+      })
+      const newData = await response.json()
+      if (response.ok) {
+        setWalletBalance(newData[0].amount)
+      }
+    } catch (error) {
+      
+    }
+  },
+  [],
+)
+
+
+useEffect(() => {
+  
+    getSubscriberWalletBlance()
+}, [getSubscriberWalletBlance]);
+
+
+
+
 const handleCloseWalletBalance = () => {
   setOpenWalletBalance(false);
 }
@@ -45,7 +117,6 @@ const handleCloseWalletBalance = () => {
 
 
 
-const subdomain = window.location.hostname.split('.')[0];
 
 
 const getSubscriber = useCallback(
@@ -61,7 +132,6 @@ const getSubscriber = useCallback(
 
         if (response.ok) {
             const data = await response.json()
-            console.log('data from get subscriber', data)
             const {name, id} = data
             setSubscriberName(name)
            setUserName(data.ppoe_username)
@@ -90,11 +160,13 @@ useEffect(() => {
   return (
     <>
 
-    <EditWalletBalance handleCloseWalletBalance={handleCloseWalletBalance} openWalletBalance={openWalletBalance}/>
+    <EditWalletBalance handleCloseWalletBalance={handleCloseWalletBalance}
+     openWalletBalance={openWalletBalance}/>
     <Box sx={{ width: '100%',  }}>
       <div className='flex flex-row gap-2 items-center
       cursor-pointer hover:shadow-xl w-fit h-fit'>
-           <Link to='/admin/pppoe-subscribers' className='font-bold text-black text-xl dark:text-white'>
+           <Link to='/admin/pppoe-subscribers' className='font-bold
+            text-black text-xl dark:text-white'>
             
             {subscriberName}
             
@@ -164,7 +236,7 @@ useEffect(() => {
 
       </p>
       
-      <LiaEdit className='text-black w-5 h-5  cursor-pointer
+      <LiaEdit className='text-black w-6 h-6  cursor-pointer
        dark:text-white ' onClick={()=>{setOpenWalletBalance(true)}}/>
 
 </div>
@@ -191,11 +263,12 @@ useEffect(() => {
                 <Tab label="SUBSCRIPTIONS" value="2" />
 
         <Tab label="LIVE DATA" value="3" />
-        <Tab label="DEVICES" />
-        <Tab label="INVOICE" />
+        <Tab label="INVOICES"  value="4" />
+         <Tab label="PAYMENT HISTORY" value="5" />
+        {/* <Tab label="DEVICES" /> */}
+        
         <Tab label="COMUNICATIONS" />
         <Tab label="ACTIVITY LOGS" />
-        <Tab label="PAYMENT HISTORY" />
       </TabList>
 
        <TabPanel 
@@ -230,6 +303,23 @@ useEffect(() => {
 <LiveData
   />
       </TabPanel>
+
+
+      <TabPanel 
+       value='4'
+       >
+<SubscriberInvoice
+/>
+      </TabPanel>
+
+
+      <TabPanel
+       value='5'>
+        <SubscriberTransactions
+        />
+      </TabPanel>
+
+      
       </TabContext>
     </Box>
 

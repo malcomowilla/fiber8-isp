@@ -91,10 +91,10 @@ const CallCenterInterface = () => {
 
   // SIP Configuration - Replace with your actual credentials
   const sipConfig = {
-    server: 'ws://127.0.0.1:8088/ws',
-    username: '6001',
-    password: '6001',
-    domain: '127.0.0.1'
+    server: 'ws://10.5.0.44:8088/ws',
+    username: 'webrtc_client',
+    password: 'webrtc_client',
+    domain: '10.5.0.44'
   };
 
   // Initialize SIP.js SimpleUser
@@ -112,7 +112,7 @@ const CallCenterInterface = () => {
           authorizationUsername: sipConfig.username,
           authorizationPassword: sipConfig.password,
           displayName: 'Call Center Agent',
-          uriTransport: 'wss',
+          uriTransport: 'ws',
         }
       };
 
@@ -213,7 +213,7 @@ const CallCenterInterface = () => {
       });
       
       try {
-        await simpleUser.call(`sip:6001@${sipConfig.domain}`);
+        await simpleUser.call(`sip:9000@${sipConfig.domain}`);
         setCallStatus('ringing');
       } catch (error) {
         console.error('Call failed:', error);

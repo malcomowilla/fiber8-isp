@@ -16,6 +16,7 @@ import { BsHddNetwork } from "react-icons/bs";
 import MaterialTable from 'material-table'
 import IpPool from './IpPool'
 import DeletePool from '../delete/DeletePool'
+import LocationNetworkMap from './LocationNetworkMap'
 
 
 
@@ -28,7 +29,9 @@ const [ipPoolFormData, setIpPoolFormData] = useState({
   start_ip: '',
   end_ip: '',
   pool_name: '',
-  description: ''
+  description: '',
+  location: '',
+  nas_router: ''
 })
 
 
@@ -36,6 +39,8 @@ const [isOpenDelete, setIsOpenDelete] = useState(false);
 const subdomain = window.location.hostname.split('.')[0];
 const [loading, setLoading] = useState(false);
 const {settingsformData} = useApplicationSettings()
+const [updating, setUpdating] = useState(false);
+
 
 
 
@@ -54,6 +59,7 @@ const handleChange = (e) => {
 
 const handleRowClick = (event, rowData) => {
     setIpPoolFormData(rowData);
+    setUpdating(true);
   
     // Add your custom logic here, such as opening a modal or updating state
   };    
@@ -76,6 +82,8 @@ const columns = [
   {title: 'End Ip', field: 'end_ip'  },
   {title: 'Pool Name', field: 'pool_name'  },
   {title: 'Description', field: 'description'  },
+  {title: 'Location', field: 'location'  },
+  {title: 'NAS Router', field: 'nas_router'  },
  
 
 
@@ -147,7 +155,7 @@ const deletePool = async(id)=> {
 
   try {
     setLoading(true)
-    const response = await fetch(`/api/ip_pools/${id}?router_name=${settingsformData.router_name}`, {
+    const response = await fetch(`/api/ip_pools/${id}?nas_router=${ipPoolFormData.nas_router}`, {
       method: 'DELETE',
       headers: {
         'X-Subdomain': subdomain,
@@ -203,7 +211,7 @@ console.log("Response status:", response.status);
 <DeletePool openDelete={isOpenDelete} handleCloseDelete={handleCloseDelete} deletePool={deletePool} 
 id={ipPoolFormData.id}  loading={loading}/>
     <IpPool isOpen={isOpen} setIsOpen={setIsOpen} ipPoolFormData={ipPoolFormData}
-    setIpPoolFormData={setIpPoolFormData} handleChange={handleChange}
+    setIpPoolFormData={setIpPoolFormData} handleChange={handleChange} updating={updating}
 
     ipPools={ipPools} setIpPools={setIpPools}
     />
@@ -244,6 +252,18 @@ id={ipPoolFormData.id}  loading={loading}/>
          <span className="sr-only">Search</span>
      </button>
  </div>
+
+              <div className="mb-6">
+  <p className="text-gray-700 mb-3">
+    <strong>IP Pool Tip:</strong> Assign each location its own range. Examples:
+  </p>
+  <div className="inline-flex flex-wrap gap-2">
+    <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Nairobi: 192.168.10.x</span>
+    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Kisumu: 192.168.20.x</span>
+    <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">Mombasa: 192.168.30.x</span>
+    <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">Eldoret: 192.168.40.x</span>
+  </div>
+</div>
       <MaterialTable columns={columns}
       
       title='Ip Pool'
@@ -254,7 +274,12 @@ id={ipPoolFormData.id}  loading={loading}/>
     onRowClick={handleRowClick}
     actions={[
         {
-          icon: () => <AddIcon  onClick={()=> setIsOpen(true)}  />,
+          icon: () => <AddIcon  onClick={()=> {
+            setIsOpen(true)
+            setUpdating(false)
+            setIpPoolFormData('')
+
+          }}  />,
           isFreeAction: true, // This makes the action always visible
           tooltip: 'Add Ip Pool',
         },

@@ -324,7 +324,7 @@ const BulkMessage = () => {
 
 </p>
 
-                    <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+                    <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 5 }}>
                         <Button 
                             type="submit" 
                             variant="contained" 
@@ -334,6 +334,12 @@ const BulkMessage = () => {
                         >
                             {loading ? 'Sending...' : 'Send SMS'}
                         </Button>
+
+
+
+<button className='bg-gray-200 px-10 py-2 rounded-lg shadow-sm' onClick={() => navigate('/admin/messages')}>
+            <span className=''>Cancel</span>
+          </button>
                     </Box>
                 </form>
             </Paper>

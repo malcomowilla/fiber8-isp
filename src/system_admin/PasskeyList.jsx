@@ -36,14 +36,14 @@ const fetchPasskeyLists =  useCallback(
           setPasskeys(credentials)
         } else {
             toast.error('failed to fetch passkey credentials', {
-                duration: 7000, 
+                duration: 4000, 
                 position: 'top-center',
             })
           console.log('failed to fetch passkey credentials')
         }   
     } catch (error) {
-        toast.error('internal server error something went wrong with geting passkey credentials', {
-            duration: 7000, 
+        toast.error(' error while geting passkey credentials, We’re having trouble completing this request', {
+            duration: 3000, 
             position: 'top-center',
         })
     }
@@ -65,7 +65,7 @@ useEffect(() => {
 
     <Toaster />
     <div className="passkey-list">
-      <h1 className="text-2xl font-bold mb-4">Your Passkeys</h1>
+      <h1 className="text-2xl font-bold mb-4 dark:text-black text-black">Your Passkeys</h1>
       <ul className="space-y-3">
         <AnimatePresence>
           {passkeys.map((passkey) => (
@@ -77,7 +77,7 @@ useEffect(() => {
               transition={{ duration: 0.3 }}
               className="flex items-center justify-between p-4 bg-white shadow-md rounded-lg"
             >
-              <span className="text-lg">{passkey.system_admin?.email}</span>
+              <span className="text-lg dark:text-black text-black">{passkey.system_admin?.email}</span>
               <button
                 onClick={() => handleDelete(passkey.id)}
                 className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"

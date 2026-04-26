@@ -160,9 +160,9 @@ const EditLead = ({ open, setOpen, formData, setFormData, createLead,
             fullWidth
             margin="normal"
             className='myTextField'
-            label="Company Name"
-            name="company_name"
-            value={formData.company_name}
+            label="Location"
+            name="location"
+            value={formData.location}
             onChange={handleChange}
             InputProps={{
               startAdornment: (

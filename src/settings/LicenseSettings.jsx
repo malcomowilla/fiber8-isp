@@ -1,6 +1,4 @@
 
-
-
 import {
     Card,
     CardContent,
@@ -29,7 +27,7 @@ import {
   import { useFormik } from 'formik';
   import * as Yup from 'yup';
   import toast, { Toaster } from 'react-hot-toast';
-
+import {RefreshCw} from 'lucide-react'
   
   const LicenseSettings = () => {
     const [saved, setSaved] = useState(false);
@@ -92,7 +90,6 @@ if (res.status === 401) {
         //   phoneNumber: data.phone_number[0] ?? '',
         // });
       } catch (err) {
-        console.error('Error loading settings:', err);
         // toast.error('Failed to load settings');
       } finally {
         setLoading(false);
@@ -133,6 +130,7 @@ if (res.status === 401) {
         try {
           setSubmitLoading(true);
           setError(null);
+          setLoading
   
           const payload = {
             expiry_warning_days: values.warningDays,
@@ -163,7 +161,6 @@ if (res.status === 401) {
             phoneNumber: updatedData.phone_number,
           });
         } catch (err) {
-          console.error('Save error:', err);
           setError(err.message);
           toast.error(err.message);
         } finally {
@@ -295,7 +292,7 @@ if (res.status === 401) {
                 type="submit"
                 variant="contained"
                 color="primary"
-                startIcon={<CheckCircleIcon />}
+                startIcon={submitLoading ? <RefreshCw className='animate-spin'/> : <CheckCircleIcon />}
                 sx={{ minWidth: 120 }}
               >
                 <p className='roboto-condensed-light'>Save Settings</p>

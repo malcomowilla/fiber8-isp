@@ -311,16 +311,6 @@ width: '100%',
   );
 };
 
-// const SpringModal = ({ isOpen, setIsOpen, addCustomer, handleCloseRegistrationForm }) => {
-//   const { customerformData,  setcustomerformData} = useApplicationSettings()
-//   const {name, email, phone_number, customer_code, location, amount_paid} = customerformData
-
-// const handleChange = (e) => {
-//   const {name, value} =  e.target
-//   setcustomerformData((prevData) => (
-//     {...prevData, [name]: value}
-//   ))
-// }
 
 
 

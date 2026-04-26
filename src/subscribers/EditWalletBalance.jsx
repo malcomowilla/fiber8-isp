@@ -1,5 +1,4 @@
 
-
 import * as React from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -8,7 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import CloseIcon from '@mui/icons-material/Close';
 // import Stack from '@mui/material/Stack';
-import { forwardRef } from 'react';
+import { forwardRef, useCallback, useEffect, useState } from 'react';
 import {
     TextField, 
 
@@ -27,6 +26,10 @@ import {
   Warning as WarningIcon
 } from '@mui/icons-material';
 import { IoWalletOutline } from "react-icons/io5";
+import {useSearchParams} from 'react-router-dom';
+import toast,{ Toaster } from 'react-hot-toast';
+import {useApplicationSettings} from '../settings/ApplicationSettings'
+
 
 
 
@@ -39,18 +42,95 @@ const Transition = forwardRef(function Transition(props, ref) {
  function EditWalletBalance({openWalletBalance, handleCloseWalletBalance, loading}) {
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState('xs');
-
-// const handleDelete = ()=> {
-//   deleteNode(id)
-//   handleCloseDelete()
-// }
-
+const [walletBalance, setWalletBalance] = useState(0)
 
 const theme = useTheme();
 const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const [searchParams] = useSearchParams();
+
+  const subscriberId = searchParams.get('id')
+
+const subdomain = window.location.hostname.split('.')[0];
+
+
+
+
+
+const getSubscriberWalletBlance = useCallback(
+  async() => {
+    try {
+      const response = await fetch(`/api/subscriber_wallet_balances?subscriber_id=${subscriberId}`, {
+        method: 'GET',
+        headers: {
+          'X-Subdomain': subdomain,
+          
+        },
+
+      })
+      const newData = await response.json()
+      if (response.ok) {
+        setWalletBalance(newData[0].amount)
+      }
+    } catch (error) {
+      
+    }
+  },
+  [],
+)
+
+
+useEffect(() => {
+  
+    getSubscriberWalletBlance()
+}, [getSubscriberWalletBlance]);
+
+
+
+
+
+
+
+const handleCreateWalletBalance = async(e)  => {
+  e.preventDefault()
+  try {
+    const response = await fetch(`/api/subscriber_wallet_balances?subscriber_id=${subscriberId} &amount=${walletBalance}`, {
+      method: 'POST',
+      headers: {
+        'X-Subdomain': subdomain,
+      },
+      body: JSON.stringify({
+        amount: walletBalance,
+        })
+    })
+
+    const newData = await response.json()
+    if (response.ok) {
+      toast.success('Wallet balance created successfully', {
+        position: "top-center",
+        duration: 4000,
+      })
+      handleCloseWalletBalance()
+      setWalletBalance(newData.amount)
+      
+    } else {
+      toast.error('Failed to create wallet balance', {
+        position: "top-center",
+        duration: 4000,
+      })
+      
+    }
+  } catch (error) {
+    toast.error('Failed to create wallet balance', {
+      position: "top-center",
+      duration: 4000,
+    })
+    
+  }
+}
 
   return (
     <React.Fragment>
+      <Toaster />
 <Dialog
         fullScreen={fullScreen}
         open={openWalletBalance}
@@ -126,7 +206,7 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
             align="center"
             sx={{ mb: 2, fontWeight: 500 }}
           >
-
+<form onSubmit={handleCreateWalletBalance}>
 
              <TextField
               fullWidth
@@ -137,22 +217,18 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
     },
     mt: 2
   }}
-      label="Name"
+      label="Wallet Balance"
       required
       InputProps={{
         startAdornment: <IoWalletOutline className='mr-2'  />
       }}
-
-        name='name'
-    value={name}
+onChange={(e)=> setWalletBalance(e.target.value)}
+        value={walletBalance}
              >
 
              </TextField>
-               </Typography>
-       
-        </DialogContent>
-  
-        <DialogActions
+
+              <DialogActions
           sx={{
             position: 'relative',
             zIndex: 1,
@@ -168,7 +244,10 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
           <Button
             variant="outlined"
-            onClick={handleCloseWalletBalance}
+            onClick={(e) => {
+              handleCloseWalletBalance()
+              e.preventDefault()
+            }}
             sx={{
               minWidth: 100,
               borderColor: 'grey.300',
@@ -184,6 +263,9 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
           <Button
             variant="contained"
+            type='submit'
+            color='success'
+
             onClick={handleCloseWalletBalance}
             disabled={loading}
             sx={{
@@ -200,6 +282,12 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
             )}
           </Button>
         </DialogActions>
+             </form>
+               </Typography>
+       
+        </DialogContent>
+  
+       
       </Dialog>
     </React.Fragment>
   );

@@ -1,25 +1,14 @@
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton } from '@mui/material';
-
 import EditIcon from '@mui/icons-material/Edit';
-import  EditPayment from '../edit/EditPayment'
-
 import {useState,  useEffect, useCallback} from 'react'
-
-
-import GetAppIcon from '@mui/icons-material/GetApp';
-
-import MaterialTable from 'material-table'
-import { MdOutlineWifi } from "react-icons/md";
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 import { createConsumer } from "@rails/actioncable";
 const cable = createConsumer(`wss://${window.location.hostname}/cable`);
 
 
-import toast, { Toaster } from 'react-hot-toast';
 
-import {motion} from 'framer-motion'
 
 
 
@@ -56,36 +45,9 @@ const [stats, setStats] = useState([])
     </IconButton>
   );
   
-const columns = [
-  {title: 'voucher', field: 'username',   },
-  {title: 'ip adress', field: 'ip_address',  },
-  {title: 'start time', field: 'start_time'},
-  {title: 'up time', field: 'up_time'},
-  {title: 'download', field: 'download',   },
-  {title: 'upload', field: 'upload' },
-  {title: 'mac_address', field: 'mac_address',   },
 
+  
 
-//   {title: 'Action', field:'Action', align: 'right',
-
-//   render: (params) =>  
-    
-//      <>
-      
-//        <DeleteButton {...params} />
-
-
-//        <EditButton    onClick={handleClickOpen} {...params}/>
-//        </>
-
-
-// }
-
-
-]
-
-
-// get_active_hotspot_users
 
 
           
@@ -102,14 +64,11 @@ const fetchRouters = useCallback(
      })
 const newData = await response.json()
      if (response) {
-       console.log('fetched router settings', newData)
        const {router_name} = newData[0]
        setFormData({...settingsformData, router_name})
      } else {
-       console.log('failed to fetch router settings')
      }
    } catch (error) {
-     console.log(error)
    }
  },
  [],
@@ -200,24 +159,19 @@ const newData = await response.json()
 
   return (
     <>
-    <Toaster />
+    {/* <Toaster />
     <div className=''>
     <EditPayment open={open} handleClose={handleClose}/>
      
 
 
 
-    <div className="flex items-center max-w-sm mx-auto p-3">  
+    <div className="flex items-center max-w-sm mx-auto p-3 ">  
      
      <label htmlFor="simple-search" className="sr-only">Search</label>
      <div className="relative w-full">
          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-             {/* <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none" viewBox="0 0 18 20">
-                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-                  strokeWidth="2" d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"/>
-             </svg> */}
+            
              <MdOutlineWifi className='text-green-500'/>
              
          </div>
@@ -252,13 +206,11 @@ const newData = await response.json()
 
       actions={[
         {
-        //   icon: () => <AddIcon  onClick={handleClickOpen }/>,
-        //   isFreeAction: true, 
-        //   tooltip: 'Edit Payment',
+       
         },
         {
           icon: () => <GetAppIcon />,
-          isFreeAction: true, // This makes the action always visible
+          isFreeAction: true, 
       
           tooltip: 'Import',
         },
@@ -266,7 +218,6 @@ const newData = await response.json()
 
 options={{
        pageSizeOptions:[5, 10, 20],
-    //    pageSize: 20,
        search: false,
 searchFieldStyle: {
   borderColor: 'red'
@@ -289,9 +240,6 @@ headerStyle:{
   textTransform: 'uppercase'
   } ,
   
-//   rowStyle:(data, index)=> index % 2 === 0 ? {
-//   background: 'gray'
-//   }: null,
   
   fontFamily: 'mono'
 }}     
@@ -301,7 +249,7 @@ headerStyle:{
       
       />
 
-    </div>
+    </div> */}
     </>
   )
 }

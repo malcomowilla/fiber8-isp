@@ -52,18 +52,20 @@ const RadiusSettings = () => {
     [name]:  value,
   }));
       }
+// const ip = searchParams.get('ip_address')
+// const shared_secret = searchParams.get('l')
 
-const ip = searchParams.get('ip_address')
-const l = searchParams.get('l')
+const ip = searchParams.get('ip_address')?.trim();
+const shared_secret = searchParams.get('l')?.trim();
 
 
   const generateMikrotikConfig = () => {
     setIsGenerating(true);
     const config = `
-/radius incoming seta accept=yes port=3799
+/radius incoming set accept=yes port=3799
 /radius add service=ppp,hotspot \\
   address=${'10.2.0.1'} \\
-  secret=${secret || l} \\
+  secret=${shared_secret} \\
   protocol=udp
     `.trim();
     setMikrotikConfig(config);
@@ -123,7 +125,7 @@ const saveRadiusSettings = async(e) => {
                 'X-Subdomain': subdomain,
 
             },
-            body: JSON.stringify(radiusSettings),  //
+            body: JSON.stringify({...radiusSettings, ip, shared_secret, }),  //
         })
 
         const newData = await response.json()
@@ -209,7 +211,8 @@ if (response.status === 401) {
             })
         }
     } catch (error) {
-        console.log(error)
+
+      
     }
   },
   [],
@@ -272,7 +275,7 @@ useEffect(() => {
               <TextField
                 name="ipaddr"
                  className='myTextField'
-                value={ipaddr || ip}
+                value={ip}
                 onChange={onChange}
                 label="IP Address"
                 variant="outlined"
@@ -286,7 +289,7 @@ useEffect(() => {
               <TextField
               className='myTextField'
                 name="secret"
-                value={secret || l}
+                value={shared_secret}
                 onChange={onChange}
                 label="Shared Secret"
                 variant="outlined"

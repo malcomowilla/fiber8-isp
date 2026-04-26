@@ -21,6 +21,15 @@ import { IoWifiOutline } from "react-icons/io5";
 import { FaLongArrowAltUp } from "react-icons/fa";
 import { FaLongArrowAltDown } from "react-icons/fa";
 import { LuCalendar1 } from "react-icons/lu";
+import { useState, useEffect, useCallback } from "react";
+import { 
+  Select,
+  MenuItem,
+  InputLabel,
+  Stack, InputAdornment, 
+  DialogContentText,Chip
+
+} from '@mui/material';
 
 
 
@@ -36,6 +45,8 @@ const EditHotspotPackage = ({
   handleChangeTimeUntil,
   handleWeekdayChange,
   editing,
+  nodes,
+  setNodes
 }) => {
   const {
     name,
@@ -46,7 +57,8 @@ const EditHotspotPackage = ({
     upload_burst_limit,
     download_burst_limit,
     validity_period_units,
-    shared_users, // Add shared_users to the destructured object
+    shared_users, 
+    location// Add shared_users to the destructured object
   } = hotspotPackage;
 
   const theme = useTheme();
@@ -59,6 +71,12 @@ const EditHotspotPackage = ({
 
   const { dateTimeValue, newDate, setNewDate, setDateTimeValue } =
     useApplicationSettings();
+
+
+
+
+
+
 
   return (
     <React.Fragment>
@@ -232,6 +250,37 @@ const EditHotspotPackage = ({
                   placeholder="validity-period..."
                   type="number"
                 ></TextField>
+
+
+
+
+
+                 <TextField
+                  label="Simultaneous-Use"
+                  sx={{
+                    "& label.Mui-focused": {
+                      color: "black",
+                      fontSize: "16px",
+                    },
+                    "& .MuiOutlinedInput-root": {
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "black",
+                        borderWidth: "3px",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "black",
+                      },
+                    },
+                  }}
+                  className="myTextField"
+                  id="shared_users"
+                  value={shared_users}
+                  InputProps={{
+                    startAdornment: <LuCalendar1 className="mr-2" />,
+                  }}
+                  onChange={handleChangeHotspotPackage}
+                  placeholder="shared-users..."
+                ></TextField>
               </Box>
 
               <DemoContainer
@@ -305,7 +354,7 @@ const EditHotspotPackage = ({
 
               <FormControl
                 sx={{
-                  "& > :not(style)": { m: 1, width: "50ch" },
+                  "& > :not(style)": { mt: 3, width: "50ch" },
                   "& label.Mui-focused": {
                     color: "black",
                     fontSize: "16px",
@@ -343,6 +392,56 @@ const EditHotspotPackage = ({
   sx={{ width: '100%' }}
 />
               </FormControl>
+
+
+
+
+
+
+               <Autocomplete
+  fullWidth
+  id="node-autocomplete"
+  options={nodes}
+  getOptionLabel={(option) => option.name}
+  value={nodes.find(n => n.name === location) || null}
+  onChange={(event, newValue) => {
+    console.log('Selected location:', newValue);
+    setHotspotPackage({...hotspotPackage, location: newValue?.name || ''})
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Location"
+      variant="outlined"
+      InputProps={{
+        ...params.InputProps,
+        className: 'myTextField',
+      }}
+    />
+  )}
+  renderOption={(props, option) => (
+    <li {...props} key={option.id}>
+      <p className='text-black'>{option.name}</p>
+    </li>
+  )}
+  sx={{
+    mt: 3,
+    '& .MuiAutocomplete-inputRoot': {
+      padding: '8px 14px',
+    },
+    '& .MuiOutlinedInput-root': {
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: 'black',
+        borderWidth: '2px'
+      }
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: 'black',
+      fontSize: '18px'
+    }
+  }}
+/>
+
             </div>
 
             <DialogActions>

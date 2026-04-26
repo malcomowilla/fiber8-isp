@@ -4,730 +4,326 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import { motion } from "framer-motion";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   VpnKey,
   Payment,
   Business,
   Lock,
+  Phone,
+  Info,
 } from "@mui/icons-material";
-import { useEffect, useState, useCallback, lazy} from "react";
-import {useApplicationSettings} from '../settings/ApplicationSettings'
+import { useEffect, useState, useCallback, lazy } from "react";
+import { useApplicationSettings } from '../settings/ApplicationSettings';
 import toast, { Toaster } from 'react-hot-toast';
-const SettingsNotification = lazy(() => import('../notification/SettingsNotification'))
-import Backdrop from '../backdrop/Backdrop'
+const SettingsNotification = lazy(() => import('../notification/SettingsNotification'));
+import Backdrop from '../backdrop/Backdrop';
+import { Autocomplete } from '@mui/material';
+import { CiUser } from "react-icons/ci";
 
-
-
-
-
+const MUI_FOCUS = {
+  "& label.Mui-focused": { color: "black", fontSize: "16px" },
+  "& .MuiOutlinedInput-root": {
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "black", borderWidth: "3px" },
+    "&.Mui-focused fieldset": { borderColor: "black" },
+  },
+};
 
 const MpesaSettings = () => {
+  const {
+    selectedAccountTypeHotspot, setSelectedAccountTypeHotspot,
+    hotspotMpesaSettings, setHotspotMpesaSettings,
+    selectedAccountTypeSubscriber, setSelectedAccountTypeSubscriber,
+    dialMpesaSettings, setDialMpesaSettings,
+  } = useApplicationSettings();
 
+  const { consumer_key, consumer_secret, passkey, short_code,
+    api_initiator_username, api_initiator_password, phone_number } = hotspotMpesaSettings;
 
-  // saved_hotspot_mpesa_settings
-  // hotspot_mpesa_settings
+  const [open, setOpen]                     = useState(false);
+  const [openNotifactionSettings, setOpenSettings] = useState(false);
+  const [isloading, setisloading]           = useState(false);
+  const [loadRegisterUrls, setLoadRegisterUrls] = useState(false);
 
-const {selectedAccountTypeHotspot, setSelectedAccountTypeHotspot,
+  // ── "I don't have API keys" toggle ──────────────────────────────────────
+  const [noApiKeys, setNoApiKeys] = useState(false);
 
-  hotspotMpesaSettings, setHotspotMpesaSettings
-} = useApplicationSettings()
-
-
-const { consumer_key, consumer_secret, passkey, short_code } = hotspotMpesaSettings
-const [open, setOpen] = useState(false);
-const [openNotifactionSettings, setOpenSettings] = useState(false)
-const [isloading, setisloading] = useState(false)
-// const navigate = useNavigate()
-
-const subdomain = window.location.hostname.split('.')[0]
-
-
-
-
+  const subdomain = window.location.hostname.split('.')[0];
 
 
 
 
 
-
-
-
-
-const fetchSavedHotspotMpesaSettings = useCallback(
-  async() => {
-    
+  // ── Fetch hotspot M-Pesa settings ────────────────────────────────────────
+  const fetchHotspotMpesaSettings = useCallback(async () => {
     try {
-      const response = await fetch(`/api/saved_hotspot_mpesa_settings`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Subdomain': subdomain,
-        },
+      const res = await fetch(`/api/hotspot_mpesa_settings?account_type=${selectedAccountTypeHotspot}`, {
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
       });
-  
-      const data = await response.json();
-
-      const newData = data.length > 0 
-        ? data.reduce((latest, item) => new Date(item.created_at) > new Date(latest.created_at) ? item : latest, data[0])
-        : null;
-  
-      if (response.ok) {
-        console.log('Fetched hotspot mpesa settings:', newData);
-        const { consumer_key, consumer_secret, passkey, short_code } = newData;
-        setSelectedAccountTypeHotspot(newData.account_type)
-        setHotspotMpesaSettings({ consumer_key, consumer_secret, passkey, short_code })
-      } else {
-
-
-        if (response.status === 402) {
-        setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/license-expired'
-         }, 1800);
-        
-      }
-if (response.status === 401) {
-  toast.error(newData.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
-        toast.error(newData.error || 'Failed to fetch hotspot mpesa settings', {
-          duration: 3000,
-          position: 'top-center',
-        });
-
-        
-      }
-    } catch (error) {
-      toast.error('Internal server error: Something went wrong with fetching hotspot mpesa settings', {
-        duration: 3000,
-        position: 'top-center',
-      });
-    }
-  },
-  [],
-)
-
-
-useEffect(() => {
-  fetchSavedHotspotMpesaSettings();
- 
-}, [fetchSavedHotspotMpesaSettings]);
-
-
-
-
-
-
-
-
-const fetchHotspotMpesaSettings = useCallback(async () => {
-  try {
-    const response = await fetch(`/api/hotspot_mpesa_settings?account_type=${selectedAccountTypeHotspot}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Subdomain': subdomain,
-      },
-    });
-
-    const newData = await response.json();
-
-    if (response.ok) {
-      
-      if (
-        !newData || // Handles null or undefined
-        newData.length === 0 || // Handles empty array
-        !newData.account_type // Handles missing or null provider
-      ) {
-        console.log('No SMS settings found, resetting form.');
-      
-        setHotspotMpesaSettings({ 
-          consumer_key: '', 
-          consumer_secret: '', 
-          passkey: '', 
-          short_code: '' ,
-        });
-      
-        // setSelectedProvider('');
-      } else {
-        console.log('Fetched hotspot mpesa settings:', newData);
-      
-        const { consumer_key, consumer_secret, passkey, short_code } = newData;
-      
-
-        setHotspotMpesaSettings(prevData => ({
-          ...prevData, 
-          consumer_key, consumer_secret, passkey, short_code
+      const newData = await res.json();
+      if (res.ok) {
+        const { consumer_key, consumer_secret, passkey, short_code,
+          api_initiator_username, 
+          api_initiator_password, phone_number, no_api_keys } = newData[0];
+        setHotspotMpesaSettings(prev => ({
+          ...prev, consumer_key, consumer_secret, passkey, short_code,
+          api_initiator_username, api_initiator_password, phone_number,
         }));
 
-
-
-
-      
-
-        // setHotspotMpesaSettings(
-
-        //   {...hotspotMpesaSettings, consumer_key: consumer_key || '', consumer_secret: consumer_secret || '', passkey: passkey || '', short_code: short_code || ''}
-        // );
-      
+setNoApiKeys(no_api_keys)
+        // Auto-enable "no API keys" mode if only phone_number is set
+        // if (phone_number && !consumer_key) setNoApiKeys(true);
       }
-    } else {
-      toast.error(newData.error || 'Failed to fetch SMS settings', {
-        duration: 3000,
-        position: 'top-center',
-      });
+    } catch (_) {
+      toast.error('Failed to load M-Pesa settings', { position: 'top-center' });
     }
-  } catch (error) {
-    toast.error('Internal server error: Something went wrong with fetching SMS settings', {
-      duration: 3000,
-      position: 'top-center',
-    });
-  }
-}, [selectedAccountTypeHotspot]);
+  }, [selectedAccountTypeHotspot]);
+
+  useEffect(() => {
+    fetchHotspotMpesaSettings();
+  }, [fetchHotspotMpesaSettings, selectedAccountTypeHotspot]);
 
 
 useEffect(() => {
-  if (selectedAccountTypeHotspot) {
-    fetchHotspotMpesaSettings();
+  if (noApiKeys === false) {
+   fetchHotspotMpesaSettings()
   }
-}, [fetchHotspotMpesaSettings, selectedAccountTypeHotspot]);
+}, [fetchHotspotMpesaSettings]);
 
 
-
-
-
-const saveHotspotMpesaSettings = async(e) => {
-e.preventDefault()
-
-  try {
-    setisloading(true)
-    setOpen(true)
-    const response = await fetch('/api/hotspot_mpesa_settings', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Subdomain': subdomain,
-      },
-      body: JSON.stringify({
-        consumer_key: consumer_key,
-        consumer_secret: consumer_secret,
-        passkey: passkey,
-        short_code: short_code,
-        account_type: selectedAccountTypeHotspot
-      })
-    })
-
-const newData = await response.json()
-
-
-  if (response.status === 402) {
-    setTimeout(() => {
-      window.location.href = '/license-expired';
-     }, 1800);
-    
-  }
-
-    if (response.ok) {
-      setisloading(false)
-      setOpen(false)
-      setOpenSettings(true)
-      toast.success('Hotspot Mpesa settings saved successfully', {
-        duration: 3000,
-        position: 'top-center',
-      })
-      setHotspotMpesaSettings({
-        ...hotspotMpesaSettings,
-        consumer_key: newData.consumer_key,
-        consumer_secret: newData.consumer_secret,
-        passkey: newData.passkey,
-        short_code: newData.short_code,
-      })
-     
-    } else {
-      
-      setOpen(false)
-      setisloading(false)
-      setOpenSettings(false)
-      toast.error('failed to save hotspot mpesa settings', {
-        duration: 3000,
-        position: 'top-center',
-      })
+  
+  const saveHotspotMpesaSettings = async (e) => {
+    e.preventDefault();
+    try {
+      setisloading(true); setOpen(true);
+      const res = await fetch('/api/hotspot_mpesa_settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+        body: JSON.stringify({
+          // When "no API keys" mode is on, send only phone_number — omit API fields
+          ...(noApiKeys
+            ? { phone_number }
+            : { consumer_key, consumer_secret, passkey, short_code,
+                api_initiator_username, api_initiator_password,
+                account_type: selectedAccountTypeHotspot }),
+          phone_number,
+          no_api_keys: noApiKeys,
+        }),
+      });
+      const newData = await res.json();
+      if (res.status === 402) { setTimeout(() => { window.location.href = '/license-expired'; }, 1800); return; }
+      if (res.ok) {
+        setisloading(false); setOpen(false); setOpenSettings(true);
+        toast.success('M-Pesa settings saved', { duration: 3000, position: 'top-center' });
+        setHotspotMpesaSettings(prev => ({ ...prev, ...newData }));
+      } else {
+        setOpen(false); setisloading(false);
+        toast.error('Failed to save M-Pesa settings', { position: 'top-center' });
+      }
+    } catch (_) {
+      setisloading(false); setOpen(false);
+      toast.error('Something went wrong. Please try again.', { position: 'top-center' });
     }
-  } catch (error) {
-    setisloading(false)
-    setOpenSettings(false)
-    toast.error('internal server error', {  duration: 3000, position: 'top-center' })
-  }
+  };
 
+  const handleChangeMPesaHotspotSettings = (e) => {
+    const { type, name, checked, value } = e.target;
+    setHotspotMpesaSettings(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  };
 
-}
-
-
-const handleChangeMPesaHotspotSettings = (e) => {
-  const { type, name, checked, value } = e.target;
-  setHotspotMpesaSettings((prevData) => ({
-    ...prevData,
-    [name]: type === "checkbox" ? checked : value,
-  }));
-};
-
-
-const handleClose = () => {
-  setOpen(false);
-};
-
-
-const handleCloseNotifaction = () => {
- setOpenSettings(false);
-};
+  const registerUrls = async () => {
+    try {
+      setLoadRegisterUrls(true);
+      const res = await fetch('/api/register_urls', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+      });
+      const newData = await res.json();
+      if (res.ok) toast.success('M-Pesa URLs registered', { duration: 4000, position: 'top-center' });
+      else toast.error(newData.error || 'Failed to register URLs', { position: 'top-center' });
+    } catch (e) {
+      toast.error(String(e), { position: 'top-center' });
+    } finally {
+      setLoadRegisterUrls(false);
+    }
+  };
 
   return (
-
     <>
-    <Toaster />
-    <Backdrop  handleClose={handleClose}  open={open}/>
-<SettingsNotification open={openNotifactionSettings} handleClose={ handleCloseNotifaction }/>
+      <Toaster />
+      <Backdrop handleClose={() => setOpen(false)} open={open} />
+      <SettingsNotification open={openNotifactionSettings}
+       handleClose={() => setOpenSettings(false)} />
 
-
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="mt-10 h-screen p-6"
-    >
-      {/* Hotspot Section */}
       <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="mb-8"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mt-10 min-h-screen p-6"
       >
-        <p className="text-xl font-semibold mb-4 flex items-center">
-          <Payment className="mr-2" /> Hotspot
-        </p>
+        
 
-    <form onSubmit={saveHotspotMpesaSettings}>
-        <FormControl
-          variant="standard"
-          sx={{
-            m: 1,
-            width: "100%",
-            marginTop: 4,
-            "& .MuiOutlinedInput-notchedOutline": {
-              px: 2.5,
-            },
-            "& label.Mui-focused": {
-              color: "black",
-              fontSize: "16px",
-            },
-            "& .MuiOutlinedInput-root": {
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "black",
-                borderWidth: "3px",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "black",
-              },
-            },
-          }}
-        >
-          <InputLabel id="hotspot-account-type-label">
-            Hotspot Mpesa Account Type
-          </InputLabel>
-          <Select
-           value={selectedAccountTypeHotspot}
-           onChange={(e) => setSelectedAccountTypeHotspot(e.target.value)}
-            labelId="hotspot-account-type-label"
-            id="hotspot-account-type"
-            label="Hotspot Mpesa Account Type"
-          >
-            <MenuItem value="Till">Till</MenuItem>
-            <MenuItem value="Paybill">Paybill</MenuItem>
-          </Select>
-        </FormControl>
-
-        <Box
-          component="form"
-          sx={{
-            "& .MuiTextField-root": { m: 1, width: "52ch", marginTop: 5 },
-            "& label.Mui-focused": {
-              color: "black",
-              fontSize: "16px",
-            },
-            "& .MuiOutlinedInput-root": {
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "black",
-                borderWidth: "3px",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "black",
-              },
-            },
-          }}
-          noValidate
-        >
-          <TextField
-           onChange={handleChangeMPesaHotspotSettings}
-            name="short_code"
-            value={short_code}
-            className='myTextField'
-            label="Short Code"
-            InputProps={{
-              startAdornment: <Business className="mr-2" />,
-            }}
-          />
-        </Box>
-
-        <Box
-          component="form"
-          sx={{
-            "& .MuiTextField-root": { m: 1, width: "100%", marginTop: 5 },
-            "& label.Mui-focused": {
-              color: "black",
-              fontSize: "16px",
-            },
-            "& .MuiOutlinedInput-root": {
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "black",
-                borderWidth: "3px",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "black",
-              },
-            },
-          }}
-          noValidate
-        >
-          <TextField
-          className='myTextField'
-          onChange={handleChangeMPesaHotspotSettings}
-            name="consumer_key"
-            value={consumer_key}
-            label="Consumer Key"
-            InputProps={{
-              startAdornment: <VpnKey className="mr-2" />,
-            }}
-          />
-          <TextField
-           onChange={handleChangeMPesaHotspotSettings}
-            name="consumer_secret"
-            value={consumer_secret}
-           className='myTextField'
-            label="Consumer Secret"
-            InputProps={{
-              startAdornment: <Lock className="mr-2" />,
-            }}
-          />
-          <TextField
-           onChange={handleChangeMPesaHotspotSettings}
-            name="passkey"
-            value={passkey}
-             className='myTextField'
-            label="Pass Key"
-            InputProps={{
-              startAdornment: <VpnKey className="mr-2" />,
-            }}
-          />
-        </Box>
-
-        <Box
-          component="form"
-          sx={{
-            "& .MuiTextField-root": { m: 1, width: "52ch", marginTop: 5 },
-            "& label.Mui-focused": {
-              color: "black",
-              fontSize: "16px",
-            },
-            "& .MuiOutlinedInput-root": {
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "black",
-                borderWidth: "3px",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "black",
-              },
-            },
-          }}
-          noValidate
-        >
-          {/* <div className="flex">
-            <TextField
-             className='myTextField'
-              id="initiator-username"
-              label="Initiator Username"
-              InputProps={{
-                startAdornment: <Person className="mr-2" />,
-              }}
-            />
-            <TextField
-              id="initiator-password"
-               className='myTextField'
-              label="Initiator Password"
-              InputProps={{
-                startAdornment: <Lock className="mr-2" />,
-              }}
-            />
-          </div> */}
-        </Box>
-
-        <FormControl
-          sx={{
-            m: 1,
-            width: "100%",
-            marginTop: 4,
-            "& label.Mui-focused": {
-              color: "black",
-              fontSize: "14px",
-            },
-            "& .MuiOutlinedInput-root": {
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "black",
-                borderWidth: "3px",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "black",
-              },
-            },
-          }}
-        >
-            <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.6 }}
-        className="flex justify-center w-full mt-8"
-      >
-        <button type='submit' className="p-3 border rounded-sm
-         dark:border-teal-500 dark:text-blue-300 text-center w-full border-gray-800 hover:bg-green-500 hover:text-white transition-all duration-300">
-          Save
-        </button>
-      </motion.div>
-        </FormControl>
-</form>
-
-
-      </motion.div>
-
-
-
-
-
-      {/* Fixed Mpesa Section */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className="mt-8"
-      >
-        <p className="text-xl font-semibold mb-4 flex items-center">
-          <Payment className="mr-2" /> Dial Up
-        </p>
-        <FormControl
-          variant="standard"
-          sx={{
-            m: 1,
-            width: "100%",
-            marginTop: 4,
-            "& label.Mui-focused": {
-              color: "black",
-              fontSize: "14px",
-            },
-            "& .MuiOutlinedInput-root": {
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "black",
-                borderWidth: "3px",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "black",
-              },
-            },
-          }}
-        >
-          <InputLabel id="fixed-mpesa-account-type-label">
-            Fixed Mpesa Account Type
-          </InputLabel>
-          <Select
-            labelId="fixed-mpesa-account-type-label"
-            id="fixed-mpesa-account-type"
-            autoWidth
-            label="Fixed Mpesa Account Type"
-          >
-            <MenuItem value="Paybill">Paybill</MenuItem>
-            <MenuItem value="Till Number">Till Number</MenuItem>
-          </Select>
-        </FormControl>
-
-        <Box
-          component="form"
-          sx={{
-            "& .MuiTextField-root": { m: 1, width: "52ch", marginTop: 2 },
-            "& label.Mui-focused": {
-              color: "black",
-              fontSize: "16px",
-            },
-            "& .MuiOutlinedInput-root": {
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "black",
-                borderWidth: "3px",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "black",
-              },
-            },
-          }}
-          noValidate
-        >
-          <div className="flex">
-            <TextField
-              className='myTextField'
-              id="head-office-shortcode"
-              label="Business Shortcode/Till Number"
-              InputProps={{
-                startAdornment: <Business className="mr-2" />,
-              }}
-            />
-           
-           
+          {/* ── Page header ── */}
+          <div className="flex justify-between items-center mb-6">
+            <p className="text-xl font-semibold flex items-center gap-2">
+              <Payment /> M-Pesa Settings
+            </p>
+            <button type="button" onClick={registerUrls}
+              className="px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-sm font-medium hover:bg-green-200 transition-colors">
+              {loadRegisterUrls ? 'Registering…' : 'Register URLs'}
+            </button>
           </div>
-        </Box>
 
-        <Box
-          component="form"
-          sx={{
-            "& .MuiTextField-root": { m: 1, width: "100%", marginTop: 2 },
-            "& label.Mui-focused": {
-              color: "black",
-              fontSize: "16px",
-            },
-            "& .MuiOutlinedInput-root": {
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "black",
-                borderWidth: "3px",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "black",
-              },
-            },
-          }}
-          noValidate
-        >
-          <TextField
-          className='myTextField'
-            id="fixed-consumer-secret"
-            label="Consumer Secret"
-            InputProps={{
-              startAdornment: <Lock className="mr-2" />,
-            }}
-          />
-          <TextField
-          className='myTextField'
-            id="fixed-consumer-key"
-            label="Consumer Key"
-            InputProps={{
-              startAdornment: <VpnKey className="mr-2" />,
-            }}
-          />
-          <TextField
-           className='myTextField'
-            id="fixed-pass-key"
-            label="Pass Key"
-            InputProps={{
-              startAdornment: <VpnKey className="mr-2" />,
-            }}
-          />
-        </Box>
+          <form onSubmit={saveHotspotMpesaSettings} className="space-y-6">
 
-        <Box
-          component="form"
-          sx={{
-            "& .MuiTextField-root": { m: 1, width: "52ch", marginTop: 2 },
-            "& label.Mui-focused": {
-              color: "black",
-              fontSize: "16px",
-            },
-            "& .MuiOutlinedInput-root": {
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "black",
-                borderWidth: "3px",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "black",
-              },
-            },
-          }}
-          noValidate
-        >
-          {/* <div className="flex">
-            <TextField
-              id="fixed-initiator-username"
-              label="Initiator Username"
-              InputProps={{
-                startAdornment: <Person className="mr-2" />,
-              }}
-            />
-            <TextField
-              id="fixed-initiator-password"
-              label="Initiator Password"
-              InputProps={{
-                startAdornment: <Lock className="mr-2" />,
-              }}
-            />
-          </div> */}
-        </Box>
+            {/* ── "No API keys" checkbox ── */}
+            <div className="p-4 rounded-2xl border"
+              style={{ background: noApiKeys ? 'rgba(251,191,36,.05)' : 'rgba(148,163,184,.04)',
+                borderColor: noApiKeys ? 'rgba(251,191,36,.3)' : 'rgba(148,163,184,.15)' }}>
 
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={noApiKeys}
+                    onChange={e => setNoApiKeys(e.target.checked)}
+                    sx={{
+                      color: '#ca8a04',
+                      '&.Mui-checked': { color: '#ca8a04' },
+                    }}
+                  />
+                }
+                label={
+                  <span className="font-semibold text-sm text-gray-800 dark:text-gray-200">
+                    I am using a <strong>Till number</strong>, <strong>Paybill</strong>,{' '}
+                    or <strong>phone number</strong> — without Safaricom API keys
+                  </span>
+                }
+              />
 
-{/* 
-        <FormControl
-          sx={{
-            m: 1,
-            width: "100%",
-            marginTop: 4,
-            "& label.Mui-focused": {
-              color: "black",
-              fontSize: "14px",
-            },
-            "& .MuiOutlinedInput-root": {
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "black",
-                borderWidth: "3px",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "black",
-              },
-            },
-          }}
-        >
-          <InputLabel id="fixed-api-version-label">API VERSION</InputLabel>
-          <Select
-            labelId="fixed-api-version-label"
-            id="fixed-api-version"
-            autoWidth
-            label="API VERSION"
-          >
-            <MenuItem>V1</MenuItem>
-            <MenuItem>V2</MenuItem>
-          </Select>
-        </FormControl> */}
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-8 leading-relaxed">
+                Check this if you do not have a Safaricom developer account (consumer key / secret / passkey).
+                You will provide your M-Pesa phone number below and payments will be collected
+                through our Paybill on your behalf. A <strong>1% transaction fee</strong> is deducted
+                and the remainder is sent to your phone number.
+              </p>
+            </div>
+
+            {/* ── API fields — hidden when noApiKeys is checked ── */}
+            <AnimatePresence initial={false}>
+              {!noApiKeys && (
+                <motion.div
+                  key="api-fields"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                  className="overflow-hidden space-y-1"
+                >
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                    Safaricom API Credentials
+                  </p>
+
+                  <Box sx={{ "& .MuiTextField-root": { m: 1, width: "100%" }, ...MUI_FOCUS }} noValidate>
+                    <TextField onChange={handleChangeMPesaHotspotSettings}
+                      name="short_code" value={short_code || ''} className="myTextField" label="Short Code"
+                      InputProps={{ startAdornment: <Business className="mr-2" /> }} />
+
+                    <TextField onChange={handleChangeMPesaHotspotSettings}
+                      name="consumer_key" value={consumer_key || ''} className="myTextField" label="Consumer Key"
+                      InputProps={{ startAdornment: <VpnKey className="mr-2" /> }} />
+
+                    <TextField onChange={handleChangeMPesaHotspotSettings}
+                      name="consumer_secret" value={consumer_secret || ''} className="myTextField" label="Consumer Secret"
+                      InputProps={{ startAdornment: <Lock className="mr-2" /> }} />
+
+                    <TextField onChange={handleChangeMPesaHotspotSettings}
+                      name="passkey" value={passkey || ''} className="myTextField" label="Pass Key"
+                      InputProps={{ startAdornment: <VpnKey className="mr-2" /> }} />
+                  </Box>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* ── Phone number — shown when noApiKeys is checked ── */}
+            <AnimatePresence initial={false}>
+              {noApiKeys && (
+                <motion.div
+                  key="phone-field"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                  className="overflow-hidden"
+                >
+                  {/* Yellow info strip */}
+                  <div className="rounded-2xl overflow-hidden border mb-4"
+                    style={{ borderColor: 'rgba(251,191,36,.2)' }}>
+                    <div className="px-4 py-3 flex items-start gap-3"
+                      style={{ background: 'rgba(251,191,36,.08)', borderBottom: '1px solid rgba(251,191,36,.15)' }}>
+                      <Payment style={{ fontSize: 18, color: '#ca8a04', flexShrink: 0, marginTop: 2 }} />
+                      <div>
+                        <p className="font-semibold text-sm text-yellow-700 dark:text-yellow-400 mb-0.5">
+                          Payments collected via our Paybill
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                          Since you don't have Safaricom API keys, your customers will pay through our
+                          platform Paybill. We deduct a <strong>1% transaction fee</strong> and
+                          M-Pesa the rest to the phone number you enter below.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="px-4 py-4">
+                      <Box sx={{ "& .MuiTextField-root": { m: 0, width: "100%" }, ...MUI_FOCUS }}>
+                        <TextField
+                          onChange={handleChangeMPesaHotspotSettings}
+                          name="phone_number"
+                          value={phone_number || ''}
+                          className="myTextField"
+                          label="Your M-Pesa Phone Number"
+                          placeholder="e.g. 0712 345 678"
+                          InputProps={{ startAdornment: <Phone className="mr-2" style={{ color: '#ca8a04' }} /> }}
+                        />
+                      </Box>
+                    </div>
+                  </div>
+
+                  {/* B2B coming soon notice */}
+                  <div className="flex items-start gap-3 p-4 rounded-2xl"
+                    style={{ background: 'rgba(99,102,241,.06)', border: '1px solid rgba(99,102,241,.18)' }}>
+                    <Info style={{ fontSize: 18, color: '#818cf8', flexShrink: 0, marginTop: 1 }} />
+                    <div>
+                      <p className="text-sm font-semibold mb-1" style={{ color: '#818cf8' }}>
+                        🔜 Direct B2B Paybill / Till — coming soon
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                        If you have your own Paybill or Till number but <em>no</em> Safaricom API credentials,
+                        direct integration is not currently possible — M-Pesa B2B requires API access.
+                        Once we enable B2B support, you will be able to point payments straight to your
+                        Paybill or Till with zero API setup, giving your customers a fully branded payment
+                        experience under your business name. Until then, use the phone number option above.
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* ── Save button ── */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+            >
+              <button type="submit"
+                className="w-full p-3 border rounded-sm dark:border-teal-500 dark:text-blue-300
+                  border-gray-800 hover:bg-green-500 hover:text-white transition-all duration-300">
+                {isloading ? 'Saving…' : 'Save Settings'}
+              </button>
+            </motion.div>
+
+          </form>
       </motion.div>
-
-      {/* Save Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.6 }}
-        className="flex justify-center w-full mt-8"
-      >
-        <button className="p-3 border rounded-sm
-         dark:border-teal-500 dark:text-blue-300 text-center w-full border-gray-800 hover:bg-green-500 hover:text-white transition-all duration-300">
-          Save
-        </button>
-      </motion.div>
-    </motion.div>
-
     </>
   );
 };

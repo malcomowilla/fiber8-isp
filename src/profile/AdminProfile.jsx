@@ -74,10 +74,8 @@ useEffect(() => {
      })
      const newData = await response.json()
      if (response) {
-       console.log('fetched current user', newData)
        const {username, email, id, created_at, updated_at, phone_number} = newData
        setFormData({...formData, username, email, phone_number})
-       console.log('current user', newData)
      }
    } catch (error) {
      toast.error('Something went wrong please try again failed to fetch profile', {
@@ -126,12 +124,12 @@ const handleLogout = async () => {
         setCurrentUser(null)
         navigate('/signin');
         
-console.log(user)
+// console.log(user)
       } else {
         throw new Error('Logout failed');
       }
     } catch (error) {
-      console.error('Error logging out:', error);
+      // console.error('Error logging out:', error);
      }
 }
 
@@ -157,7 +155,6 @@ console.log(user)
         const newData = await response.json()
         const {username, email,  phone_number} = newData
         setFormData({...formData, username, email, phone_number})
-        console.log('updated profile', newData)
         toast.success("Profile updated successfully", {
           duration: 7000,
           position: "top-center",
@@ -349,7 +346,6 @@ setRegistrationStatus('error');
         position: "top-center",
         duration: 7000,
       });
-      console.log('signup success');
       // setsignupFormData('')
       setOpenLoad(false);
       // setisloading(false);
@@ -369,7 +365,6 @@ setRegistrationStatus('error');
         position: "top-center",
         duration: 7000,
       });
-      console.log('signup failed');
       // setOpen(false);
       // setRegistrationError(options.errors);
       setOpenLoad(false);
@@ -384,7 +379,6 @@ setRegistrationStatus('error');
     });
     // setOpen(false);
     setOpenLoad(false);
-    console.error('Error during WebAuthn credential creation:', err);
   }
 }
 

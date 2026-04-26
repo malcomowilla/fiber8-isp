@@ -60,7 +60,6 @@ const onChange = (e)=> {
 
    const handleRowClick = (event, rowData)=> {
        setEquipmentForm(rowData)
-       console.log('row data', rowData)
         }
   const equipmentData = [
     {
@@ -179,7 +178,6 @@ const fetchSubscribers = useCallback(
     setCustomers(newData)
 
   } else {
-    console.log('failed to fetch routers')
      if (response.status === 401) {
  
    setTimeout(() => {
@@ -192,7 +190,6 @@ const fetchSubscribers = useCallback(
   
   } catch (error) {
     
-    console.log(error)
   
   }
   },
@@ -232,7 +229,7 @@ const getEquipment = useCallback(
       
     }
   },
-  [],
+  [subdomain],
 )
 
 useEffect(() => {
@@ -394,23 +391,45 @@ const newData = await response.json()
         data={equipments}
         onRowClick={(event, rowData)=>handleRowClick(event, rowData)}
 
-        options={{
-          search: true,
-          actionsColumnIndex: -1,
-          pageSize: 5,
-          pageSizeOptions: [5, 10, 20],
-          showTitle: false,
-          toolbar: true,
-          // emptyRowsWhenPaging: false,
-          // headerStyle: {
-          //   backgroundColor: '#f5f5f5',
-          //   fontWeight: 'bold'
-          // }
-        }}
+       localization={{
+                body: {
+                  emptyDataSourceMessage: 'No equipment found. Create your first equipment to get started!',
+                },
+               
+              
+              
+              }}
+
+
+options={{
+  sorting: true,
+  actionsColumnIndex: -1,
+  pageSizeOptions:[2, 5, 10],
+  pageSize: 10,
+
+  
+exportButton: true,
+exportAllData: true,
+
+
+  emptyRowsWhenPaging: false,
+
+
+headerStyle:{
+  fontFamily: 'bold',
+  textTransform: 'uppercase'
+  } ,
+  
+  
+  fontFamily: 'mono'
+}}
         icons={{
           Search: Search,
           ResetSearch: Clear,
         }}
+
+
+        
         actions={[
           {
             icon: () => <Visibility color="primary" />,

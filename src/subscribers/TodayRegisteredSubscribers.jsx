@@ -128,8 +128,7 @@ const handleClickRow = () => {
 
   const handleRowClick = (event, rowData) => {
     setOnlyShowSubscription(true)
-    console.log('subscribers',rowData)
-   console.log('showClientStatsAndSUbscriptions',showClientStatsAndSUbscriptions)
+    
     setShowClientStatsAndSubscriptions(true)
 setFormData({
   ...rowData,
@@ -174,7 +173,7 @@ setFormData({
     if (response.ok) {
 setTableData(getTodaysSubscribers(newData));  
     } else {
-      console.log('failed to fetch routers')
+      // console.log('failed to fetch routers')
 
       toast.error(newData.error, {
         position: 'top-center',
@@ -194,7 +193,7 @@ setTableData(getTodaysSubscribers(newData));
         position: 'top-center',
         duration: 4000,
       })
-      console.log(error)
+      // console.log(error)
     
     }
     },

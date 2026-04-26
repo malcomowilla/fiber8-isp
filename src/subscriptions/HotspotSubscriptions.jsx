@@ -1,30 +1,47 @@
 
-import MaterialTable from 'material-table'
+import MaterialTable from 'material-table';
 import AddIcon from '@mui/icons-material/Add';
 import { FaPhoneVolume } from "react-icons/fa6";
 import { FaHands } from "react-icons/fa";
-import { useState, useEffect, useCallback } from 'react'
-import { IconButton, Tooltip } from '@mui/material';
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { IconButton, Tooltip, Chip, Badge } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IoIosQrScanner } from "react-icons/io";
-import EditVoucher from '../edit/EditVoucher'
+import EditVoucher from '../edit/EditVoucher';
 import toast, { Toaster } from 'react-hot-toast';
-
 import LoadingAnimation from '../loader/loading_animation.json'
 import Lottie from 'react-lottie';
 import Backdrop from '@mui/material/Backdrop';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteVoucher from '../delete/DeleteVoucher'
-import { FaDesktop } from "react-icons/fa"; // Import device icon
+import DeleteVoucher from '../delete/DeleteVoucher';
+import { FaDesktop } from "react-icons/fa"; 
 import { useDebounce } from 'use-debounce';
 import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading animation
-import SendVoucher from './SendVoucher'
-import CompensationVoucher from '../edit/CompensationVoucher'
+import SendVoucher from './SendVoucher';
+import CompensationVoucher from '../edit/CompensationVoucher';
 import { createConsumer } from "@rails/actioncable";
 const cable = createConsumer(`wss://${window.location.hostname}/cable`);
 // const cable = createConsumer(`ws://localhost:4000/cable`);
-
+import VoucherDetails from './VoucherDetails';
+import { IoEyeOutline } from "react-icons/io5";
+import { 
+   RefreshCw,
+  BarChart3, TrendingDown, Download, Upload,
+   Wifi, 
+  Smartphone, 
+  Calendar, 
+  Clock,
+  Globe,
+  Cpu,
+  Activity,
+} from 'lucide-react';
+import {FaCheckCircle} from "react-icons/fa";
+import Popper from '@mui/material/Popper';
+import Paper from '@mui/material/Paper';
+import { Box, Button,
+  Typography,
+ } from '@mui/material';
 
 
 const HotspotSubscriptions = () => {
@@ -34,9 +51,12 @@ const HotspotSubscriptions = () => {
   const [isSearching, setIsSearching] = useState(false); // New state for search loading
   const [openSendVoucher, setOpenSendVoucher] = useState(false);
   const [editVoucher, setEditVoucher] = useState(false);
-  
+    const iconRef = useRef(null);
 
 
+
+
+const [anchorEl, setAnchorEl] = useState(null);
 
   const { settingsformData, setFormData, selectedProvider, setSelectedProvider, 
     setSmsSettingsForm
@@ -49,15 +69,59 @@ const HotspotSubscriptions = () => {
     package: '',
     phone: '',  
     shared_users: '',
+    number_of_vouchers: '',
     
-
-
   })
+
+  const handleClosePopper = () => {
+    setAnchorEl(null);
+  };
+
+  const openPopper = Boolean(anchorEl);
+  const idPopper = openPopper ? 'logout-popover' : undefined;
+
   const [vouchers, setVouchers] = useState([])
   const [openLoad, setopenLoad] = useState(false)
   const [openDelete, setOpenDelete] = useState(false);
 const [voucher, setVoucher] = useState('')
+const [status, setStatus] = useState('')
+const [expiration, setExpiration] = useState('')
+const [useLimit, setUseLimit] = useState('')
+const [speed, setSpeed] = useState('')
+const [phone, setPhone] = useState('')
+const [createdAt, setCreatedAt] = useState('')
+const [updatedAt, setUpdatedAt] = useState('')
+const [id, setId] = useState('')
+const [time_paid, setTimePaid] = useState('')
+const [payment_method, setPaymentMethod] = useState('')
+const [reference, setReference] = useState('')
+const [amount, setAmount] = useState('')
+const [customer, setCustomer] = useState('')
+const [isOnline, setIsOnline] = useState(false)
+const [loadingLogout, setLoadingLogout] = useState(false)
+
 const [openCompensationVoucher, setOpenCompensationVoucher] = useState(false);
+const [openVoucherDetails, setOpenVoucherDetails] = useState(false);
+const [isSpinning, setIsSpinning] = useState(false);
+const [loginBy, setLoginBy] = useState('')
+
+const selectedVoucherIdRef = useRef(id);
+const isDetailsOpenRef = useRef(openVoucherDetails);
+
+useEffect(() => {
+  selectedVoucherIdRef.current = id;
+}, [id]);
+
+useEffect(() => {
+  isDetailsOpenRef.current = openVoucherDetails;
+}, [openVoucherDetails]);
+
+
+
+
+const handleCloseVoucherDetails = () => {
+  setOpenVoucherDetails(false);
+}
 
   const handleCloseDelete = () => {
     setOpenDelete(false);
@@ -72,17 +136,9 @@ const [openCompensationVoucher, setOpenCompensationVoucher] = useState(false);
       preserveAspectRatio: 'xMidYMid slice',
     },
   };
+const subdomain = window.location.hostname.split('.')[0]
 
 
-//   const handleChangeVoucher = (e) => {
-// const {name, id, value} = e.target
-// console.log('voucher', e.target.value)
-//     setVoucherForm({
-//       ...voucherForm,
-//       [name]: value
-//     })
-
-//   }
 
 
 
@@ -91,20 +147,68 @@ setVoucherForm((prevState) => ({
  ...prevState,
   [e.target.name]: e.target.value
 }))
-  console.log('voucher', e.target.value)
 }
 
 
 
 
   const handleRowClick = (event, rowData) => {
-    console.log('vouchers',rowData)
    setVoucher(rowData.voucher)
     setVoucherForm(rowData)
     setEditVoucher(true)
-
-
+    setId(rowData.id)
+    setStatus(rowData.status)
+    setExpiration(rowData.expiration)
+    setUseLimit(rowData.shared_users)
+    setPhone(rowData.phone)
+    setCreatedAt(rowData.created_at)
+    setUpdatedAt(rowData.updated_at)
+    setSpeed(rowData.speed_limit)
+    setTimePaid(rowData.time_paid)
+    setPaymentMethod(rowData.payment_method)
+    setReference(rowData.reference)
+    setAmount(rowData.amount)
+    setCustomer(rowData.customer)
+    setIsOnline(rowData.is_online)
+    setLoginBy(rowData.login_by)
   }
+
+
+
+
+
+
+
+useEffect(() => {
+  const subscription = cable.subscriptions.create(
+    { channel: "HotspotVoucherChannel", "X-Subdomain": subdomain },
+    {
+      received(data) {
+        console.log('voucher channel received', data);
+        // Assume the backend sends at least { id, is_online }
+        if (data.id && data.is_online !== undefined) {
+          // 1. Update the main vouchers arrayf
+          setVouchers(prevVouchers =>
+            prevVouchers.map(v =>
+              v.id === data.id ? { ...v, is_online: data.is_online } : v
+            )
+          );
+
+          // 2. If details are open and this is the selected voucher, update isOnline
+          if (isDetailsOpenRef.current && selectedVoucherIdRef.current === data.id) {
+            setIsOnline(data.is_online);
+          }
+        }
+      },
+      connected() {
+        console.log('voucher channel connected');
+      },
+      disconnected() {},
+    }
+  );
+
+  return () => subscription.unsubscribe();
+}, [subdomain]); 
 
 
 
@@ -162,106 +266,259 @@ const formatRemainingTime = (expirationDate) => {
   
 
 
-  
+
     const columns = [
-        {title: 'Voucher', field: 'voucher', headerClassName: 'dark:text-black ', defaultSort: 'asc'},
-      
-        {title: 'Status', field: 'status',  headerClassName: 'dark:text-black', render: (rowData) => (
-          <div className='flex items-center gap-2'>
-            <p className={`
-              ${rowData.status === 'active' && 'text-green-500 bg-green-100 p-1 rounded-lg'}
-              ${rowData.status === 'expired' && 'text-red-500 bg-red-100 p-1 rounded-lg'}
-              ${rowData.status === 'used' && 'text-yelow-500 bg-yellow-100 p-1 rounded-lg'}
-              `}>{rowData.status}</p>
+    { 
+      title: 'Voucher', 
+      field: 'voucher', 
+      headerClassName: 'dark:text-black',
+      render: (rowData) => (
+        <div className="flex items-center gap-2">
+          <Wifi className="w-4 h-4 text-blue-500" />
+          <code className="font-mono text-sm bg-gray-100
+           dark:bg-gray-800 px-2 py-1 rounded">
+            {rowData.voucher}
+          </code>
+        </div>
+      ),
+    },
+    { 
+      title: 'Status', 
+      field: 'status',  
+      headerClassName: 'dark:text-black', 
+      render: (rowData) => (
+        <Chip
+          label={rowData.status}
+          size="small"
+          className="font-semibold"
+          sx={{
+            backgroundColor: rowData.status === 'active' ? '#d1fae5' : 
+                           rowData.status === 'expired' ? '#fee2e2' : '#fef3c7',
+            color: rowData.status === 'active' ? '#065f46' : 
+                  rowData.status === 'expired' ? '#991b1b' : '#92400e',
+            fontWeight: 'bold',
+          }}
+        />
+      )
+    },
+    {
+      title: 'Expiration', 
+      field: 'expiration', 
+      headerClassName: 'dark:text-black',
+      render: (rowData) => {
+        const progress = calculateExpirationProgress(rowData.expiration);
+        const remainingText = formatRemainingTime(rowData.expiration);
+        const isExpired = progress >= 100;
+        
+        return (
+          <Tooltip title={`Expires: ${rowData.expiration}`} arrow>
+            <div className="flex flex-col w-40">
+              <div className="flex items-center gap-1 mb-1">
+                <Calendar className="w-3 h-3 text-gray-500" />
+                <span className={`text-sm ${isExpired ? 'text-red-600' : 'text-green-600'}`}>
+                  {remainingText}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
+                <div 
+                  className="h-1.5 rounded-full transition-all duration-300" 
+                  style={{ 
+                    width: `${isExpired ? 100 : 100 - progress}%`,
+                    background: isExpired 
+                      ? 'linear-gradient(90deg, #ef4444, #f97316)'
+                      : progress > 80 
+                        ? 'linear-gradient(90deg, #f59e0b, #fbbf24)'
+                        : 'linear-gradient(90deg, #10b981, #34d399)'
+                  }}
+                ></div>
+              </div>
+            </div>
+          </Tooltip>
+        );
+      }
+    },
+    { 
+      title: 'Package', 
+      field: 'package',  
+      headerClassName: 'dark:text-black',
+      render: (rowData) => (
+        <Chip
+          label={<span className='text-black
+             dark:text-white text-xs'>{rowData.package}</span>}
+          size="small"
+          variant="outlined"
+          className="border-blue-200 text-blue-700"
+        />
+      )
+    },
+    { 
+      title: 'Speed Limit', 
+      field: 'speed_limit',  
+      headerClassName: 'dark:text-black',
+      render: (rowData) => (
+        <div className="flex items-center gap-1">
+          <Activity className="w-3 h-3 text-purple-500" />
+          <span className="font-medium text-black dark:text-white">{rowData.speed_limit}</span>
+        </div>
+      )
+    },
+    { 
+      title: 'Phone', 
+      field: 'phone',  
+      headerClassName: 'dark:text-black',
+      render: (rowData) => (
+        <div className="flex items-center gap-1">
+          {rowData.sms_sent && <FaCheckCircle className="text-green-500" />}
+          <Smartphone className="w-4 h-4 text-black " />
+          <span className="text-sm text-black dark:text-white">{rowData.phone || 'N/A'}</span>
+        </div>
+      )
+    },
+    { 
+      title: 'IP Address', 
+      field: 'ip',  
+      headerClassName: 'dark:text-black',
+      render: (rowData) => (
+        <div className="flex items-center gap-1">
+          <Globe className="w-3 h-3 text-blue-500" />
+          <code className="text-xs font-mono bg-gray-100
+           dark:bg-gray-800 px-1.5 py-0.5 rounded">
+            {rowData.ip || 'N/A'}
+          </code>
+        </div>
+      )
+    },
+    { 
+      title: 'MAC Address', 
+      field: 'mac',  
+      headerClassName: 'dark:text-black',
+      render: (rowData) => (
+        <div className="flex items-center gap-1">
+          <Cpu className="w-3 h-3 text-green-500" />
+          <code className="text-xs font-mono bg-gray-100
+           dark:bg-gray-800 px-1.5 py-0.5 rounded">
+            {rowData.mac ? rowData.mac.toUpperCase() : 'N/A'}
+          </code>
+        </div>
+      )
+    },
+    { 
+      title: 'Last Login', 
+      field: 'last_logged_in',  
+      headerClassName: 'dark:text-black',
+      render: (rowData) => (
+        <Tooltip title={rowData.last_logged_in || 'Never logged in'} arrow>
+          <div className="flex items-center gap-1">
+            <Clock className="w-3 h-3 text-gray-500" />
+            <span className="text-xs text-gray-600 dark:text-white">
+              {rowData.last_logged_in}
+            </span>
           </div>
-        )},
-      {
-  title: 'Expiration', 
-  field: 'expiration', 
-  headerClassName: 'dark:text-black',
-  render: (rowData) => {
-    const progress = calculateExpirationProgress(rowData.expiration);
-    const remainingText = formatRemainingTime(rowData.expiration);
-    const isExpired = progress >= 100;
-    
-    return (
-      <Tooltip title={remainingText} arrow>
-        <div className="flex flex-col w-full">
-          <span className={isExpired ? 'text-red-500' : 'text-green-500'}>
-            {rowData.expiration}
-          </span>
-          <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-            <div 
-              className="h-2.5 rounded-full" 
-              style={{ 
-                width: `${isExpired ? 100 : 100 - progress}%`,
-                backgroundColor: isExpired 
-                  ? 'orange' // red when expired
-                  : progress > 80 
-                    ? '#f59e0b' // yellow when less than 20% remaining
-                    : '#10b981' // green otherwise
-              }}
-            ></div>
+        </Tooltip>
+      )
+    },
+    {
+      title: "Device & Actions",
+      field: "shared_users",
+      headerClassName: "dark:text-black",
+      render: (rowData) => (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <FaDesktop className="text-green-500" />
+              {rowData.shared_users > 1 && (
+                <Badge 
+                  badgeContent={rowData.shared_users} 
+                  color="primary" 
+                  className="text-xs"
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      fontSize: '0.6rem',
+                      height: '16px',
+                      minWidth: '16px',
+                    }
+                  }}
+                />
+              )}
+            </div>
+            {/* <span className="text-sm">{rowData.device || 'Unknown'}</span> */}
+          </div>
+          
+          <div className="flex items-center gap-1">
+            {rowData.status === 'active' &&  (
+              <Tooltip title="Send voucher to device">
+                <IconButton 
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenSendVoucher(true);
+                    setVoucher(rowData.voucher);
+                  }}
+                  className="hover:bg-green-50"
+                >
+                  <FaPhoneVolume className='text-green-500 text-lg'/>
+                </IconButton>
+              </Tooltip>
+            )}
+            
+            <Tooltip title="View voucher details">
+              <IconButton 
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRowClick(e, rowData);
+                  setOpenVoucherDetails(true);
+                }}
+                className="hover:bg-blue-50"
+              >
+                <IoEyeOutline className='text-blue-500 text-lg'/>
+              </IconButton>
+            </Tooltip>
           </div>
         </div>
-      </Tooltip>
-    );
-  }
-},
-        {title: 'package', field:'package',  headerClassName: 'dark:text-black'},
-      
-        {title: 'Speed Limit', field:'speed_limit',  headerClassName: 'dark:text-black'},
-        {title: 'Phone', field:'phone',  headerClassName: 'dark:text-black'},
-        {
-          title: "Device",
-          field: "shared_users",
-          headerClassName: "dark:text-black",
-          render: (rowData) => (
-            <div className="flex items-center">
-              <FaDesktop className="mr-2 text-green-500" /> {/* Device icon */}
-              <span>{rowData.device}</span>
-              {rowData.shared_users && (
-                <span className=" text-sm text-black dark:text-white">({rowData.shared_users})</span>
-              )}
+      ),
+    },
+    {
+      title: 'Actions', 
+      field: 'actions',  
+      headerClassName: 'dark:text-black', 
+      sorting: false,
+      render: (rowData) => (
+        <div className="flex items-center gap-1">
+          {/* <Tooltip title="Edit voucher">
+            <IconButton 
+              size="small" 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRowClick(e, rowData);
+                setOpen(true);
+              }}
+              className="hover:bg-green-50"
+            >
+              <EditIcon className="text-green-600" fontSize="small" />
+            </IconButton>
+          </Tooltip>
+           */}
+          <Tooltip title="Delete voucher">
+            <IconButton 
+              size="small" 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRowClick(e, rowData);
+                setOpenDelete(true);
+              }}
+              className="hover:bg-red-50"
+            >
+              <DeleteIcon className="text-red-600" fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </div>
+      )
+    }
+  ];
 
-               <Tooltip title="send voucher to device">
-        <IconButton arrow color="primary" 
-        onClick={() => setOpenSendVoucher(true)}>
-         <FaPhoneVolume className='text-green-500 text-xl'/>
-         </IconButton>
-         </Tooltip>
-            </div>
-          ),
-        },
 
-        {title: 'Action', field:'Action',  headerClassName: 'dark:text-black', 
-    
-    
-  render: (params) =>  
-    
-  <>
-   
-   <DeleteButton {...params} />
-   <EditButton {...params}/>
-
-    </>
-
-
-}
-      
-      ]
-
-  const DeleteButton = ({ id }) => (
-    <IconButton style={{ color: '#8B0000' }} onClick={()=> setOpenDelete(true)}>
-      <DeleteIcon />
-    </IconButton>
-  );
-
-  const EditButton = () => (
-    <IconButton style={{color: 'green'}} onClick={() => setOpen(true)} >
-      <EditIcon />
-    </IconButton>
-  )
+ 
 
   const handleClose = () => {
     setOpen(false);
@@ -272,43 +529,52 @@ const formatRemainingTime = (expirationDate) => {
   }
 
 
-const subdomain = window.location.hostname.split('.')[0]
 
 
 
 
 
 
-// useEffect(() => {
-//     const subscription = cable.subscriptions.create(
-//       { channel: "VoucherChannel" , 
-//         "X-Subdomain": subdomain
-//   }, 
-//       {
-//         received(data) {
-//            console.log('received data from voucher chanel', data)
-//             setVouchers(data.vouchers)
-       
+const logoutUser = async() => {
+  try {
+    setLoadingLogout(true)
+    const response = await fetch('/api/disconnect_user', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+        },
+      body: JSON.stringify({ voucher: voucher })
 
-         
-//         },
-//         connected() {
-//           console.log("Connected to VoucherChannel");
-//         },
-//         disconnected() {
-//           console.log("Disconnected from VoucherChannel");
-//         },
-//       }
-//     );
+    })
 
-//     return () => {
-//       subscription.unsubscribe();
-//     };
-//   }, [subdomain]);
+    if (response.ok) {
+      toast.success('logged out successfully', {
+        position: "top-center",
+        duration: 4000,
+      })
+      handleCloseVoucherDetails()
+      setLoadingLogout(false)
+    } else {
+      toast.error('failed to logout', {
+        position: "top-center",
+        duration: 4000,
+      })
+      handleCloseVoucherDetails()
+      setLoadingLogout(false)
+      
+    }
+  } catch (error) {
+    handleCloseVoucherDetails()
+    setLoadingLogout(false)
+    toast.error('failed to logout, something went wrong, please try again', {
+      position: "top-center",
+      duration: 4000,
+    })
+    
+  }
 
-
-
-
+}
 
 const fetchRouters = useCallback(
   async() => {
@@ -320,14 +586,14 @@ const fetchRouters = useCallback(
       })
 const newData = await response.json()
       if (response) {
-        console.log('fetched router settings', newData)
+        // console.log('fetched router settings', newData)
         const {router_name} = newData[0]
         setFormData({...settingsformData, router_name})
       } else {
-        console.log('failed to fetch router settings')
+        // console.log('failed to fetch router settings')
       }
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
   },
   [],
@@ -348,6 +614,7 @@ const getHotspotVouchers = useCallback(
   async() => {
     try {
       setIsSearching(true)
+      setIsSpinning(true)
       const response = await fetch('/api/hotspot_vouchers', {
         headers: {
           'X-Subdomain': subdomain, 
@@ -356,15 +623,25 @@ const getHotspotVouchers = useCallback(
       const newData = await response.json()
       if (response.ok) {
         setIsSearching(false)
+        setIsSpinning(false)
         setVouchers(newData)
         setVouchers(newData.filter((voucher)=> {
-          return search.toLowerCase() === '' ? voucher : voucher.status.toLowerCase().includes(search)
+          return search.trim() === ''
+  ? voucher
+  : (
+      voucher.voucher?.toLowerCase().includes(search.toLowerCase()) ||
+      voucher.phone?.includes(search) ||
+      voucher.ip?.includes(search) ||
+      voucher.status?.toLowerCase().includes(search.toLowerCase())
+    )
+
         }))
 
 
         
       } else {
         setIsSearching(false)
+        setIsSpinning(false)
 
 
   if (response.status === 402) {
@@ -400,6 +677,7 @@ const getHotspotVouchers = useCallback(
         })
       }
     } catch (error) {
+      setIsSpinning(false)
       setIsSearching(false)
       toast.error('Failed to fetch vouchers internal server error', {
         position: "top-center",
@@ -442,22 +720,22 @@ const fetchSavedSmsSettings = useCallback(
       : null;
   
       if (response.ok) {
-        console.log('Fetched SMS settings:', newData);
+        // console.log('Fetched SMS settings:', newData);
         const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID } = newData[0];
         // setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID });
         setSelectedProvider(sms_provider);
         // setSelectedProvider(newData[0].sms_provider);
       } else {
-        toast.error(newData.error || 'Failed to fetch SMS settings', {
+        toast.error('Failed to fetch SMS settings', {
           duration: 3000,
           position: 'top-center',
         });
       }
     } catch (error) {
-      toast.error('Internal server error: Something went wrong with fetching SMS settings', {
-        duration: 3000,
-        position: 'top-center',
-      });
+      // toast.error('Error fetching SMS settings, We’re having trouble completing this request.', {
+      //   duration: 3000,
+      //   position: 'top-center',
+      // });
     }
   },
   [],
@@ -513,7 +791,11 @@ setopenLoad(false)
            setVouchers(vouchers.map(item => (item.id === voucherForm.id ? newData : item)));
         } else {
           
-          setVouchers([...vouchers, newData])
+          // setVouchers([...vouchers, newData])
+            setVouchers(prev => [...newData, ...prev]);
+
+          // setVouchers(prev => [newData, ...prev])
+
            toast.success('Voucher created successfully', {
             position: "top-center",
             duration: 4000,
@@ -542,7 +824,6 @@ setopenLoad(false)
         duration: 4000,
       })
     }
-
   }
 
 
@@ -572,10 +853,10 @@ setopenLoad(false)
           duration: 4000,
         })
 
-        toast.error(newData.error, {
-          position: "top-center",
-          duration: 4000,
-        })
+        // toast.error(newData.error, {
+        //   position: "top-center",
+        //   duration: 4000,
+        // })
       }
     } catch (error) {
       toast.error('Failed to delete voucher servere error', {
@@ -589,186 +870,319 @@ setopenLoad(false)
     setOpenCompensationVoucher(false);
   }
 
+
+
+  // Add this new function to get connection status badge
+  const getConnectionStatus = (rowData) => {
+    if (!rowData.last_logged_in) return 'offline';
+    const lastLogin = parseBackendDate(rowData.last_logged_in);
+    if (!lastLogin) return 'offline';
+    
+    const now = new Date();
+    const diffHours = (now - lastLogin) / (1000 * 60 * 60);
+    
+    if (diffHours < 1) return 'online';
+    if (diffHours < 24) return 'recent';
+    return 'offline';
+  };
+
+
+
+
+  // Add this new function for metrics calculation
+  const calculateMetrics = () => {
+    if (!vouchers.length) return { active: 0, expired: 0, used: 0, online: 0 };
+    
+    const active = vouchers.filter(v => v.status === 'active').length;
+    const expired = vouchers.filter(v => v.status === 'expired').length;
+    const used = vouchers.filter(v => v.status === 'used').length;
+    const online = vouchers.filter(v => {
+      const status = getConnectionStatus(v);
+      return status === 'online' && v.status === 'active';
+    }).length;
+    
+    return { active, expired, used, online };
+  };
+
+  const metrics = calculateMetrics();
+
   return (
-    <>
+   <>
+      <SendVoucher  
+        open={openSendVoucher} 
+        setOpen={setOpenSendVoucher}
+        voucher={voucher} 
+        useLimit={useLimit} 
+        expiration={expiration}
+      />
 
-<SendVoucher  open={openSendVoucher} setOpen={setOpenSendVoucher}
+      <VoucherDetails  
+        handleCloseVoucherDetails={handleCloseVoucherDetails}
+        openVoucherDetails={openVoucherDetails} 
+        voucher={voucher}
+        status={status}
+        expiration={expiration}
+        useLimit={useLimit}
+        speed={speed}
+        phone={phone}
+        time_paid={time_paid}
+        payment_method={payment_method}
+        reference={reference}
+        amount={amount}
+        customer={customer}
+        createdAt={createdAt}
+        updatedAt={updatedAt}
+        id={id}
+        isOnline={isOnline}
+        loadingLogout={loadingLogout}
+        logoutUser={logoutUser}
+        loginBy={loginBy}
+      />
 
-voucher={voucher}
-/>
+      <DeleteVoucher  
+        openDelete={openDelete} 
+        handleCloseDelete={handleCloseDelete} 
+        deleteVoucher={deleteVoucher} 
+        id={voucherForm.id} 
+        loading={loading}
+      />
 
-<DeleteVoucher  openDelete={openDelete} handleCloseDelete={handleCloseDelete} 
-deleteVoucher={deleteVoucher} id={voucherForm.id} loading={loading}/>
-
-<Backdrop open={openLoad} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
+      <Backdrop open={openLoad} sx={{ color: '#fff',
+         zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <Lottie className='relative z-50' options={defaultOptions}
+         height={400} width={400} />
       </Backdrop>
 
+      <Toaster />
 
-    <Toaster />
+      <EditVoucher 
+        open={open} 
+        handleClose={handleClose}
+        voucherForm={voucherForm} 
+        createVoucher={createVoucher}
+        setVoucherForm={setVoucherForm}
+        handleChangeVoucher={handleChangeVoucher}
+        editVoucher={editVoucher}
+      />
 
-    <EditVoucher open={open} handleClose={handleClose}
-    voucherForm={voucherForm} createVoucher={createVoucher}
-    setVoucherForm={setVoucherForm}
-    handleChangeVoucher={handleChangeVoucher}
-    editVoucher={editVoucher}
+      <CompensationVoucher 
+        open={openCompensationVoucher}
+        handleClose={handleCloseCompensationVoucher}
+        voucherForm={voucherForm} 
+        createVoucher={createVoucher}
+        setVoucherForm={setVoucherForm}
+        handleChangeVoucher={handleChangeVoucher}
+      />
+      
+       
 
-    />
-
-
-    <CompensationVoucher open={openCompensationVoucher}
-    handleClose={handleCloseCompensationVoucher}
-    
-     voucherForm={voucherForm} createVoucher={createVoucher}
-    setVoucherForm={setVoucherForm}
-    handleChangeVoucher={handleChangeVoucher}
-    />
-    <div>
-
-
-         
-<div className="flex items-center max-w-sm mx-auto p-3">  
-     
-    <label htmlFor="simple-search" className="sr-only">Search</label>
-    <div className="relative w-full">
-        <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-            {/* <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-             xmlns="http://www.w3.org/2000/svg"
-             fill="none" viewBox="0 0 18 20">
-                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-                 strokeWidth="2" d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"/>
-            </svg> */}
-            <IoIosQrScanner className='text-black'/>
-            
+        <div className="flex flex-col md:flex-row gap-4 items-center
+         justify-between p-4 bg-white dark:bg-gray-800 rounded-xl 
+         shadow-sm border
+          border-gray-200 dark:border-gray-700 mb-4">
+          <div className="flex-1 w-full md:w-auto">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex
+               items-center pointer-events-none">
+                <IoIosQrScanner className='text-gray-400' />
+              </div>
+              <input 
+                type="text" 
+                value={search} 
+                onChange={(e)=> setSearch(e.target.value)}
+                className="pl-10 w-full bg-gray-50 border border-gray-300 
+                  text-gray-900 text-sm rounded-lg focus:ring-green-500
+                   focus:border-green-500 
+                  p-2.5 dark:bg-gray-700 dark:border-gray-600
+                   dark:placeholder-gray-400 
+                  dark:text-white dark:focus:ring-green-500
+                   dark:focus:border-green-500" 
+                placeholder="Search vouchers by status, phone, IP..." 
+              />
+              {isSearching && (
+                <div className="absolute inset-y-0 right-0 pr-3
+                 flex items-center">
+                  <RefreshCw className="animate-spin
+                   text-blue-500 w-4 h-4" />
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setOpenCompensationVoucher(true)}
+              className="flex items-center gap-2 bg-gradient-to-r
+               from-green-500 to-emerald-600
+                text-white px-4 py-2.5 rounded-lg hover:from-green-600 hover:to-emerald-700
+                transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+              <FaHands className="text-white text-lg" />
+              <span className="text-sm font-medium">Compensate</span>
+            </button>
+          </div>
         </div>
 
-
-        <input type="text" value={search} onChange={(e)=> setSearch(e.target.value)}
-         className="bg-gray-50 border border-gray-300 text-gray-900 
-        text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full ps-10 p-2.5 
-          dark:border-gray-600 dark:placeholder-gray-400 dark:text-black
-          dark:focus:ring-green-500 dark:focus:border-green-500" placeholder="Search for vouchers..."  />
-    </div>
-    <button type="" className="p-2.5 ms-2 text-sm font-medium text-white bg-green-700 
-    rounded-lg border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
-     focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-        <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-             strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-        </svg>
-        <span className="sr-only">Search</span>
-    </button>
-</div>   
-
-
-<div style={{ maxWidth: "100%", position: "relative" }}>
-  
-
-  {isSearching ? (
-  
-  <div className="absolute inset-0 flex justify-center cursor-pointer items-center  
-   bg-opacity-70 z-[2] mb-[50rem]">
-      <CircularProgress size={90} color="inherit" className='text-black dark:text-white' /> 
-      
+        {/* Table Container */}
+       <div className="rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+  <div style={{ 
+    maxWidth: "100%", 
+    position: "relative",
+    overflow: 'hidden' 
+  }}>
+    {isSearching && (
+      <div className="absolute inset-0 flex justify-center cursor-pointer items-center  
+        bg-white dark:bg-gray-800 bg-opacity-80 z-[2]">
+        <div className="flex flex-col items-center gap-2">
+          <RefreshCw className='animate-spin text-blue-500 w-8 h-8' />
+          <p className="text-gray-600 dark:text-gray-300">
+            Refreshing vouchers...</p>
+        </div>
       </div>
+    )}
     
-  ) : (
-    <div className='hidden'>
-    <svg
-      className="w-4 h-4"
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 20 20"
-    >
-      <path
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-      />
-    </svg>
-    </div>
-  )} 
-   
-<MaterialTable columns={columns}
-
-title={<p className='bg-gradient-to-r from-green-600 via-blue-400
-         to-cyan-500 bg-clip-text text-transparent text-2xl font-bold'>Hotspot Vouchers </p>}
-onRowClick={handleRowClick}
-data={vouchers}
-
-actions={[
- {
-  icon: ()=> <AddIcon onClick={() => {
-    handleClickOpen()
-     setEditVoucher(false)
-     setVoucherForm('')
-  }}/>,
-    isFreeAction: true,
-    tooltip: 'Add Voucher',
-  
-  
-
- },
-
-{
-  
-
-  icon: ()=>  <button
-  onClick={() => setOpenCompensationVoucher(true)}
-  className='flex text-white gap-2 bg-green-600
-  p-2 rounded-md
-  '> <FaHands  className='text-white text-xl'/>
-  <p className='text-sm'>compensate</p>
-    </button>,
-    isFreeAction: true,
-
-
-
-}
-]}
-options={{
-  sorting: true,
-  pageSizeOptions:[2, 5, 10],
-  // pageSize: 20,
-  paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-selection: true,
-search: false,
-searchAutoFocus: true,
-showSelectAllCheckbox: false,
-showTextRowsSelected: false,
-
-hover: true, 
-paginationType: 'stepped',
-
-
-
-headerStyle:{
-  fontFamily: 'bold',
-  textTransform: 'uppercase'
-  } ,
-  
-  
-  fontFamily: 'mono'
-
-
-}}
-
-
-
-/>
-
-    </div>
-    </div>
+    <MaterialTable 
+      columns={columns}
+      title={
+        <div className="flex items-center gap-2 p-4">
+          <div className="p-2 bg-gradient-to-r from-green-500
+           to-green-500 rounded-lg">
+            <Wifi className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <p className="text-xl font-bold text-gray-800 dark:text-white">
+              Hotspot Vouchers
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {vouchers.length} total vouchers • {metrics.active} active
+            </p>
+          </div>
+        </div>
+      }
+      onRowClick={handleRowClick}
+      data={vouchers}
+      actions={[
+        {
+          icon: () => (
+            <button className="flex items-center gap-2 bg-gradient-to-r
+             from-green-500 to-cyan-500
+              text-white px-4 py-2 rounded-lg 
+               hover:bg-cyan-600
+              transition-all duration-200 shadow-sm hover:shadow-md"
+              onClick={() => {
+                getHotspotVouchers()
+              }}
+            >
+              <RefreshCw className={`${isSpinning ? 'animate-spin' : ''}`} />
+              <span className="text-sm font-medium">Refresh</span>
+            </button>
+          ),
+          isFreeAction: true,
+          tooltip: 'Refresh',
+        },
+        {
+          icon: () => (
+            <button className="flex items-center gap-2 bg-green-500
+            
+              text-white px-4 py-2 rounded-lg 
+               hover:bg-cyan-600
+              "
+              onClick={() => {
+                handleClickOpen()
+                setEditVoucher(false)
+                setVoucherForm({
+                  package: '',
+                  phone: '',  
+                  shared_users: '',
+                  number_of_vouchers: '',
+                })
+              }}
+            >
+              <AddIcon />
+              <span className="text-sm font-medium">Add Voucher</span>
+            </button>
+          ),
+          isFreeAction: true,
+          tooltip: 'Add New Voucher',
+        },
+      ]}
+      localization={{
+        body: {
+          emptyDataSourceMessage: (
+            <div className="flex flex-col items-center
+             justify-center py-12">
+              <Wifi className="w-16 h-16 text-gray-300 mb-4" />
+              <p className="text-gray-500 text-lg font-medium mb-2">
+                No vouchers found
+              </p>
+              <p className="text-gray-400 text-sm">
+                Create your first voucher to get started!
+              </p>
+            </div>
+          )
+        },
+        header: {
+          actions: 'Actions'
+        }
+      }}
+      options={{
+        sorting: true,
+        pageSizeOptions: [10, 25, 50],
+        pageSize: 10,
+        paginationType: 'stepped',
+        exportButton: true,
+        exportAllData: true,
+        selection: false,
+        search: false,
+        searchAutoFocus: true,
+        showSelectAllCheckbox: false,
+        showTextRowsSelected: false,
+        emptyRowsWhenPaging: false,
+        headerStyle: {
+          backgroundColor: '#f8fafc',
+          color: '#1e293b',
+          fontWeight: '600',
+          fontSize: '0.875rem',
+          borderBottom: '2px solid #e2e8f0',
+          padding: '16px',
+        },
+        rowStyle: {
+          '&:hover': {
+            backgroundColor: '#f1f5f9',
+            cursor: 'pointer'
+          }
+        },
+        cellStyle: {
+          padding: '12px 16px',
+        },
+     
+        draggable: false,
+      }}
+      components={{
+        Container: props => (
+          <div 
+            className="rounded-lg overflow-hidden border border-gray-200"
+            style={{ 
+              overflow: 'hidden',
+              height: 'auto'
+            }}
+          >
+            {props.children}
+          </div>
+        )
+      }}
+      style={{
+        overflow: 'hidden', 
+      }}
+    />
+  </div>
+</div>
     </>
   )
 }
 
 export default HotspotSubscriptions
+
 
 
 

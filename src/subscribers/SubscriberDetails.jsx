@@ -1,7 +1,5 @@
 
-import { Box, TextField, Autocomplete, Stack, InputAdornment, Button,
-  DialogContentText,Chip
- } from '@mui/material';
+
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Close, Add } from '@mui/icons-material';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
@@ -28,13 +26,17 @@ import {
   Select,
   MenuItem,
   InputLabel,
+  Box, TextField, Autocomplete, Stack, InputAdornment, Button,
+  DialogContentText,Chip, Snackbar, Alert, LinearProgress
 
 } from '@mui/material';
+
 import { FcInfo } from "react-icons/fc";
 import { CiLocationOn } from "react-icons/ci";
 import { TbWorldLatitude } from "react-icons/tb";
 import { TbWorldLongitude } from "react-icons/tb";
 import {useSearchParams, useNavigate} from 'react-router-dom';
+import { Save as SaveIcon, Delete as DeleteIcon, Warning as WarningIcon } from '@mui/icons-material';
 
 
 
@@ -67,8 +69,10 @@ const SubscriberDetails = ({
 
 
   const {settingsformData, subscriberSettings, setSubscriberSettings,
-    locationInput, setLocationInput, allLocations, setAllLocations, setFormDataSubscriber, formDataSubscriber,
-    handleChangeSubscriber,selectedLocations, setSelectedLocations, editingSubscriber, setEditingSubscriber,
+    locationInput, setLocationInput, allLocations, setAllLocations, 
+    setFormDataSubscriber, formDataSubscriber,
+    handleChangeSubscriber,selectedLocations, setSelectedLocations,
+     editingSubscriber, setEditingSubscriber,
     setTableDataSubscriber, tableDataSubscriber
   } = useApplicationSettings()
   
@@ -84,7 +88,6 @@ const SubscriberDetails = ({
 
   const subscriberId = searchParams.get('id')
 
-//   console.log('subscriberId subscriber details', subscriberId)
 
   const [packageName, setPackageName] = useState([])
   const [routers, setRouters]= useState ([])
@@ -93,11 +96,214 @@ const SubscriberDetails = ({
   const [mikrotik_router, setRouter] = useState(null)
   const [nodes, setNodes] = useState([])
 
+
+
+ // FIX: Use constant draft ID
+  const draftId = useMemo(() => {
+    return subscriberId ? `subscriber_draft_${subscriberId}` : 'subscriber_draft_new';
+  }, [subscriberId]);
+
+
+
+
+  // Draft-related states
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [showDraftSaved, setShowDraftSaved] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [lastSavedTime, setLastSavedTime] = useState(null);
+  const [draftExists, setDraftExists] = useState(false);
+  const [draftLoaded, setDraftLoaded] = useState(false);
+
 const {name, ref_no , ppoe_password,  ppoe_username,  phone_number, email, second_phone_number,
      package_name, installation_fee, subscriber_discount, date_registered, router_name,
      latitude, longitude, house_number, building_name,location,node
     }= formDataSubscriber
 
+
+
+  // Function to save draft
+    // Function to save draft
+  const saveDraftToStorage = useCallback(() => {
+    try {
+      setIsSavingDraft(true);
+      const draftData = {
+        formData: formDataSubscriber,
+        selectedLocations,
+        timestamp: new Date().toISOString(),
+        draftId
+      };
+
+      localStorage.setItem(draftId, JSON.stringify(draftData));
+      setLastSavedTime(new Date());
+      setShowDraftSaved(true);
+      setHasUnsavedChanges(false);
+      setDraftExists(true);
+
+      setTimeout(() => setShowDraftSaved(false), 3000);
+    } catch (error) {
+      console.error('Failed to save draft:', error);
+      toast.error('Failed to save draft', {
+        position: 'top-center',
+        duration: 3000,
+      });
+    } finally {
+      setIsSavingDraft(false);
+    }
+  }, [formDataSubscriber, selectedLocations, draftId]);
+
+
+
+  // Function to load draft
+  const loadDraft = useCallback(() => {
+    try {
+      const savedDraft = localStorage.getItem(draftId);
+      // console.log('Looking for draft with ID:', draftId);
+      // console.log('Found draft:', savedDraft);
+      
+      if (savedDraft) {
+        const { formData, selectedLocations: savedLocations } = JSON.parse(savedDraft);
+        // console.log('Loaded draft data:', formData);
+        
+        // Update form data
+        setFormDataSubscriber(formData);
+        
+        // Update selected locations if they exist
+        if (savedLocations) {
+          setSelectedLocations(savedLocations);
+        }
+        
+        setDraftLoaded(true);
+        setHasUnsavedChanges(true);
+        
+        toast.success('Draft loaded successfully!', {
+          position: 'top-center',
+          duration: 3000,
+        });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Failed to load draft:', error);
+      toast.error('Failed to load draft', {
+        position: 'top-center',
+        duration: 3000,
+      });
+      return false;
+    }
+  }, [draftId]);
+
+
+  // Function to clear draft
+  const clearDraft = () => {
+    if (window.confirm('Are you sure you want to clear all unsaved changes?')) {
+      localStorage.removeItem(draftId);
+      setHasUnsavedChanges(false);
+      setDraftExists(false);
+      setDraftLoaded(false);
+      
+      // Also clear the draft for new subscribers when editing existing
+      if (subscriberId) {
+        localStorage.removeItem('subscriber_draft_new');
+      }
+      
+      toast.success('Draft cleared', {
+        position: 'top-center',
+        duration: 3000,
+      });
+    }
+  };
+
+
+  // Auto-save effect (debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (hasUnsavedChanges) {
+        saveDraftToStorage();
+      }
+    }, 6000);
+
+    return () => clearTimeout(timer);
+  }, [formDataSubscriber, selectedLocations, hasUnsavedChanges, saveDraftToStorage]);
+
+  
+
+// Check for unsaved changes when component unmounts
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+
+
+
+    const checkDraftExists = useCallback(() => {
+    const exists = localStorage.getItem(draftId) !== null;
+    setDraftExists(exists);
+    return exists;
+  }, [draftId]);
+
+
+  // Check for draft on mount
+  useEffect(() => {
+    checkDraftExists();
+  }, [checkDraftExists]);
+
+  // Load draft on mount if exists (for new subscribers only)
+  useEffect(() => {
+    // if (!subscriberId && !draftLoaded) {
+      const exists = checkDraftExists();
+    //    loadDraft();
+    //   if (exists) {
+    //     const shouldLoad = window.confirm('You have an unsaved draft. Would you like to continue where you left off?');
+    //     if (shouldLoad) {
+    //       loadDraft();
+    //     }
+    //   }
+
+    // }
+
+    if (exists) {
+ loadDraft();
+    }
+   
+  }, [loadDraft, checkDraftExists]);
+
+
+
+
+
+
+  // Check for draft when component mounts
+  useEffect(() => {
+    const checkDraft = () => {
+      const keys = Object.keys(localStorage);
+      const subscriberDrafts = keys.filter(key => key.startsWith('subscriber_draft_'));
+      if (subscriberDrafts.length > 0) {
+      }
+    };
+    checkDraft();
+  }, []);
+
+
+
+
+  // For debugging: Log all drafts in localStorage
+  useEffect(() => {
+    // console.log('All drafts in localStorage:');
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.includes('subscriber_draft')) {
+        // console.log(`Draft key: ${key}`);
+      }
+    });
+  }, []);
 
 const handleGetLocationPageload = () => {
     if (navigator.geolocation) {
@@ -113,11 +319,11 @@ const handleGetLocationPageload = () => {
           
         },
         (err) => {
-          console.log(`Error getting location: ${err.message}`);
+          // console.log(`Error getting location: ${err.message}`);
         }
       );
     } else {
-      console.log("Geolocation is not supported by this browser.");
+      // console.log("Geolocation is not supported by this browser.");
     }
   };
 
@@ -163,6 +369,7 @@ const handleGetLocationPageload = () => {
     const handleChangeBuildingNameAndHouseNumber =(e)=> {
     const {value, name} = e.target 
     setFormDataSubscriber({...formDataSubscriber, [name]:  value})
+     setHasUnsavedChanges(true);
 
   }
 
@@ -170,13 +377,13 @@ const handleGetLocationPageload = () => {
       const handleEmailChange =(e)=> {
         const {value, name} = e.target 
         setFormDataSubscriber({...formDataSubscriber, [name]:  value})
-        console.log('my date',email)
+         setHasUnsavedChanges(true);
 
       }
       const handleLatitudeLongitudeChange =(e)=> {
         const {value, name} = e.target 
         setFormDataSubscriber({...formDataSubscriber, [name]:  value})
-        console.log('latitude, long',value)
+          setHasUnsavedChanges(true);
 
       }
 
@@ -271,10 +478,10 @@ const subdomain = window.location.hostname.split('.')[0];
   })  
         }
       } catch (error) {
-        toast.error('failed to fetch subscriber settings server error', {
-          position: "top-center",
-          duration: 2000,
-        })  
+        // toast.error('failed to fetch subscriber settings server error', {
+        //   position: "top-center",
+        //   duration: 2000,
+        // })  
       }
     },
     [],
@@ -333,11 +540,12 @@ const handleChangeName = (e) => {
   const {value} = e.target
   const capitalLetter = capitalizeName(value)
   setFormDataSubscriber({...formDataSubscriber,  name:  capitalLetter})
+    setHasUnsavedChanges(true);
 }
 
   const handleChangeDate = (date)=> {
     setFormDataSubscriber({...formDataSubscriber, date_registered: date})
-    console.log('my date',date_registered)
+     setHasUnsavedChanges(true);
   }
 
 
@@ -349,8 +557,9 @@ const handleChangeName = (e) => {
 
       const formattedValue = convertToKenyanFormat(value);
       setFormDataSubscriber({ ...formDataSubscriber, phone_number: formattedValue })
-     
+     setHasUnsavedChanges(true); 
     }
+    
    
   };
 
@@ -364,6 +573,7 @@ const handleChangeName = (e) => {
     if (value.length <= 13) {
       const formattedValue = convertToKenyanFormat2(value);
       setFormDataSubscriber({ ...formDataSubscriber, second_phone_number: formattedValue });
+      setHasUnsavedChanges(true);
     }
 
     }
@@ -403,6 +613,7 @@ const handleChangeName = (e) => {
             setSelectedLocations(prev => [...prev, newLocation]);
             // Clear input
             setLocationInput('');
+             setHasUnsavedChanges(true);
         }
         setNewLocationDialogOpen(false);
     };
@@ -440,24 +651,24 @@ const getSubscriber = useCallback(
             const data = await response.json()
             console.log('data from get subscriber', data)
             const {name, id} = data
-            setSubscriberName(name)
-            setFormDataSubscriber({
-                name,
-                id,
-                ref_no: data.ref_no,
-                ppoe_username: data.ppoe_username,
-                ppoe_password: data.ppoe_password,
-                house_number: data.house_number,
-                building_name: data.building_name,
-                latitude: data.latitude,
-                longitude: data.longitude,
-                email: data.email,
-                phone_number: data.phone_number,
-                package_name: data.package_name,
-                registration_date: data.registration_date,
-                node: data.node,
-                location: data.location,
-            })
+            // setSubscriberName(name)
+            // setFormDataSubscriber({
+            //     name,
+            //     id,
+            //     ref_no: data.ref_no,
+            //     ppoe_username: data.ppoe_username,
+            //     ppoe_password: data.ppoe_password,
+            //     house_number: data.house_number,
+            //     building_name: data.building_name,
+            //     latitude: data.latitude,
+            //     longitude: data.longitude,
+            //     email: data.email,
+            //     phone_number: data.phone_number,
+            //     package_name: data.package_name,
+            //     registration_date: data.registration_date,
+            //     node: data.node,
+            //     location: data.location,
+            // })
             
         } else {
             
@@ -522,7 +733,10 @@ e.preventDefault()
 
 if (response.ok) {
   
- 
+    localStorage.removeItem(draftId);
+        setHasUnsavedChanges(false);
+        setDraftExists(false);
+        setDraftLoaded(false);
   setloading(false)
 
 
@@ -570,7 +784,7 @@ if (formDataSubscriber.id) {
         'Failed to create subscriber',
         {
           position: 'top-center',
-          duration: 4000,
+          duration: 3000,
         }
       )
     }
@@ -580,12 +794,85 @@ if (formDataSubscriber.id) {
   return (
       <>
      <Toaster />
+         {hasUnsavedChanges && (
+        <div className="fixed top-4 right-4 z-50 max-w-md">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-yellow-50 border border-yellow-200 rounded-lg shadow-lg p-3"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <WarningIcon className="text-yellow-600" />
+                <span className="text-sm font-medium text-yellow-800">
+                  You have unsaved changes
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="small"
+                  startIcon={<SaveIcon />}
+                  onClick={saveDraftToStorage}
+                  disabled={isSavingDraft}
+                  variant="outlined"
+                  className="text-xs"
+                >
+                  {isSavingDraft ? 'Saving...' : 'Save Draft'}
+                </Button>
+                <Button
+                  size="small"
+                  startIcon={<DeleteIcon />}
+                  onClick={clearDraft}
+                  variant="outlined"
+                  color="error"
+                  className="text-xs"
+                >
+                  Clear
+                </Button>
+              </div>
+            </div>
+            {isSavingDraft && (
+              <LinearProgress className="mt-2" />
+            )}
+          </motion.div>
+        </div>
+      )}
+
+      {/* Draft Saved Notification */}
+      <Snackbar
+        open={showDraftSaved}
+        autoHideDuration={3000}
+        onClose={() => setShowDraftSaved(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert severity="success" onClose={() => setShowDraftSaved(false)}>
+          Draft saved successfully!
+          {lastSavedTime && (
+            <span className="text-xs block mt-1">
+              Last saved: {lastSavedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          )}
+        </Alert>
+      </Snackbar>
+
+
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="relative w-full md:mx-auto md:max-w-4xl p-4"
       >
+        {draftLoaded && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center gap-2">
+              <SaveIcon className="text-green-600" />
+              <span className="text-sm font-medium text-green-800">
+                Loaded from draft
+              </span>
+            </div>
+          </div>
+        )}
         <form onSubmit={createSubscriber}>
           {/* Name and User Group */}
           <div className="mb-3">
@@ -722,14 +1009,6 @@ if (formDataSubscriber.id) {
                 },
               }}
             >
-{/*             
-              <DatePicker
-                className='myTextField'
-                value={date_registered}
-                onChange={(date) => handleChangeDate(date)}
-                label="Date Registered"
-                renderInput={(params) => <TextField {...params} fullWidth sx={{ mb: 2 }} />}
-              /> */}
 
 
 
@@ -934,7 +1213,8 @@ rounded-md mt-4 cursor-pointer'>
             >
              
 
-                <InputLabel>Nodes</InputLabel>
+
+                {/* <InputLabel>Nodes</InputLabel>
                <Autocomplete
   fullWidth
   id="node-autocomplete"
@@ -979,10 +1259,9 @@ rounded-md mt-4 cursor-pointer'>
       fontSize: '18px'
     }
   }}
-/>
+/> */}
 
              
-              {/* {position && ( */}
                 <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
                   
                    <TextField

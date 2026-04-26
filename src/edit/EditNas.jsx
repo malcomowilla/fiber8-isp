@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -10,8 +11,12 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { motion,} from 'framer-motion';
 import {
-
   InputAdornment,
+   Select,
+  MenuItem,
+  InputLabel,
+  Autocomplete,Button,
+  DialogContentText,Chip
  
 } from '@mui/material';
 
@@ -21,14 +26,53 @@ import { TbLockPassword } from "react-icons/tb";
 import { FaUserEdit } from "react-icons/fa";
 
 
+
 function EditNas({ open, handleClose, handleSubmit, nasformData, setnasFormData, isloading , editingRouter}) {
   const { name, username, ip_address, password } = nasformData;
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState('lg');
+    const [nodes, setNodes] = useState([])
+
 
   const onChange = (e) => {
     setnasFormData({ ...nasformData, [e.target.id]: e.target.value });
   };
+
+
+
+
+
+const subdomain = window.location.hostname.split('.')[0];
+
+
+ const getNodes = useCallback(
+    async() => {
+     
+      
+      try {
+        const response = await fetch('/api/nodes', {
+          headers: { 'X-Subdomain': subdomain },
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setNodes(data)
+          
+        } else {
+          
+
+        }
+      } catch (error) {
+        
+      }
+    },
+    [],
+  )
+  
+
+  useEffect(() => {
+    getNodes()
+   
+  }, [getNodes]);
 
   return (
     <React.Fragment>
@@ -137,6 +181,57 @@ InputProps={{
                   />
                 </motion.div>
 
+
+
+               <Autocomplete
+  fullWidth
+  id="node-autocomplete"
+  options={nodes}
+  getOptionLabel={(option) => option.name}
+  value={nodes.find(n => n.name === nasformData.location) || null}
+  onChange={(event, newValue) => {
+    console.log('Selected node:', newValue);
+    // setFormDataSubscriber(prev => ({ 
+    //   ...prev, 
+    //   node: newValue?.name || '' 
+    // }));
+
+    setnasFormData({...nasformData, location: newValue?.name || ''})
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Location"
+      variant="outlined"
+      InputProps={{
+        ...params.InputProps,
+        className: 'myTextField',
+      }}
+    />
+  )}
+  renderOption={(props, option) => (
+    <li {...props} key={option.id}>
+      <p className='text-black'>{option.name}</p>
+    </li>
+  )}
+  sx={{
+    '& .MuiAutocomplete-inputRoot': {
+      padding: '8px 14px',
+    },
+    '& .MuiOutlinedInput-root': {
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: 'black',
+        borderWidth: '2px'
+      }
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: 'black',
+      fontSize: '18px'
+    }
+  }}
+/>
+
+
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -158,6 +253,7 @@ InputProps={{
                     className="myTextField"
                     id="password"
                     value={password}
+                    type='password'
                     onChange={onChange}
                     label= { <p className='dark:text-black text-black'>Nas Password</p>}
                     fullWidth

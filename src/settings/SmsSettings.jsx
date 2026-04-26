@@ -51,7 +51,7 @@ const SmsSettings = () => {
 const {isloading, setisloading, selectedProvider, setSelectedProvider,
   smsSettingsForm, setSmsSettingsForm,
   smsBalance, setSmsBalance,
-  providerSms, setProviderSms
+  providerSms, setProviderSms,
 } = useApplicationSettings()
 const [open, setOpen] = useState(false);
 const [openNotifactionSettings, setOpenSettings] = useState(false)
@@ -83,7 +83,7 @@ setSmsTemplates((prevData) => (
 
 const subdomain = window.location.hostname.split('.')[0]
 
-const {api_key, api_secret, sender_id, short_code, partnerID} = smsSettingsForm
+const {api_key, api_secret, sender_id, short_code, partnerID, username} = smsSettingsForm
 
 const {send_voucher_template, voucher_template} = smsTemplates
 
@@ -127,7 +127,6 @@ if (response.status === 401) {
        
       }
     } catch (error) {
-      console.log(error)
     }
   },
   [],
@@ -157,18 +156,16 @@ useEffect(() => {
           })
         }
         if(response.ok){
-console.log('sms balance', newData)
 setSmsBalance(newData.message)
         }else{
           toast.error('failed to fetch sms balance', {
             duration: 3000,
             position: 'top-center',
           })
-            console.log('failed to fetch sms balance')
         }
       } catch (error) {
-        toast.error('internal server error something went wrong with geting sms balance', {
-          duration: 4000,
+        toast.error('Something went wrong with geting sms balance, Please retry in a moment', {
+          duration: 3000,
           position: 'top-center',
         })
       }
@@ -260,13 +257,11 @@ const fetchSavedSmsSettings = useCallback(
       const newData = data.length > 0 
         ? data.reduce((latest, item) => new Date(item.sms_setting_updated_at) > new Date(latest.sms_setting_updated_at) ? item : latest, data[0])
         : null;
-        console.log('newdata updated at', newData)
   
       if (response.ok) {
-        console.log('Fetched saved  SMS settings:', newData);
-        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID } = newData;
+        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID, username } = newData;
         setSmsSettingId(newData.id)
-        setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID });
+        setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID, username });
         setSelectedProvider(sms_provider);
         // setSelectedProvider(newData[0].sms_provider);
       } else {
@@ -288,13 +283,13 @@ if (response.status === 401) {
           window.location.href='/signin'
          }, 1900);
 }
-        toast.error(newData.error || 'Failed to fetch SMS settings', {
+        toast.error( 'Failed to fetch SMS settings', {
           duration: 3000,
           position: 'top-center',
         });
       }
     } catch (error) {
-      toast.error('Internal server error: Something went wrong with fetching SMS settings', {
+      toast.error('Something went wrong with fetching SMS settings, Please retry in a moment', {
         duration: 3000,
         position: 'top-center',
       });
@@ -337,7 +332,8 @@ const fetchSmsSettings = useCallback(async () => {
           api_secret: '', 
           sender_id: '', 
           short_code: '' ,
-          partnerID: ''
+          partnerID: '',
+          username: ''
         });
       
         // setSelectedProvider('');
@@ -359,16 +355,16 @@ if (response.status === 401) {
           window.location.href='/signin'
          }, 1900);
 }
-        console.log('Fetched SMS settings:', newData);
       
-        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID } = newData;
+        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID,username  } = newData;
       
         setSmsSettingsForm({ 
           api_key: api_key || '', 
           api_secret: api_secret || '', 
           sender_id: sender_id || '', 
           short_code: short_code || '' ,
-          partnerID: partnerID || ''
+          partnerID: partnerID || '',
+          username: username || ''
         });
       
         // setSelectedProvider(sms_provider || '');
@@ -380,7 +376,7 @@ if (response.status === 401) {
       });
     }
   } catch (error) {
-    toast.error('Internal server error: Something went wrong with fetching SMS settings', {
+    toast.error('Something went wrong with fetching SMS settings, Please retry in a moment', {
       duration: 3000,
       position: 'top-center',
     });
@@ -424,7 +420,8 @@ const saveSmsSettings = async (e) => {
         sender_id: sender_id,
         short_code: short_code,
         sms_provider: selectedProvider,
-        partnerID: partnerID
+        partnerID: partnerID,
+        username: username
       }),
     });
 
@@ -442,12 +439,12 @@ const saveSmsSettings = async (e) => {
   }
     if (response.ok) {
       setisloading(false);
-      const {api_key, api_secret, sender_id, short_code, partnerID} = newData 
+      const {api_key, api_secret, sender_id, short_code, partnerID, username} = newData 
       setSelectedProvider(newData.sms_provider)
-      setSmsSettingsForm({...smsSettingsForm, api_key,api_secret,sender_id,short_code, partnerID})
+      setSmsSettingsForm({...smsSettingsForm, api_key,api_secret,
+        sender_id,short_code, partnerID, username})
       setOpenSettings(true);
       setOpen(false);
-      console.log('SMS settings saved:', newData);
       toast.success('SMS settings saved successfully', {
         duration: 3000,
         position: 'top-center',
@@ -482,8 +479,8 @@ if (response.status === 401) {
     setisloading(false);
     setOpenSettings(false);
     setOpen(false);
-    toast.error('Internal server error: Something went wrong with saving SMS settings', {
-      duration: 6000,
+    toast.error('Something went wrong with saving SMS settings, Please retry in a moment', {
+      duration: 2000,
       position: 'top-center',
     });
   }
@@ -551,8 +548,8 @@ if (response.status === 401) {
         })
       }
     } catch (error) {
-      toast.error('Internal server error: Something went wrong with fetching SMS templates', {
-        duration: 4000,
+      toast.error('Something went wrong with fetching SMS templates, Please retry in a moment', {
+        duration: 2000,
         position: 'top-center',
       });
     }
@@ -607,15 +604,15 @@ try {
   } else {
    
     toast.error('Error Saving SMS Templates', {
-      duration: 4000,
+      duration: 3000,
       position: 'top-center',
     })
   }
 } catch (error) {
   toast.error(
-    'Error Saving SMS Templates server error',
+    'Error Saving SMS Templates, Please retry in a moment',
     {
-      duration: 4000,
+      duration: 3000,
       position: 'top-center',
     }
   )
@@ -625,8 +622,6 @@ try {
 
  }
 
-
-console.log('selected provider',selectedProvider)
 
   return (
     <>
@@ -742,13 +737,13 @@ console.log('selected provider',selectedProvider)
   renderInput={(params) => (
     <TextField
       {...params}
-      label={ <p className=''> Provider </p>}
+      label={ <p className='text-xl'> Provider </p>}
       variant="outlined"
       sx={{
         width: '80ch',
         '& label.Mui-focused': {
           color: 'black',
-          fontSize: '23px'
+          fontSize: '10px'
         },
         '& .MuiOutlinedInput-root': {
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
@@ -835,6 +830,8 @@ value={api_key} onChange={handleChange} name='api_key'>
 
 </TextField>
 
+
+{/* selectedProvider === 'Africastalking' */}
 {selectedProvider === 'TextSms' ?   
    <TextField label='Partner Id'
    InputProps={{
@@ -844,7 +841,13 @@ value={api_key} onChange={handleChange} name='api_key'>
 
 </TextField>:  
 
+
+
+// Africastalking
 <>
+
+{selectedProvider === 'SMS leopard' && (
+
 
 <TextField label='API secret' 
 InputProps={{
@@ -854,6 +857,22 @@ InputProps={{
 value={api_secret} onChange={handleChange}  name='api_secret'> 
 
 </TextField>
+)}
+
+
+{selectedProvider === 'Africastalking' && (
+
+
+<TextField label='Username' 
+InputProps={{
+  startAdornment: <LiaUserSecretSolid className='mr-3 w-5 h-5' />,
+}}
+
+value={username} onChange={handleChange}  name='username'> 
+
+</TextField>
+)}
+
 
         
 <TextField label='Short Code' value={short_code} 

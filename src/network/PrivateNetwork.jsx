@@ -25,7 +25,8 @@ import CloudIcon from '@mui/icons-material/Cloud';
 import WarningIcon from '@mui/icons-material/Warning';
 import toast, { Toaster } from 'react-hot-toast';
 import { useApplicationSettings } from '../settings/ApplicationSettings';
-
+import { IoInformationCircleOutline } from "react-icons/io5";
+import {RefreshCw} from 'lucide-react';
 
 
 
@@ -44,11 +45,13 @@ const PrivateNetwork = () => {
   const [nas, setNas] = useState([]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadButton, setLoadButton] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'success'
   });
+  const [loadRefresh, setLoadRefresh] = useState(false);
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [networkToDelete, setNetworkToDelete] = useState(null);
@@ -132,6 +135,97 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
     }
   };
 
+
+
+
+
+
+
+
+
+
+
+  const refreshNetwork = async (e) => {
+    setLoading(true);
+setLoadRefresh(true);
+e.preventDefault();
+
+    try {
+      const response = await fetch('/api/wireguard_peers', {
+        headers: { 'X-Subdomain': subdomain }
+      });
+      const result = await response.json();
+      if (response.status === 401) {
+
+  toast.error(response.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
+      if (response.ok) {
+        
+        setData(result);
+        setLoadRefresh(false)
+        toast.success('IP networks refreshed successfully', {
+          position: "top-center",
+          duration: 5000,
+        });
+      } else {
+        
+
+        toast.error('Failed to refresh IP networks', {
+          position: "top-center",
+          duration: 5000,
+        });
+         setLoadRefresh(false)
+        if (response.status === 401) {
+  toast.error(result.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
+
+
+        if (response.status === 401) {
+  toast.error(result.error, {
+    position: "top-center",
+    duration: 4000,
+  })
+   setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/signin'
+         }, 1900);
+}
+        if (response.status === 402) {
+        setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 1800);
+        
+      }
+
+        throw new Error('Failed to fetch IP networks');
+      }
+    } catch (error) {
+       setLoadRefresh(false)
+      showSnackbar(error.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
+
+
   const fetchNasRouters = async () => {
     try {
       const response = await fetch('/api/routers', {
@@ -199,6 +293,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
   const handleSubmit = async () => {
     try {
       setLoading(true);
+      setLoadButton(true)
       const url = editing ? `/api/wireguard_peers/${currentNetwork.id}` : '/api/wireguard_peers';
       const method = editing ? 'PUT' : 'POST';
 
@@ -221,9 +316,12 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.errors?.join(', ') || 'Request failed');
-      }
+        setLoadButton(false)
 
+        throw new Error(errorData.errors?.join(', ') || 'Request failed');
+        
+      }
+setLoadButton(false)
       showSnackbar(
         editing ? 'Network updated successfully' : 'Network created successfully'
       );
@@ -231,8 +329,12 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       setOpenDialog(false);
     } catch (error) {
       showSnackbar(error.message, 'error');
+      setLoadButton(false)
+
     } finally {
       setLoading(false);
+      setLoadButton(false)
+
     }
   };
 
@@ -311,6 +413,13 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
   return (
     <>
     <Toaster />
+
+     <div role="alert" className="alert alert-info bg-green-500 rounded-lg w-fit
+          p-2 flex items-center gap-2 justify-center mb-3">
+ <IoInformationCircleOutline className='text-white text-xl '/>
+  <span className='text-white'>connect your private subnets
+     eg 10.0.0.0/24 to connect to tr069 for onu management</span>
+</div>
     <div 
     onClick={() =>{
       setShowMenu1(false)
@@ -344,6 +453,8 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       }}
        variant="h4" gutterBottom sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
         <CloudIcon sx={{ mr: 2, color: 'success.main' }} />
+
+
         <p className='roboto-condensed   bg-gradient-to-r from-green-600 via-blue-400 to-cyan-500 bg-clip-text
   
   text-transparent font-bold '>Private Routes Management </p>
@@ -352,10 +463,11 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       <MaterialTable
         title=""
         columns={[
-          { title: <p className='text-sm text-black'>AllowedIps</p>, field: 'allowed_ips' },
-          { title: <p className='text-sm text-black'>Private IP </p>, field: 'private_ip' 
+          { title: <p className='text-sm text-black'>VPN Client Ip</p>, field: 'allowed_ips' },
+          { title: <p className='text-sm text-black'>Connected Subnets </p>, field: 'private_ip' 
           },
 
+          { title: <p className='text-sm text-black'>Status</p>, field: 'status' },
         ]}
         data={data}
         isLoading={loading}
@@ -372,6 +484,25 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
             isFreeAction: true,
             onClick: handleOpenAddDialog
           },
+
+          {
+              icon: () => (
+                <Tooltip title="Refresh For Latest Data">
+<button className=' bg-blue-500 text-white  flex
+            justify-center items-center gap-2
+            p-2
+            rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2  focus:ring-blue-500'>
+              Refresh
+                <RefreshCw className={`${loadRefresh ? 'animate-spin text-white w-4 h-4 mx-auto ' : 'text-white w-5 h-5'}`} />
+
+</button>
+                </Tooltip>
+
+              ),
+              isFreeAction: true,
+              onClick: refreshNetwork
+          },
+
           {
             icon: () => <EditIcon color="primary" />,
             tooltip: 'Edit Network',
@@ -384,16 +515,38 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
             onClick: (event, rowData) => handleDeleteClick(rowData.id)
           }
         ]}
-        options={{
-          actionsColumnIndex: -1,
-          pageSize: 10,
-          pageSizeOptions: [10],
-          showTitle: false,
-          headerStyle: {
-            backgroundColor: '#f5f5f5',
-            fontWeight: 'bold'
-          }
-        }}
+       
+localization={{
+                body: {
+                  emptyDataSourceMessage: 'No private networks found. Create your first private network to get started!'
+                },
+               
+              
+              
+              }}
+
+options={{
+  sorting: true,
+  actionsColumnIndex: -1,
+  pageSizeOptions:[2, 5, 10],
+  pageSize: 10,
+
+  
+exportButton: true,
+exportAllData: true,
+
+
+  emptyRowsWhenPaging: false,
+
+
+headerStyle:{
+  fontFamily: 'bold',
+  textTransform: 'uppercase'
+  } ,
+  
+  
+  fontFamily: 'mono'
+}}
       />
 
 
@@ -434,7 +587,8 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
 
 
       {/* Add/Edit Dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+      <Dialog open={openDialog} onClose={handleCloseDialog}
+       maxWidth="sm" fullWidth>
         <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>
           {editing ? 'Edit Private Network' : 'Add Private Network'}
         </DialogTitle>
@@ -463,7 +617,7 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
                 value={formData.private_ip}
                 onChange={handleInputChange}
                 placeholder="e.g., 10.0.0.1"
-                required
+                // required
               />
             </Grid>
             {/* <Grid item xs={12} sm={6}>
@@ -526,15 +680,19 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
           </Grid>
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>
-          <Button onClick={handleCloseDialog} variant="outlined" color="secondary">
+          <Button onClick={handleCloseDialog} variant="outlined"
+           color="secondary">
             Cancel
           </Button>
+
+{/* !formData.private_ip */}
+
           <Button 
             onClick={handleSubmit} 
             variant="contained" 
             color="primary"
-            disabled={loading || !formData.private_ip}
-            startIcon={loading && <CircularProgress size={20} />}
+            disabled={loadButton}
+            startIcon={loadButton && <CircularProgress size={20} />}
           >
             {editing ? 'Update' : 'Create'}
           </Button>

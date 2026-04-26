@@ -87,7 +87,6 @@ const handleAddClient = () => setAddClient(true);
         toast.error('Failed to fetch plans');
       }
     } catch (error) {
-      console.error('Error fetching plans:', error);
       toast.error('Error loading plans');
     }
   };
@@ -120,7 +119,6 @@ const handleAddClient = () => setAddClient(true);
         toast.error('Failed to fetch plans');
       }
     } catch (error) {
-      console.error('Error fetching plans:', error);
       toast.error('Error loading plans');
     }
   };
@@ -145,7 +143,6 @@ const handleAddClient = () => setAddClient(true);
         toast.error('Failed to fetch clients');
       }
     } catch (error) {
-      console.error('Error fetching clients:', error);
       toast.error('Error loading clients');
     } finally {
       setFetchingClients(false);
@@ -325,7 +322,6 @@ const handleAddClient = () => setAddClient(true);
         });
       }
     } catch (error) {
-      console.error('Error inviting client:', error);
       toaster.error('Something went wrong, please try again', {
         duration: 5000,
         position: 'top-center',
@@ -356,7 +352,6 @@ const handleAddClient = () => setAddClient(true);
   const handleRowClick = (event, rowData) => {
     setFormData(rowData);
 
-    console.log('rowData=>', rowData);
   };
 
   
@@ -380,7 +375,6 @@ const handleAddClient = () => setAddClient(true);
         });
       } else {
         setIsOpenDelete(false);
-        console.log('failed to delete');
         setLoading(false);
         toaster.error('Failed to delete client', {
           duration: 5000,
@@ -395,7 +389,6 @@ const handleAddClient = () => setAddClient(true);
         });
       }
     } catch (error) {
-      console.log(error);
       setIsOpenDelete(false);
       toaster.error('Failed to delete client', {
         duration: 5000,
@@ -432,12 +425,9 @@ const getCurreentHotspotPlan = useCallback(
 
       if (response.ok) {
         setCurrentHotspotPlan(data.hotspot_plans);
-          console.log('current plan', data.current_hotspot_plan);
       } else {
-          console.log('Error fetching current plan');
       }
   } catch (error) {
-      console.log('Error fetching current plan');
   }
   },
   
@@ -467,12 +457,9 @@ const getCurrentPlan = useCallback(
 
         if (response.ok) {
             setCurrentPlan(data.ppoe_plans);
-            console.log('current plan', data.current_plan);
         } else {
-            console.log('Error fetching current plan');
         }
     } catch (error) {
-        console.log('Error fetching current plan');
     }
   },
   [],

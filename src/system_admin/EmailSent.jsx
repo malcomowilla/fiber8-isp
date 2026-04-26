@@ -76,7 +76,6 @@ const EmailSent = () => {
         if (users.ok) {
           // const actualUserDataInJson = await users.json
           setloading(false)
-        console.log(actualUserDataInJson)
         navigate('/system-admin-dashboard')
         // setTimeout(() => {
         //   setDone(true);
@@ -95,7 +94,6 @@ const EmailSent = () => {
       
         } else {
             setloading(false)
-            console.log('sigup  failed')
             // setopenOtpInvalid(true)
               toaster.error('invalid one time password,try again', {
                 duration: 6000,
@@ -110,7 +108,6 @@ const EmailSent = () => {
           duration: 6000,
           position: 'top-center',
         })
-        console.error(error);
         setloading(false)
       }
       }

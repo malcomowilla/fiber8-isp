@@ -1,41 +1,30 @@
-import { RiErrorWarningLine, RiDownloadLine } from "react-icons/ri";
+import { RiErrorWarningLine, RiDownloadLine, RiCheckLine } from "react-icons/ri";
 import { APP_VERSION, APP_NAME, APP_DESCRIPTION } from '../version';
 import { motion } from 'framer-motion';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { PiRecycleFill } from "react-icons/pi";
-
 import ChangeLog from './ChangeLog';
-
-
-
-
 
 const Updates = () => {
   const [showUpdate, setShowUpdate] = useState(false);
   const [storedVersion, setStoredVersion] = useState('');
-      const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [changelogs, setChangelogs] = useState([]);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const progressIntervalRef = useRef(null);
 
-
-
-  const getChangelogs = useCallback(
-    async() => {
-      const response = await fetch('/api/change_logs');
-      if (response.ok) {
-        const data = await response.json();
-        setChangelogs(data);
-      }
-    },
-    [],
-  )
-  
-
+  const getChangelogs = useCallback(async () => {
+    const response = await fetch('/api/change_logs');
+    if (response.ok) {
+      const data = await response.json();
+      setChangelogs(data);
+    }
+  }, []);
 
   useEffect(() => {
     getChangelogs();
-   
   }, [getChangelogs]);
-
 
   const releaseDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
@@ -44,105 +33,181 @@ const Updates = () => {
   });
 
   useEffect(() => {
-    // Check localStorage for previous version
     const lastSeenVersion = localStorage.getItem('lastSeenVersion');
     
     if (lastSeenVersion) {
       setStoredVersion(lastSeenVersion);
-      // Compare versions (simple string comparison works for semantic versioning)
       if (lastSeenVersion !== APP_VERSION) {
         setShowUpdate(true);
       }
     } else {
-      // First time visit or no version stored
       localStorage.setItem('lastSeenVersion', APP_VERSION);
       setStoredVersion(APP_VERSION);
     }
   }, []);
 
   const handleUpdate = () => {
-    // Update the stored version and hide the component
-    localStorage.setItem('lastSeenVersion', APP_VERSION);
-    setShowUpdate(false);
-    window.location.reload();
+    setIsUpdating(true);
+    setProgress(0);
+    
+    // Clear existing interval
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+    }
+
+    // Simulate progress
+    progressIntervalRef.current = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(progressIntervalRef.current);
+          // Update version and reload
+          setTimeout(() => {
+            localStorage.setItem('lastSeenVersion', APP_VERSION);
+            window.location.reload();
+          }, 500);
+          return 100;
+        }
+        return prev + Math.random() * 20;
+      });
+    }, 200);
   };
+
+  const cancelUpdate = () => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+    }
+    setIsUpdating(false);
+    setProgress(0);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+    };
+  }, []);
 
   if (!showUpdate) return null;
 
   return (
     <>
-
-    <ChangeLog  open={open} setOpen={setOpen}  changelogs={changelogs} />
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="max-w-md mx-auto bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg overflow-hidden mb-4"
-    >
-      <div className="p-6">
-        <div className="flex items-start gap-4">
-          <div className="flex-shrink-0">
-            <div className="relative">
-              <RiErrorWarningLine className="text-3xl text-yellow-500 animate-pulse" />
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>
+      <ChangeLog open={open} setOpen={setOpen} changelogs={changelogs} />
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-md mx-auto bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg overflow-hidden mb-4"
+      >
+        <div className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0">
+              <div className="relative">
+                {isUpdating ? (
+                  progress >= 100 ? (
+                    <RiCheckLine className="text-3xl text-green-500 animate-bounce" />
+                  ) : (
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                  )
+                ) : (
+                  <RiErrorWarningLine className="text-3xl text-yellow-500 animate-pulse" />
+                )}
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>
+              </div>
+            </div>
+            
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-gray-800 mb-1">
+                {isUpdating ? (progress >= 100 ? 'Update Complete!' : 'Updating...') : 'New Version Available!'}
+              </h3>
+              <p className="text-gray-600 mb-3">
+                {APP_NAME} {APP_VERSION} {isUpdating && progress >= 100 ? 'is ready!' : 'is ready to use.'}
+              </p>
+              
+              <div className="bg-white rounded-lg p-3 mb-4 shadow-inner">
+                {isUpdating ? (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="font-medium text-gray-700">
+                        {progress >= 100 ? 'Update complete!' : 'Applying update...'}
+                      </span>
+                      <span className="font-semibold">{Math.round(progress)}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className="bg-gradient-to-r from-blue-500 to-green-500 h-2.5 rounded-full transition-all duration-300"
+                        style={{ width: `${progress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-medium text-gray-700">Previous Version:</span>
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md">{storedVersion}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm mt-2">
+                      <span className="font-medium text-gray-700">New Version:</span>
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-md">{APP_VERSION}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm mt-2">
+                      <span className="font-medium text-gray-700">Released:</span>
+                      <span className="text-gray-600">{releaseDate}</span>
+                    </div>
+                  </>
+                )}
+              </div>
+              
+              <div className="flex gap-3">
+                {!isUpdating ? (
+                  <>
+                    <button
+                      onClick={handleUpdate}
+                      className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors duration-200"
+                    >
+                      <RiDownloadLine className='text-2xl' />
+                      Update Now
+                    </button>
+                    <button
+                      onClick={() => setOpen(true)}
+                      className="flex-1 flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-lg transition-colors duration-200"
+                    >
+                      <PiRecycleFill className='text-2xl' />
+                      View Changes
+                    </button>
+                    <button 
+                      onClick={() => setShowUpdate(false)}
+                      className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg transition-colors duration-200"
+                    >
+                      Dismiss
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white py-2 px-4 rounded-lg">
+                      {progress >= 100 ? 'Restarting...' : `Updating... ${Math.round(progress)}%`}
+                    </div>
+                    {progress < 100 && (
+                      <button 
+                        onClick={cancelUpdate}
+                        className="flex-1 border border-red-300 hover:bg-red-50 text-red-700 py-2 px-4 rounded-lg transition-colors duration-200"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
           
-          <div className="flex-1">
-            <h3 className="text-xl font-bold text-gray-800 mb-1">New Version Available!</h3>
-            <p className="text-gray-600 mb-3">{APP_NAME} {APP_VERSION} is ready to use.</p>
-            
-            <div className="bg-white rounded-lg p-3 mb-4 shadow-inner">
-              <div className="flex justify-between items-center text-sm">
-                <span className="font-medium text-gray-700">Previous Version:</span>
-                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md">{storedVersion}</span>
-              </div>
-              <div className="flex justify-between items-center text-sm mt-2">
-                <span className="font-medium text-gray-700">New Version:</span>
-                <span className="bg-green-100 text-green-800 px-2 py-1 rounded-md">{APP_VERSION}</span>
-              </div>
-              <div className="flex justify-between items-center text-sm mt-2">
-                <span className="font-medium text-gray-700">Released:</span>
-                <span className="text-gray-600">{releaseDate}</span>
-              </div>
+          {APP_DESCRIPTION && !isUpdating && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <p className="text-sm text-gray-500 italic">{APP_DESCRIPTION}</p>
             </div>
-            
-            <div className="flex gap-3">
-              <button
-                onClick={handleUpdate}
-                className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors duration-200"
-              >
-                <RiDownloadLine className='text-2xl' />
-                Refresh to Update
-              </button>
-
-              
- <button
-                onClick={() => setOpen(true)}
-                className="flex-1 flex items-center justify-center gap-2 bg-orange-600
-                 hover:bg-orange-700 text-white py-2 px-4 rounded-lg transition-colors duration-200"
-              >
-                <PiRecycleFill className='text-2xl' />
-                View Change Log
-              </button>
-
-              <button 
-                onClick={() => setShowUpdate(false)}
-                className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg transition-colors duration-200"
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
+          )}
         </div>
-        
-        {APP_DESCRIPTION && (
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <p className="text-sm text-gray-500 italic">{APP_DESCRIPTION}</p>
-          </div>
-        )}
-      </div>
-    </motion.div>
+      </motion.div>
     </>
   );
 };
