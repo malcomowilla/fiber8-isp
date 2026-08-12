@@ -647,45 +647,11 @@ const AdminWalletPortal = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4 md:p-8 font-sans
 ">
       {/* Modals */}
-     <PinVerificationModal 
-  isOpen={showPinModal} 
-  onClose={() => setShowPinModal(false)}
-  onVerifySuccess={async () => { 
-    setPinVerified(true); 
-    setShowPinModal(false); 
-    showNotification('PIN verified successfully', 'success');
-    
-    // ✅ ADD THIS: Immediately send OTP after PIN verified
-    try {
-      const response = await apiService.sendWithdrawalOtp(phoneNumber);
-      if (response.success) { 
-        setShowOtpModal(true); 
-        showNotification(`OTP sent via ${otpMethod}`, 'success'); 
-      } else {
-        showNotification(response.error || 'Failed to send OTP', 'error');
-      }
-    } catch (error) { 
-      showNotification(error.message, 'error'); 
-    }
-  }}
-/>
+      <PinVerificationModal isOpen={showPinModal} onClose={() => setShowPinModal(false)}
+        onVerifySuccess={() => { setPinVerified(true); setShowPinModal(false); showNotification('PIN verified successfully', 'success'); }}
+      />
       <OtpVerificationModal isOpen={showOtpModal} onClose={() => setShowOtpModal(false)}
-        onVerifySuccess={async () => { 
-  setPinVerified(true); 
-  setShowPinModal(false); 
-  showNotification('PIN verified successfully', 'success');
-  try {
-    const response = await apiService.sendWithdrawalOtp(phoneNumber);
-    if (response.success) { 
-      setShowOtpModal(true); 
-      showNotification(`OTP sent via ${otpMethod}`, 'success'); 
-    } else {
-      showNotification(response.error || 'Failed to send OTP', 'error');
-    }
-  } catch (error) { 
-    showNotification(error.message, 'error'); 
-  }
-}}
+        onVerifySuccess={() => { setOtpVerified(true); setShowOtpModal(false); showNotification('OTP verified successfully', 'success'); processWithdrawal(); }}
         method={otpMethod}
       />
       <PinSetupModal isOpen={showPinSetup} onClose={() => setShowPinSetup(false)}
