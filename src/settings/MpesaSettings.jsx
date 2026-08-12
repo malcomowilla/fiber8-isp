@@ -11,7 +11,7 @@ import {
   Business,
   Lock,
 } from "@mui/icons-material";
-import { useEffect, useState, useCallback, lazy} from "react";
+import { useEffect, useState, useCallback, lazy, useMemo} from "react";
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import toast, { Toaster } from 'react-hot-toast';
 const SettingsNotification = lazy(() => import('../notification/SettingsNotification'))
