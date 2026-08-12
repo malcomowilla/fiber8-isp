@@ -83,7 +83,8 @@ const CustomerWhatsapSupport = () => {
 
   return customerProfileData ? (
     <>
-      <Tooltip title={<p className='text-xl'>Help & Resources</p>}>
+      <Tooltip title={<p className='text-x font-sans
+l'>Help & Resources</p>}>
         <IconButton
           onClick={handleClick}
           className="help-button"

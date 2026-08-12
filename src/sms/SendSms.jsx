@@ -15,7 +15,8 @@ import { ContentCopy, Check } from '@mui/icons-material';
 import { Autocomplete } from '@mui/material';
 import { useEffect,  } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
 
 
 const SendSms = () => {
@@ -25,6 +26,55 @@ const SendSms = () => {
 const navigate = useNavigate()
 
     const subdomain = window.location.hostname.split('.')[0]
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
+
+
 
 
     useEffect(() => {
@@ -146,10 +196,14 @@ const navigate = useNavigate()
   };
 
   return (
+    <ThemeProvider theme={tableTheme}>
+    <div className='font-sans
+'>
     <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
       <Paper elevation={3} sx={{ p: 3 }}>
         <Typography variant="h5" component="h1" gutterBottom sx={{ mb: 3 }}>
-          Send SMS
+          <p className='font-sans
+'>Send SMS </p>
         </Typography>
         
         <form onSubmit={handleSubmit}>
@@ -171,7 +225,8 @@ const navigate = useNavigate()
     <TextField
     className='myTextField'
       {...params}
-      label="Select Subscriber"
+      label={<p className='font-sans
+'>Select Subscriber</p>}
       margin="normal"
       required
     />
@@ -184,7 +239,8 @@ const navigate = useNavigate()
             <Grid item xs={12}>
               <Box sx={{ mb: 2 }}>
                 <Typography variant="subtitle2" gutterBottom>
-                  Template Variables:
+                  <p className='font-sans
+'> Template Variables: </p>
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                   {templateVariables.map((item) => (
@@ -263,7 +319,10 @@ const navigate = useNavigate()
           {snackbar.message}
         </Alert>
       </Snackbar>
+
     </Box>
+    </div>
+    </ThemeProvider>
   );
 };
 

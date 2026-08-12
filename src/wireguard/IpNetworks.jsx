@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import MaterialTable from 'material-table';
 import { 
   Dialog, 
@@ -27,9 +27,8 @@ import CloudIcon from '@mui/icons-material/Cloud';
 import WarningIcon from '@mui/icons-material/Warning';
 import toast, { Toaster } from 'react-hot-toast';
 import { useApplicationSettings } from '../settings/ApplicationSettings';
-
 import Autocomplete from '@mui/material/Autocomplete';
-
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 
 const IpNetworks = () => {
@@ -75,6 +74,59 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
 
     { value: '30', label: '/30 (2 hosts)' },
   ];
+
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
+
+
+
+
+
 
   const fetchData = async () => {
     setLoading(true);
@@ -322,9 +374,10 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       }}
        variant="h4" gutterBottom sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
         <CloudIcon sx={{ mr: 2, color: 'success.main' }} />
-        <p className='roboto-condensed bg-gradient-to-r from-green-600 via-blue-400
-         to-cyan-500 bg-clip-text text-transparent font-bold '>IP Networks Management </p>
+        <p className=' font-serif
+ font-bold '>IP Networks Management </p>
       </Typography>
+<ThemeProvider theme={tableTheme}>
 
       <MaterialTable
         title=""
@@ -369,29 +422,48 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
 
 localization={{
                 body: {
-                  emptyDataSourceMessage: 'No IP networks found. Create your first IP network to get started!',
+                  emptyDataSourceMessage: <p className='font-serif
+'>No IP networks found. Create your first IP network to get started!</p>
                 },
                
               
               
               }}
-        options={{
-          actionsColumnIndex: -1,
-          pageSize: 10,
-          pageSizeOptions: [10, 20, 50],
-          showTitle: false,
-           sorting: true,
- emptyRowsWhenPaging: false,
-
-
-
-          headerStyle: {
-            backgroundColor: '#f5f5f5',
-            fontWeight: 'bold'
-          }
-        }}
+       
+ options={{
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'monospace',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'monospace',
+      }),
+    }}
       />
 
+</ThemeProvider>
 
 
 

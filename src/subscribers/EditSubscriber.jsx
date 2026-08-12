@@ -39,6 +39,7 @@ const [updatedAT, setUpdatedAT] = useState('')
 const [walletBalance, setWalletBalance] = useState(0)
 
 const [openWalletBalance, setOpenWalletBalance] = useState(false)
+// const [selectedRouter, setSelectedRouter] = useState('')
 
 
 const subdomain = window.location.hostname.split('.')[0];
@@ -166,7 +167,8 @@ useEffect(() => {
       <div className='flex flex-row gap-2 items-center
       cursor-pointer hover:shadow-xl w-fit h-fit'>
            <Link to='/admin/pppoe-subscribers' className='font-bold
-            text-black text-xl dark:text-white'>
+            text-black text-xl dark:text-white font-sans
+'>
             
             {subscriberName}
             
@@ -182,7 +184,8 @@ useEffect(() => {
             </div>
 
 
-<div className='flex gap-2 items-center'> 
+<div className='flex gap-2 items-center font-sans
+'> 
 
     <p className='text-black dark:text-white border-r border-black 
     dark:border-white
@@ -197,7 +200,8 @@ useEffect(() => {
 
 
 <div className='border-r border-black pr-4  flex gap-2
-    dark:border-white'>
+    dark:border-white font-sans
+'>
       <FaRegBuilding className='text-black w-5 h-5 
        dark:text-white ' />
 
@@ -259,16 +263,34 @@ useEffect(() => {
               // variant={isMobile ? 'scrollable' : 'standard'}
               scrollButtons="auto"
       >
-        <Tab label="SUBSCRIBER DETAILS" value="1" />
-                <Tab label="SUBSCRIPTIONS" value="2" />
+        <Tab label={<p className="font-sans
+">SUBSCRIBER DETAILS </p>} value="1" />
 
-        <Tab label="LIVE DATA" value="3" />
-        <Tab label="INVOICES"  value="4" />
-         <Tab label="PAYMENT HISTORY" value="5" />
+
+                <Tab label={<p className="font-sans
+">SUBSCRIPTIONS</p>} value="2" />
+
+        <Tab label={<p className="font-sans
+">LIVE DATA </p>} value="3" />
+
+
+        <Tab label={<p className="font-sans
+">INVOICES </p>}  value="4" />
+        
+
+
+         <Tab label={<p className="font-sans
+">PAYMENT HISTORY </p>} value="5" />
         {/* <Tab label="DEVICES" /> */}
         
-        <Tab label="COMUNICATIONS" />
-        <Tab label="ACTIVITY LOGS" />
+
+
+        <Tab label={<p className="font-sans
+">COMUNICATIONS </p>} />
+
+
+        <Tab label={<p className="font-sans
+">ACTIVITY LOGS </p>} />
       </TabList>
 
        <TabPanel 
@@ -277,7 +299,7 @@ useEffect(() => {
        >
 
 <SubscriberDetails
-   
+  //  selectedRouter={selectedRouter} setSelectedRouter={setSelectedRouter}
   />
       </TabPanel>
 

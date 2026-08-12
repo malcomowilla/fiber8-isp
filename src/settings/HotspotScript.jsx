@@ -309,9 +309,9 @@ echo "Hotspot configuration completed successfully"`;
         <DialogTitle>
           <div className="flex items-center gap-3">
             <SiGoogleappsscript className="text-2xl text-green-500" />
-            <h2 className="text-xl font-bold text-gray-800">MikroTik Hotspot Setup Commands</h2>
+            <h2 className="text-xl font-bold text-gray-800">MikroTik Hotspot File Setup </h2>
           </div>
-          <p className="text-sm text-gray-600 mt-1">Copy and paste these commands into your MikroTik terminal</p>
+          {/* <p className="text-sm text-gray-600 mt-1">Copy and paste these commands into your MikroTik terminal</p> */}
         </DialogTitle>
 
         <DialogContent dividers>
@@ -322,10 +322,11 @@ echo "Hotspot configuration completed successfully"`;
   transition={{ duration: 0.3 }}
   className="mb-4"
 >
-  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-lg p-4">
+  <div className="bg-gradient-to-r from-blue-50
+   to-cyan-50 border border-blue-200 rounded-lg p-4 font-sans">
     <div className="flex items-center gap-3 mb-3">
       <FaServer className="text-xl text-blue-500" />
-      <h3 className="font-semibold text-blue-800">Select Target Router</h3>
+      <h3 className="font-semibold text-blue-800 ">Select Target Router</h3>
     </div>
     
     <Autocomplete
@@ -366,7 +367,7 @@ echo "Hotspot configuration completed successfully"`;
     />
     
     {selectedRouter && (
-      <div className="mt-3 p-2 bg-white rounded border">
+      <div className="mt-3 p-2 bg-white rounded border font-sans">
         <div className="grid grid-cols-2 gap-2 text-sm">
           <span className="font-medium">IP Address:</span>
           <span>{routers.find(r => r.id === selectedRouter)?.ip_address}</span>
@@ -388,11 +389,11 @@ echo "Hotspot configuration completed successfully"`;
             <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <FaFileImport className="text-2xl text-purple-500" />
+                  <FaFileImport className="text-2xl text-green-500" />
                   <div>
-                    <h3 className="font-semibold text-purple-800">Import/Export Hotspot Configuration</h3>
-                    <p className="text-sm text-purple-600">Upload a .rsc file or download a complete configuration</p>
-                    <p className="text-sm text-purple-600">You can also upload the hotspot file to your router</p>
+                    {/* <h3 className="font-semibold text-green-800">Import/Export Hotspot Configuration</h3>
+                    <p className="text-sm text-green-600">Upload a .rsc file or download a complete configuration</p> */}
+                    <p className="text-lg text-green-600">upload the hotspot file to your router</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -401,9 +402,11 @@ echo "Hotspot configuration completed successfully"`;
                     whileTap={{ scale: 0.95 }}
                     onClick={handleUploadToRouter}
                     disabled={!selectedRouter}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                    className={`flex items-center gap-2 px-4  font-sans
+ py-2 
+                      rounded-lg font-medium transition-colors ${
                       selectedRouter 
-                        ? 'bg-purple-500 text-white hover:bg-purple-600' 
+                        ? 'bg-green-500 text-white hover:bg-green-600' 
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
@@ -411,7 +414,7 @@ echo "Hotspot configuration completed successfully"`;
                     Upload to Router
                   </motion.button>
                   
-                  <motion.button
+                  {/* <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={generateHotspotConfigFile}
@@ -419,7 +422,7 @@ echo "Hotspot configuration completed successfully"`;
                   >
                     <FaFileImport fontSize="small" />
                     Export Config
-                  </motion.button>
+                  </motion.button> */}
                 </div>
               </div>
               
@@ -434,7 +437,7 @@ echo "Hotspot configuration completed successfully"`;
           </motion.div>
 
           {/* Rest of the content remains the same */}
-          <Stack spacing={3} sx={{ mt: 1 }}>
+          {/* <Stack spacing={3} sx={{ mt: 1 }}>
             {mikrotikCommands.map((section, sectionIndex) => (
               <motion.div
                 key={sectionIndex}
@@ -473,9 +476,12 @@ echo "Hotspot configuration completed successfully"`;
                 </Stack>
               </motion.div>
             ))}
-          </Stack>
+          </Stack> */}
 
           {/* Quick Copy Sections */}
+
+
+{/*           
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -510,27 +516,28 @@ echo "Hotspot configuration completed successfully"`;
                 </motion.div>
               ))}
             </div>
-          </motion.div>
+          </motion.div> */}
         </DialogContent>
 
         <DialogActions sx={{ p: 3, gap: 2 }}>
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-6 py-3 font-medium text-white rounded-lg transition-all hover:bg-red-600 bg-red-500"
+            className="px-6 py-3 font-medium text-white rounded-lg transition-all hover:bg-red-600 bg-red-500 font-sans
+"
             onClick={handleClose}
           >
             Close
           </motion.button>
           
-          <motion.button
+          {/* <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="px-6 py-3 font-medium text-white rounded-lg transition-all hover:bg-green-600 bg-green-500"
             onClick={() => copyToClipboard(mikrotikCommands.flatMap(s => s.commands).join('\n'))}
           >
             Copy All Commands
-          </motion.button>
+          </motion.button> */}
         </DialogActions>
       </Dialog>
 
@@ -547,13 +554,16 @@ echo "Hotspot configuration completed successfully"`;
       >
         <DialogTitle>
           <div className="flex items-center gap-2">
-            <CloudUpload className="text-green-500" />
-            <span>Confirm Upload to Router</span>
+            <CloudUpload className="text-green-500 font-sans
+" />
+            <span className='font-sans
+'>Confirm Upload to Router</span>
           </div>
         </DialogTitle>
         <DialogContent>
           {selectedRouter && (
-            <div className="space-y-3">
+            <div className="space-y-3 font-sans
+">
               <p className="text-gray-600">Are you sure you want to upload the hotspot configuration to:</p>
               <div className="bg-blue-50 p-3 rounded-lg">
                 <div className="grid grid-cols-2 gap-2 text-sm">
@@ -572,13 +582,15 @@ echo "Hotspot configuration completed successfully"`;
         <DialogActions>
           <button
             onClick={() => setShowRouterSelection(false)}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            className="px-4 py-2 text-gray-600 hover:text-gray-800 font-sans
+"
           >
             Cancel
           </button>
           <button
             onClick={confirmUploadToRouter}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-blue-600"
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-blue-600 font-sans
+"
           >
             {loading ? <span>Confirming Upload........</span> : <span>Confirm Upload</span>}
           </button>

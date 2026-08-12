@@ -23,7 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import FreeRadiusLogo from "../../public/images/free_radius.svg";
 import { BsRouter } from "react-icons/bs";
 
-
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 
 const AccessPoint = () => {
@@ -61,6 +61,58 @@ const [selectedRouterId, setSelectedRouterId] = useState(() => {
   const savedRouterId = localStorage.getItem('selectedCheckedRouter');
   return savedRouterId ? parseInt(savedRouterId, 10) : null;
 });
+
+
+
+
+
+  function useIsDarkMode() {
+    const [isDark, setIsDark] = useState(
+      () => typeof document !== 'undefined' &&
+        document.documentElement.classList.contains('dark')
+    );
+  
+    useEffect(() => {
+      const root = document.documentElement;
+  
+      const update = () => setIsDark(root.classList.contains('dark'));
+      update();
+  
+      const observer = new MutationObserver(update);
+      observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+  
+      return () => observer.disconnect();
+    }, []);
+  
+    return isDark;
+  }
+  
+  
+  
+  
+  const isDark = useIsDarkMode();
+  
+  const tableTheme = useMemo(() => createTheme({
+    palette: {
+      mode: isDark ? 'dark' : 'light',
+      background: {
+        paper: isDark ? '#1e1e1e' : '#ffffff',
+        default: isDark ? '#1e1e1e' : '#ffffff',
+      },
+      text: {
+        primary: isDark ? '#f1f1f1' : '#1a1a1a',
+        secondary: isDark ? '#a3a3a3' : '#6b7280',
+      },
+    },
+  }), [isDark]);
+  
+  
+
+
+
+
+
+
 const handleClickOpenDelete = () => {
   setOpenDelete(true);
 };
@@ -464,16 +516,21 @@ tableData={tableDataNas} handleSubmit={handleSubmit}
         
         <div className='flex flex-row items-center gap-2'>
       <p className='
-         font-bold text-3xl inline-block p-2'> Access Points </p>
+         font-bold text-3xl inline-block p-2 font-sans
+'> Access Points </p>
          <BsRouter className='w-7 h-7'/>
 </div>
-        
 
+
+    <div className="rounded-2xl border border-[#e5e0d5] overflow-hidden shadow-sm">
+    
+ <ThemeProvider theme={tableTheme}>
       <MaterialTable columns={columns}
       
       title= { <p className='
         
-         font-bold text-lg text-gray-500'>
+         font-bold text-lg text-gray-500 font-sans
+'>
             This section lists all registered access points in the network. 
             Each access point is identified by its name, IP address, and 
             physical location. The system continuously checks their status
@@ -501,39 +558,53 @@ tableData={tableDataNas} handleSubmit={handleSubmit}
 
 localization={{
                 body: {
-                  emptyDataSourceMessage: 'No Access Point found. Create your first Access Point to get started!'
+                  emptyDataSourceMessage: <p className='font-sans
+'>No Access Point found. Create your first Access Point to get started!</p>
                 },
                
               
               
               }}
 
-
 options={{
-  sorting: true,
-  pageSizeOptions:[2, 5, 10],
-  pageSize: 10,
-  paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-selection: true,
-search:false,
-searchAutoFocus: true,
-showSelectAllCheckbox: false,
-showTextRowsSelected: false,
-  emptyRowsWhenPaging: false,
-headerStyle:{
-  fontFamily: 'bold',
-  textTransform: 'uppercase'
-  } ,
-  
-  
-  fontFamily: 'mono'
-}}  
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'monospace',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'monospace',
+      }),
+    }}
       
       
       
       />
+
+      </ThemeProvider>
+      </div>
+
 
     </div>
     </>

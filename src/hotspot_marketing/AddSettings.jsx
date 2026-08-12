@@ -1,885 +1,446 @@
-import { useState, useRef, useCallback, useEffect, } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Upload, Save, Eye, MapPin, Timer,
-  Layers, CheckCircle, Play, Pause, Smartphone, Monitor,
-  RefreshCw, Link, Type, Trash2, Package, Plus, X,
-  Wifi, Clock, DollarSign, ChevronDown, ChevronUp, AlertCircle
-} from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import { Image as ImageIcon, Video, Paintbrush } from 'lucide-react';
+import HotspotAdBuilder from './HotspotAdBuilder';
 
-
-
-
-const POSITIONS = [
-  { id: 'top-banner',    label: 'Top Banner',    icon: '⬆', description: 'Full width at top of screen' },
-  { id: 'bottom-banner', label: 'Bottom Banner', icon: '⬇', description: 'Full width at bottom' },
-  { id: 'center-modal',  label: 'Center Modal',  icon: '⬛', description: 'Centered overlay popup' },
-  { id: 'bottom-right',  label: 'Bottom Right',  icon: '↘', description: 'Floating card, bottom right' },
-  { id: 'bottom-left',   label: 'Bottom Left',   icon: '↙', description: 'Floating card, bottom left' },
+const AD_FORMATS = [
+  { id: 'image',  label: 'Image',        icon: ImageIcon,  hint: 'Upload a static image ad' },
+  { id: 'video',  label: 'Video',        icon: Video,      hint: 'Customer watches, then gets access' },
+  { id: 'design',  label: 'Build a design', icon: Paintbrush, hint: 'Design an ad in the builder' },
 ];
 
-const DURATIONS = [5, 10, 15, 20, 30, 45, 60];
 
-const TABS = [
-  { id: 'media',    label: 'Media',    icon: Upload },
-  { id: 'position', label: 'Position', icon: MapPin },
-  { id: 'timing',   label: 'Timing',   icon: Timer },
-  { id: 'packages', label: 'Packages', icon: Package },
-  { id: 'preview',  label: 'Preview',  icon: Eye },
+
+const isBlankLink = (url) => {
+  if (!url) return true;
+  const trimmed = url.trim();
+  if (!trimmed) return true;
+  const bareForms = ['https://wa.me/', 'https://', 'tel:', 'mailto:', 'https://maps.google.com/?q='];
+  return bareForms.includes(trimmed);
+};
+
+const REWARD_TYPES = [
+  { id: 'none',        label: 'No reward — just an ad' },
+  { id: 'free_browse', label: 'Grant free browsing time' },
+  { id: 'specific',    label: 'Unlock a specific package' },
 ];
 
-// ── Ad card preview ──
-function AdCard({ mediaType, mediaPreview, adTitle, adDuration, canSkip, skipAfter, compact }) {
-  return (
-    <div className={`bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden ${compact ? 'rounded-lg' : 'rounded-xl'}`}>
-      {mediaType === 'image' && (
-        <img src={mediaPreview} alt="Ad" className={`w-full object-cover ${compact ? 'max-h-20' : 'max-h-40'}`} />
-      )}
-      {mediaType === 'video' && (
-        <video src={mediaPreview} className={`w-full object-cover ${compact ? 'max-h-20' : 'max-h-40'}`} muted autoPlay loop />
-      )}
-      <div className={`${compact ? 'px-2 py-1.5' : 'px-3 py-2'} flex items-center justify-between gap-2`}>
-        {adTitle && <p className="text-xs text-white font-medium truncate flex-1">{adTitle}</p>}
-        <div className="flex items-center gap-1.5 shrink-0">
-          {mediaType === 'video' ? (
-            <>
-              <div className="flex items-center gap-1 bg-black/50 rounded px-1.5 py-0.5">
-                <Timer size={10} className="text-green-400" />
-                <span className="text-xs text-green-400 font-bold font-mono">{adDuration}s</span>
-              </div>
-              {canSkip && (
-                <span className="text-xs text-gray-400 bg-gray-800 rounded px-1.5 py-0.5">Skip {skipAfter}s</span>
-              )}
-            </>
-          ) : (
-            <span className="text-xs text-gray-400 bg-gray-800 rounded px-1.5 py-0.5">✕ Close</span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function AddSettings() {
-  const [activeTab, setActiveTab]         = useState('media');
-  const [adEnabled, setAdEnabled]         = useState(false);
-  const [mediaType, setMediaType]         = useState(null);
-  const [mediaPreview, setMediaPreview]   = useState(null);
-  const [mediaFile, setMediaFile]         = useState(null);
-  const [position, setPosition]           = useState('bottom-right');
-  const [adDuration, setAdDuration]       = useState(15);
-  const [skipAfter, setSkipAfter]         = useState(5);
-  const [canSkip, setCanSkip]             = useState(true);
-  const [adTitle, setAdTitle]             = useState('');
-  const [adLink, setAdLink]               = useState('');
-  const [saved, setSaved]                 = useState(false);
-  const [videoPlaying, setVideoPlaying]   = useState(false);
-  const [previewDevice, setPreviewDevice] = useState('mobile');
-  const [isDragging, setIsDragging]       = useState(false);
-  const [loading, setLoading]             = useState(false);
-
-  // ── Package reward settings ──
-  const [rewardType, setRewardType]             = useState('specific'); // 'specific' | 'choice' | 'free_browse'
-  const [selectedPackage, setSelectedPackage] = useState(null);
-  const [availablePackages, setAvailablePackages] = useState([]);
-  const [packagesLoading, setPackagesLoading]   = useState(false);
-  const [freeMinutes, setFreeMinutes]           = useState(30);
-  const [showPackageForm, setShowPackageForm]   = useState(false);
-  // packages user can pick from (for 'choice' mode)
-  const [choicePackageIds, setChoicePackageIds] = useState([]);
-
+export default function AddAdSettings() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const adId = new URLSearchParams(location.search).get('id');
   const subdomain = window.location.hostname.split('.')[0];
+  const isEditing = !!adId;
 
-  const fileInputRef    = useRef();
-  const videoPreviewRef = useRef();
-    const [searchParams] = useSearchParams();
+  // ── core fields ──────────────────────────────────────────
+  const [adTitle, setAdTitle] = useState('');
+  const [adFormat, setAdFormat] = useState('image'); // image | video | design
+  const [adEnabled, setAdEnabled] = useState(true);
+  const [position, setPosition] = useState('bottom-right');
+  const [adDuration, setAdDuration] = useState(15);
+  const [skipAfter, setSkipAfter] = useState(5);
+  const [canSkip, setCanSkip] = useState(true);
 
+  // ── media (image/video) ─────────────────────────────────
+  const [mediaFile, setMediaFile] = useState(null);
+  const [mediaPreview, setMediaPreview] = useState('');
+  const [existingMediaUrl, setExistingMediaUrl] = useState('');
 
-  // ── Load settings on mount ──
+  // ── design (builder) ────────────────────────────────────
+  const [designConfig, setDesignConfig] = useState(null);
+  const [existingDesignConfig, setExistingDesignConfig] = useState(null);
+
+  // ── reward ──────────────────────────────────────────────
+  const [rewardType, setRewardType] = useState('none');
+  const [selectedPackage, setSelectedPackage] = useState('');
+  const [freeMinutes, setFreeMinutes] = useState('');
+  const [packages, setPackages] = useState([]);
+
+  // ── link (for image/design tap-through) ─────────────────
+  const [adLink, setAdLink] = useState('');
+
+  const [loading, setLoading] = useState(isEditing);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  // Fetch packages for the reward dropdown
   useEffect(() => {
-    const loadSettings = async () => {
+    (async () => {
       try {
-        const res = await fetch(`/api/get_ad_settings_by_id?id=${searchParams.get('id')}`, {
-          headers: { 'X-Subdomain': subdomain }
+        const res = await fetch('/api/allow_get_hotspot_packages', {
+          headers: { 'X-Subdomain': subdomain },
         });
-        if (!res.ok) return;
+        if (res.ok) setPackages(await res.json());
+      } catch (_) {}
+    })();
+  }, [subdomain]);
+
+  // Autofill when editing
+  useEffect(() => {
+    if (!adId) return;
+    (async () => {
+      try {
+        const res = await fetch(`/api/get_ad_settings_by_id?id=${adId}`, {
+          headers: { 'X-Subdomain': subdomain },
+        });
         const data = await res.json();
+        if (!res.ok) {
+          toast.error('Failed to load ad settings');
+          return;
+        }
+
         setAdTitle(data.ad_title || '');
-        setAdLink(data.ad_link || '');
+        setAdFormat(data.media_type === 'video' ? 'video' : (data.media_type === 'custom_design' || (data.design_config && data.design_config !== '[]') ? 'design' : 'image'));
+        setAdEnabled(!!data.ad_enabled);
         setPosition(data.position || 'bottom-right');
         setAdDuration(data.ad_duration || 15);
         setSkipAfter(data.skip_after || 5);
         setCanSkip(data.can_skip ?? true);
-        setAdEnabled(data.ad_enabled ?? false);
-        setMediaType(data.media_type || null);
-        if (data.media_url) setMediaPreview(data.media_url);
-        setRewardType(data.reward_type || 'specific');
-        setSelectedPackage(data.selected_package || null);
-        setFreeMinutes(data.free_minutes || 30);
-        setChoicePackageIds(data.choice_package_ids || []);
-      } catch (err) {
-        console.error('Failed to load ad settings', err);
-      }
-    };
-    loadSettings();
-  }, []);
+        // media_url is the actual Cloudinary URL for image/video ads.
+        // ad_link is reserved for the tap-through link and is a separate field.
+        // setExistingMediaUrl(data.media_url || '');
+        // setAdLink(data.ad_link || '');
+        setExistingMediaUrl(data.media_url || '');
+setAdLink(isBlankLink(data.ad_link) ? '' : data.ad_link);
+        setRewardType(data.reward_type || 'none');
+        setSelectedPackage(data.selected_package || '');
+        setFreeMinutes(data.free_minutes || '');
 
-  // ── Fetch hotspot packages ──
-  useEffect(() => {
-    const fetchPackages = async () => {
-      try {
-        setPackagesLoading(true);
-        const res = await fetch('/api/allow_get_hotspot_packages', {
-          headers: { 'X-Subdomain': subdomain }
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        setAvailablePackages(data);
-      } catch (err) {
-        console.error('Failed to fetch packages', err);
+       if (data.design_config) {
+  try {
+    const parsed = JSON.parse(data.design_config);
+    const cleanLink = isBlankLink(data.ad_link) ? '' : data.ad_link;
+    setExistingDesignConfig({
+      elements: parsed,
+      background: data.design_background,
+      canvasW: data.design_canvas_w,
+      canvasH: data.design_canvas_h,
+      linkType: data.link_type,
+      linkValue: cleanLink,
+      link: cleanLink, // real "link" key so handleSave never needs to fall back
+    });
+  } catch (_) {}
+}
+      } catch (error) {
+        toast.error('Network error loading ad');
       } finally {
-        setPackagesLoading(false);
+        setLoading(false);
       }
-    };
-    fetchPackages();
-  }, []);
+    })();
+  }, [adId, subdomain]);
 
-  // ── Save ──
-  const handleSave = async () => {
-    if (!adTitle) {
-      toast.error('Please enter an ad title');
-      return;
+  const handleMediaChange = (file) => {
+    setMediaFile(file);
+    setMediaPreview(URL.createObjectURL(file));
+  };
+
+
+    console.log('existin config', existingDesignConfig)
+
+
+  const validate = () => {
+    const errs = {};
+    if (!adTitle.trim()) errs.adTitle = 'Ad title is required';
+
+    if (adFormat === 'image' || adFormat === 'video') {
+      if (!mediaFile && !existingMediaUrl) errs.media = `Please upload ${adFormat === 'video' ? 'a video' : 'an image'}`;
     }
+
+    if (adFormat === 'design') {
+      if (!designConfig && !existingDesignConfig) errs.design = 'Build a design or switch to Image/Video';
+    }
+
+    // Reward validation only applies to the reward type the user actually picked —
+    // never blanket-required, and never blocking for a plain ad with no reward.
     if (rewardType === 'specific' && !selectedPackage) {
-      toast.error('Please select a package to reward after the ad');
-      setActiveTab('packages');
-      return;
+      errs.reward = 'Choose which package this ad unlocks';
     }
-    if (rewardType === 'choice' && choicePackageIds.length === 0) {
-      toast.error('Please select at least one package for the user to choose from');
-      setActiveTab('packages');
+    if (rewardType === 'free_browse' && !freeMinutes) {
+      errs.reward = 'Enter how many free minutes to grant';
+    }
+
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const handleSave = async () => {
+    if (!validate()) {
+      toast.error('Please fix the highlighted fields');
       return;
     }
 
+    setSaving(true);
     try {
-      setLoading(true);
       const formData = new FormData();
-      formData.append('ad_title',            adTitle);
-      formData.append('ad_link',             adLink);
-      formData.append('position',            position);
-      formData.append('ad_duration',         adDuration);
-      formData.append('skip_after',          skipAfter);
-      formData.append('can_skip',            canSkip);
-      formData.append('ad_enabled',          adEnabled);
-      formData.append('media_type',          mediaType || '');
-      formData.append('reward_type',         rewardType);
-      formData.append('free_minutes',        freeMinutes);
-      formData.append('selected_package', selectedPackage || '');
-      choicePackageIds.forEach(id => formData.append('choice_package_ids[]', id));
-      if (mediaFile) formData.append('media_file', mediaFile);
+      formData.append('ad_title', adTitle);
+      formData.append('ad_format', adFormat);
+      formData.append('media_type', adFormat === 'video' ? 'video' : (adFormat === 'design' ? 'custom_design' : 'image'));
+      formData.append('ad_enabled', adEnabled);
+      formData.append('position', position);
+      formData.append('ad_duration', adDuration);
+      formData.append('skip_after', skipAfter);
+      formData.append('can_skip', canSkip);
+      formData.append('reward_type', rewardType);
+      formData.append('selected_package', rewardType === 'specific' ? selectedPackage : '');
+      formData.append('free_minutes', rewardType === 'free_browse' ? freeMinutes : '');
 
-      const getCsrfToken = () =>
-        document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      if (adFormat === 'design') {
+        const cfg = designConfig || existingDesignConfig;
+  formData.append('design_config', JSON.stringify(cfg.elements));
+  formData.append('design_background', cfg.background);
+  formData.append('design_canvas_w', cfg.canvasW);
+  formData.append('design_canvas_h', cfg.canvasH);
+  formData.append('link_type', cfg.linkType);
+  // Design ads only ever use the link chosen inside the builder itself —
+  // never fall back to the separate image/video adLink field, and never
+  // resubmit a stale prefix-only value.
+  const designLink = cfg.link || '';
+  formData.append('ad_link', isBlankLink(designLink) ? '' : designLink);
+      } else {
+        formData.append('ad_link', adLink);
+        formData.append('design_config', '');
+        if (mediaFile) formData.append('media_file', mediaFile);
+      }
 
-      const res = await fetch('/api/ad_settings', {
+      if (isEditing) {
+        formData.append('_method', 'patch');
+      }
+
+      const url = isEditing ? `/api/ad_settings/${adId}` : '/api/ad_settings';
+
+      const res = await fetch(url, {
         method: 'POST',
-        headers: {
-          'X-Subdomain': subdomain,
-          'X-CSRF-Token': getCsrfToken(),
-        },
+        headers: { 'X-Subdomain': subdomain },
         body: formData,
       });
 
       const data = await res.json();
       if (res.ok) {
-        setSaved(true);
-        setLoading(false)
-        setTimeout(() => setSaved(false), 3000);
-        if (data.media_url) setMediaPreview(data.media_url);
-        setMediaFile(null);
-        toast.success('Ad settings saved successfully');
+        toast.success(isEditing ? 'Ad updated' : 'Ad created');
+        navigate('/admin/hotspot-marketing-dashboard');
       } else {
-        toast.error('Failed to save ad settings');
+        toast.error(data.error?.join?.(', ') || data.error || 'Failed to save ad');
       }
-    } catch (err) {
-              setLoading(false)
-
-      toast.error('Failed to save ad settings. Please try again.');
+    } catch (error) {
+      toast.error('Network error while saving ad');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
-  const handleFileUpload = useCallback((file) => {
-    if (!file) return;
-    const isVideo = file.type.startsWith('video/');
-    const isImage = file.type.startsWith('image/');
-    if (!isVideo && !isImage) return;
-    setMediaType(isVideo ? 'video' : 'image');
-    setMediaFile(file);
-    setMediaPreview(URL.createObjectURL(file));
-  }, []);
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    handleFileUpload(e.dataTransfer.files[0]);
-  };
-
-  const clearMedia = () => {
-    setMediaPreview(null);
-    setMediaFile(null);
-    setMediaType(null);
-    setVideoPlaying(false);
-  };
-
-  const toggleVideo = () => {
-    if (!videoPreviewRef.current) return;
-    videoPlaying ? videoPreviewRef.current.pause() : videoPreviewRef.current.play();
-    setVideoPlaying(!videoPlaying);
-  };
-
-  const toggleChoicePackage = (id) => {
-    console.log('toggle choice package', id)
-    setChoicePackageIds(prev =>
-      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
-    );
-  };
-
-  const selectedPos = POSITIONS.find(p => p.id === position);
-  const selectedPkg = availablePackages.find(p => p.id === selectedPackage);
-
-  const FREE_DURATION_OPTIONS = [15, 30, 45, 60, 90, 120];
+  if (loading) {
+    return <div className="p-8 text-center text-gray-500">Loading ad settings…</div>;
+  }
 
   return (
-    <div className="min-h-screen text-white">
-      <Toaster />
+    <>
+      <ToastContainer />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 font-sans">
+        <div className="max-w-4xl mx-auto px-4 space-y-6">
 
-      {/* ── Header ── */}
-      <div className="sticky top-0 z-50 border-gray-800 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-            <Layers size={16} className="text-black" />
-          </div>
           <div>
-            <h1 className="text-base font-bold tracking-tight text-gray-700 dark:text-gray-100">Ad Settings</h1>
-            <p className="text-sm dark:text-gray-300 text-gray-600">Hotspot captive portal ads</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {isEditing ? 'Edit Advertisement' : 'New Advertisement'}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">One place to configure everything, one button to save it.</p>
           </div>
-        </div>
 
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className={`text-xs font-medium ${adEnabled ? 'text-green-400' : 'text-gray-500'}`}>
-              {adEnabled ? 'Ads On' : 'Ads Off'}
-            </span>
+          {/* Ad title */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Ad Title</label>
+            <input
+              type="text"
+              value={adTitle}
+              onChange={e => setAdTitle(e.target.value)}
+              className={`w-full p-3 rounded-lg border ${errors.adTitle ? 'border-red-500' : 'border-gray-300'} dark:bg-gray-700 dark:text-white`}
+              placeholder="e.g. Westlands Cafe Promo"
+            />
+            {errors.adTitle && <p className="text-red-500 text-xs mt-1">{errors.adTitle}</p>}
+          </div>
+
+          {/* Format selector */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+              How do you want to build this ad?
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {AD_FORMATS.map(f => {
+                const Icon = f.icon;
+                const active = adFormat === f.id;
+                return (
+                  <button
+                    key={f.id}
+                    onClick={() => setAdFormat(f.id)}
+                    className={`p-4 rounded-xl border-2 text-left transition-colors ${
+                      active ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'border-gray-200 dark:border-gray-700'
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 mb-2 ${active ? 'text-blue-600' : 'text-gray-400'}`} />
+                    <p className="font-semibold text-gray-900 dark:text-white">{f.label}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{f.hint}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Media upload — image/video only */}
+          {(adFormat === 'image' || adFormat === 'video') && (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                {adFormat === 'video' ? 'Upload Video' : 'Upload Image'}
+              </label>
+              <input
+                type="file"
+                accept={adFormat === 'video' ? 'video/*' : 'image/*'}
+                onChange={e => e.target.files[0] && handleMediaChange(e.target.files[0])}
+                className="block w-full text-sm"
+              />
+              {(mediaPreview || existingMediaUrl) && (
+                adFormat === 'video'
+                  ? <video src={mediaPreview || existingMediaUrl} controls className="mt-3 w-full max-w-sm rounded-lg" />
+                  : <img src={mediaPreview || existingMediaUrl} alt="" className="mt-3 w-full max-w-sm rounded-lg object-cover" />
+              )}
+              {errors.media && <p className="text-red-500 text-xs">{errors.media}</p>}
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Tap-through Link (optional)</label>
+                <input
+                  type="text"
+                  value={adLink}
+                  onChange={e => setAdLink(e.target.value)}
+                  placeholder="https://wa.me/254712345678"
+                  className="w-full p-3 rounded-lg border border-gray-300 dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Design builder */}
+          {adFormat === 'design' && (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4">
+              <HotspotAdBuilder
+                initialConfig={existingDesignConfig}
+                onChange={setDesignConfig}
+              />
+              {errors.design && <p className="text-red-500 text-xs mt-2">{errors.design}</p>}
+            </div>
+          )}
+
+          {/* Reward — optional, independent of format */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+              Reward (optional)
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {REWARD_TYPES.map(r => (
+                <button
+                  key={r.id}
+                  onClick={() => setRewardType(r.id)}
+                  className={`p-3 rounded-lg border-2 text-sm text-left ${
+                    rewardType === r.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+
+            {rewardType === 'specific' && (
+              <div>
+                <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Package to unlock</label>
+                <select
+                  value={selectedPackage}
+                  onChange={e => setSelectedPackage(e.target.value)}
+                  className="w-full p-3 rounded-lg border border-gray-300 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="">Select a package…</option>
+                  {packages.map(p => (
+                    <option key={p.id} value={p.name}>{p.name} — Ksh {p.price}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {rewardType === 'free_browse' && (
+              <div>
+                <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Free minutes to grant</label>
+                <input
+                  type="number"
+                  value={freeMinutes}
+                  onChange={e => setFreeMinutes(e.target.value)}
+                  className="w-full p-3 rounded-lg border border-gray-300 dark:bg-gray-700 dark:text-white"
+                  placeholder="e.g. 15"
+                />
+              </div>
+            )}
+
+            {errors.reward && <p className="text-red-500 text-xs">{errors.reward}</p>}
+          </div>
+
+          {/* Display settings — mainly relevant for video */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Display Settings</label>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Position on screen</label>
+                <select
+                  value={position}
+                  onChange={e => setPosition(e.target.value)}
+                  className="w-full p-2 rounded-lg border border-gray-300 dark:bg-gray-700 dark:text-white"
+                >
+                   <option value="top-left">Top Left</option>
+  <option value="top-right">Top Right</option>
+  <option value="bottom-left">Bottom Left</option>
+  <option value="bottom-right">Bottom Right</option>
+  <option value="center-modal">Center Modal (dimmed background)</option>
+  <option value="fullscreen">Full Screen (entire image visible)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Duration (seconds)</label>
+                <input type="number" value={adDuration} onChange={e => setAdDuration(e.target.value)}
+                  className="w-full p-2 rounded-lg border border-gray-300 dark:bg-gray-700 dark:text-white" />
+              </div>
+              {adFormat === 'video' && (
+                <>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Skip after (seconds)</label>
+                    <input type="number" value={skipAfter} onChange={e => setSkipAfter(e.target.value)}
+                      className="w-full p-2 rounded-lg border border-gray-300 dark:bg-gray-700 dark:text-white" />
+                  </div>
+                  <div className="flex items-center gap-2 mt-5">
+                    <input type="checkbox" checked={canSkip} onChange={e => setCanSkip(e.target.checked)} />
+                    <label className="text-sm text-gray-600 dark:text-gray-400">Allow skipping</label>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <input type="checkbox" checked={adEnabled} onChange={e => setAdEnabled(e.target.checked)} />
+              <label className="text-sm text-gray-600 dark:text-gray-400">Ad enabled</label>
+            </div>
+          </div>
+
+          {/* THE one save button */}
+          <div className="flex justify-end gap-3">
             <button
-              onClick={() => setAdEnabled(!adEnabled)}
-              className={`relative w-11 h-6 rounded-full transition-colors duration-300 ${adEnabled ? 'bg-green-400' : 'bg-gray-700'}`}
+              onClick={() => navigate('/admin/hotspot-marketing')}
+              className="px-6 py-3 rounded-lg font-semibold text-gray-600 border border-gray-300"
             >
-              <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all duration-300 ${adEnabled ? 'left-6' : 'left-1'}`} />
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold disabled:opacity-50"
+            >
+              {saving ? 'Saving…' : isEditing ? 'Save Changes' : 'Create Ad'}
             </button>
           </div>
-          <button
-            onClick={handleSave}
-            disabled={loading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200
-              ${saved ? 'bg-green-500 text-white' : 'bg-green-400 hover:bg-green-300 text-black disabled:opacity-60'}`}
-          >
-            {loading
-              ? <><RefreshCw size={14} className="animate-spin" /> Saving...</>
-              : saved
-                ? <><CheckCircle size={14} /> Saved!</>
-                : <><Save size={14} /> Save Changes</>}
-          </button>
         </div>
       </div>
-
-      <div className="flex">
-
-        {/* ── Sidebar ── */}
-        <aside className="w-48 shrink-0 border-r border-gray-800 p-4 min-h-[calc(100vh-65px)] flex flex-col gap-1">
-          {TABS.map(tab => {
-            const Icon = tab.icon;
-            const active = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition-all border
-                  ${active
-                    ? 'bg-green-400/10 text-green-400 border-green-400/20'
-                    : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/50 border-transparent'}`}
-              >
-                <Icon size={15} />
-                {tab.label}
-                {/* Badge on packages tab if not set */}
-                {tab.id === 'packages' && rewardType === 'specific' && !selectedPackage && (
-                  <span className="ml-auto w-2 h-2 rounded-full bg-amber-400" />
-                )}
-              </button>
-            );
-          })}
-
-          <div className="mt-auto p-3 bg-gray-900 rounded-xl border border-gray-800">
-            <p className="text-xs text-gray-600 font-mono uppercase tracking-wider mb-2">Status</p>
-            <div className="flex items-center gap-2 mb-1">
-              <div className={`w-2 h-2 rounded-full ${adEnabled ? 'bg-green-400' : 'bg-gray-600'}`} />
-              <span className="text-xs text-gray-400">{adEnabled ? 'Live' : 'Inactive'}</span>
-            </div>
-            <p className="text-xs text-gray-600">{mediaPreview ? (mediaType === 'video' ? '📹 Video' : '🖼 Banner') : 'No media set'}</p>
-            <p className="text-xs text-gray-600 mt-0.5">
-              {mediaType === 'video' ? `${adDuration}s · ${selectedPos?.label}` : `Banner · ${selectedPos?.label}`}
-            </p>
-            <p className="text-xs text-gray-600 mt-0.5">
-              {rewardType === 'specific' && selectedPkg ? `📦 ${selectedPkg.name}` : ''}
-              {rewardType === 'choice' ? `📦 ${choicePackageIds.length} pkg choices` : ''}
-              {rewardType === 'free_browse' ? `🌐 ${freeMinutes}min free` : ''}
-            </p>
-          </div>
-        </aside>
-
-        {/* ── Main Panel ── */}
-        <main className="flex-1 p-8 overflow-y-auto">
-          <AnimatePresence mode="wait">
-
-            {/* ════ MEDIA TAB ════ */}
-            {activeTab === 'media' && (
-              <motion.div key="media"
-                initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.18 }}
-                className="max-w-2xl space-y-6"
-              >
-                <div>
-                  <h2 className="text-lg font-semibold mb-1 text-black dark:text-white">Upload Ad Media</h2>
-                  <p className="text-sm text-gray-700 dark:text-gray-400">Add a banner image or short video to show customers before they connect</p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider mb-2">Ad Title</label>
-                  <div className="relative">
-                    <Type size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="text" value={adTitle} onChange={e => setAdTitle(e.target.value)}
-                      placeholder="e.g. Get 20% off at Mama's Kitchen today!"
-                      className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-400 focus:outline-none focus:border-green-400 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider mb-2">
-                    Click-Through URL <span className="text-gray-600 normal-case font-normal">(optional)</span>
-                  </label>
-                  <div className="relative">
-                    <Link size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="url" value={adLink} onChange={e => setAdLink(e.target.value)}
-                      placeholder="https://yourbusiness.com"
-                      className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-400 focus:outline-none focus:border-green-400 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                {!mediaPreview ? (
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider mb-2">Media File</label>
-                    <div
-                      onDrop={handleDrop}
-                      onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
-                      onDragLeave={() => setIsDragging(false)}
-                      onClick={() => fileInputRef.current?.click()}
-                      className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-200
-                        ${isDragging ? 'border-green-400 bg-green-400/5' : 'border-gray-700 hover:border-green-400/50 hover:bg-gray-900/50 hover:text-white'}`}
-                    >
-                      <div className="w-14 h-14 rounded-2xl bg-gray-800 
-                      flex items-center justify-center mx-auto mb-4 ">
-                        <Upload size={22} className="text-green-400" />
-                      </div>
-                      <p className="text-sm font-semibold text-gray-400 mb-1 ">Drop your file here or click to browse</p>
-                      <p className="text-sm text-gray-600">Images: JPG, PNG, GIF, WebP · Videos: MP4, WebM, MOV</p>
-                      <p className="text-sm text-gray-700 mt-1">Max 50MB for video · 10MB for image</p>
-                    </div>
-                    <input ref={fileInputRef} type="file" accept="image/*,video/*" className="hidden"
-                      onChange={e => handleFileUpload(e.target.files[0])} />
-                  </div>
-                ) : (
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        {mediaType === 'video' ? '📹 Video Preview' : '🖼 Banner Preview'}
-                      </label>
-                      <button onClick={clearMedia} className="flex items-center gap-1.5 text-xs
-                       text-red-400 hover:text-red-300 transition-colors">
-                        <Trash2 size={13} /> Remove
-                      </button>
-                    </div>
-                    
-                    <div className="relative rounded-2xl overflow-hidden bg-gray-900 border border-gray-700">
-                      {mediaType === 'image' && <img src={mediaPreview || adLink} alt="Ad preview" className="w-full max-h-72 object-contain" />}
-                      {mediaType === 'video' && (
-                        <div className="relative">
-                          <video ref={videoPreviewRef} src={mediaPreview} className="w-full max-h-72 object-contain" onEnded={() => setVideoPlaying(false)} />
-                          <button onClick={toggleVideo} className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors group">
-                            <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center group-hover:scale-110 transition-transform">
-                              {videoPlaying ? <Pause size={20} className="text-white" /> : <Play size={20} className="text-white ml-1" />}
-                            </div>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    <div className="mt-3 flex items-center gap-2">
-                      <div className={`px-3 py-1 rounded-full text-xs font-semibold ${mediaType === 'video' ? 'bg-blue-400/10 text-blue-400' : 'bg-green-400/10 text-green-400'}`}>
-                        {mediaType === 'video' ? 'Video' : 'Image'}
-                      </div>
-                      <span className="text-xs text-gray-500 truncate">{mediaFile?.name}</span>
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            )}
-
-            {/* ════ POSITION TAB ════ */}
-            {activeTab === 'position' && (
-              <motion.div key="position"
-                initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.18 }}
-                className="max-w-2xl space-y-6"
-              >
-                <div>
-                  <h2 className="text-lg font-semibold mb-1 text-gray-800 dark:text-white">Ad Position</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Choose where the ad appears on the hotspot login page</p>
-                </div>
-                <div className="grid grid-cols-1 gap-3">
-                  {POSITIONS.map(pos => (
-                    <button key={pos.id} onClick={() => setPosition(pos.id)}
-                      className={`flex items-center gap-4 p-4 rounded-xl border text-left transition-all
-                        ${position === pos.id ? 'border-green-400 bg-green-400/5' : 'border-gray-700 hover:border-gray-600 bg-gray-900/40'}`}
-                    >
-                      <span className="text-2xl w-10 text-center">{pos.icon}</span>
-                      <div className="flex-1">
-                        <p className={`text-lg font-bold ${position === pos.id ? 'text-green-400' : 'text-gray-200'}`}>{pos.label}</p>
-                        <p className="text-sm text-gray-700 mt-0.5 dark:text-gray-400">{pos.description}</p>
-                      </div>
-                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${position === pos.id ? 'border-green-400' : 'border-gray-600'}`}>
-                        {position === pos.id && <div className="w-2 h-2 rounded-full bg-green-400" />}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                <div className="p-5 bg-gray-900 rounded-2xl border border-gray-800">
-                  <p className="text-xs text-gray-500 mb-4 font-semibold uppercase tracking-wider">Layout Diagram</p>
-                  <div className="relative w-48 h-28 bg-gray-800 rounded-lg mx-auto border border-gray-700 overflow-hidden">
-                    <div className="absolute inset-x-0 top-0 h-5 bg-gray-700 flex items-center justify-center">
-                      <div className="w-8 h-1 bg-gray-600 rounded-full" />
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center mt-5">
-                      <span className="text-xs text-gray-600">Login page</span>
-                    </div>
-                    {position === 'top-banner' && <div className="absolute top-5 inset-x-0 h-6 bg-green-400/40 border border-green-400/60 flex items-center justify-center"><span className="text-xs font-bold text-green-400">AD</span></div>}
-                    {position === 'bottom-banner' && <div className="absolute bottom-0 inset-x-0 h-6 bg-green-400/40 border border-green-400/60 flex items-center justify-center"><span className="text-xs font-bold text-green-400">AD</span></div>}
-                    {position === 'center-modal' && <div className="absolute inset-0 mt-5 flex items-center justify-center"><div className="w-24 h-12 bg-green-400/40 border border-green-400/60 rounded flex items-center justify-center"><span className="text-xs font-bold text-green-400">AD</span></div></div>}
-                    {position === 'bottom-right' && <div className="absolute bottom-2 right-2 w-16 h-10 bg-green-400/40 border border-green-400/60 rounded flex items-center justify-center"><span className="text-xs font-bold text-green-400">AD</span></div>}
-                    {position === 'bottom-left' && <div className="absolute bottom-2 left-2 w-16 h-10 bg-green-400/40 border border-green-400/60 rounded flex items-center justify-center"><span className="text-xs font-bold text-green-400">AD</span></div>}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* ════ TIMING TAB ════ */}
-            {activeTab === 'timing' && (
-              <motion.div key="timing"
-                initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.18 }}
-                className="max-w-2xl space-y-8"
-              >
-                <div>
-                  <h2 className="text-lg font-semibold mb-1 dark:text-white text-gray-900">Ad Timing</h2>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">Control how customers interact with the ad before accessing WiFi</p>
-                </div>
-                {mediaType === 'image' && (
-                  <div className="p-5 bg-blue-400/5 border border-blue-400/20 rounded-2xl flex gap-4 items-start">
-                    <div className="w-9 h-9 rounded-lg bg-blue-400/10 flex items-center justify-center shrink-0">
-                      <CheckCircle size={18} className="dark:text-blue-400 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="text-base font-semibold dark:text-blue-300 text-blue-600 mb-1">Banner Image — no timer needed</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">A banner image is static — customers simply view it and tap <strong className="dark:text-white text-black">Close</strong> or click through to your link.</p>
-                      <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                        <span className="px-3 py-1 bg-gray-800 rounded-full text-gray-300">✅ Instant dismiss</span>
-                        <span className="px-3 py-1 bg-gray-800 rounded-full text-gray-300">✅ Click-through link</span>
-                        <span className="px-3 py-1 bg-gray-800 rounded-full text-gray-300">✅ No wait time</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {!mediaType && (
-                  <div className="p-5 bg-gray-900 border border-gray-700 rounded-2xl flex gap-4 items-start">
-                    <div className="w-9 h-9 rounded-lg bg-gray-800 flex items-center justify-center shrink-0">
-                      <Timer size={18} className="text-gray-500" />
-                    </div>
-                    <div>
-                      <p className="text-base font-semibold text-white mb-1">No media uploaded yet</p>
-                      <p className="text-sm text-gray-300">Upload a video in the Media tab to configure timing and skip settings. For banner images, no timing is needed.</p>
-                    </div>
-                  </div>
-                )}
-                {mediaType === 'video' && (
-                  <>
-                    <div className="p-5 bg-gray-900 rounded-2xl border border-gray-800">
-                      <label className="block text-base font-semibold text-white uppercase tracking-wider mb-1">Video Duration</label>
-                      <p className="text-sm text-gray-300 mb-4">Customer must watch this long before WiFi unlocks</p>
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {DURATIONS.map(d => (
-                          <button key={d} onClick={() => setAdDuration(d)}
-                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all
-                              ${adDuration === d ? 'bg-green-400 text-black' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-200'}`}
-                          >{d}s</button>
-                        ))}
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-gray-300 mb-2">
-                        <span>Less friction</span>
-                        <span className="text-green-400 font-bold text-base">{adDuration} seconds</span>
-                        <span>More exposure</span>
-                      </div>
-                      <input type="range" min={5} max={60} step={5} value={adDuration}
-                        onChange={e => setAdDuration(Number(e.target.value))} className="w-full accent-green-400" />
-                    </div>
-                    <div className="p-5 bg-gray-900 rounded-2xl border border-gray-800">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <label className="block text-base font-semibold text-white uppercase tracking-wider">Allow Skip</label>
-                          <p className="text-sm text-gray-300 mt-0.5">Let users skip the video after a few seconds</p>
-                        </div>
-                        <button onClick={() => setCanSkip(!canSkip)}
-                          className={`relative w-11 h-6 rounded-full transition-colors duration-300 ${canSkip ? 'bg-green-400' : 'bg-gray-700'}`}
-                        >
-                          <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all duration-300 ${canSkip ? 'left-6' : 'left-1'}`} />
-                        </button>
-                      </div>
-                      {canSkip && (
-                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
-                          <label className="block text-xs text-gray-300 mb-3">
-                            Skip button appears after <span className="text-green-400 font-bold">{skipAfter}s</span>
-                          </label>
-                          <input type="range" min={3} max={Math.min(adDuration - 1, 30)} step={1} value={skipAfter}
-                            onChange={e => setSkipAfter(Number(e.target.value))} className="w-full accent-green-400" />
-                          <div className="flex justify-between text-xs text-gray-300 mt-1">
-                            <span>3s</span><span>{Math.min(adDuration - 1, 30)}s</span>
-                          </div>
-                        </motion.div>
-                      )}
-                    </div>
-                    <div className="p-5 bg-green-400/5 border border-green-400/20 rounded-2xl">
-                      <p className="text-xs font-semibold text-green-400 uppercase tracking-wider mb-3">Summary</p>
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-400 shrink-0" /><span className="text-gray-400">Video plays for <strong className="text-white">{adDuration} seconds</strong></span></li>
-                        <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-400 shrink-0" /><span className="text-gray-400">{canSkip ? <>Skip appears after <strong className="text-white">{skipAfter}s</strong></> : <>Skip <strong className="text-white">disabled</strong></>}</span></li>
-                        <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-400 shrink-0" /><span className="text-gray-400">WiFi unlocks after video completes</span></li>
-                      </ul>
-                    </div>
-                  </>
-                )}
-              </motion.div>
-            )}
-
-            {/* ════ PACKAGES TAB ════ */}
-            {activeTab === 'packages' && (
-              <motion.div key="packages"
-                initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.18 }}
-                className="max-w-2xl space-y-6"
-              >
-                <div>
-                  <h2 className="text-lg font-semibold mb-1
-                   text-gray-800 dark:text-white">Internet Package Reward</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Choose what internet access the customer receives after completing the ad
-                  </p>
-                </div>
-
-                {/* Reward type selector */}
-                <div className="grid grid-cols-1 gap-3">
-                  {[
-                    {
-                      id: 'specific',
-                      icon: Package,
-                      label: 'Assign a specific package',
-                      desc: 'Customer automatically gets one fixed package after the ad ends',
-                    },
-                   
-                    {
-                      id: 'free_browse',
-                      icon: Clock,
-                      label: 'Grant free timed browsing',
-                      desc: 'Give the customer a set number of free minutes — no package needed',
-                    },
-                  ].map(opt => {
-                    const Icon = opt.icon;
-                    const active = rewardType === opt.id;
-                    return (
-                      <button key={opt.id} onClick={() => setRewardType(opt.id)}
-                        className={`flex items-start gap-4 p-4 rounded-xl border text-left transition-all
-                          ${active ? 'border-green-400 bg-green-400/5' : 'border-gray-700 hover:border-gray-600 bg-gray-900/40'}`}
-                      >
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${active ? 'bg-green-400/20' : 'bg-gray-800'}`}>
-                          <Icon size={16} className={active ? 'text-green-400' : 'text-gray-500'} />
-                        </div>
-                        <div className="flex-1">
-                          <p className={`text-base font-semibold ${active ? 'text-green-400' : 'text-white'}`}>{opt.label}</p>
-                          <p className="text-sm text-gray-700 mt-0.5  dark:text-gray-300">{opt.desc}</p>
-                        </div>
-                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 ${active ? 'border-green-400' : 'border-gray-600'}`}>
-                          {active && <div className="w-2 h-2 rounded-full bg-green-400" />}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* ── SPECIFIC package picker ── */}
-                {rewardType === 'specific' && (
-                  <motion.div key="specific" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
-                    className="p-5 bg-gray-900 rounded-2xl border border-gray-800 space-y-3"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-white">Select Package</p>
-                        <p className="text-xs text-gray-500 mt-0.5">This package is automatically activated once the ad finishes</p>
-                      </div>
-                      {packagesLoading && <RefreshCw size={14} className="animate-spin text-gray-500" />}
-                    </div>
-
-                    {availablePackages.length === 0 && !packagesLoading && (
-                      <div className="flex items-center gap-2 p-3 bg-amber-400/10 border border-amber-400/20 rounded-lg">
-                        <AlertCircle size={14} className="text-amber-400 shrink-0" />
-                        <p className="text-xs text-amber-300">No packages found. Create packages in your hotspot settings first.</p>
-                      </div>
-                    )}
-
-                    <div className="grid grid-cols-1 gap-2 max-h-72 overflow-y-auto pr-1">
-                      {availablePackages.map(pkg => (
-                        <button key={pkg.id} onClick={() => setSelectedPackage(pkg.id)}
-                          className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all
-                            ${selectedPackage === pkg.id
-                              ? 'border-green-400 bg-green-400/5'
-                              : 'border-gray-700 hover:border-gray-600 bg-gray-800/40'}`}
-                        >
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0
-                            ${parseInt(selectedPackage) === pkg.id ? 'bg-green-400/20' : 'bg-gray-700'}`}>
-                            <Wifi size={14} className={parseInt(selectedPackage) === pkg.id ? 'text-green-400' : 'text-gray-400'} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-sm font-semibold truncate ${parseInt(selectedPackage) === pkg.id ? 'text-green-400' : 'text-gray-200'}`}>
-                              {pkg.name}
-                            </p>
-                            <div className="flex items-center gap-3 mt-0.5">
-                              <span className="text-xs text-gray-500 flex items-center gap-1">
-                                <Clock size={10} /> {pkg.valid}
-                              </span>
-                              <span className="text-xs text-gray-500 flex items-center gap-1">
-                                <DollarSign size={10} /> Ksh {pkg.price}
-                              </span>
-                            </div>
-                          </div>
-                          <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center
-                            ${parseInt(selectedPackage) === pkg.id ? 'border-green-400' : 'border-gray-600'}`}>
-                            {parseInt(selectedPackage) === pkg.id && <div className="w-2 h-2 rounded-full bg-green-400" />}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-
-                    {selectedPkg && (
-                      <div className="flex items-center gap-2 p-3 bg-green-400/10 border border-green-400/20 rounded-lg">
-                        <CheckCircle size={14} className="text-green-400 shrink-0" />
-                        <p className="text-xs text-green-300">
-                          After the ad, customers will receive: <strong>{selectedPkg.name}</strong> ({selectedPkg.valid})
-                        </p>
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-
-                {/* ── CHOICE package picker ── */}
-                {rewardType === 'choice' && (
-                  <motion.div key="choice" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
-                    className="p-5 bg-gray-900 rounded-2xl border border-gray-800 space-y-3"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-white">Select Packages to Offer</p>
-                      <p className="text-xs text-gray-500 mt-0.5">Tick each package the customer can choose from. They'll see these options after the ad</p>
-                    </div>
-
-                    {availablePackages.length === 0 && !packagesLoading && (
-                      <div className="flex items-center gap-2 p-3 bg-amber-400/10 border border-amber-400/20 rounded-lg">
-                        <AlertCircle size={14} className="text-amber-400 shrink-0" />
-                        <p className="text-xs text-amber-300">No packages found. Create packages in your hotspot settings first.</p>
-                      </div>
-                    )}
-
-                    <div className="grid grid-cols-1 gap-2 max-h-72 overflow-y-auto pr-1">
-                      {availablePackages.map(pkg => {
-                        const checked = choicePackageIds.includes(pkg.id);
-                        return (
-                          <button key={pkg.id} onClick={() => toggleChoicePackage(pkg.id)}
-                            className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all
-                              ${checked ? 'border-green-400 bg-green-400/5' : 'border-gray-700 hover:border-gray-600 bg-gray-800/40'}`}
-                          >
-                            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all
-                              ${checked ? 'bg-green-400 border-green-400' : 'border-gray-500'}`}>
-                              {checked && <CheckCircle size={12} className="text-black" />}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className={`text-sm font-semibold truncate ${checked ? 'text-green-400' : 'text-gray-200'}`}>{pkg.name}</p>
-                              <div className="flex items-center gap-3 mt-0.5">
-                                <span className="text-xs text-gray-500 flex items-center gap-1"><Clock size={10} /> {pkg.valid}</span>
-                                <span className="text-xs text-gray-500 flex items-center gap-1"><DollarSign size={10} /> Ksh {pkg.price}</span>
-                              </div>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {choicePackageIds.length > 0 && (
-                      <div className="flex items-center gap-2 p-3 bg-green-400/10 border border-green-400/20 rounded-lg">
-                        <CheckCircle size={14} className="text-green-400 shrink-0" />
-                        <p className="text-xs text-green-300">
-                          After the ad, customers will choose from <strong>{choicePackageIds.length}</strong> package{choicePackageIds.length > 1 ? 's' : ''}
-                        </p>
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-
-                {/* ── FREE BROWSE timer ── */}
-                {rewardType === 'free_browse' && (
-                  <motion.div key="free" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
-                    className="p-5 bg-gray-900 rounded-2xl border border-gray-800 space-y-4"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-white">Free Browsing Duration</p>
-                      <p className="text-xs text-gray-500 mt-0.5">How many minutes of free internet the customer gets after the ad</p>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      {FREE_DURATION_OPTIONS.map(m => (
-                        <button key={m} onClick={() => setFreeMinutes(m)}
-                          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all
-                            ${freeMinutes === m ? 'bg-green-400 text-black' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-200'}`}
-                        >
-                          {m >= 60 ? `${m / 60}hr` : `${m}min`}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div>
-                      <div className="flex justify-between text-xs text-gray-500 mb-1">
-                        <span>Duration</span>
-                        <span className="text-green-400 font-bold">{freeMinutes >= 60 ? `${freeMinutes / 60} hour` : `${freeMinutes} minutes`}</span>
-                      </div>
-                      <input type="range" min={15} max={120} step={15} value={freeMinutes}
-                        onChange={e => setFreeMinutes(Number(e.target.value))} className="w-full accent-green-400" />
-                    </div>
-
-                    <div className="flex items-center gap-2 p-3 bg-green-400/10 border border-green-400/20 rounded-lg">
-                      <CheckCircle size={14} className="text-green-400 shrink-0" />
-                      <p className="text-xs text-green-300">
-                        After the ad, customers get <strong>{freeMinutes >= 60 ? `${freeMinutes / 60} hour` : `${freeMinutes} minutes`}</strong> of free internet access
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </motion.div>
-            )}
-
-            {/* ════ PREVIEW TAB ════ */}
-            {activeTab === 'preview' && (
-              <motion.div key="preview"
-                initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.18 }}
-                className="max-w-2xl space-y-6"
-              >
-                <div>
-                  <h2 className="text-lg font-semibold mb-1 dark:text-white text-gray-900">Ad Preview</h2>
-                  <p className="text-sm text-gray-700 dark:text-gray-400">See how your ad looks to customers on the login page</p>
-                </div>
-                <div className="flex gap-2">
-                  {[{ id: 'mobile', icon: Smartphone, label: 'Mobile' }, { id: 'desktop', icon: Monitor, label: 'Desktop' }].map(d => {
-                    const Icon = d.icon;
-                    return (
-                      <button key={d.id} onClick={() => setPreviewDevice(d.id)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
-                          ${previewDevice === d.id ? 'bg-green-400 text-black' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
-                      >
-                        <Icon size={14} />{d.label}
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className={`mx-auto transition-all duration-300 ${previewDevice === 'mobile' ? 'max-w-xs' : 'max-w-2xl'}`}>
-                  <div className={`bg-gray-900 border-2 border-gray-700 overflow-hidden relative ${previewDevice === 'mobile' ? 'rounded-3xl' : 'rounded-xl'}`}>
-                    <div className="bg-gradient-to-br from-blue-900 to-indigo-900 p-6 min-h-64 flex flex-col items-center justify-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                        <RefreshCw size={20} className="text-white/50" />
-                      </div>
-                      <p className="text-white/50 text-sm">Hotspot Login Page</p>
-                      <div className="w-48 h-10 bg-white/10 rounded-lg" />
-                      <div className="w-32 h-8 bg-blue-500/60 rounded-full" />
-                    </div>
-                    {mediaPreview && (
-                      <>
-                        {position === 'top-banner' && <div className="absolute top-0 inset-x-0"><AdCard mediaType={mediaType} mediaPreview={mediaPreview} adTitle={adTitle} adDuration={adDuration} canSkip={canSkip} skipAfter={skipAfter} compact /></div>}
-                        {position === 'bottom-banner' && <div className="absolute bottom-0 inset-x-0"><AdCard mediaType={mediaType} mediaPreview={mediaPreview} adTitle={adTitle} adDuration={adDuration} canSkip={canSkip} skipAfter={skipAfter} compact /></div>}
-                        {position === 'center-modal' && (
-                          <div className="absolute inset-0 bg-black/60 flex items-center justify-center p-4">
-                            <div className="w-full max-w-xs"><AdCard mediaType={mediaType} mediaPreview={mediaPreview} adTitle={adTitle} adDuration={adDuration} canSkip={canSkip} skipAfter={skipAfter} /></div>
-                          </div>
-                        )}
-                        {position === 'bottom-right' && <div className="absolute bottom-3 right-3 w-44"><AdCard mediaType={mediaType} mediaPreview={mediaPreview} adTitle={adTitle} adDuration={adDuration} canSkip={canSkip} skipAfter={skipAfter} compact /></div>}
-                        {position === 'bottom-left' && <div className="absolute bottom-3 left-3 w-44"><AdCard mediaType={mediaType} mediaPreview={mediaPreview} adTitle={adTitle} adDuration={adDuration} canSkip={canSkip} skipAfter={skipAfter} compact /></div>}
-                      </>
-                    )}
-                    {!mediaPreview && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-center p-6">
-                          <Upload size={28} className="text-gray-600 mx-auto mb-2" />
-                          <p className="text-xs text-gray-600">Upload media in the Media tab to see a preview</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Config summary chips */}
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { label: 'Type', value: mediaType === 'video' ? 'Video' : mediaType === 'image' ? 'Banner' : 'Not set' },
-                    { label: 'Position', value: selectedPos?.label || '—' },
-                    { label: mediaType === 'video' ? 'Duration' : 'Timing', value: mediaType === 'video' ? `${adDuration}s` : 'Instant dismiss' },
-                    {
-                      label: 'Reward',
-                      value: rewardType === 'specific' && selectedPkg
-                        ? selectedPkg.name
-                        : rewardType === 'choice'
-                          ? `${choicePackageIds.length} pkg choices`
-                          : rewardType === 'free_browse'
-                            ? `${freeMinutes >= 60 ? freeMinutes / 60 + 'hr' : freeMinutes + 'min'} free`
-                            : 'Not set'
-                    },
-                  ].map(item => (
-                    <div key={item.label} className="p-3 bg-gray-900 rounded-xl border border-gray-800 text-center">
-                      <p className="text-xs text-gray-500 mb-1">{item.label}</p>
-                      <p className="text-sm font-semibold text-white truncate">{item.value}</p>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-
-          </AnimatePresence>
-        </main>
-      </div>
-    </div>
+    </>
   );
 }

@@ -2,7 +2,7 @@
 import MaterialTable from 'material-table'
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { IconButton } from '@mui/material';
+import { IconButton, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import {useState,useEffect, useCallback,} from'react'
 import dayjs from 'dayjs';
@@ -27,7 +27,8 @@ import { FaShareNodes } from "react-icons/fa6";
 import { MdOutlinePhoneForwarded } from "react-icons/md";
 import { GoPaperclip } from "react-icons/go";
 import {useNavigate} from 'react-router-dom'
-
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
 
 
 
@@ -57,35 +58,51 @@ const [showClientStatsAndSUbscriptions, setShowClientStatsAndSubscriptions] = us
 const [onlyShowSubscription, setOnlyShowSubscription] = useState(false)
 
 const [searchInput] = useDebounce(search, 1000)
-const [isSearching, setIsSearching] = useState(false); // New state for search loading
+const [isSearching, setIsSearching] = useState(false); 
 
 const [subscriberId, setSubscriberId] = useState('')
 
+const [statusFilter, setStatusFilter] = useState('all');
+const [routers, setRouters] = useState([]);
+const [routerFilter, setRouterFilter] = useState('all');
+const statusCounts = useMemo(() => {
+  const counts = { Active: 0, Online: 0, Throttled: 0, Expiring: 0, Expired: 0 };
+  tableDataSubscriber.forEach((s) => {
+    const st = (s.status || '').toLowerCase();
+    if (st === 'active') counts.Active++;
+    else if (st === 'online') counts.Online++;
+    else if (st === 'throttled') counts.Throttled++;
+    else if (st === 'expiring') counts.Expiring++;
+    else if (st === 'expired') counts.Expired++;
+  });
+  return counts;
+}, [tableDataSubscriber]);
 
 
-// const handleChange = (e)=> {
 
-//     const {id, value} = e.target
-//     setFormDataSubscriber({...formDataSubscriber, [id]: value})
-//   }
+
+const filteredSubscribers = useMemo(() => {
+  return tableDataSubscriber.filter((s) => {
+    const statusMatch =
+      statusFilter === 'all' ||
+      (s.status || '').toLowerCase() === statusFilter.toLowerCase();
+
+    const routerMatch =
+      routerFilter === 'all' ||
+      (s.router_name || s.nas_router) === routerFilter;
+
+    return statusMatch && routerMatch;
+  });
+}, [tableDataSubscriber, statusFilter, routerFilter]);
+
+
+
   const handleClickOpen = () => {
     // setOpen(true);
     setEditingSubscriber(true)
     // setFormData(intialValue)
     setShowClientStatsAndSubscriptions(true)
 
-// navigate(`/admin/subscriber-details?id=${encodeURIComponent(subscriberId)}
-//  &formData=${encodeURIComponent(formData)}
-//  &createSubscriber=${encodeURIComponent(createSubscriber)}
-  
-//  &name=${encodeURIComponent(formData.name)}
-//  &packageName=${encodeURIComponent(formData.package_name)}
-//  &package_name=${encodeURIComponent(formData.package_name)}
-//    &setFormData=${encodeURIComponent(setFormData)} 
-//     &selectedLocations=${encodeURIComponent(selectedLocations)}
-//      &setSelectedLocations=${encodeURIComponent(setSelectedLocations)}
-//       &editingSubscriber=${encodeURIComponent(editingSubscriber)}
-//        &setEditingSubscriber=${encodeURIComponent(setEditingSubscriber)}`)
   };
 
 
@@ -115,6 +132,49 @@ const [subscriberId, setSubscriberId] = useState('')
   
 
 
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
   
   
 
@@ -138,7 +198,6 @@ const handleClickRow = () => {
   const handleRowClick = (event, rowData) => {
     setOnlyShowSubscription(true)
     setEditingSubscriber(true)
-   console.log('showClientStatsAndSUbscriptions',showClientStatsAndSUbscriptions)
     setShowClientStatsAndSubscriptions(true)
     setSelectedLocations(rowData.location)
     setSubscriberId(rowData.id)
@@ -335,10 +394,21 @@ toast.error('failed to delete subscriber', {
 
 
 
-  const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
+const fetchRouters = useCallback(async () => {
+  try {
+    const response = await fetch('/api/routers', {
+      headers: { 'X-Subdomain': subdomain },
+    });
+    const data = await response.json();
+    if (response.ok) setRouters(data || []);
+  } catch (error) {
+    // silent fail is fine here, filter just won't populate
+  }
+}, [subdomain]);
+
+useEffect(() => {
+  fetchRouters();
+}, [fetchRouters]);
 
   
 
@@ -517,6 +587,8 @@ navigate(`/admin/subscriber-details?id=${encodeURIComponent(params.id)}
     <DeleteSubscriber  openDelete={openDelete} handleCloseDelete={handleCloseDelete} 
     deleteSubscriber={deleteSubscriber} id={formDataSubscriber.id}
      loading={loading}/>
+
+
       <Toaster />
       <Backdrop open={openLoad} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
   
@@ -562,12 +634,73 @@ packageName={formData.package_name}
 </div>
 
 
+<div className="flex gap-2 flex-wrap items-center my-3 font-sans
+">
+  {[
+    { label: 'Active', value: 'active', color: 'bg-green-600' },
+    { label: 'Online', value: 'online', color: 'bg-blue-600' },
+    { label: 'Throttled', value: 'throttled', color: 'bg-orange-500' },
+    { label: 'Expiring', value: 'expiring', color: 'bg-yellow-500' },
+    { label: 'Expired', value: 'expired', color: 'bg-red-600' },
+  ].map((item) => (
+    <button
+      key={item.value}
+      onClick={() =>
+        setStatusFilter((prev) => (prev === item.value ? 'all' : item.value))
+      }
+      className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium text-white
+        transition transform hover:scale-105
+        ${statusFilter === item.value ? `${item.color} ring-2 ring-offset-1 ring-black` : `${item.color} opacity-70`}
+      `}
+    >
+      {item.label}
+      <span className="bg-white/30 rounded-full px-1.5">
+        {statusCounts[item.label]}
+      </span>
+    </button>
+  ))}
+
+<ThemeProvider theme={tableTheme}>
+
+ <FormControl size="small" sx={{ minWidth: 180, ml: 2 }}>
+    <InputLabel><p className='font-sans
+'>Router </p></InputLabel>
+    <Select
+      value={routerFilter}
+      label="Router"
+      onChange={(e) => setRouterFilter(e.target.value)}
+    >
+      <MenuItem value="all">
+        <em className='font-sans
+'>All Routers</em>
+      </MenuItem>
+      {routers.map((r) => (
+        <MenuItem key={r.id} value={r.name}>
+          {r.name}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+
+</ThemeProvider >
+  {statusFilter !== 'all' && (
+    <button
+      onClick={() => setStatusFilter('all')}
+      className="text-sm text-gray-500 underline ml-2 font-sans
+"
+    >
+      Clear filter
+    </button>
+  )}
+</div>
+<div className="rounded-2xl border border-[#e5e0d5] overflow-hidden shadow-sm">
+
+<ThemeProvider theme={tableTheme}>
+
 <MaterialTable columns={columns}
 isLoading={isSearching}
-data={tableDataSubscriber}
-title={<p className='bg-gradient-to-r from-green-600 via-blue-400 to-cyan-500 bg-clip-text
-  
-  text-transparent font-bold text-xl'>PPPoe Subscribers</p>}
+data={filteredSubscribers}
+title={<p className=' font-bold text-xl font-sans'>PPPoe Subscribers</p>}
 
 onRowClick={(event, rowData)=>handleRowClick(event, rowData)}
 icons={{
@@ -599,32 +732,46 @@ localization={{
               
               }}
 
-
 options={{
-  sorting: true,
-  pageSizeOptions:[2, 5, 10],
-  pageSize: 10,
-  paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-selection: true,
-search:false,
-searchAutoFocus: true,
-showSelectAllCheckbox: false,
-showTextRowsSelected: false,
-  emptyRowsWhenPaging: false,
-headerStyle:{
-  fontFamily: 'bold',
-  textTransform: 'uppercase'
-  } ,
-  
-  
-  fontFamily: 'mono'
-}}
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'monospace',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'monospace',
+      }),
+    }}
+      
 
 
 
 />
+</ThemeProvider>
+
+</div>
+
 
 <div>{savedNotification && <SubscriberNotification/>}</div>
     </div>

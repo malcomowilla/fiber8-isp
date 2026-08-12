@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle, FiClock, FiRefreshCw, FiMail } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { FaPhoneVolume } from "react-icons/fa";
-
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
 
 const LicenseExpired = () => {
 
@@ -90,7 +91,7 @@ let dateExpiryHotspot = new Date(clean2);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 font-sans 
     flex items-center justify-center p-4">
       <AnimatePresence>
         <motion.div

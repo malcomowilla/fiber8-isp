@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useState, useEffect, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -23,6 +22,10 @@ import { TbLockPassword } from "react-icons/tb";
 import { FaUserEdit, FaMapMarkerAlt } from "react-icons/fa"; 
 import { TbWorldLatitude } from "react-icons/tb";
 import { TbWorldLongitude } from "react-icons/tb";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import {useState,useMemo, useEffect, useCallback} from 'react'
+
+
 
 
 
@@ -39,6 +42,59 @@ function EditAccessPoints({ open, handleClose, handleSubmit,
   };
 
   const subdomain = window.location.hostname.split('.')[0];
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
+
+
+
+
+
+
 
   const getNodes = useCallback(async () => {
     try {
@@ -59,6 +115,8 @@ function EditAccessPoints({ open, handleClose, handleSubmit,
   }, [getNodes]);
 
   return (
+              <ThemeProvider theme={tableTheme}>
+    
     <Dialog
       fullWidth={fullWidth}
       maxWidth={maxWidth}
@@ -74,12 +132,16 @@ function EditAccessPoints({ open, handleClose, handleSubmit,
       }}
     >
       <motion.div
+      className='font-sans
+'
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
         <DialogTitle sx={{ fontSize: '1.5rem', fontWeight: 600, color: '#1e293b' }}>
-          {editingRouter ? 'Edit Access Point' : 'Add Access Point'}
+          {editingRouter ? <p className='font-sans
+'>Edit Access Point</p> : <p className='font-sans
+'>Add Access Point</p>}
         </DialogTitle>
       </motion.div>
 
@@ -243,11 +305,15 @@ function EditAccessPoints({ open, handleClose, handleSubmit,
             color="success"
             sx={{ borderRadius: '8px', px: 4, background: '#22c55e' }}
           >
-            {editingRouter ? 'Update' : 'Save'}
+            {editingRouter ? <p font-sans
+>Update</p> : <p className='font-sans
+'>Save</p>}
           </LoadingButton>
         </motion.div>
       </DialogActions>
     </Dialog>
+         </ThemeProvider>
+    
   );
 }
 

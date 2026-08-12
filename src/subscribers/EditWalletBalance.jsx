@@ -29,6 +29,8 @@ import { IoWalletOutline } from "react-icons/io5";
 import {useSearchParams} from 'react-router-dom';
 import toast,{ Toaster } from 'react-hot-toast';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
 
 
 
@@ -52,6 +54,52 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
 const subdomain = window.location.hostname.split('.')[0];
 
+
+
+
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
 
 
 
@@ -129,6 +177,8 @@ const handleCreateWalletBalance = async(e)  => {
 }
 
   return (
+    <ThemeProvider theme={tableTheme}>
+    
     <React.Fragment>
       <Toaster />
 <Dialog
@@ -187,7 +237,8 @@ const handleCreateWalletBalance = async(e)  => {
             
               <IoWalletOutline  sx={{ fontSize: 32 }} />
             <Typography variant="h5" component="span" fontWeight="bold">
-              Edit Wallet Balance
+              <p className='font-sans
+'>Edit Wallet Balance </p>
             </Typography>
           </Box>
         </DialogTitle>
@@ -217,7 +268,8 @@ const handleCreateWalletBalance = async(e)  => {
     },
     mt: 2
   }}
-      label="Wallet Balance"
+      label={<p className='font-sans
+'>Wallet Balance</p>}
       required
       InputProps={{
         startAdornment: <IoWalletOutline className='mr-2'  />
@@ -258,7 +310,8 @@ onChange={(e)=> setWalletBalance(e.target.value)}
               }
             }}
           >
-            Cancel
+           <p className='font-sans
+'> Cancel </p>
           </Button>
 
           <Button
@@ -278,7 +331,8 @@ onChange={(e)=> setWalletBalance(e.target.value)}
             {loading ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
-              'Save Changes'
+              <p className='font-sans
+'>Save Changes</p>
             )}
           </Button>
         </DialogActions>
@@ -290,6 +344,8 @@ onChange={(e)=> setWalletBalance(e.target.value)}
        
       </Dialog>
     </React.Fragment>
+    </ThemeProvider>
+    
   );
 }
 export default EditWalletBalance

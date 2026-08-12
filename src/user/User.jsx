@@ -1,26 +1,20 @@
 import DeleteIcon from '@mui/icons-material/Delete';
-
-
 import EditIcon from '@mui/icons-material/Edit';
-
 import { IconButton, Tooltip } from '@mui/material';
 import { FaPhoneVolume } from "react-icons/fa6";
-
 import AddIcon from '@mui/icons-material/Add';
-
 import { IoPeople } from "react-icons/io5";
-
 import MaterialTable from 'material-table'
-
 import {useState, useEffect, useCallback} from 'react'
 import InvitationForm from  './InvitationForm'
 import toast,{Toaster} from 'react-hot-toast'
 import DeleteUser from '../delete/DeleteUser'
 import { useDebounce } from 'use-debounce';
 import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading animation
-
 import { LuDot } from "react-icons/lu";
 import {RefreshCw} from 'lucide-react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
 
 
 const User = () => {
@@ -79,6 +73,49 @@ const [permissionAndRoles, setPermissionAndRoles] = useState({
   equipment: {read: false, readWrite: false},
 
 });
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
 
 
 
@@ -707,11 +744,14 @@ useEffect(() => {
           className="bg-gray-50 border border-gray-300 text-gray-900 
          text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full ps-10 p-2.5 
            dark:border-gray-600 dark:placeholder-gray-400 dark:text-black
-           dark:focus:ring-green-500 dark:focus:border-green-500" placeholder="Search for users..."  />
+           dark:focus:ring-green-500 dark:focus:border-green-500 font-sans
+" placeholder="Search for users..."  />
      </div>
      <button
           type="button"
-          className="p-2.5 ms-2 text-sm font-medium text-white bg-green-700 rounded-lg border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+          className="p-2.5 ms-2 text-sm font-medium text-white bg-green-700 rounded-lg border
+           border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300
+            dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
         >
           {isSearching ? (
             <RefreshCw className='animate-spin text-blue-500 w-12 h-12 mx-auto ' />
@@ -732,7 +772,8 @@ useEffect(() => {
               />
             </svg>
           )}
-          <span className="sr-only">Search</span>
+          <span className="sr-only font-sans
+">Search</span>
         </button>
  </div>
 
@@ -769,11 +810,13 @@ useEffect(() => {
   </div>
 )} 
 
+<ThemeProvider theme={tableTheme}>
 
       <MaterialTable columns={columns}
       onRowClick={handleRowAdd}
-      title={<p className='bg-gradient-to-r from-green-600 via-blue-400
-         to-cyan-500 bg-clip-text text-transparent text-2xl font-bold'>Users </p>}
+      title={<p className='
+         text-2xl font-bold font-sans
+'>Users </p>}
       className='relative'
        data={users}
 
@@ -789,7 +832,8 @@ useEffect(() => {
 
 localization={{
                 body: {
-                  emptyDataSourceMessage: 'No users found. Create your first user to get started!'
+                  emptyDataSourceMessage: <p className='font-sans
+'> No users found. Create your first user to get started! </p>
                 },
                
               
@@ -797,31 +841,43 @@ localization={{
               }}
 
 
-options={{
-  sorting: true,
-  pageSizeOptions:[2, 5, 10],
-  pageSize: 10,
-  paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-selection: true,
-search:false,
-searchAutoFocus: true,
-showSelectAllCheckbox: false,
-showTextRowsSelected: false,
-  emptyRowsWhenPaging: false,
-headerStyle:{
-  fontFamily: 'bold',
-  textTransform: 'uppercase'
-  } ,
-  
-  
-  fontFamily: 'mono'
-}}
+ options={{
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'monospace',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'monospace',
+      }),
+    }}
       
       
       
       />
+      </ThemeProvider>
+      
 
     </div>
     </div>

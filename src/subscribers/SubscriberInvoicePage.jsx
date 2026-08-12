@@ -868,7 +868,7 @@ const status = (searchParams.get('status') || '').trim()
 
                 <div className='flex gap-2'> 
 <p className='font-bold'>Paybill:</p>
-<p>{shortCode}</p>
+<p>{shortCode || "4007893"}</p>
 
                 </div>
 

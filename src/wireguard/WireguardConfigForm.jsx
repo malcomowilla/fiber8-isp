@@ -9,7 +9,7 @@
  *   5. Optionally configures PPPoE / Hotspot on the same device
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Router, Shield, Terminal, CheckCircle, Copy, Check,
@@ -18,6 +18,11 @@ import {
   Download, QrCode, Info, ArrowRight, Loader
 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
+import { useLayoutEffect } from "react";
+
+
+
+
 
 // ── CSS ────────────────────────────────────────────────────────────────────────
 const CSS = `
@@ -257,6 +262,8 @@ export default function MikrotikWireguardOnboarding({ onComplete }) {
 
   // ── Step 2 result (from API) ─────────────────────────────────────────────────
   const [wgConfig, setWgConfig] = useState(null);
+  const [userScript, setUserScript] = useState(null);
+  const [showSecrets, setShowSecrets] = useState(false);
   // { mikrotik_config, server_config, client_ip, server_ip, network,
   //   private_key, public_key, qr_code_data_url }
 
@@ -264,8 +271,12 @@ export default function MikrotikWireguardOnboarding({ onComplete }) {
   const [services, setServices] = useState({
     pppoe:   false,
     hotspot: false,
+    bridges:       false,           // ← add this
+
     pppoe_pool:   '192.168.100.2-192.168.100.254',
     hotspot_pool: '10.3.0.2-10.3.0.254',
+      pppoe_ports:   'ether2,ether3',  // ← add this
+  hotspot_ports: 'ether4,ether5',  // ← add this
     pppoe_secret_prefix: 'client',
   });
 
@@ -294,7 +305,24 @@ export default function MikrotikWireguardOnboarding({ onComplete }) {
       });
       const data = await res.json();
       if (!res.ok) { toast.error(data.error || 'Failed to generate config'); return; }
-      setWgConfig(data);
+      // setWgConfig(data);
+
+
+      const apiUserScript = `
+/user add name=${data.api_username} password=${data.api_password} group=full comment="Owitech API User"
+/radius incoming set accept=yes port=3799
+/radius add service=ppp,hotspot \
+  address=10.2.0.1 \
+  timeout=3s \
+  secret=${data.api_password} \
+  protocol=udp
+/ip service set api disabled=no port=8728
+/ip service set api-ssl disabled=yes
+`
+
+
+setUserScript(apiUserScript)
+setWgConfig({ ...data, api_user_script: apiUserScript })
       toast.success('WireGuard configuration generated!');
       setStep(2); // Jump straight to script view
     } catch (e) {
@@ -344,7 +372,27 @@ export default function MikrotikWireguardOnboarding({ onComplete }) {
           clearInterval(pollRef.current);
           setTunnelUp(true);
           setPolling(false);
-          toast.success('Tunnel is UP! MikroTik connected successfully.');
+          // toast.success('Tunnel is UP! MikroTik connected successfully.');
+            toast.success(<p className='font-sans'> Tunnel is UP! Provisioning router…</p>)
+
+
+             // Auto-provision: push API user to router
+  try {
+    const provRes = await fetch('/api/wireguard/provision_router', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+      body: JSON.stringify({ router_id: wgConfig.router_id })
+    })
+    const provData = await provRes.json()
+    if (provRes.ok) {
+      toast.success('Router provisioned! NAS created automatically.')
+    } else {
+      toast.error('Tunnel up but provisioning failed: ' + provData.error)
+    }
+  } catch {
+    toast.error('Provisioning call failed — do it manually in NAS settings.')
+  }
+
           setTimeout(() => setStep(4), 1200);
         }
       } catch (_) {}
@@ -364,45 +412,78 @@ export default function MikrotikWireguardOnboarding({ onComplete }) {
 /interface pppoe-server server add service-name=pppoe interface=ether1 authentication=mschap2 default-profile=pppoe-profile enabled=yes max-sessions=500
 /ip firewall nat add chain=srcnat out-interface=ether1 action=masquerade`;
 
-  const hotspotScript = `# Hotspot Setup — paste in MikroTik terminal  
- /interface bridge add name=bridge-hotspot comment="Owitech Hotspot"
-    /interface/bridge/port add interface=ether5 bridge=bridge-hotspot
-    /ip pool
-    add name=hotspot-pool ranges=10.3.0.2-10.3.0.254 comment="Hotspot IP Pool Owitech"
-
-    /ip address
-add address=10.3.0.1/24 comment="hotspot network Owitech" interface=bridge-hotspot
-/ip dhcp-server
-add address-pool=hotspot-pool disabled=no interface=bridge-hotspot lease-time=40m name=hotspot-dhcp comment="Hotspot DHCP Owitech"
-
-/ip dhcp-server network
-add address=10.3.0.0/24 comment="hotspot network Owitech" gateway=10.3.0.1 netmask=255.255.255.0 dns-s=8.8.8.8
-    /ip hotspot profile add name=hsprof1 hotspot-address=10.3.0.1 use-radius=yes radius-accounting=yes radius-interim-update=10s
-    
-
-  /ip hotspot add name=hotspot1 interface=bridge-hotspot profile=hsprof1 address-pool=hotspot-pool disabled=no 
-
-/ip dns
-set allow-remote-requests=yes
-
-# Walled Garden for AITechs
-/ip hotspot walled-garden ip add action=accept dst-host=${window.location.hostname.split('.')[0]}.owitech.co.ke
-/ip hotspot walled-garden add action=allow dst-host="^:${window.location.hostname.split('.')[0]}.owitech.co.ke path=:/hotspot-page\\$"
-
-
-
-    /ip firewall nat add chain=srcnat action=masquerade out-interface=bridge-hotspot comment="Hotspot Owitech"
 
 
 
 
 
-`;
 
-  // ── Render ────────────────────────────────────────────────────────────────────
+
+const bridgeSetupScript = useMemo(() => {
+  const pppoePorts = services.pppoe_ports
+    .split(',').map(p => p.trim()).filter(Boolean);
+  const hotspotPorts = services.hotspot_ports
+    .split(',').map(p => p.trim()).filter(Boolean);
+
+  const pppoePortLines = pppoePorts
+    .map(p => `add interface=${p} bridge=bridge-pppoe`)
+    .join('\n');
+  const hotspotPortLines = hotspotPorts
+    .map(p => `add interface=${p} bridge=bridge-hotspot`)
+    .join('\n');
+
+  return `# ── Step 1: Create Bridges ─────────────────────────────────────────
+/interface bridge
+add name=bridge-pppoe   comment="Owitech PPPoE Bridge"
+add name=bridge-hotspot comment="Owitech Hotspot Bridge"
+
+# ── Step 2: Assign Ports to PPPoE Bridge (${services.pppoe_ports}) ──────────
+/interface bridge port
+${pppoePortLines}
+
+# ── Step 3: Assign Ports to Hotspot Bridge (${services.hotspot_ports}) ──────
+/interface bridge port
+${hotspotPortLines}`;
+}, [services.pppoe_ports, services.hotspot_ports]);
+
+ const hotspotScript = `# Hotspot Setup
+/interface bridge add name=bridge-hotspot comment="Owitech Hotspot"
+/interface/bridge/port add interface=ether5 bridge=bridge-hotspot
+/ip pool add name=hotspot-pool ranges=10.3.0.2-10.3.0.254
+/ip address add address=10.3.0.1/24 interface=bridge-hotspot
+/ip dhcp-server add address-pool=hotspot-pool interface=bridge-hotspot lease-time=40m name=hotspot-dhcp
+/ip dhcp-server network add address=10.3.0.0/24 gateway=10.3.0.1 netmask=255.255.255.0 dns-server=8.8.8.8
+${services.use_radius
+  ? `/ip hotspot profile add name=hsprof1 hotspot-address=10.3.0.1 use-radius=yes radius-accounting=yes radius-interim-update=10s`
+  : `/ip hotspot profile add name=hsprof1 hotspot-address=10.3.0.1 use-radius=no login-by=http-chap,cookie`}
+/ip hotspot add name=hotspot1 interface=bridge-hotspot profile=hsprof1 address-pool=hotspot-pool disabled=no
+/ip dns set allow-remote-requests=yes
+/ip hotspot walled-garden ip add action=accept dst-host=${window.location.hostname}
+/ip hotspot walled-garden ip add action=accept dst-host=res.cloudinary.com
+/ip firewall nat add chain=srcnat action=masquerade out-interface=bridge-hotspot`;
+
+const activeService = (() => {
+  // Check which services are enabled and return the first one
+  if (services.bridges) return { label: 'Bridge Setup', badge: 'Active', color: '#8b5cf6' };
+  if (services.pppoe) return { label: 'PPPoE Server', badge: 'Active', color: '#6366f1' };
+  if (services.hotspot) return { label: 'Hotspot', badge: 'Active', color: '#0ea5e9' };
+  return null; // No active service
+})();
+
+
+
+
+useLayoutEffect(() => {
+  const style = document.createElement("style");
+  style.innerHTML = CSS;
+  document.head.appendChild(style);
+
+  return () => style.remove();
+}, []);
+
   return (
     <>
-      <style>{CSS}</style>
+      {/* <style>{CSS}</style> */}
       <Toaster position="top-right" 
       toastOptions={{ style:{ fontFamily:'DM Sans,sans-serif', fontSize:13 } }}/>
       {showQr && wgConfig?.qr_code_data_url && (
@@ -416,6 +497,20 @@ set allow-remote-requests=yes
          flexDirection:'column', alignItems:'center',
       }}>
         <div style={{ width:'100%', maxWidth:760 }}>
+
+<p style={{ fontSize:14, fontWeight:600, color:'#111827', margin:'0 0 2px' }}>
+  {activeService?.label || 'MikroTik Router'}
+  {activeService?.badge && (
+    <span style={{
+      marginLeft:8, fontSize:10, padding:'2px 7px',
+      borderRadius:4, fontWeight:600,
+      background:`${activeService.color}14`, color:activeService.color,
+      border:`1px solid ${activeService.color}33`,
+    }}>{activeService.badge}</span>
+  )}
+</p>
+
+
 
           {/* Page header */}
           <motion.div initial={{ opacity:0, y:-12 }}
@@ -560,16 +655,22 @@ set allow-remote-requests=yes
                       {wgConfig.private_key}
                     </p>
                   </div>
-
+{/* apiUserScript */}
                   {/* MikroTik script */}
                   <div style={{ marginBottom:8 }}>
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
                       <span style={{ fontSize:13, fontWeight:600, color:'#374151' }}>MikroTik Terminal Script</span>
                       <div style={{ display:'flex', gap:8 }}>
-                        <button onClick={() => copy(wgConfig.mikrotik_config, 'script')}
+                        <button onClick={() => {
+                          copy(wgConfig.mikrotik_config, 'script')
+                          // copy(userScript, 'script')
+                          
+                        }}
                           className="wg-btn-ghost" style={{ padding:'6px 12px', fontSize:12 }}>
                           {copied==='script' ? <><Check size={12}/> Copied!</> : <><Copy size={12}/> Copy Script</>}
                         </button>
+
+                        
                         <button onClick={generateAppConfig} disabled={loading}
                           className="wg-btn-ghost" style={{ padding:'6px 12px', fontSize:12 }}>
                           <QrCode size={12}/> QR Code
@@ -578,8 +679,75 @@ set allow-remote-requests=yes
                     </div>
                     <div className="wg-code-block">
                       <HighlightedScript text={wgConfig.mikrotik_config}/>
+                      {/* <HighlightedScript text={wgConfig.mikrotik_config + '\n' + wgConfig.api_user_script} /> */}
+
                     </div>
                   </div>
+
+
+                        {/* API User Script — separate block with blurred secrets */}
+<div style={{ marginTop: 16, marginBottom: 8 }}>
+  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
+    <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+      <Key size={13} style={{ color:'#ea580c' }}/>
+      <span style={{ fontSize:13, fontWeight:600, color:'#374151' }}>API User & RADIUS Script</span>
+      <span style={{ fontSize:10, background:'#fff7ed', color:'#ea580c', border:'1px solid #fed7aa', borderRadius:4, padding:'2px 7px', fontWeight:600 }}>
+        Contains credentials
+      </span>
+    </div>
+    <div style={{ display:'flex', gap:8 }}>
+      <button
+        onClick={() => setShowSecrets(p => !p)}
+        style={{ background:'none', border:'none', cursor:'pointer', color:'#6b7280', display:'flex', alignItems:'center', gap:4, fontSize:11 }}>
+        {showSecrets ? <EyeOff size={13}/> : <Eye size={13}/>} {showSecrets ? 'Hide secrets' : 'Show secrets'}
+      </button>
+      <button
+        onClick={() => copy(wgConfig.api_user_script, 'api_script')}
+        className="wg-btn-ghost" style={{ padding:'6px 12px', fontSize:12 }}>
+        {copied === 'api_script' ? <><Check size={12}/> Copied!</> : <><Copy size={12}/> Copy Script</>}
+      </button>
+    </div>
+  </div>
+
+  <div className="wg-code-block">
+    <pre>
+      {wgConfig.api_user_script?.split('\n').map((line, i) => {
+        // Blur password= and secret= values
+        const sensitivePatterns = [/password=(\S+)/, /secret=(\S+)/];
+        let rendered = line;
+        let hasSensitive = sensitivePatterns.some(p => p.test(line));
+
+        if (hasSensitive && !showSecrets) {
+          rendered = line.replace(/(password=|secret=)(\S+)/g, (_, key, val) =>
+            `${key}${'•'.repeat(val.length)}`
+          );
+        }
+
+        return (
+          <div key={i} style={{ filter: hasSensitive && !showSecrets ? 'blur(3.5px)' : 'none', transition:'filter .25s', userSelect: hasSensitive && !showSecrets ? 'none' : 'text' }}>
+            {rendered.startsWith('#')
+              ? <span className="cmt">{rendered}</span>
+              : rendered.split(' ').map((word, j) => {
+                  if (word.startsWith('/')) return <span key={j} className="kw">{word} </span>;
+                  if (word.includes('=')) {
+                    const [k, ...vs] = word.split('=');
+                    return <span key={j}><span className="key">{k}</span>=<span className="val">{vs.join('=')}</span> </span>;
+                  }
+                  if (['add','set','ip','user','radius'].includes(word)) return <span key={j} className="kw">{word} </span>;
+                  return <span key={j}>{word} </span>;
+                })
+            }
+          </div>
+        );
+      })}
+    </pre>
+  </div>
+
+  <p style={{ fontSize:11, color:'#9ca3af', marginTop:6 }}>
+    Paste this in a <strong>second terminal pass</strong> after the WireGuard script above.
+  </p>
+</div>
+
 
                   <div style={{ padding:'10px 14px', borderRadius:8, background:'#f0fdf4', border:'1px solid #bbf7d0', marginTop:12, marginBottom:20 }}>
                     <p style={{ fontSize:12, color:'#166534', margin:0 }}>
@@ -674,6 +842,14 @@ set allow-remote-requests=yes
 
               {/* ══ STEP 4 — Services ══ */}
               {step === 4 && (
+
+
+
+
+
+
+
+
                 <motion.div key="step4"
                   initial={{ opacity:0, x:20 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-20 }}
                   transition={{ duration:.22 }}>
@@ -687,10 +863,55 @@ set allow-remote-requests=yes
                     </div>
                   </div>
 
+                  
+{wgConfig?.router_id && (
+  <div className="flex gap-3 p-4 bg-green-50 border border-green-200 rounded-xl mb-5">
+    <span className="text-green-600 text-xl">✅</span>
+    <div>
+      <p className="text-sm font-bold text-green-800">NAS created automatically</p>
+      <p className="text-xs text-green-700 mt-0.5">
+        Router <strong>{wgConfig.client_ip}</strong> has been registered in your NAS list
+        with API user <code className="bg-green-100 px-1 rounded">{wgConfig.api_username}</code>.
+        You can manage it from the <strong>NAS Routers</strong> page.
+      </p>
+    </div>
+  </div>
+)}
+
+
                   {/* Toggle cards */}
                   {[
+                   
                     {
+  key: 'bridges',
+  icon: Network,
+  color: '#8b5cf6',
+  label: 'Bridge Setup (Run First)',
+  desc: 'Create PPPoE and Hotspot bridges and assign LAN ports — run before PPPoE/Hotspot scripts',
+      badge: '① Run First',        // ← add badge field
+
+  extras: (
+    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <Field label="PPPoE Bridge Ports" hint="Comma-separated, e.g. ether2,ether3">
+        <input className="wg-input" value={services.pppoe_ports}
+          onChange={e => setServices(p => ({...p, pppoe_ports: e.target.value}))}
+          placeholder="ether2,ether3"/>
+      </Field>
+      <Field label="Hotspot Bridge Ports" hint="Comma-separated, e.g. ether4,ether5">
+        <input className="wg-input" value={services.hotspot_ports}
+          onChange={e => setServices(p => ({...p, hotspot_ports: e.target.value}))}
+          placeholder="ether4,ether5"/>
+      </Field>
+    </div>
+  ),
+  script: bridgeSetupScript,
+  scriptKey: 'bridge_script',
+},
+
+
+ {
                       key:'pppoe', icon:Server, color:'#6366f1', label:'PPPoE Server',
+                      badge: '② After bridges', 
                       desc:'Provision a PPPoE server for subscriber authentication',
                       extras: (
                         <>
@@ -703,6 +924,16 @@ set allow-remote-requests=yes
                       script: pppoeScript,
                       scriptKey: 'pppoe_script',
                     },
+
+
+
+
+
+
+
+
+
+                    
                     {
                       key:'hotspot', icon:Wifi, color:'#0ea5e9', label:'Hotspot',
                       desc:'Set up a captive portal hotspot for guest access',

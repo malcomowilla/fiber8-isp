@@ -42,7 +42,8 @@ const navigate = useNavigate()
       animate="visible"
       variants={containerVariants}
       className="bg-gradient-to-br from-blue-900 to-indigo-900 min-h-screen
- flex items-center justify-center relative overflow-hidden"
+ flex items-center justify-center relative overflow-hidden font-sans
+"
     >
 
 <div className="absolute inset-0 opacity-20">

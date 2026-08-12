@@ -44,11 +44,14 @@ import TrackEvent from './TrackEvent'
 import { createConsumer } from "@rails/actioncable";
 import { MacRandomizationInstructions, SimpleMacInstructions, 
   HotspotAutoLoginNotice } from './MacRandomizationInstructions'; // Import MacRandomizationInstructions from './MacRandomizationInstructions'
-
-
 import HotspotSMSInfo from './HotspotSmsInfo';
 import { CiReceipt } from "react-icons/ci";
 import HotspotAdOverlay from './HotspotAdOverlay';
+import HotspotPackageCards from './HotspotPackageCards'
+import { useLayoutEffect } from "react";
+import HotspotPromotionCard from "../promotion/HotspotPromotionCard"
+
+
 
 
 const Styles = () => (
@@ -212,7 +215,10 @@ function ConnectedScreen({ packageName, expiration, username }) {
 
 function PkgCard({ pkg, selected, onClick }) {
   return (
-    <motion.button whileTap={{ scale:.98 }} onClick={onClick}
+    <>
+
+{!pkg.enable_free_trial && (
+  <motion.button whileTap={{ scale:.98 }} onClick={onClick}
       className="pkg-card relative w-full text-left p-4 rounded-2xl border overflow-hidden"
       style={{
         borderColor: selected ? pkg.accent : 'rgba(148,163,184,.1)',
@@ -237,13 +243,18 @@ function PkgCard({ pkg, selected, onClick }) {
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-slate-100">{pkg.name}</p>
+          <p className="text-sm font-bold text-slate-100">{!pkg.enable_free_trial && pkg.name}</p>
           <div className="flex items-center gap-3 mt-0.5">
-            <span className="flex items-center gap-1 text-xs" style={{ color:'#64748b' }}>
+            <span className="flex items-center gap-1 text-xs" style={{ color:'white' }}>
               <Clock size={9} /> {pkg.valid}
             </span>
-            <span className="flex items-center gap-1 text-xs" style={{ color:'#64748b' }}>
+            {/* <span className="flex items-center gap-1 text-xs" style={{ color:'#64748b' }}>
               <Zap size={9} /> {pkg.speed}
+            </span> */}
+
+
+              <span className="flex items-center gap-1 text-xs" style={{ color:'white' }}>
+                {pkg.shared_users}
             </span>
           </div>
         </div>
@@ -251,8 +262,8 @@ function PkgCard({ pkg, selected, onClick }) {
         {/* Price */}
         <div className="text-right shrink-0">
           <p className="text-lg font-bold text-slate-100 mono">
-            <span className="text-xs font-normal mr-0.5" style={{ color:'#64748b' }}>Ksh</span>
-            {pkg.price}
+            <span className="text-xs font-normal mr-0.5" style={{ color:'#64748b' }}>Bob</span>
+              {Number(pkg.price || 0).toLocaleString()}
           </p>
         </div>
       </div>
@@ -267,8 +278,87 @@ function PkgCard({ pkg, selected, onClick }) {
         </motion.div>
       )}
     </motion.button>
+)}
+    
+    </>
   );
 }
+
+
+
+
+
+
+
+
+
+function PkgCardFreeTrial({ pkg, selected, onClick, free_trial_duration_minutes, handleFreeTrial, freeTrialLoad,
+  freeTrialSuccess, freeTrialError, status
+ }) {
+  return (
+    <>
+{pkg.enable_free_trial && (
+  <>
+ <div
+      className="flex items-start gap-3 p-4 rounded-2xl mb-5"
+      style={{
+        background: 'rgba(250,204,21,.07)',
+        border:     '1px solid rgba(250,204,21,.2)',
+      }}
+    >
+      <Zap size={15} className="shrink-0 mt-0.5" style={{ color: '#facc15' }} />
+      <div>
+        <p className="text-sm font-semibold text-slate-200 mb-0.5">
+          Free Trial — {free_trial_duration_minutes} min
+        </p>
+        <p className="text-xs leading-relaxed" style={{ color: '#64748b' }}>
+          Get {free_trial_duration_minutes} minute{free_trial_duration_minutes !== 1 ? 's' : ''} of free internet access.
+         
+        </p>
+      </div>
+
+       {freeTrialError && !status && (
+      <div
+        className="flex items-start gap-2 p-3.5 rounded-xl mb-4 text-xs"
+        style={{ background: 'rgba(239,68,68,.08)', border: '1px solid rgba(239,68,68,.2)', color: '#fca5a5' }}
+      >
+        <AlertCircle size={13} className="shrink-0 mt-0.5" />
+        {freeTrialError}
+      </div>
+    )}
+
+{/* onClick */}
+       {/* CTA button */}
+    {!freeTrialSuccess && (
+      <button
+        onClick={() => {
+          handleFreeTrial(pkg.name)
+        }}
+        disabled={freeTrialLoad}
+        className="w-full py-4 rounded-2xl font-bold text-sm text-black flex items-center justify-center gap-2 transition-all"
+        style={{
+          background: freeTrialLoad ? 'rgba(250,204,21,.4)' : 'linear-gradient(135deg,#facc15,#f59e0b)',
+          cursor:     freeTrialLoad ? 'not-allowed' : 'pointer',
+          opacity:    freeTrialLoad ? 0.7 : 1,
+        }}
+      >nt
+        {freeTrialLoad
+          ? <><RefreshCw size={15} className="animate-spin" /> Starting trial…</>
+          : <><Zap size={15} /> Start Free Trial</>}
+      </button>
+    )}
+    </div>
+
+  </>
+)}
+
+    </>
+  );
+}
+
+
+
+
 
 
 
@@ -283,7 +373,10 @@ const [showVoucherError, setShowVoucherError] = useState(false)
 const [activeTabPremium, setActiveTabPremium] = useState('packages')
   const [tab, setTab]  = useState('packages');
   const [adCompleted, setAdCompleted] = useState(false);
+const [deviceForm, setDeviceForm] = useState({ deviceName: '', mac: '', phone: '' });
+const [isDevicePackage, setIsDevicePackage] = useState(false);
 
+const [deviceMacError, setDeviceMacError] = useState('');
 
 
    const [pkgLoading, setPkgLoading] = useState(false);
@@ -292,10 +385,6 @@ const [activeTabPremium, setActiveTabPremium] = useState('packages')
 
 
 
-
-  // ── Voucher
-
-  // ── M-Pesa receipt
   const [txCode, setTxCode]         = useState('');
 
   // ── Shared status
@@ -350,7 +439,11 @@ const {companySettings, setCompanySettings,
   minimal, simple, clean, default_template, sleekspot, pepea, premium} = templateStates
 
 const { 
-  customize_template_and_package_per_location,enable_autologin
+  customize_template_and_package_per_location,enable_autologin,
+  enable_free_trial,
+  free_trial_duration_minutes,
+  free_trial_download_limit,
+  free_trial_upload_limit,
 } = hotspotCustomization
 
 
@@ -378,6 +471,11 @@ const [seeSleekSpotPackages, setSeeSleekSpotPackages] = useState(false);
 const [templatesLoaded, setTemplatesLoaded] = useState(false);
 const [packageLoaded, setPackageLoaded] = useState(false);
 
+
+
+const [freeTrialLoad,    setFreeTrialLoad]    = useState(false);
+const [freeTrialSuccess, setFreeTrialSuccess] = useState(false);
+const [freeTrialError,   setFreeTrialError]   = useState('');
   
 const queryParams = new URLSearchParams(window.location.search);
 const router_mac = queryParams.get('mac')
@@ -393,6 +491,29 @@ const ip = localStorage.getItem("hotspot_ip");
 const username = localStorage.getItem("hotspot_username");
 
  const subdomain = window.location.hostname.split('.')[0]
+
+
+
+
+
+
+
+
+
+
+
+const handlePkgClick = (pkg) => {
+  if (pkg.intended_device_type && pkg.intended_device_type !== null) {
+    setSelectedPkg(pkg);
+    setIsDevicePackage(true);
+    setPayStep('device_form'); // new step
+  } else {
+    setSelectedPkg(prev => prev?.id === pkg.id ? null : pkg);
+    setIsDevicePackage(false);
+  }
+};
+
+
 
 
 
@@ -613,55 +734,6 @@ const handleUserLogout = async () => {
     }
 
 
-
-    if (isConnected ) {
-      return (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-        >
-          <div className="bg-white rounded-2xl p-8 text-center max-w-md mx-4">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center"
-            >
-              <CheckCircle className="w-10 h-10 text-green-500" />
-            </motion.div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">Connected!</h3>
-            <p className="text-gray-600 mb-6">You're now connected to the WiFi</p>
-            
-            <div className="space-y-4 text-left mb-6">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="text-gray-600">Package</span>
-                <span className="text-black">{voucherPackage || 'No Package'}</span>
-              </div>
-
-           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="text-gray-600">Username</span> 
-                <span className="text-black">
-                  {voucherName || 'No Name'}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="text-gray-600">Expiry</span> 
-                <span className="text-black">
-                  {expiration || 'No Expiration'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between p-3 
-              bg-gray-50 rounded-lg">
-              </div>
-            </div>
-            
-         
-          </div>
-        </motion.div>
-      );
-    }
 
     return null;
   };
@@ -980,7 +1052,12 @@ const handleGetHotspotCustomizations = useCallback(
     if (response.ok) {
       setHotspotCustomization({
         customize_template_and_package_per_location: newData[0].customize_template_and_package_per_location,
-        enable_autologin: newData[0].enable_autologin 
+        enable_autologin: newData[0].enable_autologin ,
+
+        enable_free_trial:          newData[0].enable_free_trial,           
+   free_trial_duration_minutes: newData[0].free_trial_duration_minutes, 
+ free_trial_download_limit:   newData[0].free_trial_download_limit,  
+   free_trial_upload_limit:     newData[0].free_trial_upload_limit,     
       })
     } else {
     }
@@ -1000,24 +1077,6 @@ const handleGetHotspotCustomizations = useCallback(
     return () => clearTimeout(timer);
 
   }, []);
-
-
-
-  useEffect(() => {
-   if (enabled && seeForm) {
- fetch("/api/track_ad_event", {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "X-Subdomain": subdomain,
-      },
-      body: JSON.stringify({
-        event_type: 'Ad View',
-      })
-    }).then(res => console.log("Event tracked"))
-      .catch(err => console.error(err));
-   }
-  }, [enabled, subdomain, seeForm]);
 
 
 
@@ -1454,6 +1513,63 @@ useEffect(() => {
 
 const [voucherError, setVoucherError] = useState('')
 const [seeVoucherError, setSeeVoucherError] = useState(false)
+
+
+
+
+
+
+
+
+
+
+const handleFreeTrial = async (package_name) => {
+  setFreeTrialLoad(true);
+  setFreeTrialError('');
+  setStatus(null);
+
+  try {
+    const res = await fetch('/api/grant_free_trial', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Subdomain':   subdomain,
+      },
+      body: JSON.stringify({ mac, ip, package: package_name }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setFreeTrialSuccess(true);
+      setStatus('success');
+      setConnected(true)
+      setFreeTrialLoad(false)
+      setMessage(
+        `Free trial started! You have ${free_trial_duration_minutes} minute${free_trial_duration_minutes !== 1 ? 's' : ''} of free browsing.`
+      );
+    } else {
+      setFreeTrialError(data.error || 'Could not start free trial. Please try again.');
+      setStatus('error');
+      setMessage(data.error || 'Free trial failed. Please try a paid package.');
+      toast.error(data.error || 'Free trial failed. Please try a paid package.')
+      setFreeTrialLoad(false)
+    }
+  } catch (error) {
+    setFreeTrialLoad(false)
+    setFreeTrialError('Network error. Check your connection and try again.');
+    setStatus('error');
+    setMessage('Network error. Try again.');
+          toast.error('Free trial failed')
+
+  } 
+};
+
+
+
+
+
+
 const loginWithVoucher = async(e) => {
 
   e.preventDefault()
@@ -1734,6 +1850,7 @@ setLoadingPay(false);
     { id:'packages', label:'Buy Package', icon:CreditCard },
     { id:'voucher',  label:'Voucher',     icon:Tag },
     { id:'mpesa',    label:'M-Pesa Code', icon:Receipt },
+    //  ...(enable_free_trial ? [{ id: 'free_trial', label: 'Free Trial', icon: Zap }] : []),
   ];
 
 
@@ -1772,68 +1889,49 @@ setLoadingPay(false);
 // }, [subdomain]);  
 
 
-if (success) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 flex items-center 
-      justify-center bg-black bg-opacity-50"
-    >
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 50 }}
-        className="bg-white p-8 rounded-lg shadow-lg text-center"
-      >
-        <MdOutlineWifi className="text-green-500 w-12 h-12 mx-auto mb-4" />
-        <motion.h2
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-2xl font-bold text-gray-900"
-        >
-          Connected!
-        </motion.h2>
-      </motion.div>
-    </motion.div>
-  );
-}
 
 
+const handleDevicePackagePay = async (e) => {
+  // e.preventDefault();
+  if (!selectedPkg || !deviceForm.phone || !deviceForm.mac) return;
+  setLoadingPay(true); setStatus(null);
+  setQueryStatus(null); setQueryMessage('');
 
+  try {
+    const res = await fetch('/api/make_device_package_payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+      body: JSON.stringify({
+        phone_number: deviceForm.phone,
+        amount: selectedPkg.price,
+        package: selectedPkg.name,
+        device_name: deviceForm.deviceName,
+        device_mac: deviceForm.mac,
+        device_type: selectedPkg.intended_device_type,
+        ip: ip,
+        mac: mac,
+      })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem('checkout_request_id', data.checkout_request_id);
+      setQueryStatus('processing');
+      setStatus('processing');
+      setMessage('STK push sent — enter your M-Pesa PIN to pay.');
+      startQueryStatus();
+      setLoadingPay(false);
+    } else {
+      setStatus('error');
+      setMessage(data.message || 'Payment failed. Try again.');
+      setLoadingPay(false);
+    }
+  } catch (_) {
+    setStatus('error');
+    setMessage('Network error. Check connection and try again.');
+    setLoadingPay(false);
+  }
+};
 
-
-
-
-if (loading) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-    >
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 50 }}
-        className="bg-white p-8 rounded-lg shadow-lg text-center"
-      >
-        <MdOutlineWifi className="text-yellow-500 w-12 h-12 mx-auto animate-pulse mb-4" />
-        <motion.h2
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-2xl font-bold text-gray-900"
-        >
-          Connecting...
-        </motion.h2>
-      </motion.div>
-    </motion.div>
-  );
-}
 
 
   const reset = () => { setStatus(null); setMessage(''); setLoading(false); if (pollRef.current) clearInterval(pollRef.current); };
@@ -1841,12 +1939,20 @@ if (loading) {
 
 
 
+useLayoutEffect(() => {
+  const style = document.createElement("style");
+  style.innerHTML = CSS;
+  document.head.appendChild(style);
+
+  return () => style.remove();
+}, []);
 
   return (
 
-    <>
+    <section>
 
-{/*     
+{/*   
+
 {enable_autologin ? (
   <MacRandomizationInstructions />
 ): null} */}
@@ -1855,21 +1961,140 @@ if (loading) {
 
 {/* < HotspotSMSInfo/> */}
 
+
+{isConnected && (
+  <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="fixed inset-0 z-50 flex  font-sans
+          items-center justify-center bg-black/50 backdrop-blur-sm"
+        >
+          <div className="bg-white rounded-2xl p-8 text-center max-w-md mx-4">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center"
+            >
+              <CheckCircle className="w-10 h-10 text-green-500" />
+            </motion.div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">Connected!</h3>
+            <p className="text-gray-600 mb-6">You're now connected to the WiFi</p>
+            
+            <div className="space-y-4 text-left mb-6">
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="text-gray-600">Package</span>
+                <span className="text-black">{voucherPackage || 'No Package'}</span>
+              </div>
+
+           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="text-gray-600">Username</span> 
+                <span className="text-black">
+                  {voucherName || 'No Name'}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="text-gray-600">Expiry</span> 
+                <span className="text-black">
+                  {expiration || 'No Expiration'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-3 
+              bg-gray-50 rounded-lg">
+              </div>
+            </div>
+            
+         
+          </div>
+        </motion.div>
+)}
+
+
+
+
+ {success && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 flex font-sans
+ items-center justify-center bg-black bg-opacity-50"
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 50 }}
+          className="bg-white p-8 rounded-lg shadow-lg text-center"
+        >
+          <MdOutlineWifi className="text-green-500 w-12 h-12 mx-auto mb-4" />
+          <motion.h2
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-2xl font-bold text-gray-900"
+          >
+            Connected!
+          </motion.h2>
+        </motion.div>
+      </motion.div>
+    )}
+
+    {loading && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 font-sans
+ flex items-center justify-center bg-black bg-opacity-50"
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 50 }}
+          className="bg-white p-8 rounded-lg shadow-lg text-center"
+        >
+          <MdOutlineWifi className="text-yellow-500 w-12 h-12 mx-auto animate-pulse mb-4" />
+          <motion.h2
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-2xl font-bold text-gray-900"
+          >
+            Connecting...
+          </motion.h2>
+        </motion.div>
+      </motion.div>
+    )}
+
+
+
+
 {!templatesLoaded && (
-  <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <RefreshCw className="w-12 h-12 animate-spin text-blue-500
-         mx-auto mb-4" />
-        <p className="text-gray-600">Loading hotspot page...</p>
-      </div>
+  <div className="flex flex-col items-center justify-center
+   min-h-screen gap-5 font-sans
+">
+    <div className="flex items-center gap-2">
+      {[0, 0.2, 0.4].map((delay, i) => (
+        <div
+          key={i}
+          className="w-2 h-2 rounded-full bg-gray-900"
+          style={{ animation: `pulse 1s ease-in-out ${delay}s infinite` }}
+        />
+      ))}
     </div>
+    <div className="text-center">
+      <p className=" font-medium text-gray-900 mb-1 text-lg">Loading hotspot page</p>
+      <p className="text-sm text-gray-700">This will just take a moment</p>
+    </div>
+  </div>
 )}
 
 
 {/* Payment Status Modal */}
 {queryStatus && (
   <div className="fixed inset-0 z-50 flex items-center justify-center
-   bg-black/70 backdrop-blur-sm">
+   bg-black/70 backdrop-blur-sm font-sans">
     <motion.div
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
@@ -1932,21 +2157,26 @@ if (loading) {
             </div>
             
             {/* Close Button */}
+           {/* Close Button */}
             <button
               onClick={() => {
                 // For processing status, show confirmation before closing
                 if (queryStatus === 'processing') {
                   if (window.confirm('Are you sure you want to stop checking payment status? You can check again later.')) {
-                    if (stkQueryIntervalId) {
-                      clearInterval(stkQueryIntervalId);
-                      stkQueryIntervalId = null;
+                    if (stkQueryIntervalIdRef.current) {
+                      clearInterval(stkQueryIntervalIdRef.current);
+                      stkQueryIntervalIdRef.current = null;
                     }
                     setQueryStatus(null);
                     setQueryMessage('');
+                    setStatus(null);
+                    setMessage('');
                   }
                 } else {
                   setQueryStatus(null);
                   setQueryMessage('');
+                  setStatus(null);
+                  setMessage('');
                 }
               }}
               className="p-2 hover:bg-gray-200/50 rounded-full transition-colors"
@@ -1999,17 +2229,19 @@ if (loading) {
           </div>
           
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 mt-6">
-            {queryStatus === 'processing' && (
+          <div className="flex flex-col sm:flex-row gap-3 mt-6 font-sans">
+          {queryStatus === 'processing' && (
               <>
                 <button
                   onClick={() => {
-                    if (stkQueryIntervalId) {
-                      clearInterval(stkQueryIntervalId);
-                      stkQueryIntervalId = null;
+                    if (stkQueryIntervalIdRef.current) {
+                      clearInterval(stkQueryIntervalIdRef.current);
+                      stkQueryIntervalIdRef.current = null;
                     }
                     setQueryStatus(null);
                     setQueryMessage('');
+                    setStatus(null);
+                    setMessage('');
                   }}
                   className="flex-1 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors"
                 >
@@ -2018,9 +2250,9 @@ if (loading) {
                 <button
                   onClick={() => {
                     // Refresh the status check
-                    if (stkQueryIntervalId) {
-                      clearInterval(stkQueryIntervalId);
-                      stkQueryIntervalId = null;
+                    if (stkQueryIntervalIdRef.current) {
+                      clearInterval(stkQueryIntervalIdRef.current);
+                      stkQueryIntervalIdRef.current = null;
                     }
                     startQueryStatus();
                   }}
@@ -2041,7 +2273,8 @@ if (loading) {
                     setQueryStatus(null);
                     setQueryMessage('');
                   }}
-                  className="flex-1 py-3 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                  className="flex-1 py-3 bg-blue-500 text-white 
+                  font-medium rounded-lg hover:bg-blue-600 transition-colors font-sans"
                 >
                   Close
                 </button>
@@ -2066,7 +2299,7 @@ if (loading) {
           </div>
           
           {/* Status Info */}
-          <div className="mt-6 pt-4 border-t border-gray-200/50">
+          <div className="mt-6 pt-4 border-t border-gray-200/50 font-sans">
             <div className="flex items-center justify-center text-sm text-gray-500">
               {queryStatus === 'processing' && (
                 <>
@@ -2100,7 +2333,7 @@ if (loading) {
 
 {attractive && (
   <>
- <Styles />
+ {/* <Styles /> */}
 
       <AnimatePresence>
         {connected && <ConnectedScreen username={voucherName} 
@@ -2109,8 +2342,9 @@ if (loading) {
       </AnimatePresence>
 
       <div className="min-h-screen relative flex flex-col items-center
-       justify-center px-4 py-12 overflow-hidden"
-        style={{ background:'#020617', fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
+       justify-center px-4 py-12 overflow-hidden font-sans
+"
+        style={{ background:'#020617',  }}>
 
         {/* Background blobs */}
         <div className="drift1 absolute -top-32 -left-24 w-[480px]
@@ -2164,7 +2398,7 @@ if (loading) {
                   {typedName || hotspotName}<span className="cursor-blink" style={{ color:'#38bdf8' }}>|</span> 
                 </h1>
               </div>
-              <p className="text-sm" style={{ color:'#475569' }}>Connect to the internet</p>
+              <p className="text-sm text-slate-300" >Connect to the internet</p>
               <div className="flex items-center justify-center gap-5 mt-3">
                 {[{I:Shield,l:'Secure'},{I:Lock,l:'Private'},{I:Globe,l:'Fast'}].map(({I,l})=>(
                   <div key={l} className="flex items-center gap-1.5">
@@ -2200,6 +2434,27 @@ if (loading) {
             <div className="px-5 pt-5 pb-7">
               <AnimatePresence mode="wait">
 
+
+
+
+
+
+
+
+
+<HotspotPromotionCard
+  subdomain={subdomain}
+  onSelectPromotion={(promo) => {
+    const pkg = packages.find(p => p.id === promo.package_id);
+    if (pkg) {
+      setSelectedPkg({ ...pkg, price: promo.promotional_price });
+      setPayStep('pay');
+    }
+  }}
+/>
+
+
+
                 {/* ══════════════════════ PACKAGES TAB ══════════════════════ */}
                 {tab === 'packages' && (
                   <motion.div key="packages"
@@ -2217,10 +2472,30 @@ if (loading) {
                           <div>
                             <p className="text-sm font-semibold text-slate-200 mb-0.5">Choose a plan</p>
                             <p className="text-xs leading-relaxed" style={{ color:'#64748b' }}>
-                              Select a package below and pay instantly via M-Pesa STK push.
+                              Select a package below and pay instantly via M-Pesa.
                             </p>
                           </div>
                         </div>
+
+
+                        {!pkgLoading && packages.map((pkg, i) => (
+                          <motion.div key={pkg.id}
+                            initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
+                            transition={{ delay: i * 0.07 }}>
+                            <PkgCardFreeTrial pkg={pkg} selected={selectedPkg?.id === pkg.id}
+                              onClick={() =>   setHotspotPackage(pkg.name)} 
+                              free_trial_duration_minutes={pkg?.free_trial_duration_minutes} 
+                              handleFreeTrial={handleFreeTrial} freeTrialLoad={freeTrialLoad}
+                              freeTrialSucces={freeTrialSuccess} freeTrialError={freeTrialError}
+                              status={status}
+                              />
+                          </motion.div>
+                        ))}
+
+
+
+
+                      
 
                         {/* Loading skeleton */}
                         {pkgLoading && (
@@ -2232,13 +2507,29 @@ if (loading) {
                           </div>
                         )}
 
+                        
+
                         {/* Package cards */}
+
                         {!pkgLoading && packages.map((pkg, i) => (
                           <motion.div key={pkg.id}
                             initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
                             transition={{ delay: i * 0.07 }}>
                             <PkgCard pkg={pkg} selected={selectedPkg?.id === pkg.id}
-                              onClick={() => setSelectedPkg(prev => prev?.id === pkg.id ? null : pkg)} />
+                              onClick={() => {
+                                
+  const isDevice = pkg.intended_device_type && pkg.intended_device_type !== null;
+  if (isDevice) {
+    setSelectedPkg(pkg);
+    setIsDevicePackage(true);
+    setPayStep('device_form');
+  } else {
+    setSelectedPkg(prev => prev?.id === pkg.id ? null : pkg);
+    setIsDevicePackage(false);
+  }
+}}
+                              free_trial_duration_minutes={free_trial_duration_minutes}
+                              />
                           </motion.div>
                         ))}
 
@@ -2259,6 +2550,172 @@ if (loading) {
                       </div>
                     )}
 
+
+
+{payStep === 'device_form' && selectedPkg && (
+  <motion.div initial={{ opacity:0, x:20 }} animate={{ opacity:1, x:0 }}>
+    <button onClick={() => { setPayStep('list'); setSelectedPkg(null); reset(); }}
+      className="flex items-center gap-1.5 text-xs font-semibold mb-4"
+      style={{ color:'#64748b' }}>
+      <ArrowLeft size={13} /> Back to packages
+    </button>
+
+    {/* Package recap */}
+    <div className="flex items-center gap-3 p-4 rounded-2xl border mb-5"
+      style={{ background:`${selectedPkg.accent}0a`, borderColor:`${selectedPkg.accent}25` }}>
+      <div className="text-2xl">{selectedPkg.device_icon || '📺'}</div>
+      <div className="flex-1">
+        <p className="text-sm font-bold text-slate-200">{selectedPkg.name}</p>
+        <p className="text-xs" style={{ color:'#64748b' }}>Ksh {Number(selectedPkg.price||0).toLocaleString()}</p>
+      </div>
+    </div>
+
+    {/* MAC instructions */}
+    <div className="p-4 rounded-2xl mb-5"
+      style={{ background:'rgba(56,189,248,.05)', border:'1px solid rgba(56,189,248,.12)' }}>
+      <p className="text-xs font-bold text-sky-300 uppercase tracking-wider mb-3">
+        📺 How to find your TV's MAC Address
+      </p>
+      <div className="space-y-2">
+        {[
+          { brand: 'Samsung', path: 'Settings → General → Network → Network Status → MAC Address' },
+          { brand: 'LG', path: 'Settings → All Settings → Network → Wired/Wi-Fi Connection → Advanced Settings → MAC Address' },
+          { brand: 'Sony (Android)', path: 'Settings → Network → Network setup → Expert → View network status → MAC Address' },
+          { brand: 'TCL / Hisense', path: 'Settings → System → About → Status → Wi-Fi MAC Address' },
+          { brand: 'Decoder/Set-top Box', path: 'Settings → Network → Network Info → MAC Address  OR check the sticker on the back of the device' },
+        ].map(({ brand, path }) => (
+          <div key={brand} className="flex items-start gap-2">
+            <div className="shrink-0 w-16 text-xs font-bold mt-0.5" style={{ color:'#38bdf8' }}>{brand}</div>
+            <div className="text-xs leading-relaxed" style={{ color:'#94a3b8' }}>{path}</div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 pt-3 border-t flex items-start gap-2"
+        style={{ borderColor:'rgba(148,163,184,.1)' }}>
+        <AlertCircle size={12} className="shrink-0 mt-0.5 text-amber-400" />
+        <p className="text-xs" style={{ color:'#94a3b8' }}>
+          Make sure your TV is connected to this WiFi network before entering its MAC address.
+          The MAC address looks like: <span className="mono text-sky-300">AA:BB:CC:DD:EE:FF</span> (6 pairs of characters separated by colons).
+        </p>
+      </div>
+    </div>
+
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      // Validate MAC before submitting
+      const macRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
+      if (!macRegex.test(deviceForm.mac)) {
+        setDeviceMacError('Invalid MAC address. It should look like AA:BB:CC:DD:EE:FF');
+        return;
+      }
+      setDeviceMacError('');
+      handleDevicePackagePay(e);
+    }} className="space-y-4">
+
+      {/* Device Name */}
+      <div>
+        <label className="block text-xs font-semibold uppercase tracking-wider mb-2"
+          style={{ color:'#64748b' }}>Device Name</label>
+        <input type="text" required
+          value={deviceForm.deviceName}
+          onChange={e => setDeviceForm(p => ({...p, deviceName: e.target.value}))}
+          placeholder="e.g. Living Room TV, Bedroom Decoder"
+          className="input-base w-full px-4 py-3.5 rounded-xl text-sm"
+        />
+      </div>
+
+      {/* MAC Address */}
+      <div>
+        <label className="block text-xs font-semibold uppercase tracking-wider mb-2"
+          style={{ color:'#64748b' }}>
+          Device MAC Address <span style={{ color:'#f87171' }}>*</span>
+        </label>
+        <input type="text" required
+          value={deviceForm.mac}
+          onChange={e => {
+            // Auto-format as user types: insert colons after every 2 chars
+            let val = e.target.value.replace(/[^0-9A-Fa-f:]/g, '').toUpperCase();
+            // Auto-insert colons
+            val = val.replace(/:/g, '');
+            if (val.length > 12) val = val.slice(0, 12);
+            val = val.match(/.{1,2}/g)?.join(':') || val;
+            setDeviceForm(p => ({...p, mac: val}));
+            setDeviceMacError('');
+          }}
+          placeholder="AA:BB:CC:DD:EE:FF"
+          maxLength={17}
+          className={`input-base w-full px-4 py-3.5 rounded-xl text-sm mono tracking-widest ${deviceMacError ? 'border-red-500' : ''}`}
+          style={deviceMacError ? { borderColor:'rgba(239,68,68,.6)' } : {}}
+        />
+        {/* Live format indicator */}
+        <div className="flex gap-1 mt-2">
+          {Array.from({length: 6}).map((_, i) => {
+            const parts = deviceForm.mac.split(':');
+            const filled = parts[i]?.length === 2;
+            return (
+              <div key={i} className="flex-1 h-1 rounded-full transition-all"
+                style={{ background: filled ? '#38bdf8' : 'rgba(148,163,184,.15)' }} />
+            );
+          })}
+        </div>
+        {deviceMacError && (
+          <p className="text-xs mt-1.5 flex items-center gap-1" style={{ color:'#f87171' }}>
+            <AlertCircle size={11} /> {deviceMacError}
+          </p>
+        )}
+        {!deviceMacError && deviceForm.mac.length > 0 && (
+          <p className="text-xs mt-1.5" style={{ color: deviceForm.mac.length === 17 ? '#34d399' : '#64748b' }}>
+            {deviceForm.mac.length === 17
+              ? '✓ MAC address format looks correct'
+              : `${Math.floor(deviceForm.mac.replace(/:/g,'').length / 2)} of 6 pairs entered`}
+          </p>
+        )}
+      </div>
+
+      {/* Phone */}
+      <div>
+        <label className="block text-xs font-semibold uppercase tracking-wider mb-2"
+          style={{ color:'#64748b' }}>M-Pesa Phone Number</label>
+        <div className="relative">
+          <Phone size={14} className="absolute left-4 top-1/2 -translate-y-1/2"
+            style={{ color:'#475569' }} />
+          <input type="tel" required
+            value={deviceForm.phone}
+            onChange={e => {
+              const val = e.target.value.replace(/[^0-9+]/g, '');
+              setDeviceForm(p => ({...p, phone: val}));
+            }}
+            placeholder="07XX XXX XXX"
+            maxLength={13}
+            className="input-base w-full pl-11 pr-4 py-3.5 rounded-xl text-sm mono"
+          />
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {status && (
+          <motion.div initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:'auto' }} exit={{ opacity:0, height:0 }}>
+            <StatusBanner status={status} message={message} onDismiss={status !== 'processing' ? reset : undefined} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <button
+        type="submit"
+        disabled={loadingPay || deviceForm.mac.length !== 17 || !deviceForm.phone || !deviceForm.deviceName}
+        className="gradient-btn w-full py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2"
+      >
+        {loadingPay
+          ? <><RefreshCw size={15} className="animate-spin"/> Sending payment request…</>
+          : <>Pay Ksh {Number(selectedPkg.price||0).toLocaleString()} via M-Pesa <ArrowRight size={15}/></>}
+      </button>
+
+      <p className="text-xs text-center" style={{ color:'#334155' }}>
+        After payment, your device will be granted internet access automatically.
+      </p>
+    </form>
+  </motion.div>
+)}
                     {/* PAY step */}
                     {payStep === 'pay' && selectedPkg && (
                       <motion.div key="pay"
@@ -2454,7 +2911,7 @@ value={vouchers}
                       <Smartphone size={15} className="shrink-0 mt-0.5" style={{ color:'#34d399' }} />
                       <div>
                         <p className="text-sm font-semibold text-slate-200 mb-0.5">Already paid via M-Pesa?</p>
-                        <p className="text-xs leading-relaxed" style={{ color:'#64748b' }}>
+                        <p className="text-xs leading-relaxed text-slate-300" >
                           Enter the transaction code from your M-Pesa confirmation SMS to connect without paying again.
                         </p>
                       </div>
@@ -2462,8 +2919,8 @@ value={vouchers}
 
                     <form onSubmit={handleReceipt} className="space-y-4">
                       <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider mb-2"
-                          style={{ color:'#64748b' }}>M-Pesa Transaction Code</label>
+                        <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2"
+                          >M-Pesa Transaction Code</label>
                         <div className="relative">
                           <Receipt size={14} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color:'#475569' }} />
                           <input
@@ -2515,7 +2972,7 @@ value={vouchers}
 
                     {/* Steps */}
                     <div className="mt-5 space-y-2.5">
-                      <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color:'#334155' }}>
+                      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-slate-300" >
                         How to find your code
                       </p>
                       {[
@@ -2524,8 +2981,8 @@ value={vouchers}
                         'Copy the code at the top (e.g. QHJ1234ABC)',
                       ].map((s, i) => (
                         <div key={i} className="flex items-center gap-3">
-                          <div className="w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-xs font-bold mono"
-                            style={{ background:'rgba(52,211,153,.12)', color:'#34d399', border:'1px solid rgba(52,211,153,.2)' }}>
+                          <div className="w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-xs text-slate-300 font-bold mono"
+                            style={{ background:'rgba(52,211,153,.12)',  border:'1px solid rgba(52,211,153,.2)' }}>
                             {i+1}
                           </div>
                           <p className="text-xs" style={{ color:'#475569' }}>{s}</p>
@@ -2554,7 +3011,7 @@ value={vouchers}
           <motion.div initial={{ opacity:0 }} animate={{ opacity:ready?1:0 }}
            transition={{ delay:.5 }}
             className="text-center mt-5 space-y-1.5">
-            <p className="text-xs" style={{ color:'#334155' }}>Need help?</p>
+            <p className="text-lg text-white" >Customer Care Contact</p>
             <a href={`tel:${hotspotPhoneNumber}`}
               className="inline-flex items-center gap-1.5 text-xs font-semibold"
               style={{ color:'#38bdf8' }}>
@@ -2572,7 +3029,8 @@ value={vouchers}
   <>
 
  <div className="min-h-screen bg-gradient-to-br
-  from-gray-900 to-black text-white">
+  from-gray-900 to-black text-white font-sans
+">
   
       
       {/* Main Container */}
@@ -3220,7 +3678,8 @@ onChange={(e) => setPhoneNumber(e.target.value)}
 {/* <MacRandomizationInstructions /> */}
   {seePackages ? (
     <div>
-<section className='bg-yellow-300 flex  flex-col justify-center'>
+<section className='bg-yellow-300 flex  flex-col justify-center font-sans
+'>
     
 
 
@@ -3538,46 +3997,23 @@ onChange={(e) => setPhoneNumber(e.target.value)}
 
 
 <div className='flex flex-row gap-2 items-center justify-center mt-4'>
-<div className='grid grid-cols-3 gap-3 px-4 py-2
- text-black rounded-lg'>
+
             {activeTabPremium === 'packages' && (
               <> 
-
-{packages.map((pkg, index) => (
-    <motion.div
-      key={index}
-      className="bg-white p-4 rounded-lg shadow-lg"
-      variants={packageVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <h3 className="text-xl font-bold text-gray-900">{pkg.name}</h3>
-      <p className="text-gray-600">Valid For {pkg.valid}</p>
-      <p className="text-black font-bold mt-2"> Price: {pkg.price} bob</p>
-      
-<button 
-  onClick={() => {
-
-
-          setHotspotPackage(pkg.name)
-          setPackageAmount(pkg.price)
-          setSeePackages(false);
-          setSeeForm(true);
-          setSeeInstructions(false);
-        }}
-className='bg-yellow-300 text-white rounded-lg px-4 py-2 
-font-bold flex gap-2'>
-    <p>Buy Plan </p>
-    <FaLongArrowAltRight />
-</button>
-      
-    </motion.div>
-  ))}
+<HotspotPackageCards
+  packages={packages}
+  onPackageSelect={(pkg) => {
+    setHotspotPackage(pkg.name);
+    setPackageAmount(pkg.price);
+    setSeePackages(false);
+    setSeeForm(true);
+  }}
+  // loading={paymentLoading}
+/>
               </>
             )}
 
  
-</div>
 </div>
 
 
@@ -3631,7 +4067,8 @@ relative
 
 
 
-      <section className='flex flex-row'>
+      <section className='flex flex-row font-sans
+'>
 
 <section className="bg-white shadow-lg rounded-xl p-6 max-w-md
  w-full border border-gray-100 ">
@@ -4468,159 +4905,9 @@ grid grid-cols-1 gap-6">
 
             <>
 
-{enabled ? (
-<>
-{seeAdd ? (
-      <div 
-  className="rounded-2xl flex flex-col justify-between
-             fixed z-50 animate-slide-in-right
-             backdrop-blur-lg shadow-2xl p-4
-             mx-4 mb-4
-             bottom-0 left-0 right-0
-             sm:bottom-4 sm:left-auto sm:right-4 sm:mx-0
-             sm:max-w-sm w-auto sm:w-80"
-  style={{ 
-    background: adData.backgroundColor,
-    color: adData.textColor
-  }}
->
-  {/* Close Button */}
-  <button 
-    onClick={() => setSeeAdd(false)}  
-    className="absolute top-2 right-2 text-white/80
-     hover:text-white transition-colors z-10"
-  >
-    <X className="w-4 h-4" />
-  </button>
 
-  <div className="flex flex-col sm:flex-row gap-3">
-    {/* Image Section */}
-    {adData.imagePreview && (
-      <div className="flex-shrink-0">
-        <img
-          src={adData.imagePreview}
-          alt="Business preview"
-          className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-xl"
-        />
-      </div>
-    )}
 
-    {/* Content Section */}
-    <div className="flex-1 min-w-0">
-      {/* Discount Badge */}
-      {adData.discount && (
-        <div className="inline-flex items-center gap-1 bg-yellow-400
-         text-yellow-900 px-2 py-1 rounded-full text-xs font-bold mb-2">
-          <span>✨</span>
-          {adData.discount}
-        </div>
-      )}
 
-      {/* Title */}
-      <h3 
-        className="text-lg sm:text-xl font-bold mb-1 truncate"
-        style={getTextStyle()}
-        title={adData.title}
-      >
-        {adData.title || 'Business Name'}
-      </h3>
-      
-      {/* Description */}
-      <p 
-        className="text-sm sm:text-base opacity-90 mb-2 line-clamp-2"
-        style={getTextStyle()}
-      >
-        {adData.description || 'Business description...'}
-      </p>
-
-      {/* Business Info - Compact */}
-      <div className="space-y-1 mb-2">
-        {adData.businessName && (
-          <div className="flex items-center gap-1 text-xs sm:text-sm">
-            <Star className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-            <span className="truncate">{adData.businessName}</span>
-          </div>
-        )}
-        
-        {adData.location.address && (
-          <div className="flex items-center gap-1 text-xs sm:text-sm">
-            <MapPin className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-            <span className="truncate">{adData.location.address}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Services Preview - Only show on larger screens */}
-    {adData.services.some(s => s.trim() !== '') && (
-      <div className="hidden sm:block mb-2">
-        <div className="flex flex-wrap gap-1">
-          {adData.services.filter(s => s.trim() !== '').slice(0, 2).map((service, index) => (
-            <span key={index} className="bg-white/20 px-2 py-1 rounded text-xs">
-              {service}
-            </span>
-          ))}
-          {adData.services.filter(s => s.trim() !== '').length > 2 && (
-            <span className="bg-white/20 px-2 py-1 rounded text-xs">
-              +{adData.services.filter(s => s.trim() !== '').length - 2}
-            </span>
-          )}
-        </div>
-      </div>
-    )}
-    </div>
-  </div>
-
-  {/* Action Buttons */}
-  <div className="flex flex-col sm:flex-row gap-2 mt-3">
-    <button 
-      className="bg-white text-gray-800 py-2 px-4 rounded-full font-bold hover:bg-gray-100
-       transition-colors flex-1 text-sm sm:text-base"
-      style={{ color: adData.backgroundColor.split(' ')[0] }}
-    >
-      {adData.ctaText}
-    </button>
-    
-    <div className="hidden sm:flex gap-2">
-     
-      <button
-      onClick={() => {
-    
-        window.location.href = `tel:${adData.contact.phone}`;
-        TrackEvent({eventType: 'click', button_name: 'call'})
-
-      }}
-      
-      className="bg-white/20 py-2 px-3 rounded-lg text-sm
-       hover:bg-white/30 transition-colors flex items-center gap-1">
-        <Phone className="w-3 h-3" />
-       <TrackEvent eventType="click" button_name="Call">
-  Call
-</TrackEvent>
-      </button>
-    </div>
-
-    {/* Mobile secondary actions */}
-    <div className="flex sm:hidden gap-2">
-      
-
-      <button 
-      
-       onClick={() => {
-    
-        window.location.href = `tel:${adData.contact.phone}`;
-        TrackEvent({eventType: 'click', button_name: 'call'})
-
-      }}
-      className="flex-1 bg-white/20 py-2 px-3 rounded-lg text-xs hover:bg-white/30 transition-colors">
-        Call Now
-      </button>
-    </div>
-  </div>
-</div>
-): null}
-     
-</>
-): null}
  
 
             <form onSubmit={makeHotspotPayment}>
@@ -4662,7 +4949,7 @@ grid grid-cols-1 gap-6">
       type='submit'
         disabled={loading}
         className="w-full py-3 bg-purple-600 text-white
-                 rounded-full shadow-md focus:outline-none dotted-font font-thin"
+                 rounded-full shadow-md focus:outline-none "
       >
         {loading ? (
           <CircularProgress size={24} className="text-white" />
@@ -4998,11 +5285,12 @@ relative
                       setPackageAmount(pkg.price)
                       setSeeForm(true);
                       setSeeInstructions(false);
+                      
                     }}
                   >
                     <h3 className="text-xl font-bold text-gray-800">{pkg.name}</h3>
                     <p className="text-gray-600">Valid For {pkg.valid}</p>
-                    <p className="text-purple-600 font-bold mt-2">Price: Ksh{pkg.price}</p>
+                    <p className="text-purple-600 font-bold mt-2">Price: Ksh {Number(pkg.price || 0).toLocaleString()}</p>
                   </motion.div>
                 ))}
               </div>
@@ -5054,7 +5342,7 @@ relative
   
 
    
-    </>
+    </section>
   );
 };
 

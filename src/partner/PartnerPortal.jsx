@@ -11,6 +11,8 @@ import {
   Download, RefreshCw, User, Phone, Mail, MapPin, Percent, Banknote,
   BarChart3, Activity, Star
 } from 'lucide-react';
+import { useLayoutEffect } from "react";
+
 
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=JetBrains+Mono:wght@400;500;700&display=swap');
@@ -152,6 +154,17 @@ export default function PartnerPortal() {
   const s    = data?.stats        || {};
   const p    = data?.partner      || {};
   const maxEarned = Math.max(...(data?.monthly||[]).map(m=>m.earned),1);
+
+
+
+  
+  useLayoutEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = CSS;
+    document.head.appendChild(style);
+  
+    return () => style.remove();
+  }, []);
 
   return (
     <>

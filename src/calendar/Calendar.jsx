@@ -540,7 +540,8 @@ useEffect(() => {
       setShowMenu11(false)  
       setShowMenu12(false)
      }}
-     className=''>
+     className='font-sans
+'>
       <div className='col-span-8'>
         <CalendarEvent  handleChangeDateTime1={handleChangeDateTime1}   handleChangeDateTime2={handleChangeDateTime2} 
         isOpen={isOpen} handleChange={handleChange} 

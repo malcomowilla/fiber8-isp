@@ -1,36 +1,37 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from "path"
-import MillionLint from "@million/lint";
+// import MillionLint from "@million/lint";
 
-
+import million from 'million/compiler'
 
 export default defineConfig({
   plugins: [react(),
-     MillionLint.vite({ auto: true })
+    //  MillionLint.vite({ auto: true })
+        million.vite({ auto: true })
   ],
   server: {
     
     proxy: {
       '/api': {
-        target: 'http://localhost:4000',
-        // // target: 'http://0.0.0.0:3000',
+        // target: 'http://localhost:4000',
+        // // // target: 'http://0.0.0.0:3000',
         // changeOrigin: true,
         // rewrite: (path) => path.replace(/^\/api/, ''),
 
         
-        // target: (req) => {
-        //   const host = req.headers.host; 
+        target: (req) => {
+          const host = req.headers.host; 
       
-        //   if (host === 'aitechs.co.ke' || host.endsWith('.aitechs.co.ke')) {
-        //     return `https://${host}`; 
-        //   }else{
-        //    host.endsWith('.owitech.co.ke') 
-        //   }
-        //   return 'http://0.0.0.0:3000'; 
-        // },
-        // changeOrigin: true,
-        // rewrite: (path) => path.replace(/^\/api/, ''),
+          if (host === 'aitechs.co.ke' || host.endsWith('.aitechs.co.ke')) {
+            return `https://${host}`; 
+          }else{
+           host.endsWith('.owitech.co.ke') 
+          }
+          return 'http://0.0.0.0:3000'; 
+        },
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
 
         
       }
@@ -43,6 +44,11 @@ export default defineConfig({
 
 
   build: {
+     cssCodeSplit: true,
+    minify: "esbuild",
+    chunkSizeWarningLimit: 1000,
+
+
     outDir: 'dist', 
         sourcemap: false,
 

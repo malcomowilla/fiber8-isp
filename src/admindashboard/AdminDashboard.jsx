@@ -28,9 +28,10 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { VscGitPullRequestCreate } from "react-icons/vsc";
 // import { block } from "million/react";
 import { IoCreateOutline } from "react-icons/io5";
-
 import UiLoader from '../uiloader/UiLoader'
 import { Suspense } from "react";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
 
 
 const AdminDashboard = () => {
@@ -61,6 +62,57 @@ const [registrations, setRegistrations] = useState({
 
 {/* <Route path='/admin/this-week-subscribers' element={<ThisWeekRegisteredSubscribers/>}/> */}
 const subdomain = window.location.hostname.split('.')[0];
+
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
+
+
+
 
  const fetchLogs = async () => {
     try {
@@ -233,6 +285,10 @@ onClick={() => {
       transition={{ duration: 0.5 }}
       className="bg-white rounded-xl shadow-md overflow-hidden"
     >
+<div className="rounded-2xl border border-[#e5e0d5] overflow-hidden shadow-sm">
+
+      <ThemeProvider theme={tableTheme}>
+      
         <MaterialTable
           title={
             <motion.div
@@ -330,27 +386,42 @@ onClick={() => {
             }
           ]}
           isLoading={isLoading}
-          options={{
-            pageSize: 10,
-            pageSizeOptions: [5, 10, 20],
-            sorting: true,
-            search: true,
-            searchFieldAlignment: 'left',
-            headerStyle: {
-              backgroundColor: '#f8fafc',
-              color: '#64748b',
-              fontWeight: '600',
-              fontSize: '0.875rem'
-            },
-            rowStyle: {
-              backgroundColor: '#fff',
-              '&:hover': {
-                backgroundColor: '#f1f5f9'
-              }
-            }
-          }}
+         options={{
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'monospace',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'monospace',
+      }),
+    }}
+      
          
         />
+        </ThemeProvider>
+        </div>
     </motion.div>
    
 

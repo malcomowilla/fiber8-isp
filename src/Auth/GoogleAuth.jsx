@@ -1,56 +1,55 @@
 import React, { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { motion } from 'framer-motion';
-import {useApplicationSettings} from '../settings/ApplicationSettings'
-
-
-
-
-
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check, Copy, Download, ShieldCheck, Smartphone, KeyRound, ScanLine } from 'lucide-react';
+import { useApplicationSettings } from '../settings/ApplicationSettings';
 
 const GoogleAuthenticatorSetup = ({ userEmail, onComplete }) => {
   const [setupData, setSetupData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [isCopied, setIsCopied] = useState(false);
+  const [copiedKey, setCopiedKey] = useState(null); // 'secret' | 'codes' | null
 
-
-  const {currentUser, setCurrentUser, currentUsername, currentEmail, setOpenDropDown} = useApplicationSettings()
+  const { currentUser, setCurrentUser, currentUsername, currentEmail, setOpenDropDown } = useApplicationSettings();
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
+      transition: { staggerChildren: 0.08 },
+    },
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 16, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: { type: 'spring', stiffness: 100 }
-    }
+      transition: { type: 'spring', stiffness: 120, damping: 16 },
+    },
   };
 
+  const flash = (key) => {
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
 
+  const subdomain = window.location.hostname.split('.')[0];
 
-
-  
-const subdomain = window.location.hostname.split('.')[0]
   const initiateSetup = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch('/api/setup_google_authenticator', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 
-            'X-Subdomain': subdomain,
-         },
-        body: JSON.stringify({ email: currentEmail }),});
-      
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Subdomain': subdomain,
+        },
+        body: JSON.stringify({ email: currentEmail }),
+      });
+
       if (!response.ok) throw new Error('Setup failed');
       const data = await response.json();
       setSetupData(data);
@@ -61,119 +60,194 @@ const subdomain = window.location.hostname.split('.')[0]
     }
   };
 
+  const downloadCodes = () => {
+    if (!setupData?.backup_codes) return;
+    const blob = new Blob([setupData.backup_codes.join('\n')], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'backup-codes.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (!setupData) {
     return (
-      <div className="text-center p-8">
-        <h2 className="text-2xl font-bold mb-4">Enable Two-Factor Authentication</h2>
-        <p className="mb-6">Click below to begin setting up Google Authenticator</p>
-        <button
-          onClick={initiateSetup}
-          disabled={isLoading}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg disabled:bg-blue-300 hover:bg-blue-700 transition-colors"
+      <div className="min-h-[420px] flex items-center justify-center  font-sans px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center"
         >
-          {isLoading ? 'Preparing Setup...' : 'Begin Setup'}
-        </button>
-        {error && <p className="text-red-500 mt-4">{error}</p>}
+          <div className="w-12 h-12 mx-auto mb-5 rounded-xl bg-indigo-50 flex items-center justify-center">
+            <ShieldCheck className="w-6 h-6 text-indigo-600" strokeWidth={2} />
+          </div>
+          <h2 className="text-lg font-semibold text-slate-900 mb-2 tracking-tight">
+            Enable two-factor authentication
+          </h2>
+          <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+            Add an extra layer of security to your account using Google Authenticator or a similar app.
+          </p>
+          <button
+            onClick={initiateSetup}
+            disabled={isLoading}
+            className="w-full py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg
+                       hover:bg-indigo-700 active:bg-indigo-800 disabled:bg-indigo-300
+                       transition-colors duration-150 shadow-sm"
+          >
+            {isLoading ? 'Preparing setup…' : 'Begin setup'}
+          </button>
+          <AnimatePresence>
+            {error && (
+              <motion.p
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="text-sm text-red-500 mt-4"
+              >
+                {error}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <motion.div 
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-      className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6"
-    >
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-        Set Up Google Authenticator
-      </h2>
+    <div className="min-h-[600px] bg-slate-50 font-sans py-10 px-4">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="max-w-md mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+      >
+        <div className="px-7 pt-7 pb-2">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-4.5 h-4.5 text-indigo-600" strokeWidth={2} />
+            </div>
+            <h2 className="text-lg font-semibold text-slate-900 tracking-tight">
+              Set up Google Authenticator
+            </h2>
+          </div>
+        </div>
 
-      <motion.div variants={itemVariants}>
-        <div className="mb-6">
-          <p className="text-gray-600 mb-4">
-            Scan this QR code with <strong>Google Authenticator</strong> or similar app:
-          </p>
-          
-          <div className="flex justify-center mb-6">
-            <img 
-              src={setupData.qr_code_data_url} 
-              alt="2FA QR Code"
-              className="border-4 border-white shadow-lg rounded-lg w-48 h-48"
-            />
+        <motion.div variants={itemVariants} className="px-7 pb-7">
+          {/* QR code */}
+          <div className="mt-5 mb-6">
+            <p className="text-sm text-slate-500 mb-3">
+              Scan this code with your authenticator app
+            </p>
+            <div className="flex justify-center p-5 bg-slate-50 rounded-xl border border-slate-100">
+              <img
+                src={setupData.qr_code_data_url}
+                alt="2FA QR Code"
+                className="w-44 h-44 rounded-lg bg-white p-2 shadow-sm"
+              />
+            </div>
           </div>
 
+          {/* Manual entry */}
           <div className="mb-6">
-            <p className="text-gray-600 mb-2">Or enter this code manually:</p>
-            <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-              <code className="font-mono text-lg">{setupData.otp_secret}</code>
-              <CopyToClipboard 
-                text={setupData.otp_secret}
-                onCopy={() => {
-                  setIsCopied(true);
-                  setTimeout(() => setIsCopied(false), 2000);
-                }}
-              >
-                <button className="px-3 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition">
-                  {isCopied ? 'Copied!' : 'Copy'}
+            <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">
+              Or enter this key manually
+            </p>
+            <div className="flex items-center justify-between gap-3 bg-slate-50 border border-slate-100 px-4 py-3 rounded-lg">
+              <code className="font-mono text-sm text-slate-700 tracking-wide truncate">
+                {setupData.otp_secret}
+              </code>
+              <CopyToClipboard text={setupData.otp_secret} onCopy={() => flash('secret')}>
+                <button className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-md hover:bg-slate-100 transition-colors">
+                  {copiedKey === 'secret' ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-600" /> Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" /> Copy
+                    </>
+                  )}
                 </button>
               </CopyToClipboard>
             </div>
           </div>
 
-          <div className="bg-blue-50 p-4 rounded-lg mb-6">
-            <h3 className="font-semibold text-blue-800 mb-2">How to set up:</h3>
-            <ol className="list-decimal list-inside space-y-2 text-blue-700">
-              <li>Open Google Authenticator on your phone</li>
-              <li>Tap the "+" icon and select "Scan QR code"</li>
-              <li>Point your camera at the QR code above</li>
-              <li>Or choose "Enter setup key" and paste the manual code</li>
+          {/* Steps */}
+          <div className="mb-6 rounded-xl border border-slate-100 bg-slate-50 p-4">
+            <h3 className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-3">
+              <Smartphone className="w-4 h-4 text-slate-400" />
+              How to set up
+            </h3>
+            <ol className="space-y-2.5">
+              {[
+                'Open Google Authenticator on your phone',
+                'Tap the "+" icon and select "Scan QR code"',
+                'Point your camera at the code above',
+                'Or choose "Enter setup key" and paste it in',
+              ].map((step, i) => (
+                <li key={i} className="flex items-start gap-2.5 text-sm text-slate-600">
+                  <span className="mt-0.5 shrink-0 w-4.5 h-4.5 flex items-center justify-center rounded-full bg-white border border-slate-200 text-[11px] font-medium text-slate-400">
+                    {i + 1}
+                  </span>
+                  {step}
+                </li>
+              ))}
             </ol>
           </div>
 
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-            <p className="text-yellow-700">
-              <strong>Important:</strong> Save these backup codes in a secure place. Each code can be used once if you lose access to your authenticator app.
+          {/* Backup codes notice */}
+          <div className="flex gap-2.5 bg-amber-50 border border-amber-100 rounded-lg p-3.5 mb-4">
+            <KeyRound className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+            <p className="text-sm text-amber-800 leading-relaxed">
+              Save these backup codes somewhere secure. Each one works only once if you lose access to your app.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="grid grid-cols-2 gap-2 mb-6">
             {setupData.backup_codes.map((code, index) => (
-              <div 
+              <div
                 key={index}
-                className="bg-gray-50 p-3 rounded text-center font-mono select-all"
+                className="bg-slate-50 border border-slate-100 py-2.5 rounded-lg text-center font-mono text-sm text-slate-600 select-all"
               >
                 {code}
               </div>
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
-            <CopyToClipboard text={setupData.backup_codes.join('\n')}>
-              <button 
-                className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition"
-                onClick={() => {
-                  setIsCopied(true);
-                  setTimeout(() => setIsCopied(false), 2000);
-                }}
-              >
-                {isCopied ? 'Copied!' : 'Copy All Codes'}
+          <div className="flex gap-2 mb-3">
+            <CopyToClipboard text={setupData.backup_codes.join('\n')} onCopy={() => flash('codes')}>
+              <button className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 text-sm font-medium rounded-lg transition-colors">
+                {copiedKey === 'codes' ? (
+                  <>
+                    <Check className="w-4 h-4 text-emerald-600" /> Copied
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" /> Copy all
+                  </>
+                )}
               </button>
             </CopyToClipboard>
-            <button className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition">
-              Download Codes
+            <button
+              onClick={downloadCodes}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 text-sm font-medium rounded-lg transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              Download
             </button>
           </div>
 
           <button
             onClick={onComplete}
-            className="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
+            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
           >
-            I've Saved My Backup Codes - Finish Setup
+            I've saved my backup codes — finish setup
           </button>
-        </div>
+        </motion.div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 };
 

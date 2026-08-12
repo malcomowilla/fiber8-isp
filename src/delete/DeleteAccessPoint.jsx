@@ -111,7 +111,8 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
               <WarningIcon color="error" sx={{ fontSize: 32 }} />
             </Box>
             <Typography variant="h5" component="span" fontWeight="bold">
-              Delete Access Point
+              <p className='font-sans
+'>Delete Access Point </p>
             </Typography>
           </Box>
         </DialogTitle>
@@ -130,13 +131,15 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
             align="center"
             sx={{ mb: 2, fontWeight: 500 }}
           >
-            Are you sure you want to delete this access point?   </Typography>
+            <p className='font-sans
+'>Are you sure you want to delete this access point? </p>   </Typography>
           <Typography
             variant="body2"
             color="text.secondary"
             align="center"
           >
-            This action cannot be undone.
+            <p className='font-sans
+'>This action cannot be undone. </p>
           </Typography>
         </DialogContent>
   
@@ -167,7 +170,8 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
               }
             }}
           >
-            Cancel
+            <p className='font-sans
+'>Cancel </p>
           </Button>
 
           <Button
@@ -185,7 +189,8 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
             {loading ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
-              'Delete'
+              <p className='font-sans
+'>Delete</p>
             )}
           </Button>
         </DialogActions>

@@ -26,6 +26,13 @@ import {
 } from '@mui/icons-material';
 import { forwardRef } from 'react';
 
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+import { useMemo, useEffect, useCallback } from 'react';
+
+
+
+
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -61,7 +68,57 @@ const EditLead = ({ open, setOpen, formData, setFormData, createLead,
     setOpen(false);
   };
 
+
+
+
+
+
+
+
+  function useIsDarkMode() {
+    const [isDark, setIsDark] = useState(
+      () => typeof document !== 'undefined' &&
+        document.documentElement.classList.contains('dark')
+    );
+  
+    useEffect(() => {
+      const root = document.documentElement;
+  
+      const update = () => setIsDark(root.classList.contains('dark'));
+      update();
+  
+      const observer = new MutationObserver(update);
+      observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+  
+      return () => observer.disconnect();
+    }, []);
+  
+    return isDark;
+  }
+  
+  
+  
+  
+  const isDark = useIsDarkMode();
+  
+  const tableTheme = useMemo(() => createTheme({
+    palette: {
+      mode: isDark ? 'dark' : 'light',
+      background: {
+        paper: isDark ? '#1e1e1e' : '#ffffff',
+        default: isDark ? '#1e1e1e' : '#ffffff',
+      },
+      text: {
+        primary: isDark ? '#f1f1f1' : '#1a1a1a',
+        secondary: isDark ? '#a3a3a3' : '#6b7280',
+      },
+    },
+  }), [isDark]);
+  
+
   return (
+          <ThemeProvider theme={tableTheme}>
+    
     <Dialog
       fullScreen={fullScreen}
       open={open}
@@ -87,7 +144,8 @@ const EditLead = ({ open, setOpen, formData, setFormData, createLead,
         alignItems: 'center',
         py: 2
       }}>
-        <Typography variant="h6">Edit Lead Information</Typography>
+        <Typography variant="h6"><p className='font-sans
+'>Edit Lead Information</p></Typography>
         <IconButton 
           edge="end" 
           color="inherit" 
@@ -118,7 +176,8 @@ const EditLead = ({ open, setOpen, formData, setFormData, createLead,
           <TextField
             fullWidth
             margin="normal"
-            label="Full Name"
+            label={<p className='font-sans
+'>Full Name</p>}
             name="name"
             className='myTextField'
             value={formData.name}
@@ -139,7 +198,8 @@ const EditLead = ({ open, setOpen, formData, setFormData, createLead,
             fullWidth
             className='myTextField'
             margin="normal"
-            label="Email Address"
+            label={<p className='font-sans
+'>Email Address</p>}
             name="email"
             type="email"
             value={formData.email}
@@ -160,7 +220,8 @@ const EditLead = ({ open, setOpen, formData, setFormData, createLead,
             fullWidth
             margin="normal"
             className='myTextField'
-            label="Location"
+            label={<p className='font-sans
+'>Location </p>}
             name="location"
             value={formData.location}
             onChange={handleChange}
@@ -178,7 +239,8 @@ const EditLead = ({ open, setOpen, formData, setFormData, createLead,
           <TextField
             fullWidth
             margin="normal"
-            label="Phone Number"
+            label={<p className='font-sans
+'>Phone Number </p>} 
             className='myTextField'
             name="phone_number"
             value={formData.phone_number}
@@ -211,7 +273,8 @@ const EditLead = ({ open, setOpen, formData, setFormData, createLead,
               }
             }}
           >
-            Cancel
+            <p className='font-sans
+'>Cancel </p>
           </Button>
           <Button
             type="submit"
@@ -227,11 +290,16 @@ const EditLead = ({ open, setOpen, formData, setFormData, createLead,
               }
             }}
           >
-            {loading ? 'Saving...' : <p>{editLead ? 'Update Lead' : 'Save Lead'} </p>}
+            {loading ? <p className='font-sans
+'>Saving...</p> : <p>{editLead ?<p className='font-sans
+'>Update Lead</p> : <p className='font-sans
+'>Save Lead</p>} </p>}
           </Button>
         </DialogActions>
       </Box>
     </Dialog>
+    </ThemeProvider>
+    
   );
 };
 

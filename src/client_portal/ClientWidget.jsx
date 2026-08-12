@@ -1,506 +1,841 @@
-import {Link, useNavigate} from 'react-router-dom'
-import {useState, useEffect} from 'react'
-import {useApplicationSettings} from '../settings/ApplicationSettings'
+import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { useApplicationSettings } from '../settings/ApplicationSettings'
 
-
-
-
+/* ─── Static demo data ─── */
 const PLANS = [
-  { id: 1, name: "Basic Fiber", speed: "10 Mbps", price: 999, color: "#0ea5e9", popular: false, features: ["Unlimited data", "Email support", "1 device"] },
-  { id: 2, name: "Home Plus", speed: "50 Mbps", price: 1999, color: "#8b5cf6", popular: true, features: ["Unlimited data", "Priority support", "5 devices", "Free router"] },
-  { id: 3, name: "Business Pro", speed: "100 Mbps", price: 3499, color: "#f59e0b", popular: false, features: ["Unlimited data", "24/7 support", "10 devices", "Static IP", "SLA guarantee"] },
-  { id: 4, name: "Ultra 5G", speed: "500 Mbps", price: 5999, color: "#10b981", popular: false, features: ["Unlimited data", "Dedicated account manager", "Unlimited devices", "Static IP", "SLA", "Cloud backup"] },
-];
+  { id: 1, name: "Basic Fiber",    speed: "10 Mbps",  price: 999,  color: "#f59e0b", features: ["Unlimited data","Email support","1 device"] },
+  { id: 2, name: "Home Plus",      speed: "50 Mbps",  price: 1999, color: "#10b981", popular: true, features: ["Unlimited data","Priority support","5 devices","Free router"] },
+  { id: 3, name: "Business Pro",   speed: "100 Mbps", price: 3499, color: "#3b82f6", features: ["Unlimited data","24/7 support","10 devices","Static IP","SLA guarantee"] },
+  { id: 4, name: "Ultra 5G",       speed: "500 Mbps", price: 5999, color: "#8b5cf6", features: ["Unlimited data","Dedicated manager","Unlimited devices","Static IP","SLA","Cloud backup"] },
+]
+
+const TRANSACTIONS = [
+  { id: "TXN-9841", date: "Apr 14, 2026", amount: 1999, method: "M-Pesa",       ref: "QHJ2839KL", status: "Success" },
+  { id: "TXN-9720", date: "Mar 14, 2026", amount: 1999, method: "M-Pesa",       ref: "PGT9183AB", status: "Success" },
+  { id: "TXN-9603", date: "Feb 14, 2026", amount: 1999, method: "Bank Transfer", ref: "EQ2029112",  status: "Success" },
+  { id: "TXN-9501", date: "Jan 14, 2026", amount: 1999, method: "M-Pesa",       ref: "NKL9283RT", status: "Success" },
+  { id: "TXN-9388", date: "Dec 14, 2025", amount: 1999, method: "M-Pesa",       ref: "WQM0293HS", status: "Success" },
+  { id: "TXN-9271", date: "Nov 14, 2025", amount: 1500, method: "M-Pesa",       ref: "XYZ1928DF", status: "Success" },
+]
 
 const TICKETS = [
   { id: "TKT-1042", subject: "Slow speeds in the evening", status: "In Progress", date: "2025-03-28", priority: "High" },
-  { id: "TKT-1031", subject: "Router keeps disconnecting", status: "Resolved", date: "2025-03-15", priority: "Medium" },
-  { id: "TKT-1018", subject: "Billing discrepancy for February", status: "Resolved", date: "2025-02-20", priority: "Low" },
-];
+  { id: "TKT-1031", subject: "Router keeps disconnecting",  status: "Resolved",    date: "2025-03-15", priority: "Medium" },
+  { id: "TKT-1018", subject: "Billing discrepancy Feb",     status: "Resolved",    date: "2025-02-20", priority: "Low" },
+]
 
-const USAGE_DATA = [40, 65, 55, 80, 72, 90, 68, 85, 78, 92, 88, 76];
-const MONTHS = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
+const MONTHS = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"]
+const USAGE_DATA = [40,65,55,80,72,90,68,85,78,92,88,76]
 
-const statusColor = (s) => {
-  if (s === "Resolved") return { bg: "#d1fae5", text: "#065f46" };
-  if (s === "In Progress") return { bg: "#fef3c7", text: "#92400e" };
-  return { bg: "#dbeafe", text: "#1e40af" };
-};
+/* ─── Helpers ─── */
+const statusStyle = s => s === "Resolved"    ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                       : s === "In Progress" ? "bg-amber-100 text-amber-700 border-amber-200"
+                       :                       "bg-blue-100 text-blue-700 border-blue-200"
 
-const priorityColor = (p) => {
-  if (p === "High") return { bg: "#fee2e2", text: "#991b1b" };
-  if (p === "Medium") return { bg: "#fef3c7", text: "#92400e" };
-  return { bg: "#f0fdf4", text: "#166534" };
-};
+const priorityStyle = p => p === "High"   ? "bg-red-100 text-red-600 border-red-200"
+                         : p === "Medium" ? "bg-amber-100 text-amber-700 border-amber-200"
+                         :                  "bg-green-100 text-green-700 border-green-200"
 
-function LoginScreen({ onLogin }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [showPass, setShowPass] = useState(false);
-
-  const handleLogin = () => {
-    if (!username.trim() || !password.trim()) { setError("Please enter your account number and password."); return; }
-    setError(""); setLoading(true);
-    setTimeout(() => { setLoading(false); onLogin(); }, 1600);
-  };
-
-
-
-
-
-
-
-
+/* ─── Live Speed Gauge ─── */
+function SpeedGauge({ label, value, max, unit, color }) {
+  const pct = Math.min(value / max, 1)
+  const r = 52, cx = 60, cy = 60
+  const circ = Math.PI * r  // half circle
+  const dash = pct * circ
+  const strokeColor = color
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0f0e17", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans','Segoe UI',sans-serif", padding: 20 }}>
-      <div style={{ width: "100%", maxWidth: 420 }}>
-        {/* Logo */}
-        <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <div style={{ width: 56, height: 56, borderRadius: 16, background: "linear-gradient(135deg,#7c3aed,#3b82f6)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 24, color: "#fff", margin: "0 auto 14px" }}>N</div>
-          <h1 style={{ fontSize: 26, fontWeight: 800, color: "#fffffe", margin: "0 0 6px", background: "linear-gradient(90deg,#a78bfa,#60a5fa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>NetLink ISP</h1>
-          <p style={{ fontSize: 14, color: "#6b7280", margin: 0 }}>Sign in to your customer portal</p>
+    <div className="flex flex-col items-center gap-1">
+      <svg width="120" height="72" viewBox="0 0 120 80">
+        {/* track */}
+        <path d={`M ${cx - r},${cy} A ${r},${r} 0 0 1 ${cx + r},${cy}`}
+          fill="none" stroke="#e5e7eb" strokeWidth="10" strokeLinecap="round" />
+        {/* fill */}
+        <path d={`M ${cx - r},${cy} A ${r},${r} 0 0 1 ${cx + r},${cy}`}
+          fill="none" stroke={strokeColor} strokeWidth="10" strokeLinecap="round"
+          strokeDasharray={`${dash} ${circ}`}
+          style={{ transition: "stroke-dasharray 1s ease" }} />
+        {/* value */}
+        <text x={cx} y={cy - 4} textAnchor="middle" fontSize="18" fontWeight="700" fill="#111827">{value}</text>
+        <text x={cx} y={cy + 12} textAnchor="middle" fontSize="11" fill="#6b7280">{unit}</text>
+      </svg>
+      <span className="text-xs font-semibold text-gray-500 tracking-wide uppercase">{label}</span>
+    </div>
+  )
+}
+
+/* ─── Live Usage Widget ─── */
+function LiveUsageCard({ planSpeed }) {
+  const [download, setDownload] = useState(18.4)
+  const [upload, setUpload]     = useState(4.2)
+  const [latency, setLatency]   = useState(12)
+  const [online, setOnline]     = useState(true)
+  const [sessionTime, setSessionTime] = useState(7234) // seconds
+  const [totalUsed, setTotalUsed]     = useState(42.7)  // GB this month
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setDownload(v => +(Math.max(0.5, v + (Math.random() - 0.48) * 4)).toFixed(1))
+      setUpload(v   => +(Math.max(0.1, v + (Math.random() - 0.48) * 1.5)).toFixed(1))
+      setLatency(v  => Math.max(2, Math.min(80, v + Math.round((Math.random() - 0.48) * 6))))
+      setSessionTime(v => v + 1)
+      setTotalUsed(v => +(v + 0.001).toFixed(3))
+    }, 1800)
+    return () => clearInterval(id)
+  }, [])
+
+  const fmt = s => {
+    const h = String(Math.floor(s / 3600)).padStart(2,'0')
+    const m = String(Math.floor((s % 3600) / 60)).padStart(2,'0')
+    const sec = String(s % 60).padStart(2,'0')
+    return `${h}:${m}:${sec}`
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      {/* header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+          </span>
+          <span className="text-sm font-bold text-gray-800 tracking-tight">Live Connection</span>
         </div>
+        <span className="text-xs font-mono text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-100">
+          Session: {fmt(sessionTime)}
+        </span>
+      </div>
 
-        {/* Card */}
-        <div style={{ background: "#16131f", border: "1px solid #2a2637", borderRadius: 18, padding: "32px 28px" }}>
-          {error && (
-            <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 9, padding: "10px 14px", marginBottom: 18, fontSize: 13, color: "#f87171" }}>
-              {error}
-            </div>
-          )}
+      {/* gauges */}
+      <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100 py-4 px-2">
+        <SpeedGauge label="Download" value={download} max={parseFloat(planSpeed) || 50} unit="Mbps" color="#10b981" />
+        <SpeedGauge label="Upload"   value={upload}   max={parseFloat(planSpeed) * 0.4 || 20} unit="Mbps" color="#3b82f6" />
+        <SpeedGauge label="Latency"  value={latency}  max={100} unit="ms"   color={latency > 50 ? "#ef4444" : "#f59e0b"} />
+      </div>
 
-          <label style={{ fontSize: 13, color: "#9ca3af", display: "block", marginBottom: 6 }}>Account Number</label>
-          <input value={username} onChange={e => setUsername(e.target.value)} placeholder="e.g. NL-2024-0042817"
-            style={{ width: "100%", padding: "12px 14px", borderRadius: 10, background: "#0f0e17", border: "1px solid #2a2637", color: "#fffffe", fontSize: 14, outline: "none", boxSizing: "border-box", marginBottom: 16 }} />
-
-          <label style={{ fontSize: 13, color: "#9ca3af", display: "block", marginBottom: 6 }}>Password</label>
-          <div style={{ position: "relative", marginBottom: 10 }}>
-            <input value={password} onChange={e => setPassword(e.target.value)} type={showPass ? "text" : "password"} placeholder="Enter your password"
-              onKeyDown={e => e.key === "Enter" && handleLogin()}
-              style={{ width: "100%", padding: "12px 44px 12px 14px", borderRadius: 10, background: "#0f0e17", border: "1px solid #2a2637", color: "#fffffe", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
-            <button onClick={() => setShowPass(v => !v)}
-              style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#6b7280", cursor: "pointer", fontSize: 16, padding: 0 }}>
-              {showPass ? "◎" : "◉"}
-            </button>
-          </div>
-
-          <div style={{ textAlign: "right", marginBottom: 22 }}>
-            <button style={{ background: "none", border: "none", color: "#7c3aed", fontSize: 13, cursor: "pointer", padding: 0 }}>Forgot password?</button>
-          </div>
-
-          <button onClick={handleLogin} disabled={loading}
-            style={{ width: "100%", padding: "14px", borderRadius: 11, background: loading ? "#374151" : "linear-gradient(135deg,#7c3aed,#3b82f6)", border: "none", color: "#fff", fontWeight: 700, fontSize: 15, cursor: loading ? "default" : "pointer", transition: "all 0.2s" }}>
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-
-          <p style={{ textAlign: "center", fontSize: 13, color: "#6b7280", margin: "20px 0 0" }}>
-            Need help? Call <span style={{ color: "#a78bfa", fontWeight: 600 }}>0800 720 999</span>
-          </p>
+      {/* stats bar */}
+      <div className="grid grid-cols-2 gap-px bg-gray-100 border-t border-gray-100">
+        <div className="bg-white px-5 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5">Used This Month</p>
+          <p className="text-lg font-bold text-gray-800">{totalUsed.toFixed(1)} <span className="text-sm font-normal text-gray-500">GB</span></p>
+        </div>
+        <div className="bg-white px-5 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5">Plan Speed</p>
+          <p className="text-lg font-bold text-gray-800">{planSpeed}</p>
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-function LogoutModal({ onConfirm, onCancel }) {
-   const [isLoggingOut, setIsLoggingOut] = useState(false);
-    const navigate = useNavigate()
+/* ─── Logout Modal ─── */
+function LogoutModal({ onCancel }) {
+  const [busy, setBusy] = useState(false)
+  const navigate = useNavigate()
+  const subdomain = window.location.hostname.split('.')[0]
 
-
-
-
-    
-const subdomain = window.location.hostname.split('.')[0];
-
- const handleCustomerLogout = async () => {
-    setIsLoggingOut(true);
+  const handleLogout = async () => {
+    setBusy(true)
     try {
-      const response = await fetch('/api/customer-logout', {
-        method: 'POST',
-        headers: {
-          'X-Subdomain': subdomain,
-        }
-
-      });
-
-      if (response.ok) {
-        // Redirect to login page after successful logout
-        navigate('/client-login');
-      } else {
-        console.error('Logout failed');
-
-        // You might want to show an error message here
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      setIsLoggingOut(false);
-    }
-  };
-
+      const res = await fetch('/api/customer-logout', {
+        method: 'POST', headers: { 'X-Subdomain': subdomain }
+      })
+      if (res.ok) navigate('/client-login')
+    } catch { } finally { setBusy(false) }
+  }
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}>
-      <div style={{ background: "#16131f", border: "1px solid #2a2637", borderRadius: 16, padding: "32px 28px", maxWidth: 360, width: "90%", textAlign: "center" }}>
-        <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 22 }}>⏻</div>
-        <h3 style={{ fontSize: 18, fontWeight: 700, color: "#fffffe", margin: "0 0 8px" }}>Sign Out?</h3>
-        <p style={{ fontSize: 14, color: "#9ca3af", margin: "0 0 24px" }}>You'll be returned to the login screen.</p>
-        <div style={{ display: "flex", gap: 12 }}>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center">
+        <div className="w-14 h-14 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-4 text-2xl">👋</div>
+        <h3 className="text-lg font-bold text-gray-800 mb-1">Sign Out?</h3>
+        <p className="text-sm text-gray-500 mb-6">You'll be returned to the login screen.</p>
+        <div className="flex gap-3">
           <button onClick={onCancel}
-            style={{ flex: 1, padding: "11px", borderRadius: 9, background: "transparent", border: "1px solid #2a2637", color: "#d1d5db", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
+            className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-gray-50 transition">
             Cancel
           </button>
-          <button onClick={handleCustomerLogout}
-            style={{ flex: 1, padding: "11px", borderRadius: 9, background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.4)", color: "#f87171", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
-            Sign Out
+          <button onClick={handleLogout} disabled={busy}
+            className="flex-1 py-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 font-semibold text-sm hover:bg-red-100 transition">
+            {busy ? "Signing out…" : "Sign Out"}
           </button>
         </div>
       </div>
     </div>
-  );
+  )
 }
 
+/* ══════════════════════════════════════════════════════════
+   MAIN PORTAL
+══════════════════════════════════════════════════════════ */
 export default function ISPPortal() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const [paymentMethod, setPaymentMethod] = useState("mpesa");
-  const [mpesaPhone, setMpesaPhone] = useState("0712 345 678");
-  const [bankName, setBankName] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [paySuccess, setPaySuccess] = useState(false);
-  const [payLoading, setPayLoading] = useState(false);
-  const [ticketSubject, setTicketSubject] = useState("");
-  const [ticketDesc, setTicketDesc] = useState("");
-  const [ticketPriority, setTicketPriority] = useState("Medium");
-  const [ticketSuccess, setTicketSuccess] = useState(false);
-  const [feedbackRating, setFeedbackRating] = useState(0);
-  const [feedbackText, setFeedbackText] = useState("");
-  const [feedbackSuccess, setFeedbackSuccess] = useState(false);
-  const [upgradeSelected, setUpgradeSelected] = useState(null);
-  const [upgradeSuccess, setUpgradeSuccess] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [isLoggingOut, setIsLoggingOut] = useState(false);
-    const navigate = useNavigate()
+  const [activeTab, setActiveTab]             = useState("dashboard")
+  const [showLogout, setShowLogout]           = useState(false)
+  const [sidebarOpen, setSidebarOpen]         = useState(false)
+  const [payMethod, setPayMethod]             = useState("mpesa")
+  const [mpesaPhone, setMpesaPhone]           = useState("0712 345 678")
+  const [cardNumber, setCardNumber]           = useState("")
+  const [bankName, setBankName]               = useState("")
+  const [payLoading, setPayLoading]           = useState(false)
+  const [paySuccess, setPaySuccess]           = useState(false)
+  const [ticketSubject, setTicketSubject]     = useState("")
+  const [ticketDesc, setTicketDesc]           = useState("")
+  const [ticketPriority, setTicketPriority]   = useState("Medium")
+  const [ticketSuccess, setTicketSuccess]     = useState(false)
+  const [rating, setRating]                   = useState(0)
+  const [feedbackText, setFeedbackText]       = useState("")
+  const [feedbackOk, setFeedbackOk]           = useState(false)
+  const [upgradeSelected, setUpgradeSelected] = useState(null)
+  const [upgradeOk, setUpgradeOk]             = useState(false)
+  const [txFilter, setTxFilter]               = useState("all")
+  const [transactions, setTransactions] = useState(TRANSACTIONS)
+  const [supportTickets, setSupportTickets] = useState(TICKETS)
+  const navigate = useNavigate()
 
-  // if (!isLoggedIn) return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
-
-
-
-
-
+  const { currentCustomer, settingsformData, setWelcomeMessage,  setWelcome,
+    companySettings,setCompanySettings,
+    adminSettings, setAdminSettings, } = useApplicationSettings()
 
 
 
-  const currentPlan = PLANS[1];
-  const expiryDate = "April 14, 2026";
-  const daysLeft = 13;
-  const usagePercent = 68;
+      const {company_name, contact_info, email_info, logo_preview} = companySettings
+
+  const subdomain = window.location.hostname.split('.')[0]
+
+  const currentPlan  = PLANS[1]
+  const expiryDate   = "May 14, 2026"
+  const daysLeft     = 13
 
   const handlePay = () => {
-    setPayLoading(true);
-    setTimeout(() => { setPayLoading(false); setPaySuccess(true); }, 2000);
-  };
+    setPayLoading(true)
+    setTimeout(() => { setPayLoading(false); setPaySuccess(true) }, 2000)
+  }
 
-  const handleTicket = () => {
-    if (!ticketSubject.trim()) return;
-    setTicketSuccess(true);
-    setTicketSubject(""); setTicketDesc("");
-  };
 
-  const handleFeedback = () => {
-    if (!feedbackRating) return;
-    setFeedbackSuccess(true);
-    setFeedbackRating(0); setFeedbackText("");
-  };
 
-  const handleUpgrade = () => {
-    if (!upgradeSelected) return;
-    setUpgradeSuccess(true);
-  };
+
+  const handleGetCompanySettings = useCallback(
+    async() => {
+      try {
+        const response = await fetch('/api/allow_get_company_settings', {
+          headers: {
+            'X-Subdomain': subdomain,
+          },
+        })
+        const newData = await response.json()
+        if (response.ok) {
+          // setcompanySettings(newData)
+          const { contact_info, company_name, email_info, logo_url,
+            customer_support_phone_number,agent_email ,customer_support_email
+           } = newData
+
+           setLogoUrl(logo_url)
+          setCompanySettings((prevData)=> ({...prevData, 
+            contact_info, company_name, email_info,
+            customer_support_phone_number,agent_email ,customer_support_email,
+          
+            logo_preview: logo_url
+          }))
+  
+        }else{
+        }
+      } catch (error) {
+      
+      }
+    },
+    [setCompanySettings, subdomain],
+  )
+
+
+
+  const fetchPackages = useCallback(async () => {
+    try {
+      await fetch('/api/allow_get_packages', { headers: { 'X-Subdomain': subdomain } })
+    } catch {}
+  }, [subdomain])
+
+
+
+// /api/allow_get_pp_poe_mpesa_revenues
+
+
+
+
+  const getRevenue = useCallback(
+    async() => {
+      
+      try {
+        const response = await fetch(`/api/allow_get_pp_poe_mpesa_revenues?subscriber_id=${currentCustomer.id}`, {
+
+          headers: { 'X-Subdomain': subdomain },
+        })
+        const data = await response.json()
+        if (response.ok) {
+          setTransactions(data)
+        } else {
+          
+        }
+      }
+      catch (error) {
+        console.log(error)
+      }
+    },
+    []
+  )
+
+
+
+
+  const getSubscriptions = useCallback(
+    async() => {
+      
+      try {
+        const response = await fetch(`/api/allow_get_subscriptions?subscriber_id=${currentCustomer.id}`, {
+
+          headers: { 'X-Subdomain': subdomain },
+        })
+        const data = await response.json()
+      }
+      catch (error) {
+        console.log(error)
+      }
+    },
+    []
+  )
+
+
+
+
+
+  const getSupportTickets = useCallback(
+    async() => {
+      
+      try {
+        const response = await fetch(`/api/allow_get_support_ticket?subscriber_id=${currentCustomer.id}`, {
+
+          headers: { 'X-Subdomain': subdomain },
+        })
+        const data = await response.json()
+
+        if (response.ok){
+setSupportTickets(data)
+        }
+      }
+      catch (error) {
+        console.log(error)
+      }
+    },
+    []
+  )
+
+
+
+
+  useEffect(() => { 
+    
+    fetchPackages() 
+     getSubscriptions() 
+     getRevenue()
+     getSupportTickets()
+     handleGetCompanySettings()
+
+
+  }, [fetchPackages, getSubscriptions, getRevenue, getSupportTickets, handleGetCompanySettings])
 
   const nav = [
-    { id: "dashboard", icon: "⊞", label: "Dashboard" },
-    { id: "pay", icon: "₿", label: "Pay Bill" },
-    { id: "plans", icon: "◈", label: "Plans" },
-    { id: "upgrade", icon: "↑", label: "Upgrade" },
-    { id: "tickets", icon: "◎", label: "Support" },
-    { id: "feedback", icon: "✦", label: "Feedback" },
-    { id: "account", icon: "◉", label: "Account" },
-  ];
+    { id: "dashboard",    icon: "⊞", label: "Dashboard"    },
+    { id: "usage",        icon: "📶", label: "Live Usage"   },
+    { id: "transactions", icon: "💳", label: "Transactions" },
+    { id: "pay",          icon: "₿",  label: "Pay Bill"     },
+    { id: "plans",        icon: "◈",  label: "Plans"        },
+    { id: "upgrade",      icon: "↑",  label: "Upgrade"      },
+    { id: "tickets",      icon: "◎",  label: "Support"      },
+    { id: "account",      icon: "◉",  label: "Account"      },
+  ]
+
+  const filteredTx = txFilter === "all" ? transactions
+    : transactions.filter(t => t?.payment_method.toLowerCase().includes(txFilter))
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0f0e17", color: "#fffffe", fontFamily: "'DM Sans', 'Segoe UI', sans-serif", display: "flex", overflow: "hidden" }}>
-      {showLogoutModal && <LogoutModal onConfirm={() => { setIsLoggedIn(false); setShowLogoutModal(false); setActiveTab("dashboard"); }} onCancel={() => setShowLogoutModal(false)} />}
+    <div className="min-h-screen bg-gray-50 flex font-sans overflow-hidden"
+      style={{ fontFamily: "'Plus Jakarta Sans','DM Sans','Segoe UI',sans-serif" }}>
 
-      {/* Sidebar */}
-      <aside style={{
-        width: sidebarOpen ? 220 : 68, minWidth: sidebarOpen ? 220 : 68,
-        background: "#16131f", borderRight: "1px solid #2a2637",
-        display: "flex", flexDirection: "column", transition: "width 0.25s ease, min-width 0.25s ease",
-        zIndex: 20, overflow: "hidden"
-      }}>
-        <div style={{ padding: "24px 0 16px", display: "flex", alignItems: "center", justifyContent: "center", borderBottom: "1px solid #2a2637" }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#3b82f6)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 16, color: "#fff", flexShrink: 0 }}>N</div>
-          {sidebarOpen && <span style={{ marginLeft: 10, fontWeight: 700, fontSize: 17, whiteSpace: "nowrap", background: "linear-gradient(90deg,#a78bfa,#60a5fa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>NetLink ISP</span>}
+      {/* inject font */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        * { box-sizing: border-box; }
+        .tab-active { background: linear-gradient(135deg,#ecfdf5,#d1fae5); color:#065f46; border-left:3px solid #10b981; }
+        .tab-inactive { color:#6b7280; border-left:3px solid transparent; }
+        .tab-inactive:hover { background:#f9fafb; color:#374151; }
+        ::-webkit-scrollbar { width:5px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:99px; }
+      `}</style>
+
+      {showLogout && <LogoutModal onCancel={() => setShowLogout(false)} />}
+
+      {/* ── Sidebar ── */}
+      <aside className={`${sidebarOpen ? 'w-56' : 'w-16'} bg-white border-r border-gray-100 flex flex-col
+        transition-all duration-200 z-20 shrink-0 shadow-sm`}>
+
+        {/* Logo */}
+        <div className="h-16 flex items-center justify-center border-b border-gray-100 px-3">
+         
+          {sidebarOpen && (
+            <span className="ml-2.5 font-extrabold text-gray-800 text-sm whitespace-nowrap truncate">
+              {company_name}
+            </span>
+          )}
         </div>
 
-        <nav style={{ flex: 1, padding: "12px 0" }}>
+        {/* Nav */}
+        <nav className="flex-1 py-3 overflow-y-auto">
           {nav.map(n => (
-            <button key={n.id} onClick={() => { setActiveTab(n.id); setSidebarOpen(false); }}
-              style={{
-                width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "11px 16px",
-                background: activeTab === n.id ? "rgba(124,58,237,0.18)" : "transparent",
-                border: "none", borderLeft: activeTab === n.id ? "3px solid #7c3aed" : "3px solid transparent",
-                color: activeTab === n.id ? "#a78bfa" : "#9ca3af", cursor: "pointer",
-                fontSize: 14, fontWeight: activeTab === n.id ? 600 : 400, transition: "all 0.15s"
-              }}>
-              <span style={{ fontSize: 18, width: 20, textAlign: "center", flexShrink: 0 }}>{n.icon}</span>
-              {sidebarOpen && <span style={{ whiteSpace: "nowrap" }}>{n.label}</span>}
+            <button key={n.id}
+              onClick={() => { setActiveTab(n.id); setSidebarOpen(false) }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium transition-all
+                ${activeTab === n.id ? 'tab-active' : 'tab-inactive'}`}>
+              <span className="text-base w-5 text-center shrink-0">{n.icon}</span>
+              {sidebarOpen && <span className="whitespace-nowrap">{n.label}</span>}
             </button>
           ))}
         </nav>
 
-        <button onClick={() => setShowLogoutModal(true)}
-          style={{ margin: "0 10px 8px", padding: "10px 16px", borderRadius: 8, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", gap: 10, width: "calc(100% - 20px)" }}>
-          <span style={{ fontSize: 17, flexShrink: 0 }}>⏻</span>
-          {sidebarOpen && <span style={{ fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>Sign Out</span>}
-        </button>
-
-        <button onClick={() => setSidebarOpen(o => !o)}
-          style={{ margin: "0 10px 20px", padding: "9px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid #2a2637", color: "#9ca3af", cursor: "pointer", fontSize: 14 }}>
-          {sidebarOpen ? "◀" : "▶"}
-        </button>
+        {/* Logout */}
+        <div className="p-2 border-t border-gray-100 space-y-1">
+          <button onClick={() => setShowLogout(true)}
+            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl
+              text-red-800 hover:bg-red-50 hover:text-red-500 transition text-sm font-medium">
+            <span className="text-base w-5 text-center shrink-0">⏻</span>
+            {sidebarOpen && <span className="whitespace-nowrap">Sign Out</span>}
+          </button>
+          <button onClick={() => setSidebarOpen(o => !o)}
+            className="w-full flex items-center justify-center py-1.5 rounded-xl
+              text-black hover:bg-gray-50 transition text-xs">
+            {sidebarOpen ? '◀' : '▶'}
+          </button>
+        </div>
       </aside>
 
-      {/* Main */}
-      <main style={{ flex: 1, overflowY: "auto", overflowX: "hidden" }}>
+      {/* ── Main ── */}
+      <main className="flex-1 overflow-y-auto overflow-x-hidden">
 
         {/* Topbar */}
-        <div style={{ padding: "18px 28px", borderBottom: "1px solid #2a2637", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#16131f", position: "sticky", top: 0, zIndex: 10 }}>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, color: "#fffffe" }}>
-            {nav.find(n => n.id === activeTab)?.label}
-          </h1>
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <div style={{ padding: "5px 12px", borderRadius: 20, background: daysLeft <= 7 ? "rgba(239,68,68,0.15)" : "rgba(16,185,129,0.15)", border: `1px solid ${daysLeft <= 7 ? "rgba(239,68,68,0.4)" : "rgba(16,185,129,0.4)"}`, fontSize: 12, color: daysLeft <= 7 ? "#f87171" : "#34d399", fontWeight: 600 }}>
-              Expires: {expiryDate}
-            </div>
-            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#3b82f6)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14 }}>JK</div>
+        <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between
+          px-6 sticky top-0 z-10 shadow-sm">
+          <div className="flex items-center gap-3">
+            <h1 className="text-base font-bold text-gray-800">
+              {nav.find(n => n.id === activeTab)?.label}
+            </h1>
           </div>
-        </div>
+          <div className="flex items-center gap-3">
+            <div className={`text-xs font-semibold px-3 py-1.5 rounded-full border
+              ${daysLeft <= 7
+                ? 'bg-red-50 text-red-600 border-red-200'
+                : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+              Expires {expiryDate}
+            </div>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500
+              flex items-center justify-center text-white font-bold text-xs cursor-pointer"
+              onClick={() => setActiveTab("account")}>
+              {currentCustomer?.name?.slice(0,2)?.toUpperCase() || "CU"}
+            </div>
+          </div>
+        </header>
 
-        <div style={{ padding: "28px", maxWidth: 960 }}>
+        <div className="p-5 md:p-7 max-w-5xl mx-auto">
 
-          {/* ── DASHBOARD ── */}
+          {/* ══ DASHBOARD ══ */}
           {activeTab === "dashboard" && (
-            <div>
+            <div className="space-y-5">
+              {/* Greeting */}
+              <div>
+                <h2 className="text-2xl font-extrabold text-gray-800">
+                  Welcome back, {currentCustomer?.name?.split(' ')[0] || 'Customer'} 👋
+                </h2>
+                <p className="text-sm text-gray-500 mt-0.5">Here's your internet account at a glance.</p>
+              </div>
+
               {/* Stat cards */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 16, marginBottom: 28 }}>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                  { label: "Current Plan", value: currentPlan.name, sub: currentPlan.speed, color: "#7c3aed" },
-                  { label: "Days Remaining", value: daysLeft, sub: "until renewal", color: daysLeft <= 7 ? "#ef4444" : "#10b981" },
-                  { label: "Monthly Cost", value: `KES ${currentPlan.price.toLocaleString()}`, sub: "per month", color: "#3b82f6" },
-                  { label: "Data Used", value: `${usagePercent}%`, sub: "of fair use", color: "#f59e0b" },
+                  { label: "Current Plan",    value: currentPlan.name,                          sub: currentPlan.speed,         accent: "bg-emerald-500", icon: "📡" },
+                  { label: "Days Left",        value: daysLeft,                                   sub: "until renewal",           accent: daysLeft <= 7 ? "bg-red-500" : "bg-amber-400", icon: "⏳" },
+                  { label: "Monthly Cost",     value: `KES ${currentPlan.price.toLocaleString()}`, sub: "per month",               accent: "bg-blue-500",    icon: "💰" },
+                  { label: "Payments Made",    value: transactions.length,                        sub: "total transactions",      accent: "bg-violet-500",  icon: "✅" },
                 ].map(c => (
-                  <div key={c.label} style={{ background: "#16131f", border: "1px solid #2a2637", borderRadius: 14, padding: "18px 20px", position: "relative", overflow: "hidden" }}>
-                    <div style={{ position: "absolute", top: 0, left: 0, width: 3, height: "100%", background: c.color, borderRadius: "3px 0 0 3px" }} />
-                    <p style={{ fontSize: 12, color: "#9ca3af", margin: "0 0 6px", fontWeight: 500 }}>{c.label}</p>
-                    <p style={{ fontSize: 22, fontWeight: 700, margin: "0 0 2px", color: "#fffffe" }}>{c.value}</p>
-                    <p style={{ fontSize: 12, color: "#6b7280", margin: 0 }}>{c.sub}</p>
+                  <div key={c.label} className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm
+                    hover:shadow-md transition-shadow relative overflow-hidden group">
+                    <div className={`absolute top-0 right-0 w-16 h-16 rounded-bl-3xl ${c.accent} opacity-10 group-hover:opacity-20 transition-opacity`} />
+                    <div className="text-2xl mb-2">{c.icon}</div>
+                    <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-1">{c.label}</p>
+                    <p className="text-xl font-extrabold text-gray-800 leading-tight">{c.value}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{c.sub}</p>
                   </div>
                 ))}
               </div>
 
-              {/* Usage chart + Plan summary */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20, marginBottom: 24 }}>
-                <div style={{ background: "#16131f", border: "1px solid #2a2637", borderRadius: 14, padding: "22px 24px" }}>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: "#d1d5db", margin: "0 0 20px" }}>Data Usage — Last 12 Months (%)</p>
-                  <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 120 }}>
-                    {USAGE_DATA.map((v, i) => (
-                      <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                        <div style={{ width: "100%", background: i === 11 ? "#7c3aed" : "rgba(124,58,237,0.3)", borderRadius: "4px 4px 0 0", height: `${v}%`, transition: "height 0.5s" }} />
-                        <span style={{ fontSize: 10, color: "#6b7280" }}>{MONTHS[i]}</span>
-                      </div>
-                    ))}
-                  </div>
+              {/* Live usage + plan */}
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+                <div className="lg:col-span-3">
+                  <LiveUsageCard planSpeed={currentPlan.speed} />
                 </div>
 
-                <div style={{ background: "#16131f", border: "1px solid #2a2637", borderRadius: 14, padding: "22px 24px" }}>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: "#d1d5db", margin: "0 0 16px" }}>Active Plan</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(139,92,246,0.2)", border: "1px solid rgba(139,92,246,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>◈</div>
+                <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Active Plan</p>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-100
+                      flex items-center justify-center text-emerald-600 font-black text-lg">◈</div>
                     <div>
-                      <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#fffffe" }}>{currentPlan.name}</p>
-                      <p style={{ margin: 0, fontSize: 13, color: "#a78bfa" }}>{currentPlan.speed}</p>
+                      <p className="font-bold text-gray-800 text-base">{currentPlan.name}</p>
+                      <p className="text-xs text-emerald-600 font-semibold">{currentPlan.speed}</p>
                     </div>
                   </div>
-                  <div style={{ borderTop: "1px solid #2a2637", paddingTop: 14 }}>
+                  <div className="space-y-2 mb-5">
                     {currentPlan.features.map(f => (
-                      <div key={f} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
-                        <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#7c3aed", flexShrink: 0 }} />
-                        <span style={{ fontSize: 13, color: "#d1d5db" }}>{f}</span>
+                      <div key={f} className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                          <span className="text-emerald-600 text-[9px] font-black">✓</span>
+                        </div>
+                        <span className="text-sm text-gray-600">{f}</span>
                       </div>
                     ))}
                   </div>
                   <button onClick={() => setActiveTab("pay")}
-                    style={{ marginTop: 16, width: "100%", padding: "10px", borderRadius: 9, background: "linear-gradient(135deg,#7c3aed,#3b82f6)", border: "none", color: "#fff", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
+                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500
+                      text-white font-bold text-sm hover:from-emerald-600 hover:to-teal-600 transition shadow-sm">
                     Renew Now
                   </button>
                 </div>
               </div>
 
-              {/* Recent tickets */}
-              <div style={{ background: "#16131f", border: "1px solid #2a2637", borderRadius: 14, padding: "22px 24px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: "#d1d5db", margin: 0 }}>Recent Tickets</p>
-                  <button onClick={() => setActiveTab("tickets")} style={{ fontSize: 13, color: "#7c3aed", background: "none", border: "none", cursor: "pointer" }}>View all →</button>
+              {/* Usage chart */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">
+                  Data Usage — Last 12 Months (%)
+                </p>
+                <div className="flex items-end gap-1.5 h-28">
+                  {USAGE_DATA.map((v, i) => (
+                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                      <div
+                        className={`w-full rounded-t-md transition-all duration-500
+                          ${i === 11 ? 'bg-emerald-500' : 'bg-emerald-100'}`}
+                        style={{ height: `${v}%` }}
+                      />
+                      <span className="text-[9px] text-gray-400 font-medium">{MONTHS[i]}</span>
+                    </div>
+                  ))}
                 </div>
-                {TICKETS.slice(0, 2).map(t => (
-                  <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 0", borderBottom: "1px solid #2a2637" }}>
-                    <span style={{ fontSize: 12, color: "#6b7280", minWidth: 80 }}>{t.id}</span>
-                    <span style={{ flex: 1, fontSize: 14, color: "#d1d5db" }}>{t.subject}</span>
-                    <span style={{ fontSize: 12, padding: "3px 10px", borderRadius: 20, background: statusColor(t.status).bg, color: statusColor(t.status).text, fontWeight: 600 }}>{t.status}</span>
+              </div>
+
+              {/* Recent transactions preview */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Recent Payments</p>
+                  <button onClick={() => setActiveTab("transactions")}
+                    className="text-xs text-emerald-600 font-semibold hover:text-emerald-700">
+                    View all →
+                  </button>
+                </div>
+
+
+                <div className="space-y-2">
+                  {transactions.slice(0,3).map(t => (
+                    <div key={t.id} className="flex items-center gap-4 p-3 rounded-xl bg-gray-50
+                      hover:bg-gray-100 transition group">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center
+                        text-emerald-600 font-bold text-sm shrink-0">
+                        {t.payment_method === "M-Pesa" ? "M" : "🏦"}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-800 truncate">{t?.payment_method || t.method}</p>
+                        <p className="text-xs text-gray-400 font-mono">{t?.reference || t.ref}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-sm font-bold text-gray-800">KES {t?.amount.toLocaleString()}</p>
+                        <p className="text-xs text-gray-400">{t?.time_paid || t.date}</p>
+                      </div>
+                      {/* <span className="text-[10px] font-bold px-2.5 py-1 rounded-full
+                        bg-emerald-100 text-emerald-700 border border-emerald-200 shrink-0">
+                        {t.status}
+                      </span> */}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══ LIVE USAGE ══ */}
+          {activeTab === "usage" && (
+            <div className="space-y-5">
+              <div>
+                <h2 className="text-xl font-extrabold text-gray-800">Live Connection Stats</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Real-time data for your active PPPoE session.</p>
+              </div>
+              <LiveUsageCard planSpeed={currentPlan.speed} />
+
+              {/* monthly usage bar */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Monthly Fair-Use Progress</p>
+                  <span className="text-sm font-bold text-gray-700">42.7 GB / Unlimited</span>
+                </div>
+                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full"
+                    style={{ width: '68%', transition: 'width 1s ease' }} />
+                </div>
+                <div className="flex justify-between mt-1.5">
+                  <span className="text-xs text-gray-400">0 GB</span>
+                  <span className="text-xs text-gray-400">Fair use: ~63 GB</span>
+                </div>
+              </div>
+
+              {/* historical chart */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">
+                  Historical Usage (%)
+                </p>
+                <div className="flex items-end gap-1.5 h-32">
+                  {USAGE_DATA.map((v, i) => (
+                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                      <span className="text-[9px] text-gray-400">{v}%</span>
+                      <div
+                        className={`w-full rounded-t-md ${i === 11 ? 'bg-emerald-500' : 'bg-emerald-100'}`}
+                        style={{ height: `${v * 1.1}%` }}
+                      />
+                      <span className="text-[9px] text-gray-400">{MONTHS[i]}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══ TRANSACTIONS ══ */}
+          {activeTab === "transactions" && (
+            <div className="space-y-5">
+              <div>
+                <h2 className="text-xl font-extrabold text-gray-800">Payment History</h2>
+                <p className="text-sm text-gray-500 mt-0.5">All your payments and transactions.</p>
+              </div>
+
+              {/* summary cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {[
+                  { label: "Total Paid",     value: `KES ${transactions.reduce((a,t)=>a+t.amount,0).toLocaleString()}` },
+                  { label: "Transactions",   value: transactions.length },
+                  // { label: "Last Payment",   value: transactions[0].date },
+                ].map(s => (
+                  <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">{s.label}</p>
+                    <p className="text-lg font-extrabold text-gray-800">{s.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* filter pills */}
+              <div className="flex gap-2 flex-wrap">
+                {["all","mpesa","bank"].map(f => (
+                  <button key={f} onClick={() => setTxFilter(f)}
+                    className={`px-4 py-1.5 rounded-full text-xs font-bold border transition
+                      ${txFilter === f
+                        ? 'bg-emerald-500 text-white border-emerald-500'
+                        : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}>
+                    {f === "all" ? "All" : f === "mpesa" ? "M-Pesa" : "Bank Transfer"}
+                  </button>
+                ))}
+              </div>
+
+              {/* table */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                {/* head */}
+                <div className="hidden sm:grid grid-cols-[1fr_1fr_1fr_1fr_1fr] px-5 py-3
+                  bg-gray-50 border-b border-gray-100">
+                  {["Transaction ID","Date","Method","Reference","Amount"].map(h => (
+                    <span key={h} className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{h}</span>
+                  ))}
+                </div>
+
+
+        
+
+                {filteredTx.map((t, i) => (
+                  <div key={t.id}
+                    className={`grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_1fr_1fr] gap-y-1 sm:gap-y-0
+                      px-5 py-4 hover:bg-gray-50 transition
+                      ${i < filteredTx.length - 1 ? 'border-b border-gray-100' : ''}`}>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center
+                        text-emerald-600 font-bold text-xs shrink-0">
+                        {t.payment_method === "M-Pesa" ? "M" : "🏦"}
+                      </div>
+                      <span className="font-mono text-xs text-gray-500">{t.id}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">{t?.time_paid || t.date}</div>
+                    <div className="flex items-center text-sm font-medium text-gray-700">{t?.payment_method || t.method}</div>
+                    <div className="flex items-center font-mono text-xs text-gray-400">{t?.reference || t.ref}</div>
+                    <div className="flex items-center justify-between sm:justify-start gap-3">
+                      <span className="text-sm font-bold text-gray-800">KES {t?.amount}</span>
+                      {/* <span className="text-[10px] font-bold px-2.5 py-1 rounded-full
+                        bg-emerald-100 text-emerald-700 border border-emerald-200">
+                        {t.status}
+                      </span> */}
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* ── PAY BILL ── */}
+          {/* ══ PAY BILL ══ */}
           {activeTab === "pay" && (
-            <div style={{ maxWidth: 560 }}>
+            <div className="max-w-lg space-y-4">
               {paySuccess ? (
-                <div style={{ textAlign: "center", padding: "60px 0" }}>
-                  <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(16,185,129,0.15)", border: "2px solid #10b981", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 32 }}>✓</div>
-                  <h2 style={{ fontSize: 24, fontWeight: 700, color: "#fffffe", margin: "0 0 8px" }}>Payment Successful!</h2>
-                  <p style={{ color: "#9ca3af", margin: "0 0 28px" }}>Your internet plan has been renewed until May 14, 2026.</p>
-                  <button onClick={() => { setPaySuccess(false); setActiveTab("dashboard"); }}
-                    style={{ padding: "12px 32px", borderRadius: 9, background: "linear-gradient(135deg,#7c3aed,#3b82f6)", border: "none", color: "#fff", fontWeight: 600, fontSize: 15, cursor: "pointer" }}>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center">
+                  <div className="w-16 h-16 rounded-full bg-emerald-100 border-2 border-emerald-300
+                    flex items-center justify-center mx-auto mb-4 text-3xl">✓</div>
+                  <h2 className="text-xl font-extrabold text-gray-800 mb-2">Payment Successful!</h2>
+                  <p className="text-sm text-gray-500 mb-6">Plan renewed until May 14, 2026.</p>
+                  <button onClick={() => { setPaySuccess(false); setActiveTab("dashboard") }}
+                    className="px-8 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500
+                      text-white font-bold text-sm hover:from-emerald-600 hover:to-teal-600 transition">
                     Back to Dashboard
                   </button>
                 </div>
               ) : (
-                <div>
-                  <div style={{ background: "#16131f", border: "1px solid #2a2637", borderRadius: 14, padding: "20px 24px", marginBottom: 20 }}>
-                    <p style={{ fontSize: 12, color: "#9ca3af", margin: "0 0 4px" }}>Amount Due</p>
-                    <p style={{ fontSize: 36, fontWeight: 800, color: "#fffffe", margin: "0 0 2px" }}>KES {currentPlan.price.toLocaleString()}</p>
-                    <p style={{ fontSize: 13, color: "#f87171", margin: 0 }}>Expires {expiryDate} · {daysLeft} days left</p>
+                <>
+                  {/* Amount due */}
+                  <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-md">
+                    <p className="text-xs font-bold uppercase tracking-widest opacity-80 mb-1">Amount Due</p>
+                    <p className="text-4xl font-black mb-1">KES {currentPlan.price.toLocaleString()}</p>
+                    <p className="text-sm opacity-80">Expires {expiryDate} · {daysLeft} days left</p>
                   </div>
 
-                  {/* Payment methods */}
-                  <div style={{ background: "#16131f", border: "1px solid #2a2637", borderRadius: 14, padding: "22px 24px", marginBottom: 20 }}>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: "#d1d5db", margin: "0 0 16px" }}>Payment Method</p>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
+                  {/* Method select */}
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Payment Method</p>
+                    <div className="grid grid-cols-3 gap-3 mb-5">
                       {[
-                        { id: "mpesa", label: "M-Pesa", icon: "📱", color: "#10b981" },
-                        { id: "bank", label: "Bank Transfer", icon: "🏦", color: "#3b82f6" },
-                        { id: "card", label: "Debit/Credit", icon: "💳", color: "#f59e0b" },
+                        { id:"mpesa", label:"M-Pesa",        icon:"📱", ring:"ring-emerald-400" },
+                        { id:"bank",  label:"Bank Transfer",  icon:"🏦", ring:"ring-blue-400"    },
+                        { id:"card",  label:"Debit/Credit",   icon:"💳", ring:"ring-amber-400"   },
                       ].map(m => (
-                        <button key={m.id} onClick={() => setPaymentMethod(m.id)}
-                          style={{
-                            padding: "14px 10px", borderRadius: 10, border: paymentMethod === m.id ? `2px solid ${m.color}` : "1px solid #2a2637",
-                            background: paymentMethod === m.id ? `rgba(${m.id === "mpesa" ? "16,185,129" : m.id === "bank" ? "59,130,246" : "245,158,11"},0.1)` : "transparent",
-                            color: "#fffffe", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6
-                          }}>
-                          <span style={{ fontSize: 22 }}>{m.icon}</span>
-                          <span style={{ fontSize: 12, fontWeight: 600, color: paymentMethod === m.id ? m.color : "#9ca3af" }}>{m.label}</span>
+                        <button key={m.id} onClick={() => setPayMethod(m.id)}
+                          className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition
+                            ${payMethod === m.id
+                              ? `border-emerald-400 bg-emerald-50 ring-2 ${m.ring}`
+                              : 'border-gray-200 hover:border-gray-300'}`}>
+                          <span className="text-2xl">{m.icon}</span>
+                          <span className={`text-xs font-bold ${payMethod === m.id ? 'text-emerald-700' : 'text-gray-500'}`}>
+                            {m.label}
+                          </span>
                         </button>
                       ))}
                     </div>
 
-                    {paymentMethod === "mpesa" && (
+                    {payMethod === "mpesa" && (
                       <div>
-                        <label style={{ fontSize: 13, color: "#9ca3af", display: "block", marginBottom: 6 }}>M-Pesa Phone Number</label>
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1.5">
+                          M-Pesa Phone Number
+                        </label>
                         <input value={mpesaPhone} onChange={e => setMpesaPhone(e.target.value)}
-                          style={{ width: "100%", padding: "11px 14px", borderRadius: 9, background: "#0f0e17", border: "1px solid #2a2637", color: "#fffffe", fontSize: 15, outline: "none", boxSizing: "border-box" }} />
-                        <p style={{ fontSize: 12, color: "#6b7280", margin: "8px 0 0" }}>You'll receive a push notification on your phone to complete payment.</p>
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800
+                            focus:outline-none focus:ring-2 focus:ring-emerald-400 transition" />
+                        <p className="text-xs text-gray-400 mt-2">You'll receive an STK push to confirm payment.</p>
                       </div>
                     )}
 
-                    {paymentMethod === "bank" && (
-                      <div style={{ display: "grid", gap: 14 }}>
-                        <div style={{ background: "#0f0e17", border: "1px solid #2a2637", borderRadius: 10, padding: "14px 16px" }}>
-                          <p style={{ fontSize: 12, color: "#9ca3af", margin: "0 0 4px" }}>Account Name</p>
-                          <p style={{ fontSize: 14, fontWeight: 600, color: "#fffffe", margin: 0 }}>NetLink Internet Services Ltd</p>
-                        </div>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                          <div style={{ background: "#0f0e17", border: "1px solid #2a2637", borderRadius: 10, padding: "14px 16px" }}>
-                            <p style={{ fontSize: 12, color: "#9ca3af", margin: "0 0 4px" }}>Account No.</p>
-                            <p style={{ fontSize: 14, fontWeight: 600, color: "#fffffe", margin: 0 }}>1234567890</p>
+                    {payMethod === "bank" && (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">Account Name</p>
+                            <p className="text-sm font-semibold text-gray-700">NetLink Internet Services Ltd</p>
                           </div>
-                          <div style={{ background: "#0f0e17", border: "1px solid #2a2637", borderRadius: 10, padding: "14px 16px" }}>
-                            <p style={{ fontSize: 12, color: "#9ca3af", margin: "0 0 4px" }}>Bank</p>
-                            <p style={{ fontSize: 14, fontWeight: 600, color: "#fffffe", margin: 0 }}>Equity Bank</p>
+                          <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">Account No.</p>
+                            <p className="text-sm font-semibold text-gray-700">1234567890</p>
                           </div>
                         </div>
-                        <div>
-                          <label style={{ fontSize: 13, color: "#9ca3af", display: "block", marginBottom: 6 }}>Your Bank Name (for reference)</label>
-                          <input value={bankName} onChange={e => setBankName(e.target.value)} placeholder="e.g. KCB, Equity..."
-                            style={{ width: "100%", padding: "11px 14px", borderRadius: 9, background: "#0f0e17", border: "1px solid #2a2637", color: "#fffffe", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
-                        </div>
+                        <input value={bankName} onChange={e => setBankName(e.target.value)}
+                          placeholder="Your bank name (for reference)"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800
+                            focus:outline-none focus:ring-2 focus:ring-emerald-400 transition" />
                       </div>
                     )}
 
-                    {paymentMethod === "card" && (
-                      <div style={{ display: "grid", gap: 14 }}>
-                        <div>
-                          <label style={{ fontSize: 13, color: "#9ca3af", display: "block", marginBottom: 6 }}>Card Number</label>
-                          <input value={cardNumber} onChange={e => setCardNumber(e.target.value)} placeholder="1234 5678 9012 3456"
-                            style={{ width: "100%", padding: "11px 14px", borderRadius: 9, background: "#0f0e17", border: "1px solid #2a2637", color: "#fffffe", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
-                        </div>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                          <div>
-                            <label style={{ fontSize: 13, color: "#9ca3af", display: "block", marginBottom: 6 }}>Expiry</label>
-                            <input placeholder="MM/YY"
-                              style={{ width: "100%", padding: "11px 14px", borderRadius: 9, background: "#0f0e17", border: "1px solid #2a2637", color: "#fffffe", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
-                          </div>
-                          <div>
-                            <label style={{ fontSize: 13, color: "#9ca3af", display: "block", marginBottom: 6 }}>CVV</label>
-                            <input placeholder="···"
-                              style={{ width: "100%", padding: "11px 14px", borderRadius: 9, background: "#0f0e17", border: "1px solid #2a2637", color: "#fffffe", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
-                          </div>
+                    {payMethod === "card" && (
+                      <div className="space-y-3">
+                        <input value={cardNumber} onChange={e => setCardNumber(e.target.value)}
+                          placeholder="1234 5678 9012 3456"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800
+                            focus:outline-none focus:ring-2 focus:ring-emerald-400 transition" />
+                        <div className="grid grid-cols-2 gap-3">
+                          <input placeholder="MM/YY"
+                            className="px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800
+                              focus:outline-none focus:ring-2 focus:ring-emerald-400 transition" />
+                          <input placeholder="CVV"
+                            className="px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800
+                              focus:outline-none focus:ring-2 focus:ring-emerald-400 transition" />
                         </div>
                       </div>
                     )}
                   </div>
 
                   <button onClick={handlePay} disabled={payLoading}
-                    style={{ width: "100%", padding: "15px", borderRadius: 11, background: payLoading ? "#374151" : "linear-gradient(135deg,#7c3aed,#3b82f6)", border: "none", color: "#fff", fontWeight: 700, fontSize: 16, cursor: payLoading ? "default" : "pointer", transition: "all 0.2s" }}>
-                    {payLoading ? "Processing..." : `Pay KES ${currentPlan.price.toLocaleString()}`}
+                    className={`w-full py-4 rounded-xl font-black text-base transition
+                      ${payLoading
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 shadow-md'}`}>
+                    {payLoading ? "Processing…" : `Pay KES ${currentPlan.price.toLocaleString()}`}
                   </button>
-                </div>
+                </>
               )}
             </div>
           )}
 
-          {/* ── PLANS ── */}
+          {/* ══ PLANS ══ */}
           {activeTab === "plans" && (
-            <div>
-              <p style={{ color: "#9ca3af", fontSize: 15, margin: "0 0 24px" }}>Browse all available internet plans. Your current plan is highlighted.</p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 16 }}>
+            <div className="space-y-5">
+              <div>
+                <h2 className="text-xl font-extrabold text-gray-800">Available Plans</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Your current plan is highlighted. Upgrade anytime.</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {PLANS.map(p => (
-                  <div key={p.id} style={{ background: "#16131f", border: p.id === currentPlan.id ? `2px solid ${p.color}` : "1px solid #2a2637", borderRadius: 16, padding: "22px 20px", position: "relative", transition: "transform 0.15s", cursor: "default" }}>
-                    {p.popular && <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: "#7c3aed", color: "#fff", fontSize: 11, fontWeight: 700, padding: "4px 14px", borderRadius: 20 }}>MOST POPULAR</div>}
-                    {p.id === currentPlan.id && <div style={{ position: "absolute", top: -12, right: 16, background: "#10b981", color: "#fff", fontSize: 11, fontWeight: 700, padding: "4px 12px", borderRadius: 20 }}>ACTIVE</div>}
-                    <div style={{ width: 40, height: 40, borderRadius: 10, background: `${p.color}22`, border: `1px solid ${p.color}55`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14, fontSize: 18 }}>◈</div>
-                    <p style={{ fontSize: 17, fontWeight: 700, color: "#fffffe", margin: "0 0 4px" }}>{p.name}</p>
-                    <p style={{ fontSize: 28, fontWeight: 800, color: p.color, margin: "0 0 2px" }}>{p.speed}</p>
-                    <p style={{ fontSize: 14, color: "#6b7280", margin: "0 0 16px" }}>KES {p.price.toLocaleString()}/mo</p>
-                    <div style={{ borderTop: "1px solid #2a2637", paddingTop: 14 }}>
+                  <div key={p.id}
+                    className={`bg-white rounded-2xl border-2 shadow-sm p-5 relative transition-all
+                      hover:shadow-md hover:-translate-y-0.5
+                      ${p.id === currentPlan.id ? 'border-emerald-400 ring-2 ring-emerald-200' : 'border-gray-100'}`}>
+                    {p.popular && (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-violet-600 text-white
+                        text-[10px] font-black px-3 py-1 rounded-full tracking-wide">POPULAR</div>
+                    )}
+                    {p.id === currentPlan.id && (
+                      <div className="absolute -top-3 right-4 bg-emerald-500 text-white
+                        text-[10px] font-black px-3 py-1 rounded-full">ACTIVE</div>
+                    )}
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 text-lg"
+                      style={{ background: `${p.color}18` }}>◈</div>
+                    <p className="font-extrabold text-gray-800 text-base mb-0.5">{p.name}</p>
+                    <p className="text-2xl font-black mb-0.5" style={{ color: p.color }}>{p.speed}</p>
+                    <p className="text-sm text-gray-400 mb-4">KES {p.price.toLocaleString()}/mo</p>
+                    <div className="space-y-2 mb-4">
                       {p.features.map(f => (
-                        <div key={f} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
-                          <div style={{ width: 5, height: 5, borderRadius: "50%", background: p.color, flexShrink: 0 }} />
-                          <span style={{ fontSize: 12, color: "#d1d5db" }}>{f}</span>
+                        <div key={f} className="flex items-center gap-2">
+                          <span className="text-[10px] font-black text-emerald-500">✓</span>
+                          <span className="text-xs text-gray-600">{f}</span>
                         </div>
                       ))}
                     </div>
                     {p.id !== currentPlan.id && (
-                      <button onClick={() => { setUpgradeSelected(p); setActiveTab("upgrade"); }}
-                        style={{ marginTop: 16, width: "100%", padding: "9px", borderRadius: 8, background: "transparent", border: `1px solid ${p.color}`, color: p.color, fontWeight: 600, fontSize: 13, cursor: "pointer" }}>
-                        Switch to this
+                      <button onClick={() => { setUpgradeSelected(p); setActiveTab("upgrade") }}
+                        className="w-full py-2 rounded-xl border-2 font-bold text-xs transition hover:bg-gray-50"
+                        style={{ borderColor: p.color, color: p.color }}>
+                        Switch Plan
                       </button>
                     )}
                   </div>
@@ -509,108 +844,123 @@ export default function ISPPortal() {
             </div>
           )}
 
-          {/* ── UPGRADE ── */}
+          {/* ══ UPGRADE ══ */}
           {activeTab === "upgrade" && (
-            <div style={{ maxWidth: 540 }}>
-              {upgradeSuccess ? (
-                <div style={{ textAlign: "center", padding: "60px 0" }}>
-                  <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(124,58,237,0.15)", border: "2px solid #7c3aed", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 32 }}>↑</div>
-                  <h2 style={{ fontSize: 24, fontWeight: 700, color: "#fffffe", margin: "0 0 8px" }}>Request Submitted!</h2>
-                  <p style={{ color: "#9ca3af", margin: "0 0 28px" }}>Your upgrade request to <strong>{upgradeSelected?.name}</strong> has been received. Our team will contact you within 24 hours.</p>
-                  <button onClick={() => { setUpgradeSuccess(false); setUpgradeSelected(null); setActiveTab("dashboard"); }}
-                    style={{ padding: "12px 32px", borderRadius: 9, background: "linear-gradient(135deg,#7c3aed,#3b82f6)", border: "none", color: "#fff", fontWeight: 600, fontSize: 15, cursor: "pointer" }}>
+            <div className="max-w-lg space-y-4">
+              {upgradeOk ? (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center">
+                  <div className="text-5xl mb-4">🚀</div>
+                  <h2 className="text-xl font-extrabold text-gray-800 mb-2">Request Submitted!</h2>
+                  <p className="text-sm text-gray-500 mb-6">
+                    Upgrade to <strong>{upgradeSelected?.name}</strong> received. We'll call you within 24 hrs.
+                  </p>
+                  <button onClick={() => { setUpgradeOk(false); setUpgradeSelected(null); setActiveTab("dashboard") }}
+                    className="px-8 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500
+                      text-white font-bold text-sm hover:opacity-90 transition">
                     Back to Dashboard
                   </button>
                 </div>
               ) : (
-                <div>
-                  <div style={{ background: "#16131f", border: "1px solid #2a2637", borderRadius: 14, padding: "20px 24px", marginBottom: 20 }}>
-                    <p style={{ fontSize: 12, color: "#9ca3af", margin: "0 0 4px" }}>Current Plan</p>
-                    <p style={{ fontSize: 18, fontWeight: 700, color: "#fffffe", margin: 0 }}>{currentPlan.name} — {currentPlan.speed}</p>
+                <>
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Current Plan</p>
+                    <p className="text-lg font-extrabold text-gray-800">{currentPlan.name} — {currentPlan.speed}</p>
                   </div>
-
-                  <p style={{ fontSize: 14, fontWeight: 600, color: "#d1d5db", margin: "0 0 12px" }}>Select New Plan</p>
-                  <div style={{ display: "grid", gap: 10, marginBottom: 20 }}>
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Select New Plan</p>
+                  <div className="space-y-3">
                     {PLANS.filter(p => p.id !== currentPlan.id).map(p => (
                       <button key={p.id} onClick={() => setUpgradeSelected(p)}
-                        style={{
-                          display: "flex", alignItems: "center", gap: 16, padding: "16px 18px", borderRadius: 12,
-                          border: upgradeSelected?.id === p.id ? `2px solid ${p.color}` : "1px solid #2a2637",
-                          background: upgradeSelected?.id === p.id ? `${p.color}11` : "#16131f",
-                          color: "#fffffe", cursor: "pointer", textAlign: "left"
-                        }}>
-                        <div style={{ width: 40, height: 40, borderRadius: 10, background: `${p.color}22`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>◈</div>
-                        <div style={{ flex: 1 }}>
-                          <p style={{ margin: "0 0 2px", fontWeight: 600, fontSize: 15 }}>{p.name}</p>
-                          <p style={{ margin: 0, fontSize: 13, color: "#9ca3af" }}>{p.speed}</p>
+                        className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition
+                          ${upgradeSelected?.id === p.id ? 'border-emerald-400 bg-emerald-50' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
+                        <div className="w-11 h-11 rounded-xl flex items-center justify-center text-lg shrink-0"
+                          style={{ background: `${p.color}18` }}>◈</div>
+                        <div className="flex-1">
+                          <p className="font-bold text-gray-800 text-sm">{p.name}</p>
+                          <p className="text-xs text-gray-500">{p.speed}</p>
                         </div>
-                        <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: p.color }}>KES {p.price.toLocaleString()}</p>
+                        <p className="font-black text-base shrink-0" style={{ color: p.color }}>
+                          KES {p.price.toLocaleString()}
+                        </p>
                       </button>
                     ))}
                   </div>
-
-                  <button onClick={handleUpgrade} disabled={!upgradeSelected}
-                    style={{ width: "100%", padding: "15px", borderRadius: 11, background: upgradeSelected ? "linear-gradient(135deg,#7c3aed,#3b82f6)" : "#1f1f2e", border: "none", color: upgradeSelected ? "#fff" : "#4b5563", fontWeight: 700, fontSize: 16, cursor: upgradeSelected ? "pointer" : "default", transition: "all 0.2s" }}>
+                  <button onClick={() => upgradeSelected && setUpgradeOk(true)} disabled={!upgradeSelected}
+                    className={`w-full py-4 rounded-xl font-black text-sm transition
+                      ${upgradeSelected
+                        ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:opacity-90 shadow-md'
+                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}>
                     Request Upgrade
                   </button>
-                </div>
+                </>
               )}
             </div>
           )}
 
-          {/* ── TICKETS ── */}
+          {/* ══ SUPPORT ══ */}
           {activeTab === "tickets" && (
-            <div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 20 }}>
-                {/* Ticket history */}
-                <div>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: "#d1d5db", margin: "0 0 14px" }}>Your Tickets</p>
-                  {TICKETS.map(t => (
-                    <div key={t.id} style={{ background: "#16131f", border: "1px solid #2a2637", borderRadius: 12, padding: "16px 18px", marginBottom: 10 }}>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                        <span style={{ fontSize: 12, color: "#6b7280", fontFamily: "monospace" }}>{t.id}</span>
-                        <div style={{ display: "flex", gap: 8 }}>
-                          <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 20, background: priorityColor(t.priority).bg, color: priorityColor(t.priority).text, fontWeight: 600 }}>{t.priority}</span>
-                          <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 20, background: statusColor(t.status).bg, color: statusColor(t.status).text, fontWeight: 600 }}>{t.status}</span>
+            <div className="space-y-5">
+              <div>
+                <h2 className="text-xl font-extrabold text-gray-800">Support Tickets</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Track issues or raise a new request.</p>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+                {/* list */}
+                <div className="lg:col-span-3 space-y-3">
+                  {supportTickets.map(t => (
+                    <div key={t.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4
+                      hover:shadow-md transition">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-mono text-xs text-gray-400">{t?.ticket_number || t.id}</span>
+                        <div className="flex gap-2">
+                          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${priorityStyle(t?.priority)}`}>
+                            {t.priority}
+                          </span>
+                          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${statusStyle(t?.status)}`}>
+                            {t.status}
+                          </span>
                         </div>
                       </div>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: "#fffffe", margin: "0 0 4px" }}>{t.subject}</p>
-                      <p style={{ fontSize: 12, color: "#6b7280", margin: 0 }}>{t.date}</p>
+                      <p className="font-semibold text-gray-800 text-sm">{t?.agent_review || t.subject}</p>
+                      <p className="text-xs text-gray-400 mt-1">{t?.formatted_date_of_creation || t.date}</p>
                     </div>
                   ))}
                 </div>
 
-                {/* New ticket form */}
-                <div style={{ background: "#16131f", border: "1px solid #2a2637", borderRadius: 14, padding: "22px 20px", height: "fit-content" }}>
+                {/* form */}
+                <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                   {ticketSuccess ? (
-                    <div style={{ textAlign: "center", padding: "30px 0" }}>
-                      <div style={{ fontSize: 40, marginBottom: 12 }}>◎</div>
-                      <p style={{ fontWeight: 700, fontSize: 16, color: "#fffffe", margin: "0 0 6px" }}>Ticket Created!</p>
-                      <p style={{ color: "#9ca3af", fontSize: 13, margin: "0 0 20px" }}>We'll respond within 24 hours.</p>
+                    <div className="text-center py-8">
+                      <div className="text-4xl mb-3">✅</div>
+                      <p className="font-bold text-gray-800 mb-1">Ticket Created!</p>
+                      <p className="text-sm text-gray-500 mb-4">We'll respond within 24 hours.</p>
                       <button onClick={() => setTicketSuccess(false)}
-                        style={{ padding: "9px 20px", borderRadius: 8, background: "rgba(124,58,237,0.15)", border: "1px solid #7c3aed", color: "#a78bfa", fontWeight: 600, fontSize: 13, cursor: "pointer" }}>
+                        className="px-5 py-2 rounded-xl bg-emerald-50 border border-emerald-200
+                          text-emerald-700 font-bold text-sm hover:bg-emerald-100 transition">
                         New Ticket
                       </button>
                     </div>
                   ) : (
-                    <div>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: "#d1d5db", margin: "0 0 16px" }}>Create New Ticket</p>
-                      <label style={{ fontSize: 12, color: "#9ca3af", display: "block", marginBottom: 6 }}>Subject *</label>
-                      <input value={ticketSubject} onChange={e => setTicketSubject(e.target.value)} placeholder="Brief description of issue"
-                        style={{ width: "100%", padding: "10px 12px", borderRadius: 8, background: "#0f0e17", border: "1px solid #2a2637", color: "#fffffe", fontSize: 13, outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
-
-                      <label style={{ fontSize: 12, color: "#9ca3af", display: "block", marginBottom: 6 }}>Priority</label>
+                    <div className="space-y-3">
+                      <p className="text-xs font-bold uppercase tracking-widest text-gray-400">New Ticket</p>
+                      <input value={ticketSubject} onChange={e => setTicketSubject(e.target.value)}
+                        placeholder="Brief subject *"
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800
+                          focus:outline-none focus:ring-2 focus:ring-emerald-400 transition" />
                       <select value={ticketPriority} onChange={e => setTicketPriority(e.target.value)}
-                        style={{ width: "100%", padding: "10px 12px", borderRadius: 8, background: "#0f0e17", border: "1px solid #2a2637", color: "#fffffe", fontSize: 13, outline: "none", marginBottom: 14 }}>
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-700
+                          focus:outline-none focus:ring-2 focus:ring-emerald-400 transition bg-white">
                         <option>Low</option><option>Medium</option><option>High</option>
                       </select>
-
-                      <label style={{ fontSize: 12, color: "#9ca3af", display: "block", marginBottom: 6 }}>Description</label>
-                      <textarea value={ticketDesc} onChange={e => setTicketDesc(e.target.value)} rows={4} placeholder="Describe the issue in detail..."
-                        style={{ width: "100%", padding: "10px 12px", borderRadius: 8, background: "#0f0e17", border: "1px solid #2a2637", color: "#fffffe", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box", marginBottom: 16 }} />
-
-                      <button onClick={handleTicket} disabled={!ticketSubject.trim()}
-                        style={{ width: "100%", padding: "12px", borderRadius: 9, background: ticketSubject.trim() ? "linear-gradient(135deg,#7c3aed,#3b82f6)" : "#1f1f2e", border: "none", color: ticketSubject.trim() ? "#fff" : "#4b5563", fontWeight: 600, fontSize: 14, cursor: ticketSubject.trim() ? "pointer" : "default" }}>
+                      <textarea value={ticketDesc} onChange={e => setTicketDesc(e.target.value)} rows={4}
+                        placeholder="Describe the issue in detail…"
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800
+                          focus:outline-none focus:ring-2 focus:ring-emerald-400 transition resize-none" />
+                      <button onClick={() => ticketSubject.trim() && setTicketSuccess(true)}
+                        disabled={!ticketSubject.trim()}
+                        className={`w-full py-2.5 rounded-xl font-bold text-sm transition
+                          ${ticketSubject.trim()
+                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:opacity-90'
+                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}>
                         Submit Ticket
                       </button>
                     </div>
@@ -620,102 +970,69 @@ export default function ISPPortal() {
             </div>
           )}
 
-          {/* ── FEEDBACK ── */}
-          {activeTab === "feedback" && (
-            <div style={{ maxWidth: 520 }}>
-              {feedbackSuccess ? (
-                <div style={{ textAlign: "center", padding: "60px 0" }}>
-                  <div style={{ fontSize: 52, marginBottom: 16 }}>✦</div>
-                  <h2 style={{ fontSize: 22, fontWeight: 700, color: "#fffffe", margin: "0 0 8px" }}>Thank you for your feedback!</h2>
-                  <p style={{ color: "#9ca3af", margin: "0 0 28px" }}>Your input helps us improve our service.</p>
-                  <button onClick={() => setFeedbackSuccess(false)}
-                    style={{ padding: "11px 28px", borderRadius: 9, background: "linear-gradient(135deg,#7c3aed,#3b82f6)", border: "none", color: "#fff", fontWeight: 600, fontSize: 15, cursor: "pointer" }}>
-                    Leave More Feedback
-                  </button>
-                </div>
-              ) : (
-                <div style={{ background: "#16131f", border: "1px solid #2a2637", borderRadius: 14, padding: "28px 28px" }}>
-                  <p style={{ fontSize: 15, color: "#d1d5db", fontWeight: 600, margin: "0 0 6px" }}>How would you rate our service?</p>
-                  <p style={{ fontSize: 13, color: "#6b7280", margin: "0 0 20px" }}>Your feedback matters and helps us serve you better.</p>
-
-                  <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
-                    {[1,2,3,4,5].map(s => (
-                      <button key={s} onClick={() => setFeedbackRating(s)}
-                        style={{ width: 52, height: 52, borderRadius: 12, border: feedbackRating >= s ? "2px solid #f59e0b" : "1px solid #2a2637", background: feedbackRating >= s ? "rgba(245,158,11,0.15)" : "transparent", fontSize: 24, cursor: "pointer" }}>
-                        ★
-                      </button>
-                    ))}
-                  </div>
-
-                  {feedbackRating > 0 && (
-                    <p style={{ fontSize: 13, color: "#f59e0b", margin: "0 0 16px", fontWeight: 600 }}>
-                      {["", "Very Poor", "Poor", "Average", "Good", "Excellent"][feedbackRating]}
-                    </p>
-                  )}
-
-                  <div style={{ display: "grid", gap: 10, marginBottom: 20 }}>
-                    {["Network speed & reliability", "Customer service", "Billing & pricing", "General feedback"].map(cat => (
-                      <div key={cat} style={{ padding: "12px 14px", borderRadius: 9, border: "1px solid #2a2637", background: "#0f0e17", fontSize: 14, color: "#d1d5db", cursor: "default" }}>{cat}</div>
-                    ))}
-                  </div>
-
-                  <label style={{ fontSize: 12, color: "#9ca3af", display: "block", marginBottom: 6 }}>Additional Comments</label>
-                  <textarea value={feedbackText} onChange={e => setFeedbackText(e.target.value)} rows={4} placeholder="Tell us more..."
-                    style={{ width: "100%", padding: "11px 14px", borderRadius: 9, background: "#0f0e17", border: "1px solid #2a2637", color: "#fffffe", fontSize: 14, outline: "none", resize: "vertical", boxSizing: "border-box", marginBottom: 18 }} />
-
-                  <button onClick={handleFeedback} disabled={!feedbackRating}
-                    style={{ width: "100%", padding: "14px", borderRadius: 11, background: feedbackRating ? "linear-gradient(135deg,#7c3aed,#3b82f6)" : "#1f1f2e", border: "none", color: feedbackRating ? "#fff" : "#4b5563", fontWeight: 700, fontSize: 15, cursor: feedbackRating ? "pointer" : "default" }}>
-                    Submit Feedback
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ── ACCOUNT ── */}
+          {/* ══ ACCOUNT ══ */}
           {activeTab === "account" && (
-            <div style={{ maxWidth: 620 }}>
-              {/* Profile card */}
-              <div style={{ background: "#16131f", border: "1px solid #2a2637", borderRadius: 14, padding: "24px", marginBottom: 20 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
-                  <div style={{ width: 60, height: 60, borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#3b82f6)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 22, color: "#fff" }}>JK</div>
+            <div className="max-w-2xl space-y-5">
+              {/* profile card */}
+              <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-md">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center
+                    justify-center font-black text-xl">
+                    {currentCustomer?.name?.slice(0,2)?.toUpperCase() || "CU"}
+                  </div>
                   <div>
-                    <p style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 700, color: "#fffffe" }}>John Kamau</p>
-                    <p style={{ margin: 0, fontSize: 14, color: "#9ca3af" }}>Customer since January 2023</p>
+                    <p className="text-xl font-extrabold">{currentCustomer?.name || "Customer"}</p>
+                    <p className="text-sm opacity-80">Customer since {currentCustomer?.registration_date || "2024"}</p>
                   </div>
                 </div>
+              </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {/* details grid */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Account Details</p>
+                <div className="grid grid-cols-2 gap-3">
                   {[
-                    { label: "Account Number", value: "NL-2024-0042817" },
-                    { label: "Customer ID", value: "CID-98312" },
-                    { label: "Email", value: "john.kamau@email.com" },
-                    { label: "Phone", value: "+254 712 345 678" },
-                    { label: "Location", value: "Githunguri, Kiambu" },
-                    { label: "Installation Date", value: "January 12, 2023" },
+                    { label: "Account Number",    value: currentCustomer?.ref_no       },
+                     { label: "Customer Id",    value: currentCustomer?.id       },
+                    { label: "Email",              value: currentCustomer?.email        },
+                    { label: "Phone",              value: currentCustomer?.phone_number },
+                    { label: "Location",           value: "Githunguri, Kiambu"          },
+                    { label: "Installation Date",  value: currentCustomer?.registration_date },
+                    { label: "Current Plan",       value: currentPlan.name              },
                   ].map(f => (
-                    <div key={f.label} style={{ background: "#0f0e17", border: "1px solid #2a2637", borderRadius: 10, padding: "12px 14px" }}>
-                      <p style={{ fontSize: 11, color: "#6b7280", margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>{f.label}</p>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: "#fffffe", margin: 0 }}>{f.value}</p>
+                    <div key={f.label} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5">{f.label}</p>
+                      <p className="text-sm font-semibold text-gray-800">{f.value || "—"}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Billing history */}
-              <div style={{ background: "#16131f", border: "1px solid #2a2637", borderRadius: 14, padding: "22px 24px" }}>
-                <p style={{ fontSize: 14, fontWeight: 600, color: "#d1d5db", margin: "0 0 14px" }}>Billing History</p>
-                {[
-                  { date: "Mar 14, 2026", amount: 1999, method: "M-Pesa", status: "Paid" },
-                  { date: "Feb 14, 2026", amount: 1999, method: "M-Pesa", status: "Paid" },
-                  { date: "Jan 14, 2026", amount: 1999, method: "Bank Transfer", status: "Paid" },
-                  { date: "Dec 14, 2025", amount: 1999, method: "M-Pesa", status: "Paid" },
-                ].map((b, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", padding: "12px 0", borderBottom: i < 3 ? "1px solid #2a2637" : "none" }}>
-                    <span style={{ flex: 1, fontSize: 14, color: "#d1d5db" }}>{b.date}</span>
-                    <span style={{ fontSize: 13, color: "#9ca3af", marginRight: 16 }}>{b.method}</span>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: "#fffffe", marginRight: 16 }}>KES {b.amount.toLocaleString()}</span>
-                    <span style={{ fontSize: 12, padding: "3px 10px", borderRadius: 20, background: "#d1fae5", color: "#065f46", fontWeight: 600 }}>{b.status}</span>
+              {/* billing history */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-gray-100">
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Billing History</p>
+                </div>
+                {transactions.map((t, i) => (
+                  <div key={t.id}
+                    className={`flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 transition
+                      ${i < transactions.length - 1 ? 'border-b border-gray-100' : ''}`}>
+                    <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center
+                      text-emerald-600 font-bold text-sm shrink-0">
+                      {t.method === "M-Pesa" ? "M" : "🏦"}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-800">{t?.payment_method || t.method}</p>
+                      <p className="text-xs text-gray-400 font-mono truncate">{t?.reference || t.ref}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-bold text-gray-800">KES {t.amount.toLocaleString()}</p>
+                      <p className="text-xs text-gray-400">{t?.time_paid || t.date}</p>
+                    </div>
+                    {/* <span className="text-[10px] font-bold px-2.5 py-1 rounded-full
+                      bg-emerald-100 text-emerald-700 border border-emerald-200 shrink-0">
+                      {t.status}
+                    </span> */}
                   </div>
                 ))}
               </div>
@@ -725,5 +1042,5 @@ export default function ISPPortal() {
         </div>
       </main>
     </div>
-  );
+  )
 }

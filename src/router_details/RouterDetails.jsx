@@ -1,32 +1,29 @@
 import { FcAlarmClock } from "react-icons/fc";
 import { GoCpu, GoServer } from "react-icons/go";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useApplicationSettings } from '../settings/ApplicationSettings'
 import { useSearchParams } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import TrafficStatsGraph from './TrafficData';
 import toast, { Toaster } from 'react-hot-toast';
-import { IoWarningOutline, IoClose, IoSearch, IoFilter, IoDownload, IoRefresh, IoEye, IoEyeOff } from "react-icons/io5";
+import { IoWarningOutline, IoClose, IoSearch, IoDownload, IoRefresh, IoEye, IoEyeOff } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
 import { MdMemory } from "react-icons/md";
-import { FiHardDrive } from "react-icons/fi";
+import { FiHardDrive, FiActivity } from "react-icons/fi";
 import { FcAreaChart } from "react-icons/fc";
 import Lottie from 'react-lottie';
 import animationData from '../lotties/Connection error.json';
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
-import Chip from '@mui/material/Chip';
-import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -37,39 +34,125 @@ import TablePagination from '@mui/material/TablePagination';
 import CircularProgress from '@mui/material/CircularProgress';
 import Tooltip from '@mui/material/Tooltip';
 
+// ── Radial gauge SVG ──────────────────────────────────────────────────────────
+const GaugeRing = ({ value = 0, size = 72, stroke = 6, color, track = 'rgba(255,255,255,0.06)' }) => {
+  const pct = Math.max(0, Math.min(100, value));
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (pct / 100) * circumference;
+
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90" style={{ display: 'block' }}>
+        <circle cx={size / 2} cy={size / 2} r={radius} stroke={track} strokeWidth={stroke} fill="none" />
+        <circle
+          cx={size / 2} cy={size / 2} r={radius}
+          stroke={color} strokeWidth={stroke} fill="none"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          style={{ transition: 'stroke-dashoffset 0.7s cubic-bezier(0.4,0,0.2,1)', filter: `drop-shadow(0 0 6px ${color}88)` }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-xs font-bold tabular-nums" style={{ color }}>{pct.toFixed(0)}%</span>
+      </div>
+    </div>
+  );
+};
+
+// ── Mini sparkline bar chart ──────────────────────────────────────────────────
+const SparkBars = ({ color }) => (
+  <div className="flex items-end gap-0.5 h-6">
+    {[40, 65, 50, 80, 55, 90, 70].map((h, i) => (
+      <div
+        key={i}
+        className="w-1 rounded-sm opacity-60"
+        style={{ height: `${h}%`, backgroundColor: color, opacity: i === 6 ? 1 : 0.4 + i * 0.08 }}
+      />
+    ))}
+  </div>
+);
+
+// ── Stat card ─────────────────────────────────────────────────────────────────
+const THEMES = {
+  sky:     { accent: '#38bdf8', badge: 'bg-sky-500/10 text-sky-400 ring-sky-500/20' },
+  amber:   { accent: '#f59e0b', badge: 'bg-amber-500/10 text-amber-400 ring-amber-500/20' },
+  emerald: { accent: '#10b981', badge: 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' },
+  violet:  { accent: '#8b5cf6', badge: 'bg-violet-500/10 text-violet-400 ring-violet-500/20' },
+};
+
+const StatCard = ({ icon, title, value, unit, gauge, theme = 'sky', footnote }) => {
+  const t = THEMES[theme];
+  return (
+    <div className="relative group rounded-2xl border border-white/5  p-5 overflow-hidden
+     transition-all duration-300 ">
+      {/* Subtle gradient top accent */}
+      <div
+        className="absolute inset-x-0 top-0 h-px"
+        style={{ background: `linear-gradient(90deg, transparent, ${t.accent}55, transparent)` }}
+      />
+
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <div className={`mb-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 
+            text-[11px] font-semibold uppercase tracking-wider ring-1 ${t.badge}`}>
+            {icon}
+            {title}
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-mono text-2xl font-bold text-black dark:text-white tabular-nums leading-none">{value}</span>
+            {unit && <span className="text-sm font-medium text-gray-500">{unit}</span>}
+          </div>
+          {footnote && <p className="mt-1.5 text-xs text-gray-600 font-mono truncate">{footnote}</p>}
+        </div>
+
+        <div className="flex flex-col items-end gap-2">
+          {typeof gauge === 'number' && <GaugeRing value={gauge} color={t.accent} />}
+          <SparkBars color={t.accent} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ── Info row inside board card ────────────────────────────────────────────────
+const InfoRow = ({ label, value }) => (
+  <div className="flex items-center justify-between py-2.5 border-b border-white/[0.04] last:border-0">
+    <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{label}</span>
+    <span className="text-sm font-sans text-black dark:text-white truncate max-w-[55%] text-right">{value || 'N/A'}</span>
+  </div>
+);
+
+// ── Severity chip for logs ────────────────────────────────────────────────────
+const SCOLORS = { error: '#f87171', critical: '#f87171', warning: '#fbbf24', info: '#38bdf8', debug: '#94a3b8' };
+const getSeverityChip = (s) => {
+  const c = SCOLORS[s?.toLowerCase()] || '#64748b';
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+      style={{ backgroundColor: `${c}18`, color: c, border: `1px solid ${c}35` }}>
+      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: c }} />
+      {s || '—'}
+    </span>
+  );
+};
+
+// ── Main component ─────────────────────────────────────────────────────────────
 const RouterDetails = ({ message = "Connection to router failed" }) => {
-  const { openNasTable, setOpenNasTable,
-    openRouterDetails, setOpenRouterDetails } = useApplicationSettings()
+  const { openNasTable, setOpenNasTable, openRouterDetails, setOpenRouterDetails } = useApplicationSettings();
   const [routerData, setRouterData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentRouterImage, setCurrentRouterImage] = useState(null);
   const [uptime, setUptime] = useState(null);
   const [error, setError] = useState(null);
   const [routerInfo, setRouterInfo] = useState(null);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [routerInterface, setRouterInterface] = useState([]);
   const [routerInterfaceForm, setRouterInterfaceForm] = useState('');
-  const [showSucessReboot, setShowSucessReboot] = useState(false);
-  const navigate = useNavigate()
+  const [showSuccessReboot, setShowSuccessReboot] = useState(false);
+  const navigate = useNavigate();
+  const [trafficData, setTrafficData] = useState(null);
 
-  const handleChange = (event) => {
-    setRouterInterfaceForm(event.target.value);
-    localStorage.setItem('routerInterfaceForm', event.target.value)
-    fetchTrafficStats(event.target.value)
-  };
-
-  const [trafficData, setTrafficData] = useState([]);
-
-  const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: animationData,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice"
-    }
-  };
-
-  // Logs state
   const [openLogsModal, setOpenLogsModal] = useState(false);
   const [logs, setLogs] = useState([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
@@ -78,162 +161,119 @@ const RouterDetails = ({ message = "Connection to router failed" }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [autoRefreshInterval, setAutoRefreshInterval] = useState(5); // seconds
+  const [autoRefreshInterval, setAutoRefreshInterval] = useState(5);
 
-  const fetchTrafficStats = useCallback(async (routerInterfaceForm) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const [cpuLoad, setCpuLoad] = useState(0);
+  const [freeMemory, setFreeMemory] = useState(0);
+  const [totalMemory, setTotalMemory] = useState(0);
+  const [freeHdd, setFreeHdd] = useState(0);
+  const [totalHdd, setTotalHdd] = useState(0);
+  const [routerVersion, setRouterVersion] = useState(0);
+  const [showRebootConfirm, setShowRebootConfirm] = useState(false);
+  const [archiTecture, setArchiTecture] = useState(null);
+  const [routerTimezone, setRouterTimezone] = useState(null);
 
-      const response = await
-        fetch(`/api/trafic_stats?id=${id} &interface=${routerInterfaceForm || localStorage.getItem('routerInterfaceForm')}`, {
-          headers: { 'X-Subdomain': window.location.hostname.split('.')[0] },
-        });
-      if (!response.ok) throw new Error('Failed to fetch router info');
+  const id = searchParams.get('id');
+  const status = searchParams.get('status');
+  const event = new Date();
 
-      const data = await response.json();
+  const mikotik = [
+    { id: 1, name: "hAP ax lite", image: '/images/hAP_ax_lite.png' },
+    { id: 2, name: "RB951Ui-2HnD", image: '/images/RB951Ui-2HnD.png' },
+    { id: 3, name: "L009UiGS", image: '/images/L009UiGS-RM.png' },
+    { id: 4, name: "RB4011iGS+", image: '/images/RB4011iGS+RM.png' },
+    { id: 5, name: "CCR1009-7G-1C-1S+", image: '/images/CCR1009-7G-1C-1S+.webp' },
+  ];
 
-      setTrafficData(data[0]); // Keep last 30 data points
 
-    } catch (err) {
-      setError(err.message);
-      setRouterInfo(null);
-      setUptime(null);
-    } finally {
-      setLoading(false);
-    }
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
   }, []);
 
+  return isDark;
+}
 
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
+
+
+
+
+
+  const fetchTrafficStats = useCallback(async (iface) => {
+  try {
+    const response = await fetch(
+      `/api/trafic_stats?id=${id}&interface=${iface || localStorage.getItem('routerInterfaceForm')}`,
+      { headers: { 'X-Subdomain': window.location.hostname.split('.')[0] } }
+    );
+    if (!response.ok) throw new Error('Failed to fetch traffic stats');
+    const data = await response.json();
+
+    // Handle either shape: an array of one stats object, or the object directly
+    const stats = Array.isArray(data) ? data[0] : data;
+
+    if (stats && typeof stats.download_speed !== 'undefined') {
+      setTrafficData(stats);
+    } else {
+      console.warn('Unexpected traffic stats shape:', data);
+    }
+  } catch (err) {
+    console.error('Traffic stats fetch failed:', err);
+  }
+}, [id]);
 
   useEffect(() => {
     fetchTrafficStats();
-    const intervalId = setInterval(fetchTrafficStats, 5000);
-    return () => clearInterval(intervalId);
+    const id = setInterval(fetchTrafficStats, 5000);
+    return () => clearInterval(id);
   }, [fetchTrafficStats]);
-
-
-  const [ubuntuStats, setUbuntuStats] = useState({
-    cpuUsage: 0,
-    memoryUsage: 0,
-    diskUsage: 0,
-    uptime: "0h 0m",
-    available_memory: 0,
-    memory_used: 0,
-    disk_used: 0,
-    available_disk: 0,
-  });
-  const [loadingUbuntuStats, setLoadingUbuntuStats] = useState(true);
-
-  const event = new Date();
-  console.log('current time:', event.toLocaleTimeString("en-US"))
-
-  const id = searchParams.get('id')
-  const [mikotik, setMikotik] = useState([
-    {
-      "id": 1,
-      "name": "hAP ax lite",
-      "image": '/images/hAP_ax_lite.png'
-    },
-    {
-      "id": 2,
-      "name": "RB951Ui-2HnD",
-      "image": '/images/RB951Ui-2HnD.png'
-    },
-
-    {
-      "id": 3,
-      "name": "L009UiGS",
-      "image": '/images/L009UiGS-RM.png'
-    },
-
-    {
-      "id": 4,
-      "name": "RB4011iGS+",
-      "image": '/images/RB4011iGS+RM.png'
-    },
-    {
-      "id": 5,
-      "name": "CCR1009-7G-1C-1S+",  
-      "image": '/images/CCR1009-7G-1C-1S+.webp'
-    }
-  ])
-
-  const [cpuLoad, setCpuLoad] = useState(0)
-  const [freeMemory, setFreeMemory] = useState(0)
-  const [totalMemory, setTotalMemory] = useState(0)
-  const [freeHdd, setFreeHdd] = useState(0)
-  const [totalHdd, setTotalHdd] = useState(0)
-  const [routerVersion, setRouterVersion] = useState(0)
-  const [showRebootConfirm, setShowRebootConfirm] = useState(false);
-  const [archiTecture, setArchiTecture] = useState(null)
-  const [routerTimezone, setRouterTimezone] = useState(null)
-
-
-  
-  const rebootRouter = async (e) => {
-    e.preventDefault()
-
-    if (!showRebootConfirm) {
-      setShowRebootConfirm(true);
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/reboot_router?id=${id}`, {
-        method: 'POST',
-        headers: { 'X-Subdomain': window.location.hostname.split('.')[0] },
-      })
-
-      const newData = await response.json()
-
-      if (response.status === 402) {
-        setTimeout(() => {
-          window.location.href = '/license-expired';
-        }, 1800);
-      }
-
-      if (response.ok) {
-        toast.success('Router is rebooting', {
-          position: "top-center",
-          duration: 5000,
-        });
-        setShowSucessReboot(true);
-
-        setTimeout(() => {
-          navigate('/admin/nas')
-        }, 2500);
-      } else {
-        toast.error(
-          newData.error, {
-          position: "top-center",
-          duration: 5000,
-        }
-        )
-      }
-    } catch (error) {
-      toast.error(
-        'Failed to reboot router server error', {
-        position: "top-center",
-        duration: 5000,
-      }
-      )
-    }
-  }
-
-
 
   const fetchRouterInfoo = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-
       const response = await fetch(`/api/router_info?id=${id}`, {
         headers: { 'X-Subdomain': window.location.hostname.split('.')[0] },
       });
-
       if (!response.ok) throw new Error('Failed to fetch router info');
-
       const data = await response.json();
       setRouterInfo(data.board_name);
       setUptime(data.uptime);
@@ -243,104 +283,48 @@ const RouterDetails = ({ message = "Connection to router failed" }) => {
       setFreeHdd(data.disk_usage.free);
       setTotalHdd(data.disk_usage.total);
       setRouterVersion(data.version);
-      setArchiTecture(data.architecture_name)
-
-      const matchedRouter = mikotik.find(router => router.name === data.board_name);
-      setCurrentRouterImage(matchedRouter?.image || null);
-
+      setArchiTecture(data.architecture_name);
+      const match = mikotik.find(r => r.name === data.board_name);
+      setCurrentRouterImage(match?.image || null);
     } catch (err) {
       setError(err.message);
       setRouterInfo(null);
       setUptime(null);
     } finally {
       setLoading(false);
-    }
-  }, []);
-
-
-
-
-
-  const fetchRouterTimezone = useCallback(async () => {
-    try {
-    
-
-      const response = await fetch(`/api/router_timezone?id=${id}`, {
-        headers: { 'X-Subdomain': window.location.hostname.split('.')[0] },
-      });
-
-      if (!response.ok) throw new Error('Failed to fetch router timezone');
-
-      const data = await response.json();
-
-    setRouterTimezone(data.time_zone_name)
-     
-
-    } catch (err) {
-      // setRouterTimezone('N/A')
-     
-    } finally {
-
-          //  setRouterTimezone('N/A')
-
-     
     }
   }, [id]);
 
-
-useEffect(() => {
-  fetchRouterTimezone();
-}, [fetchRouterTimezone]);
-
-
-
-  useEffect(() => {
-    fetchRouterInfoo();
-    const intervalId = setInterval(fetchRouterInfoo, 8000);
-    return () => clearInterval(intervalId);
-  }, [fetchRouterInfoo]);
+  const fetchRouterTimezone = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/router_timezone?id=${id}`, {
+        headers: { 'X-Subdomain': window.location.hostname.split('.')[0] },
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      setRouterTimezone(data.time_zone_name);
+    } catch { /* silent */ }
+  }, [id]);
 
   const fetchRouterInterface = useCallback(async () => {
     try {
-      setLoading(true);
-      setError(null);
-
       const response = await fetch(`/api/get_router_interface?id=${id}`, {
         headers: { 'X-Subdomain': window.location.hostname.split('.')[0] },
       });
-
-      if (!response.ok) throw new Error('Failed to fetch router info');
-
+      if (!response.ok) return;
       const data = await response.json();
+      setRouterInterface(data);
+    } catch { /* silent */ }
+  }, [id]);
 
-      if (response.ok) {
-        setRouterInterface(data);
-      }
-    } catch (err) {
-      setError(err.message);
-      setRouterInfo(null);
-      setUptime(null);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchRouterInterface();
-  }, [fetchRouterInterface]);
-
-  // Logs functions
   const fetchLogs = useCallback(async () => {
     if (!openLogsModal) return;
-
     try {
       setLoadingLogs(true);
       const response = await fetch(`/api/get_router_logs?id=${id}`, {
         headers: { 'X-Subdomain': window.location.hostname.split('.')[0] },
       });
-
       if (!response.ok) throw new Error('Failed to fetch logs');
-
       const data = await response.json();
       setLogs(data);
     } catch (err) {
@@ -350,45 +334,46 @@ useEffect(() => {
     }
   }, [openLogsModal, id]);
 
+  useEffect(() => { fetchRouterTimezone(); }, [fetchRouterTimezone]);
   useEffect(() => {
-    if (openLogsModal) {
-      fetchLogs();
-      let interval;
-      if (autoRefresh) {
-        interval = setInterval(fetchLogs, autoRefreshInterval * 1000);
-      }
-      return () => {
-        if (interval) clearInterval(interval);
-      };
+    fetchRouterInfoo();
+    const interval = setInterval(fetchRouterInfoo, 8000);
+    return () => clearInterval(interval);
+  }, [fetchRouterInfoo]);
+  useEffect(() => { fetchRouterInterface(); }, [fetchRouterInterface]);
+  useEffect(() => {
+    if (!openLogsModal) return;
+    fetchLogs();
+    if (autoRefresh) {
+      const interval = setInterval(fetchLogs, autoRefreshInterval * 1000);
+      return () => clearInterval(interval);
     }
   }, [openLogsModal, autoRefresh, autoRefreshInterval]);
 
-  const handleOpenLogs = () => {
-    setOpenLogsModal(true);
-  };
-
-  const handleCloseLogs = () => {
-    setOpenLogsModal(false);
-  };
-
-  const handleRefreshLogs = () => {
-    fetchLogs();
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+  const rebootRouter = async (e) => {
+    e.preventDefault();
+    if (!showRebootConfirm) { setShowRebootConfirm(true); return; }
+    try {
+      const response = await fetch(`/api/reboot_router?id=${id}`, {
+        method: 'POST',
+        headers: { 'X-Subdomain': window.location.hostname.split('.')[0] },
+      });
+      const newData = await response.json();
+      if (response.status === 402) { setTimeout(() => { window.location.href = '/license-expired'; }, 1800); }
+      if (response.ok) {
+        toast.success('Router is rebooting', { position: 'top-center', duration: 5000 });
+        setShowSuccessReboot(true);
+        setTimeout(() => navigate('/admin/nas'), 2500);
+      } else {
+        toast.error(newData.error, { position: 'top-center', duration: 5000 });
+      }
+    } catch {
+      toast.error('Failed to reboot router', { position: 'top-center', duration: 5000 });
+    }
   };
 
   const handleExportLogs = () => {
-    const logText = logs.map(log => 
-      `${log.time || ''}\t${log.topics || ''}\t${log.message || ''}`
-    ).join('\n');
-    
+    const logText = logs.map(l => `${l.time || ''}\t${l.topics || ''}\t${l.message || ''}`).join('\n');
     const blob = new Blob([logText], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -400,589 +385,328 @@ useEffect(() => {
     URL.revokeObjectURL(url);
   };
 
-  const getSeverityColor = (severity) => {
-    switch (severity?.toLowerCase()) {
-      case 'error':
-      case 'critical':
-        return '#ef4444';
-      case 'warning':
-        return '#f59e0b';
-      case 'info':
-        return '#3b82f6';
-      case 'debug':
-        return '#6b7280';
-      default:
-        return '#9ca3af';
-    }
-  };
-
-  const getSeverityChip = (severity) => {
-    const color = getSeverityColor(severity);
-    return (
-      <Chip
-        label={severity || 'unknown'}
-        size="small"
-        style={{
-          backgroundColor: color,
-          color: 'white',
-          fontWeight: 'bold',
-          fontSize: '0.7rem',
-          height: '20px'
-        }}
-      />
-    );
-  };
-
   const filteredLogs = logs.filter(log => {
-    const matchesSearch = 
-      (log.message?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       log.topics?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       log.time?.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesSeverity = 
-      severityFilter === 'all' || 
-      (log.topics?.toLowerCase().includes(severityFilter.toLowerCase()));
-    
-    return matchesSearch && matchesSeverity;
+    const q = searchTerm.toLowerCase();
+    const matchSearch = log.message?.toLowerCase().includes(q) || log.topics?.toLowerCase().includes(q) || log.time?.toLowerCase().includes(q);
+    const matchSev = severityFilter === 'all' || log.topics?.toLowerCase().includes(severityFilter);
+    return matchSearch && matchSev;
   });
 
-  const [timezone, setTimeZone] = useState(null);
-  const handleGetSystemGeneralSettings = useCallback(async () => {
-    try {
-      const response = await fetch('/api/general_settings', {
-        headers: {
-          'X-Subdomain': window.location.hostname.split('.')[0]
-        },
-      })
-      const newData = await response.json()
-      if (response.ok) {
-        setTimeZone(newData[0].timezone)
-      } else {
-        console.log('failed to fetch system general settings')
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }, []);
+  const memPct = totalMemory ? ((totalMemory - freeMemory) / totalMemory * 100) : 0;
+  const diskPct = totalHdd ? ((totalHdd - freeHdd) / totalHdd * 100) : 0;
 
-  useEffect(() => {
-    handleGetSystemGeneralSettings()
-  }, [handleGetSystemGeneralSettings]);
-
-  const status = searchParams.get('status')
-
-  const StatCard = ({ icon, title, value, unit, color = "blue", children }) => {
-    const colors = {
-      blue: "from-blue-500 to-blue-600",
-      green: "from-green-500 to-green-600",
-      orange: "from-orange-500 to-orange-600",
-      purple: "from-purple-500 to-purple-600",
-      red: "from-red-500 to-red-600"
-    };
-
-    return (
-      <div className={`bg-gradient-to-br ${colors[color]} rounded-xl 
-      shadow-lg overflow-hidden text-white`}>
-        <div className="p-5">
-          <div className="flex justify-between items-center">
-            <div className="text-2xl font-bold">
-              {value} {unit && <span className="text-sm opacity-80">{unit}</span>}
-            </div>
-            <div className="p-3 rounded-full bg-white/20">
-              {icon}
-            </div>
-          </div>
-          <div className="mt-2 text-sm font-medium opacity-90">{title}</div>
-          {children && <div className="mt-3">{children}</div>}
-        </div>
-      </div>
-    );
+  const defaultOptions = {
+    loop: true, autoplay: true, animationData,
+    rendererSettings: { preserveAspectRatio: 'xMidYMid slice' },
   };
 
-  const ProgressBar = ({ value, max = 100, color = "blue" }) => {
-    const colors = {
-      blue: "bg-blue-400",
-      green: "bg-green-400",
-      orange: "bg-orange-400",
-      purple: "bg-purple-400",
-      red: "bg-red-400"
-    };
-
-    const percentage = Math.min(100, (value / max) * 100);
-
-    return (
-      <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-        <div
-          className={`h-2.5 rounded-full ${colors[color]}`}
-          style={{ width: `${percentage}%` }}
-        ></div>
-      </div>
-    );
-  };
+  // ── Dialog shared styles ──────────────────────────────────────────────────
+  const dlgBg = { backgroundImage: 'none', border: '1px solid rgba(255,255,255,0.06)' };
+  const dlgHeaderBg = { borderBottom: '1px solid rgba(255,255,255,0.06)' };
+  const cellStyle = { borderColor: 'rgba(255,255,255,0.05)', fontSize: 13 };
+  const headCellStyle = { ...cellStyle, color: '#6b7280', fontWeight: 700, fontSize: 11,
+     letterSpacing: '0.05em', textTransform: 'uppercase',};
 
   return (
-    <div>
+    <div className="font-sans antialiased">
+      <ThemeProvider theme={tableTheme}>
+      
       <Toaster />
 
-      {/* Logs Modal */}
-      <Dialog
-        open={openLogsModal}
-        onClose={handleCloseLogs}
-        maxWidth="lg"
-        fullWidth
-        PaperProps={{
-          style: {
-            minHeight: '80vh',
-            maxHeight: '80vh',
-            backgroundColor: '#1f2937'
-          }
-        }}
-      >
-        <DialogTitle style={{ backgroundColor: '#111827', color: 'white', 
-          borderBottom: '1px solid #374151' }}>
+      {/* ── Logs Modal ──────────────────────────────────────────────────────── */}
+      <Dialog open={openLogsModal} onClose={() => setOpenLogsModal(false)} maxWidth="lg" fullWidth
+        PaperProps={{ style: { ...dlgBg, minHeight: '80vh', maxHeight: '80vh' } }}>
+
+        <DialogTitle style={{ ...dlgHeaderBg, color: 'white', padding: '16px 24px' }}>
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
-                <span className="font-bold text-lg">MikroTik System Logs</span>
-              </div>
-              <Chip
-                label={`${logs.length} entries`}
-                size="small"
-                style={{ backgroundColor: '#3b82f6', color: 'white' }}
-              />
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75 animate-ping" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
+              </span>
+              <span className="font-mono font-bold text-base tracking-tight text-white">System Logs</span>
+              <span className="rounded-full bg-sky-500/10 text-sky-400 ring-1 ring-sky-500/20 px-2.5 py-0.5 text-xs font-semibold">
+                {logs.length} entries
+              </span>
             </div>
-            <IconButton onClick={handleCloseLogs} style={{ color: 'white' }}>
-              <IoClose size={24} />
+            <IconButton onClick={() => setOpenLogsModal(false)} size="small" style={{ color: '#6b7280' }}>
+              <IoClose size={18} />
             </IconButton>
           </div>
         </DialogTitle>
 
-        <DialogContent style={{ padding: 0, backgroundColor: '#1f2937' }}>
+        <DialogContent style={{ padding: 0, backgroundColor: '#111827' }}>
           {/* Toolbar */}
-          <div className="p-4 border-b border-gray-700 bg-gray-800">
-            <div className="flex flex-wrap gap-4 items-center">
-              <TextField
-                size="small"
-                placeholder="Search logs..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: <IoSearch style={{ marginRight: 8, color: '#9ca3af' }} />,
-                  style: { 
-                    backgroundColor: '#374151', 
-                    color: 'white',
-                    width: 300
-                  }
-                }}
-              />
+          <div className="px-4 py-3 border-b border-white/5 bg-gray-900/60 flex flex-wrap gap-3 items-center">
+            <TextField size="small" placeholder="Search logs…" value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: <IoSearch style={{ marginRight: 8, color: '#6b7280' }} />,
+                style: { backgroundColor: '#1f2937', color: '#e5e7eb', width: 260, borderRadius: 10, fontSize: 13 },
+              }} />
 
-              <FormControl size="small" style={{ minWidth: 120 }}>
-                <Select
-                  value={severityFilter}
-                  onChange={(e) => setSeverityFilter(e.target.value)}
-                  style={{ 
-                    backgroundColor: '#374151', 
-                    color: 'white',
-                    height: 40
-                  }}
-                >
-                  <MenuItem value="all">All Severities</MenuItem>
-                  <MenuItem value="info">Info</MenuItem>
-                  <MenuItem value="warning">Warning</MenuItem>
-                  <MenuItem value="error">Error</MenuItem>
-                  <MenuItem value="debug">Debug</MenuItem>
+            <FormControl size="small">
+              <Select value={severityFilter} onChange={e => setSeverityFilter(e.target.value)}
+                style={{ backgroundColor: '#1f2937', color: '#e5e7eb', height: 40, borderRadius: 10, fontSize: 13, minWidth: 130 }}>
+                <MenuItem value="all">All severities</MenuItem>
+                <MenuItem value="info">Info</MenuItem>
+                <MenuItem value="warning">Warning</MenuItem>
+                <MenuItem value="error">Error</MenuItem>
+                <MenuItem value="debug">Debug</MenuItem>
+              </Select>
+            </FormControl>
+
+            <div className="flex items-center gap-2 ml-auto">
+              <Tooltip title={autoRefresh ? 'Pause auto-refresh' : 'Enable auto-refresh'}>
+                <IconButton size="small" onClick={() => setAutoRefresh(!autoRefresh)}
+                  style={{ color: autoRefresh ? '#38bdf8' : '#6b7280', backgroundColor: autoRefresh ? 'rgba(56,189,248,0.1)' : 'transparent', borderRadius: 8 }}>
+                  {autoRefresh ? <IoEye size={17} /> : <IoEyeOff size={17} />}
+                </IconButton>
+              </Tooltip>
+
+              <FormControl size="small">
+                <Select value={autoRefreshInterval} onChange={e => setAutoRefreshInterval(e.target.value)}
+                  style={{ backgroundColor: '#1f2937', color: '#e5e7eb', height: 36, borderRadius: 8, fontSize: 13, minWidth: 80 }}>
+                  {[2, 5, 10, 30].map(v => <MenuItem key={v} value={v}>{v}s</MenuItem>)}
                 </Select>
               </FormControl>
 
-              <div className="flex items-center gap-2 ml-auto">
-                <Tooltip title="Auto refresh">
-                  <IconButton
-                    size="small"
-                    onClick={() => setAutoRefresh(!autoRefresh)}
-                    style={{ 
-                      color: autoRefresh ? '#3b82f6' : '#9ca3af',
-                      backgroundColor: autoRefresh ? '#1e40af20' : 'transparent'
-                    }}
-                  >
-                    {autoRefresh ? <IoEye size={20} /> : <IoEyeOff size={20} />}
-                  </IconButton>
-                </Tooltip>
+              <button onClick={fetchLogs} disabled={loadingLogs}
+                className="flex items-center gap-1.5 h-9 px-3 rounded-lg border border-white/10 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium transition-colors disabled:opacity-50">
+                {loadingLogs ? <CircularProgress size={14} style={{ color: '#38bdf8' }} /> : <IoRefresh size={15} />}
+                Refresh
+              </button>
 
-                <FormControl size="small" style={{ minWidth: 100 }}>
-                  <Select
-                    value={autoRefreshInterval}
-                    onChange={(e) => setAutoRefreshInterval(e.target.value)}
-                    style={{ 
-                      backgroundColor: '#374151', 
-                      color: 'white',
-                      height: 40
-                    }}
-                  >
-                    <MenuItem value={2}>2 seconds</MenuItem>
-                    <MenuItem value={5}>5 seconds</MenuItem>
-                    <MenuItem value={10}>10 seconds</MenuItem>
-                    <MenuItem value={30}>30 seconds</MenuItem>
-                  </Select>
-                </FormControl>
-
-                <Button
-                  variant="outlined"
-                  startIcon={<IoRefresh />}
-                  onClick={handleRefreshLogs}
-                  disabled={loadingLogs}
-                  style={{ 
-                    color: '#3b82f6', 
-                    borderColor: '#3b82f6',
-                    height: 40
-                  }}
-                >
-                  {loadingLogs ? <CircularProgress size={20} /> : 'Refresh'}
-                </Button>
-
-                <Button
-                  variant="contained"
-                  startIcon={<IoDownload />}
-                  onClick={handleExportLogs}
-                  style={{ 
-                    backgroundColor: '#10b981',
-                    color: 'white',
-                    height: 40
-                  }}
-                >
-                  Export
-                </Button>
-              </div>
+              <button onClick={handleExportLogs}
+                className="flex items-center gap-1.5 h-9 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors">
+                <IoDownload size={15} />
+                Export
+              </button>
             </div>
           </div>
 
-          {/* Logs Table */}
-          <TableContainer 
-            component={Paper} 
-            style={{ 
-              backgroundColor: '#1f2937',
-              height: 'calc(80vh - 200px)',
-              overflow: 'auto'
-            }}
-          >
+          {/* Table */}
+          <TableContainer style={{ backgroundColor: '#111827', height: 'calc(80vh - 200px)', overflow: 'auto' }}>
             <Table stickyHeader size="small">
               <TableHead>
-                <TableRow style={{ backgroundColor: '#111827' }}>
-                  <TableCell style={{ color: '#9ca3af', fontWeight: 'bold', borderColor: '#374151' }}>Time</TableCell>
-                  <TableCell style={{ color: '#9ca3af', fontWeight: 'bold', borderColor: '#374151' }}>Severity</TableCell>
-                  <TableCell style={{ color: '#9ca3af', fontWeight: 'bold', borderColor: '#374151' }}>Topics</TableCell>
-                  <TableCell style={{ color: '#9ca3af', fontWeight: 'bold', borderColor: '#374151' }}>Message</TableCell>
+                <TableRow>
+                  {['Time', 'Severity', 'Topics', 'Message'].map(h => (
+                    <TableCell key={h} style={headCellStyle}>{h}</TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>
                 {loadingLogs ? (
-                  <TableRow>
-                    <TableCell colSpan={4} align="center" style={{ color: '#9ca3af', borderColor: '#374151' }}>
-                      <CircularProgress style={{ color: '#3b82f6' }} />
-                    </TableCell>
-                  </TableRow>
+                  <TableRow><TableCell colSpan={4} align="center" style={{ ...cellStyle, padding: '48px 0' }}>
+                    <CircularProgress style={{ color: '#38bdf8' }} size={24} />
+                  </TableCell></TableRow>
                 ) : filteredLogs.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} align="center" style={{ color: '#9ca3af', borderColor: '#374151' }}>
-                      No logs found
-                    </TableCell>
+                  <TableRow><TableCell colSpan={4} align="center" style={{ ...cellStyle, color: '#6b7280', padding: '48px 0' }}>
+                    No logs match your filters
+                  </TableCell></TableRow>
+                ) : filteredLogs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((log, i) => (
+                  <TableRow key={i} style={{ backgroundColor: i % 2 === 0 ? '#111827' : '#1f2937' }}>
+                    <TableCell style={{ ...cellStyle, color: '#9ca3af', fontFamily: 'monospace', fontSize: 12 }}>{log.time || '—'}</TableCell>
+                    <TableCell style={cellStyle}>{getSeverityChip(log.topics)}</TableCell>
+                    <TableCell style={{ ...cellStyle, color: '#d1d5db' }}>{log.topics || '—'}</TableCell>
+                    <TableCell style={{ ...cellStyle, color: '#d1d5db', whiteSpace: 'pre-wrap' }}>{log.message || '—'}</TableCell>
                   </TableRow>
-                ) : (
-                  filteredLogs
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((log, index) => (
-                      <TableRow 
-                        key={index} 
-                        hover
-                        style={{ 
-                          backgroundColor: index % 2 === 0 ? '#1f2937' : '#111827',
-                          borderColor: '#374151'
-                        }}
-                      >
-                        <TableCell style={{ color: '#d1d5db', borderColor: '#374151', fontFamily: 'monospace' }}>
-                          {log.time || '-'}
-                        </TableCell>
-                        <TableCell style={{ borderColor: '#374151' }}>
-                          {getSeverityChip(log.topics)}
-                        </TableCell>
-                        <TableCell style={{ color: '#d1d5db', borderColor: '#374151' }}>
-                          {log.topics || '-'}
-                        </TableCell>
-                        <TableCell style={{ color: '#d1d5db', borderColor: '#374151', whiteSpace: 'pre-wrap' }}>
-                          {log.message || '-'}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                )}
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
 
-          {/* Pagination */}
-          <div className="p-2 border-t border-gray-700 bg-gray-800">
+          <div className="border-t border-white/5 bg-gray-900/60">
             <TablePagination
-              component="div"
-              count={filteredLogs.length}
-              page={page}
-              onPageChange={handleChangePage}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
+              component="div" count={filteredLogs.length} page={page}
+              onPageChange={(_, p) => setPage(p)} rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={e => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
               rowsPerPageOptions={[10, 20, 50, 100]}
-              style={{ color: '#9ca3af' }}
-              classes={{
-                root: 'text-gray-400',
-                selectIcon: 'text-gray-400'
-              }}
-            />
+              style={{ color: '#9ca3af' }} />
           </div>
         </DialogContent>
 
-        <DialogActions style={{ backgroundColor: '#111827', 
-          borderTop: '1px solid #374151' }}>
-          <div className="flex justify-between items-center w-full px-4 py-2">
-            <div style={{ color: '#9ca3af', fontSize: '0.875rem' }}>
-              Showing {filteredLogs.length} of {logs.length} log entries
-            </div>
-            <Button onClick={handleCloseLogs} style={{ color: '#9ca3af' }}>
+        <DialogActions style={{ ...dlgHeaderBg, borderTop: '1px solid rgba(255,255,255,0.05)', padding: '12px 20px' }}>
+          <div className="flex justify-between items-center w-full">
+            <span className="text-xs font-mono text-gray-600">{filteredLogs.length} / {logs.length} entries shown</span>
+            <button onClick={() => setOpenLogsModal(false)}
+              className="px-3 py-1.5 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors">
               Close
-            </Button>
+            </button>
           </div>
         </DialogActions>
       </Dialog>
 
+      {/* ── Main view ───────────────────────────────────────────────────────── */}
       {status === 'Reachable' ? (
-        <div className="space-y-6">
-          {/* Main Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Uptime Card */}
-            <StatCard
-              icon={<FcAlarmClock className="w-6 h-6" />}
-              title="System Uptime"
-              value={uptime || "N/A"}
-              color="purple"
-            />
+        <div className="space-y-5 
+        rounded-2xl  p-5 ring-1 ring-white/5">
 
-            {/* CPU Card */}
-            <StatCard
-              icon={<GoCpu className="w-6 h-6" />}
-              title="CPU Load"
-              value={cpuLoad || "0"}
-              unit="%"
-              color="orange"
-            >
-              <ProgressBar value={parseFloat(cpuLoad) || 0} color="orange" />
-            </StatCard>
-
-            {/* Memory Card */}
-            <StatCard
-              icon={<MdMemory className="w-6 h-6" />}
-              title="Memory Usage"
-              value={`${((totalMemory - freeMemory) / totalMemory * 100).toFixed(1)}`}
-              unit="%"
-              color="blue"
-            >
-              <div className="text-xs mb-1">
-                {freeMemory} free of {totalMemory}
-              </div>
-              <ProgressBar
-                value={((totalMemory - freeMemory) / totalMemory * 100)}
-                color="blue"
-              />
-            </StatCard>
-
-            {/* Disk Card */}
-            <StatCard
-              icon={<FiHardDrive className="w-6 h-6" />}
-              title="Disk Usage"
-              value={`${((totalHdd - freeHdd) / totalHdd * 100).toFixed(1)}`}
-              unit="%"
-              color="green"
-            >
-              <div className="text-xs mb-1">
-                {freeHdd} free of {totalHdd}
-              </div>
-              <ProgressBar
-                value={((totalHdd - freeHdd) / totalHdd * 100)}
-                color="green"
-              />
-            </StatCard>
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              <h2 className="font-sans font-bold text-base text-  tracking-tight text-lack dark:text-white">
+                {routerInfo || 'Router'}
+                <span className="ml-2 text-gray-600 font-normal">/ online</span>
+              </h2>
+            </div>
+            <span className="font-mono text-xs text-gray-600">{event.toLocaleTimeString('en-US')}</span>
           </div>
 
-          {/* Router Info Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Router Board Card */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden 
-        border border-gray-200 dark:border-gray-700">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold flex items-center gap-2">
-                    <GoServer className="text-blue-500" />
-                    Router Board
-                  </h3>
-                  {currentRouterImage && (
-                    <img
-                      src={currentRouterImage}
-                      alt="router"
-                      className="w-16 h-16 object-contain"
-                    />
-                  )}
+          {/* Stat cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <StatCard
+              icon={<FcAlarmClock className="w-3 h-3" />}
+              title="Uptime" value={uptime || 'N/A'} theme="violet"
+            />
+            <StatCard
+              icon={<GoCpu className="w-3 h-3" />}
+              title="CPU" value={cpuLoad || '0'} unit="%" gauge={parseFloat(cpuLoad) || 0} theme="amber"
+            />
+            <StatCard
+              icon={<MdMemory className="w-3 h-3" />}
+              title="Memory" value={memPct.toFixed(1)} unit="%" gauge={memPct} theme="sky"
+              footnote={`${freeMemory} free · ${totalMemory} total`}
+            />
+            <StatCard
+              icon={<FiHardDrive className="w-3 h-3" />}
+              title="Disk" value={diskPct.toFixed(1)} unit="%" gauge={diskPct} theme="emerald"
+              footnote={`${freeHdd} free · ${totalHdd} total`}
+            />
+          </div>
+
+          {/* Lower section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+            {/* Board info card */}
+            <div className="rounded-2xl border border-white/5 p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider
+                 text-black dark:text-white">
+                  <GoServer className="text-sky-400 w-3.5 h-3.5" />
+                  Router Board
                 </div>
+                {currentRouterImage && (
+                  <img src={currentRouterImage} alt="router" className="h-10 object-contain opacity-80" />
+                )}
+              </div>
 
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-300">Model:</span>
-                    <span className="font-medium">{routerInfo || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-300">Version:</span>
-                    <span className="font-medium">{routerVersion || "N/A"}</span>
-                  </div>
+              <div className="mb-5">
+                <InfoRow label="Model" value={routerInfo} />
+                <InfoRow label="Version" value={routerVersion} />
+                <InfoRow label="Architecture" value={archiTecture} />
+                <InfoRow label="Timezone" value={routerTimezone} />
+              </div>
 
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-300">Architecture:</span>
-                    <span className="font-medium">{archiTecture || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-300">Timezone:</span>
-                    <span className="font-medium">{routerTimezone || "N/A"}</span>
-                  </div>
-                </div>
+              <div className="space-y-2 pt-4 border-t border-white/[0.04]">
+                <button onClick={() => setOpenLogsModal(true)}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/8
+                   bg-white/[0.03] hover:bg-white/[0.07] dark:text-gray-300 text-black text-sm font-medium 
+                   py-2.5 transition-colors">
+                  <FiActivity className="w-4 h-4 text-sky-400" />
+                  View system logs
+                </button>
 
-                <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
-                  {/* View Logs Button */}
-                  <button
-                    onClick={handleOpenLogs}
-                    className="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
-                  >
-                    View System Logs
-                    <IoFilter className="w-5 h-5" />
-                  </button>
-
+                <AnimatePresence mode="wait">
                   {showRebootConfirm ? (
-                    <div className="flex gap-3">
-                      <button
-                        onClick={rebootRouter}
-                        className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
-                      >
-                        Confirm Reboot
+                    <motion.div key="confirm" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="flex gap-2">
+                      <button onClick={rebootRouter}
+                        className="flex-1 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold py-2.5 transition-colors">
+                        Confirm
                       </button>
-                      <button
-                        onClick={() => setShowRebootConfirm(false)}
-                        className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 py-2 px-4 rounded-lg transition-colors"
-                      >
+                      <button onClick={() => setShowRebootConfirm(false)}
+                        className="flex-1 rounded-xl border border-white/8 bg-white/[0.03] hover:bg-white/[0.07] text-gray-400 text-sm font-medium py-2.5 transition-colors">
                         Cancel
                       </button>
-                    </div>
+                    </motion.div>
                   ) : (
-                    <button
-                      onClick={rebootRouter}
-                      className="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
-                    >
-                      Reboot Router
-                      <IoWarningOutline className="w-5 h-5" />
-                    </button>
+                    <motion.button key="reboot" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={rebootRouter}
+                      className="w-full flex items-center justify-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/8
+                       hover:bg-rose-500/15 text-rose-400 text-sm font-semibold py-2.5 transition-colors">
+                      <IoWarningOutline className="w-4 h-4" />
+                      Reboot router
+                    </motion.button>
                   )}
-                </div>
+                </AnimatePresence>
               </div>
             </div>
 
-            {/* Traffic Stats Card */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 lg:col-span-2">
-              <div className="p-6">
-                <h3 className="text-lg font-bold flex items-center gap-2 mb-4">
-                  <FcAreaChart className="w-6 h-6" />
-                  Network Traffic
-                </h3>
-
-                <div className="mb-4">
-                  <select
-                    value={routerInterfaceForm}
-                    onChange={(e) => {
-                      setRouterInterfaceForm(e.target.value);
-                      localStorage.setItem('routerInterfaceForm', e.target.value);
-                      fetchTrafficStats(e.target.value);
-                    }}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg
-         focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700
-          dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                  >
-                    {routerInterface.map((option) => (
-                      <option key={option.id} value={option.name}>
-                        {option.name}
-                      </option>
-                    ))}
-                  </select>
+            {/* Traffic graph */}
+            <div className="rounded-2xl border border-white/5  p-5 lg:col-span-2">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-white">
+                  <FcAreaChart className="w-3.5 h-3.5" />
+                  Network traffic
                 </div>
 
-                <div className="h-80 pb-8 bg-white">
-                  <TrafficStatsGraph trafficData={trafficData} />
-                </div>
+                <select
+                  value={routerInterfaceForm}
+                  onChange={e => {
+                    setRouterInterfaceForm(e.target.value);
+                    localStorage.setItem('routerInterfaceForm', e.target.value);
+                    fetchTrafficStats(e.target.value);
+                  }}
+                  className="h-8 px-3 rounded-lg border border-white/8  dark:text-gray-300  text-black
+                  text-xs outline-none focus:ring-1 focus:ring-sky-500/50 transition-colors"
+                >
+                  {routerInterface.map(opt => (
+                    <option key={opt.id} value={opt.name} className="">{opt.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Graph area with subtle grid background */}
+              <div className="rounded-xl overflow-hidden  ring-1 ring-white/[0.04]" >
+                <TrafficStatsGraph trafficData={trafficData} />
               </div>
             </div>
           </div>
 
-          {/* Reboot Success Message */}
-          {showSucessReboot && (
-            <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-bounce">
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+          {/* Reboot toast */}
+          <AnimatePresence>
+            {showSuccessReboot && (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}
+                className="fixed bottom-5 right-5 flex items-center gap-2.5 text-black bg-emerald-600 dark:text-white 
+                px-4 py-3 rounded-xl shadow-lg shadow-emerald-900/40 text-sm font-medium"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                 </svg>
-                Router is rebooting. Please wait...
-              </div>
-            </div>
-          )}
-        </div>
-      ) : <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-col items-center justify-center p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-red-100 dark:border-red-900 max-w-md mx-auto"
-      >
-        {/* Lottie Animation */}
-        <div className="relative mb-6">
-          <Lottie
-            options={defaultOptions}
-            height={200}
-            width={200}
-          />
-
-          {/* Red alert circle around animation */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-48 h-48 rounded-full border-4 border-red-200 dark:border-red-800 opacity-60 animate-pulse"></div>
-          </div>
+                Router is rebooting…
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* Error Message */}
+      ) : (
+        /* ── Offline / error state ──────────────────────────────────────────── */
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="text-center"
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
+          className="flex flex-col items-center justify-center p-10  rounded-2xl border
+           border-rose-500/15 max-w-sm mx-auto"
         >
-          <h3 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-3">
-            Connection Failed
-          </h3>
-
-          <p className="text-gray-600 dark:text-gray-300 mb-6 text-lg">
-            {message}
-          </p>
-
-          {/* Additional Help Text */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-            className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg"
-          >
-            <p className="text-sm text-red-700 dark:text-red-300">
-              💡 Check if the router is powered on and connected to the network
-            </p>
-          </motion.div>
+          <div className="relative mb-4">
+            <Lottie options={defaultOptions} height={160} width={160} />
+          </div>
+          <h3 className="text-xl font-bold text-rose-400 mb-2 font-mono">Connection failed</h3>
+          <p className="text-gray-500 text-sm text-center mb-5 leading-relaxed">{message}</p>
+          <div className="w-full rounded-xl bg-rose-500/8 ring-1 ring-rose-500/15 px-4 py-3">
+            <p className="text-sm text-rose-500 text-center">Check that the router is powered on and reachable on the network.</p>
+          </div>
         </motion.div>
-      </motion.div>}
-    </div>
-  )
-}
+      )}
 
-export default RouterDetails
+      </ThemeProvider>
+      
+    </div>
+  );
+};
+
+export default RouterDetails;

@@ -13,6 +13,12 @@ import {useApplicationSettings} from '../settings/ApplicationSettings'
 import DeleteNode from '../delete/DeleteNode'
 import { IoInformationCircleOutline } from "react-icons/io5";
 
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
+
+// inside PPPOEpackages component:
+
+
 
 
 
@@ -32,7 +38,7 @@ const Nodes = () => {
   const [nodeId, setNodeId] = useState('');
   const [editingNode, setEditingNode] = useState(false)
   const [openDeleteNode, setOpenDeleteNode] = useState(false);
-
+const [loading, setloading] = useState(false)
 
 
 
@@ -45,6 +51,51 @@ const Nodes = () => {
       showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
        showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
         showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,} = useApplicationSettings();
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
 
 
   const handleClickOpen = () => {
@@ -118,7 +169,7 @@ const deleteNode = async() => {
   
   const createNode = async(e) => {
     e.preventDefault();
-
+setloading(true)
     try {
 
       const url = nodeId ? `/api/nodes/${nodeId}` : '/api/nodes';
@@ -133,7 +184,7 @@ const deleteNode = async() => {
       });
       if (response.ok) {
         setOpen(false)
-
+setloading(false)
 
 const newData = await response.json()
         if (nodeId) {
@@ -145,7 +196,7 @@ const newData = await response.json()
             
           })
         } else {
-          
+          setloading(false)
           setNodes([...nodes, newData])
           toast.success('Node created successfully', {
             position: "top-center",
@@ -171,6 +222,7 @@ const newData = await response.json()
         }
       }
     } catch (error) {
+      setloading(false)
       toast.error('failed to create node server error', {
         position: "top-center",
         duration: 4000,
@@ -246,7 +298,8 @@ const columns = [
  <div role="alert" className="alert alert-info bg-green-500 rounded-lg w-fit
           p-2 flex items-center gap-2 justify-center mb-3">
  <IoInformationCircleOutline className='text-white text-xl '/>
-  <span className='text-white'>
+  <span className='text-white font-sans
+'>
 
      Use nodes to group subscribers, router, onu device management,vouchers, per town, neighborhood or village. Nodes are simple display separations with 
     no influence on the subscriber’s traffic or settings.
@@ -275,7 +328,7 @@ const columns = [
          <EditNode  open={open} handleClose={handleClose}
          name={name} setName={setName} position={position} setPosition={setPosition}
          mapReady={mapReady} setMapReady={setMapReady}
-         createNode={createNode} editingNode={editingNode} setEditingNode={setEditingNode}
+         createNode={createNode} editingNode={editingNode} setEditingNode={setEditingNode} loading={loading}
          />
        
            <DeleteNode handleCloseDelete={handleCloseDelete} openDeleteNode={openDeleteNode}
@@ -317,13 +370,21 @@ const columns = [
 
 
 
+<div className={`rounded-2xl border overflow-hidden shadow-sm ${
+  isDark ? 'border-[#3a3a3a]' : 'border-[#e5e0d5]'
+}`}>
+<ThemeProvider theme={tableTheme}>
+
+
+
+
+
 
 
       <MaterialTable columns={columns}
       
-      title={<p className='bg-gradient-to-r from-green-600 via-blue-400 to-cyan-500 bg-clip-text
-  
-  text-transparent font-bold text-2xl'>Nodes</p>}
+      title={<p className=' font-sans
+ font-bold text-2xl'>Nodes</p>}
       
        data={nodes}
 
@@ -352,34 +413,45 @@ localization={{
               
               }}
 
-
-options={{
-  sorting: true,
-  pageSizeOptions:[2, 5, 10, 20],
-  pageSize: 20,
-  paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-selection: true,
-search:false,
-searchAutoFocus: true,
-showSelectAllCheckbox: false,
-showTextRowsSelected: false,
-  emptyRowsWhenPaging: false,
-headerStyle:{
-  fontFamily: 'bold',
-  textTransform: 'uppercase'
-  } ,
-  
-  
-  fontFamily: 'mono'
-}}
+  options={{
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'monospace',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'monospace',
+      }),
+    }}
       
       
       
       
       />
+      </ThemeProvider>
 
+</div>
     </div>
     </>
   )

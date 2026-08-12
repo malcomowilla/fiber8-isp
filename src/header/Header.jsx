@@ -1,217 +1,229 @@
-import { useContext } from 'react'
+import { useContext, useState, useEffect, useCallback } from 'react'
 import { ApplicationContext } from '../context/ApplicationContext'
 import { Profile } from '../profile/Profile'
-import { useState, useEffect, useCallback } from 'react'
-import ArrowBackSharpIcon from '@mui/icons-material/ArrowBackSharp';
-import EastSharpIcon from '@mui/icons-material/EastSharp';
 import { useApplicationSettings } from '../settings/ApplicationSettings'
-import { LuBotMessageSquare } from "react-icons/lu";
-import { FiDollarSign, FiAlertTriangle, FiInfo } from 'react-icons/fi';
-import { FaArrowRightLong } from "react-icons/fa6";
-import { FaIdCard } from "react-icons/fa";
-import { FaCopy } from "react-icons/fa6";
-import { MdMenu, MdClose } from "react-icons/md";
+import { Link } from 'react-router-dom'
+import { 
+  ArrowLeft, 
+  ArrowRight, 
+  Copy, 
+  MessageSquare, 
+  AlertCircle, 
+  Moon, 
+  Sun,
+  Info
+} from 'lucide-react'
+import toast from 'react-hot-toast'
 
 const Header = () => {
-  const { handleThemeSwitch, seeSidebar, setSeeSideBar, setPreferDarkMode, preferDarkMode } = useContext(ApplicationContext);
+  const { handleThemeSwitch, seeSidebar, setSeeSideBar, setPreferDarkMode, preferDarkMode } = useContext(ApplicationContext)
   
   const { 
-    companySettings,
     showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
     showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
     showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
     showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
     providerSms, setProviderSms, smsBalance, setSmsBalance, setSelectedProvider
-  } = useApplicationSettings();
+  } = useApplicationSettings()
 
-  const [user, setUser] = useState(null);
-  const [icon, setIcon] = useState(false);
-  const [companyId, setCompanyId] = useState('');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const subdomain = window.location.hostname.split('.')[0];
-
-  // Toggle mobile menu
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-    // Close all other menus when opening mobile menu
-    if (!isMobileMenuOpen) {
-      setShowMenu1(false); setShowMenu2(false); setShowMenu3(false);
-      setShowMenu4(false); setShowMenu5(false); setShowMenu6(false);
-      setShowMenu7(false); setShowMenu8(false); setShowMenu9(false);
-      setShowMenu10(false); setShowMenu11(false); setShowMenu12(false);
-    }
-  };
+  const [companyId, setCompanyId] = useState('')
+  const [copiedId, setCopiedId] = useState(false)
+  const subdomain = window.location.hostname.split('.')[0]
 
   const getCompanyId = useCallback(async () => {
     try {
       const response = await fetch('/api/company_ids', {
         headers: { 'X-Subdomain': subdomain },
-      });
-      const newData = await response.json();
+      })
+      const newData = await response.json()
       if (response.ok) {
-        setCompanyId(newData[0].company_id);
+        setCompanyId(newData[0].company_id)
       }
     } catch (error) {
-      console.error('Error fetching company ID:', error);
+      console.error('Error fetching company ID:', error)
     }
-  }, [subdomain]);
+  }, [subdomain])
 
   const handleGetSmsProviderSettings = useCallback(async () => {
     try {
       const response = await fetch(`/api/sms_provider_settings`, {
         headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
-      });
-      const newData = await response.json();
+      })
+      const newData = await response.json()
       if (response.ok) {
-        setProviderSms(newData[0].sms_provider);
-      } else {
-        if (response.status === 402) {
-          setTimeout(() => { window.location.href = '/license-expired'; }, 1800);
-        }
-        if (response.status === 401) {
-          setTimeout(() => { window.location.href = '/signin'; }, 1900);
-        }
+        setProviderSms(newData[0].sms_provider)
       }
     } catch (error) {
-      console.error('Error fetching SMS provider settings:', error);
+      console.error('Error fetching SMS provider settings:', error)
     }
-  }, [subdomain, setProviderSms]);
+  }, [subdomain, setProviderSms])
 
   const getSmsBalance = useCallback(async () => {
     try {
       const response = await fetch(`/api/get_sms_balance?selected_provider=${providerSms}`, {
         headers: { 'X-Subdomain': subdomain },
-      });
-      const newData = await response.json();
+      })
+      const newData = await response.json()
       if (response.ok) {
-        setSmsBalance(newData.message);
+        setSmsBalance(newData.message)
       }
     } catch (error) {
-      console.error('Error fetching SMS balance:', error);
+      console.error('Error fetching SMS balance:', error)
     }
-  }, [providerSms, subdomain, setSmsBalance]);
+  }, [providerSms, subdomain, setSmsBalance])
 
   const fetchSavedSmsSettings = useCallback(async () => {
     try {
       const response = await fetch(`/api/saved_sms_settings`, {
         headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
-      });
-      const data = await response.json();
+      })
+      const data = await response.json()
       const newData = data.length > 0 
         ? data.reduce((latest, item) => new Date(item.sms_setting_updated_at) > new Date(latest.sms_setting_updated_at) ? item : latest, data[0])
-        : null;
+        : null
       if (response.ok && newData) {
-        setSelectedProvider(newData.sms_provider);
+        setSelectedProvider(newData.sms_provider)
       }
     } catch (error) {
-      console.error('Error fetching SMS settings:', error);
+      console.error('Error fetching SMS settings:', error)
     }
-  }, [subdomain, setSelectedProvider]);
+  }, [subdomain, setSelectedProvider])
 
   useEffect(() => {
-    getCompanyId();
-    handleGetSmsProviderSettings();
-    fetchSavedSmsSettings();
-  }, [getCompanyId, handleGetSmsProviderSettings, fetchSavedSmsSettings]);
+    getCompanyId()
+    handleGetSmsProviderSettings()
+    fetchSavedSmsSettings()
+  }, [getCompanyId, handleGetSmsProviderSettings, fetchSavedSmsSettings])
 
   useEffect(() => {
     if (providerSms) {
-      getSmsBalance();
+      getSmsBalance()
     }
-  }, [getSmsBalance, providerSms]);
+  }, [getSmsBalance, providerSms])
 
-  // Close mobile menu on window resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const handleCopyId = () => {
+    navigator.clipboard.writeText(companyId || 'FFETE')
+    setCopiedId(true)
+    toast.success('Company ID copied!', { duration: 2000 })
+    setTimeout(() => setCopiedId(false), 2000)
+  }
+
+  const closeAllMenus = () => {
+    setShowMenu1(false); setShowMenu2(false); setShowMenu3(false);
+    setShowMenu4(false); setShowMenu5(false); setShowMenu6(false);
+    setShowMenu7(false); setShowMenu8(false); setShowMenu9(false);
+    setShowMenu10(false); setShowMenu11(false); setShowMenu12(false);
+  }
 
   return (
-    <>
-     <div className="w-full p-4 sm:p-10 h-auto sm:h-20 dark:text-white text-black cursor-pointer">
+    <div 
+      className="w-full px-4 sm:px-10 py-4 sm:py-5 font-sans"
+      onClick={closeAllMenus}
+    >
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        
+        {/* Left Section: Toggle & Company ID */}
         <div className="flex items-center gap-4 w-full sm:w-auto">
-          <div style={{ cursor: 'pointer' }} onClick={() => setSeeSideBar(!seeSidebar)} className="transition-all duration-500">
-            {seeSidebar ? <FaArrowRightLong className="w-7 h-7" /> : <ArrowBackSharpIcon />}
-          </div>
-          <div className="flex items-center justify-between bg-white rounded-lg px-4 py-4 border border-gray-300 shadow-sm w-full sm:w-auto">
-            <div className="flex items-center gap-3">
-              <FaIdCard className="text-green-600 h-6 w-6" />
+          {/* Sidebar Toggle */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              setSeeSideBar(!seeSidebar)
+            }}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300"
+            aria-label="Toggle sidebar"
+          >
+            {seeSidebar ? (
+              <ArrowRight size={24} />
+            ) : (
+              <ArrowLeft size={24} />
+            )}
+          </button>
+
+          {/* Company ID Card */}
+          <div className="flex items-center gap-3 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-750 rounded-lg px-4 py-3 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow w-full sm:w-auto">
+            <div className="flex items-center gap-3 flex-1">
+              <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                <span className="text-lg">🆔</span>
+              </div>
               <div>
-                <p className="text-sm text-black">Company ID</p>
-                <p className="font-mono text-gray-900">{companyId || 'FFETE'}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Company ID</p>
+                <p className="font-mono font-semibold text-gray-900 dark:text-white text-sm">{companyId || 'FFETE'}</p>
               </div>
             </div>
             <button
-              onClick={() => navigator.clipboard.writeText(companyId || 'FFETE')}
-              className="text-black hover:text-green-500 transition-colors"
+              onClick={handleCopyId}
+              className={`p-2 rounded-lg transition-all duration-300 ${
+                copiedId 
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' 
+                  : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+              title="Copy Company ID"
             >
-              <FaCopy className="text-green-600 w-6 h-6" />
+              <Copy size={18} />
             </button>
           </div>
         </div>
 
+        {/* Right Section: SMS, Theme, Profile */}
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-          <div className="flex flex-row gap-x-3 items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow w-full sm:w-auto">
+          
+          {/* SMS Status */}
+          <div className="w-full sm:w-auto">
             {providerSms ? (
-              <>
-                <div className="p-2 bg-green-100 dark:bg-blue-900 rounded-full">
-                  <LuBotMessageSquare className="text-green-600 dark:text-blue-300 w-6 h-6" />
+              <div className="flex items-center gap-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg px-4 py-3 border border-green-200 dark:border-green-800/50 shadow-sm">
+                <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
+                  <MessageSquare size={18} className="text-green-600 dark:text-green-400" />
                 </div>
-                <div className="flex-1" id="sms-balance">
-                  <p className="text-lg font-medium text-gray-800 dark:text-gray-200">
-                    SMS Provider: <span className="text-green-600 dark:text-blue-300 font-semibold">{providerSms}</span>
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    SMS
-                    <span className="text-gray-600 dark:text-gray-300">
-                      Balance: <span className="font-bold text-green-600 dark:text-blue-300">{smsBalance}</span>
-                    </span>
-                  </div>
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-gray-600 dark:text-gray-300">SMS Provider</p>
+                  <p className="text-sm font-semibold text-green-600 dark:text-green-400">{providerSms}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Balance: <span className="font-bold text-green-600 dark:text-green-400">{smsBalance}</span></p>
                 </div>
-              </>
+              </div>
             ) : (
-              <>
-                <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-full">
-                  <FiAlertTriangle className="text-red-500 dark:text-red-400 w-6 h-6" />
-                </div>
-                <div id="sms-balance" className="flex-1">
-                  <p className="text-lg font-medium text-gray-800 dark:text-gray-200">
-                    SMS Provider <span className="text-red-500 dark:text-red-400">Not Configured</span>
+              <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg px-4 py-3 border border-amber-200 dark:border-amber-800/50 shadow-sm w-full sm:w-auto">
+                <AlertCircle size={18} className="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-1">SMS not configured</p>
+                  <p className="text-xs text-gray-700 dark:text-gray-300 mb-2 leading-relaxed">
+                    Connect your SMS provider to send messages.
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    <FiInfo className="inline mr-1" />
-                    Please configure SMS settings in admin panel
-                  </p>
+                  <Link 
+                    to="/admin/settings"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-100/50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-md px-2.5 py-1 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
+                  >
+                    ⚙️ SMS Settings
+                  </Link>
                 </div>
-              </>
+              </div>
             )}
           </div>
 
-          <div className="flex items-center gap-4">
-            <div onClick={() => setPreferDarkMode(!preferDarkMode)} id="dark-light">
-              <div onClick={handleThemeSwitch}>
-                <ion-icon
-                  onClick={() => setIcon(!icon)}
-                  name={icon ? 'moon-outline' : 'sunny'}
-                  size="large"
-                ></ion-icon>
-              </div>
-            </div>
-            <div id="profile" className="profile">
+          {/* Theme Toggle & Profile */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Theme Toggle */}
+            <button
+              onClick={handleThemeSwitch}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300"
+              aria-label="Toggle theme"
+            >
+              {preferDarkMode ? (
+                <Sun size={20} />
+              ) : (
+                <Moon size={20} />
+              )}
+            </button>
+
+            {/* Profile Menu */}
+            <div id="profile">
               <Profile />
             </div>
           </div>
         </div>
       </div>
     </div>
-    </>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header

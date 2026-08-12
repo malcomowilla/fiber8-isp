@@ -11,7 +11,8 @@ import {
   Wifi, Zap, Shield, Users, BarChart3, Globe,
   ArrowRight, Star, ChevronDown, ChevronUp, Menu, X,
   Percent, DollarSign, CheckCircle, XCircle, Phone,
-  MessageSquare, Sparkles, TrendingUp, Server
+  MessageSquare, Sparkles, TrendingUp, Server,
+  Router, Bell, ShieldCheck, MapPin, Sun, Moon
 } from 'lucide-react';
 
 // ── Styles ─────────────────────────────────────────────────────────────────────
@@ -20,6 +21,64 @@ const Styles = () => (
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
     .landing-root { font-family: 'Plus Jakarta Sans', sans-serif; }
     .mono { font-family: 'Space Mono', monospace; }
+
+    /* ── Theme tokens ─────────────────────────────────────────────────── */
+    .landing-root {
+      --bg-page: #020617;
+      --bg-page-alt: #0a1220;
+      --bg-hero-1: #020617;
+      --bg-hero-2: #0a1628;
+      --bg-hero-3: #0f1f3d;
+      --bg-nav: rgba(2,6,23,.85);
+      --bg-card: rgba(15,23,42,.7);
+      --bg-card-strong: rgba(15,23,42,.8);
+      --bg-soft: rgba(15,23,42,.6);
+      --border-subtle: rgba(148,163,184,.1);
+      --border-subtle-2: rgba(148,163,184,.08);
+      --border-subtle-3: rgba(148,163,184,.07);
+      --text-primary: #ffffff;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --text-faint: #475569;
+      --text-dim: #334155;
+      --dot-color: rgba(148,163,184,.06);
+      --shadow-color: rgba(0,0,0,.4);
+      transition: background-color .3s ease, color .3s ease;
+    }
+    .landing-root[data-theme='light'] {
+      --bg-page: #f8fafc;
+      --bg-page-alt: #eef2f7;
+      --bg-hero-1: #eef2ff;
+      --bg-hero-2: #e0e7ff;
+      --bg-hero-3: #dbeafe;
+      --bg-nav: rgba(255,255,255,.85);
+      --bg-card: rgba(255,255,255,.75);
+      --bg-card-strong: rgba(255,255,255,.9);
+      --bg-soft: rgba(255,255,255,.7);
+      --border-subtle: rgba(15,23,42,.08);
+      --border-subtle-2: rgba(15,23,42,.06);
+      --border-subtle-3: rgba(15,23,42,.06);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --text-faint: #94a3b8;
+      --text-dim: #cbd5e1;
+      --dot-color: rgba(15,23,42,.05);
+      --shadow-color: rgba(15,23,42,.12);
+    }
+    .text-theme-primary   { color: var(--text-primary); }
+    .text-theme-secondary { color: var(--text-secondary); }
+    .text-theme-muted     { color: var(--text-muted); }
+    .text-theme-faint     { color: var(--text-faint); }
+    .text-theme-dim       { color: var(--text-dim); }
+    .theme-toggle-btn {
+      background: var(--bg-soft);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      transition: transform .15s, background-color .3s, border-color .3s;
+    }
+    .theme-toggle-btn:hover { transform: translateY(-1px); }
+    .nav-link:hover { color: var(--text-primary) !important; }
 
     @keyframes gradientShift {
       0%,100% { background-position: 0% 50%; }
@@ -53,7 +112,7 @@ const Styles = () => (
     }
 
     .gradient-hero {
-      background: linear-gradient(135deg, #020617 0%, #0a1628 40%, #0f1f3d 70%, #020617 100%);
+      background: linear-gradient(135deg, var(--bg-hero-1) 0%, var(--bg-hero-2) 40%, var(--bg-hero-3) 70%, var(--bg-hero-1) 100%);
     }
     .gradient-text {
       background: linear-gradient(135deg, #22d3ee, #6366f1, #8b5cf6, #22d3ee);
@@ -72,23 +131,23 @@ const Styles = () => (
       background-clip: text;
     }
     .card-glass {
-      background: rgba(15,23,42,.7);
+      background: var(--bg-card);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(148,163,184,.1);
-      transition: transform .22s ease, box-shadow .22s ease, border-color .25s;
+      border: 1px solid var(--border-subtle);
+      transition: transform .22s ease, box-shadow .22s ease, border-color .25s, background-color .3s;
     }
     .card-glass:hover {
       transform: translateY(-4px);
-      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+      box-shadow: 0 20px 60px var(--shadow-color);
     }
     .pricing-card {
-      background: rgba(15,23,42,.8);
+      background: var(--bg-card-strong);
       backdrop-filter: blur(24px);
-      border: 1px solid rgba(148,163,184,.1);
-      transition: transform .25s ease, box-shadow .25s ease, border-color .25s;
+      border: 1px solid var(--border-subtle);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s, background-color .3s;
     }
-    .pricing-card:hover { transform: translateY(-6px); box-shadow: 0 24px 64px rgba(0,0,0,.45); }
+    .pricing-card:hover { transform: translateY(-6px); box-shadow: 0 24px 64px var(--shadow-color); }
     .pricing-featured {
       border-color: rgba(99,102,241,.5) !important;
       box-shadow: 0 0 40px rgba(99,102,241,.15) !important;
@@ -120,22 +179,23 @@ const Styles = () => (
       animation: pulse-ring 2s ease-out infinite;
     }
     .dot-grid {
-      background-image: radial-gradient(rgba(148,163,184,.06) 1px, transparent 1px);
+      background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
       background-size: 28px 28px;
     }
     .nav-glass {
-      background: rgba(2,6,23,.85);
+      background: var(--bg-nav);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(148,163,184,.08);
+      border-bottom: 1px solid var(--border-subtle-2);
+      transition: background-color .3s, border-color .3s;
     }
     .feature-icon {
       background: linear-gradient(135deg, rgba(99,102,241,.15), rgba(139,92,246,.1));
       border: 1px solid rgba(99,102,241,.2);
     }
     .integration-item {
-      background: rgba(15,23,42,.6);
-      border: 1px solid rgba(148,163,184,.08);
+      background: var(--bg-soft);
+      border: 1px solid var(--border-subtle-2);
       transition: border-color .2s, transform .2s;
     }
     .integration-item:hover { border-color: rgba(99,102,241,.3); transform: translateY(-2px); }
@@ -157,6 +217,29 @@ const FEATURES = [
   { icon: FaUsersCog,  accent: '#fb923c', title: 'User Management',       desc: 'Full control over roles, permissions, PPPoE profiles and customer settings.' },
   { icon: IoKeyOutline, accent: '#f87171', title: 'Multi-Layer Security', desc: 'Enterprise-grade auth: 2FA via SMS/email, passkeys, granular RBAC and audit trails.' },
   { icon: BarChart3,  accent: '#34d399', title: 'Advanced Analytics',     desc: 'Real-time revenue dashboards, bandwidth monitoring and customer behaviour insights.' },
+];
+
+const PLATFORM_FEATURES = [
+  { icon: Router,      accent: '#38bdf8', title: 'Advanced MikroTik Integration',
+    desc: 'Seamlessly connect and manage your entire MikroTik infrastructure. Real-time monitoring, remote configuration, bandwidth management, and automatic synchronization with RouterOS v6 and v7.',
+    tags: ['CCR', 'RB4011', 'CRS', 'LtAP', 'RB5009', 'hEX'] },
+  { icon: DollarSign,  accent: '#10b981', title: 'Intelligent Billing Engine',
+    desc: 'Automated invoice generation, payment processing, and customer activation. Supports multiple payment gateways and currencies.',
+    tags: ['Multiple Payment Gateways Supported'] },
+  { icon: Wifi,        accent: '#a78bfa', title: 'PPPoE Session Control',
+    desc: 'Complete subscriber session management with IP pool allocation, bandwidth profiles, and automatic service suspension for overdue accounts.' },
+  { icon: Zap,         accent: '#fbbf24', title: 'Hotspot Management',
+    desc: 'Bulk voucher generation, customizable captive portals, session tracking, bandwidth throttling, and usage analytics.' },
+  { icon: ShieldCheck, accent: '#f87171', title: 'Radius Authentication',
+    desc: 'Enterprise-grade authentication server with CoA support, accounting, and seamless integration with your network infrastructure.' },
+  { icon: Users,       accent: '#f97316', title: 'Customer Self-Service',
+    desc: 'White-label customer portal for account management, bill payments, usage monitoring, and support ticket submission.' },
+  { icon: Bell,        accent: '#34d399', title: 'Smart Notifications',
+    desc: 'Automated SMS and email alerts for billing reminders, service updates, and promotional campaigns.' },
+  { icon: MapPin,      accent: '#38bdf8', title: 'Static IP Management',
+    desc: 'Allocate and manage static IP addresses for business customers with automatic DNS integration and IP tracking.' },
+  { icon: BarChart3,   accent: '#818cf8', title: 'Comprehensive Analytics & Reporting',
+    desc: 'Real-time dashboards for MRR, customer churn, collection rates, and growth metrics. Generate detailed financial reports, subscriber analytics, and performance insights.' },
 ];
 
 const INTEGRATIONS = [
@@ -231,6 +314,7 @@ function SectionLabel({ text }) {
 function WaBtn({ text = 'Chat on WhatsApp', large }) {
   return (
     <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: .97 }}
+      data-cta="true"
       onClick={() => window.open('https://wa.me/254791568852?text=Hello%2C%20I%20am%20interested%20in%20Aitechs%20ISP%20platform.', '_blank')}
       className={`whatsapp-btn inline-flex items-center gap-2 font-bold text-white rounded-2xl transition-all ${large ? 'px-8 py-4 text-base' : 'px-5 py-2.5 text-sm'}`}
     >
@@ -251,6 +335,25 @@ const Signup = () => {
   const [currentText, setCurrentText] = useState('Hotspot');
   const [scrolled, setScrolled]     = useState(false);
   const [activeFaq, setActiveFaq]   = useState(null);
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === 'undefined') return 'dark';
+    return window.localStorage.getItem('aitechs-theme') || 'dark';
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem('aitechs-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(t => (t === 'dark' ? 'light' : 'dark'));
+
+  // ── Lingering-visitor lead capture ────────────────────────────────────
+  const [showLinger, setShowLinger] = useState(false);
+  const [lingerSubmitted, setLingerSubmitted] = useState(false);
+  const [lingerSubmitting, setLingerSubmitting] = useState(false);
+  const [lingerName, setLingerName] = useState('');
+  const [lingerPhone, setLingerPhone] = useState('');
+  const engagedRef = useRef(false);
+  const scrolledEnoughRef = useRef(false);
 
   const texts = ['Hotspot', 'PPPoE'];
 
@@ -260,10 +363,73 @@ const Signup = () => {
   }, []);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 20);
+      if (window.scrollY > 400) scrolledEnoughRef.current = true;
+    };
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // Mark the visitor "engaged" the moment they click a primary CTA
+  // (WhatsApp buttons, Contact Us, Call Us) so the linger prompt never
+  // fires for someone who's already acted.
+  useEffect(() => {
+    const handleCtaClick = (e) => {
+      if (e.target.closest('[data-cta]')) engagedRef.current = true;
+    };
+    document.addEventListener('click', handleCtaClick);
+    return () => document.removeEventListener('click', handleCtaClick);
+  }, []);
+
+  // Soft "lingering visitor" capture — shown once per session to visitors
+  // who've scrolled into the content and spent a while without clicking a CTA.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (sessionStorage.getItem('aitechs-linger-dismissed')) return;
+    if (sessionStorage.getItem('aitechs-linger-submitted')) return;
+
+    const timer = setTimeout(() => {
+      if (engagedRef.current) return;
+      if (!scrolledEnoughRef.current) return;
+      if (document.visibilityState !== 'visible') return;
+      setShowLinger(true);
+    }, 48000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const dismissLinger = () => {
+    setShowLinger(false);
+    sessionStorage.setItem('aitechs-linger-dismissed', '1');
+  };
+
+  const submitLinger = async (e) => {
+    e.preventDefault();
+    if (!lingerName.trim() || !lingerPhone.trim()) return;
+    setLingerSubmitting(true);
+    try {
+      const response = await fetch('/api/company_leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: lingerName,
+          phone_number: lingerPhone,
+          source: 'website_linger',
+          status: 'new',
+        }),
+      });
+      if (response.ok) {
+        setLingerSubmitted(true);
+        sessionStorage.setItem('aitechs-linger-submitted', '1');
+        setTimeout(() => setShowLinger(false), 3500);
+      }
+    } catch (err) {
+      // non-critical widget — fail silently
+    } finally {
+      setLingerSubmitting(false);
+    }
+  };
 
   const scrollTo    = () => scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   const scrollToTop = () => scrollRefTop.current?.scrollIntoView({ behavior: 'smooth' });
@@ -275,20 +441,21 @@ const Signup = () => {
     { label: 'Contact',  href: '#contact' },
   ];
 
-  const calcPPPoECost = (subs) => subs ? `KES ${(subs * 25).toLocaleString()}` : 'Custom';
-  const calcPPPoENote = (subs) => subs ? `${subs} active clients × KES 25` : 'Negotiated pricing';
+  const calcPPPoECost = (subs) => subs ? `KES ${(subs * 10).toLocaleString()}` : 'Custom';
+  const calcPPPoENote = (subs) => subs ? `${subs} active clients × KES 10` : 'Negotiated pricing';
 
   return (
     <>
       <Styles />
-      <div className="landing-root bg-gray-950 text-white overflow-x-hidden" ref={scrollRefTop}>
+      <div className="landing-root overflow-x-hidden" data-theme={theme}
+        style={{ background: 'var(--bg-page)', color: 'var(--text-primary)' }} ref={scrollRefTop}>
 
         {/* ── Sticky nav ──────────────────────────────────────────────────── */}
         <nav className={`nav-glass fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'shadow-2xl' : ''}`}>
           <div className="max-w-7xl mx-auto px-5 py-3.5 flex items-center justify-between">
             <a href="/" className="flex items-center gap-2.5">
               <img src="/images/aitechs.png" className="h-8" alt="Aitechs" />
-              <span className="text-xl font-bold text-white">Aitechs</span>
+              <span className="text-xl font-bold text-theme-primary">Aitechs</span>
             </a>
 
             {/* Desktop links */}
@@ -296,7 +463,7 @@ const Signup = () => {
               {NAV_LINKS.map(l => (
                 <li key={l.label}>
                   <a href={l.href} onClick={l.onClick}
-                    className="text-sm font-medium text-slate-400 hover:text-white transition-colors cursor-pointer">
+                    className="nav-link text-sm font-medium text-theme-secondary transition-colors cursor-pointer">
                     {l.label}
                   </a>
                 </li>
@@ -304,18 +471,31 @@ const Signup = () => {
             </ul>
 
             <div className="hidden md:flex items-center gap-3">
+              <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: .95 }}
+                onClick={toggleTheme} aria-label="Toggle light/dark theme"
+                className="theme-toggle-btn w-10 h-10 rounded-xl flex items-center justify-center">
+                {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+              </motion.button>
               <WaBtn text="Get Demo" />
               <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: .97 }}
+                data-cta="true"
                 onClick={() => window.location.href = '/contact-us'}
                 className="btn-cta px-5 py-2.5 rounded-2xl text-sm font-bold text-white">
                 Contact Us →
               </motion.button>
             </div>
 
-            <button onClick={() => setMenuOpen(p => !p)} className="md:hidden p-2 rounded-lg"
-              style={{ background: 'rgba(148,163,184,.1)' }}>
-              {menuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
+            <div className="md:hidden flex items-center gap-2">
+              <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: .95 }}
+                onClick={toggleTheme} aria-label="Toggle light/dark theme"
+                className="theme-toggle-btn w-9 h-9 rounded-lg flex items-center justify-center">
+                {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+              </motion.button>
+              <button onClick={() => setMenuOpen(p => !p)} className="p-2 rounded-lg"
+                style={{ background: 'var(--bg-soft)' }}>
+                {menuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            </div>
           </div>
 
           {/* Mobile menu */}
@@ -323,11 +503,11 @@ const Signup = () => {
             {menuOpen && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }} transition={{ duration: .22 }}
-                className="md:hidden overflow-hidden border-t" style={{ borderColor: 'rgba(148,163,184,.08)' }}>
+                className="md:hidden overflow-hidden border-t" style={{ borderColor: 'var(--border-subtle-2)' }}>
                 <div className="px-5 py-4 space-y-3">
                   {NAV_LINKS.map(l => (
                     <a key={l.label} href={l.href} onClick={() => { setMenuOpen(false); l.onClick?.(); }}
-                      className="block text-sm font-medium text-slate-400 py-2">{l.label}</a>
+                      className="block text-sm font-medium text-theme-secondary py-2">{l.label}</a>
                   ))}
                   <WaBtn text="Get Demo" />
                 </div>
@@ -359,7 +539,7 @@ const Signup = () => {
 
             {/* Rotating text */}
             <div className="flex items-center justify-center gap-3 mb-4">
-              <span className="text-lg text-slate-400 font-medium">Powering your</span>
+              <span className="text-lg text-theme-secondary font-medium">Powering your</span>
               <AnimatePresence mode="wait">
                 <motion.span key={currentText}
                   initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}
@@ -369,17 +549,17 @@ const Signup = () => {
                   {currentText}
                 </motion.span>
               </AnimatePresence>
-              <span className="text-lg text-slate-400 font-medium">business</span>
+              <span className="text-lg text-theme-secondary font-medium">business</span>
             </div>
 
             <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .1, duration: .6 }}
               className="text-5xl md:text-7xl font-black mb-6 leading-tight">
-              <span className="text-white">Revolutionize Your</span><br />
+              <span className="text-theme-primary">Revolutionize Your</span><br />
               <span className="gradient-text">Internet Business</span>
             </motion.h1>
 
             <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .2, duration: .5 }}
-              className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+              className="text-lg md:text-xl text-theme-secondary mb-10 max-w-2xl mx-auto leading-relaxed">
               The all-in-one SaaS platform for Kenyan ISPs — hotspot management, PPPoE billing,
               M-Pesa automation, and real-time analytics. Built for scale.
             </motion.p>
@@ -389,18 +569,18 @@ const Signup = () => {
               <WaBtn text="Get Free Demo" large />
               <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: .97 }}
                 onClick={scrollTo}
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-bold text-white border transition-all"
-                style={{ border: '1px solid rgba(148,163,184,.2)', background: 'rgba(15,23,42,.6)' }}>
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-bold text-theme-primary border transition-all"
+                style={{ border: '1px solid var(--border-subtle)', background: 'var(--bg-soft)' }}>
                 View Pricing <ArrowRight size={18} />
               </motion.button>
             </motion.div>
 
             {/* Social proof */}
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: .6 }}
-              className="flex items-center justify-center gap-6 mt-12 text-sm text-slate-500">
+              className="flex items-center justify-center gap-6 mt-12 text-sm text-theme-muted">
               {[['50+', 'ISPs onboarded'], ['99.9%', 'Uptime'], ['24/7', 'Support']].map(([v, l]) => (
                 <div key={l} className="text-center">
-                  <p className="text-xl font-bold text-white mono">{v}</p>
+                  <p className="text-xl font-bold text-theme-primary mono">{v}</p>
                   <p className="text-xs">{l}</p>
                 </div>
               ))}
@@ -414,7 +594,7 @@ const Signup = () => {
               className="w-full rounded-t-2xl shadow-2xl opacity-60"
               style={{ maxHeight: 240, objectFit: 'cover', objectPosition: 'top' }} />
             <div className="absolute inset-x-0 bottom-0 h-24"
-              style={{ background: 'linear-gradient(to top,#020617,transparent)' }} />
+              style={{ background: 'linear-gradient(to top,var(--bg-page),transparent)' }} />
           </motion.div>
         </section>
 
@@ -422,7 +602,7 @@ const Signup = () => {
         {/* <div className="py-3 border-y overflow-hidden" style={{ background:'rgba(15,23,42,.6)', borderColor:'rgba(148,163,184,.08)' }}>
           <div className="ticker-inner flex whitespace-nowrap">
             {[0,1].map(k => (
-              <span key={k} className="mono text-xs text-slate-600 mr-20">
+              <span key={k} className="mono text-xs text-theme-faint mr-20">
                 ✅ No setup fees &nbsp;·&nbsp; ✅ Pay only for active users &nbsp;·&nbsp; ✅ Hotspot: 4% of revenue &nbsp;·&nbsp;
                 ✅ PPPoE: KES 25/active client/month &nbsp;·&nbsp; ✅ M-Pesa integration &nbsp;·&nbsp; ✅ White-label ready &nbsp;·&nbsp;
                 ✅ MikroTik compatible &nbsp;·&nbsp; ✅ Real-time analytics &nbsp;·&nbsp;
@@ -433,15 +613,15 @@ const Signup = () => {
 
         {/* ── Features ────────────────────────────────────────────────────── */}
         <section id="features" className="py-24 px-6"
-          style={{ background: 'linear-gradient(180deg,#020617 0%,#0a1220 100%)' }}>
+          style={{ background: 'linear-gradient(180deg,var(--bg-page) 0%,var(--bg-page-alt) 100%)' }}>
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <SectionLabel text="Why Choose Aitechs" />
               <motion.h2 initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
-                className="text-4xl md:text-5xl font-black text-white mb-4">
+                className="text-4xl md:text-5xl font-black text-theme-primary mb-4">
                 Everything you need to<br /><span className="gradient-text">run a modern ISP</span>
               </motion.h2>
-              <p className="text-slate-500 max-w-xl mx-auto">
+              <p className="text-theme-muted max-w-xl mx-auto">
                 One platform. Zero complexity. Built specifically for Kenyan internet service providers.
               </p>
             </div>
@@ -459,8 +639,55 @@ const Signup = () => {
                     <div className="w-11 h-11 rounded-xl feature-icon flex items-center justify-center mb-4">
                       <Icon size={20} style={{ color: f.accent }} />
                     </div>
-                    <h3 className="text-sm font-bold text-white mb-2">{f.title}</h3>
-                    <p className="text-xs text-slate-500 leading-relaxed">{f.desc}</p>
+                    <h3 className="text-sm font-bold text-theme-primary mb-2">{f.title}</h3>
+                    <p className="text-xs text-theme-muted leading-relaxed">{f.desc}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Platform Features ───────────────────────────────────────────── */}
+        <section className="py-24 px-6" style={{ background: 'var(--bg-page-alt)' }}>
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <SectionLabel text="Platform Features" />
+              <motion.h2 initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
+                className="text-4xl md:text-5xl font-black text-theme-primary mb-4">
+                Enterprise-Grade<br /><span className="gradient-text">ISP Management</span>
+              </motion.h2>
+              <p className="text-theme-muted max-w-2xl mx-auto">
+                A comprehensive suite of tools designed to automate operations, maximize revenue,
+                and deliver exceptional service to your subscribers.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {PLATFORM_FEATURES.map((f, i) => {
+                const Icon = f.icon;
+                return (
+                  <motion.div key={f.title}
+                    initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }}
+                    viewport={{ once:true }} transition={{ delay: i*0.05 }}
+                    className="card-glass rounded-2xl p-6 relative overflow-hidden">
+                    <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full pointer-events-none"
+                      style={{ background:`radial-gradient(circle,${f.accent}18,transparent)` }} />
+                    <div className="w-11 h-11 rounded-xl feature-icon flex items-center justify-center mb-4">
+                      <Icon size={20} style={{ color: f.accent }} />
+                    </div>
+                    <h3 className="text-sm font-bold text-theme-primary mb-2">{f.title}</h3>
+                    <p className="text-xs text-theme-muted leading-relaxed mb-3">{f.desc}</p>
+                    {f.tags && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {f.tags.map(tag => (
+                          <span key={tag} className="text-[10px] font-semibold px-2 py-1 rounded-md"
+                            style={{ background:`${f.accent}15`, color: f.accent, border:`1px solid ${f.accent}25` }}>
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </motion.div>
                 );
               })}
@@ -472,167 +699,22 @@ const Signup = () => {
 
 
 
-{/* ── Access Point Monitoring ─────────────────────────────────────────── */}
-<section className="py-24 px-6" style={{ background: '#020617' }}>
-  <div className="max-w-5xl mx-auto">
-    <div className="text-center mb-16">
-      <SectionLabel text="Access Point Monitoring" />
-      <motion.h2 initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
-        className="text-4xl md:text-5xl font-black text-white mb-4">
-        Know instantly when an AP<br />
-        <span className="gradient-text">goes offline — or gets stolen</span>
-      </motion.h2>
-      <p className="text-slate-500 max-w-xl mx-auto">
-        Access points installed in the field are a common theft target. Aitechs constantly
-        pings every device and sends an SMS alert the moment one disappears — so you can act fast.
-      </p>
-    </div>
-
-    {/* Feature cards */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-14">
-      {AP_MONITOR_FEATURES.map((f, i) => {
-        const Icon = f.icon;
-        return (
-          <motion.div key={f.title}
-            initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }}
-            viewport={{ once:true }} transition={{ delay: i*0.07 }}
-            className="card-glass rounded-2xl p-5 relative overflow-hidden">
-            <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full pointer-events-none"
-              style={{ background:`radial-gradient(circle,${f.accent}18,transparent)` }} />
-            <div className="w-11 h-11 rounded-xl feature-icon flex items-center justify-center mb-4"
-              style={{ background:`${f.accent}18`, border:`1px solid ${f.accent}28` }}>
-              <Icon size={20} style={{ color: f.accent }} />
-            </div>
-            <h3 className="text-sm font-bold text-white mb-2">{f.title}</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">{f.desc}</p>
-          </motion.div>
-        );
-      })}
-    </div>
-
-    {/* Live monitor mockup + SMS alert mockup side by side */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-
-      {/* Device dashboard */}
-      <motion.div initial={{ opacity:0, x:-16 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }}
-        className="card-glass rounded-2xl p-6"
-        style={{ border:'1px solid rgba(56,189,248,.2)' }}>
-        <div className="flex items-center justify-between mb-5">
-          <p className="text-sm font-bold text-white">Access point monitor</p>
-          <span className="text-xs px-2.5 py-1 rounded-full font-semibold"
-            style={{ background:'rgba(52,211,153,.12)', color:'#34d399' }}>
-            Live
-          </span>
-        </div>
-        {[
-          { name: 'AP-001 · Westlands Rd',     status: 'online',   ping: '12ms',  uptime: '99.9%', accent: '#34d399' },
-          { name: 'AP-002 · Garden Estate',    status: 'online',   ping: '18ms',  uptime: '99.7%', accent: '#34d399' },
-          { name: 'AP-003 · Kasarani Stage',   status: 'offline',  ping: '—',     uptime: '61.2%', accent: '#f87171' },
-          { name: 'AP-004 · Ruiru Town',       status: 'online',   ping: '9ms',   uptime: '100%',  accent: '#34d399' },
-          { name: 'AP-005 · Pipeline Estate',  status: 'degraded', ping: '340ms', uptime: '88.4%', accent: '#fbbf24' },
-        ].map(ap => (
-          <div key={ap.name} className="flex items-center justify-between py-2.5"
-            style={{ borderTop:'1px solid rgba(148,163,184,.07)' }}>
-            <div className="flex items-center gap-2.5">
-              <span className="w-2 h-2 rounded-full shrink-0" style={{ background: ap.accent }} />
-              <span className="text-xs text-slate-300">{ap.name}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-mono" style={{ color: ap.accent === '#34d399' ? '#475569' : ap.accent }}>{ap.ping}</span>
-              <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                style={{ background:`${ap.accent}18`, color: ap.accent }}>
-                {ap.status}
-              </span>
-            </div>
-          </div>
-        ))}
-      </motion.div>
-
-      {/* SMS alert mockup */}
-      <motion.div initial={{ opacity:0, x:16 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }}
-        className="card-glass rounded-2xl p-6 flex flex-col"
-        style={{ border:'1px solid rgba(248,113,113,.2)' }}>
-        <div className="flex items-center justify-between mb-5">
-          <p className="text-sm font-bold text-white">SMS alert — sent to admin</p>
-          <span className="text-xs px-2.5 py-1 rounded-full font-semibold"
-            style={{ background:'rgba(248,113,113,.12)', color:'#f87171' }}>
-            Theft risk
-          </span>
-        </div>
-
-        {/* Phone mockup */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="w-64 rounded-3xl p-4"
-            style={{ background:'rgba(15,23,42,.9)', border:'1px solid rgba(148,163,184,.15)' }}>
-            {/* Status bar */}
-            <div className="flex items-center justify-between mb-3 px-1">
-              <span className="text-xs text-slate-500 mono">9:41 AM</span>
-              <div className="flex gap-1">
-                <span style={{ width:14, height:8, background:'#334155', borderRadius:2, display:'inline-block' }} />
-                <span style={{ width:14, height:8, background:'#334155', borderRadius:2, display:'inline-block' }} />
-              </div>
-            </div>
-            {/* SMS bubble */}
-            <div className="rounded-2xl p-4 mb-3"
-              style={{ background:'rgba(248,113,113,.08)', border:'1px solid rgba(248,113,113,.2)' }}>
-              <p className="text-xs font-bold mb-1" style={{ color:'#f87171' }}>Aitechs Alert</p>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                ⚠️ ACCESS POINT OFFLINE<br /><br />
-                Device: <span className="text-white font-semibold">AP-003 Kasarani Stage</span><br />
-                Last seen: <span className="text-white">Today, 09:38 AM</span><br />
-                Status: <span style={{ color:'#f87171' }}>Unreachable (ping failed)</span><br /><br />
-                This may indicate theft or tampering. Please investigate immediately.
-              </p>
-              <p className="text-xs text-slate-600 mt-2 text-right">09:41 AM · Delivered</p>
-            </div>
-            <div className="rounded-2xl p-3"
-              style={{ background:'rgba(251,191,36,.06)', border:'1px solid rgba(251,191,36,.15)' }}>
-              <p className="text-xs font-bold mb-1" style={{ color:'#fbbf24' }}>Aitechs Alert</p>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                ⚡ AP-005 Pipeline Estate response time degraded (340ms). Monitor closely.
-              </p>
-              <p className="text-xs text-slate-600 mt-1.5 text-right">08:12 AM · Delivered</p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-
-    {/* Bottom stats */}
-    <motion.div initial={{ opacity:0, y:12 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
-      className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-      {[
-        { value:'30s',    label:'Ping interval',       note:'Every device checked every 30 seconds', accent:'#38bdf8' },
-        { value:'< 1min', label:'Alert delivery time', note:'SMS reaches admin in under 60 seconds',  accent:'#f87171' },
-        { value:'100%',   label:'Device coverage',     note:'Every AP on your network is monitored',  accent:'#34d399' },
-      ].map(s => (
-        <div key={s.label} className="card-glass rounded-2xl p-5 text-center relative overflow-hidden">
-          <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full pointer-events-none"
-            style={{ background:`radial-gradient(circle,${s.accent}15,transparent)` }} />
-          <p className="text-3xl font-black mono mb-1" style={{ color: s.accent }}>{s.value}</p>
-          <p className="text-sm font-bold text-white mb-1">{s.label}</p>
-          <p className="text-xs text-slate-500">{s.note}</p>
-        </div>
-      ))}
-    </motion.div>
-  </div>
-</section>
 
 
 
 
 
 {/* ── Partner / Reseller ──────────────────────────────────────────────── */}
-<section className="py-24 px-6" style={{ background: '#0a1220' }}>
+<section className="py-24 px-6" style={{ background: 'var(--bg-page-alt)' }}>
   <div className="max-w-5xl mx-auto">
     <div className="text-center mb-16">
       <SectionLabel text="Partner & Reseller Program" />
       <motion.h2 initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
-        className="text-4xl md:text-5xl font-black text-white mb-4">
+        className="text-4xl md:text-5xl font-black text-theme-primary mb-4">
         Earn by reselling Aitechs<br />
         <span className="gradient-green">hotspot to your tenants</span>
       </motion.h2>
-      <p className="text-slate-500 max-w-xl mx-auto">
+      <p className="text-theme-muted max-w-xl mx-auto">
         Are you a landlord, estate manager, or agent? Deploy hotspot equipment,
         sell internet to your customers — and earn a commission on every sale, automatically.
       </p>
@@ -646,8 +728,8 @@ const Signup = () => {
           viewport={{ once:true }} transition={{ delay: i*0.08 }}
           className="card-glass rounded-2xl p-5 relative overflow-hidden">
           <div className="text-4xl font-black mono mb-3" style={{ color:`${s.accent}30` }}>{s.num}</div>
-          <h3 className="text-sm font-bold text-white mb-2">{s.title}</h3>
-          <p className="text-xs text-slate-500 leading-relaxed">{s.desc}</p>
+          <h3 className="text-sm font-bold text-theme-primary mb-2">{s.title}</h3>
+          <p className="text-xs text-theme-muted leading-relaxed">{s.desc}</p>
         </motion.div>
       ))}
     </div>
@@ -658,11 +740,11 @@ const Signup = () => {
       style={{ border:'1px solid rgba(16,185,129,.2)', background:'rgba(16,185,129,.04)' }}>
       <div className="flex items-center gap-3 mb-2">
         <TrendingUp size={18} style={{ color:'#34d399' }} />
-        <h3 className="text-sm font-bold text-white">Example earnings — 20% commission rate</h3>
+        <h3 className="text-sm font-bold text-theme-primary">Example earnings — 20% commission rate</h3>
         <span className="ml-auto text-xs px-2.5 py-1 rounded-full font-semibold"
           style={{ background:'rgba(52,211,153,.12)', color:'#34d399' }}>Monthly</span>
       </div>
-      <p className="text-xs text-slate-500 mb-5">Your tenants generate KES 30,000 in hotspot sales this month</p>
+      <p className="text-xs text-theme-muted mb-5">Your tenants generate KES 30,000 in hotspot sales this month</p>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { label:'Total sales revenue', value:'KES 30,000', note:'From your customers',  accent:'#38bdf8' },
@@ -673,8 +755,8 @@ const Signup = () => {
           <div key={r.label} className="rounded-xl p-4 text-center"
             style={{ background:`${r.accent}0a`, border:`1px solid ${r.accent}20` }}>
             <p className="text-xl font-bold mono" style={{ color: r.accent }}>{r.value}</p>
-            <p className="text-xs font-semibold text-white mt-1">{r.label}</p>
-            <p className="text-xs text-slate-500 mt-0.5">{r.note}</p>
+            <p className="text-xs font-semibold text-theme-primary mt-1">{r.label}</p>
+            <p className="text-xs text-theme-muted mt-0.5">{r.note}</p>
           </div>
         ))}
       </div>
@@ -703,8 +785,8 @@ const Signup = () => {
       style={{ border:'1px solid rgba(99,102,241,.2)' }}>
       <div className="flex items-center justify-between mb-5">
         <div>
-          <p className="text-sm font-bold text-white">Reseller portal</p>
-          <p className="text-xs text-slate-500 mt-0.5">Your personal dashboard to track earnings & sales</p>
+          <p className="text-sm font-bold text-theme-primary">Reseller portal</p>
+          <p className="text-xs text-theme-muted mt-0.5">Your personal dashboard to track earnings & sales</p>
         </div>
         <span className="text-xs px-2.5 py-1 rounded-full font-semibold"
           style={{ background:'rgba(52,211,153,.12)', color:'#34d399' }}>Live</span>
@@ -719,19 +801,19 @@ const Signup = () => {
           <div key={s.label} className="rounded-xl p-3 text-center"
             style={{ background:'rgba(99,102,241,.08)', border:'1px solid rgba(99,102,241,.15)' }}>
             <p className="text-lg font-bold mono" style={{ color: s.accent }}>{s.value}</p>
-            <p className="text-xs text-slate-500 mt-1">{s.label}</p>
+            <p className="text-xs text-theme-muted mt-1">{s.label}</p>
           </div>
         ))}
       </div>
-      <p className="text-xs font-semibold text-slate-400 mb-2">Payout history</p>
+      <p className="text-xs font-semibold text-theme-secondary mb-2">Payout history</p>
       {[
         { month:'April 2025', amount:'KES 5,400', paid: true },
         { month:'March 2025', amount:'KES 4,900', paid: true },
         { month:'May 2025',   amount:'KES 6,200', paid: false },
       ].map(p => (
         <div key={p.month} className="flex items-center justify-between py-2.5"
-          style={{ borderTop:'1px solid rgba(148,163,184,.07)' }}>
-          <span className="text-xs text-slate-400">{p.month}</span>
+          style={{ borderTop:'1px solid var(--border-subtle-3)' }}>
+          <span className="text-xs text-theme-secondary">{p.month}</span>
           <span className="text-xs font-bold mono" style={{ color:'#34d399' }}>+ {p.amount}</span>
           <span className="text-xs px-2.5 py-1 rounded-full font-semibold"
             style={p.paid
@@ -744,7 +826,7 @@ const Signup = () => {
     </motion.div>
 
     <div className="text-center">
-      <p className="text-slate-500 text-sm mb-4">
+      <p className="text-theme-muted text-sm mb-4">
         Interested in becoming a reseller? Contact us to get set up.
       </p>
       <WaBtn text="Become a Reseller" large />
@@ -756,46 +838,20 @@ const Signup = () => {
 
 
 
-        {/* ── Integrations ────────────────────────────────────────────────── */}
-        <section className="py-20 px-6" style={{ background:'#0a1220' }}>
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <SectionLabel text="Integrations" />
-              <h2 className="text-3xl font-black text-white">Works with what you already use</h2>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {INTEGRATIONS.map((item, i) => (
-                <motion.div key={item.label}
-                  initial={{ opacity:0, scale:.95 }} whileInView={{ opacity:1, scale:1 }}
-                  viewport={{ once:true }} transition={{ delay: i*0.07 }}
-                  className="integration-item rounded-2xl p-5 flex items-center gap-4 cursor-pointer">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
-                    style={{ background:'rgba(99,102,241,.1)', border:'1px solid rgba(99,102,241,.2)' }}>
-                    {item.emoji}
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-white">{item.label}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{item.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── PRICING: HOTSPOT ────────────────────────────────────────────── */}
-        <section ref={scrollRef} className="py-24 px-6" style={{ background:'#020617' }}>
+   
+     {/* ── PRICING: HOTSPOT ────────────────────────────────────────────── */}
+        <section ref={scrollRef} className="py-24 px-6" style={{ background:'var(--bg-page)' }}>
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-16">
               <SectionLabel text="Hotspot Pricing" />
               <motion.h2 initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
-                className="text-4xl md:text-5xl font-black text-white mb-4">
-                Hotspot — <span className="gradient-green">Pay as you earn</span>
+                className="text-4xl md:text-5xl font-black text-theme-primary mb-4">
+                Hotspot — <span className="gradient-green">Pay fixed price</span>
               </motion.h2>
-              <p className="text-slate-400 max-w-xl mx-auto text-lg">
-                We charge <strong className="text-white">4% of your hotspot M-Pesa revenue</strong>.
-                Zero upfront cost. You only pay when you earn.
-              </p>
+<p className="text-theme-secondary max-w-xl mx-auto text-lg">
+  <strong className="text-theme-primary">KES 1,000/month per router</strong> — unlimited users,
+  unlimited packages. No hidden fees.
+</p>
             </div>
 
             {/* How it works */}
@@ -803,7 +859,8 @@ const Signup = () => {
               {[
                 { step:'01', title:'Customer pays', desc:'Your customer pays via M-Pesa for hotspot access', icon: Percent, accent:'#10b981' },
                 { step:'02', title:'They connect',  desc:'WiFi is activated instantly — seamless experience', icon: Wifi, accent:'#38bdf8' },
-                { step:'03', title:'We bill 4%',    desc:'We collect 4% of that payment automatically at month end', icon: DollarSign, accent:'#a78bfa' },
+                { step:'03', title:'Pay KES 1,000/router/mo', desc:'One flat monthly fee per Mikrotik router — unlimited users on that router, no percentage taken.', icon: DollarSign, accent:'#a78bfa' },
+
               ].map((s, i) => {
                 const Icon = s.icon;
                 return (
@@ -813,13 +870,12 @@ const Signup = () => {
                     className="card-glass rounded-2xl p-6 text-center relative overflow-hidden">
                     <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full pointer-events-none"
                       style={{ background:`radial-gradient(circle,${s.accent}20,transparent)` }} />
-                    <div className="text-4xl font-black mono mb-4" style={{ color:`${s.accent}40` }}>{s.step}</div>
                     <div className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center"
                       style={{ background:`${s.accent}18`, border:`1px solid ${s.accent}28` }}>
                       <Icon size={22} style={{ color: s.accent }} />
                     </div>
-                    <h3 className="text-sm font-bold text-white mb-2">{s.title}</h3>
-                    <p className="text-xs text-slate-500">{s.desc}</p>
+                    <h3 className="text-sm font-bold text-theme-primary mb-2">{s.title}</h3>
+                    <p className="text-xs text-theme-muted">{s.desc}</p>
                   </motion.div>
                 );
               })}
@@ -831,21 +887,21 @@ const Signup = () => {
               style={{ border:'1px solid rgba(16,185,129,.2)', background:'rgba(16,185,129,.04)' }}>
               <div className="flex items-center gap-3 mb-6">
                 <BarChart3 size={20} style={{ color:'#34d399' }} />
-                <h3 className="text-sm font-bold text-white">Example Revenue Breakdown</h3>
+                <h3 className="text-sm font-bold text-theme-primary">Example Revenue Breakdown</h3>
                 <span className="ml-auto text-xs px-2.5 py-1 rounded-full font-semibold"
                   style={{ background:'rgba(52,211,153,.12)', color:'#34d399' }}>Monthly</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {[
-                  { label:'Your hotspot revenue', value:'KES 50,000', note:'e.g. 1,000 sales × KES 50', accent:'#38bdf8' },
-                  { label:'Our platform fee (4%)', value:'KES 2,000', note:'4% × KES 50,000', accent:'#a78bfa' },
-                  { label:'You keep',             value:'KES 48,000', note:'96% stays with you', accent:'#34d399' },
+                    { label:'Flat fee per router',  value:'KES 1,000',    note:'Add more routers anytime, same flat rate',   accent:'#38bdf8' },
+  { label:'Active users',      value:'Unlimited',  note:'No per-user charges, per router',         accent:'#a78bfa' },
+  { label:'You keep',          value:'100%',       note:'All your M-Pesa revenue is yours', accent:'#34d399' },
                 ].map(r => (
                   <div key={r.label} className="rounded-xl p-4 text-center"
                     style={{ background:`${r.accent}0a`, border:`1px solid ${r.accent}20` }}>
                     <p className="text-2xl font-bold mono" style={{ color: r.accent }}>{r.value}</p>
-                    <p className="text-xs font-semibold text-white mt-1">{r.label}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{r.note}</p>
+                    <p className="text-xs font-semibold text-theme-primary mt-1">{r.label}</p>
+                    <p className="text-xs text-theme-muted mt-0.5">{r.note}</p>
                   </div>
                 ))}
               </div>
@@ -853,38 +909,44 @@ const Signup = () => {
 
             <div className="text-center">
               <WaBtn text="Start Free Trial" large />
-              <p className="text-xs text-slate-600 mt-3">No contract · No setup fee · Cancel anytime</p>
+              <p className="text-xs text-theme-faint mt-3">No contract · No setup fee · Cancel anytime · KES 1,000/router/month</p>
             </div>
           </div>
         </section>
 
+
+
+
+
+
+
         {/* ── PRICING: PPPOE ──────────────────────────────────────────────── */}
-        <section className="py-24 px-6" style={{ background:'#0a1220' }}>
+        <section className="py-24 px-6" style={{ background:'var(--bg-page-alt)' }}>
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-6">
               <SectionLabel text="PPPoE Pricing" />
               <motion.h2 initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
-                className="text-4xl md:text-5xl font-black text-white mb-4">
-                PPPoE — <span className="gradient-text">KES 25 per active client</span>
-              </motion.h2>
-              <p className="text-slate-400 max-w-xl mx-auto">
-                Only pay for <strong className="text-white">active subscribers</strong> each month.
-                No flat fees, no hidden charges. Scale up and down freely.
-              </p>
+               className="text-4xl md:text-5xl font-black text-theme-primary mb-4">
+  PPPoE — <span className="gradient-text">KES 10 per active client</span>
+</motion.h2>
+<p className="text-theme-secondary max-w-xl mx-auto">
+  Only pay for <strong className="text-theme-primary">active subscribers</strong> each month.
+  No flat fees, no hidden charges. Scale up and down freely.
+</p>
             </div>
 
             {/* Formula card */}
             <motion.div initial={{ opacity:0, y:12 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
               className="card-glass rounded-2xl p-6 mb-10 max-w-2xl mx-auto text-center"
               style={{ border:'1px solid rgba(99,102,241,.2)' }}>
-              <p className="text-slate-400 text-sm mb-3">Monthly bill formula</p>
-              <p className="text-2xl font-black mono text-white">
+              <p className="text-theme-secondary text-sm mb-3">Monthly bill formula</p>
+              <p className="text-2xl font-black mono text-theme-primary">
                 Active Clients &nbsp;×&nbsp;
-                <span style={{ color:'#818cf8' }}>KES 25</span>
+                <span style={{ color:'#818cf8' }}>KES 10</span>
                 &nbsp;=&nbsp;
                 <span className="gradient-text">Your bill</span>
               </p>
-              <p className="text-xs text-slate-500 mt-3">
+              <p className="text-xs text-theme-muted mt-3">
                 Billed at end of each month · Only active (connected) subscribers count
               </p>
             </motion.div>
@@ -908,13 +970,13 @@ const Signup = () => {
                       style={{ background:`radial-gradient(circle,${plan.color}18,transparent)` }} />
 
                     <h3 className="text-lg font-bold mb-1" style={{ color: plan.color }}>{plan.name}</h3>
-                    <p className="text-xs text-slate-500 mb-4">
+                    <p className="text-xs text-theme-muted mb-4">
                       {plan.subs ? `Up to ${plan.subs} active clients` : 'Unlimited clients'}
                     </p>
 
                     <div className="mb-5">
-                      <p className="text-3xl font-black text-white mono">{calcPPPoECost(plan.subs)}</p>
-                      <p className="text-xs text-slate-500 mt-1">{calcPPPoENote(plan.subs)}</p>
+                      <p className="text-3xl font-black text-theme-primary mono">{calcPPPoECost(plan.subs)}</p>
+                      <p className="text-xs text-theme-muted mt-1">{calcPPPoENote(plan.subs)}</p>
                     </div>
 
                     <div className="space-y-2 mb-6">
@@ -923,7 +985,7 @@ const Signup = () => {
                           {featureFlags[fi]
                             ? <CheckCircle size={13} style={{ color:'#34d399', flexShrink:0 }} />
                             : <XCircle    size={13} style={{ color:'#475569', flexShrink:0 }} />}
-                          <span className={`text-xs ${featureFlags[fi] ? 'text-slate-300' : 'text-slate-600'}`}>{feat}</span>
+                          <span className={`text-xs ${featureFlags[fi] ? 'text-theme-secondary' : 'text-theme-faint'}`}>{feat}</span>
                         </div>
                       ))}
                     </div>
@@ -945,9 +1007,9 @@ const Signup = () => {
                     style={{ background:`radial-gradient(circle,${plan.color}15,transparent)` }} />
                   <div>
                     <h3 className="text-base font-bold" style={{ color: plan.color }}>{plan.name}</h3>
-                    <p className="text-xs text-slate-500">{plan.subs ? `Up to ${plan.subs} clients` : 'Custom'}</p>
-                    <p className="text-lg font-black text-white mono mt-1">{calcPPPoECost(plan.subs)}</p>
-                    <p className="text-xs text-slate-600">{calcPPPoENote(plan.subs)}</p>
+                    <p className="text-xs text-theme-muted">{plan.subs ? `Up to ${plan.subs} clients` : 'Custom'}</p>
+                    <p className="text-lg font-black text-theme-primary mono mt-1">{calcPPPoECost(plan.subs)}</p>
+                    <p className="text-xs text-theme-faint">{calcPPPoENote(plan.subs)}</p>
                   </div>
                   <WaBtn text="Start" />
                 </motion.div>
@@ -955,15 +1017,15 @@ const Signup = () => {
             </div>
 
             <div className="text-center">
-              <p className="text-slate-500 text-sm mb-4">
-                All plans include a <strong className="text-white">free 14-day trial</strong>.
+              <p className="text-theme-muted text-sm mb-4">
+                All plans include a <strong className="text-theme-primary">free 7-day trial</strong>.
                 No credit card required.
               </p>
               <WaBtn text="Talk to Sales — Get Custom Quote" large />
             </div>
           </div>
         </section>
-
+jdd1&FDNyv237#%
         {/* ── CTA strip ───────────────────────────────────────────────────── */}
         <section className="py-20 px-6 relative overflow-hidden"
           style={{ background:'linear-gradient(135deg,#1a1040 0%,#0f1f3d 50%,#0a2218 100%)' }}>
@@ -978,15 +1040,15 @@ const Signup = () => {
             <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
               Ready to grow your ISP?
             </h2>
-            <p className="text-slate-400 text-lg mb-8 max-w-xl mx-auto">
+            <p className="text-theme-secondary text-lg mb-8 max-w-xl mx-auto">
               Join 50+ Kenyan ISPs already using Aitechs. Get a free demo today —
               no setup fees, no contracts, cancel anytime.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <WaBtn text="Get Free Demo on WhatsApp" large />
-              <a href="tel:+254791568852"
+              <a href="tel:+254791568852" data-cta="true"
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-bold text-white border transition-all hover:opacity-80"
-                style={{ border:'1px solid rgba(148,163,184,.2)', background:'rgba(15,23,42,.6)' }}>
+                style={{ border:'1px solid var(--border-subtle)', background:'rgba(15,23,42,.6)' }}>
                 <Phone size={18} /> Call Us Now
               </a>
             </div>
@@ -994,12 +1056,12 @@ const Signup = () => {
         </section>
 
         {/* ── Contact ─────────────────────────────────────────────────────── */}
-        <section id="contact" className="py-20 px-6" style={{ background:'#020617' }}>
+        <section id="contact" className="py-20 px-6" style={{ background:'var(--bg-page)' }}>
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <SectionLabel text="Get in Touch" />
-              <h2 className="text-3xl font-black text-white">We're here to help</h2>
-              <p className="text-slate-500 mt-2">For demos, trials, pricing or technical questions — reach out anytime.</p>
+              <h2 className="text-3xl font-black text-theme-primary">We're here to help</h2>
+              <p className="text-theme-muted mt-2">For demos, trials, pricing or technical questions — reach out anytime.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -1014,25 +1076,21 @@ const Signup = () => {
                   value:'+254 791 568 852', action: () => window.location.href='tel:+254791568852',
                   cta:'Call now',
                 },
-                {
-                  icon: MdEmail, accent:'#a78bfa', label:'Email',
-                  value:'malcomowilla@gmail.com', action: () => window.location.href='mailto:malcomowilla@gmail.com',
-                  cta:'Send email',
-                },
               ].map((c, i) => {
                 const Icon = c.icon;
                 return (
                   <motion.div key={c.label}
                     initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }}
                     viewport={{ once:true }} transition={{ delay: i*0.1 }}
+                    data-cta="true"
                     className="card-glass rounded-2xl p-6 text-center cursor-pointer"
                     onClick={c.action}>
                     <div className="w-12 h-12 rounded-2xl mx-auto mb-4 flex items-center justify-center"
                       style={{ background:`${c.accent}15`, border:`1px solid ${c.accent}25` }}>
                       <Icon size={22} style={{ color: c.accent }} />
                     </div>
-                    <p className="text-xs text-slate-500 mb-1">{c.label}</p>
-                    <p className="text-sm font-semibold text-white mb-3 break-all">{c.value}</p>
+                    <p className="text-xs text-theme-muted mb-1">{c.label}</p>
+                    <p className="text-sm font-semibold text-theme-primary mb-3 break-all">{c.value}</p>
                     <button className="text-xs font-bold px-4 py-2 rounded-xl transition-all hover:opacity-80"
                       style={{ background:`${c.accent}18`, color: c.accent, border:`1px solid ${c.accent}25` }}>
                       {c.cta} →
@@ -1046,15 +1104,75 @@ const Signup = () => {
 
         {/* ── Footer ──────────────────────────────────────────────────────── */}
         <footer className="border-t py-8 px-6 text-center"
-          style={{ borderColor:'rgba(148,163,184,.07)', background:'#020617' }}>
+          style={{ borderColor:'var(--border-subtle-3)', background:'var(--bg-page)' }}>
           <div className="flex items-center justify-center gap-2 mb-3">
             <img src="/images/aitechs.png" className="h-6 opacity-60" alt="Aitechs" />
-            <span className="text-sm font-semibold text-slate-500">Aitechs</span>
+            <span className="text-sm font-semibold text-theme-muted">Aitechs</span>
           </div>
-          <p className="text-xs text-slate-700">
-            © {new Date().getFullYear()} Aitechs. Built for Kenyan ISPs. · <a href="/hotspot-pricing" className="hover:text-slate-500">Hotspot Pricing</a>
+          <p className="text-xs text-theme-dim">
+            © {new Date().getFullYear()} Aitechs. Built for Kenyan ISPs. · <a href="/hotspot-pricing" className="hover:text-theme-muted">Hotspot Pricing</a>
           </p>
         </footer>
+
+        {/* ── Lingering-visitor lead capture ─────────────────────────────── */}
+        <AnimatePresence>
+          {showLinger && (
+            <motion.div
+              initial={{ opacity: 0, y: 40, scale: .95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 30, scale: .95 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+              className="card-glass fixed bottom-6 left-6 z-50 rounded-3xl p-5"
+              style={{ width: 320, maxWidth: 'calc(100vw - 3rem)', border: '1px solid rgba(99,102,241,.25)' }}
+            >
+              <button onClick={dismissLinger} aria-label="Dismiss"
+                className="absolute top-3 right-3 p-1 rounded-lg opacity-60 hover:opacity-100 transition-opacity text-theme-secondary">
+                <X size={16} />
+              </button>
+
+              {!lingerSubmitted ? (
+                <>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-8 h-8 rounded-xl flex items-center justify-center"
+                      style={{ background: 'rgba(99,102,241,.15)', border: '1px solid rgba(99,102,241,.25)' }}>
+                      <Sparkles size={15} style={{ color: '#818cf8' }} />
+                    </span>
+                    <p className="text-sm font-bold text-theme-primary">Still exploring?</p>
+                  </div>
+                  <p className="text-xs text-theme-muted mb-4 leading-relaxed">
+                    Get the full pricing breakdown and a quick walkthrough sent to your WhatsApp — no obligation.
+                  </p>
+                  <form onSubmit={submitLinger} className="space-y-2">
+                    <input
+                      type="text" placeholder="Your name" value={lingerName}
+                      onChange={(e) => setLingerName(e.target.value)} required
+                      className="w-full text-sm px-3 py-2 rounded-xl bg-transparent text-theme-primary"
+                      style={{ border: '1px solid var(--border-subtle)' }}
+                    />
+                    <input
+                      type="tel" placeholder="WhatsApp number" value={lingerPhone}
+                      onChange={(e) => setLingerPhone(e.target.value)} required
+                      className="w-full text-sm px-3 py-2 rounded-xl bg-transparent text-theme-primary"
+                      style={{ border: '1px solid var(--border-subtle)' }}
+                    />
+                    <button type="submit" disabled={lingerSubmitting}
+                      data-cta="true"
+                      className="btn-cta w-full flex items-center justify-center gap-2 text-sm font-bold text-white py-2.5 rounded-xl">
+                      {lingerSubmitting ? 'Sending...' : <>Send Me Info <ArrowRight size={14} /></>}
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <div className="flex items-center gap-3 py-2">
+                  <CheckCircle size={22} style={{ color: '#34d399' }} />
+                  <p className="text-sm text-theme-primary font-medium">
+                    Thanks! We'll reach out on WhatsApp shortly.
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── Scroll to top ────────────────────────────────────────────────── */}
         <motion.button

@@ -9,7 +9,14 @@ import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persist
 import { BrowserRouter as Router } from 'react-router-dom';
 import ApplicationSettings from './settings/ApplicationSettings'
 import { HelmetProvider } from 'react-helmet-async';
+import { bootTheme } from './theme/applyTheme';
 
+
+
+const subdomain = window.location.hostname.split('.')[0];
+// userId is optional at boot (not logged in yet) — pass it once known,
+// or just re-run bootTheme(currentUser.id, subdomain) after login resolves.
+bootTheme(localStorage.getItem('last_known_user_id'), subdomain);
 
 
 export const queryClient = new QueryClient({

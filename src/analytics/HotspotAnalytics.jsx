@@ -124,8 +124,11 @@ function StatCard({ title, value, sub, icon: Icon, accent, trend, loading, prefi
     <motion.div
       initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }}
       className="card-hover rounded-2xl border p-4 sm:p-5
-       relative overflow-hidden bg-gray-600"
-      style={{ borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}
+ relative overflow-hidden 
+ bg-white dark:bg-slate-800/75"
+style={{ borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}
+
+
     >
       <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20 pointer-events-none"
         style={{ background: `radial-gradient(circle, ${accent}, transparent)` }} />
@@ -145,13 +148,13 @@ function StatCard({ title, value, sub, icon: Icon, accent, trend, loading, prefi
         </div>
       ) : (
         <>
-          <p className="font-bold text-white mono stat-num 
+          <p className="font-bold text-black dark:text-white mono stat-num 
                         text-lg xs:text-xl sm:text-2xl 
                         truncate max-w-full break-words"
              title={formattedValue}>   {/* tooltip shows full value on hover */}
             {formattedValue}
           </p>
-          <p className="text-xs mt-1 text-gray-300" >{title}</p>
+          <p className="text-xs mt-1 text-gray-500" >{title}</p>
           {sub && <p className="text-[11px] mt-0.5 truncate" style={{ color:'#475569' }}>{sub}</p>}
         </>
       )}
@@ -425,8 +428,9 @@ const HotspotAnalytics = () => {
       <Styles />
       <Toaster />
 
-      <div className="dash-root min-h-screen p-6 space-y-6"
-        style={{  color:'#e2e8f0' }}>
+<div className="dash-root min-h-screen p-6 space-y-6
+  bg-slate-50 dark:bg-[#030712]
+  text-slate-800 dark:text-slate-200">
 
         {/* ── Header ──────────────────────────────────────────────────────── */}
         <motion.div initial={{ opacity:0, y:-12 }} animate={{ opacity:1, y:0 }}
@@ -482,9 +486,10 @@ const HotspotAnalytics = () => {
             return (
               <motion.div key={month.key}
                 initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay: 0.05 + i * 0.08 }}
-                className="card-hover rounded-2xl border p-5 
-                relative overflow-hidden bg-gray-600"
-                style={{  borderColor:`${accent}25`, backdropFilter:'blur(16px)' }}
+               className="card-hover rounded-2xl border p-5 
+relative overflow-hidden
+bg-white dark:bg-slate-800/75"
+style={{ borderColor:`${accent}25`, backdropFilter:'blur(16px)' }}
               >
                 {/* Corner glow */}
                 <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none"
@@ -507,10 +512,10 @@ const HotspotAnalytics = () => {
                       </div>
                     ) : (
                       <>
-                        <p className="text-2xl font-bold text-white mono stat-num">
+                        <p className="text-2xl font-bold text-black dark:text-white mono stat-num">
                           {fmt(month.revenue)}
                         </p>
-                        <p className="text-xs mt-1 text-gray-300" >
+                        <p className="text-xs mt-1 text-gray-500" >
                           Total revenue · {fmtNum(month.sessions)} sessions
                         </p>
                         {month.top_pkg && (
@@ -592,16 +597,16 @@ const HotspotAnalytics = () => {
           {/* Hourly activity (2 cols) */}
           <motion.div initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:.1 }}
             className="lg:col-span-2 rounded-2xl border p-5"
-            style={{ background:'rgba(15,23,42,.7)', borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}>
+            style={{ borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-base font-bold text-white">Today's Hourly Activity</h2>
-                <p className="text-xs mt-0.5 text-gray-300" >
+                <h2 className="text-base font-bold text-black dark:text-white">Today's Hourly Activity</h2>
+                <p className="text-xs mt-0.5 text-gray-500" >
                   {peakHour ? `Peak hour: ${peakHr?.time} · KES ${fmtNum(peakHr?.total_revenue)}` : 'Revenue & sessions by hour'}
                 </p>
               </div>
               <div className="flex gap-1 p-1 rounded-xl flex-col sm:flex-row" 
-              style={{ background:'rgba(30,41,59,.6)' }}>
+              style={{  }}>
                 {['total_revenue','sessions'].map(m => (
                   <button key={m} onClick={() => setActiveMetric(m)}
                     className="px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all"
@@ -631,9 +636,9 @@ const HotspotAnalytics = () => {
           {/* Package donut */}
           <motion.div initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:.15 }}
             className="rounded-2xl border p-5"
-            style={{ background:'rgba(15,23,42,.7)', borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}>
-            <h2 className="text-base font-bold text-white mb-1">Revenue by Package</h2>
-            <p className="text-xs mb-3 text-gray-300" >Share of total revenue per plan</p>
+            style={{ borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}>
+            <h2 className="text-base font-bold text-black dark:text-white mb-1">Revenue by Package</h2>
+            <p className="text-xs mb-3 text-gray-500" >Share of total revenue per plan</p>
             {loading
               ? <SkeletonBlock h="h-48" rounded="rounded-xl" />
               : <ReactApexChart options={donutChart.options} series={donutChart.series} type="donut" height={200} />
@@ -666,9 +671,9 @@ const HotspotAnalytics = () => {
           {/* Weekly bar */}
           <motion.div initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:.2 }}
             className="rounded-2xl border p-5"
-            style={{ background:'rgba(15,23,42,.7)', borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}>
-            <h2 className="text-base font-bold text-white mb-1">Last 7 Days</h2>
-            <p className="text-xs mb-3 text-gray-300" >Daily revenue trend</p>
+            style={{  borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}>
+            <h2 className="text-base font-bold text-black dark:text-white mb-1">Last 7 Days</h2>
+            <p className="text-xs mb-3 text-gray-500" >Daily revenue trend</p>
             {loading
               ? <SkeletonBlock h="h-44" rounded="rounded-xl" />
               : <ReactApexChart options={weeklyChart.options} series={weeklyChart.series} type="bar" height={200} />
@@ -692,11 +697,11 @@ const HotspotAnalytics = () => {
   animate={{ opacity:1, y:0 }}
   transition={{ delay: .22 }}
   className="rounded-2xl border p-4 sm:p-5 max-h-72 overflow-y-auto scrollbar-thin"
-  style={{ background:'rgba(15,23,42,.7)', borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}
+  style={{ borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}
 >
   <div className="flex items-center gap-2 mb-4">
     <Award size={16} style={{ color:'#fbbf24' }} />
-    <h2 className="text-base font-bold text-white">Top Customers</h2>
+    <h2 className="text-base font-bold text-black">Top Customers</h2>
     <span className="ml-auto text-xs px-2 py-0.5 rounded-full"
       style={{ background:'rgba(251,191,36,.12)', color:'#fbbf24' }}>All time</span>
   </div>
@@ -720,13 +725,13 @@ const HotspotAnalytics = () => {
         {/* Info - takes remaining space, truncates */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <p className="text-xs sm:text-sm font-semibold text-slate-200 mono truncate">
+            <p className="text-xs sm:text-sm font-semibold text-slate-500 mono truncate">
               {u.phone}
             </p>
             {u.rank <= 3 && <Star size={10} fill="#fbbf24" style={{ color:'#fbbf24', flexShrink:0 }} />}
           </div>
           {/* Secondary info: hidden on very small screens, visible on sm+ */}
-          <p className="hidden sm:block text-[11px] sm:text-xs text-gray-300 truncate">
+          <p className="hidden sm:block text-[11px] sm:text-xs text-gray-500 truncate">
             {u.purchases} purchases · {u.last_payment_at}
             {u.name && ` · ${u.name}`}
           </p>
@@ -751,10 +756,10 @@ const HotspotAnalytics = () => {
           {/* Recent transactions */}
           <motion.div initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:.25 }}
             className="rounded-2xl border p-5"
-            style={{ background:'rgba(15,23,42,.7)', borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}>
+            style={{  borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}>
             <div className="flex items-center gap-2 mb-4">
               <Activity size={16} style={{ color:'#38bdf8' }} />
-              <h2 className="text-base font-bold text-white">Recent Transactions</h2>
+              <h2 className="text-base font-bold text-black dark:text-white">Recent Transactions</h2>
               <LiveDot />
             </div>
 
@@ -771,7 +776,7 @@ const HotspotAnalytics = () => {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-300 mono truncate">{tx.phone_number || tx.PhoneNumber}</p>
+                    <p className="text-sm font-medium text-slate-500 mono truncate">{tx.phone_number || tx.PhoneNumber}</p>
                     <p className="text-xs" style={{ color:'#64748b' }}>{tx.name || tx.PackageName} · {tx.time_paid || tx.created_at}</p>
                   </div>
 
@@ -797,12 +802,14 @@ const HotspotAnalytics = () => {
         {/* ── Package performance table ────────────────────────────────────── */}
         <motion.div initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} 
         transition={{ delay:.3 }}
-          className="rounded-2xl border p-5 bg-gray-600"
-          style={{  borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}>
+          className="rounded-2xl border p-5
+bg-white dark:bg-slate-800/75"
+style={{ borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}
+          >
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
               <ShoppingCart size={16} style={{ color:'#a78bfa' }} />
-              <h2 className="text-base font-bold text-white">Package Performance</h2>
+              <h2 className="text-base font-bold text-black dark:text-white">Package Performance</h2>
             </div>
             <span className="text-xs" style={{ color:'#475569' }}>All-time breakdown</span>
           </div>
@@ -813,7 +820,7 @@ const HotspotAnalytics = () => {
                 <tr className='' style={{ borderBottom:'1px solid rgba(148,163,184,.08)' }}>
                   {['Package','Sales','Revenue','Avg. Sale','% of Total','Trend'].map(h => (
                     <th key={h} className="pb-3 text-left font-semibold
-                     text-xs uppercase tracking-wider pr-4 text-gray-300"
+                     text-xs uppercase tracking-wider pr-4 text-gray-600"
                       >{h}</th>
                   ))}
                 </tr>
@@ -828,7 +835,7 @@ const HotspotAnalytics = () => {
                       <td className="py-3 pr-4">
                         <div className="flex items-center gap-2">
                           <div className="w-2.5 h-2.5 rounded-full" style={{ background: p.color }} />
-                          <span className="font-semibold text-slate-200">{p.name}</span>
+                          <span className="font-semibold text-slate-500">{p.name}</span>
                         </div>
                       </td>
                       <td className="py-3 pr-4 mono" style={{ color:'#94a3b8' }}>{fmtNum(p.count)}</td>
@@ -851,8 +858,8 @@ const HotspotAnalytics = () => {
               </tbody>
               <tfoot>
                 <tr style={{ borderTop:'1px solid rgba(148,163,184,.1)' }}>
-                  <td className="pt-3 font-bold text-slate-200">Total</td>
-                  <td className="pt-3 mono font-bold text-slate-200">{fmtNum(pkgBreakdown.reduce((a,b)=>a+b.count,0))}</td>
+                  <td className="pt-3 font-bold text-slate-500">Total</td>
+                  <td className="pt-3 mono font-bold text-slate-500">{fmtNum(pkgBreakdown.reduce((a,b)=>a+b.count,0))}</td>
                   <td className="pt-3 mono font-bold" style={{ color:'#34d399' }}>
                     KES {fmtNum(pkgBreakdown.reduce((a,b)=>a+b.revenue,0))}
                   </td>
@@ -898,20 +905,20 @@ const HotspotAnalytics = () => {
               <motion.div key={card.label}
                 initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay:.05*i }}
                 className="card-hover rounded-2xl border p-5 relative overflow-hidden"
-                style={{ background:'rgba(15,23,42,.7)', borderColor:'rgba(148,163,184,.1)' }}>
+                style={{  borderColor:'rgba(148,163,184,.1)' }}>
                 <div className="absolute -bottom-6 -right-6 w-20 h-20 rounded-full pointer-events-none opacity-15"
                   style={{ background:`radial-gradient(circle,${card.accent},transparent)` }} />
                 <Icon size={20} className="mb-3" style={{ color: card.accent }} />
-                <p className="text-xs font-semibold uppercase tracking-wider mb-1 text-gray-300" >{card.label}</p>
-                <p className="text-xl font-bold text-white mono">{card.value}</p>
-                <p className="text-xs mt-1 text-gray-400" >{card.sub}</p>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-1 text-gray-500" >{card.label}</p>
+                <p className="text-xl font-bold text-black dark:text-white mono">{card.value}</p>
+                <p className="text-xs mt-1 text-gray-500" >{card.sub}</p>
               </motion.div>
             );
           })}
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs pb-4" style={{ color:'#334155' }}>
+        <p className="text-center text-xs pb-4 dark:text-white" >
           Auto-refreshes every 5 minutes · Last updated {new Date().toLocaleTimeString()}
         </p>
       </div>

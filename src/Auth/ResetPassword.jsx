@@ -91,7 +91,8 @@ function ResetPassword() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
         className=" min-h-screen
- flex items-center justify-center relative overflow-hidden"
+ flex items-center justify-center relative overflow-hidden font-sans
+"
       >
 
           <div className="absolute inset-0 z-0">
@@ -208,7 +209,8 @@ className="w-24 h-24 mx-auto rounded-full"
                   {loading ? (
                     <CircularProgress size={24} className="text-white" />
                   ) : (
-                    "Reset Password"
+                    <p className="font-sans
+">Reset Password </p>
                   )}
                 </Button>
               </motion.div>

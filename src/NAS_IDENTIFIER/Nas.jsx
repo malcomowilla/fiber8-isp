@@ -1,28 +1,28 @@
 import DeleteIcon from '@mui/icons-material/Delete';
-
 import EditIcon from '@mui/icons-material/Edit';
-
 import { IconButton,Tooltip,
  } from '@mui/material';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import {  useState, useEffect, useMemo, useCallback} from 'react'
 import EditNas from '../edit/EditNas' 
 import AddIcon from '@mui/icons-material/Add';
-
 import MaterialTable from 'material-table'
 import toast, { Toaster } from 'react-hot-toast';
-
 import DeleteRouter from '../delete/DeleteRouter'
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { LuRouter } from "react-icons/lu";
 import { LuChartNetwork } from "react-icons/lu";
-
-
 import { FaFulcrum } from "react-icons/fa";
-
 import { useNavigate } from 'react-router-dom';
 import Loading from './Loading'
 import FreeRadiusLogo from "../../public/images/free_radius.svg";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { LuMonitorSmartphone } from "react-icons/lu";
+import RemoteWinboxModal from './RemoteWinboxModal'; 
+
+
+
+
 
 
 const Nas = () => {
@@ -34,6 +34,17 @@ const navigate = useNavigate()
 const [loading, setloading] = useState(false)
 const [offlineerror, setofflineerror] = useState(false)
 const [openDelete, setOpenDelete] = useState(false);
+const [winboxModalOpen, setWinboxModalOpen] = useState(false);
+const [winboxRouter, setWinboxRouter] = useState(null);
+const [winboxClosing, setWinboxClosing] = useState(false);
+
+
+
+
+
+
+
+
 const { nasformData, setnasFormData,initialValueNas, setTableData,
   pingStatus, setPingStatus,
   showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
@@ -59,6 +70,57 @@ const [selectedRouterId, setSelectedRouterId] = useState(() => {
   const savedRouterId = localStorage.getItem('selectedCheckedRouter');
   return savedRouterId ? parseInt(savedRouterId, 10) : null;
 });
+
+
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
+
 const handleClickOpenDelete = () => {
   setOpenDelete(true);
 };
@@ -81,46 +143,6 @@ const handleCloseDelete = () => {
   const handleClose = () => {
     setOpen(false);
   };
-
-
-
-
-// const updateRouter = async(id, e) => {
-
-//   e.preventDefault()
-
-//   try {
-//       setloading(true)
-
-//       const res = await fetch('/api/router', {
-//           method: 'POST',
-//           headers: {
-//               'Content-Type': 'application/json'
-//           },
-//           signal: controller.signal,
-//           body: JSON.stringify(formData),
-//       })
-
-//         clearTimeout(id)
-      
-//       const newData = await res.json()
-//       if (res.ok) {
-//           setTableData((tableData)=>[...tableData, newData])
-//           setloading(false)
-
-
-//       } else {
-//           setloading(false)
-
-//       }
-//   } catch (error) {
-//     console.log(error.name === 'AbortError');
-
-//       setloading(false);
-
-//   }
-// }
-
 
 
 
@@ -170,39 +192,6 @@ const subdomain = window.location.hostname.split('.')[0];
   };
 
 
-  
-// const fetchPingStatus = useCallback(
-//   async() => {
-    
-// const response = await fetch('/api/router_ping_response', {
-//     headers: {
-//       'X-Subdomain': subdomain,
-//     },
-
-
-// })
-
-// const newData = await response.json()
-// if (response.ok) {
-//   setTableData(newData)
-//   console.log('router ping status', newData)
-  
-// }else{
-//   console.log('failed to fetch ping status')
-// }
-//   },
-//   [],
-// )
-
-
-
-// useEffect(() => {
-  
-//   fetchPingStatus()
-// }, [fetchPingStatus]);
-
-
-
   const fetchRouters = useMemo(() => async ()=> {
   
   try {
@@ -218,7 +207,6 @@ const subdomain = window.location.hostname.split('.')[0];
   
     const newData = await response.json()
   if (response.ok) {
-  //  setTableData(newData)
    setTableDataNas(newData)
    const ip_address = newData[0].ip_address
    const username = newData[0].username
@@ -234,7 +222,6 @@ if (response.status === 401) {
     duration: 4000,
   })
    setTimeout(() => {
-          // navigate('/license-expired')
           window.location.href='/signin'
          }, 1900);
 }
@@ -265,9 +252,6 @@ duration: 4000,
 
 
 
-  // const controller = new AbortController();
-  // const id = setTimeout(() => controller.abort(), 6000);
-
 const handleSubmit = async (e)=> {
 
     e.preventDefault()
@@ -283,12 +267,9 @@ const handleSubmit = async (e)=> {
                 'X-Subdomain': subdomain,
                 
             },
-            // signal: controller.signal,
             body: JSON.stringify(nasformData),
         })
 
-          // clearTimeout(id)
-        
         const newData = await res.json()
         if (res.ok) {
           setloading(false)
@@ -307,10 +288,6 @@ const handleSubmit = async (e)=> {
             })
           }
             
-            const ip_address = newData.ip_address
-            const username = newData.username
-            const password = newData.password
-            // setnasFormData({...nasformData,password, username, ip_address })
             setloading(false)
           handleClose()
 
@@ -349,13 +326,9 @@ const handleSubmit = async (e)=> {
     const handleCheckboxChange = (event, rowData) => {
       const newSelectedRouter = rowData.id === selectedRouter ? null : rowData.id;
       setSelectedRouter(newSelectedRouter);
-      // localStorage.setItem('selectedCheckedRouter', newSelectedRouter !== null ? newSelectedRouter : '');
       setnasFormData(newSelectedRouter !== null ? rowData : initialValueNas);
 
     };
-
-
-
 
 
         const getPingStatus = useCallback(
@@ -370,10 +343,6 @@ const handleSubmit = async (e)=> {
             const newData = await response.json()
             if (response.ok) {
               setPingStatus(newData)
-              // setTableData((prevData) => ({
-              //   ...prevData, 
-              //   ...newData // This will overwrite existing keys if they exist
-              // }));
             
             }else{
               toast.error('failed to get router ping status something went wrong', {
@@ -400,25 +369,6 @@ const handleSubmit = async (e)=> {
         
 
 
-
-
-
-
-// const mergedTableData = tableDataNas.map((router) => {
-//   const response = router.ping_status?.router_status?.response || "";
-//   const pingTimeMatch = response.match(/time (\d+ms)/); // Extracts "time XXXXms"
-//   const pingTime = pingTimeMatch ? pingTimeMatch[1] : "N/A"; // Default if no match
-//   console.log('router ping status',(router.ping_status?.router_status?.response))
-
-//   return {
-//     ...router,
-//     ping: pingTime, // Extracted ping time
-//     reachable: router.ping_status?.router_status?.reachable ? "Reachable" : "Not Reachable",
-//   };
-// });
-// pingStatus]
-
-
 const mergedTableData = tableDataNas.map((nasRouter) => {
   // Find matching ping status for this router
   const routerPingStatus = pingStatus.find(
@@ -440,7 +390,43 @@ const mergedTableData = tableDataNas.map((nasRouter) => {
 });
 
 
+  // Stops the relay session on the server (deletes the HAProxy conf file
+  // for this port) before closing the modal, so idle sessions don't sit
+  // open for the full 15 minute TTL.
+  const closeWinboxSession = async () => {
+    if (winboxRouter?.id) {
+      setWinboxClosing(true);
+      try {
+        const res = await fetch(`/api/nas_routers/${winboxRouter.id}/winbox_session`, {
+          method: 'DELETE',
+          headers: {
+            'X-Subdomain': subdomain,
+          },
+        });
+        if (res.ok) {
+          toast.success('WinBox session closed', {
+            position: 'top-center', duration: 3000,
+          });
+        } else {
+          const data = await res.json().catch(() => ({}));
+          toast.error(data.error || `Failed to close session (${res.status})`, {
+            position: 'top-center', duration: 6000,
+          });
+        }
+      } catch (error) {
+        toast.error('Failed to close session — network error', {
+          position: 'top-center', duration: 6000,
+        });
+        console.log('failed to stop winbox session', error);
+      } finally {
+        setWinboxClosing(false);
+      }
+    }
+    setWinboxModalOpen(false);
+  };
 
+
+  
 
   const DeleteButton = () => (
         <IconButton style={{ color: '#8B0000' }}  onClick={handleClickOpenDelete}>
@@ -456,16 +442,12 @@ const mergedTableData = tableDataNas.map((nasRouter) => {
   );
 const columns = [
     {title: 'name', field: 'name',  },
-  // {title: 'ping', field: 'ping'},
-
 
   {
     title: 'ping',
     field: 'response',
     render: rowData => (
       <span style={{ 
-        // color: pingStatus.router_status?.response ? 'green' : 'red', 
-        // color: rowData.ping_status?.router_status?.reachable === true ? 'green' : 'red', 
         color: rowData.reachable === 'Reachable' ? 'green' : 'red', 
         fontWeight: 'bold' 
       }}>
@@ -475,7 +457,6 @@ const columns = [
     )
   },
   
-  // {title: 'status', field: 'reachable'},
   {
     title: 'Status',
     field: 'reachable',
@@ -493,40 +474,40 @@ const columns = [
 
    {title: 'Location', field: 'location'},
   {title: 'username', field: 'username', },
-  // {title: 'password', field: 'password', },
-
-  {title: 'Action', field:'Action',
-
+{title: 'Action', field:'Action',
   render: (rowData) =>  
-    
-     <>
-      <div className='flex flex-row gap-4'>
-       <DeleteButton  id={rowData.id} />
-       <EditButton />
+    <>
+      <div className='flex flex-wrap gap-2 items-center'>
+        <DeleteButton id={rowData.id} />
+        <EditButton />
+
+        <Tooltip title="Router Details">
+          <IconButton
+            size="small"
+            onClick={() => {
+              setOpenLoading(true);
+              setRouterName(rowData.id);
+              setTimeout(() => {
+                navigate(`/admin/router_details?id=${rowData.id}&status=${rowData.reachable}`);
+              }, 2000);
+            }}
+          >
+            <LuChartNetwork className='text-black' style={{ width: 22, height: 22 }} />
+          </IconButton>
+        </Tooltip>
 
 
-                  <LuChartNetwork
-                  className='text-black w-6 h-6 sm:w-10 
-                  sm:h-10 cursor-pointer lg:w-7 lg:h-7'
-                   onClick={() => {
-                   setOpenLoading(true);
-                   setRouterName(rowData.id)
-                    setTimeout(() => {
-                       navigate(`/admin/router_details?id=${rowData.id} &status=${rowData.reachable}`);
-                    }, 2000);
-                  }}
-                 
-                   />
-
-
-              <Tooltip title='radius' onClick={() => {
-                 navigate(`/admin/radius-settings?id=${encodeURIComponent(rowData.id)}&ip_address=${encodeURIComponent(rowData.ip_address)}&l=${encodeURIComponent(rowData.password)}&short_code=${encodeURIComponent(rowData.shortcode)}`);
-              }}>
-<img src={FreeRadiusLogo} className="w-6 h-6" alt="FreeRADIUS" />
-              </Tooltip>
-   </div>
-       </>
-
+<Tooltip title="Remote WinBox">
+  <IconButton size="small" onClick={() => {
+    setWinboxRouter(rowData);
+    setWinboxModalOpen(true);
+  }}>
+    <LuMonitorSmartphone className='text-black' style={{ width: 22, height: 22 }} />
+  </IconButton>
+</Tooltip>
+       
+      </div>
+    </>
 }
 
 ]
@@ -565,12 +546,6 @@ const handleCloseLoading = () => {
      <label htmlFor="simple-search" className="sr-only">Search</label>
      <div className="relative w-full">
          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-             {/* <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none" viewBox="0 0 18 20">
-                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-                  strokeWidth="2" d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"/>
-             </svg> */}
              <LuRouter className='text-black'/>
              
          </div>
@@ -600,11 +575,27 @@ const handleCloseLoading = () => {
 
 <DeleteRouter loading={loading}  deleteRouter={deleteRouter} id={nasformData.id} 
  handleCloseDelete ={handleCloseDelete}  openDelete={openDelete}/>
+<RemoteWinboxModal
+  open={winboxModalOpen}
+  onClose={closeWinboxSession}
+  closing={winboxClosing}
+  routerId={winboxRouter?.id}
+  routerName={winboxRouter?.name}
+/>
+
+
+
+<div className={`rounded-2xl border overflow-hidden shadow-sm ${
+  isDark ? 'border-[#3a3a3a]' : 'border-[#e5e0d5]'
+}`}>
+ <ThemeProvider theme={tableTheme}>
+
       <MaterialTable columns={columns}
       
       title= { <p className='
         
-         font-bold text-2xl'>NAS (Mikrotik Routers 
+         font-bold text-2xl font-sans
+'>NAS (Mikrotik Routers 
          with PPPoE/Hotspot) </p> }
       
       
@@ -633,32 +624,44 @@ localization={{
               
               }}
 
-
-options={{
-  sorting: true,
-  pageSizeOptions:[2, 5, 10],
-  pageSize: 10,
-  paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-selection: true,
-search:false,
-searchAutoFocus: true,
-showSelectAllCheckbox: false,
-showTextRowsSelected: false,
-  emptyRowsWhenPaging: false,
-headerStyle:{
-  fontFamily: 'bold',
-  textTransform: 'uppercase'
-  } ,
-  
-  
-  fontFamily: 'mono'
-}}  
-      
+ options={{
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'monospace',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'monospace',
+      }),
+    }} 
       
       
       />
+
+      </ThemeProvider>
+      </div>
+
 
     </div>
     </>
@@ -666,4 +669,3 @@ headerStyle:{
 }
 
 export default Nas
-

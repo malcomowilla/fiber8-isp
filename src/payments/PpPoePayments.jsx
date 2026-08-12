@@ -30,6 +30,8 @@ import { GoPeople } from "react-icons/go";
 import DeletePaymentPpPoe from './DeletePaymentPpPoe';
 import RecordPpoePaymentDetails from './RecordPpoePaymentDetails';
 import { GrMoney } from "react-icons/gr";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
 
 
 
@@ -75,9 +77,52 @@ setRecordPaymentForm((prev)=> ({...prev, [name]: value}))
 
 
 
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
 const recordPayment = async (e) => {
   e.preventDefault();
-
+setLoading(true)
 
   try {
     const response = await fetch('/api/pp_poe_mpesa_revenues', {
@@ -96,6 +141,7 @@ const recordPayment = async (e) => {
 
     const newData = await response.json()
     if (response.ok) {
+      setLoading(false)
       setRecordPaymentForm((prev) => ({
         ...prev,
         user: '',
@@ -115,6 +161,7 @@ const recordPayment = async (e) => {
 
       
     } else {
+      setLoading(false)
       setOpenRecordDetails(false)
       toast.error('Failed to record payment', {  
         position: 'top-center',
@@ -124,8 +171,10 @@ const recordPayment = async (e) => {
       
     }
   } catch (error) {
+    setLoading(false)
     setOpenRecordDetails(false)
-    toast.error('Failed to record payment, Please retry in a moment', {  
+    toast.error(<p className='font-sans
+'>Failed to record payment, Please retry in a moment</p>, {  
       position: 'top-center',   
       duration: 4000,
     })
@@ -225,7 +274,7 @@ const fetchSubscribers = useCallback(
       }
     } catch (error) {
       setIsSearching(false);
-      toast.error('Failed to fetch payments: Server error', {
+      toast.error(<p className=''>Failed to fetch payments: Server error</p>, {
         position: 'top-center',
         duration: 4000,
       });
@@ -268,10 +317,12 @@ const fetchSubscribers = useCallback(
       if (response.status !== 204) {
         const data = await response.json(); 
       }
-      toast.success('Payment deleted successfully', {
+      toast.success(<p className='font-sans
+'>Payment deleted successfully</p>, {
         position: 'top-center',
         duration: 4000,
       });
+      
       setPayments(prev => prev.filter(payment => payment.id !== id));
       setOpenDelete(false);
     } else {
@@ -282,13 +333,15 @@ const fetchSubscribers = useCallback(
       } catch (e) {
         errorMessage = response.statusText || errorMessage;
       }
-      toast.error(errorMessage, {
+      toast.error(<p className='font-sans
+'>errorMessage </p> ,{
         position: 'top-center',
         duration: 4000,
       });
     }
   } catch (error) {
-    toast.error('Failed to delete payment: network or server error', {
+    toast.error(<p className='font-sans
+'>Failed to delete payment: network or server error</p>, {
       position: 'top-center',
       duration: 4000,
     });
@@ -367,6 +420,39 @@ const fetchSubscribers = useCallback(
         </div>
       ),
     },
+
+
+
+
+{
+  title: 'Disbursed',
+  field: 'paid_out',
+  headerClassName: 'dark:text-black font-semibold',
+  render: (rowData) => (
+    <div className="flex items-center gap-2">
+      {rowData.paid_out ? (
+        <>
+          <CheckCircle className="w-4 h-4 text-green-600" />
+          <span className="text-green-700">Yes</span>
+          {rowData.paid_out_at && (
+            <Tooltip title={rowData.paid_out_at} arrow>
+              <AccessTime className="w-3 h-3 text-gray-400 ml-1" />
+            </Tooltip>
+          )}
+        </>
+      ) : (
+        <>
+          <Cancel className="w-4 h-4 text-amber-500" />
+          <span className="text-amber-600">No</span>
+        </>
+      )}
+    </div>
+  ),
+},
+
+
+
+
     {
       title: 'Amount',
       field: 'amount',
@@ -483,6 +569,7 @@ const fetchSubscribers = useCallback(
  recordPaymentForm={recordPaymentForm}
  handleChange={handleChange}
  recordPayment={recordPayment}
+ loading={loading}
  />
       
       {/* Edit Payment Modal */}
@@ -526,7 +613,8 @@ const fetchSubscribers = useCallback(
     
 
       {/* Search and Actions Bar */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between p-4 bg-white
+       dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="flex-1 w-full md:w-auto">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex
@@ -541,7 +629,8 @@ const fetchSubscribers = useCallback(
               className="pl-10 w-full bg-gray-50 border border-gray-300 
                 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 
                 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 font-sans
+"
               placeholder="Search by voucher, reference, name..."
             />
             {isSearching && (
@@ -591,11 +680,16 @@ const fetchSubscribers = useCallback(
               bg-white dark:bg-gray-800 bg-opacity-80 z-[2]">
               <div className="flex flex-col items-center gap-2">
                 <CircularProgress className="text-blue-500" />
-                <p className="text-gray-600 dark:text-gray-300">Loading payments...</p>
+                <p className="text-gray-600 dark:text-gray-300 font-sans
+">Loading payments...</p>
               </div>
             </div>
           )}
-          
+
+
+<div className="rounded-2xl border border-[#e5e0d5] overflow-hidden shadow-sm">
+
+          <ThemeProvider theme={tableTheme}>
           <MaterialTable
             columns={columns}
             title={
@@ -606,7 +700,9 @@ const fetchSubscribers = useCallback(
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+                  <h2 className="text-xl font-bold text-gray-800
+                   dark:text-white font-sans
+">
                     PpPoe Payments
                   </h2>
                  
@@ -635,7 +731,8 @@ const fetchSubscribers = useCallback(
                     }}
                   >
                     <GrMoney />
-                    <span className="text-sm font-medium">Record Payment</span>
+                    <span className="text-sm font-medium font-sans
+">Record Payment</span>
                   </button>
                 ),
                 isFreeAction: true,
@@ -718,6 +815,9 @@ const fetchSubscribers = useCallback(
                 )
               }}
           />
+          </ThemeProvider>
+          </div>
+
         </div>
       </div>
     </div>

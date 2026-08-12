@@ -134,12 +134,12 @@ const PaymentDetails = ({ open, setOpen, payment }) => {
 
           {/* ID */}
           <Box>
-            <Typography variant="subtitle2" color="textSecondary">
+            {/* <Typography variant="subtitle2" color="textSecondary">
               Amount Disbursed
             </Typography>
             <Typography variant="body2" className="text-gray-500 mt-1">
               {payment.amount_disbursed || 'N/A'}
-            </Typography>
+            </Typography> */}
             {/* <Typography variant="body2" className="text-gray-500 mt-1">
               {payment.id}
             </Typography> */}

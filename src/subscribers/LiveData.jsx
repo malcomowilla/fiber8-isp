@@ -5,48 +5,210 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from 'react-router-dom';
 import TrafficStatsGraph from './TrafficStatsGraph';
 
-// ── CSS injected once ──────────────────────────────────────────────────────────
+// ── CSS ────────────────────────────────────────────────────────────────────────
 const CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-  .noc-root *   { box-sizing: border-box; }
-  .noc-root     { font-family: 'Syne', sans-serif; }
-  .noc-root .mono { font-family: 'JetBrains Mono', monospace; }
+  .noc * { box-sizing: border-box; margin: 0; padding: 0; }
+  .noc { font-family: 'Inter', system-ui, sans-serif; }
+  .noc .mono { font-family: 'JetBrains Mono', monospace; }
 
-  @keyframes noc-pulse  { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.25)} }
-  @keyframes noc-blink  { 0%,100%{opacity:1} 50%{opacity:0} }
-  @keyframes noc-slide  { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes noc-glow   { 0%,100%{box-shadow:0 0 6px #00d4ff44} 50%{box-shadow:0 0 18px #00d4ff88} }
-  @keyframes noc-spin   { to{transform:rotate(360deg)} }
-  @keyframes noc-bar    { from{width:0} to{width:var(--w)} }
+  /* ── Design tokens (light default) ── */
+  .noc {
+    --bg:          #F8FAFC;
+    --surface:     #FFFFFF;
+    --surface-2:   #F1F5F9;
+    --border:      #E2E8F0;
+    --border-2:    #CBD5E1;
+    --text-1:      #0F172A;
+    --text-2:      #475569;
+    --text-3:      #94A3B8;
+    --accent:      #2563EB;
+    --accent-light:#EFF6FF;
+    --accent-mid:  #BFDBFE;
+    --green:       #10B981;
+    --green-light: #ECFDF5;
+    --amber:       #F59E0B;
+    --amber-light: #FFFBEB;
+    --red:         #EF4444;
+    --shadow-sm:   0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md:   0 4px 12px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+    --radius:      10px;
+    --radius-sm:   6px;
+  }
 
-  .noc-card  { background:rgba(0,16,30,0.75); border:1px solid rgba(0,212,255,0.12); border-radius:14px; backdrop-filter:blur(12px); }
-  .noc-row   { animation: noc-slide .25s ease both; }
-  .noc-row:hover { background:rgba(0,212,255,0.04) !important; }
-  .noc-stat-card { transition:border-color .2s, transform .2s; }
-  .noc-stat-card:hover { border-color:rgba(0,212,255,.35) !important; transform:translateY(-2px); }
-  .noc-table th { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.1em; color:#3a6a7a; text-transform:uppercase; }
-  .noc-table td { font-size:13px; border-bottom:1px solid rgba(0,212,255,0.05); }
-  .noc-tag { display:inline-flex; align-items:center; padding:2px 9px; border-radius:20px; font-size:10px; font-family:'JetBrains Mono',monospace; font-weight:600; letter-spacing:.04em; }
+  /* ── Dark mode ── */
+  @media (prefers-color-scheme: dark) {
+    .noc {
+      --bg:          #0B1120;
+      --surface:     #111827;
+      --surface-2:   #1A2333;
+      --border:      #1E293B;
+      --border-2:    #2D3F55;
+      --text-1:      #F1F5F9;
+      --text-2:      #94A3B8;
+      --text-3:      #475569;
+      --accent:      #3B82F6;
+      --accent-light:#1E3A5F;
+      --accent-mid:  #1D4ED8;
+      --green:       #10B981;
+      --green-light: #064E3B;
+      --amber:       #F59E0B;
+      --amber-light: #451A03;
+      --shadow-sm:   0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md:   0 4px 12px rgba(0,0,0,0.4);
+    }
+  }
 
-  ::-webkit-scrollbar       { width:4px; height:4px; }
-  ::-webkit-scrollbar-thumb { background:#0d3040; border-radius:4px; }
+  /* ── Base ── */
+  .noc-wrap {
+    background: var(--bg);
+    min-height: 100%;
+    padding: 24px;
+    border-radius: 12px;
+  }
 
-  /* scanline */
-  .noc-scanline::before {
-    content:'';
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    z-index:0;
-    background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,212,255,0.01) 2px,rgba(0,212,255,0.01) 4px);
+  /* ── Cards ── */
+  .noc-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ── Stat card ── */
+  .noc-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .noc-stat::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--stat-accent, var(--accent));
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .noc-stat:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+
+  /* ── Table ── */
+  .noc-table { width: 100%; border-collapse: collapse; }
+  .noc-table thead th {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    padding: 10px 14px;
+    text-align: left;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .noc-table tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-2);
+    font-size: 13px;
+    vertical-align: middle;
+  }
+  .noc-table tbody tr:last-child td { border-bottom: none; }
+  .noc-table tbody tr { transition: background 0.12s; }
+  .noc-table tbody tr:hover td { background: var(--surface-2); }
+
+  /* ── Badge ── */
+  .noc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Live pulse — the ONE animated element ── */
+  @keyframes noc-live {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--green); }
+    50%       { opacity: 0.8; box-shadow: 0 0 0 4px transparent; }
+  }
+  .noc-live-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green);
+    animation: noc-live 2.4s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  /* ── Mini bar ── */
+  .noc-bar-track {
+    height: 3px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .noc-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ── Scrollbar ── */
+  .noc-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+  .noc-scroll::-webkit-scrollbar-track { background: transparent; }
+  .noc-scroll::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 4px; }
+
+  /* ── Loading spinner ── */
+  @keyframes noc-spin { to { transform: rotate(360deg); } }
+  .noc-spinner {
+    width: 32px; height: 32px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: noc-spin 0.8s linear infinite;
+  }
+
+  /* ── Fade in ── */
+  @keyframes noc-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .noc-fade { animation: noc-fade 0.25s ease both; }
+
+  /* ── Responsive grid ── */
+  .noc-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .noc-mid-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 12px;
+  }
+  @media (max-width: 900px) {
+    .noc-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .noc-mid-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 500px) {
+    .noc-kpi-grid { grid-template-columns: 1fr; }
+    .noc-wrap { padding: 14px; }
   }
 `;
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
-const fmtBytes = (bytes, dp = 2) => {
+const fmtBytes = (bytes, dp = 1) => {
   if (!bytes || bytes === 0) return '0 B';
-  const k = 1024, sizes = ['B','KB','MB','GB','TB'];
+  const k = 1024, sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${(bytes / k ** i).toFixed(dp)} ${sizes[i]}`;
 };
@@ -56,7 +218,7 @@ const parseBytes = (str) => {
   const m = str.match(/(\d+\.?\d*)\s*(KB|MB|GB|B)/i);
   if (!m) return 0;
   const v = parseFloat(m[1]), u = m[2].toUpperCase();
-  return u==='KB'?v*1024:u==='MB'?v*1048576:u==='GB'?v*1073741824:v;
+  return u === 'KB' ? v * 1024 : u === 'MB' ? v * 1048576 : u === 'GB' ? v * 1073741824 : v;
 };
 
 const parseMbps = (str) => {
@@ -65,91 +227,68 @@ const parseMbps = (str) => {
   return m ? parseFloat(m[1]) : 0;
 };
 
-// ── Sub-components ─────────────────────────────────────────────────────────────
-function Dot({ color = '#00ff88', glow }) {
+// ── StatCard ──────────────────────────────────────────────────────────────────
+function StatCard({ label, value, sub, icon: Icon, accentVar = '--accent', delay = 0 }) {
   return (
-    <span style={{
-      display: 'inline-block', width: 7, height: 7, borderRadius: '50%',
-      background: color, flexShrink: 0,
-      boxShadow: glow ? `0 0 8px ${color}` : 'none',
-      animation: 'noc-pulse 2s ease-in-out infinite',
-    }}/>
-  );
-}
-
-function StatCard({ label, value, sub, icon: Icon, color, accent, delay = 0 }) {
-  return (
-    <div className="noc-card noc-stat-card" style={{
-      padding: '16px 18px', position: 'relative', overflow: 'hidden',
-      borderLeft: `2px solid ${color}`,
-      animation: `noc-slide .35s ease ${delay}s both`,
-    }}>
-      {/* Corner glow */}
-      <div style={{
-        position: 'absolute', top: 0, right: 0, width: 80, height: 80,
-        background: `radial-gradient(circle at top right, ${color}18, transparent)`,
-        pointerEvents: 'none',
-      }}/>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+    <div className="noc-stat noc-fade" style={{ '--stat-accent': `var(${accentVar})`, animationDelay: `${delay}s` }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-3)' }}>
+          {label}
+        </span>
         <div style={{
-          width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: `${color}15`, border: `1px solid ${color}30`,
+          width: 30, height: 30, borderRadius: 7,
+          background: `var(${accentVar === '--green' ? '--green-light' : accentVar === '--amber' ? '--amber-light' : '--accent-light'})`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <Icon style={{ color, fontSize: 15 }}/>
+          <Icon style={{ color: `var(${accentVar})`, fontSize: 13 }} />
         </div>
-        {accent && (
-          <span className="noc-tag" style={{ color: accent, background: `${accent}15` }}>{accent}</span>
-        )}
       </div>
-
-      <p className="mono" style={{ fontSize: 22, fontWeight: 700, color: '#e8f4f8', lineHeight: 1.1, marginBottom: 4 }}>
+      <p className="mono" style={{ fontSize: 24, fontWeight: 600, color: 'var(--text-1)', lineHeight: 1, marginBottom: 4 }}>
         {value}
       </p>
-      <p style={{ fontSize: 11, color: '#3a6a7a', letterSpacing: '.06em', textTransform: 'uppercase' }}>{label}</p>
-      {sub && <p className="mono" style={{ fontSize: 10, color: `${color}aa`, marginTop: 3 }}>{sub}</p>}
+      {sub && (
+        <p className="mono" style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 5 }}>{sub}</p>
+      )}
     </div>
   );
 }
 
-function BandwidthBar({ label, value, max, color }) {
+// ── BandwidthBar ──────────────────────────────────────────────────────────────
+function BandwidthBar({ label, value, max, colorVar }) {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
   return (
-    <div style={{ marginBottom: 8 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-        <span style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: '#3a6a7a' }}>{label}</span>
-        <span className="mono" style={{ fontSize: 10, color }}>{value.toFixed(2)} Mbps</span>
+    <div style={{ marginBottom: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+        <span style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 500 }}>{label}</span>
+        <span className="mono" style={{ fontSize: 10, color: `var(${colorVar})`, fontWeight: 600 }}>
+          {value.toFixed(2)} Mbps
+        </span>
       </div>
-      <div style={{ height: 4, background: 'rgba(255,255,255,0.04)', borderRadius: 99, overflow: 'hidden' }}>
-        <div style={{
-          height: '100%', borderRadius: 99,
-          width: `${pct}%`,
-          background: `linear-gradient(90deg,${color}88,${color})`,
-          boxShadow: `0 0 8px ${color}66`,
-          transition: 'width 1s ease',
-        }}/>
+      <div className="noc-bar-track">
+        <div className="noc-bar-fill" style={{ width: `${pct}%`, background: `var(${colorVar})` }} />
       </div>
     </div>
   );
 }
 
+// ── LoadingScreen ─────────────────────────────────────────────────────────────
 function LoadingScreen() {
   return (
-    <div className="noc-root" style={{
-      minHeight: 400, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      background: 'linear-gradient(135deg,#000d1a 0%,#001428 100%)', borderRadius: 14,
+    <div className="noc" style={{
+      minHeight: 360, display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      background: 'var(--bg)', borderRadius: 12, gap: 14,
     }}>
-      <div style={{
-        width: 44, height: 44, border: '2px solid rgba(0,212,255,.15)',
-        borderTop: '2px solid #00d4ff', borderRadius: '50%',
-        animation: 'noc-spin 1s linear infinite', marginBottom: 16,
-      }}/>
-      <p className="mono" style={{ color: '#00d4ff', fontSize: 12, letterSpacing: '.12em' }}>INITIALISING SESSIONS…</p>
+      <style>{CSS}</style>
+      <div className="noc-spinner" />
+      <p className="mono" style={{ fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.1em' }}>
+        LOADING SESSIONS
+      </p>
     </div>
   );
 }
 
-// ── Main ───────────────────────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────────
 const LiveData = () => {
   const [stats,          setStats]          = useState([]);
   const [trafficData,    setTrafficData]    = useState([]);
@@ -164,7 +303,7 @@ const LiveData = () => {
   const subdomain      = window.location.hostname.split('.')[0];
   const isMounted      = useRef(true);
 
-  const getPPOEstats = useCallback(async () => {
+  const getPPPoEstats = useCallback(async () => {
     if (!isMounted.current) return;
     try {
       const res = await fetch(`/api/get_active_pppoe_users?subscriber_id=${subscriberId}`, {
@@ -186,12 +325,13 @@ const LiveData = () => {
 
   useEffect(() => {
     isMounted.current = true;
-    getPPOEstats();
-    const id = setInterval(() => { if (isMounted.current) { getPPOEstats(); setTick(t => t + 1); } }, 5000);
+    getPPPoEstats();
+    const id = setInterval(() => {
+      if (isMounted.current) { getPPPoEstats(); setTick(t => t + 1); }
+    }, 5000);
     return () => { isMounted.current = false; clearInterval(id); };
-  }, [getPPOEstats]);
+  }, [getPPPoEstats]);
 
-  // Aggregate totals
   const totalDl  = stats.reduce((s, u) => s + parseMbps(u?.download || ''), 0);
   const totalUl  = stats.reduce((s, u) => s + parseMbps(u?.upload   || ''), 0);
   const totalDlB = stats.reduce((s, u) => s + parseBytes(u?.download || ''), 0);
@@ -202,247 +342,270 @@ const LiveData = () => {
   if (isLoading) return <LoadingScreen />;
 
   if (error) return (
-    <div className="noc-root" style={{
-      background: 'linear-gradient(135deg,#000d1a,#001428)', borderRadius: 14, padding: 40, textAlign: 'center',
-    }}>
+    <div className="noc">
       <style>{CSS}</style>
-      <GiNetworkBars style={{ fontSize: 40, color: '#ff4466', marginBottom: 12 }}/>
-      <p className="mono" style={{ color: '#ff4466', marginBottom: 16 }}>{error}</p>
-      <button onClick={getPPOEstats} style={{
-        background: 'rgba(0,212,255,.12)', border: '1px solid rgba(0,212,255,.3)',
-        color: '#00d4ff', padding: '8px 20px', borderRadius: 8, cursor: 'pointer',
-        fontFamily: 'JetBrains Mono', fontSize: 12,
-      }}>RETRY</button>
+      <div className="noc-wrap font-sans
+" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', 
+        justifyContent: 'center', minHeight: 320, gap: 14 }}>
+        <div style={{
+          width: 48, height: 48, borderRadius: 12,
+          background: 'rgba(239,68,68,0.1)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <GiNetworkBars style={{ fontSize: 22, color: 'var(--red)' }} />
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-1)', marginBottom: 4 }}>Connection Error</p>
+          <p className="mono" style={{ fontSize: 12, color: 'var(--text-3)' }}>{error}</p>
+        </div>
+        <button onClick={getPPPoEstats} style={{
+          background: 'var(--accent)', color: '#fff', border: 'none',
+          padding: '8px 20px', borderRadius: 7, cursor: 'pointer',
+          fontFamily: 'Inter', fontSize: 13, fontWeight: 600,
+        }}>
+          Retry
+        </button>
+      </div>
     </div>
   );
 
   return (
-    <div className="noc-root" style={{
-      background: 'linear-gradient(160deg,#000d1a 0%,#001020 40%,#000d18 100%)',
-      borderRadius: 16, padding: '24px 24px 20px', position: 'relative', overflow: 'hidden',
-    }}>
+    <div className="noc font-sans
+">
       <style>{CSS}</style>
-
-      {/* Background grid */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
-        backgroundImage: `
-          linear-gradient(rgba(0,212,255,0.025) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(0,212,255,0.025) 1px, transparent 1px)
-        `,
-        backgroundSize: '48px 48px',
-      }}/>
-
-      {/* Ambient blobs */}
-      <div style={{ position:'absolute', top:-80, right:-80, width:300, height:300, borderRadius:'50%', background:'radial-gradient(circle,rgba(0,212,255,.06) 0%,transparent 70%)', pointerEvents:'none', zIndex:0 }}/>
-      <div style={{ position:'absolute', bottom:-60, left:-60, width:240, height:240, borderRadius:'50%', background:'radial-gradient(circle,rgba(0,255,136,.05) 0%,transparent 70%)', pointerEvents:'none', zIndex:0 }}/>
-
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      <div className="noc-wrap">
 
         {/* ── Header ── */}
-        <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:12, marginBottom:24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 
+          'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 22 }}>
           <div>
-            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:4 }}>
-              <Dot color="#00ff88" glow/>
-              <span className="mono" style={{ fontSize:10, color:'#00ff88', letterSpacing:'.14em', textTransform:'uppercase' }}>
-                System Operational
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <div className="noc-live-dot" />
+              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--green)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                Live · refreshes every 5s
               </span>
             </div>
-            <h1 style={{ fontSize:26, fontWeight:800, color:'#e8f4f8', margin:0, letterSpacing:'-.02em' }}>
+            <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-1)', letterSpacing: '-0.03em' }}>
               Active Sessions
             </h1>
-            <p className="mono" style={{ fontSize:11, color:'#3a6a7a', marginTop:3 }}>
-              PPPoE live monitoring · refreshes every 5s
-            </p>
           </div>
 
-          <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6 }}>
-            <div style={{
-              display:'flex', alignItems:'center', gap:6, padding:'6px 14px',
-              background:'rgba(0,212,255,.07)', border:'1px solid rgba(0,212,255,.18)',
-              borderRadius:20,
-            }}>
-              <Dot color="#00d4ff" glow/>
-              <span className="mono" style={{ fontSize:12, color:'#00d4ff', fontWeight:600 }}>
-                {stats.length} CONNECTED
-              </span>
+          <div style={{ display: 'flex', align: 'center', gap: 10 }}>
+            <div className="noc-badge" style={{ background: 'var(--accent-light)', color: 'var(--accent)', border: '1px solid var(--accent-mid)', fontSize: 12 }}>
+              <MdOutlineOnlinePrediction style={{ fontSize: 13 }} />
+              {stats.length} connected
             </div>
             {lastRefresh && (
-              <span className="mono" style={{ fontSize:9, color:'#2a4a5a' }}>
-                UPDATED {lastRefresh.toLocaleTimeString('en-US',{hour12:false})}
+              <span className="mono" style={{ fontSize: 11, color: 'var(--text-3)', alignSelf: 'center' }}>
+                {lastRefresh.toLocaleTimeString('en-US', { hour12: false })}
               </span>
             )}
           </div>
         </div>
 
         {/* ── KPI Cards ── */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', gap:12, marginBottom:20 }}>
-          <StatCard label="Active Sessions"  value={stats.length}            icon={MdOutlineOnlinePrediction} color="#00d4ff" delay={0}/>
-          <StatCard label="Total Download"   value={`${totalDl.toFixed(1)} Mbps`} icon={FaDownload}          color="#00d4ff" sub={fmtBytes(totalDlB)} delay={0.05}/>
-          <StatCard label="Total Upload"     value={`${totalUl.toFixed(1)} Mbps`} icon={FaUpload}            color="#00ff88" sub={fmtBytes(totalUlB)} delay={0.1}/>
-          <StatCard label="Bandwidth Used"   value={totalBandwidth}          icon={GiNetworkBars}             color="#ffaa00" delay={0.15}/>
+        <div className="noc-kpi-grid" style={{ marginBottom: 14 }}>
+          <StatCard label="Sessions"       value={stats.length}                  icon={MdOutlineOnlinePrediction} accentVar="--accent"  delay={0}    />
+          <StatCard label="Download"       value={`${totalDl.toFixed(1)} Mbps`}  icon={FaDownload}                accentVar="--accent"  delay={0.05} sub={fmtBytes(totalDlB)} />
+          <StatCard label="Upload"         value={`${totalUl.toFixed(1)} Mbps`}  icon={FaUpload}                  accentVar="--green"   delay={0.1}  sub={fmtBytes(totalUlB)} />
+          <StatCard label="Bandwidth Used" value={totalBandwidth}                 icon={GiNetworkBars}             accentVar="--amber"   delay={0.15} />
         </div>
 
-        {/* ── Bandwidth bars + Graph ── */}
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:14, marginBottom:20 }}>
+        {/* ── Middle: per-user bars + graph ── */}
+        <div className="noc-mid-grid" style={{ marginBottom: 14 }}>
 
-          {/* Bandwidth per-user bars */}
-          <div className="noc-card" style={{ padding:'16px 18px' }}>
-            <p className="mono" style={{ fontSize:10, color:'#3a6a7a', letterSpacing:'.1em', textTransform:'uppercase', marginBottom:14 }}>
+          {/* Per-user bandwidth */}
+          <div className="noc-card" style={{ padding: '16px 18px' }}>
+            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 14 }}>
               Per-User Bandwidth
             </p>
-            {stats.length === 0
-              ? <p className="mono" style={{ fontSize:11, color:'#2a4a5a', textAlign:'center', padding:'20px 0' }}>No data</p>
-              : <div style={{ maxHeight:180, overflowY:'auto' }}>
-                  {stats.map((s, i) => {
-                    const dl = parseMbps(s?.download || '');
-                    const ul = parseMbps(s?.upload   || '');
-                    return (
-                      <div key={i} style={{ marginBottom:12 }}>
-                        <p className="mono" style={{ fontSize:10, color:'#5a8a9a', marginBottom:4, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                          {s?.username || s?.client || `User ${i+1}`}
-                        </p>
-                        <BandwidthBar label="DL" value={dl} max={maxDl} color="#00d4ff"/>
-                        <BandwidthBar label="UL" value={ul} max={maxUl} color="#00ff88"/>
-                      </div>
-                    );
-                  })}
-                </div>
-            }
+            {stats.length === 0 ? (
+              <p className="mono" style={{ fontSize: 11, color: 'var(--text-3)', textAlign: 'center', padding: '24px 0' }}>No data</p>
+            ) : (
+              <div className="noc-scroll" style={{ maxHeight: 200, overflowY: 'auto', paddingRight: 4 }}>
+                {stats.map((s, i) => {
+                  const dl = parseMbps(s?.download || '');
+                  const ul = parseMbps(s?.upload   || '');
+                  return (
+                    <div key={i} style={{ marginBottom: 14 }}>
+                      <p className="mono" style={{
+                        fontSize: 10, color: 'var(--text-2)', marginBottom: 5,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}>
+                        {s?.username || s?.client || `User ${i + 1}`}
+                      </p>
+                      <BandwidthBar label="DL" value={dl} max={maxDl} colorVar="--accent" />
+                      <BandwidthBar label="UL" value={ul} max={maxUl} colorVar="--green"  />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Traffic graph */}
-          <TrafficStatsGraph trafficData={trafficData}/>
+          <div className="noc-card" style={{ padding: '16px 18px' }}>
+            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 14 }}>
+              Traffic Overview
+            </p>
+            <TrafficStatsGraph trafficData={trafficData} />
+          </div>
         </div>
 
         {/* ── Sessions Table ── */}
-        <div className="noc-card" style={{ overflow:'hidden' }}>
-          {/* Table header */}
+        <div className="noc-card" style={{ overflow: 'hidden' }}>
+
+          {/* Table toolbar */}
           <div style={{
-            display:'flex', alignItems:'center', justifyContent:'space-between',
-            padding:'14px 18px 10px', borderBottom:'1px solid rgba(0,212,255,0.08)',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '12px 16px', borderBottom: '1px solid var(--border)',
           }}>
-            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-              <FaChartLine style={{ color:'#00d4ff', fontSize:13 }}/>
-              <span className="mono" style={{ fontSize:11, color:'#5a8a9a', letterSpacing:'.08em', textTransform:'uppercase' }}>
-                Session Detail
-              </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              <FaChartLine style={{ color: 'var(--accent)', fontSize: 12 }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>Session Detail</span>
             </div>
-            <span className="noc-tag" style={{ color:'#00d4ff', background:'rgba(0,212,255,.08)' }}>
+            <span className="noc-badge" style={{ background: 'var(--surface-2)', color: 'var(--text-2)', border: '1px solid var(--border)' }}>
               {stats.length} rows
             </span>
           </div>
 
-          <div style={{ overflowX:'auto' }}>
-            <table className="noc-table" style={{ width:'100%', borderCollapse:'collapse' }}>
+          <div className="noc-scroll" style={{ overflowX: 'auto' }}>
+            <table className="noc-table">
               <thead>
-                <tr style={{ background:'rgba(0,212,255,0.03)' }}>
-                  {['#','Client','Package','Username','IP Address','Uptime','Upload','Download'].map(h => (
-                    <th key={h} style={{ padding:'10px 14px', textAlign:'left', whiteSpace:'nowrap' }}>{h}</th>
+                <tr>
+                  {['#', 'Client', 'Package', 'Username', 'IP Address', 'Uptime', 'Upload', 'Download'].map(h => (
+                    <th key={h}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {stats.length > 0
-                  ? stats.map((s, i) => {
-                      const dl = parseMbps(s?.download || '');
-                      const ul = parseMbps(s?.upload   || '');
-                      const dlPct = maxDl > 0 ? (dl / maxDl) * 100 : 0;
-                      const ulPct = maxUl > 0 ? (ul / maxUl) * 100 : 0;
-                      return (
-                        <tr key={i} className="noc-row" style={{ animationDelay:`${i*0.03}s` }}>
-                          <td style={{ padding:'10px 14px', color:'#2a4a5a' }} className="mono">{String(i+1).padStart(2,'0')}</td>
-                          <td style={{ padding:'10px 14px' }}>
-                            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                              <div style={{
-                                width:28, height:28, borderRadius:8, flexShrink:0,
-                                background:'rgba(0,212,255,.1)', border:'1px solid rgba(0,212,255,.2)',
-                                display:'flex', alignItems:'center', justifyContent:'center',
-                              }}>
-                                <FaUser style={{ color:'#00d4ff', fontSize:11 }}/>
+                {stats.length > 0 ? (
+                  stats.map((s, i) => {
+                    const dl    = parseMbps(s?.download || '');
+                    const ul    = parseMbps(s?.upload   || '');
+                    const dlPct = maxDl > 0 ? (dl / maxDl) * 100 : 0;
+                    const ulPct = maxUl > 0 ? (ul / maxUl) * 100 : 0;
+                    return (
+                      <tr key={i}>
+                        {/* # */}
+                        <td className="mono" style={{ color: 'var(--text-3)', fontSize: 11, width: 42 }}>
+                          {String(i + 1).padStart(2, '0')}
+                        </td>
+
+                        {/* Client */}
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <div style={{
+                              width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                              background: 'var(--accent-light)', border: '1px solid var(--accent-mid)',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                              <FaUser style={{ color: 'var(--accent)', fontSize: 11 }} />
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)', whiteSpace: 'nowrap' }}>
+                                {s?.client || 'Unknown'}
                               </div>
-                              <div>
-                                <div style={{ color:'#cce8f0', fontWeight:600, fontSize:12, whiteSpace:'nowrap' }}>{s?.client || 'Unknown'}</div>
-                                <div className="mono" style={{ fontSize:9, color:'#3a6a7a', whiteSpace:'nowrap' }}>{s?.mac_address || '—'}</div>
+                              <div className="mono" style={{ fontSize: 10, color: 'var(--text-3)', whiteSpace: 'nowrap' }}>
+                                {s?.mac_address || '—'}
                               </div>
                             </div>
-                          </td>
-                          <td style={{ padding:'10px 14px' }}>
-                            <span className="noc-tag" style={{ color:'#b088ff', background:'rgba(176,136,255,.1)' }}>
-                              {s?.package || 'N/A'}
+                          </div>
+                        </td>
+
+                        {/* Package */}
+                        <td>
+                          <span className="noc-badge" style={{ background: 'var(--surface-2)', color: 'var(--text-2)', border: '1px solid var(--border)' }}>
+                            {s?.package || 'N/A'}
+                          </span>
+                        </td>
+
+                        {/* Username */}
+                        <td className="mono" style={{ color: 'var(--text-2)', fontSize: 12 }}>
+                          {s?.username || '—'}
+                        </td>
+
+                        {/* IP */}
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', flexShrink: 0 }} />
+                            <span className="mono" style={{ color: 'var(--text-1)', fontSize: 12 }}>
+                              {s?.ip_address || '—'}
                             </span>
-                          </td>
-                          <td style={{ padding:'10px 14px' }} className="mono" >
-                            <span style={{ color:'#5a8a9a', fontSize:12 }}>{s?.username || '—'}</span>
-                          </td>
-                          <td style={{ padding:'10px 14px' }}>
-                            <div style={{ display:'flex', alignItems:'center', gap:5 }}>
-                              <Dot color="#00ff88"/>
-                              <span className="mono" style={{ color:'#cce8f0', fontSize:12 }}>{s?.ip_address || '—'}</span>
-                            </div>
-                          </td>
-                          <td style={{ padding:'10px 14px' }}>
-                            <div style={{ display:'flex', alignItems:'center', gap:5 }}>
-                              <FaClock style={{ color:'#3a6a7a', fontSize:10 }}/>
-                              <span className="mono" style={{ color:'#8aaabb', fontSize:11 }}>{s?.up_time || '—'}</span>
-                            </div>
-                          </td>
-                          {/* Upload cell with mini-bar */}
-                          <td style={{ padding:'10px 14px', minWidth:110 }}>
-                            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                              <FaUpload style={{ color:'#00ff88', fontSize:10, flexShrink:0 }}/>
-                              <div style={{ flex:1 }}>
-                                <span className="mono" style={{ color:'#00ff88', fontWeight:700, fontSize:12 }}>{s?.upload || '0'}</span>
-                                <div style={{ height:2, background:'rgba(255,255,255,.04)', borderRadius:99, marginTop:3, overflow:'hidden' }}>
-                                  <div style={{ height:'100%', width:`${ulPct}%`, background:'#00ff88', borderRadius:99, transition:'width 1s ease' }}/>
-                                </div>
+                          </div>
+                        </td>
+
+                        {/* Uptime */}
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                            <FaClock style={{ color: 'var(--text-3)', fontSize: 10 }} />
+                            <span className="mono" style={{ color: 'var(--text-2)', fontSize: 11 }}>
+                              {s?.up_time || '—'}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Upload */}
+                        <td style={{ minWidth: 120 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                            <FaUpload style={{ color: 'var(--green)', fontSize: 10, flexShrink: 0 }} />
+                            <div style={{ flex: 1 }}>
+                              <span className="mono" style={{ fontSize: 12, fontWeight: 600, color: 'var(--green)' }}>
+                                {s?.upload || '0'}
+                              </span>
+                              <div className="noc-bar-track">
+                                <div className="noc-bar-fill" style={{ width: `${ulPct}%`, background: 'var(--green)' }} />
                               </div>
                             </div>
-                          </td>
-                          {/* Download cell with mini-bar */}
-                          <td style={{ padding:'10px 14px', minWidth:110 }}>
-                            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                              <FaDownload style={{ color:'#00d4ff', fontSize:10, flexShrink:0 }}/>
-                              <div style={{ flex:1 }}>
-                                <span className="mono" style={{ color:'#00d4ff', fontWeight:700, fontSize:12 }}>{s?.download || '0'}</span>
-                                <div style={{ height:2, background:'rgba(255,255,255,.04)', borderRadius:99, marginTop:3, overflow:'hidden' }}>
-                                  <div style={{ height:'100%', width:`${dlPct}%`, background:'#00d4ff', borderRadius:99, transition:'width 1s ease' }}/>
-                                </div>
+                          </div>
+                        </td>
+
+                        {/* Download */}
+                        <td style={{ minWidth: 120 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                            <FaDownload style={{ color: 'var(--accent)', fontSize: 10, flexShrink: 0 }} />
+                            <div style={{ flex: 1 }}>
+                              <span className="mono" style={{ fontSize: 12, fontWeight: 600, color: 'var(--accent)' }}>
+                                {s?.download || '0'}
+                              </span>
+                              <div className="noc-bar-track">
+                                <div className="noc-bar-fill" style={{ width: `${dlPct}%`, background: 'var(--accent)' }} />
                               </div>
                             </div>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  : (
-                    <tr>
-                      <td colSpan={8} style={{ padding:'48px 20px', textAlign:'center' }}>
-                        <GiNetworkBars style={{ fontSize:36, color:'#1a3a4a', display:'block', margin:'0 auto 10px' }}/>
-                        <p className="mono" style={{ color:'#2a4a5a', fontSize:12 }}>NO ACTIVE SESSIONS</p>
-                        <p style={{ color:'#1a3a4a', fontSize:11, marginTop:4 }}>Waiting for PPPoE connections…</p>
-                      </td>
-                    </tr>
-                  )
-                }
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={8} style={{ padding: '52px 20px', textAlign: 'center' }}>
+                      <GiNetworkBars style={{ fontSize: 32, color: 'var(--border-2)', display: 'block', margin: '0 auto 10px' }} />
+                      <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-2)', marginBottom: 4 }}>No active sessions</p>
+                      <p style={{ fontSize: 12, color: 'var(--text-3)' }}>Waiting for PPPoE connections</p>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
 
-          {/* Table footer */}
+          {/* Footer */}
           <div style={{
-            display:'flex', alignItems:'center', justifyContent:'space-between',
-            padding:'10px 18px', borderTop:'1px solid rgba(0,212,255,0.06)',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '10px 16px', borderTop: '1px solid var(--border)',
+            background: 'var(--surface-2)',
           }}>
-            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-              <Dot color="#00ff88" glow/>
-              <span className="mono" style={{ fontSize:9, color:'#3a6a7a', letterSpacing:'.08em' }}>SYSTEM OPERATIONAL</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div className="noc-live-dot" style={{ width: 6, height: 6 }} />
+              <span style={{ fontSize: 11, color: 'var(--green)', fontWeight: 600 }}>System Operational</span>
             </div>
-            <span className="mono" style={{ fontSize:9, color:'#2a4a5a' }}>
-              AUTO-REFRESH 5s · TICK {tick}
+            <span className="mono" style={{ fontSize: 10, color: 'var(--text-3)' }}>
+              Auto-refresh 5s · tick {tick}
             </span>
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
   );

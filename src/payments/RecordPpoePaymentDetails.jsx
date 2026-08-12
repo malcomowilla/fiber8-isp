@@ -43,14 +43,14 @@ import {
 } from '@mui/icons-material';
 import { FaReceipt } from "react-icons/fa";
 import { RiSecurePaymentLine } from "react-icons/ri";
-
-
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo, useState, useEffect } from 'react';
 
 
 
 const RecordPpoePaymentDetails = ({ openRecordDetails, setOpenRecordDetails,
      payment, customers,setRecordPaymentForm,recordPaymentForm,
-      handleChange, recordPayment }) => {
+      handleChange, recordPayment, loading }) => {
 //   if (!payment) return null;
 
   
@@ -67,14 +67,66 @@ const RecordPpoePaymentDetails = ({ openRecordDetails, setOpenRecordDetails,
 
 
 
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
+
+
+
+
+
+
   return (
+    <ThemeProvider theme={tableTheme}>
+    
     <Dialog open={openRecordDetails}
      onClose={() => setOpenRecordDetails(false)} maxWidth="md"
      fullWidth>
       <DialogTitle className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Receipt className="text-blue-500" />
-          <Typography variant="h6">Record Payment</Typography>
+          <Typography variant="h6"><p className='font-sans
+'>Record Payment </p></Typography>
         </div>
         <IconButton onClick={() => setOpenRecordDetails(false)}
          size="small">
@@ -272,7 +324,7 @@ const RecordPpoePaymentDetails = ({ openRecordDetails, setOpenRecordDetails,
                 />
          
 
-         
+' 
         </Stack>
 
 
@@ -284,16 +336,19 @@ const RecordPpoePaymentDetails = ({ openRecordDetails, setOpenRecordDetails,
         <button 
         type='submit'
         className='bg-green-500 hover:bg-green-700
-         text-white font-bold py-2 px-4 border border-green-700 rounded'
+         text-white font-bold py-2 px-4 border border-green-700 rounded font-sans flex gap-2'
          >
           Save
+          {loading &&  <span className="w-4 h-4 border-2 border-white/40 border-t-blue-500 rounded-full
+         animate-spin" />}
+         
         </button>
 
 
 
          <button 
-        className='bg-red-500 hover:bg-red-700
-         text-white font-bold py-2 px-4 border border-red-700 rounded'
+        className='bg-red-500 hover:bg-red-700 
+         text-white font-bold py-2 px-4 border border-red-700 rounded font-sans'
         onClick={(e) => {
             setOpenRecordDetails(false)
             e.preventDefault()
@@ -308,6 +363,8 @@ const RecordPpoePaymentDetails = ({ openRecordDetails, setOpenRecordDetails,
       
      
     </Dialog>
+    </ThemeProvider>
+    
   );
 };
 

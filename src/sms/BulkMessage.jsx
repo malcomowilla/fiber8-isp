@@ -20,7 +20,9 @@ import {
 import { ContentCopy, Check, Close, Add } from '@mui/icons-material';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { useNavigate } from 'react-router-dom';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
+import { useMemo } from 'react';
 
 
 const BulkMessage = () => {
@@ -33,6 +35,56 @@ const BulkMessage = () => {
 
     const [strictFilter, setStrictFilter] = useState(false);
     const navigate = useNavigate()
+
+
+
+
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
 
 
     useEffect(() => {
@@ -190,10 +242,13 @@ const BulkMessage = () => {
    }
 
     return (
+            <ThemeProvider theme={tableTheme}>
+        
         <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
             <Paper elevation={3} sx={{ p: 3 }}>
                 <Typography variant="h5" component="h1" gutterBottom sx={{ mb: 3 }}>
-                    Send SMS In Bulk
+                    <p className='font-sans
+'>Send SMS In Bulk </p>
                 </Typography>
                 
                 <form onSubmit={handleSubmit}>
@@ -316,10 +371,12 @@ const BulkMessage = () => {
        after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5
         after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-400
          dark:peer-checked:bg-blue-400"></div>
-  <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+  <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300 font-sans
+">
     Strict Filter</span>
 </label>
-<p>
+<p className='font-sans
+'>
     When strict filter is enabled, a user has to match all the filters applied, if not, a user can have any of them
 
 </p>
@@ -374,6 +431,8 @@ const BulkMessage = () => {
                 </Alert>
             </Snackbar>
         </Box>
+            </ThemeProvider>
+        
     );
 };
 

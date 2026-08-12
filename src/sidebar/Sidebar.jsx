@@ -3520,7 +3520,7 @@
 
 import { useContext, useCallback, useEffect, useState } from 'react'
 import { ApplicationContext } from '../context/ApplicationContext'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useApplicationSettings } from '../settings/ApplicationSettings'
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from "framer-motion";
@@ -3581,8 +3581,11 @@ import {
   
 } from '@mui/icons-material';
 import { BsRouter } from "react-icons/bs";
+import { GrTechnology } from "react-icons/gr";
 
-
+import { FaUsersBetweenLines } from "react-icons/fa6";
+import { Sparkles, Palette,  MapPinned, LogOut, AlertTriangle, LifeBuoy } from 'lucide-react'
+import { LuTv } from "react-icons/lu";
 
 
 const Sidebar = () => {
@@ -3590,12 +3593,16 @@ const Sidebar = () => {
     isExpanded,
     setIsExpanded,
     seeSidebar,
-    setSeeSideBar
+    setSeeSideBar,
+    setCurrentUser
   } = useContext(ApplicationContext);
 
   const { companySettings, setCompanySettings } = useApplicationSettings();
   const { company_name, logo_preview } = companySettings;
   const location = useLocation();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+const [loggingOut, setLoggingOut] = useState(false)
+const navigate = useNavigate() // add useNavigate to your react-router-dom import
   const subdomain = window.location.hostname.split('.')[0];
   
   // Use a single state for all expanded menus
@@ -3611,6 +3618,48 @@ const Sidebar = () => {
   });
 
   const [hoveredMenu, setHoveredMenu] = useState(null);
+
+
+
+
+
+
+
+
+
+
+const handleLogout = async () => {
+  setLoggingOut(true)
+  try {
+    const response = await fetch('/api/logout', {
+      method: "DELETE",
+      credentials: 'include',
+      headers: { 'X-Subdomain': subdomain },
+    })
+    const newData = await response.json()
+
+    if (response.status === 401) {
+      toast.error(newData.error, { position: "top-center", duration: 4000 })
+      setTimeout(() => { window.location.href = '/signin' }, 1900)
+      return
+    }
+    if (response.ok) {
+      setCurrentUser(null)
+      navigate('/signin')
+    } else if (response.status === 402) {
+      setTimeout(() => navigate('/license-expired'), 1800)
+    }
+  } catch (error) {
+    toast.error('Logout failed', { position: "top-center", duration: 4000 })
+  } finally {
+    setLoggingOut(false)
+    setShowLogoutConfirm(false)
+  }
+}
+
+
+
+
 
   // Menu items configuration
   const menuItems = {
@@ -3630,11 +3679,7 @@ const Sidebar = () => {
           label: "Analytics",
           path: "/admin/analytics"
         },
-        {
-          icon: <CiMoneyCheck1 className="w-6 h-6" />,
-          label: "Money Check",
-          path: "/admin/finance-stats"
-        }
+        
       ]
     },
     pppoe: {
@@ -3675,10 +3720,18 @@ const Sidebar = () => {
           label: "Nodes",
           path: "/admin/nodes"
         },
+        // {
+        //   icon: <PiNetworkSlashLight className="w-6 h-6 text-yellow-600" />,
+        //   label: "IP Pool",
+        //   path: "/admin/ip-pool"
+        // },
+
+
+
         {
-          icon: <PiNetworkSlashLight className="w-6 h-6 text-yellow-600" />,
-          label: "IP Pool",
-          path: "/admin/ip-pool"
+          icon: <MapPinned className="w-6 h-6 text-yellow-600" />,
+          label: "Network Map",
+          path: "/admin/network-map"
         },
 
  {
@@ -3721,11 +3774,11 @@ const Sidebar = () => {
           path: "/admin/networks-wireguard-config"
         }, 
 
-        {
-          icon: <FaRegMap />,
-          label: "Map",
-          path: "/admin/map"
-        }
+        // {
+        //   icon: <FaRegMap />,
+        //   label: "Map",
+        //   path: "/admin/map"
+        // }
       ]
     },
     finance: {
@@ -3798,23 +3851,53 @@ const Sidebar = () => {
             path: "/admin/hotspot-marketing-dashboard"
 
         },
+
+
+
+
+        {
+            icon: <GrTechnology className=''/>,
+            label: "Bypass Hotspot",
+            path: "/admin/hotspot-bypass"
+
+        },
         {
           icon: <SiPaloaltonetworks className="w-6 h-6" />,
           label: "Hotspot Package",
           path: "/admin/hotspot-package"
         },
+
+
+
+ {
+          icon: <LuTv  className="w-6 h-6" />,
+          label: "TV Plans",
+          path: "/admin/tv-plans"
+        },
+
+
         {
           icon: <LuTicketsPlane className="w-6 h-6 text-yellow-500" />,
           label: "Vouchers",
           path: "/admin/hotspot-subscriptions"
         }, 
-
+{
+  icon: <Sparkles className="w-6 h-6 text-amber-400" />, // import { Sparkles } from 'lucide-react' or react-icons equivalent
+  label: "Promotions",
+  path: "/admin/hotspot-promotions"
+},
 
         {
           icon: <LuLayoutTemplate />,
           label: "Templates",
           path: "/admin/hotspot-templates"
         },
+
+        {
+  icon: <Palette className="w-6 h-6 text-fuchsia-400" />,
+  label: "Page Designer",
+  path: "/admin/hotspot-page-designer"
+},
         {
           icon: <ImStatsBars className="w-6 h-6 text-yellow-500" />,
           label: "Revenue",
@@ -3858,6 +3941,13 @@ const Sidebar = () => {
           label: "User Groups",
           path: "/admin/user-group"
         },
+         {
+          icon: <FaUsersBetweenLines className="w-6 h-6" />,
+          label: "Free Trial",
+          path: "/admin/free-trial-users"
+        },
+
+        
           {
           icon: <PeopleIcon className="w-6 h-6 text-green-500" />,
           label: "Partners",
@@ -3868,14 +3958,15 @@ const Sidebar = () => {
   };
 
   const quickLinks = [
-    { icon: <ReceiptIcon />, label: "Invoices", path: "/admin/invoice" },
+    { icon: <ReceiptIcon />, label: "Billing Invoices", path: "/admin/invoice" },
     // { icon: <TbLicense className="w-6 h-6" />, label: "Plan", path: "/admin/user-license" },
     { icon: <FaHandshake className="w-6 h-6" />, label: "Leads", path: "/admin/client-leads" },
     { icon: <FaRegCalendarAlt className="w-6 h-6" />, label: "Scheduler", path: "/admin/scheduler" },
     { icon: <MdOutlineSecurity className="w-6 h-6" />, label: "DDOS", path: "/admin/prevent-ddos" },
     { icon: <MdDevices className="w-6 h-6" />, label: "Equipment", path: "/admin/equipment" },
     { icon: <GrLicense className="w-6 h-6" />, label: "License", path: "/admin/license" },
-    { icon: <PermDataSettingIcon />, label: "Settings", path: "/admin/settings" }
+    { icon: <PermDataSettingIcon />, label: "Settings", path: "/admin/settings" },
+    { icon: <LifeBuoy className="w-6 h-6" />, label: "Support Tickets", path: "/admin/support-tickets" },
   ];
 
 const toggleMenu = (menu) => {
@@ -3971,12 +4062,12 @@ const toggleMenu = (menu) => {
     const isHovered = hoveredMenu === menuKey;
 
     return (
-      <li key={menuKey} className="relative">
+      <li key={menuKey} className="relative font-sans">
         {seeSidebar ? (
           // Collapsed sidebar view
           <div
             className={`flex items-center p-3 rounded-lg transition-all
-               duration-300 cursor-pointer group ${
+               duration-300  cursor-pointer group ${
               isActive(menu.path) ? 'bg-teal-800' : 'hover:bg-teal-700'
             }`}
             onMouseEnter={() => setHoveredMenu(menuKey)}
@@ -4001,7 +4092,7 @@ const toggleMenu = (menu) => {
                   className="absolute left-full 
                   ml-2 top-1/2 -translate-y-1/2 bg-gray-900 
                   text-white px-3 py-2 rounded-md shadow-lg 
-                  whitespace-nowrap z-50"
+                  whitespace-nowrap z-50 "
                 >
                   {menu.label}
                 </motion.div>
@@ -4111,10 +4202,13 @@ const toggleMenu = (menu) => {
         animate={{
           width: seeSidebar ? "64px" : "240px"
         }}
+
+       
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="fixed top-0 left-0 h-screen bg-gradient-to-b
-         from-teal-900 to-teal-950 shadow-2xl overflow-hidden
+         className="fixed top-0 left-0 h-screen bg-gradient-to-b
+         bg-primary  to-teal-950 shadow-2xl overflow-hidden
           flex flex-col text-white font-montserat z-50"
+
       >
         {/* Header */}
         <div className="p-4 border-b border-teal-700">
@@ -4133,9 +4227,10 @@ const toggleMenu = (menu) => {
                   <motion.span
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="font-bold text-white text-lg truncate"
+                    className="font-bold text-white text-lg  font-sans
+"
                   >
-                    {company_name || "Aitechs"}
+                    {company_name  || "Aitechs"}
                   </motion.span>
                 </div>
                 <motion.button
@@ -4192,6 +4287,23 @@ const toggleMenu = (menu) => {
                 Quick Links
               </div>
             )}
+
+
+{/* Logout */}
+<div className={`mt-4 ${seeSidebar ? 'px-0' : 'px-2'}`}>
+  <button
+    onClick={() => setShowLogoutConfirm(true)}
+    className={`flex items-center gap-3 p-3 rounded-lg w-full transition-all duration-300
+      text-red-300 hover:bg-red-900/30 hover:text-red-200
+      ${seeSidebar ? 'justify-center' : ''}`}
+  >
+    <LogOut size={20} className="flex-shrink-0" />
+    {!seeSidebar && <span className="text-sm font-medium">Log out</span>}
+  </button>
+</div>
+
+
+
             <ul className="space-y-1">
               {quickLinks.map((link, idx) => (
                 <li key={idx}>
@@ -4236,14 +4348,65 @@ const toggleMenu = (menu) => {
           </motion.div>
         )}
       </motion.aside>
-
-      {/* Backdrop for mobile */}
-      {/* {seeSidebar && window.innerWidth < 1080 && (
-        <div
-          className="fixed inset-0  lg:hidden"
-          onClick={() => setSeeSideBar(true)}
-        />
-      )} */}
+{/* Logout confirmation modal */}
+<AnimatePresence>
+  {showLogoutConfirm && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+      onClick={() => !loggingOut && setShowLogoutConfirm(false)}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-200 dark:border-gray-700 font-sans"
+      >
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center shrink-0">
+            <AlertTriangle size={20} className="text-red-600 dark:text-red-400" />
+          </div>
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white">Log out?</h3>
+        </div>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+          You'll need to sign in again to access the dashboard.
+        </p>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setShowLogoutConfirm(false)}
+            disabled={loggingOut}
+            className="flex-1 py-2.5 px-4 rounded-lg text-sm font-medium
+              text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700
+              hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors
+              disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="flex-1 py-2.5 px-4 rounded-lg text-sm font-medium text-white
+              bg-red-600 hover:bg-red-700 transition-colors
+              disabled:opacity-70 disabled:cursor-not-allowed
+              flex items-center justify-center gap-2"
+          >
+            {loggingOut && (
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            )}
+            {loggingOut ? 'Logging out…' : 'Log out'}
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+     
     </>
   );
 };

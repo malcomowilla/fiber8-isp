@@ -27,7 +27,8 @@ import {
   MenuItem,
   InputLabel,
   Box, TextField, Autocomplete, Stack, InputAdornment, Button,
-  DialogContentText,Chip, Snackbar, Alert, LinearProgress
+  DialogContentText,Chip, Snackbar, Alert, LinearProgress,
+  CircularProgress,FormControl 
 
 } from '@mui/material';
 
@@ -37,6 +38,9 @@ import { TbWorldLatitude } from "react-icons/tb";
 import { TbWorldLongitude } from "react-icons/tb";
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import { Save as SaveIcon, Delete as DeleteIcon, Warning as WarningIcon } from '@mui/icons-material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Server } from 'lucide-react'
+
 
 
 
@@ -73,7 +77,9 @@ const SubscriberDetails = ({
     setFormDataSubscriber, formDataSubscriber,
     handleChangeSubscriber,selectedLocations, setSelectedLocations,
      editingSubscriber, setEditingSubscriber,
-    setTableDataSubscriber, tableDataSubscriber
+    setTableDataSubscriber, tableDataSubscriber,
+      selectedRouter, setSelectedRouter
+
   } = useApplicationSettings()
   
 
@@ -114,10 +120,70 @@ const SubscriberDetails = ({
   const [draftExists, setDraftExists] = useState(false);
   const [draftLoaded, setDraftLoaded] = useState(false);
 
+
+console.log("selectedRouter",selectedRouter)
+
+  const [formComplete, setFormComplete] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [ipPool, setIpPool] = useState([])
+  const [loadingRouters, setLoadingRouters] = useState(false)
+  const [routerDetails, setRouterDetails] = useState(null)
 const {name, ref_no , ppoe_password,  ppoe_username,  phone_number, email, second_phone_number,
      package_name, installation_fee, subscriber_discount, date_registered, router_name,
      latitude, longitude, house_number, building_name,location,node
     }= formDataSubscriber
+
+
+
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
+
+
 
 
 
@@ -697,6 +763,13 @@ const [loading, setloading] = useState(false)
 const createSubscriber = async (e) => {
     // setOpenLoad(true)
 e.preventDefault()
+
+
+    if (!selectedRouter) {
+        toast.error(<p className='font-sans'>Please select a router</p>)
+        return
+      }
+     
     try {
       setloading(true)
 
@@ -791,15 +864,76 @@ if (formDataSubscriber.id) {
 
   }
 
+
+
+
+
+
+
+
+
+
+
+const fetchRouters = useCallback(async () => {
+  try {
+    setLoadingRouters(true)
+    const response = await fetch('/api/routers', {
+      headers: { 'X-Subdomain': subdomain }
+    })
+    const data = await response.json()
+    setRouters(data || [])
+    
+    // Pre-select if editing
+    if ( formDataSubscriber?.nas_router) {
+      setSelectedRouter(formDataSubscriber.nas_router)
+      const router = data.find(r => r.name === formDataSubscriber.nas_router)
+      if (router) setRouterDetails(router)
+    }
+  } catch (error) {
+    toast.error(<p className='font-sans'>Failed to load routers</p>)
+  } finally {
+    setLoadingRouters(false)
+  }
+}, [formDataSubscriber, subdomain])
+
+
+
+
+useEffect(() => {
+  if (open) {
+    fetchRouters()
+  }
+}, [open, fetchRouters])
+
+
+
+
+const handleRouterChange = (e) => {
+  const routerName = e.target.value
+  setSelectedRouter(routerName)
+  const selected = routers.find(r => r.name === routerName)
+  setRouterDetails(selected || null)
+  setFormDataSubscriber({
+    ...formDataSubscriber,
+    router_name: selected?.name || '',
+     nas_router: selected?.name || ''
+  })
+}
+
+
+
   return (
       <>
      <Toaster />
+     <ThemeProvider theme={tableTheme}>
+     
          {hasUnsavedChanges && (
-        <div className="fixed top-4 right-4 z-50 max-w-md">
+        <div className="fixed top-4 right-4 z-50 max-w-md font-sans
+">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-yellow-50 border border-yellow-200 rounded-lg shadow-lg p-3"
+            className="bg-yellow-50 border border-yellow-200 rounded-lg shadow-lg p-3 "
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -861,7 +995,8 @@ if (formDataSubscriber.id) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative w-full md:mx-auto md:max-w-4xl p-4"
+        className="relative w-full md:mx-auto md:max-w-4xl p-4 font-sans
+"
       >
         {draftLoaded && (
           <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
@@ -875,7 +1010,8 @@ if (formDataSubscriber.id) {
         )}
         <form onSubmit={createSubscriber}>
           {/* Name and User Group */}
-          <div className="mb-3">
+          <div className="mb-3 font-sans
+">
             <Box className='flex flex-col md:flex-row gap-4'
               sx={{
                 '& .MuiTextField-root': {
@@ -1026,7 +1162,8 @@ if (formDataSubscriber.id) {
                                         className='myTextField'
                                             {...params} 
                                             label="Locations" 
-                                            placeholder="Type and press enter to add new locations"
+                                            placeholder={<p className='font-sans
+'>Type and press enter to add new locations</p>}
                                             onKeyDown={handleKeyDown}
                                         />
                                     )}
@@ -1034,7 +1171,8 @@ if (formDataSubscriber.id) {
                                         value.map((option, index) => (
                                             <Chip
                                                 key={option}
-                                                label={option}
+                                                label={<p className='font-sans
+'>{option} </p>}
                                                 {...getTagProps({ index })}
                                                 deleteIcon={<Close />}
                                                 onDelete={handleDeleteLocation(option)}
@@ -1049,7 +1187,8 @@ if (formDataSubscriber.id) {
                                         onClick={handleAddNewLocation}
                                         sx={{ mt: 1 }}
                                     >
-                                        Add "{locationInput}" as new location
+                                        <p className='font-sans
+'> Add "{locationInput}" as new location </p>
                                     </Button>
                                 )}
                             </Box>
@@ -1092,7 +1231,7 @@ if (formDataSubscriber.id) {
                 },
               }}
             >
-             <TextField
+             {/* <TextField
                 className='myTextField'
                 id="second_phone_number"
                 value={formDataSubscriber.second_phone_number}
@@ -1107,7 +1246,55 @@ if (formDataSubscriber.id) {
                 }}
                 variant="outlined"
                 fullWidth
-              />
+              /> */}
+
+
+
+
+{/* Router Selection */}
+<div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+  <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+    <Server className="w-5 h-5" />
+    Select Router *
+  </h3>
+
+  {loadingRouters ? (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <CircularProgress size={30} />
+      <span style={{ marginLeft: '12px' }}>Loading routers...</span>
+    </div>
+  ) : routers.length === 0 ? (
+    <Alert severity="warning">No routers found. Add a router first.</Alert>
+  ) : (
+    <>
+      <FormControl fullWidth style={{ marginBottom: '12px' }}>
+        <InputLabel>Select Router</InputLabel>
+        <Select value={selectedRouter} onChange={handleRouterChange} label="Select Router">
+          <MenuItem value=""><em>Choose a router...</em></MenuItem>
+          {routers.map((router) => (
+            <MenuItem key={router.id} value={router.name}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Server className="w-4 h-4" />
+                {router.name}
+              </div>
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      {routerDetails && (
+        <div style={{ padding: '12px', backgroundColor: 'white', borderRadius: '6px', borderLeft: '4px solid #2196F3' }}>
+          <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>Selected Router:</p>
+          <div style={{ fontSize: '13px' }}>
+            <div>Name: <strong>{routerDetails.name}</strong></div>
+            <div>IP: <strong>{routerDetails.ip_address}</strong></div>
+          </div>
+        </div>
+      )}
+    </>
+  )}
+</div>
+
 
             <TextField 
             onChange={handleChangeBuildingNameAndHouseNumber}
@@ -1145,7 +1332,7 @@ if (formDataSubscriber.id) {
               },
             }}
           >
- <TextField id="ppoe_password" onChange={handleChangeSubscriber}
+ {/* <TextField id="ppoe_password" onChange={handleChangeSubscriber}
               InputProps={{
                 startAdornment: <TbLockPassword className='w-6 h-6 mr-2 text-blue-500' />,
               }}
@@ -1159,7 +1346,7 @@ if (formDataSubscriber.id) {
                   }}
                   
                   id="ppoe_username" onChange={handleChangeSubscriber} value={ppoe_username}
-                    label="Ppoe Username" variant="outlined" />
+                    label="Ppoe Username" variant="outlined" /> */}
 
           </Box>
 
@@ -1171,10 +1358,12 @@ if (formDataSubscriber.id) {
 <div className='bg-yellow-50 dark:bg-yellow-900 p-4 flex
 gap-2 items-center justify-center
 rounded-md mt-4 cursor-pointer'>
-<FcInfo />
+{/* <FcInfo /> */}
+
+{/* 
 <p className=''> if you have chosen pppoe username as an 
   autogenerated number in the subscriber account settings then you 
-  can leave this field blank(Ppoe Username)</p>
+  can leave this field blank(Ppoe Username)</p> */}
 
   
   </div>
@@ -1429,6 +1618,8 @@ rounded-md mt-4 cursor-pointer'>
           </Button>
         </DialogActions>
       </Dialog>
+      </ThemeProvider>
+      
     </>
 
   )

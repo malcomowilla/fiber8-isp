@@ -13,6 +13,7 @@ import { MdOutlineSupportAgent } from "react-icons/md";
  import { LiaSmsSolid } from "react-icons/lia";
  import { FaRegCheckCircle, FaRegTimesCircle } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
+import { useMemo } from 'react';
 
 
 
@@ -62,6 +63,53 @@ const handleRowClick = (event, rowData)=> {
 const handleRowOpen = ()=> {
   setIsOpen(true)
 }
+
+
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
 
 
 
@@ -235,31 +283,7 @@ const sortedMessages = [...sms].sort((a, b) => {
 
 
 
-                      const tableTheme = createTheme({
-                        palette: {
-                          mode: 'light',
-                          primary: {
-                            main: '#4f46e5', // Indigo
-                          },
-                          secondary: {
-                            main: '#10b981', // Emerald
-                          },
-                          background: {
-                            default: '#f9fafb', // Cool gray 50
-                          },
-                        },
-                        components: {
-                          MuiTableCell: {
-                            styleOverrides: {
-                              head: {
-                                fontWeight: 700,
-                                fontSize: '0.875rem',
-                                color: '#111827', // Gray 900
-                              },
-                            },
-                          },
-                        },
-                      });
+                      
                     
                       const statusChip = (status) => {
                         switch(status) {
@@ -382,7 +406,11 @@ const sortedMessages = [...sms].sort((a, b) => {
 
         {/* Messages Table */}
         <div className="bg-white rounded-xl shadow overflow-hidden">
+          <ThemeProvider theme={tableTheme}>
+          
           <MaterialTable
+          title={<p className=' font-bold text-xl font-sans'>Messages</p>}
+
             columns={[
               { 
                 title: "Message", 
@@ -392,9 +420,7 @@ const sortedMessages = [...sms].sort((a, b) => {
                   textOverflow: 'ellipsis',
                   maxWidth: '300px'
                 },
-                headerStyle: {
-                  backgroundColor: '#f9fafb',
-                },
+               
 
                 render: (rowData) => (
                   <span className="font-medium dark:text-white text-sm">{rowData.message}</span>
@@ -435,28 +461,39 @@ const sortedMessages = [...sms].sort((a, b) => {
             // data={sms}
             data={sortedMessages} // Using the sorted array
             onRowClick={(event, rowData) => setMessage(rowData)}
-            options={{
-              paging: true,
-              pageSizeOptions: [10],
-              pageSize: 10,
-              search: false,
-              showTitle: false,
-              toolbar: false,
-              headerStyle: {
-                backgroundColor: '#f9fafb',
-                fontWeight: 600,
-                color: '#374151',
-                textTransform: 'uppercase',
-                fontSize: '0.75rem',
-                letterSpacing: '0.05em'
-              },
-              rowStyle: {
-                '&:hover': {
-                  backgroundColor: '#f3f4f6'
-                }
-              },
-              actionsColumnIndex: -1
-            }}
+           
+options={{
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'monospace',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'monospace',
+      }),
+    }}
+      
             actions={[
               {
                 icon: () => (
@@ -479,6 +516,8 @@ const sortedMessages = [...sms].sort((a, b) => {
               }
             ]}
           />
+          </ThemeProvider>
+          
         </div>
 
         {/* Stats Footer */}

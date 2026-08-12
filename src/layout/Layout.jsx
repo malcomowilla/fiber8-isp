@@ -5,19 +5,14 @@ import { useContext, useState, useEffect, useCallback} from 'react'
 import {ApplicationContext} from '../context/ApplicationContext'
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import ShortCuts from './ShortCuts'
-import UiLoader from '../uiloader/UiLoader'
-import { Suspense } from "react";
+// import { Suspense } from "react";
 import { useLocation } from 'react-router-dom';
 import DashboardStatistics from '../hotspot_page/DashboardStatistics'
 import { APP_VERSION, APP_DESCRIPTION } from '../version';
 import TicketStatistics from '../tickets/TicketStatistics'
 import SubscriberStats from '../subscribers/SubscriberStats'
 import { IoWarningOutline } from "react-icons/io5";
-import { 
-  Cable as CableIcon,
-  Wifi as WifiIcon,
-  CalendarMonth as CalendarMonthIcon
-} from '@mui/icons-material';
+
 import CurrentPlans from './CurrentPlans'
 import License from './License'
 import Updates from './Updates'
@@ -364,7 +359,7 @@ useEffect(() => {
 
     
     <div
-      className={`h-screen flex flex-col overflow-y-scroll transition-all 
+      className={`h-screen flex flex-col  transition-all 
         duration-500 ease-in-out ${
         seeSidebar ? 'ml-16' : 'sm:ml-64'
       }`}
@@ -422,14 +417,24 @@ useEffect(() => {
                 location.pathname !== '/admin/ip-pool' &&
                 location.pathname !== '/admin/template-assignment' &&
                 location.pathname !== '/admin/subscriber-invoice-page' &&
-                location.pathname !== '/admin/analytics' &&
+                // location.pathname !== '/admin/analytics' &&
                 location.pathname !== '/admin/hotspot-payments' &&
                 location.pathname !== '/admin/partners-management' &&
                 location.pathname !== '/admin/pppoe-payments' &&
                 location.pathname !== '/admin/access-point' &&
+                 location.pathname !== '/admin/hotspot-bypass' &&
+                  location.pathname !== '/admin/free-trial-users' &&
+                   location.pathname !== '/admin/hotspot-promotions' &&
+                                      location.pathname !== '/admin/hotspot-page-designer' &&
+                                      location.pathname !== '/admin/network-map' &&
+                                      location.pathname !== '/admin/tv-plans' &&
+                                      location.pathname !== '/admin/support-tickets' &&
+                                      
+
+                  
+                
               <WelcomeMessage/>
  }
-
          
 {location.pathname !== '/admin/hotspot_anlytics' &&
  location.pathname !== '/admin/admin-dashboard'  && location.pathname !== '/admin/pppoe-subscribers' 
@@ -461,7 +466,8 @@ location.pathname !== '/admin/user-license' && location.pathname !== '/admin/sub
 location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/urgent-tickets' &&
 location.pathname !== '/admin/equipment' && location.pathname !== '/admin/call-center' &&
 location.pathname !== '/admin/devices' && location.pathname !== '/admin/onu-details' &&
-location.pathname !== '/admin/ip_networks'
+location.pathname !== '/admin/ip_networks' &&
+ location.pathname !== '/admin/tv-plans' 
 
 
  && 
@@ -485,7 +491,13 @@ location.pathname !== '/admin/passkeys' && location.pathname !== '/admin/ticket-
    location.pathname !== '/admin/partners-management' &&
    location.pathname !== '/admin/pppoe-payments' &&
    location.pathname !== '/admin/access-point' &&
-
+    location.pathname !== '/admin/hotspot-bypass' &&
+    location.pathname !== '/admin/free-trial-users' &&
+    location.pathname !== '/admin/hotspot-promotions' &&
+     location.pathname !== '/admin/hotspot-page-designer' &&
+location.pathname !== '/admin/network-map' &&
+ location.pathname !== '/admin/tv-plans' &&
+ location.pathname !== '/admin/support-tickets' &&
 <div
  onClick={() => {
             setShowMenu1(false)
@@ -594,6 +606,13 @@ location.pathname !== '/admin/onu-details' && location.pathname !== '/admin/node
     location.pathname !== '/admin/partners-management' &&
     location.pathname !== '/admin/pppoe-payments' &&
     location.pathname !== '/admin/access-point' &&
+     location.pathname !== '/admin/hotspot-bypass' &&
+     location.pathname !== '/admin/free-trial-users' &&
+     location.pathname !== '/admin/hotspot-promotions' &&
+     location.pathname !== '/admin/hotspot-page-designer' &&
+     location.pathname !== '/admin/network-map' &&
+      location.pathname !== '/admin/tv-plans' &&
+      location.pathname !== '/admin/support-tickets' && 
 <div 
  onClick={() => {
             setShowMenu1(false)
@@ -688,8 +707,16 @@ location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/u
                   && location.pathname !== '/admin/upload-subscriber'
                   && location.pathname !== '/admin/partners-management'
                   && location.pathname !== '/admin/pppoe-payments'
-                  && location.pathname !== '/admin/access-point'
-           && <div
+                  && location.pathname !== '/admin/access-point' &&
+                   location.pathname !== '/admin/hotspot-bypass' &&
+                   location.pathname !== '/admin/free-trial-users' && 
+                    location.pathname !== '/admin/google-authenticator' &&
+                    location.pathname !== '/admin/hotspot-promotions' &&
+                    location.pathname !== '/admin/hotspot-page-designer' &&
+                    location.pathname !== '/admin/network-map' &&
+                     location.pathname !== '/admin/tv-plans' &&
+                     location.pathname !== '/admin/support-tickets' &&
+           <div
             onClick={() => {
             setShowMenu1(false)
             setShowMenu2(false)
@@ -859,11 +886,12 @@ location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/u
             setShowMenu11(false)  
             setShowMenu12(false)
           }}>
-             <Suspense fallback={<RefreshCw 
+             {/* <Suspense fallback={<RefreshCw 
              className='animate-spin
               text-blue-500 w-12 h-12 mx-auto' />}>
             <Outlet />
-             </Suspense>
+             </Suspense> */}
+              <Outlet />
             
           </div>
         </div>
@@ -873,11 +901,12 @@ location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/u
 
 
 
-      <div className="flex flex-col p-4 font-mono">
+      <div className="flex flex-col p-4 ">
         <Sidebar />
       </div>
 
-<div className='flex justify-center roboto-condensed-light'>
+<div className='flex justify-center font-sans
+'>
       <footer className="p-4  bottom-0 font-mono  bg-gray-200 dark:bg-gray-800">
         <p className="text-black dark:text-white ">
           {APP_DESCRIPTION} -  <span className='border-2 border-green-600
@@ -890,5 +919,4 @@ location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/u
   </>
   )
 }
-
 export default Layout

@@ -5,7 +5,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import CloseIcon from '@mui/icons-material/Close';
-import { forwardRef, useState, useRef } from 'react';
+import { forwardRef, useState, useRef, useEffect } from 'react';
 import {
   Slide,
   useTheme,
@@ -15,6 +15,7 @@ import {
   Typography,
   Divider,
 } from '@mui/material';
+
 import { FaRegCreditCard } from "react-icons/fa6";
 import LogoutIcon from '@mui/icons-material/Logout'; // add this import
 
@@ -24,6 +25,13 @@ import {
 } from 'lucide-react';
 import Popper from '@mui/material/Popper';
 import Paper from '@mui/material/Paper';
+
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
+
+
+
+
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -46,9 +54,9 @@ function VoucherDetails({
   customer,
   time_paid,
   isOnline,  
-  loadingLogout    ,
+  loadingLogout  ,
   logoutUser,
-  loginBy         // <-- new prop
+  loginBy        
 }) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -77,9 +85,59 @@ function VoucherDetails({
   const id = open ? 'logout-popover' : undefined;
 
 
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
   return (
     <>
 
+
+ <ThemeProvider theme={tableTheme}>
+    <div className='font-sans
+'>
   <Popper
         id={id}
         open={open}
@@ -95,7 +153,7 @@ function VoucherDetails({
       >
         <Paper elevation={3} sx={{ p: 2, border: '1px solid #eee' }}>
           <Typography variant="body2" sx={{ mb: 1 }}>
-            Logout voucher {voucher}?
+            <p className='font-sans'>Logout voucher</p> {voucher}?
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
             <Button 
@@ -103,7 +161,7 @@ function VoucherDetails({
               variant="outlined" 
               onClick={handleClosePopper}
             >
-              Cancel
+              <p className='font-sans'>Cancel </p>
             </Button>
             <Button
               size="small"
@@ -115,7 +173,7 @@ function VoucherDetails({
                 logoutUser();
               }}
             >
-              CONFIRM
+              <p className='font-sans'>CONFIRM </p>
             </Button>
           </Box>
         </Paper>
@@ -203,7 +261,7 @@ function VoucherDetails({
             <FaRegCreditCard className="text-black" />
           </Box>
           <Typography variant="h5" component="span" fontWeight="bold">
-            <p className="text-black dark:text-white">Voucher Details</p>
+            <p className="text-black dark:text-white font-sans">Voucher Details</p>
           </Typography>
         </Box>
       </DialogTitle>
@@ -219,8 +277,8 @@ function VoucherDetails({
       >
         <Typography variant="body2" color="text.secondary" align="center">
           {/* Voucher line with online indicator */}
-         <p className="text-black font-bold p-1 dark:text-white flex items-center justify-center gap-2">
-  Voucher: <span className="font-thin">{voucher}</span>
+         <p className="text-black font-bold p-1 dark:text-white flex items-center justify-center gap-2 font-sans">
+  Voucher: <span className="">{voucher}</span>
   <span className="inline-flex items-center gap-1 ml-2">
     {isOnline ? (
       <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded-full">
@@ -236,7 +294,7 @@ function VoucherDetails({
   </span>
 </p>
 
-          <p className="text-black font-bold dark:text-white">
+          <p className="text-black font-bold dark:text-white font-sans">
             Status:{' '}
             <span
               className={`${
@@ -252,60 +310,60 @@ function VoucherDetails({
               {status}
             </span>
           </p>
-          <p className="text-black font-bold p-1 dark:text-white">
-            Expiration: <span className="font-thin">{expiration}</span>
+          <p className="text-black font-bold p-1 dark:text-white font-sans">
+            Expiration: <span className="">{expiration}</span>
           </p>
-          <p className="text-black font-bold p-1 dark:text-white">
-            Speed Limit: <span className="font-thin">{speed}</span>
+          <p className="text-black font-bold p-1 dark:text-white font-sans">
+            Speed Limit: <span className="">{speed}</span>
           </p>
-          <p className="text-black font-bold p-1 dark:text-white">
-            User Limit: <span className="font-thin">{useLimit}</span>
+          <p className="text-black font-bold p-1 dark:text-white font-sans">
+            User Limit: <span className="">{useLimit}</span>
           </p>
-          <p className="text-black font-bold p-1 dark:text-white">
-            Phone: <span className="font-thin">{phone}</span>
-          </p>
-
-                 <p className="text-black font-bold p-1 dark:text-white">
-            Login Method: <span className="font-thin">{loginBy}</span>
+          <p className="text-black font-bold p-1 dark:text-white font-sans">
+            Phone: <span className="">{phone}</span>
           </p>
 
-          <p className="text-black font-bold p-1 dark:text-white">
-            Created At: <span className="font-thin">{createdAt}</span>
+                 <p className="text-black font-bold p-1 dark:text-white font-sans">
+            Login Method: <span className="">{loginBy}</span>
           </p>
-          <p className="text-black font-bold p-1 dark:text-white">
-            Updated At: <span className="font-thin">{updatedAt}</span>
+
+          <p className="text-black font-bold p-1 dark:text-white font-sans">
+            Created At: <span className="">{createdAt}</span>
+          </p>
+          <p className="text-black font-bold p-1 dark:text-white font-sans">
+            Updated At: <span className="">{updatedAt}</span>
           </p>
         </Typography>
 
         <Divider sx={{ my: 2 }} />
 
         <Typography variant="subtitle2" align="center" sx={{ fontWeight: 600, mb: 1 }}>
-          Payment Information
+          <p className='font-sans'>Payment Information </p>
         </Typography>
         <Typography variant="body2" color="text.secondary" align="center">
           {payment_method && (
-            <p className="text-black font-bold p-1 dark:text-white">
-              Payment Method: <span className="font-thin">{payment_method}</span>
+            <p className="text-black font-bold p-1 font-sans dark:text-white">
+              Payment Method: <span className="">{payment_method}</span>
             </p>
           )}
           {reference && (
-            <p className="text-black font-bold p-1 dark:text-white">
-              Reference: <span className="font-thin">{reference}</span>
+            <p className="text-black font-bold p-1 font-sans dark:text-white">
+              Reference: <span className="">{reference}</span>
             </p>
           )}
           {amount && (
-            <p className="text-black font-bold p-1 dark:text-white">
-              Amount: <span className="font-thin">KES {amount}</span>
+            <p className="text-black font-bold p-1 dark:text-white font-sans">
+              Amount: <span className="">KES {amount}</span>
             </p>
           )}
           {customer && (
-            <p className="text-black font-bold p-1 dark:text-white">
-              Customer: <span className="font-thin">{customer}</span>
+            <p className="text-black font-bold p-1 dark:text-white font-sans">
+              Customer: <span className="">{customer}</span>
             </p>
           )}
           {time_paid && (
-            <p className="text-black font-bold p-1 dark:text-white">
-              Time Paid: <span className="font-thin">{time_paid}</span>
+            <p className="text-black font-bold p-1 dark:text-white font-sans">
+              Time Paid: <span className="">{time_paid}</span>
             </p>
           )}
         </Typography>
@@ -335,10 +393,13 @@ function VoucherDetails({
             },
           }}
         >
-          Close
+          <p className='font-sans'>Close </p>
         </Button>
       </DialogActions>
     </Dialog>
+    </div>
+
+     </ThemeProvider>
     </>
   );
 }

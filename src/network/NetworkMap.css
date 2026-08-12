@@ -1,0 +1,393 @@
+/* ==========================================================================
+   NetworkMap — dark "network operations" theme
+   Palette: void #0b1220, panel #101a2c, teal accent #14b8a6, cyan #22d3ee,
+            amber #eab308, danger #ef4444, ink text #e2e8f0, muted #7d8aa3
+   Type: Inter (UI), "JetBrains Mono" (coordinates / counters)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+.nm-root {
+  position: relative;
+  width: 100%;
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: #e2e8f0;
+  background: #0b1220;
+  overflow: hidden;
+}
+
+.nm-map {
+  position: absolute;
+  inset: 0;
+}
+
+.nm-root .leaflet-container {
+  background: #0b1220;
+  font-family: 'Inter', sans-serif;
+}
+
+.nm-root .leaflet-control-zoom a {
+  background: #101a2c;
+  color: #cbd5e1;
+  border-color: rgba(148, 163, 184, 0.15) !important;
+}
+.nm-root .leaflet-control-zoom a:hover { background: #16233b; color: #5eead4; }
+
+/* ---------------------------------------------------------------- */
+/* Shared panel chrome                                               */
+/* ---------------------------------------------------------------- */
+
+.nm-panel {
+  position: absolute;
+  background: rgba(16, 26, 44, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  z-index: 500;
+}
+
+.nm-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #94a3b8;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+}
+.nm-panel-head:hover { color: #cbd5e1; }
+
+.nm-panel-body { padding: 0 14px 14px; }
+
+/* ---------------------------------------------------------------- */
+/* Top bar                                                            */
+/* ---------------------------------------------------------------- */
+
+.nm-topbar {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background:
+    linear-gradient(90deg, rgba(16,26,44,0.94), rgba(16,26,44,0.94)),
+    repeating-linear-gradient(90deg, rgba(94,234,212,0.05) 0 1px, transparent 1px 24px);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.nm-topbar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 14.5px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.nm-logo-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #2dd4bf;
+  box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.15);
+}
+
+.nm-topbar-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #7d8aa3;
+  white-space: nowrap;
+}
+.nm-dot-sep { width: 3px; height: 3px; border-radius: 50%; background: #3a4a63; }
+
+.nm-topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---------------------------------------------------------------- */
+/* Buttons                                                            */
+/* ---------------------------------------------------------------- */
+
+.nm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: #16233b;
+  color: #cbd5e1;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+.nm-btn:hover { background: #1c2c48; border-color: rgba(45, 212, 191, 0.35); }
+.nm-btn:active { transform: translateY(1px); }
+.nm-btn:disabled { opacity: 0.6; cursor: default; }
+.nm-btn.is-busy { color: #2dd4bf; border-color: rgba(45, 212, 191, 0.4); }
+
+.nm-btn-primary {
+  background: linear-gradient(180deg, #14b8a6, #0d9488);
+  border-color: transparent;
+  color: #06251f;
+}
+.nm-btn-primary:hover { background: linear-gradient(180deg, #2dd4bf, #14b8a6); }
+
+.nm-btn-ghost { background: transparent; border-color: rgba(148, 163, 184, 0.18); }
+.nm-btn-danger { background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.35); color: #fca5a5; }
+.nm-btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+
+.nm-spin { animation: nm-rotate 0.9s linear infinite; }
+@keyframes nm-rotate { to { transform: rotate(360deg); } }
+
+.nm-seg {
+  display: flex;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.nm-seg-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 8px 12px;
+  background: #101a2c;
+  color: #94a3b8;
+  border: none;
+  border-right: 1px solid rgba(148, 163, 184, 0.12);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.nm-seg-btn:last-child { border-right: none; }
+.nm-seg-btn:hover { color: #e2e8f0; background: #16233b; }
+.nm-seg-btn.is-active { background: rgba(45, 212, 191, 0.16); color: #5eead4; }
+
+/* ---------------------------------------------------------------- */
+/* Hint bar (placement mode)                                          */
+/* ---------------------------------------------------------------- */
+
+.nm-hint {
+  position: absolute;
+  top: 68px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.14);
+  border: 1px solid rgba(45, 212, 191, 0.4);
+  color: #99f6e4;
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.nm-hint-row { display: flex; align-items: center; gap: 6px; }
+.nm-inline-select {
+  background: #0b1220; color: #e2e8f0; border: 1px solid rgba(94, 234, 212, 0.35);
+  border-radius: 6px; padding: 2px 6px; font-size: 12px;
+}
+.nm-hint-close {
+  background: none; border: none; color: #99f6e4; cursor: pointer; display: flex;
+}
+
+/* ---------------------------------------------------------------- */
+/* Hierarchy panel                                                     */
+/* ---------------------------------------------------------------- */
+
+.nm-panel-hierarchy {
+  top: 76px; left: 16px; width: 260px; max-height: calc(100vh - 220px);
+  display: flex; flex-direction: column;
+}
+.nm-panel-hierarchy .nm-panel-body { overflow-y: auto; }
+
+.nm-search {
+  display: flex; align-items: center; gap: 8px;
+  background: #0b1220; border: 1px solid rgba(148,163,184,0.15);
+  border-radius: 8px; padding: 7px 10px; margin-bottom: 10px; color: #64748b;
+}
+.nm-search input {
+  background: transparent; border: none; outline: none; color: #e2e8f0;
+  font-size: 12.5px; width: 100%;
+}
+
+.nm-empty { padding: 18px 4px; text-align: center; color: #64748b; font-size: 12.5px; }
+.nm-empty-sub { color: #475569; margin-top: 4px; }
+
+.nm-tree { list-style: none; margin: 0; padding: 0; }
+.nm-tree-children { list-style: none; margin: 2px 0 6px 14px; padding-left: 10px; border-left: 1px dashed rgba(148,163,184,0.18); }
+
+.nm-tree-row {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  background: none; border: none; text-align: left;
+  padding: 7px 8px; border-radius: 7px; color: #cbd5e1; font-size: 12.5px;
+  cursor: pointer;
+}
+.nm-tree-row:hover { background: #16233b; }
+.nm-tree-row.is-active { background: rgba(45, 212, 191, 0.14); color: #5eead4; }
+.nm-tree-pop { font-weight: 600; }
+.nm-tree-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.nm-tree-type { margin-left: auto; font-size: 10.5px; color: #64748b; font-family: 'JetBrains Mono', monospace; }
+
+/* ---------------------------------------------------------------- */
+/* Basemap switcher                                                    */
+/* ---------------------------------------------------------------- */
+
+.nm-panel-basemap {
+  bottom: 24px; left: 16px;
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px; color: #64748b;
+}
+.nm-chip {
+  padding: 6px 12px; border-radius: 7px; border: none; background: transparent;
+  color: #94a3b8; font-size: 12px; font-weight: 600; cursor: pointer;
+}
+.nm-chip:hover { color: #e2e8f0; }
+.nm-chip.is-active { background: rgba(45, 212, 191, 0.18); color: #5eead4; }
+
+/* ---------------------------------------------------------------- */
+/* Legend                                                               */
+/* ---------------------------------------------------------------- */
+
+.nm-panel-legend { top: 76px; right: 16px; width: 200px; }
+.nm-legend-body { display: flex; flex-direction: column; gap: 14px; }
+.nm-legend-group h4 {
+  margin: 0 0 6px; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em;
+  color: #4c5b74; font-weight: 700;
+}
+.nm-legend-row {
+  display: flex; align-items: center; gap: 8px; font-size: 12px; color: #cbd5e1;
+  padding: 3px 0;
+}
+.nm-legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.nm-legend-pop { background: #14b8a6; border-radius: 4px 4px 0 0; }
+.nm-legend-line { width: 18px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+
+/* ---------------------------------------------------------------- */
+/* Inspector (selected node)                                          */
+/* ---------------------------------------------------------------- */
+
+.nm-panel-inspector {
+  bottom: 24px; right: 16px; width: 260px;
+}
+.nm-inspector-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; border-bottom: 1px solid rgba(148,163,184,0.12);
+  font-size: 13.5px;
+}
+.nm-inspector-head button { background: none; border: none; color: #64748b; cursor: pointer; }
+.nm-inspector-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+.nm-kv { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; }
+.nm-kv span:first-child { color: #64748b; }
+.nm-kv span:last-child { color: #e2e8f0; font-family: 'JetBrains Mono', monospace; text-align: right; }
+.nm-status-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600;
+  background: color-mix(in srgb, var(--c) 18%, transparent);
+  color: var(--c);
+}
+.nm-status-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
+.nm-inspector-actions { padding: 10px 14px; border-top: 1px solid rgba(148,163,184,0.12); }
+
+/* ---------------------------------------------------------------- */
+/* Markers                                                              */
+/* ---------------------------------------------------------------- */
+
+.nm-marker { background: transparent; border: none; }
+
+.nm-pop-marker {
+  width: 30px; height: 30px; border-radius: 8px 8px 3px 3px;
+  background: linear-gradient(160deg, #14b8a6, #0f766e);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 3px rgba(11, 18, 32, 0.9), 0 0 0 5px var(--ring), 0 6px 14px rgba(0,0,0,0.5);
+}
+
+.nm-device-marker {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--dc);
+  box-shadow: 0 0 0 3px rgba(11, 18, 32, 0.9), 0 0 0 5px var(--sc), 0 4px 10px rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.12s;
+}
+.nm-device-marker.is-selected { transform: scale(1.35); box-shadow: 0 0 0 3px rgba(11,18,32,0.9), 0 0 0 6px #fff, 0 4px 12px rgba(0,0,0,0.6); }
+.nm-device-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.85); }
+
+/* ---------------------------------------------------------------- */
+/* Modals                                                               */
+/* ---------------------------------------------------------------- */
+
+.nm-modal-backdrop {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(4, 8, 16, 0.72);
+  backdrop-filter: blur(3px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+
+.nm-modal {
+  width: 420px; max-width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: #101a2c;
+  border: 1px solid rgba(148,163,184,0.14);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+  font-family: 'Inter', sans-serif;
+}
+.nm-modal-wide { width: 480px; }
+
+.nm-modal-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid rgba(148,163,184,0.1);
+}
+.nm-modal-head h3 { margin: 0 0 4px; font-size: 15.5px; color: #f1f5f9; }
+.nm-modal-head p { margin: 0; font-size: 12px; color: #7d8aa3; line-height: 1.5; max-width: 340px; }
+.nm-modal-head button { background: none; border: none; color: #64748b; cursor: pointer; }
+
+.nm-modal-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; }
+
+.nm-field { display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; color: #94a3b8; }
+.nm-field em { color: #f87171; font-style: normal; margin-left: 2px; }
+.nm-field input, .nm-field select, .nm-field textarea {
+  background: #0b1220; border: 1px solid rgba(148,163,184,0.18); border-radius: 8px;
+  padding: 9px 10px; color: #e2e8f0; font-size: 13px; font-family: inherit; outline: none;
+}
+.nm-field input:focus, .nm-field select:focus, .nm-field textarea:focus { border-color: #2dd4bf; }
+.nm-field input:disabled { opacity: 0.6; }
+.nm-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.nm-field-error { color: #f87171; }
+.nm-field-hint { color: #4c5b74; }
+
+.nm-modal-actions {
+  display: flex; justify-content: flex-end; gap: 10px;
+  padding: 14px 20px; border-top: 1px solid rgba(148,163,184,0.1);
+}
+
+/* Scrollbars */
+.nm-root ::-webkit-scrollbar { width: 8px; height: 8px; }
+.nm-root ::-webkit-scrollbar-thumb { background: #23324c; border-radius: 8px; }
+.nm-root ::-webkit-scrollbar-track { background: transparent; }
+
+@media (max-width: 720px) {
+  .nm-panel-hierarchy, .nm-panel-legend { display: none; }
+  .nm-topbar-stats { display: none; }
+}

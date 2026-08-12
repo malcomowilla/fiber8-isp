@@ -17,6 +17,11 @@ import { FaArrowsTurnRight } from "react-icons/fa6";
 import ConfirmLeadConversion from './ConfirmLeadConversion'
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+import { useMemo } from 'react';
+
+
 
 
 
@@ -52,6 +57,61 @@ const [openDelete, setOpenDelete] = useState(false);
 const [openEdit, setOpenEdit] = useState(false);
 const [clientName, setClientName] = useState('');
 const [editLead, setEditLead] = useState(false)
+
+
+
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
+
+
+
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -329,13 +389,15 @@ const handleCloseDelete = () => {
       setShowMenu11(false)  
       setShowMenu12(false)
     }}
-    className=''>
+    className='font-sans
+'>
          {/* <EditNode  open={open} handleClose={handleClose}/> */}
        
        
 
 
-         <div className="flex items-center max-w-sm mx-auto p-3">   
+         <div className="flex items-center max-w-sm mx-auto p-3 font-sans
+">   
     <label htmlFor="simple-search" className="sr-only">Search</label>
     <div className="relative w-full">
         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -371,12 +433,12 @@ const handleCloseDelete = () => {
 
 
 
+      <ThemeProvider theme={tableTheme}>
 
 
       <MaterialTable columns={columns}
       onRowClick={handleRowClick}
-      title={<p className='bg-gradient-to-r from-green-600 via-blue-400
-         to-cyan-500 bg-clip-text text-transparent text-2xl font-bold'>Lead List</p>}
+      title={<p className='font-mono text-2xl font-bold'>Lead List</p>}
       
        data={leads}
 
@@ -409,34 +471,43 @@ localization={{
               
               }}
 
-
 options={{
-  sorting: true,
-  pageSizeOptions:[2, 5, 10],
-  pageSize: 10,
-  paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-selection: true,
-search:false,
-searchAutoFocus: true,
-showSelectAllCheckbox: false,
-showTextRowsSelected: false,
-  emptyRowsWhenPaging: false,
-headerStyle:{
-  fontFamily: 'bold',
-  textTransform: 'uppercase'
-  } ,
-  
-  
-  fontFamily: 'mono'
-}}  
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'monospace',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'monospace',
+      }),
+    }}  
       
       
       
       />
-
-    </div>
+</ThemeProvider>
+  </div>
     </>
   )
 }

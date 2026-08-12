@@ -18,7 +18,8 @@ import { GoNumber } from "react-icons/go";
 import { TbRouter } from "react-icons/tb";
 import toast, { Toaster } from 'react-hot-toast';
 import DeleteEquipment from '../delete/DeleteEquipment'
-
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
 
 
 
@@ -55,6 +56,57 @@ const onChange = (e)=> {
       [e.target.name]: e.target.value
     })
 }
+
+
+
+
+
+
+  function useIsDarkMode() {
+    const [isDark, setIsDark] = useState(
+      () => typeof document !== 'undefined' &&
+        document.documentElement.classList.contains('dark')
+    );
+  
+    useEffect(() => {
+      const root = document.documentElement;
+  
+      const update = () => setIsDark(root.classList.contains('dark'));
+      update();
+  
+      const observer = new MutationObserver(update);
+      observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+  
+      return () => observer.disconnect();
+    }, []);
+  
+    return isDark;
+  }
+  
+  
+  
+  
+  const isDark = useIsDarkMode();
+  
+  const tableTheme = useMemo(() => createTheme({
+    palette: {
+      mode: isDark ? 'dark' : 'light',
+      background: {
+        paper: isDark ? '#1e1e1e' : '#ffffff',
+        default: isDark ? '#1e1e1e' : '#ffffff',
+      },
+      text: {
+        primary: isDark ? '#f1f1f1' : '#1a1a1a',
+        secondary: isDark ? '#a3a3a3' : '#6b7280',
+      },
+    },
+  }), [isDark]);
+  
+  
+
+
+
+
 
 
 
@@ -355,11 +407,12 @@ const newData = await response.json()
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <div>
           <Typography variant="h4" component="h1" gutterBottom>
-            <p className='bg-gradient-to-r from-green-600 via-blue-400
-         to-cyan-500 bg-clip-text text-transparent inline-block'>Equipment </p>
+            <p className=' inline-block font-sans
+'>Equipment </p>
           </Typography>
           <Typography variant="subtitle1" color="textSecondary">
-            All equipment including routers, switches, and servers that you have rented to your customers.
+           <p className='font-sans
+'> All equipment including routers, switches, and servers that you have rented to your customers</p>
           </Typography>
         </div>
         <Button
@@ -381,9 +434,15 @@ const newData = await response.json()
           startIcon={<AddBox />}
           sx={{ height: 'fit-content' }}
         >
-          Add Equipment
+         <p className='font-sans
+'> Add Equipment </p>
         </Button>
       </Box>
+
+
+
+
+      <ThemeProvider theme={tableTheme}>
 
       <MaterialTable
         title=""
@@ -393,40 +452,46 @@ const newData = await response.json()
 
        localization={{
                 body: {
-                  emptyDataSourceMessage: 'No equipment found. Create your first equipment to get started!',
+                  emptyDataSourceMessage: <p className="font-sans
+"> No equipment found. Create your first equipment to get started!</p>
                 },
                
               
               
               }}
 
-
-options={{
-  sorting: true,
-  actionsColumnIndex: -1,
-  pageSizeOptions:[2, 5, 10],
-  pageSize: 10,
-
-  
-exportButton: true,
-exportAllData: true,
-
-
-  emptyRowsWhenPaging: false,
-
-
-headerStyle:{
-  fontFamily: 'bold',
-  textTransform: 'uppercase'
-  } ,
-  
-  
-  fontFamily: 'mono'
-}}
-        icons={{
-          Search: Search,
-          ResetSearch: Clear,
-        }}
+              
+ options={{
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'monospace',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'monospace',
+      }),
+    }}
 
 
         
@@ -457,6 +522,7 @@ headerStyle:{
           }
         ]}
       />
+       </ThemeProvider>
     </div>
   );
 };

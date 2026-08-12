@@ -97,11 +97,10 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
       <div role="alert" className="alert alert-info bg-green-500 rounded-lg w-fit
           p-2 flex items-center gap-2 justify-center mb-3">
  <IoInformationCircleOutline className='text-white text-xl '/>
-  <span className='text-white'>
-
+  <span className='text-white font-sans
+'>
      Upload your existing subscribers to the system to continue where you left off.
       You can upload a CSV or JSON file.
-
   </span>
 </div>
 
@@ -129,9 +128,8 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
         transition={{ duration: 0.5 }}
       >
         <h1 className="text-2xl font-bold mb-6 text-gray-800
-        font-montserat  bg-gradient-to-r from-green-600 via-blue-400 to-cyan-500 bg-clip-text
-  
-  text-transparent
+      font-sans
+
         "
         
         >
@@ -143,7 +141,8 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
         <motion.div
           className={`border-2 border-dashed ${
             isDragging ? "border-indigo-500" : "border-gray-300"
-          } rounded-lg p-6 cursor-pointer transition-colors duration-300`}
+          } rounded-lg p-6 cursor-pointer transition-colors duration-300 font-sans
+`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}

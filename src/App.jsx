@@ -4,40 +4,24 @@ import {
   Route,
   Routes
 } from "react-router-dom";
-
 import {useState, useEffect, lazy, Suspense, useCallback} from 'react'
 import {ApplicationContext} from './context/ApplicationContext'
-
 const AdminDashboard = lazy(()=> import ('./admindashboard/AdminDashboard'))
-
 import {CableProvider} from './context/CableContext'
-
-
 const PPPOEpackages = lazy(()=> import('./packages/PPPOEpackages'))
 const HotspotPackage = lazy(()=> import('./packages/HotspotPackage'))
 const AdminProfile = lazy(() => import('./profile/AdminProfile.jsx'))
- 
-
 const HotspotSubscriptions = lazy(()=> import('./subscriptions/HotspotSubscriptions'))
-
 const EditPackage = lazy(()=> import('./edit/EditPackage'))
 const PPPOEsubscribers = lazy(()=> import('./subscribers/PPPOEsubscribers'))
-
 const FixedPayments = lazy(()=> import('./payments/FixedPayments'))
-
 const PPPOEsubscriptions = lazy(()=> import('./subscriptions/PPPOEsubscriptions'))
-
 const Zones = lazy(()=> import('./zones/Zones'))
-
 const Nodes = lazy(()=> import('./Node/Nodes'))
-
 const User = lazy(()=> import('./user/User'))
-
 const UserGroup = lazy(()=> import('./user/UserGroup'))
 const Nas = lazy(()=> import('./NAS_IDENTIFIER/Nas'))
 const HotspotPricing = lazy(()=> import('./pricing/HotspotPricing.jsx'))
-
-
 const Analytics = lazy(()=> import('./analytics/Analytics'))
 const Hotspotanalytics = lazy(()=> import('./analytics/HotspotAnalytics'))
 const Settings = lazy(()=> import('./settings/Settings'))
@@ -156,7 +140,21 @@ const PpPoePayments = lazy(() => import('./payments/PpPoePayments.jsx'))
 const AccessPoint = lazy(() => import('./access_point/AccessPoint.jsx'))
 const HotspotSignIn = lazy(() => import('./hotspot_page/HotspotSignIn.jsx'))
 const PartnerLogin = lazy(() => import('./partner/PartnerLogin.jsx'))
+const ChangePassword = lazy(() => import('./Auth/ChangePassword'))
+const HotspotCustomerPortal = lazy(()  => import('./client_portal/HotspotCustomerPortal'))
+const HotspotBypassManager = lazy(() => import('./hotspot_page/HotspotBypassManager'))
+const AdminWalletPortal = lazy(() => import('./admin_wallet/AdminWalletPortal'))
+const AdminLogin = lazy(() => import('./admin_wallet/AdminLogin') )
+const ProtectAuthWallet = lazy(()=> import('./Auth/ProtectAuthWallet'))
+const FreeTrialUsers = lazy(()=> import("./user/FreeTrialUsers"))
+const HotspotDevicePortal = lazy(()=> import("./client_portal/HotspotDevicePortal"))
 
+import { MaintenanceGate } from './maintenace/MaintenanceMode';
+const HotspotPromotionalPlans = lazy(()=> import("./promotion/HotspotPromotionalPlans"))
+const HotspotPageDesigner = lazy(() => import("./hotspot_page/HotspotPageDesigner"))
+const NetworkMap = lazy(() => import("./network/NetworkMap"))
+const TvPlans = lazy(() => import("./hotspot_page/TvPlans"))
+const SupportTickets = lazy(()=> import("./support/SupportTickets"))
 
 
 const App = ({client}) => {
@@ -533,6 +531,14 @@ const hostname = window.location.hostname;
 
   const showAdmin = shouldShowAdminRoutes();
 
+
+
+  const ROOT_DOMAINS = ['aitechs.co.ke', 'owitech.co.ke'];
+
+const isRootDomain = ROOT_DOMAINS.includes(hostname);
+const isSubdomainOfRoot = ROOT_DOMAINS.some(domain => hostname.endsWith(`.${domain}`));
+
+
   return (
     <main>
 
@@ -568,6 +574,8 @@ const hostname = window.location.hostname;
 
 
 <div>
+  <MaintenanceGate>
+
 <Routes>
 {/* 
 <Route index path='/' element={<PPPoEPackages/>}/>
@@ -579,21 +587,26 @@ hostname.endsWith('.aitechs.co.ke')
 ): null}    */}
 
 
-
+{/* 
 {hostname === 'aitechs.co.ke' ? (
       <Route index path="/" element={<Signup />} />
     ) : hostname.endsWith('.aitechs.co.ke') ? (
       <Route index path="/" element={<PPPoEPackages />} />
-    ) : null} 
+    ) : null}  */}
 
 
-
+{isRootDomain ? (
+  <Route index path="/" element={<Signup />} />
+) : isSubdomainOfRoot ? (
+  <Route index path="/" element={<PPPoEPackages />} />
+) : null}
     
 
 
 
       <Route  path='/reset-password' element={<ResetPassword/>}/>
       <Route path='/confirm-reset-password' element={<ConfirmResetPassword />}/>
+      <Route path='/change-password' element={<ChangePassword />}/>
       <Route path='/reset-password-email-sent' element={<PasswordResetEmailSent />}/>
       <Route  path='/hotspot-page' element={<HotspotPage/>}/>
       <Route  path='/hotspot-login' element={<HotspotLogin/>}/>
@@ -606,7 +619,7 @@ hostname.endsWith('.aitechs.co.ke')
 
 {showAdmin && (
         <Route path="/system-admin-login" element={<SystemAdminLogin />} />
-      )}
+      )} 
 
     <Route path='/sms-sent' element={<SmsSent/>}/>
     <Route path='/email-sent' element={<EmailSent/>}/>
@@ -626,13 +639,16 @@ hostname.endsWith('.aitechs.co.ke')
         <Route path="/system-admin-dashboard" element={<DashboardSytemAdmin />} />
     )}
 
-
 {/* 
-     {hostname === 'localhost' ? (
+
+{hostname === 'localhost' ? (
         <Route path="/system-admin-dashboard" element={<DashboardSytemAdmin />} />
       ) : null} */}
-    </Route>  
 
+
+      
+    </Route>  
+  
 
 
   
@@ -662,12 +678,12 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/today-subscribers' element={<TodayRegisteredSubscribers/>}/>
 
 <Route path='/admin/this-month-subscribers' element={<ThisMonthRegisteredSubscribers/>}/>
-
+<Route path='/admin/tv-plans' element={<TvPlans />}/>
 
 <Route path='/admin/this-week-subscribers' element={<ThisWeekRegisteredSubscribers/>}/>
 
 <Route  path='/admin/map' element={<Map/>}/>
-
+<Route path="/admin/network-map" element={<NetworkMap />}/>
 
 <Route exact path='/admin/license' element={
    <Suspense fallback={  <RefreshCw className='animate-spin text-blue-500 w-12 
@@ -685,6 +701,8 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/hotspot-payments' element={<HotspotPayments/>}/>
 <Route  path='/admin/hotspot-package' element={<HotspotPackage/>}/>
 <Route  path='/admin/hotspot-templates' element={<HotspotTemplates/>}/>
+<Route path="/admin/hotspot-page-designer" element={<HotspotPageDesigner />} />
+
 <Route  path='/admin/hotspot-subscriptions' element={<HotspotSubscriptions/>}/>
 <Route path='/admin/sms' element={<Sms/>}/>
 <Route path='/admin/hotspot-dashboard' element={<HotspotDashboard/>}/>
@@ -741,6 +759,14 @@ hostname.endsWith('.aitechs.co.ke')
       <Route path='/admin/partners-management' element={<PartnersManagement/>}/>
       <Route path='/admin/pppoe-payments' element={<PpPoePayments/>}/>
       <Route path='/admin/access-point' element={<AccessPoint/>}/>
+      <Route path="/admin/hotspot-bypass" element={<HotspotBypassManager />}/>
+      <Route path="/admin/free-trial-users" element={<FreeTrialUsers/>}/>
+            <Route path="/admin/hotspot-promotions" element={<HotspotPromotionalPlans/>}/>
+ <Route path="/admin/support-tickets" element={<SupportTickets/>}/>
+            
+
+      
+
 
 
 
@@ -781,7 +807,6 @@ hostname.endsWith('.aitechs.co.ke')
   
   } /> */}
 
-      
       <Route  path='/passkey-signin' element={<PasskeySignin/>}/>
       <Route  path='/client-login' element={<ClientLogin/>}/>
       <Route path='/qr-code-display' element={<QrCodeDisplay/>}/>
@@ -789,14 +814,22 @@ hostname.endsWith('.aitechs.co.ke')
       <Route path='/reseller-commission-dashboard' element={<ResellerCommissionDashboard/>}/>
       {/* <Route path='/mpesa-disbursement-form' element={<MpesaDisbursementForm/>}/> */}
       <Route path='/partner-portal' element={<PartnerPortal/>}/>
-      {/* <Route path='/payout-management' element={<PayoutManagement/>}/> */}
+      <Route path='/payout-management' element={<PayoutManagement/>}/>
 
       <Route path='/hotspot-signin' element={<HotspotSignIn/>}/>
       <Route  path='/partner-login' element={<PartnerLogin/>}/>
+      {/* <Route  path='/hotspot-customer-portal' element={<HotspotCustomerPortal />}/> */}
+      <Route  path='/hotspot-customer-portal' element={< HotspotDevicePortal />} />
 
-      
+     
 
+<Route element={<ProtectAuthWallet
+ />}>
+    <Route path = '/admin-wallet' element={<AdminWalletPortal/>}/>
+    <Route path='/customer-payment' element={<CustomerPayment/>}/>
+    </Route>
 
+      <Route path='/admin-wallet-login'  element={<AdminLogin />}/>
 
 <Route element={<ProtectAuthClient />}>
     <Route path='/client-portal' element={<ClientPortal/>}/> 
@@ -808,6 +841,8 @@ hostname.endsWith('.aitechs.co.ke')
       
      <Route path="*" element={<NotFound />}/>
 </Routes>
+</MaintenanceGate>
+
 </div>
 </ApplicationContext.Provider>
 

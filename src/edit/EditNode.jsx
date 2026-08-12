@@ -1,4 +1,3 @@
-import { useRef, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -12,6 +11,9 @@ import { useMapEvents } from 'react-leaflet';
 import L from 'leaflet';  
 import 'leaflet/dist/leaflet.css'
 import toast, { Toaster } from 'react-hot-toast';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import {useState,useMemo, useEffect, useCallback, useRef} from 'react'
+
 
 
 const iconUrl = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png';
@@ -34,7 +36,7 @@ function LocationMarker({ position, setPosition }) {
 
 export default function Node({ open, handleClose,
   mapReady, setMapReady, name, setName, position, setPosition,
-  createNode, editingNode
+  createNode, editingNode, loading
  }) {
   const mapRef = useRef();
 
@@ -84,9 +86,56 @@ export default function Node({ open, handleClose,
     }
   };
 
+
+
+
+  function useIsDarkMode() {
+    const [isDark, setIsDark] = useState(
+      () => typeof document !== 'undefined' &&
+        document.documentElement.classList.contains('dark')
+    );
+  
+    useEffect(() => {
+      const root = document.documentElement;
+  
+      const update = () => setIsDark(root.classList.contains('dark'));
+      update();
+  
+      const observer = new MutationObserver(update);
+      observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+  
+      return () => observer.disconnect();
+    }, []);
+  
+    return isDark;
+  }
+  
+  
+  
+  
+  const isDark = useIsDarkMode();
+  
+  const tableTheme = useMemo(() => createTheme({
+    palette: {
+      mode: isDark ? 'dark' : 'light',
+      background: {
+        paper: isDark ? '#1e1e1e' : '#ffffff',
+        default: isDark ? '#1e1e1e' : '#ffffff',
+      },
+      text: {
+        primary: isDark ? '#f1f1f1' : '#1a1a1a',
+        secondary: isDark ? '#a3a3a3' : '#6b7280',
+      },
+    },
+  }), [isDark]);
+  
+
   return (
     <>
     <Toaster />
+
+              <ThemeProvider theme={tableTheme}>
+    
     <Dialog
       fullWidth={true}
       maxWidth="md"
@@ -101,7 +150,8 @@ export default function Node({ open, handleClose,
     >
       <form onSubmit={createNode}>
       <DialogTitle sx={{ bgcolor: 'transparent', color: 'white',  fontWeight: 'bold' }}>
-        <p className='dark:text-white text-black'>Node Location</p>
+        <p className='dark:text-white text-black font-sans
+'>Node Location</p>
       </DialogTitle>
 
 
@@ -154,11 +204,13 @@ export default function Node({ open, handleClose,
                 '&:hover': { bgcolor: 'primary.dark' },
               }}
             >
-              Get My Location
+              <p className='font-sans
+'>Get My Location</p>
             </Button>
 
             <TextField
-              label="Latitude"
+              label={<p className='font-sans
+'>Latitude</p>}
               className='myTextField'
               value={position?.lat?.toFixed(6) || ''}
               InputProps={{ readOnly: true }}
@@ -167,7 +219,8 @@ export default function Node({ open, handleClose,
 
             <TextField
               className='myTextField'
-              label="Longitude"
+              label={<p className='font-sans
+'>Longitude </p>}
               value={position?.lng?.toFixed(6) || ''}
               InputProps={{ readOnly: true }}
               sx={{ flex: 1 }}
@@ -185,7 +238,8 @@ export default function Node({ open, handleClose,
             '&:hover': { borderColor: 'primary.dark' },
           }}
         >
-          Cancel
+          <p className='font-sans
+'>Cancel </p>
         </Button>
         <Button
           type="submit"
@@ -197,11 +251,21 @@ export default function Node({ open, handleClose,
             '&:disabled': { bgcolor: 'grey.300' },
           }}
         >
-          {editingNode ? 'Update Location' : 'Save Location'}
+  
+          {editingNode ? <p className='font-sans
+'>Update Location</p> : <p className='font-sans text-black
+'>Save Location</p>}
+
+          {loading && (
+            <span className="w-4 h-4 border-2 border-blue-300 border-t-blue-500 rounded-full
+         animate-spin" />
+          )}
         </Button>
       </DialogActions>
       </form>
     </Dialog>
+         </ThemeProvider>
+    
     </>
   );
 }

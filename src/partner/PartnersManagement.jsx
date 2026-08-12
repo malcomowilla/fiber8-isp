@@ -12,6 +12,8 @@ import {
   Phone, Mail, MapPin
 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
+import { useLayoutEffect } from "react";
+
 
 // ── CSS ─────────────────────────────────────────────────────────────────────
 const CSS = `
@@ -29,9 +31,10 @@ const CSS = `
   .pm-input:focus { border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,.1); }
   .pm-input::placeholder { color:#d1d5db; }
   .pm-select { appearance:none; cursor:pointer; }
-  .pm-btn    { display:inline-flex; align-items:center; gap:6px; padding:9px 16px; border-radius:9px; font-size:13px; font-weight:600; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; transition:all .15s; }
   .pm-btn-primary { background:#6366f1; color:#fff; }
   .pm-btn-primary:hover { background:#4f46e5; transform:translateY(-1px); box-shadow:0 6px 18px rgba(99,102,241,.28); }
+  .pm-btn    { display:inline-flex; align-items:center; gap:6px; padding:9px 16px; border-radius:9px; font-size:13px; font-weight:600; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; transition:all .15s; }
+
   .pm-btn-ghost { background:transparent; color:#374151; border:1.5px solid #e5e7eb; }
   .pm-btn-ghost:hover { border-color:#c7d2fe; color:#6366f1; background:#f5f3ff; }
   .pm-tag    { display:inline-flex; align-items:center; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:600; }
@@ -295,6 +298,7 @@ function PartnerModal({ open, onClose, partner, onSaved, subdomain }) {
                       {Object.entries(TYPE_META).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}
                     </select>
                   </Field>
+                  
                   <Field label="Status">
                     <select className="pm-input pm-select" value={form.status} onChange={e=>set('status',e.target.value)}>
                       <option value="active">Active</option>
@@ -302,6 +306,8 @@ function PartnerModal({ open, onClose, partner, onSaved, subdomain }) {
                       <option value="pending">Pending</option>
                     </select>
                   </Field>
+
+
                   <Field label="Email" required>
                     <input className="pm-input" type="email" value={form.email} onChange={e=>set('email',e.target.value)} placeholder="email@example.com"/>
                   </Field>
@@ -639,9 +645,18 @@ export default function PartnersManagement() {
   const openPayout = (p) => setPayoutTarget(p);
   const openDelete = (p) => setDeleteTarget(p.id);
 
+
+  useLayoutEffect(() => {
+  const style = document.createElement("style");
+  style.innerHTML = CSS;
+  document.head.appendChild(style);
+
+  return () => style.remove();
+}, []);
+
   return (
     <>
-      <style>{CSS}</style>
+      {/* <style>{CSS}</style> */}
       <Toaster position="top-right" toastOptions={{ style:{fontFamily:'DM Sans,sans-serif',fontSize:13} }}/>
 
       <PartnerModal

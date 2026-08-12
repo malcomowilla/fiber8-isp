@@ -1,936 +1,576 @@
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-import { useApplicationSettings } from '../settings/ApplicationSettings';
-import { useState, useEffect, useCallback,lazy, Suspense } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
-import { Button } from "@/components/ui/button" 
-import Backdrop from '../backdrop/Backdrop'
-import UiLoader from '../uiloader/UiLoader'
 import Autocomplete from '@mui/material/Autocomplete';
-import { IoIosKey } from "react-icons/io";
-import { FaIdBadge } from "react-icons/fa6";
-import { FaRegIdCard } from "react-icons/fa6";
-import { LiaUserSecretSolid } from "react-icons/lia";
-import { TbCircleDashedNumber4 } from "react-icons/tb";
-
-
-
-
-
-const SettingsNotification = lazy(() => import('../notification/SettingsNotification'))
-
-
-
-
-const PROVIDER_OPTIONS = [
-  { label: 'SMS leopard', value: 'SMS leopard' },
-  { label: 'Africastalking', value: 'Africastalking' },
-  { label: 'Advanta', value: 'Advanta' },
-  { label: 'Mobitech Bulk', value: 'Mobitech Bulk' },
-  { label: 'Afrokatt', value: 'Afrokatt' },
-  { label: 'Afrinet', value: 'Afrinet' },
-  { label: 'EgoSMS', value: 'EgoSMS' },
-  { label: 'BlessedTexts', value: 'BlessedTexts' },
-  { label: 'TextSms', value: 'TextSms' },
-  { label: 'Mobiweb', value: 'Mobiweb' },
-  { label: 'Mobivas', value: 'Mobivas' },
-  { label: 'MoveSMS', value: 'MoveSMS' },
-  { label: 'HostPinnacle', value: 'HostPinnacle' },
-  { label: 'Bytewave', value: 'Bytewave' },
-  { label: 'CrowdComm', value: 'CrowdComm' },
-  { label: 'Ujumbe', value: 'Ujumbe' }
-];
-
-const SmsSettings = () => {
-
-
-const {isloading, setisloading, selectedProvider, setSelectedProvider,
-  smsSettingsForm, setSmsSettingsForm,
-  smsBalance, setSmsBalance,
-  providerSms, setProviderSms,
-} = useApplicationSettings()
-const [open, setOpen] = useState(false);
-const [openNotifactionSettings, setOpenSettings] = useState(false)
-const [smsSettingId, setSmsSettingId] = useState(null)
-// const navigate = useNavigate()
-const templateData = {
-  // admin_otp_confirmation_template: '' ,
-  // payment_reminder_template: '',
-  // service_provider_otp_confirmation_template: '',
-  // customer_otp_confirmation_template: '',
-  // user_invitation_template: '',
-  // service_provider_confirmation_code_template: '',
-  // customer_confirmation_code_template: '',
-  // store_manager_otp_confirmation_template: '',
-  // store_manager_manager_number_confirmation_template: '',
-  send_voucher_template: '',
-  voucher_template: '',
-}
-
-const [smsTemplates, setSmsTemplates] = useState(templateData)
-
-const handleChangeSmsTempalate = (e) => {
-const {name, value} = e.target
-setSmsTemplates((prevData) => (
-  {...prevData, [name]: value} 
-))
-// console.log(value)
-}
-
-const subdomain = window.location.hostname.split('.')[0]
-
-const {api_key, api_secret, sender_id, short_code, partnerID, username} = smsSettingsForm
-
-const {send_voucher_template, voucher_template} = smsTemplates
-
-       const sms_provider= JSON.parse(localStorage.getItem('sms_provider')) || localStorage.getItem('sms_provider')
-
-
-const handleGetSmsProviderSettings = useCallback(
-  async() => {
-    
-
-
-    try {
-      const response = await fetch(`/api/sms_provider_settings`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Subdomain': subdomain,
-        },
-      });
-
-      const newData = await response.json()
-      if (response.ok) {
-               setProviderSms(newData[0].sms_provider)
-
-       
-
-      } else {
-        if (response.status === 402) {
-        setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/license-expired'
-         }, 1800);
-        
-      }
-if (response.status === 401) {
- 
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
-       
-      }
-    } catch (error) {
-    }
-  },
-  [],
-)
-
-
-useEffect(() => {
-  handleGetSmsProviderSettings()
-  
-}, [handleGetSmsProviderSettings]);
-
-  const getSmsBalance  = useCallback(
-    async(selectedProvider) => {
-
-      try {
-        const response = await fetch(`/api/get_sms_balance?selected_provider=${providerSms}`, {
-          headers: {
-            'X-Subdomain': subdomain,
-          },
-        })
-        const newData = await response.json()
-
-        if (response.status === 403) {
-          toast.error('acess denied for sms balance', {
-            duration: 4000,
-            position: 'top-center',
-          })
-        }
-        if(response.ok){
-setSmsBalance(newData.message)
-        }else{
-          toast.error('failed to fetch sms balance', {
-            duration: 3000,
-            position: 'top-center',
-          })
-        }
-      } catch (error) {
-        toast.error('Something went wrong with geting sms balance, Please retry in a moment', {
-          duration: 3000,
-          position: 'top-center',
-        })
-      }
-
-    },
-    [],
-  )
-
-  useEffect(() => {
-
-    if (selectedProvider) {
-      getSmsBalance(selectedProvider)
-    }
-    // getSmsBalance()
-   
-  }, [getSmsBalance, selectedProvider]);
-
-
-
-
-//   const saveSmsSettings = async (e) => {
-//     e.preventDefault()
-//     setisloading(true)
-//     const response = await fetch('/api/sms_settings', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify({
-//         api_key: api_key,
-//         api_secret: api_secret,
-//         sender_id: sender_id,
-//         short_code: short_code,
-//         sms_provider: selectedProvider,
-//       }),
-
-      
-//     });
-// const newData = await response.json()
-// setOpen(false)
-//     try {
-//       if(response.ok){
-//         setisloading(false)
-//           setOpen(false)
-//           setOpenSettings(true)
-//         console.log('sms settings', newData)
-// toast.success('sms settings saved successfully', {
-//           duration: 3000,
-//           position: 'top-center',
-//         })
-
-
-//       }else{
-//         setisloading(false)
-//           setOpen(false)
-//           setOpenSettings(false)
-//         toast.error('failed to save sms settings', {
-//           duration: 3000,
-//           position: 'top-center',
-//         })
-//       }
-//     } catch (error) {
-//       setOpen(false)
-//       setisloading(false)
-//       setOpenSettings(false)
-//           setOpen(false)
-//       toast.error('internal server error something went wrong with saving sms settings', {
-//         duration: 6000,
-//         position: 'top-center',
-//       })
-
-//     }
-//   }
-
-
-const fetchSavedSmsSettings = useCallback(
-  async() => {
-    
-    try {
-      const response = await fetch(`/api/saved_sms_settings`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Subdomain': subdomain,
-        },
-      });
-  
-      const data = await response.json();
-
-      const newData = data.length > 0 
-        ? data.reduce((latest, item) => new Date(item.sms_setting_updated_at) > new Date(latest.sms_setting_updated_at) ? item : latest, data[0])
-        : null;
-  
-      if (response.ok) {
-        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID, username } = newData;
-        setSmsSettingId(newData.id)
-        setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID, username });
-        setSelectedProvider(sms_provider);
-        // setSelectedProvider(newData[0].sms_provider);
-      } else {
-
-        if (response.status === 402) {
-        setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/license-expired'
-         }, 1800);
-        
-      }
-if (response.status === 401) {
-  toast.error(newData.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
-        toast.error( 'Failed to fetch SMS settings', {
-          duration: 3000,
-          position: 'top-center',
-        });
-      }
-    } catch (error) {
-      toast.error('Something went wrong with fetching SMS settings, Please retry in a moment', {
-        duration: 3000,
-        position: 'top-center',
-      });
-    }
-  },
-  [],
-)
-
-
-useEffect(() => {
-  fetchSavedSmsSettings();
- 
-}, [fetchSavedSmsSettings]);
-
-
-
-
-const fetchSmsSettings = useCallback(async () => {
-  try {
-    const response = await fetch(`/api/sms_settings?provider=${selectedProvider}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Subdomain': subdomain,
-      },
-    });
-
-    const newData = await response.json();
-
-    if (response.ok) {
-      
-      if (
-        !newData || // Handles null or undefined
-        newData.length === 0 || // Handles empty array
-        !newData.sms_provider // Handles missing or null provider
-      ) {
-        console.log('No SMS settings found, resetting form.');
-      
-        setSmsSettingsForm({ 
-          api_key: '', 
-          api_secret: '', 
-          sender_id: '', 
-          short_code: '' ,
-          partnerID: '',
-          username: ''
-        });
-      
-        // setSelectedProvider('');
-      } else {
-        if (response.status === 402) {
-        setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/license-expired'
-         }, 1800);
-        
-      }
-if (response.status === 401) {
-  toast.error(newData.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
-      
-        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID,username  } = newData;
-      
-        setSmsSettingsForm({ 
-          api_key: api_key || '', 
-          api_secret: api_secret || '', 
-          sender_id: sender_id || '', 
-          short_code: short_code || '' ,
-          partnerID: partnerID || '',
-          username: username || ''
-        });
-      
-        // setSelectedProvider(sms_provider || '');
-      }
-    } else {
-      toast.error(newData.error || 'Failed to fetch SMS settings', {
-        duration: 3000,
-        position: 'top-center',
-      });
-    }
-  } catch (error) {
-    toast.error('Something went wrong with fetching SMS settings, Please retry in a moment', {
-      duration: 3000,
-      position: 'top-center',
-    });
-  }
-}, [selectedProvider, setSmsSettingsForm, subdomain]);
-
-
-useEffect(() => {
-  if (selectedProvider) {
-    fetchSmsSettings();
-  }
-}, [fetchSmsSettings, selectedProvider]);
-
-
-
-
-
-
-
-
-
-const saveSmsSettings = async (e) => {
-  e.preventDefault();
-  setisloading(true);
-  setOpen(true);
-
-  try {
-    const response = await fetch('/api/sms_settings', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Subdomain': subdomain,
-
-        
-
-      },
-      body: JSON.stringify({
-        api_key: api_key,
-        sms_setting_id: smsSettingId,
-        api_secret: api_secret,
-        sender_id: sender_id,
-        short_code: short_code,
-        sms_provider: selectedProvider,
-        partnerID: partnerID,
-        username: username
-      }),
-    });
-
-    const newData = await response.json();
-
-
-
-
-  if (response.status === 402) {
-    setTimeout(() => {
-      window.location.href = '/license-expired';
-      // navigate('/license-expired')
-     }, 1800);
-    
-  }
-    if (response.ok) {
-      setisloading(false);
-      const {api_key, api_secret, sender_id, short_code, partnerID, username} = newData 
-      setSelectedProvider(newData.sms_provider)
-      setSmsSettingsForm({...smsSettingsForm, api_key,api_secret,
-        sender_id,short_code, partnerID, username})
-      setOpenSettings(true);
-      setOpen(false);
-      toast.success('SMS settings saved successfully', {
-        duration: 3000,
-        position: 'top-center',
-      });
-    } else {
-      if (response.status === 402) {
-        setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/license-expired'
-         }, 1800);
-        
-      }
-if (response.status === 401) {
-  toast.error(newData.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
-      setisloading(false);
-      setOpenSettings(false);
-      setOpen(false);
-      toast.error('Failed to save SMS settings', {
-        duration: 3000,
-        position: 'top-center',
-      });
-    }
-  } catch (error) {
-    setisloading(false);
-    setOpenSettings(false);
-    setOpen(false);
-    toast.error('Something went wrong with saving SMS settings, Please retry in a moment', {
-      duration: 2000,
-      position: 'top-center',
-    });
-  }
+import { Grid, InputAdornment } from '@mui/material';
+import Backdrop from '../backdrop/Backdrop';
+import UiLoader from '../uiloader/UiLoader';
+import { useApplicationSettings } from '../settings/ApplicationSettings';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import { motion } from 'framer-motion';
+import { IoIosKey } from 'react-icons/io';
+import { FaIdBadge } from 'react-icons/fa6';
+import { FaRegIdCard } from 'react-icons/fa6';
+import { LiaUserSecretSolid } from 'react-icons/lia';
+import { TbCircleDashedNumber4 } from 'react-icons/tb';
+import { MdTextsms } from 'react-icons/md';
+import { RefreshCw, Save, MessageSquare, Wallet, FileText } from 'lucide-react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+const SettingsNotification = lazy(() => import('../notification/SettingsNotification'));
+
+// ─── Design tokens (shared with GeneralSettings) ──────────────────────────────
+const tokens = {
+  radius: '12px',
+  radiusSm: '8px',
+  border: '1px solid',
+  transition: 'all 0.18s ease',
 };
 
+const fieldSx = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: tokens.radiusSm,
+    transition: tokens.transition,
+    '& fieldset': { borderColor: 'divider' },
+    '&:hover fieldset': { borderColor: 'text.secondary' },
+    '&.Mui-focused fieldset': { borderColor: 'primary.main', borderWidth: '1.5px' },
+  },
+  '& label.Mui-focused': { color: 'primary.main' },
+  '& .MuiFormHelperText-root': { fontSize: '0.75rem', marginTop: '4px', lineHeight: 1.5 },
+};
 
+const cssVars = `
+  :root { --divider: rgba(0,0,0,0.08); --text-secondary: #6b7280; --text-tertiary: #9ca3af; }
+  .dark { --divider: rgba(255,255,255,0.1); --text-secondary: #9ca3af; --text-tertiary: #6b7280; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+`;
 
+// ─── Shared components ────────────────────────────────────────────────────────
 
-  const handleChange = (e) => {
+const SectionLabel = ({ children }) => (
+  <div style={{ margin: '24px 0 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+    <div style={{ flex: 1, height: '1px', background: 'var(--divider)' }} />
+    <span style={{
+      fontSize: '0.6875rem', fontWeight: 600, letterSpacing: '0.08em',
+      textTransform: 'uppercase', color: 'var(--text-tertiary)', whiteSpace: 'nowrap',
+    }}>
+      {children}
+    </span>
+    <div style={{ flex: 1, height: '1px', background: 'var(--divider)' }} />
+  </div>
+);
 
-    const {name, id, value} = e.target
-    setSmsSettingsForm((prevData) => (
-      {...prevData, [name]: value} 
-    ))
-  }
-  
+const InfoBox = ({ children, variant = 'info' }) => {
+  const colors = {
+    info:    { bg: 'rgba(59,130,246,0.06)',  border: 'rgba(59,130,246,0.2)' },
+    neutral: { bg: 'rgba(107,114,128,0.06)', border: 'rgba(107,114,128,0.18)' },
+  };
+  const c = colors[variant] || colors.info;
+  return (
+    <div style={{
+      background: c.bg, border: `1px solid ${c.border}`,
+      borderRadius: tokens.radiusSm, padding: '10px 14px',
+      fontSize: '0.8125rem', lineHeight: 1.6,
+    }}>
+      {children}
+    </div>
+  );
+};
 
+const SaveButton = ({ children = 'Save settings', loading = false, type = 'submit', onClick }) => (
+  <motion.button
+    type={type}
+    onClick={onClick}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    disabled={loading}
+    style={{
+      display: 'inline-flex', alignItems: 'center', gap: 7,
+      padding: '9px 22px', fontSize: '0.875rem', fontWeight: 500,
+      color: '#fff', background: loading ? '#6b7280' : '#1a1a1a',
+      border: 'none', borderRadius: '8px', cursor: loading ? 'not-allowed' : 'pointer',
+      letterSpacing: '0.01em', transition: 'background 0.15s',
+    }}
+    onMouseEnter={e => { if (!loading) e.currentTarget.style.background = '#2563eb'; }}
+    onMouseLeave={e => { if (!loading) e.currentTarget.style.background = '#1a1a1a'; }}
+  >
+    {loading
+      ? <RefreshCw size={14} style={{ animation: 'spin 1s linear infinite' }} />
+      : <Save size={14} />}
+    {loading ? 'Saving…' : children}
+  </motion.button>
+);
 
-  const handleClose = () => {
-    setOpen(false);
+// ─── Card wrapper ─────────────────────────────────────────────────────────────
+const Card = ({ children, style = {} }) => (
+  <div style={{
+    border: '1px solid var(--divider)',
+    borderRadius: tokens.radius,
+    padding: '24px',
+    marginBottom: '12px',
+    ...style,
+  }}>
+    {children}
+  </div>
+);
+
+const CardHeader = ({ icon: Icon, iconClass = '', title, description }) => (
+  <div style={{ marginBottom: description ? 16 : 20 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: description ? 6 : 0 }}>
+      <Icon style={{ width: 18, height: 18, flexShrink: 0 }} className={iconClass} />
+      <span style={{ fontWeight: 500, fontSize: '0.9375rem' }}>{title}</span>
+    </div>
+    {description && (
+      <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.55, paddingLeft: 28 }}>
+        {description}
+      </p>
+    )}
+  </div>
+);
+
+// ─── Provider options ─────────────────────────────────────────────────────────
+const PROVIDER_OPTIONS = [
+  { label: 'SMS Leopard',    value: 'SMS leopard' },
+  { label: 'Africa\'s Talking', value: 'Africastalking' },
+  { label: 'Advanta',        value: 'Advanta' },
+  { label: 'Mobitech Bulk',  value: 'Mobitech Bulk' },
+  { label: 'Afrokatt',       value: 'Afrokatt' },
+  { label: 'Talk Sasa',      value: 'Talk Sasa' },
+  { label: 'Afrinet',        value: 'Afrinet' },
+  { label: 'EgoSMS',         value: 'EgoSMS' },
+  { label: 'BlessedTexts',   value: 'BlessedTexts' },
+  { label: 'TextSms',        value: 'TextSms' },
+  { label: 'Mobiweb',        value: 'Mobiweb' },
+  { label: 'Mobivas',        value: 'Mobivas' },
+  { label: 'MoveSMS',        value: 'MoveSMS' },
+  { label: 'HostPinnacle',   value: 'HostPinnacle' },
+  { label: 'Bytewave',       value: 'Bytewave' },
+  { label: 'CrowdComm',      value: 'CrowdComm' },
+  { label: 'Ujumbe',         value: 'Ujumbe' },
+];
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  );
+  useEffect(() => {
+    const root = document.documentElement;
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+const SmsSettings = () => {
+  const {
+    isloading, setisloading,
+    selectedProvider, setSelectedProvider,
+    smsSettingsForm, setSmsSettingsForm,
+    smsBalance, setSmsBalance,
+    providerSms, setProviderSms,
+  } = useApplicationSettings();
+
+  const [open, setOpen] = useState(false);
+  const [openNotifactionSettings, setOpenSettings] = useState(false);
+  const [smsSettingId, setSmsSettingId] = useState(null);
+  const [smsTemplates, setSmsTemplates] = useState({ send_voucher_template: '', voucher_template: '' });
+  const [welcomeMessage, setWelcomeMessage] = useState('');
+  const [savingTemplates, setSavingTemplates] = useState(false);
+  const [savingCredentials, setSavingCredentials] = useState(false);
+
+  const subdomain = window.location.hostname.split('.')[0];
+  const { api_key, api_secret, sender_id, short_code, partnerID, username } = smsSettingsForm;
+  const { send_voucher_template, voucher_template } = smsTemplates;
+
+  const isDark = useIsDarkMode();
+  const muiTheme = {
+    palette: {
+      mode: isDark ? 'dark' : 'light',
+      primary: { main: '#2563eb' },
+      background: { paper: isDark ? '#1c1c1e' : '#ffffff', default: isDark ? '#111113' : '#f9f9fb' },
+      text: { primary: isDark ? '#f0f0f0' : '#111827', secondary: isDark ? '#a3a3a3' : '#6b7280' },
+    },
+    shape: { borderRadius: 8 },
   };
 
-  
-  const handleCloseNotifaction = () => {
-   setOpenSettings(false);
- };
+  // ── API calls ────────────────────────────────────────────────────────────────
 
-//  sms_templates
-
-
-const getSmsTemplate = useCallback(
-  async() => {
+  const handleGetSmsProviderSettings = useCallback(async () => {
     try {
-      const response = await fetch('/api/sms_templates')
-      const newData = await response.json()
-      const {send_voucher_template, voucher_template} = newData[0]
-      
+      const response = await fetch('/api/sms_provider_settings', {
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+      });
+      const newData = await response.json();
+      if (response.ok) setProviderSms(newData[0].sms_provider);
+      else {
+        if (response.status === 402) setTimeout(() => { window.location.href = '/license-expired'; }, 1800);
+        if (response.status === 401) setTimeout(() => { window.location.href = '/signin'; }, 1900);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => { handleGetSmsProviderSettings(); }, [handleGetSmsProviderSettings]);
+
+  const getSmsBalance = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/get_sms_balance?selected_provider=${providerSms}`, {
+        headers: { 'X-Subdomain': subdomain },
+      });
+      const newData = await response.json();
+      if (response.ok) setSmsBalance(newData.message);
+      else toast.error('Failed to fetch SMS balance', { duration: 3000, position: 'top-center' });
+    } catch {
+      toast.error('Failed to fetch SMS balance', { duration: 3000, position: 'top-center' });
+    }
+  }, []);
+
+  useEffect(() => { if (selectedProvider) getSmsBalance(selectedProvider); }, [getSmsBalance, selectedProvider]);
+
+  const fetchSavedSmsSettings = useCallback(async () => {
+    try {
+      const response = await fetch('/api/saved_sms_settings', {
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+      });
+      const data = await response.json();
+      const newData = data.length > 0
+        ? data.reduce((latest, item) => new Date(item.sms_setting_updated_at) > new Date(latest.sms_setting_updated_at) ? item : latest, data[0])
+        : null;
+      if (response.ok && newData) {
+        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID, username } = newData;
+        setSmsSettingId(newData.id);
+        setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID, username });
+        setSelectedProvider(sms_provider);
+      }
+    } catch {
+      toast.error('Failed to fetch SMS settings', { duration: 3000, position: 'top-center' });
+    }
+  }, []);
+
+  useEffect(() => { fetchSavedSmsSettings(); }, [fetchSavedSmsSettings]);
+
+  const fetchSmsSettings = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/sms_settings?provider=${selectedProvider}`, {
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+      });
+      const newData = await response.json();
       if (response.ok) {
-        setSmsTemplates({
-          ...smsTemplates,
-          send_voucher_template: send_voucher_template,
-          voucher_template: voucher_template
-        })
+        if (!newData || newData.length === 0 || !newData.sms_provider) {
+          setSmsSettingsForm({ api_key: '', api_secret: '', sender_id: '', short_code: '', partnerID: '', username: '' });
+        } else {
+          const { api_key, api_secret, sender_id, short_code, partnerID, username } = newData;
+          setSmsSettingsForm({ api_key: api_key || '', api_secret: api_secret || '', sender_id: sender_id || '', short_code: short_code || '', partnerID: partnerID || '', username: username || '' });
+        }
+      }
+    } catch {
+      toast.error('Failed to fetch SMS settings', { duration: 3000, position: 'top-center' });
+    }
+  }, [selectedProvider, setSmsSettingsForm, subdomain]);
+
+  useEffect(() => { if (selectedProvider) fetchSmsSettings(); }, [fetchSmsSettings, selectedProvider]);
+
+  const saveSmsSettings = async e => {
+    e.preventDefault();
+    setSavingCredentials(true);
+    setOpen(true);
+    try {
+      const response = await fetch('/api/sms_settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+        body: JSON.stringify({ api_key, sms_setting_id: smsSettingId, api_secret, sender_id, short_code, sms_provider: selectedProvider, partnerID, username }),
+      });
+      const newData = await response.json();
+      if (response.ok) {
+        setSavingCredentials(false);
+        const { api_key: k, api_secret: s, sender_id: sid, short_code: sc, partnerID: pid, username: u } = newData;
+        setSelectedProvider(newData.sms_provider);
+        setSmsSettingsForm({ ...smsSettingsForm, api_key: k, api_secret: s, sender_id: sid, short_code: sc, partnerID: pid, username: u });
+        setOpenSettings(true); setOpen(false);
+        toast.success('SMS credentials saved', { duration: 3000, position: 'top-center' });
       } else {
-        if (response.status === 402) {
-        setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/license-expired'
-         }, 1800);
-        
+        setSavingCredentials(false);
+        setOpen(false);
+        if (response.status === 402) setTimeout(() => { window.location.href = '/license-expired'; }, 1800);
+        if (response.status === 401) setTimeout(() => { window.location.href = '/signin'; }, 1900);
+        toast.error('Failed to save SMS credentials', { duration: 3000, position: 'top-center' });
       }
-if (response.status === 401) {
-  toast.error(newData.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
-        toast.error('failed to fetch sms templates', {
-          duration: 3000,
-          position: 'top-center',
-        })
+    } catch {
+      setSavingCredentials(false); setOpen(false);
+      toast.error('Failed to save SMS credentials', { duration: 2000, position: 'top-center' });
+    }
+  };
+
+  const handleChange = e => {
+    const { name, value } = e.target;
+    setSmsSettingsForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const getSmsTemplate = useCallback(async () => {
+    try {
+      const response = await fetch('/api/sms_templates');
+      const newData = await response.json();
+      if (response.ok) {
+        const { send_voucher_template, voucher_template } = newData[0];
+        setSmsTemplates(prev => ({ ...prev, send_voucher_template, voucher_template }));
+      } else {
+        if (response.status === 402) setTimeout(() => { window.location.href = '/license-expired'; }, 1800);
+        if (response.status === 401) setTimeout(() => { window.location.href = '/signin'; }, 1900);
+        toast.error('Failed to fetch SMS templates', { duration: 3000, position: 'top-center' });
       }
-    } catch (error) {
-      toast.error('Something went wrong with fetching SMS templates, Please retry in a moment', {
-        duration: 2000,
-        position: 'top-center',
+    } catch {
+      toast.error('Failed to fetch SMS templates', { duration: 2000, position: 'top-center' });
+    }
+  }, []);
+
+  useEffect(() => { getSmsTemplate(); }, [getSmsTemplate]);
+
+  const saveSmsTemplate = async e => {
+    e.preventDefault();
+    setSavingTemplates(true);
+    try {
+      const response = await fetch('/api/sms_templates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+        body: JSON.stringify({ send_voucher_template: smsTemplates.send_voucher_template, voucher_template: smsTemplates.voucher_template }),
       });
+      const newData = await response.json();
+      setSavingTemplates(false);
+      if (response.ok) {
+        setSmsTemplates(prev => ({ ...prev, send_voucher_template: newData.send_voucher_template, voucher_template: newData.voucher_template }));
+        toast.success('Templates saved', { duration: 3000, position: 'top-center' });
+      } else {
+        toast.error('Failed to save templates', { duration: 3000, position: 'top-center' });
+      }
+    } catch {
+      setSavingTemplates(false);
+      toast.error('Failed to save templates', { duration: 3000, position: 'top-center' });
+    }
+  };
+
+  const handleClose = () => setOpen(false);
+  const handleCloseNotifaction = () => setOpenSettings(false);
+
+  // ── Provider-specific fields ───────────────────────────────────────────────
+  const renderProviderFields = () => {
+    if (!selectedProvider) return null;
+
+    const fields = [];
+
+    if (selectedProvider === 'TextSms') {
+      fields.push(
+        <Grid key="partnerID" item xs={12} sm={6}>
+          <TextField {...tf} label="Partner ID" name="partnerID" value={partnerID} onChange={handleChange}
+            InputProps={{ startAdornment: <InputAdornment position="start"><FaIdBadge style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
+        </Grid>
+      );
     }
 
-
-  },
-  [],
-)
-
-useEffect(() => {
-  getSmsTemplate()
-}, [getSmsTemplate]);
-
-
- const saveSmsTempalate = async(e) => {
-e.preventDefault()
-
-try {
-  const response = await fetch('/api/sms_templates', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Subdomain': subdomain,
-    },
-    body: JSON.stringify({
-      send_voucher_template: smsTemplates.send_voucher_template,
-       voucher_template: smsTemplates.voucher_template
-    })
-  })
-
-
-  const newData = await response.json()
-
-
-  if (response.ok) {
-    toast.success('SMS templates saved successfully', {
-      duration: 3000,
-      position: 'top-center',
-      });
-      setSmsTemplates({
-        ...smsTemplates,
-        send_voucher_template: newData.send_voucher_template,
-        voucher_template: newData.voucher_template
-
-
-
-
-      })
-
-
-
-  } else {
-   
-    toast.error('Error Saving SMS Templates', {
-      duration: 3000,
-      position: 'top-center',
-    })
-  }
-} catch (error) {
-  toast.error(
-    'Error Saving SMS Templates, Please retry in a moment',
-    {
-      duration: 3000,
-      position: 'top-center',
+    if (selectedProvider === 'SMS leopard') {
+      fields.push(
+        <Grid key="api_secret" item xs={12} sm={6}>
+          <TextField {...tf} label="API secret" name="api_secret" value={api_secret} onChange={handleChange}
+            InputProps={{ startAdornment: <InputAdornment position="start"><LiaUserSecretSolid style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
+        </Grid>
+      );
     }
-  )
-}
 
+    if (selectedProvider === 'Africastalking') {
+      fields.push(
+        <Grid key="username" item xs={12} sm={6}>
+          <TextField {...tf} label="Username" name="username" value={username} onChange={handleChange}
+            InputProps={{ startAdornment: <InputAdornment position="start"><LiaUserSecretSolid style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
+        </Grid>,
+        <Grid key="short_code" item xs={12} sm={6}>
+          <TextField {...tf} label="Short code" name="short_code" value={short_code} onChange={handleChange}
+            InputProps={{ startAdornment: <InputAdornment position="start"><TbCircleDashedNumber4 style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
+        </Grid>
+      );
+    }
 
+    return fields;
+  };
 
- }
-
+  const tf = { sx: { ...fieldSx, width: '100%' } };
 
   return (
     <>
-
-<Backdrop  handleClose={handleClose}  open={open}/>
-<SettingsNotification open={openNotifactionSettings} handleClose={ handleCloseNotifaction }/>
-    <Toaster  />
-    <Suspense fallback={<div className='flex justify-center items-center '>{ <UiLoader/> }</div>}>
-
-
-
-
-    <div className='p-7'>
-            <p className='text-black dark:text-white playwrite-de-grund  text-2xl font-extrabold'>SMS Templates</p>
-        </div>
-    <div className='mt-6'>
-        <p className='text-black dark:text-white playwrite-de-grund  text-lg font-bold'>
-        Customize messages sent to customers using sms.Make sure to 
-        include the keywords to correctly include content
-
-        </p>
-    </div>
-
-
-<form onSubmit={saveSmsTempalate}>
-    <Box
-        className='myTextField'
-     sx={{'& .MuiTextField-root' : {
-        width: '100%',
-        padding: '8px',
-        m: 1,
-        '& label.Mui-focused': {
-          color: 'black',
-          fontSize: '16px'
-          },
-      '& .MuiOutlinedInput-root': {
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: "black",
-          borderWidth: '3px',
-          },
-       '&.Mui-focused fieldset':  {
-          borderColor: 'black', 
-          
-        }
-      }
-    }}}
-    >
-      <TextField onChange={(e)=> handleChangeSmsTempalate(e)} fullWidth label="send voucher template"
-       name='send_voucher_template' 
-       value={send_voucher_template}
-       id="fullWidth" multiline 
-       rows={4}
-        helperText={<p className='text-black text-sm tracking-wider roboto-condensed-light'> 
-            place  {"{{voucher_code}}"}
-
-                    where the voucher code should appear in the text and either  {"{{phone_number}}"}, 
-        to include the hotspot usesr phone number,   <span className='font-extrabold'>
-          Message Sent To Customer 
-          To Confirm Voucher Code
-          </span></p>} />
-
-
-
-
-
-
-
-          <TextField onChange={(e)=> handleChangeSmsTempalate(e)} fullWidth label="voucher template"
-       name='voucher_template' 
-       id="fullWidth" multiline 
-       rows={4}
-        helperText={<p className='text-black text-sm tracking-wider roboto-condensed-light'> 
-            place  {"{{voucher_code}}"}
-
-                    where the voucher code should appear in the text and either  {"{{phone_number}}"}, 
-        to include the hotspot usesr phone number,   <span className='font-extrabold'>
-          Message Sent To Customer 
-          To Confirm Voucher Code
-          </span></p>} value={voucher_template}/>
-</Box>
-        
-<Button className='mt-2 '  type=''>save settings</Button>
-</form>
-
-
-   <form onSubmit={saveSmsSettings}>
-<div className='flex mt-4'>
-
-<FormControl  sx={{ m: 1, width:'80ch',
-  '& label.Mui-focused': {
-    color: 'black',
-    fontSize: '17px'
-    
-    },
-'& .MuiOutlinedInput-root': {
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderColor: "black",
-    borderWidth: '3px'
-    },
- '&.Mui-focused fieldset':  {
-    borderColor: 'black', // Set border color to transparent when focused
-
-  }
-}, }}>
-      <Autocomplete
-      className='myTextField'
-  options={PROVIDER_OPTIONS}
-  value={PROVIDER_OPTIONS.find(option => option.value === selectedProvider) || null}
-  onChange={(event, newValue) => {
-    setSelectedProvider(newValue?.value || '');
-  }}
-  getOptionLabel={(option) => option.label}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label={ <p className='text-xl'> Provider </p>}
-      variant="outlined"
-      sx={{
-        width: '80ch',
-        '& label.Mui-focused': {
-          color: 'black',
-          fontSize: '10px'
-        },
-        '& .MuiOutlinedInput-root': {
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'black',
-            borderWidth: '3px'
-          },
-          '&.Mui-focused fieldset': {
-            borderColor: 'black'
-          }
-        }
-      }}
-    />
-  )}
-  sx={{ m: 1 }}
-  disableClearable // Remove if you want the clear (X) button
-  isOptionEqualToValue={(option, value) => option.value === value.value}
-/>
-      </FormControl>
-
-
-
-
-        <Box           className='myTextField'
- component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '80ch',  },
-
-  '& label.Mui-focused': {
-    color: 'black'
-    },
-
-'& .MuiOutlinedInput-root': {
-  
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderColor: "black",
-    borderWidth: '3px'
-    },
- '&.Mui-focused fieldset':  {
-    borderColor: 'black', // Set border color to transparent when focused
-
-  }
-},
-      }}
-      noValidate>
-
-
-            {/* <TextField label='username'>
-
-            </TextField> */}
-        </Box>
-    </div>        
-        
-
-        <Box component="form"
-                  className='myTextField'
-
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '100%',  },
-
-  '& label.Mui-focused': {
-    color: 'black'
-    },
-
-'& .MuiOutlinedInput-root': {
-  
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderColor: "black",
-    borderWidth: '3px'
-    },
- '&.Mui-focused fieldset':  {
-    borderColor: 'black', // Set border color to transparent when focused
-
-  }
-},
-      }}
-      noValidate>
-
-
-<TextField label='API key'
-InputProps={{
-  startAdornment: <IoIosKey className='mr-3 w-5 h-5' />,
-}}
-value={api_key} onChange={handleChange} name='api_key'>
-
-</TextField>
-
-
-{/* selectedProvider === 'Africastalking' */}
-{selectedProvider === 'TextSms' ?   
-   <TextField label='Partner Id'
-   InputProps={{
-     startAdornment: <FaIdBadge className='mr-3 w-5 h-5' />,
-   }}
-   value={partnerID} onChange={handleChange}  name='partnerID' >
-
-</TextField>:  
-
-
-
-// Africastalking
-<>
-
-{selectedProvider === 'SMS leopard' && (
-
-
-<TextField label='API secret' 
-InputProps={{
-  startAdornment: <LiaUserSecretSolid className='mr-3 w-5 h-5' />,
-}}
-
-value={api_secret} onChange={handleChange}  name='api_secret'> 
-
-</TextField>
-)}
-
-
-{selectedProvider === 'Africastalking' && (
-
-
-<TextField label='Username' 
-InputProps={{
-  startAdornment: <LiaUserSecretSolid className='mr-3 w-5 h-5' />,
-}}
-
-value={username} onChange={handleChange}  name='username'> 
-
-</TextField>
-)}
-
-
-        
-<TextField label='Short Code' value={short_code} 
-InputProps={{
-  startAdornment: <TbCircleDashedNumber4 className='mr-3 w-5 h-5' />,
-}}
-onChange={handleChange} name='short_code'>
-  
-
-</TextField>
-</>
-}
-
-
-
-
-
-
-<TextField label='Sender ID' value={sender_id} onChange={handleChange}
-
-
-InputProps={{
-  startAdornment: <FaRegIdCard className='mr-3 w-5 h-5' />,
-}}
-name='sender_id'>
-  
-
-</TextField>
-
-        </Box>
-        <Button className='mt-7'  type='submit'>save settings</Button>
-
-        
-</form>
-        <div className='mt-12 flex justify-center shadow-2xl w-full h-[100px] items-center dark:bg-gray-900 '>
-
-        <p>
-           SMS balance:{smsBalance}
-        </p>
-        </div>
-
-
-        <div className='mt-12'>
-      
-<label htmlFor="message" className="block mb-2 text-sm font-medium text-gray-900
- dark:text-white roboto-condensed-light">PPPOE subscriber welcome message </label>
-<textarea id="message" rows="4" className="block p-2.5 w-full text-sm text-gray-900
- bg-gray-50 rounded-lg border border-gray-300 focus:ring-gray-500 focus:border-gray-500
-  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
-   dark:focus:ring-gray-500 dark:focus:border-gray-500" placeholder="..."></textarea>
-
-<p></p>
-        </div>
-
+      <style>{cssVars}</style>
+      <ThemeProvider theme={createTheme(muiTheme)}>
+        <Toaster toastOptions={{ style: { fontSize: '0.875rem', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' } }} />
+        <Backdrop handleClose={handleClose} open={open} />
+        <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+          <RefreshCw style={{ animation: 'spin 1s linear infinite', color: '#3b82f6', width: 28, height: 28 }} /></div>}>
+          <SettingsNotification open={openNotifactionSettings} handleClose={handleCloseNotifaction} />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+            {/* ── SMS balance strip ──────────────────────────────────────────── */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '14px 20px',
+              border: '1px solid var(--divider)',
+              borderRadius: tokens.radius,
+              gap: 16,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Wallet size={16} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
+                <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>SMS balance</span>
+              </div>
+              <span style={{ fontSize: '0.9375rem', fontWeight: 500 }}>
+                {smsBalance ?? <span style={{ color: 'var(--text-tertiary)', fontStyle: 'italic', fontSize: '0.8125rem' }}>Not loaded</span>}
+              </span>
+            </div>
+
+            {/* ── Provider credentials ───────────────────────────────────────── */}
+            <form onSubmit={saveSmsSettings}>
+              <Card>
+                <CardHeader
+                  icon={MdTextsms}
+                  iconClass="text-green-500"
+                  title="Provider credentials"
+                  description="Select your SMS provider and enter the credentials from their dashboard."
+                />
+
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <Autocomplete
+                      options={PROVIDER_OPTIONS}
+                      value={PROVIDER_OPTIONS.find(o => o.value === selectedProvider) || null}
+                      onChange={(_, newValue) => setSelectedProvider(newValue?.value || '')}
+                      getOptionLabel={o => o.label}
+                      disableClearable
+                      isOptionEqualToValue={(o, v) => o.value === v.value}
+                      renderInput={params => (
+                        <TextField
+                        className='myTextField'
+                          {...params}
+                          label="Provider"
+                          sx={fieldSx}
+                          InputProps={{
+                            ...params.InputProps,
+                            startAdornment: (
+                              <>
+                                <InputAdornment position="start">
+                                  <MdTextsms style={{ color: 'var(--text-secondary)' }} />
+                                </InputAdornment>
+                                {params.InputProps.startAdornment}
+                              </>
+                            ),
+                          }}
+                        />
+                      )}
+                      renderOption={(props, option) => (
+                        <li {...props} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px' }}>
+                          <MdTextsms style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
+                          <span style={{ fontSize: '0.875rem' }}>{option.label}</span>
+                        </li>
+                      )}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <TextField {...tf} label="API key" name="api_key" value={api_key}
+                    className='myTextField'
+                    onChange={handleChange}
+                      InputProps={{ startAdornment: <InputAdornment position="start"><IoIosKey style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
+                  </Grid>
+
+                  {renderProviderFields()}
+
+                  <Grid item xs={12} sm={6}>
+                    <TextField {...tf} label="Sender ID" name="sender_id" value={sender_id} 
+                    onChange={handleChange} className='myTextField'
+                      InputProps={{ startAdornment: <InputAdornment position="start"><FaRegIdCard
+                       style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
+                  </Grid>
+                </Grid>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                  <SaveButton loading={savingCredentials}>Save credentials</SaveButton>
+                </div>
+              </Card>
+            </form>
+
+            {/* ── SMS templates ──────────────────────────────────────────────── */}
+            <form onSubmit={saveSmsTemplate}>
+              <Card>
+                <CardHeader
+                  icon={FileText}
+                  title="Message templates"
+                  description="Customise the messages sent to customers. Use the placeholder keywords exactly as shown."
+                />
+
+                <InfoBox>
+                  Use <code style={{ fontSize: '0.8125rem', fontFamily: 'monospace', background: 'rgba(0,0,0,0.06)', padding: '1px 5px', borderRadius: 4 }}>{'{{voucher_code}}'}</code> where the code should appear, and <code style={{ fontSize: '0.8125rem', fontFamily: 'monospace', background: 'rgba(0,0,0,0.06)', padding: '1px 5px', borderRadius: 4 }}>{'{{phone_number}}'}</code> for the customer's number.
+                </InfoBox>
+
+                <Grid container spacing={2} sx={{ mt: 0.5 }}>
+                  <Grid item xs={12}>
+                    <TextField
+                      {...tf}
+                      label="Voucher delivery message"
+                      name="send_voucher_template"
+                      value={send_voucher_template}
+                      onChange={e => setSmsTemplates(prev => ({ ...prev, [e.target.name]: e.target.value }))}
+                      multiline
+                      className='myTextField'
+                      rows={4}
+                      helperText="Sent to the customer when a voucher code is delivered"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      {...tf}
+                      label="Voucher confirmation message"
+                      name="voucher_template"
+                      value={voucher_template}
+                      onChange={e => setSmsTemplates(prev => ({ ...prev, [e.target.name]: e.target.value }))}
+                      multiline
+                      rows={4}
+                      className='myTextField'
+                      helperText="Sent to confirm the voucher code to the customer"
+                    />
+                  </Grid>
+                </Grid>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                  <SaveButton loading={savingTemplates}>Save templates</SaveButton>
+                </div>
+              </Card>
+            </form>
+
+            {/* ── PPPoE welcome message ──────────────────────────────────────── */}
+            <Card>
+              <CardHeader
+                icon={MessageSquare}
+                title="PPPoE subscriber welcome message"
+                description="Sent to new PPPoE subscribers when their account is created."
+              />
+              <TextField
+                {...tf}
+                multiline
+                rows={4}
+                className='myTextField'
+                label="Welcome message"
+                value={welcomeMessage}
+                onChange={e => setWelcomeMessage(e.target.value)}
+                placeholder="Hi {{name}}, your account has been created…"
+              />
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                <SaveButton onClick={e => { e.preventDefault(); /* wire to API */ }}>
+                  Save message
+                </SaveButton>
+              </div>
+            </Card>
+
+          </div>
         </Suspense>
+      </ThemeProvider>
+    </>
+  );
+};
 
-        </>
-  )
-}
-
-export default SmsSettings
+export default SmsSettings;

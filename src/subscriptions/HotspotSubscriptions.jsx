@@ -27,7 +27,8 @@ import VoucherDetails from './VoucherDetails';
 import { IoEyeOutline } from "react-icons/io5";
 import { 
    RefreshCw,
-  BarChart3, TrendingDown, Download, Upload,
+  BarChart3,
+   TrendingDown, Download, Upload,
    Wifi, 
   Smartphone, 
   Calendar, 
@@ -42,6 +43,14 @@ import Paper from '@mui/material/Paper';
 import { Box, Button,
   Typography,
  } from '@mui/material';
+
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+import { useMemo } from 'react';
+
+
+
+
 
 
 const HotspotSubscriptions = () => {
@@ -59,7 +68,7 @@ const HotspotSubscriptions = () => {
 const [anchorEl, setAnchorEl] = useState(null);
 
   const { settingsformData, setFormData, selectedProvider, setSelectedProvider, 
-    setSmsSettingsForm
+    setSmsSettingsForm, setNasSettingsForm, nasSettingsForm
    } = useApplicationSettings();
 
   const [tableData, setTableData] = useState([])
@@ -105,6 +114,7 @@ const [openVoucherDetails, setOpenVoucherDetails] = useState(false);
 const [isSpinning, setIsSpinning] = useState(false);
 const [loginBy, setLoginBy] = useState('')
 
+
 const selectedVoucherIdRef = useRef(id);
 const isDetailsOpenRef = useRef(openVoucherDetails);
 
@@ -115,6 +125,68 @@ useEffect(() => {
 useEffect(() => {
   isDetailsOpenRef.current = openVoucherDetails;
 }, [openVoucherDetails]);
+
+
+
+const subdomain = window.location.hostname.split('.')[0]
+
+
+  const handleGetNasSettings = useCallback(async () => {
+    try {
+      const response = await fetch('/api/nas_settings', { headers: { 'X-Subdomain': subdomain } });
+      const newData = await response.json();
+      if (response.ok) setNasSettingsForm({ ...nasSettingsForm, notification_when_unreachable: newData[0].notification_when_unreachable, 
+        unreachable_duration_minutes: newData[0].unreachable_duration_minutes, 
+        use_radius:newData[0].use_radius,
+        notification_phone_number: newData[0].notification_phone_number });
+    } catch {}
+  }, []);
+
+  useEffect(() => { handleGetNasSettings(); }, [handleGetNasSettings]);
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
 
 
 
@@ -136,7 +208,6 @@ const handleCloseVoucherDetails = () => {
       preserveAspectRatio: 'xMidYMid slice',
     },
   };
-const subdomain = window.location.hostname.split('.')[0]
 
 
 
@@ -268,20 +339,38 @@ const formatRemainingTime = (expirationDate) => {
 
 
     const columns = [
-    { 
-      title: 'Voucher', 
-      field: 'voucher', 
-      headerClassName: 'dark:text-black',
-      render: (rowData) => (
-        <div className="flex items-center gap-2">
-          <Wifi className="w-4 h-4 text-blue-500" />
-          <code className="font-mono text-sm bg-gray-100
-           dark:bg-gray-800 px-2 py-1 rounded">
-            {rowData.voucher}
-          </code>
-        </div>
-      ),
-    },
+    
+
+
+{ 
+  title: 'Voucher', 
+  field: 'voucher', 
+  headerClassName: 'dark:text-black',
+  render: (rowData) => (
+    <div className="flex items-center gap-2">
+      <Wifi className="w-4 h-4 text-blue-500" />
+      <code className="font-mono text-sm bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+        {rowData.voucher}
+      </code>
+      <Tooltip title="Download / Print voucher">
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            downloadVoucherCard(rowData);
+          }}
+          className="hover:bg-green-50"
+        >
+          <Download className="w-3.5 h-3.5 text-emerald-600" />
+        </IconButton>
+      </Tooltip>
+    </div>
+  ),
+},
+
+
+
+
     { 
       title: 'Status', 
       field: 'status',  
@@ -301,6 +390,42 @@ const formatRemainingTime = (expirationDate) => {
         />
       )
     },
+
+
+
+    {
+  title: 'Sync',
+  field: 'sync_status',
+  headerClassName: 'dark:text-black',
+  cellStyle: { minWidth: 170, whiteSpace: 'nowrap' },
+  headerStyle: { minWidth: 170, whiteSpace: 'nowrap' },
+  render: (rowData) => {
+    if (nasSettingsForm?.use_radius) return <span className="text-xs text-gray-400 font-sans">RADIUS</span>;
+
+    const isSyncing = !!syncingIds[rowData.id];
+    const map = {
+      synced: { label: 'Synced', bg: '#d1fae5', color: '#065f46' },
+      not_synced: { label: 'Not synced', bg: '#fef3c7', color: '#92400e' },
+      failed: { label: 'Failed', bg: '#fee2e2', color: '#991b1b' },
+    };
+    const s = isSyncing
+      ? { label: 'Syncing…', bg: '#dbeafe', color: '#1e40af' }
+      : (map[rowData.sync_status] || map.not_synced);
+
+    return (
+      <div className="flex items-center gap-1.5 font-sans">
+        <Chip label={s.label} size="small" sx={{ backgroundColor: s.bg, color: s.color, fontWeight: 600, fontFamily: 'inherit' }} />
+        <Tooltip title={rowData.sync_error || (isSyncing ? 'Syncing to router…' : 'Sync to MikroTik')}>
+          <span>
+            <IconButton size="small" disabled={isSyncing} onClick={(e) => { e.stopPropagation(); syncVoucherToMikrotik(rowData.id); }}>
+              <RefreshCw className={`w-3.5 h-3.5 text-blue-500 ${isSyncing ? 'animate-spin' : ''}`} />
+            </IconButton>
+          </span>
+        </Tooltip>
+      </div>
+    );
+  }
+},
     {
       title: 'Expiration', 
       field: 'expiration', 
@@ -377,6 +502,7 @@ const formatRemainingTime = (expirationDate) => {
     { 
       title: 'IP Address', 
       field: 'ip',  
+      cellStyle: { minWidth: 100 }, headerStyle: { minWidth: 100 },
       headerClassName: 'dark:text-black',
       render: (rowData) => (
         <div className="flex items-center gap-1">
@@ -391,6 +517,7 @@ const formatRemainingTime = (expirationDate) => {
     { 
       title: 'MAC Address', 
       field: 'mac',  
+       cellStyle: { minWidth: 120 }, headerStyle: { minWidth: 120 },
       headerClassName: 'dark:text-black',
       render: (rowData) => (
         <div className="flex items-center gap-1">
@@ -417,14 +544,17 @@ const formatRemainingTime = (expirationDate) => {
         </Tooltip>
       )
     },
+
+
     {
       title: "Device & Actions",
       field: "shared_users",
       headerClassName: "dark:text-black",
+      // sticky-actions-col: pinned via scoped CSS below (2nd from right)
       render: (rowData) => (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="relative">
+            {/* <div className="relative">
               <FaDesktop className="text-green-500" />
               {rowData.shared_users > 1 && (
                 <Badge 
@@ -440,7 +570,7 @@ const formatRemainingTime = (expirationDate) => {
                   }}
                 />
               )}
-            </div>
+            </div> */}
             {/* <span className="text-sm">{rowData.device || 'Unknown'}</span> */}
           </div>
           
@@ -483,6 +613,7 @@ const formatRemainingTime = (expirationDate) => {
       field: 'actions',  
       headerClassName: 'dark:text-black', 
       sorting: false,
+      // sticky-actions-col: pinned via scoped CSS below (last column)
       render: (rowData) => (
         <div className="flex items-center gap-1">
           {/* <Tooltip title="Edit voucher">
@@ -534,6 +665,77 @@ const formatRemainingTime = (expirationDate) => {
 
 
 
+
+
+// new state, alongside your other useState calls
+const [syncingIds, setSyncingIds] = useState({});
+const [bulkSyncing, setBulkSyncing] = useState(false);
+
+const syncVoucherToMikrotik = async (id) => {
+  setSyncingIds(prev => ({ ...prev, [id]: true }));
+  try {
+    const response = await fetch(`/api/hotspot_vouchers/${id}/sync_to_mikrotik?router_name=${settingsformData.router_name}`, {
+      method: 'POST',
+      headers: { 'X-Subdomain': subdomain },
+    });
+    const newData = await response.json();
+    if (response.ok) {
+      setVouchers(prev => prev.map(v => v.id === id ? { ...v, ...newData } : v));
+      if (newData.sync_status === 'synced') {
+        toast.success('Voucher synced to router', { position: 'top-center', duration: 3000 });
+      } else {
+        toast.error(newData.sync_error || 'Sync failed', { position: 'top-center', duration: 4000 });
+      }
+    } else {
+      toast.error(newData.error || 'Sync request failed', { position: 'top-center', duration: 4000 });
+    }
+  } catch {
+    toast.error('Network error while syncing', { position: 'top-center', duration: 4000 });
+  } finally {
+    setSyncingIds(prev => { const next = { ...prev }; delete next[id]; return next; });
+  }
+};
+
+const bulkSyncVouchersToMikrotik = async () => {
+  const unsynced = vouchers.filter(v => v.sync_status !== 'synced').map(v => v.id);
+  if (unsynced.length === 0) {
+    toast('Nothing to sync', { position: 'top-center' });
+    return;
+  }
+  setBulkSyncing(true);
+  setSyncingIds(prev => {
+    const next = { ...prev };
+    unsynced.forEach(id => { next[id] = true; });
+    return next;
+  });
+  try {
+    const response = await fetch('/api/hotspot_vouchers/bulk_sync_to_mikrotik', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+      body: JSON.stringify({ ids: unsynced, router_name: settingsformData.router_name }),
+    });
+    const results = await response.json();
+    if (response.ok) {
+      setVouchers(prev => prev.map(v => {
+        const r = results.find(x => x.id === v.id);
+        return r ? { ...v, sync_status: r.sync_status, sync_error: r.sync_error } : v;
+      }));
+      const succeeded = results.filter(r => r.sync_status === 'synced').length;
+      toast.success(`Synced ${succeeded}/${results.length} vouchers`, { position: 'top-center', duration: 4000 });
+    } else {
+      toast.error('Bulk sync failed', { position: 'top-center', duration: 4000 });
+    }
+  } catch {
+    toast.error('Network error during bulk sync', { position: 'top-center', duration: 4000 });
+  } finally {
+    setBulkSyncing(false);
+    setSyncingIds(prev => {
+      const next = { ...prev };
+      unsynced.forEach(id => { delete next[id]; });
+      return next;
+    });
+  }
+};
 
 const logoutUser = async() => {
   try {
@@ -732,7 +934,7 @@ const fetchSavedSmsSettings = useCallback(
         });
       }
     } catch (error) {
-      // toast.error('Error fetching SMS settings, We’re having trouble completing this request.', {
+      // toast.error('Error fetching SMS settings, We're having trouble completing this request.', {
       //   duration: 3000,
       //   position: 'top-center',
       // });
@@ -827,10 +1029,8 @@ setopenLoad(false)
   }
 
 
-
-  const deleteVoucher = async(id)=> { 
+const deleteVoucher = async(id)=> { 
     try {
-      
       const response = await fetch(`/api/hotspot_vouchers/${id}?router_name=${settingsformData.router_name}&use_radius=${settingsformData.use_radius}`, {
         method: "DELETE",
         headers: {
@@ -841,25 +1041,27 @@ setopenLoad(false)
       const newData = await response.json()
       if (response.ok) {
         setVouchers((vouchers)=> vouchers.filter(item => item.id !== id))
-        toast.success('Voucher deleted successfully', {
-          position: "top-center",
-          duration: 4000,
-        })
+        if (newData.mikrotik_error) {
+          toast.error(`Deleted, but router cleanup failed: ${newData.mikrotik_error}`, {
+            position: "top-center",
+            duration: 6000,
+          })
+        } else {
+          toast.success('Voucher deleted successfully', {
+            position: "top-center",
+            duration: 4000,
+          })
+        }
         setOpenDelete(false)
       }else{
         setOpenDelete(false)
-        toast.error('Failed to delete voucher', {
+        toast.error(newData.error || 'Failed to delete voucher', {
           position: "top-center",
           duration: 4000,
         })
-
-        // toast.error(newData.error, {
-        //   position: "top-center",
-        //   duration: 4000,
-        // })
       }
     } catch (error) {
-      toast.error('Failed to delete voucher servere error', {
+      toast.error('Failed to delete voucher server error', {
         position: "top-center",
         duration: 4000,
       })
@@ -905,6 +1107,146 @@ setopenLoad(false)
   };
 
   const metrics = calculateMetrics();
+
+
+
+
+
+
+
+const downloadVoucherCard = (rowData) => {
+  const generatedDate = new Date().toLocaleString('en-GB', {
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(rowData.voucher)}`;
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>WiFi Voucher - ${rowData.voucher}</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Arial, sans-serif; }
+  body { background:#f1f5f9; padding:24px; display:flex; justify-content:center; }
+  .card {
+    width:380px; background:#ffffff; border-radius:20px; overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08); border:1px solid #e2e8f0;
+  }
+  .header {
+    background:linear-gradient(135deg, #10b981, #059669);
+    color:#fff; padding:20px 24px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .header h1 { font-size:16px; font-weight:700; letter-spacing:0.5px; }
+  .header .badge {
+    background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600;
+  }
+  .scan-note {
+    text-align:center; padding:14px 24px 0; color:#64748b; font-size:12px; font-weight:600;
+    text-transform:uppercase; letter-spacing:1px;
+  }
+  .qr-wrap { display:flex; justify-content:center; padding:16px 24px; }
+  .qr-wrap img { width:160px; height:160px; border-radius:12px; border:1px solid #e2e8f0; padding:8px; }
+  .code-section { text-align:center; padding:0 24px 16px; }
+  .code-label { font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1.5px; font-weight:600; margin-bottom:6px; }
+  .code {
+    font-family:'Courier New', monospace; font-size:32px; font-weight:800; color:#059669;
+    letter-spacing:4px; background:#f0fdf4; border:2px dashed #10b981; border-radius:12px;
+    padding:12px 0; margin:0 8px;
+  }
+  .stats {
+    display:grid; grid-template-columns:1fr 1fr; gap:1px; background:#e2e8f0;
+    margin:0 24px; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0;
+  }
+  .stat { background:#fff; padding:12px 14px; }
+  .stat-label { font-size:10px; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; font-weight:600; margin-bottom:4px; }
+  .stat-value { font-size:14px; color:#1e293b; font-weight:700; }
+  .instructions { margin:16px 24px 0; background:#f8fafc; border-radius:12px; padding:14px 16px; }
+  .instructions-title { font-size:11px; font-weight:700; color:#1e293b; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  .instructions ol { padding-left:18px; color:#475569; font-size:12px; line-height:1.7; }
+  .footer { padding:16px 24px 22px; text-align:center; }
+  .footer .note { font-size:10px; color:#94a3b8; margin-bottom:4px; }
+  .footer .support { font-size:11px; color:#64748b; font-weight:600; }
+  .divider { height:1px; background:repeating-linear-gradient(90deg,#cbd5e1 0 6px, transparent 6px 12px); margin:14px 24px 0; }
+  @media print {
+    body { background:#fff; padding:0; }
+    .card { box-shadow:none; border:1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h1>📶 WiFi Hotspot Voucher</h1>
+      <span class="badge">${rowData.status?.toUpperCase() || 'ACTIVE'}</span>
+    </div>
+
+    <p class="scan-note">Scan to activate instantly</p>
+    <div class="qr-wrap">
+      <img src="${qrUrl}" alt="QR Code" />
+    </div>
+
+    <div class="code-section">
+      <div class="code-label">Voucher Code</div>
+      <div class="code">${rowData.voucher}</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Speed</div>
+        <div class="stat-value">${rowData.speed_limit || 'Unlimited'}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Data Limit</div>
+        <div class="stat-value">${rowData.data_limit || 'Unlimited'}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Validity</div>
+        <div class="stat-value">${rowData.validity || rowData.package || 'N/A'}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Devices</div>
+        <div class="stat-value">${rowData.shared_users || 1} device(s)</div>
+      </div>
+    </div>
+
+    <div class="instructions">
+      <div class="instructions-title">How to Connect</div>
+      <ol>
+        <li>Connect to WiFi network: <b>Hotspot</b></li>
+        <li>Open your web browser (any website)</li>
+        <li>Enter voucher code: <b>${rowData.voucher}</b></li>
+        <li>Click "Connect" and enjoy your internet!</li>
+      </ol>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="footer">
+      <p class="note">This voucher is valid for one-time use only.</p>
+      <p class="support">Support: support@isp.com</p>
+      <p class="note" style="margin-top:6px;">Generated on ${generatedDate}</p>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `voucher_${rowData.voucher}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+
+
+
+  
 
   return (
    <>
@@ -963,6 +1305,7 @@ setopenLoad(false)
         setVoucherForm={setVoucherForm}
         handleChangeVoucher={handleChangeVoucher}
         editVoucher={editVoucher}
+        loading={loading}
       />
 
       <CompensationVoucher 
@@ -996,7 +1339,8 @@ setopenLoad(false)
                   p-2.5 dark:bg-gray-700 dark:border-gray-600
                    dark:placeholder-gray-400 
                   dark:text-white dark:focus:ring-green-500
-                   dark:focus:border-green-500" 
+                   dark:focus:border-green-500 font-sans
+" 
                 placeholder="Search vouchers by status, phone, IP..." 
               />
               {isSearching && (
@@ -1009,7 +1353,7 @@ setopenLoad(false)
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <button
               onClick={() => setOpenCompensationVoucher(true)}
               className="flex items-center gap-2 bg-gradient-to-r
@@ -1018,13 +1362,14 @@ setopenLoad(false)
                 transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <FaHands className="text-white text-lg" />
-              <span className="text-sm font-medium">Compensate</span>
+              <span className="text-sm font-medium font-sans
+">Compensate</span>
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Table Container */}
-       <div className="rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+       <div className="hotspot-vouchers-table rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
   <div style={{ 
     maxWidth: "100%", 
     position: "relative",
@@ -1035,11 +1380,17 @@ setopenLoad(false)
         bg-white dark:bg-gray-800 bg-opacity-80 z-[2]">
         <div className="flex flex-col items-center gap-2">
           <RefreshCw className='animate-spin text-blue-500 w-8 h-8' />
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-600 dark:text-gray-300 font-sans
+">
             Refreshing vouchers...</p>
         </div>
       </div>
     )}
+
+
+
+      <ThemeProvider theme={tableTheme}>
+    
     
     <MaterialTable 
       columns={columns}
@@ -1050,10 +1401,11 @@ setopenLoad(false)
             <Wifi className="w-6 h-6 text-white" />
           </div>
           <div>
-            <p className="text-xl font-bold text-gray-800 dark:text-white">
+            <p className="text-xl font-bold text-gray-800 font-sans dark:text-white">
               Hotspot Vouchers
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500  font-sans
+ dark:text-gray-400">
               {vouchers.length} total vouchers • {metrics.active} active
             </p>
           </div>
@@ -1061,20 +1413,16 @@ setopenLoad(false)
       }
       onRowClick={handleRowClick}
       data={vouchers}
-      actions={[
+     
+
+actions={[
         {
           icon: () => (
-            <button className="flex items-center gap-2 bg-gradient-to-r
-             from-green-500 to-cyan-500
-              text-white px-4 py-2 rounded-lg 
-               hover:bg-cyan-600
-              transition-all duration-200 shadow-sm hover:shadow-md"
-              onClick={() => {
-                getHotspotVouchers()
-              }}
+            <button className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-cyan-500 text-white px-4 py-2 rounded-lg hover:bg-cyan-600 transition-all duration-200 shadow-sm hover:shadow-md"
+              onClick={() => { getHotspotVouchers() }}
             >
               <RefreshCw className={`${isSpinning ? 'animate-spin' : ''}`} />
-              <span className="text-sm font-medium">Refresh</span>
+              <span className="text-sm font-medium font-sans">Refresh</span>
             </button>
           ),
           isFreeAction: true,
@@ -1082,40 +1430,49 @@ setopenLoad(false)
         },
         {
           icon: () => (
-            <button className="flex items-center gap-2 bg-green-500
-            
-              text-white px-4 py-2 rounded-lg 
-               hover:bg-cyan-600
-              "
+            <button className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-cyan-600"
               onClick={() => {
                 handleClickOpen()
                 setEditVoucher(false)
-                setVoucherForm({
-                  package: '',
-                  phone: '',  
-                  shared_users: '',
-                  number_of_vouchers: '',
-                })
+                setVoucherForm({ package: '', phone: '', shared_users: '', number_of_vouchers: '' })
               }}
             >
               <AddIcon />
-              <span className="text-sm font-medium">Add Voucher</span>
+              <span className="text-sm font-medium font-sans">Add Voucher</span>
             </button>
           ),
           isFreeAction: true,
           tooltip: 'Add New Voucher',
         },
-      ]}
+        !settingsformData?.use_radius && {
+  icon: () => (
+    <button
+      className="flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+      onClick={bulkSyncVouchersToMikrotik}
+      disabled={bulkSyncing}
+    >
+      <RefreshCw className={bulkSyncing ? 'animate-spin' : ''} />
+      <span className="text-sm font-medium font-sans">{bulkSyncing ? 'Syncing…' : 'Sync All to MikroTik'}</span>
+    </button>
+  ),
+  isFreeAction: true,
+  tooltip: 'Sync unsynced vouchers to router',
+},
+      ].filter(Boolean)}
+
+
       localization={{
         body: {
           emptyDataSourceMessage: (
             <div className="flex flex-col items-center
              justify-center py-12">
               <Wifi className="w-16 h-16 text-gray-300 mb-4" />
-              <p className="text-gray-500 text-lg font-medium mb-2">
+              <p className="text-gray-500 text-lg font-medium mb-2 font-sans
+">
                 No vouchers found
               </p>
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-400 text-sm font-sans
+">
                 Create your first voucher to get started!
               </p>
             </div>
@@ -1125,39 +1482,42 @@ setopenLoad(false)
           actions: 'Actions'
         }
       }}
-      options={{
-        sorting: true,
-        pageSizeOptions: [10, 25, 50],
-        pageSize: 10,
-        paginationType: 'stepped',
-        exportButton: true,
-        exportAllData: true,
-        selection: false,
-        search: false,
-        searchAutoFocus: true,
-        showSelectAllCheckbox: false,
-        showTextRowsSelected: false,
-        emptyRowsWhenPaging: false,
-        headerStyle: {
-          backgroundColor: '#f8fafc',
-          color: '#1e293b',
-          fontWeight: '600',
-          fontSize: '0.875rem',
-          borderBottom: '2px solid #e2e8f0',
-          padding: '16px',
-        },
-        rowStyle: {
-          '&:hover': {
-            backgroundColor: '#f1f5f9',
-            cursor: 'pointer'
-          }
-        },
-        cellStyle: {
-          padding: '12px 16px',
-        },
+
+
      
-        draggable: false,
-      }}
+ options={{
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+       padding: 'dense',
+  columnsButton: true,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'monospace',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'monospace',
+      }),
+    }}
       components={{
         Container: props => (
           <div 
@@ -1175,16 +1535,46 @@ setopenLoad(false)
         overflow: 'hidden', 
       }}
     />
+    </ThemeProvider>
+    
   </div>
 </div>
+
+{/*
+  Pins the last two data columns ("Device & Actions" and "Actions") to the
+  right edge so their icon buttons stay visible while the rest of the wide
+  table (11 columns) scrolls underneath. Scoped to .hotspot-vouchers-table
+  only, so it never touches any other material-table on the page.
+
+  NOTE: the pixel offsets below are estimates based on the icon-button
+  content in each column ("Actions" ~64px wide with a single small delete
+  icon, "Device & Actions" ~120px wide with up to two icons). If the icons
+  look misaligned or overlap column borders once you view it live, adjust
+  --actions-col-width to match the actual rendered width of your last
+  column (inspect it in devtools and copy the computed width).
+*/}
+<style>{`
+  .hotspot-vouchers-table {
+    --actions-col-width: 64px;
+  }
+  .hotspot-vouchers-table .MuiTableRow-root > *:nth-last-child(1) {
+    position: sticky;
+    right: 0;
+    z-index: 2;
+    background-color: inherit;
+  }
+  .hotspot-vouchers-table .MuiTableRow-root > *:nth-last-child(2) {
+    position: sticky;
+    right: var(--actions-col-width);
+    z-index: 2;
+    background-color: inherit;
+  }
+  .hotspot-vouchers-table .MuiTableHead-root .MuiTableRow-root > *:nth-last-child(-n+2) {
+    z-index: 3;
+  }
+`}</style>
     </>
   )
 }
 
 export default HotspotSubscriptions
-
-
-
-
-
-

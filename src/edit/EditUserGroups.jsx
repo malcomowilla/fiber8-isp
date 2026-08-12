@@ -13,6 +13,8 @@ import {
 
 import { CiUser } from "react-icons/ci";
 
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo, useState, useEffect } from 'react';
 
 
 
@@ -30,7 +32,55 @@ const EditUserGroups = ({
     const [fullWidth, setFullWidth] = React.useState(true);
     const [maxWidth, setMaxWidth] = React.useState("lg");
 
+
+
+
+
+
+    function useIsDarkMode() {
+      const [isDark, setIsDark] = useState(
+        () => typeof document !== 'undefined' &&
+          document.documentElement.classList.contains('dark')
+      );
+    
+      useEffect(() => {
+        const root = document.documentElement;
+    
+        const update = () => setIsDark(root.classList.contains('dark'));
+        update();
+    
+        const observer = new MutationObserver(update);
+        observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+    
+        return () => observer.disconnect();
+      }, []);
+    
+      return isDark;
+    }
+    
+    
+    
+    
+    const isDark = useIsDarkMode();
+    
+    const tableTheme = useMemo(() => createTheme({
+      palette: {
+        mode: isDark ? 'dark' : 'light',
+        background: {
+          paper: isDark ? '#1e1e1e' : '#ffffff',
+          default: isDark ? '#1e1e1e' : '#ffffff',
+        },
+        text: {
+          primary: isDark ? '#f1f1f1' : '#1a1a1a',
+          secondary: isDark ? '#a3a3a3' : '#6b7280',
+        },
+      },
+    }), [isDark]);
+    
+
   return (
+    <ThemeProvider theme={tableTheme}>
+    
     <Dialog fullWidth={fullWidth} maxWidth={maxWidth} open={open} onClose={handleClose}>
         <form onSubmit={createUserGroups}>
   <DialogContent>
@@ -64,7 +114,8 @@ const EditUserGroups = ({
           id="name"
           value={name.name}
           onChange={handleChangeUserGroups}
-          label={<p className="dark:text-black text-black">Name</p>}
+          label={<p className="dark:text-white font-sans
+ text-black">Name</p>}
           fullWidth
         />
       </motion.div>
@@ -73,11 +124,16 @@ const EditUserGroups = ({
   <DialogActions>
     <Button onClick={handleClose}  color="error">Cancel</Button>
     <Button  type='submit' variant="contained" color="success">
-      {editUserGroup ? loading ?  'Updating...' : 'Update' : loading ? 'Saving...' : 'Save'}
+      {editUserGroup ? loading ?  <p className='font-sans
+'>Updating...</p> : <p className='font-sans
+'>Update</p> : loading ? <p className='font-sans
+'>Saving...</p> : <p className='font-sans
+'>Save</p>}
     </Button>
   </DialogActions>
   </form>
 </Dialog>
+</ThemeProvider >
   )
 }
 

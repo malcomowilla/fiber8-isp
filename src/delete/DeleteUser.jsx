@@ -43,28 +43,7 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   return (
     <React.Fragment>
      
-      {/* <Dialog
-        fullWidth={fullWidth}
-        maxWidth={maxWidth}
-        open={openDelete}
-        onClose={handleCloseDelete}
-      >
-        <DialogTitle sx={{
-            fontWeight: 'bold'
-        }}>Delete Package</DialogTitle>
-        <DialogContent>
-         
-        <p className='font-mono'>Are you sure want to delete this router</p>
-        </DialogContent>
-        <DialogActions>
-        <Stack direction={{ xs: 'column', sm: 'row'}}  spacing={{xs: 1, sm: 2, md: 4}}>
-
-          <Button onClick={handleCloseDelete} color='error'>Cancel</Button>
-          <Button onClick={handleDelete} variant='outlined' startIcon={<CloseIcon/>}   color='error'>Delete</Button>
-          </Stack>
-
-        </DialogActions>
-      </Dialog> */}
+    
 
 
 
@@ -136,7 +115,8 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
               <WarningIcon color="error" sx={{ fontSize: 32 }} />
             </Box>
             <Typography variant="h5" component="span" fontWeight="bold">
-              Delete User
+              <p className='font-sans
+'>Delete User </p>
             </Typography>
           </Box>
         </DialogTitle>
@@ -155,13 +135,15 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
             align="center"
             sx={{ mb: 2, fontWeight: 500 }}
           >
-            Are you sure you want to delete this user?  </Typography>
+            <p className='font-sans
+'>Are you sure you want to delete this user? </p>  </Typography>
           <Typography
             variant="body2"
             color="text.secondary"
             align="center"
           >
-            This action cannot be undone.
+            <p className='font-sans
+'>This action cannot be undone. </p>
           </Typography>
         </DialogContent>
   
@@ -192,7 +174,8 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
               }
             }}
           >
-            Cancel
+            <p className='font-sans
+'>Cancel </p>
           </Button>
 
           <Button
@@ -210,7 +193,8 @@ const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
             {loading ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
-              'Delete'
+              <p className='font-sans
+'>Delete'=</p>
             )}
           </Button>
         </DialogActions>

@@ -16,6 +16,8 @@ import EditUserGroups from '../edit/EditUserGroups'
 import toast,{Toaster} from 'react-hot-toast'
 import DeleteUser from '../delete/DeleteUserGroup'
 import {RefreshCw} from 'lucide-react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
 
 
 
@@ -30,6 +32,59 @@ const [openDelete, setOpenDelete] = useState(false)
 const [nameId, setNameId] = useState('')
 const [editUserGroup, setEditUserGroup] = useState(false)
 const [loading, setloading] = useState(false)
+
+
+
+
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
+
+
 
 const handleCloseDelete = () => {
   setOpenDelete(false)
@@ -352,12 +407,13 @@ const createUserGroups = async(e) => {
 )} 
 
 </div>
+<ThemeProvider theme={tableTheme}>
 
       <MaterialTable columns={columns}
       onRowClick={handleRowAdd}
       
-      title={<p className='bg-gradient-to-r from-green-600 via-blue-400
-         to-cyan-500 bg-clip-text text-transparent text-2xl font-bold'>User Groups</p>}
+      title={<p className=' text-2xl font-bold font-sans
+'>User Groups</p>}
       
        data={userGroups}
 
@@ -376,7 +432,8 @@ const createUserGroups = async(e) => {
 
 localization={{
                 body: {
-                  emptyDataSourceMessage: 'No user groups found. Create your first user group to get started!'
+                  emptyDataSourceMessage: <p className='font-sans
+'>No user groups found. Create your first user group to get started!</p>
                 },
                
               
@@ -384,32 +441,44 @@ localization={{
               }}
 
 
-options={{
-  sorting: true,
-  pageSizeOptions:[2, 5, 10],
-  pageSize: 10,
-  paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-selection: true,
-search:false,
-searchAutoFocus: true,
-showSelectAllCheckbox: false,
-showTextRowsSelected: false,
-  emptyRowsWhenPaging: false,
-headerStyle:{
-  fontFamily: 'bold',
-  textTransform: 'uppercase'
-  } ,
-  
-  
-  fontFamily: 'mono'
-}}    
+ options={{
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'monospace',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'monospace',
+      }),
+    }}
+       
       
       
       
       
       />
+      </ThemeProvider>
 
     </div>
   )

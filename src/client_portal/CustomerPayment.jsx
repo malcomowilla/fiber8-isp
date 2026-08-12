@@ -239,7 +239,8 @@ useEffect(() => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-4 md:p-8
-      flex justify-center items-center"
+      flex justify-center items-center font-sans
+"
     >
       <div className="max-w-6xl mx-auto flex flex-wrap lg:flex-nowrap gap-8">
         {/* Payment Methods Card */}

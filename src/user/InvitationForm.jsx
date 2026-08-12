@@ -39,6 +39,22 @@ import { GoUpload } from "react-icons/go";
 import { FcDataConfiguration } from "react-icons/fc";
 import { GiMeshNetwork } from "react-icons/gi";
 import { TbNetwork } from "react-icons/tb";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 const InvitationForm = ({ isOpen, setIsOpen,permissionAndRoles, 
@@ -93,13 +109,62 @@ privateIps: false,
 ipNetworks: false,
 invoice: false,
 equipment: false,
-
-
-
-  
-  
   
 })
+
+
+
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
+
+
+
+
 
 
 
@@ -287,6 +352,9 @@ const [userRoles, setUserRoles] = useState([])
 
   return (
     <>
+
+    <ThemeProvider theme={tableTheme}>
+    
       {loading && (
         <Backdrop open={openLoad} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
           <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
@@ -300,7 +368,8 @@ const [userRoles, setUserRoles] = useState([])
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center
-             p-4 bg-slate-900/20 backdrop-blur"
+             p-4 bg-slate-900/20 backdrop-blur font-sans
+"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -311,7 +380,8 @@ const [userRoles, setUserRoles] = useState([])
             >
               <div className="sticky top-0 z-10 bg-white p-6 border-b border-gray-200 rounded-t-lg">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-2xl font-bold text-gray-800">
+                  <h3 className="text-2xl font-bold text-gray-800 font-sans
+">
                     Invite Users
                   </h3>
                   <button 
@@ -483,6 +553,7 @@ const [userRoles, setUserRoles] = useState([])
           </motion.div>
         )}
       </AnimatePresence>
+      </ThemeProvider>
     </>
   );
 };

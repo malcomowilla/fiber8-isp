@@ -41,6 +41,11 @@ import { useDebounce } from 'use-debounce';
 
 import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading animation
 
+import { useMemo } from 'react';
+
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Chip, Tooltip } from '@mui/material';
+import { RefreshCw } from 'lucide-react';
 
 
 
@@ -52,11 +57,17 @@ const [openLoad, setOpenLoad] = useState(false)
 const [packages, setPackages] = useState([])
 const [isOpenDelete, setisOpenDelete] = useState(false)
 
-const {settingsformData} = useApplicationSettings()
+const {settingsformData, setFormData, setNasSettingsForm, nasSettingsForm} = useApplicationSettings()
+
 const [search, setSearch] = useState('')
 
 const [searchInput] = useDebounce(search, 1000)
 const [isSearching, setIsSearching] = useState(false); // New state for search loading
+
+// Per-row "syncing" flags, keyed by package id, and a flag for the
+// bulk-sync button — these drive the spinner / disabled states.
+const [syncingIds, setSyncingIds] = useState({});
+const [bulkSyncing, setBulkSyncing] = useState(false);
 
 const [hotspotPackage, setHotspotPackage] = useState({
   name: '',
@@ -71,9 +82,21 @@ const [hotspotPackage, setHotspotPackage] = useState({
   download_burst_limit: '',
   validity_period_units: '',
   weekdays: [] ,
-  location: ''
+  location: '',
+   burst_enabled:            false,
+  burst_limit_download:     '',
+  burst_limit_upload:       '',
+  burst_threshold_download: '',
+  burst_threshold_upload:   '',
+  burst_time:               '',
+  enable_free_trial: false,
+  free_trial_duration_minutes: '',
+  free_trial_download_limit: '',
+  free_trial_upload_limit: '',
+  nas_router: ''
 
 })
+const [selectedRouter, setSelectedRouter] = useState('')
 
 const [editing, setEditing] = useState(false);
         const [nodes, setNodes] = useState([])
@@ -82,7 +105,6 @@ const [editing, setEditing] = useState(false);
 // const navigate = useNavigate()
 
 const handleWeekdayChange = (day) => {
-  console.log('day', day);
   setHotspotPackage((prev) => {
     const updatedWeekdays = prev.weekdays?.includes(day)
       ? prev.weekdays?.filter((d) => d !== day) // Remove day if already selected
@@ -91,6 +113,78 @@ const handleWeekdayChange = (day) => {
     return { ...prev, weekdays: updatedWeekdays };
   });
 };
+
+
+
+
+
+
+const subdomain = window.location.hostname.split('.')[0]
+
+
+
+
+
+  const handleGetNasSettings = useCallback(async () => {
+    try {
+      const response = await fetch('/api/nas_settings', { headers: { 'X-Subdomain': subdomain } });
+      const newData = await response.json();
+      if (response.ok) setNasSettingsForm({ ...nasSettingsForm, notification_when_unreachable: newData[0].notification_when_unreachable, 
+        unreachable_duration_minutes: newData[0].unreachable_duration_minutes, 
+        use_radius:newData[0].use_radius,
+        notification_phone_number: newData[0].notification_phone_number });
+    } catch {}
+  }, []);
+
+  useEffect(() => { handleGetNasSettings(); }, [handleGetNasSettings]);
+
+
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
 
 const handleClickOpen = (rowData) => {
   setOpen(true);
@@ -134,10 +228,14 @@ const handleChangeTimeUntil = (date)=> {
 
 
 const columns = [
-  {title: 'names', field: 'name',  },
+  {title: 'names', field: 'name', render: (rowData) => (
+    <span className="font-sans font-medium text-gray-800 dark:text-white">{rowData.name}</span>
+  ) },
 
     // {title: 'Size', field: 'Size',  type: 'numeric', align: 'left'},
-    {title: 'price', field: 'price',  },
+    {title: 'price', field: 'price', render: (rowData) => (
+      <span className="font-sans text-gray-700 dark:text-gray-200">{rowData.price}</span>
+    ) },
     // {title: 'Valid From', field: 'valid_from', 
     //   render: rowData => rowData.valid_from ? dayjs(rowData.valid_from).format('hh:mm A')
     //   : 'N/A'
@@ -148,16 +246,61 @@ const columns = [
 
 
     render: (rowData) => 
-      <>
+      <span className="font-sans text-gray-700 dark:text-gray-200">
         {rowData.package_speed === null ||  rowData.package_speed === 'null' || rowData.package_speed === '' 
-          ? <p>unlimited </p>
+          ? 'unlimited'
           : rowData.package_speed }
-      </>
+      </span>
    },
 
   // {title: 'Validity', field: 'Validity', type: 'numeric',  align: 'right'},
-  {title: 'validity', field: 'valid', },
-  {title: 'Assigned Location', field: 'location'  },
+  {title: 'validity', field: 'valid', render: (rowData) => (
+    <span className="font-sans text-gray-700 dark:text-gray-200">{rowData.valid}</span>
+  ) },
+    {title: 'Router', field: 'nas_router', render: (rowData) => (
+      <span className="font-sans text-xs text-gray-600 dark:text-gray-300">{rowData.nas_router || 'N/A'}</span>
+    ) },
+{
+    title: 'Sync',
+    field: 'sync_status',
+    cellStyle: { minWidth: 170, whiteSpace: 'nowrap' },
+    headerStyle: { minWidth: 170, whiteSpace: 'nowrap' },
+    render: (rowData) => {
+      if (nasSettingsForm?.use_radius) return <span className="text-xs text-gray-400 font-sans">RADIUS</span>;
+
+      const isSyncing = !!syncingIds[rowData.id];
+
+      const map = {
+        synced: { label: 'Synced', bg: '#d1fae5', color: '#065f46' },
+        not_synced: { label: 'Not synced', bg: '#fef3c7', color: '#92400e' },
+        failed: { label: 'Failed', bg: '#fee2e2', color: '#991b1b' },
+      };
+      const s = isSyncing
+        ? { label: 'Syncing…', bg: '#dbeafe', color: '#1e40af' }
+        : (map[rowData.sync_status] || map.not_synced);
+
+      return (
+        <div className="flex items-center gap-1.5 font-sans">
+          <Chip
+            label={s.label}
+            size="small"
+            sx={{ backgroundColor: s.bg, color: s.color, fontWeight: 600, fontFamily: 'inherit' }}
+          />
+          <Tooltip title={rowData.sync_error || (isSyncing ? 'Syncing to router…' : 'Sync to MikroTik')}>
+            <span>
+              <IconButton
+                size="small"
+                disabled={isSyncing}
+                onClick={(e) => { e.stopPropagation(); syncPackageToMikrotik(rowData.id); }}
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-blue-500 ${isSyncing ? 'animate-spin' : ''}`} />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </div>
+      );
+    }
+  },
   {title: 'Action', field:'Action', align: 'right',
 
   render: (params) =>  
@@ -207,7 +350,6 @@ setHotspotPackage({
   // Add your custom logic here, such as opening a modal or updating state
 };
 
-const subdomain = window.location.hostname.split('.')[0]
 
 
 
@@ -264,7 +406,7 @@ useEffect(() => {
         
       }
 if (response.status === 401) {
-  toast.error(newData.error, {
+  toast.error(<p  className="font-sans">newData.error</p>, {
     position: "top-center",
     duration: 4000,
   })
@@ -302,15 +444,14 @@ if (response.status === 401) {
          }, 1900);
 }
         setIsSearching(false)
-        toast.error('failed to fetch hotspot packages', {
+        toast.error(<p  className="font-sans">failed to fetch hotspot packages</p>, {
           duration: 7000,
           position: "top-center",
         });
-        console.log('failed to fetch hotspot packages')
       }
     } catch (error) {
       setIsSearching(false)
-      toast.error('Something went wrong', {
+      toast.error(<p className="font-sans">Something went wrong</p>, {
         duration: 7000,
         position: "top-center",
       });
@@ -325,13 +466,13 @@ if (response.status === 401) {
 const createHotspotPackage = async (e) => {
   e.preventDefault();
 
+   if (!selectedRouter) {
+      toast.error(<p className='font-sans'>Please select a router</p>)
+      return
+    }
+setLoading(true)
   try {
-    // const response = await fetch('/hotspot_packages', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    // }) 
+    
     const url = hotspotPackage.id ? `/api/update_hotspot_package/${hotspotPackage.id}?router_name=${settingsformData.router_name}` : '/api/hotspot_packages';
     // const url = '/api/hotspot_packages';
     const method = hotspotPackage.id ? 'PATCH' : 'POST';
@@ -364,7 +505,7 @@ const createHotspotPackage = async (e) => {
 
 
     if (response.ok) {
-      setOpen(false); // Close the form modal
+      setOpen(false); 
       setOpenLoad(false)
       setLoading(false);
 
@@ -372,15 +513,15 @@ setTimeout(() => {
 
 }, 10000);
       if (hotspotPackage.id) {
-        toast.success('Package updated successfully', {
-          duration: 7000,
+        toast.success(<p  className="font-sans">Package updated successfully</p>, {
+          duration: 5000,
           position: "top-center",
         });
         // Update existing package in tableData
         setPackages(packages.map(item => (item.id === hotspotPackage.id ? newData : item)));
       } else {
         // Add newly created package to tableData
-        toast.success('Package created successfully', {
+        toast.success(<p className="font-sans" >Package created successfully</p>, {
           duration: 7000,
           position: "top-center",
         });
@@ -392,23 +533,23 @@ setTimeout(() => {
       setOpenLoad(false)
 
       if (hotspotPackage.id) {
-        toast.error('Failed to update package', {
+        toast.error(<p  className="font-sans">Failed to update package</p>, {
           duration: 7000,
           position: "top-center",
         });
 
 
-        toast.error(newData.error, {
+        toast.error(<p  className="font-sans">newData.error </p>, {
           duration: 7000,
           position: "top-center",
         });
       }else{
 
-        toast.error(newData.error, {
+        toast.error(<p  className="font-sans">newData.error </p>, {
           duration: 7000,
           position: "top-center",
         });
-        toast.error('Failed to create package', {
+        toast.error(<p  className="font-sans">Failed to create package</p>, {
           duration: 7000,
           position: "top-center",
         });
@@ -418,7 +559,8 @@ setTimeout(() => {
     }
   } catch (error) {
     setOpen(false)
-    toast.error('Failed to create or update package something went wrong', {
+    setLoading(false)
+    toast.error(<p  className="font-sans">Failed to create or update package something went wrong</p>, {
           duration: 7000,
           position: "top-center",
         });
@@ -432,47 +574,131 @@ setTimeout(() => {
 
 
 
-const deleteHotspotPackage = async (id) => {
-  const response = await fetch(`/api/hotspot_packages/${id}?router_name=${settingsformData.router_name}`, {
-    method: "DELETE",
-    headers: {
-      'X-Subdomain': subdomain,
-    },
-    
-  
-  })
-  
+
+
+
+// Syncs a single package. Sets syncingIds[id] = true for the duration of the
+// request so the row's Sync button/chip can show a spinner and disable
+// itself — this is the loading state that was previously missing entirely.
+const syncPackageToMikrotik = async (id) => {
+  setSyncingIds(prev => ({ ...prev, [id]: true }));
   try {
+    const response = await fetch(`/api/hotspot_packages/${id}/sync_to_mikrotik?router_name=${settingsformData.router_name}`, {
+      method: 'POST',
+      headers: { 'X-Subdomain': subdomain },
+    });
+    const newData = await response.json();
+    if (response.ok) {
+      setPackages(prev => prev.map(p => p.id === id ? { ...p, ...newData } : p));
+      if (newData.sync_status === 'synced') {
+        toast.success(<p className="font-sans">Package synced to router</p>, { position: 'top-center', duration: 3000 });
+      } else {
+        toast.error(<p className="font-sans">{newData.sync_error || 'Sync failed'}</p>, { position: 'top-center', duration: 4000 });
+      }
+    } else {
+      toast.error(<p className="font-sans">{newData.error || 'Sync request failed'}</p>, { position: 'top-center', duration: 4000 });
+    }
+  } catch {
+    toast.error(<p className="font-sans">Network error syncing package</p>, { position: 'top-center', duration: 4000 });
+  } finally {
+    setSyncingIds(prev => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }
+};
+
+const bulkSyncPackagesToMikrotik = async () => {
+  const unsynced = packages.filter(p => p.sync_status !== 'synced').map(p => p.id);
+  if (unsynced.length === 0) {
+    toast(<p className="font-sans">Nothing to sync</p>, { position: 'top-center' });
+    return;
+  }
+  setBulkSyncing(true);
+  // Mark every package we're about to touch as syncing so each row's chip
+  // reflects it too, not just the bulk button.
+  setSyncingIds(prev => {
+    const next = { ...prev };
+    unsynced.forEach(id => { next[id] = true; });
+    return next;
+  });
+  try {
+    const response = await fetch('/api/hotspot_packages/bulk_sync_to_mikrotik', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+      body: JSON.stringify({ ids: unsynced, router_name: settingsformData.router_name }),
+    });
+    const results = await response.json();
+    if (response.ok) {
+      setPackages(prev => prev.map(p => {
+        const r = results.find(x => x.id === p.id);
+        return r ? { ...p, sync_status: r.sync_status, sync_error: r.sync_error } : p;
+      }));
+      const succeeded = results.filter(r => r.sync_status === 'synced').length;
+      toast.success(<p className="font-sans">Synced {succeeded}/{results.length} packages</p>, { position: 'top-center', duration: 4000 });
+    } else {
+      toast.error(<p className="font-sans">Bulk sync failed</p>, { position: 'top-center', duration: 4000 });
+    }
+  } catch {
+    toast.error(<p className="font-sans">Network error during bulk sync</p>, { position: 'top-center', duration: 4000 });
+  } finally {
+    setBulkSyncing(false);
+    setSyncingIds(prev => {
+      const next = { ...prev };
+      unsynced.forEach(id => { delete next[id]; });
+      return next;
+    });
+  }
+};
+
+
+
+
+
+
+
+
+const deleteHotspotPackage = async (id) => {
+  try {
+    const response = await fetch(`/api/hotspot_packages/${id}?router_name=${settingsformData.router_name}`, {
+      method: "DELETE",
+      headers: { 'X-Subdomain': subdomain },
+    })
+
+    const newData = await response.json()
+
     if (response.ok) {
       setisOpenDelete(false)
       setPackages((tableData)=> tableData.filter(item => item.id !== id))
-    toast.success('package deleted successfully', {
-            duration: 5000,
-            position: "top-center",
-          });
-    
+      if (newData.mikrotik_error) {
+        toast.error(<p className="font-sans">Deleted, but router cleanup failed: {newData.mikrotik_error}</p>, {
+          duration: 6000,
+          position: "top-center",
+        });
+      } else {
+        toast.success(<p className="font-sans">Package deleted successfully</p>, {
+          duration: 5000,
+          position: "top-center",
+        });
+      }
     } else {
       setisOpenDelete(false)
-      toast.error('failed to delete package', {
-            duration: 5000,
-            position: "top-center",
-          });
-
-
-         
-    
-    
+      toast.error(<p className="font-sans">{newData.error || 'Failed to delete package'}</p>, {
+        duration: 5000,
+        position: "top-center",
+      });
     }
   } catch (error) {
     setisOpenDelete(false)
-    toast.error('something went wr9ng please try again', {
-          duration: 7000,
-          position: "top-center",
-        });
+    toast.error(<p className="font-sans">Something went wrong, please try again</p>, {
+      duration: 7000,
+      position: "top-center",
+    });
   }
-  
-  
-  }
+}
+
+
   return (
 
     <>
@@ -485,7 +711,7 @@ const deleteHotspotPackage = async (id) => {
     loading={loading} hotspotPackage={hotspotPackage} setHotspotPackage={setHotspotPackage}
     createHotspotPackage={createHotspotPackage}
     handleWeekdayChange={handleWeekdayChange} nodes={nodes} setNodes={setNodes}
-    editing={editing}
+    editing={editing} selectedRouter={selectedRouter} setSelectedRouter={setSelectedRouter}
     />
 
 
@@ -497,10 +723,10 @@ const deleteHotspotPackage = async (id) => {
     
      </Backdrop>
   }
-    <div className=''>
+    <div className='font-sans'>
 
             
-          
+{/*           
 
 <Grid item xs={12} sm={6} md={3}>
           <Card elevation={2}>
@@ -514,7 +740,7 @@ const deleteHotspotPackage = async (id) => {
               </Typography>
             </CardContent>
           </Card>
-        </Grid>
+        </Grid> */}
 
     <div className="flex items-center max-w-sm mx-auto p-3">  
      
@@ -526,15 +752,15 @@ const deleteHotspotPackage = async (id) => {
                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
                   strokeWidth="2" d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"/>
              </svg> */}
-             <RiHotspotLine className='text-black'/>
+             <RiHotspotLine className='text-black dark:text-gray-300'/>
              
          </div>
  
  
          <input type="text" value={search} onChange={(e)=> setSearch(e.target.value)}
-          className="bg-gray-50 border border-gray-300 text-gray-900 
+          className="font-sans bg-gray-50 border border-gray-300 text-gray-900 
          text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full ps-10 p-2.5 
-           dark:border-gray-600 dark:placeholder-gray-400 dark:text-black
+           dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
            dark:focus:ring-green-500 dark:focus:border-green-500"
             placeholder="Search for hotspot packages..."  />
      </div>
@@ -582,15 +808,23 @@ const deleteHotspotPackage = async (id) => {
     </div>
   )} 
 
+  <ThemeProvider theme={tableTheme}>
+  
+
       <MaterialTable columns={columns}
       onRowClick={handleRowClick}
-      title={<p className='bg-gradient-to-r from-green-600 via-blue-400
-         to-cyan-500 bg-clip-text text-transparent text-2xl font-bold'>Hotspot Packages </p>}
+      title={
+        <div className="flex items-center gap-2">
+          <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg">
+            <RiHotspotLine className="w-5 h-5 text-white" />
+          </div>
+          <p className='font-sans text-xl font-bold text-gray-800 dark:text-white'>Hotspot Packages</p>
+        </div>
+      }
       
       data={packages}
 
-      
-    actions={[
+      actions={[
         {
           icon:()=><GetAppIcon/>,
           tooltip: 'import'
@@ -599,51 +833,63 @@ const deleteHotspotPackage = async (id) => {
           icon: () => <AddIcon  onClick={()=> {
             setOpen(true)
             setHotspotPackage({})
+            setEditing(false)
           }  } />,
-          isFreeAction: true, // This makes the action always visible
+          isFreeAction: true,
           tooltip: 'Add Hotspot Package'
+        },
+        !settingsformData?.use_radius && {
+          icon: () => (
+            <button
+              className="flex items-center gap-2 bg-purple-500 text-white px-3 py-2 rounded-lg hover:bg-purple-600 disabled:opacity-60 disabled:cursor-not-allowed transition-colors font-sans"
+              onClick={bulkSyncPackagesToMikrotik}
+              disabled={bulkSyncing}
+            >
+              <RefreshCw className={`w-4 h-4 ${bulkSyncing ? 'animate-spin' : ''}`} />
+              <span className="text-sm font-medium font-sans">{bulkSyncing ? 'Syncing…' : 'Sync All'}</span>
+            </button>
+          ),
+          isFreeAction: true,
+          tooltip: 'Sync unsynced packages to router'
         }
-    ]}
+    ].filter(Boolean)}
 
-
-options={{
-        paging: true,
-       pageSizeOptions:[5, 10],
-      //  pageSize: 20,
-       search: false,
-searchFieldStyle: {
-  borderColor: 'red'
-},
-searchAutoFocus: true,
-showSelectAllCheckbox: false,
-showTextRowsSelected: false,
-
-selection: true,
-paginationType: 'stepped',
-
-// rowStyle:{
-//   backgroundColor: 'dark'
-// },
-
-paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-exportFileName: 'Hotspot packages',
-
-headerStyle:{
-  fontFamily: 'bold',
-  textTransform: 'uppercase'
-  } ,
-  
-  
-  
-  fontFamily: 'mono'
-}}     
-      
+ options={{
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'inherit',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'inherit',
+      }),
+    }}
       
       
       
       />
+</ThemeProvider>
 
     </div>
     </div>
@@ -653,4 +899,3 @@ headerStyle:{
 }
 
 export default HotspotPackage
-

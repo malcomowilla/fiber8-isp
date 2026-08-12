@@ -25,6 +25,9 @@ import { CiUser } from "react-icons/ci";
 import { TbLockPassword } from "react-icons/tb";
 import { FaUserEdit } from "react-icons/fa";
 
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
+
 
 
 function EditNas({ open, handleClose, handleSubmit, nasformData, setnasFormData, isloading , editingRouter}) {
@@ -43,6 +46,56 @@ function EditNas({ open, handleClose, handleSubmit, nasformData, setnasFormData,
 
 
 const subdomain = window.location.hostname.split('.')[0];
+
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
+
+
+
+
 
 
  const getNodes = useCallback(
@@ -75,6 +128,9 @@ const subdomain = window.location.hostname.split('.')[0];
   }, [getNodes]);
 
   return (
+
+          <ThemeProvider theme={tableTheme}>
+    
     <React.Fragment>
       <Dialog
         fullWidth={fullWidth}
@@ -95,7 +151,8 @@ const subdomain = window.location.hostname.split('.')[0];
           transition={{ duration: 0.3 }}
         >
           <DialogTitle sx={{ fontSize: '24px', fontWeight: 'bold', color: '#333' }}>
-            <p className='font-thin'>  {editingRouter ? 'Edit Router' : 'Add Router'}</p>
+            <p className=' font-sans
+'>  {editingRouter ? 'Edit Router' : 'Add Router'}</p>
           </DialogTitle>
         </motion.div>
 
@@ -131,7 +188,8 @@ const subdomain = window.location.hostname.split('.')[0];
   },
 }}
 className="myTextField"
-label= { <p className='dark:text-black text-black'>Nas IP Address</p>}
+label= { <p className='dark:text-black text-black font-sans
+'>Nas IP Address</p>}
 id="ip_address"
 value={ip_address}
 onChange={onChange}
@@ -175,7 +233,8 @@ InputProps={{
                     id="name"
                     value={name}
                     onChange={onChange}
-                    label= { <p className='dark:text-black text-black'>Name</p>}
+                    label= { <p className='dark:text-black text-black font-sans
+'>Name</p>}
 
                     fullWidth
                   />
@@ -211,7 +270,8 @@ InputProps={{
   )}
   renderOption={(props, option) => (
     <li {...props} key={option.id}>
-      <p className='text-black'>{option.name}</p>
+      <p className='text-black font-sans
+'>{option.name}</p>
     </li>
   )}
   sx={{
@@ -255,7 +315,8 @@ InputProps={{
                     value={password}
                     type='password'
                     onChange={onChange}
-                    label= { <p className='dark:text-black text-black'>Nas Password</p>}
+                    label= { <p className='dark:text-black text-black font-sans
+'>Nas Password</p>}
                     fullWidth
                     InputProps={{
                       startAdornment: (
@@ -304,7 +365,8 @@ InputProps={{
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        < FaUserEdit className="text-black dark:text-black" />
+                        < FaUserEdit className="text-black dark:text-black font-sans
+" />
                       </InputAdornment>
                     ),
                   }}
@@ -331,7 +393,8 @@ InputProps={{
               </motion.div>
 
               <motion.div
-              className='flex gap-2'
+              className='flex gap-2' font-sans
+
                
               >
 
@@ -350,6 +413,7 @@ className={`  font-medium p-4
       <motion.div
        whileHover={{ scale: 1.05 }}
        whileTap={{ scale: 0.95 }}
+       className=''
       >
 
 
@@ -357,23 +421,19 @@ className={`  font-medium p-4
         type='submit'
         whileHover={{ scale: 1.05 }}
  whileTap={{ scale: 0.95 }}
-className={`  font-medium p-4
-         text-white rounded-lg transition-all
-             hover:bg-green-600 bg-green-500`}
+className={`   p-4
+         text-white rounded-lg transition-all 
+             hover:bg-green-600 bg-green-500 flex gap-2`}
             
         >
           {editingRouter ? 'Update' : 'Save'}
+          {isloading && (
+             <span className="w-4 h-4 border-2 border-blue-300 mt-1 border-t-blue-500 rounded-full
+         animate-spin" ></span>
+          )}
+        
         </motion.button>
-                {/* <LoadingButton
-                  type="submit"
-                  variant="contained"
-                  startIcon={<AutorenewIcon />}
-                  loading={isloading}
-                  color="success"
-                  sx={{ borderRadius: '8px', background: '#4CAF50' }}
-                >
-                  Save
-                </LoadingButton> */}
+         
                 </motion.div>
               </motion.div>
             </DialogActions>
@@ -384,6 +444,8 @@ className={`  font-medium p-4
         </DialogContent>
       </Dialog>
     </React.Fragment>
+        </ThemeProvider>
+    
   );
 }
 

@@ -37,7 +37,8 @@ const ApplicationSettings = ({children}) => {
       const nasSettings = {
         notification_when_unreachable: false,
         unreachable_duration_minutes: '',
-        notification_phone_number: ''
+        notification_phone_number: '',
+         use_radius: false
       }
 
 
@@ -102,7 +103,8 @@ const [currentHotspotPlan, setCurrentHotspotPlan] = useState(null)
 const [currentPPOEPlan, setCurrentPPOEPlan] = useState(null)
 const [accessPointForm, setAccessPointForm] = useState(initialValueAccessPoint)
 const [accessPointSettingsForm, setAccessPointSettingsForm] = useState(accessPointSettings)
-
+const [currentAdminWallet, setCurrentAdminWallet] = useState(null)
+const [selectedRouter, setSelectedRouter] = useState('')
 
 
 
@@ -119,8 +121,6 @@ const [accessPointSettingsForm, setAccessPointSettingsForm] = useState(accessPoi
     network_name: '',
     validity: '',
     validity_period_units: '',
-    
-  
     ip_address: '',
     package_name: '',
     installation_fee: '',
@@ -132,7 +132,8 @@ const [accessPointSettingsForm, setAccessPointSettingsForm] = useState(accessPoi
     email: '',
     router_name: '',
     check_update_username: settingsformData.check_update_username,
-    check_update_password: settingsformData.check_update_password
+    check_update_password: settingsformData.check_update_password,
+    nas_router: ''
     
 
   }
@@ -141,7 +142,11 @@ const [accessPointSettingsForm, setAccessPointSettingsForm] = useState(accessPoi
     enable_autologin: false,
     compensation_hours: '',
     compensation_minutes: '',
-    enable_compensation: false
+    enable_compensation: false,
+     enable_free_trial: false,
+  free_trial_duration_minutes: '',
+  free_trial_download_limit: '',
+  free_trial_upload_limit: ''
 
   })
 
@@ -583,6 +588,37 @@ router_name
 
 
 
+
+
+
+
+const fetchAdminWallet = useCallback(
+  async() => {
+
+    try {
+      const response = await fetch('/api/currently_logged_in_admin_wallet', {
+        headers: {
+          'X-Subdomain': subdomain,
+        },
+      })
+      const newData = await response.json()
+      if (response) {
+        const {username, email, id, created_at, updated_at} = newData
+        setCurrentAdminWallet(newData)
+      
+      }else{
+        setCurrentAdminWallet(null) 
+      }
+    } catch (error) {
+      setCurrentAdminWallet(null) 
+    }
+  },
+  [],
+)
+
+
+
+
 const fetchCurrentUser = useCallback(
   async() => {
     // document.title = subdomain
@@ -613,7 +649,8 @@ const fetchCurrentUser = useCallback(
 
 useEffect(() => {
   fetchCurrentUser()
-}, [fetchCurrentUser]);
+  fetchAdminWallet()
+}, [fetchCurrentUser, fetchAdminWallet]);
 
 
 
@@ -1011,7 +1048,8 @@ const handleChangeSubscriber = (e)=> {
          setWalletBalance,accessPointForm,handleChanageAccessPointSettings,
          accessPointSettingsForm, setAccessPointSettingsForm,
          
-          setAccessPointForm,initialValueAccessPoint,
+          setAccessPointForm,initialValueAccessPoint,fetchAdminWallet,currentAdminWallet,
+          selectedRouter, setSelectedRouter
 
 
      }}  >

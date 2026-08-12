@@ -61,9 +61,9 @@ function PartnerLogin({ onLogin }) {
             {loading ? "Signing in..." : "Sign In"}
           </button>
 
-          <p style={{ textAlign: "center", fontSize: 13, color: "#008000", margin: "20px 0 0" }}>
+          {/* <p style={{ textAlign: "center", fontSize: 13, color: "#008000", margin: "20px 0 0" }}>
             Need help? Call <span style={{ color: "#008000", fontWeight: 600 }}>0800 720 999</span>
-          </p>
+          </p> */}
         </div>
       </div>
     </div>

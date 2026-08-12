@@ -36,6 +36,12 @@ export default {
         flexGrow: {
           10: '10'
         },
+
+        fontFamily: {
+  sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+  display: ['var(--font-display)', 'var(--font-sans)', 'sans-serif'],
+},
+
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",

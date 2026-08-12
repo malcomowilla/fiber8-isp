@@ -8,8 +8,9 @@ import { FaExclamationTriangle, FaEnvelope, FaPhone } from 'react-icons/fa';
 
 
 const ClientLogin = () => {
-  const [username, setUsername] = useState('');
+  const [phone_number, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const { companySettings, setCompanySettings, setSubscriberSettings,
@@ -115,7 +116,7 @@ useEffect(() => {
           'Content-Type': 'application/json',
           'X-Subdomain': window.location.hostname.split('.')[0],
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ phone_number, password }),
       });
 
       if (response.ok) {
@@ -147,7 +148,6 @@ useEffect(() => {
   // customer_support_email: '',
   // customer_support_phone_number: '',
 
-console.log('company settings', companySettings)
 
   const handleGetCompanySettings = useCallback(async () => {
     try {
@@ -188,7 +188,8 @@ console.log('company settings', companySettings)
       
     <div 
     style={{background: "#16131f"}}
-    className='flex items-center justify-center min-h-screen '>
+    className='flex items-center justify-center min-h-screen font-sans
+'>
       <div className="absolute inset-0 z-0">
         <img
           src="/images/Telecommunications-Aitechs.jpg"
@@ -206,10 +207,7 @@ console.log('company settings', companySettings)
       >
         <div className='flex justify-center mb-6'>
          <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <div style={{ width: 56, height: 56, borderRadius: 16, 
-            background: "black",
-             display: "flex", alignItems: "center", 
-             justifyContent: "center", fontWeight: 800, fontSize: 24, color: "#fff", margin: "0 auto 14px" }}>N</div>
+          
           <h1 style={{ fontSize: 26, fontWeight: 800, 
             color: "black", margin: "0 0 6px",
            
@@ -230,17 +228,17 @@ console.log('company settings', companySettings)
         <form onSubmit={handleSubmit}>
           <div className='mb-6'>
             <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='username'>
-              Username
+              Phone Number
             </label>
             <div className='relative'>
               <FaUser className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />
               <input
                 type='text'
-                id='username'
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id='phone_number'
+                value={phone_number}
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all'
-                placeholder='Enter your username'
+                placeholder='Enter your phone number'
                 required
               />
             </div>
@@ -249,7 +247,7 @@ console.log('company settings', companySettings)
           <div className='mb-6'>
             <label className='block text-gray-700 text-sm
              font-bold mb-2' htmlFor='password'>
-              Password
+              Account Number
             </label>
             <div className='relative'>
               <FaLock className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />

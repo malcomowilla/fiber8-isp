@@ -18,6 +18,10 @@ import {useApplicationSettings} from '../settings/ApplicationSettings'
 import { FaWifi } from "react-icons/fa6";
 import toast, { Toaster } from 'react-hot-toast';
 import { PiNumberOne } from "react-icons/pi";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
+
+
 
 
 const useStyles = makeStyles({
@@ -88,6 +92,7 @@ const [downloadBurstSpeedError, setDownloadBurstSpeedError] = useState(false)
 const [validityPeriodUnitError, setUnitsError] = useState(false)
 const [editPackage, setEditPackage] = useState(false)
 
+const [selectedRouter, setSelectedRouter] = useState('')
 
 const [search, setSearch] = useState('')
 const [searchchInput] = useDebounce(search, 1000)
@@ -99,6 +104,48 @@ const handleRowClick = (event, rowData) => {
   // Add your custom logic here, such as opening a modal or updating state
 };
 // const formData = initialValue
+
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
 
 
 
@@ -146,7 +193,10 @@ const subdomain = window.location.hostname.split('.')[0]
 
 const createPackage = async (e) => {
   e.preventDefault();
-
+  if (!selectedRouter) {
+    toast.error(<p className='font-sans'>Please select a router</p>)
+    return
+  }
  
     try {
       setNameError(false);
@@ -228,7 +278,8 @@ const createPackage = async (e) => {
           package: {
             ...formData,
             router_name: settingsformData.router_name,
-            use_radius: settingsformData.use_radius
+            use_radius: settingsformData.use_radius,
+            nas_router: formData.nas_router,
           }
         })
       });
@@ -476,6 +527,12 @@ const columns = [
 
     
    },
+
+
+   {title: 'router', field: 'nas_router',  
+
+    
+   },
   {title: 'price', field: 'price', 
 
     render: (rowData) => {
@@ -550,6 +607,8 @@ return <div>{rowData.price} ksh</div>
        showNotification={showNotification}   setofflineerror={setofflineerror}  setFormData={setFormData} 
        tableData={tableData} routerName={routerName} setRouterName={setRouterName}
         editPackage={editPackage} setEditPackage={setEditPackage}
+
+        selectedRouter={selectedRouter} setSelectedRouter={setSelectedRouter}
        />
 
 
@@ -564,7 +623,8 @@ return <div>{rowData.price} ksh</div>
 
 <div className="flex items-center max-w-sm mx-auto p-3">  
      
-    <label htmlFor="simple-search" className="sr-only">Search</label>
+    <label htmlFor="simple-search" className="sr-only font-sans
+">Search</label>
     <div className="relative w-full">
         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
            
@@ -586,14 +646,20 @@ return <div>{rowData.price} ksh</div>
             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
              strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
         </svg>
-        <span className="sr-only">Search</span>
+        <span className="sr-only font-sans
+">Search</span>
     </button>
 </div>
+<div className="rounded-2xl border border-[#e5e0d5] overflow-hidden shadow-sm">
+
+<ThemeProvider theme={tableTheme}>
 
       <MaterialTable columns={columns}
-      title={<p className=' bg-gradient-to-r from-green-600 via-blue-400 to-cyan-500 bg-clip-text
+      title={<p className=' 
   
-  text-transparent font-bold text-xl'>PPPoe Packages</p>}
+  font-sans
+
+   font-bold text-xl'>PPPoe Packages</p>}
 
       data={tableData}
    
@@ -625,7 +691,8 @@ actions={[
 
 localization={{
                 body: {
-                  emptyDataSourceMessage: 'No packages found. Create your first package to get started!'
+                  emptyDataSourceMessage: <p className='font-sans
+'> No packages found. Create your first package to get started! </p>
                 },
                
               
@@ -633,33 +700,45 @@ localization={{
               }}
 
 
-options={{
-  sorting: true,
-  pageSizeOptions:[2, 5, 10, 20],
-  pageSize: 20,
-  paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-selection: true,
-search:false,
-searchAutoFocus: true,
-showSelectAllCheckbox: false,
-showTextRowsSelected: false,
-  emptyRowsWhenPaging: false,
-headerStyle:{
-  fontFamily: 'bold',
-  textTransform: 'uppercase'
-  } ,
-  
-  
-  fontFamily: 'mono'
-}}
+
+ options={{
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'monospace',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'monospace',
+      }),
+    }}
       
       
       
       />
+</ThemeProvider>
 
-
+</div>
       <div>
 
         
@@ -692,7 +771,8 @@ headerStyle:{
      
      <Alert severity="error">
        <AlertTitle>Offline </AlertTitle>
-       <p className='text-red-500 font-mono font-extrabold text-2xl'>Something went wrong please try again later</p>
+       <p className='text-red-500 font-sans
+ font-extrabold text-2xl'>Something went wrong please try again later</p>
      </Alert>
    
    </Stack>

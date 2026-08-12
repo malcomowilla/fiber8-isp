@@ -27,6 +27,9 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 import { IoInformationCircleOutline } from "react-icons/io5";
 import {RefreshCw} from 'lucide-react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useMemo } from 'react';
+
 
 
 
@@ -70,6 +73,53 @@ showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
     {value: '20', label: '/20 (4096 host)'},
     { value: '30', label: '/30 (2 hosts)' },
   ];
+
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+
+
+// inside PPPOEpackages component:
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
+    },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
+  },
+}), [isDark]);
+
+
+
 
   // Fetch data from backend
   const fetchData = async () => {
@@ -417,7 +467,7 @@ setLoadButton(false)
      <div role="alert" className="alert alert-info bg-green-500 rounded-lg w-fit
           p-2 flex items-center gap-2 justify-center mb-3">
  <IoInformationCircleOutline className='text-white text-xl '/>
-  <span className='text-white'>connect your private subnets
+  <span className='text-white font-sans'>connect your private subnets
      eg 10.0.0.0/24 to connect to tr069 for onu management</span>
 </div>
     <div 
@@ -455,15 +505,19 @@ setLoadButton(false)
         <CloudIcon sx={{ mr: 2, color: 'success.main' }} />
 
 
-        <p className='roboto-condensed   bg-gradient-to-r from-green-600 via-blue-400 to-cyan-500 bg-clip-text
-  
-  text-transparent font-bold '>Private Routes Management </p>
+        <p className='font-sans
+ font-bold '>Private Routes Management </p>
       </Typography>
+
+      <ThemeProvider theme={tableTheme}>
+
 
       <MaterialTable
         title=""
         columns={[
           { title: <p className='text-sm text-black'>VPN Client Ip</p>, field: 'allowed_ips' },
+          { title: <p className='text-sm text-black'>Date Created</p>, field: 'created_at' },
+
           { title: <p className='text-sm text-black'>Connected Subnets </p>, field: 'private_ip' 
           },
 
@@ -490,9 +544,9 @@ setLoadButton(false)
                 <Tooltip title="Refresh For Latest Data">
 <button className=' bg-blue-500 text-white  flex
             justify-center items-center gap-2
-            p-2
+            p-2 font-sans text-lg
             rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2  focus:ring-blue-500'>
-              Refresh
+              Refresh 
                 <RefreshCw className={`${loadRefresh ? 'animate-spin text-white w-4 h-4 mx-auto ' : 'text-white w-5 h-5'}`} />
 
 </button>
@@ -518,7 +572,7 @@ setLoadButton(false)
        
 localization={{
                 body: {
-                  emptyDataSourceMessage: 'No private networks found. Create your first private network to get started!'
+                  emptyDataSourceMessage:  <p className='font-sans'>No private networks found. Create your first private network to get started! </p>
                 },
                
               
@@ -526,29 +580,39 @@ localization={{
               }}
 
 options={{
-  sorting: true,
-  actionsColumnIndex: -1,
-  pageSizeOptions:[2, 5, 10],
-  pageSize: 10,
-
-  
-exportButton: true,
-exportAllData: true,
-
-
-  emptyRowsWhenPaging: false,
-
-
-headerStyle:{
-  fontFamily: 'bold',
-  textTransform: 'uppercase'
-  } ,
-  
-  
-  fontFamily: 'mono'
-}}
+      sorting: true,
+      pageSizeOptions: [2, 5, 10, 20],
+      pageSize: 20,
+      paginationPosition: 'bottom',
+      exportButton: true,
+      exportAllData: true,
+      selection: true,
+      search: false,
+      searchAutoFocus: true,
+      showSelectAllCheckbox: false,
+      showTextRowsSelected: false,
+      emptyRowsWhenPaging: false,
+      actionsColumnIndex: -1,
+      headerStyle: {
+        fontFamily: 'monospace',
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        fontSize: '12px',
+        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+      },
+      rowStyle: (rowData, index) => ({
+        backgroundColor: isDark
+          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+        color: isDark ? '#f1f1f1' : '#1a1a1a',
+        fontFamily: 'monospace',
+      }),
+    }}
       />
 
+</ThemeProvider>
 
 
 

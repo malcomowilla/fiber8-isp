@@ -1,29 +1,36 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-
-  Box,
-  Backdrop,
-  IconButton,
-  Tooltip,
- 
-} from '@mui/material';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Box, Backdrop, IconButton, Tooltip, Chip, Paper } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Lottie from 'react-lottie';
 import LoadingAnimation from '../loader/loading_animation.json';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import MaterialTable from "material-table";
-import toaster,{ Toaster } from 'react-hot-toast';
+import MaterialTable from 'material-table';
+import toaster, { Toaster } from 'react-hot-toast';
 import DeleteClient from './DeleteClient';
 import DeleteIcon from '@mui/icons-material/Delete';
-import  EditClient from './EditClient'
+import EditClient from './EditClient';
 import EditIcon from '@mui/icons-material/Edit';
 import AddClient from './AddClient';
-
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { AccountBalanceWallet } from '@mui/icons-material';
 
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  );
 
+  useEffect(() => {
+    const root = document.documentElement;
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
-
+  return isDark;
+}
 
 const InviteClient = () => {
   const [formData, setFormData] = useState({
@@ -36,10 +43,11 @@ const InviteClient = () => {
     smtpPassword: '',
     smtpHost: '',
     smtpUsername: '',
-    plan: '' ,// Add planId to formData
+    plan: '',
     hotspot_plan: '',
     password: '',
     company_name: '',
+    wallet_admin: false,
   });
 
   const [errors, setErrors] = useState({
@@ -47,7 +55,7 @@ const InviteClient = () => {
     phone_number: '',
     username: '',
     plan: '',
-    company_name: ''
+    company_name: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -56,30 +64,44 @@ const InviteClient = () => {
   const [fetchingClients, setFetchingClients] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [row_data, setRowData] = useState({});
-  const [plans, setPlans] = useState([]); // State to store plans
-  const [hotspot_plans, setHotspotPlans] = useState([]); // State to store hotspot plans
+  const [plans, setPlans] = useState([]);
+  const [hotspot_plans, setHotspotPlans] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentHotspotPlan, setCurrentHotspotPlan] = useState(null);
   const [addClient, setAddClient] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const isDark = useIsDarkMode();
+
+  const tableTheme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: isDark ? 'dark' : 'light',
+          background: {
+            paper: isDark ? '#1e1e1e' : '#ffffff',
+            default: isDark ? '#1e1e1e' : '#ffffff',
+          },
+          text: {
+            primary: isDark ? '#f1f1f1' : '#1a1a1a',
+            secondary: isDark ? '#a3a3a3' : '#6b7280',
+          },
+        },
+        typography: { fontFamily: 'inherit' },
+      }),
+    [isDark]
+  );
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const handleCloseAddClient = () => setAddClient(false);
-
+  const handleAddClient = () => setAddClient(true);
 
   const subdomain = window.location.hostname.split('.')[0];
 
-const handleAddClient = () => setAddClient(true);
-  // hotspot_plans
-  // Fetch plans from the backend
   const fetchPlans = async () => {
     try {
-      const response = await fetch('/api/pp_poe_plans', {
-        method: 'GET',
-        // headers: {
-        //   'X-Subdomain': subdomain,
-        // },
-      });
+      const response = await fetch('/api/pp_poe_plans', { method: 'GET' });
       if (response.ok) {
         const data = await response.json();
         setPlans(data);
@@ -92,26 +114,13 @@ const handleAddClient = () => setAddClient(true);
   };
 
   useEffect(() => {
-    fetchPlans(); // Fetch plans when the component mounts
+    fetchPlans();
     fetchClients();
   }, []);
 
-
-
-
-
-
-
-
-
   const fetchHotspotPlans = async () => {
     try {
-      const response = await fetch('/api/hotspot_plans', {
-        method: 'GET',
-        // headers: {
-        //   'X-Subdomain': subdomain,
-        // },
-      });
+      const response = await fetch('/api/hotspot_plans', { method: 'GET' });
       if (response.ok) {
         const data = await response.json();
         setHotspotPlans(data);
@@ -124,7 +133,7 @@ const handleAddClient = () => setAddClient(true);
   };
 
   useEffect(() => {
-    fetchHotspotPlans(); // Fetch plans when the component mounts
+    fetchHotspotPlans();
   }, []);
 
   const fetchClients = async () => {
@@ -132,9 +141,7 @@ const handleAddClient = () => setAddClient(true);
     try {
       const response = await fetch('/api/get_all_clients', {
         method: 'GET',
-        headers: {
-          'X-Subdomain': subdomain,
-        },
+        headers: { 'X-Subdomain': subdomain },
       });
       if (response.ok) {
         const data = await response.json();
@@ -149,42 +156,44 @@ const handleAddClient = () => setAddClient(true);
     }
   };
 
-
   const [currentPlan, setCurrentPlan] = useState(null);
 
+  const flattenedData = clients
+    ? clients.flatMap((client) =>
+        client.users.map((admin) => ({
+          ...admin,
+          subdomain: client.subdomain,
+          plan: currentPlan,
+          hotspot_plan: currentHotspotPlan,
+        }))
+      )
+    : [];
 
-  const flattenedData = clients && clients.flatMap(client =>
-    client.users.map(admin => ({
-      ...admin,
-      subdomain: client.subdomain,
-      plan: currentPlan,
-      hotspot_plan: currentHotspotPlan
-    }))
-  );
+  const filteredData = useMemo(() => {
+    if (!searchTerm.trim()) return flattenedData;
+    const lower = searchTerm.toLowerCase();
+    return flattenedData.filter(
+      (row) =>
+        row.subdomain?.toLowerCase().includes(lower) ||
+        row.username?.toLowerCase().includes(lower) ||
+        row.email?.toLowerCase().includes(lower) ||
+        row.phone_number?.toLowerCase().includes(lower)
+    );
+  }, [flattenedData, searchTerm]);
 
   const validateForm = () => {
     let isValid = true;
-    const newErrors = {
-      email: '',
-      phone_number: '',
-      username: '',
-      plan: ''
-    };
+    const newErrors = { email: '', phone_number: '', username: '', plan: '' };
 
-    // Username validation
     if (!formData.username.trim()) {
       newErrors.username = 'Username is required';
       isValid = false;
     }
-
-
     if (!formData.username.trim()) {
       newErrors.company_name = 'Company Name is required';
       isValid = false;
     }
 
-
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
@@ -194,7 +203,6 @@ const handleAddClient = () => setAddClient(true);
       isValid = false;
     }
 
-    // Phone number validation
     const phoneRegex = /^\+?[\d\s-]{10,}$/;
     if (!formData.phone_number.trim()) {
       newErrors.phone_number = 'Phone number is required';
@@ -204,39 +212,20 @@ const handleAddClient = () => setAddClient(true);
       isValid = false;
     }
 
-    // Plan validation
-    // if (!formData.plan) {
-    //   newErrors.plan = 'Plan is required';
-    //   isValid = false;
-    // }
-
     setErrors(newErrors);
     return isValid;
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-
-
-
-    
-    // Clear error when user starts typing
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
   const handleInvite = async (e) => {
     e.preventDefault();
-
 
     if (!formData.id) {
       if (!validateForm()) {
@@ -244,7 +233,6 @@ const handleAddClient = () => setAddClient(true);
         return;
       }
     }
-   
 
     setLoading(true);
     setOpenLoad(true);
@@ -253,45 +241,27 @@ const handleAddClient = () => setAddClient(true);
       const method = formData.id ? 'PATCH' : 'POST';
       const url = formData.id ? `/api/update_client/${formData.id}` : '/api/invite_client_super_admins';
       const response = await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Subdomain': subdomain,
-        },
-        body: JSON.stringify({
-          ...formData,
-          plan: formData.plan // Include the selected plan ID
-        }),
+        method,
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+        body: JSON.stringify({ ...formData, plan: formData.plan, wallet_admin: formData.wallet_admin }),
       });
 
       const newData = await response.json();
       if (response.ok) {
-        setAddClient(false)
+        setAddClient(false);
         if (formData.id) {
-          handleCloseModal()
-          toaster.success('Client updated successfully', {
-            duration: 5000,
-            icon: '✅'
-          });
-  
+          handleCloseModal();
+          toaster.success('Client updated successfully', { duration: 5000, icon: '✅' });
           setClients((prevClients) =>
             prevClients.map((client) => ({
               ...client,
-              users: client.users.map((user) =>
-                user.id === formData.id ? newData : user
-              ),
+              users: client.users.map((user) => (user.id === formData.id ? newData : user)),
             }))
           );
         } else {
-          setAddClient(false)
-          toaster.success('Client added successfully', {
-            duration: 5000,
-            icon: '✅'
-          });
-  
+          toaster.success('Client added successfully', { duration: 5000, icon: '✅' });
           fetchClients();
         }
-        setAddClient(false)
         setFormData({
           email: '',
           phone_number: '',
@@ -304,35 +274,14 @@ const handleAddClient = () => setAddClient(true);
           password: '',
           smtpHost: '',
           smtpUsername: '',
-          plan: '' // Reset planId
+          plan: '',
         });
-        
       } else {
-        setAddClient(false)
-        toaster.error('Something went wrong, please try again', {
-          duration: 5000,
-          position: 'top-center',
-          style: {
-            background: 'linear-gradient(135deg, #FF0000, #36A2EA)',
-            color: '#fff',
-            borderRadius: '5px',
-            padding: '10px',
-            boxShadow: '0 2px 10px 0 rgba(0, 0, 0, 0.1)',
-          },
-        });
+        setAddClient(false);
+        toaster.error('Something went wrong, please try again', { duration: 5000, position: 'top-center' });
       }
     } catch (error) {
-      toaster.error('Something went wrong, please try again', {
-        duration: 5000,
-        position: 'top-center',
-        style: {
-          background: 'linear-gradient(135deg, #FF0000, #36A2EA)',
-          color: '#fff',
-          borderRadius: '5px',
-          padding: '10px',
-          boxShadow: '0 2px 10px 0 rgba(0, 0, 0, 0.1)',
-        },
-      });
+      toaster.error('Something went wrong, please try again', { duration: 5000, position: 'top-center' });
     } finally {
       setLoading(false);
       setOpenLoad(false);
@@ -343,339 +292,218 @@ const handleAddClient = () => setAddClient(true);
     loop: true,
     autoplay: true,
     animationData: LoadingAnimation,
-    rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice',
-    },
+    rendererSettings: { preserveAspectRatio: 'xMidYMid slice' },
   };
-
 
   const handleRowClick = (event, rowData) => {
     setFormData(rowData);
-
   };
 
-  
-
+  // Deletes the admin + their entire account (routers, subscribers, invoices, etc.)
+  // on the backend. Backend route: DELETE /api/delete_client/:id -> SystemAdminsController#destroy_client
   const deleteClient = async (id) => {
     try {
       setLoading(true);
       const response = await fetch(`/api/delete_client/${id}`, {
         method: 'DELETE',
-        headers: {
-          'X-Subdomain': subdomain,
-        },
+        headers: { 'X-Subdomain': subdomain },
       });
       if (response.ok) {
         setIsOpenDelete(false);
-        setClients(flattenedData.filter((client) => client.id !== id));
-        setLoading(false);
-        toaster.success('Client deleted successfully', {
-          duration: 5000,
-          icon: '✅'
-        });
+        // Remove the deleted admin's parent account entirely from `clients`
+        // (flattenedData is derived from clients, not a separate source of truth —
+        // filtering it directly and storing it back into `clients` would corrupt
+        // the nested { subdomain, users: [...] } shape the rest of this component expects).
+        setClients((prevClients) =>
+          prevClients
+            .map((client) => ({
+              ...client,
+              users: client.users.filter((user) => user.id !== id),
+            }))
+            .filter((client) => client.users.length > 0)
+        );
+        toaster.success('Client deleted successfully', { duration: 5000, icon: '✅' });
       } else {
         setIsOpenDelete(false);
-        setLoading(false);
-        toaster.error('Failed to delete client', {
-          duration: 5000,
-          position: 'top-center',
-          style: {
-            background: 'linear-gradient(135deg, #FF0000, #36A2EA)',
-            color: '#fff',
-            borderRadius: '5px',
-            padding: '10px',
-            boxShadow: '0 2px 10px 0 rgba(0, 0, 0, 0.1)',
-          },
-        });
+        toaster.error('Failed to delete client', { duration: 5000, position: 'top-center' });
       }
     } catch (error) {
       setIsOpenDelete(false);
-      toaster.error('Failed to delete client', {
-        duration: 5000,
-        position: 'top-center',
-        style: {
-          background: 'linear-gradient(135deg, #FF0000, #36A2EA)',
-          color: '#fff',
-          borderRadius: '5px',
-          padding: '10px',
-          boxShadow: '0 2px 10px 0 rgba(0, 0, 0, 0.1)',
-        },
-      });
+      toaster.error('Failed to delete client', { duration: 5000, position: 'top-center' });
+    } finally {
       setLoading(false);
     }
   };
 
-
-// current_hotspot_plan
- 
-// setCurrentHotspotPlan
-const getCurreentHotspotPlan = useCallback(
-  async() => {
-    
+  const getCurreentHotspotPlan = useCallback(async () => {
     try {
       const response = await fetch('/api/current_hotspot_plan', {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Subdomain': subdomain,
-        }
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
       });
       const data = await response.json();
-     
-
       if (response.ok) {
         setCurrentHotspotPlan(data.hotspot_plans);
-      } else {
       }
-  } catch (error) {
-  }
-  },
-  
-  [],
-)
+    } catch (error) {}
+  }, []);
 
+  useEffect(() => {
+    getCurreentHotspotPlan();
+  }, [getCurreentHotspotPlan]);
 
-useEffect(() => {
-  
-  getCurreentHotspotPlan();
- 
-}, [getCurreentHotspotPlan]);
-
-const getCurrentPlan = useCallback(
-  async() => {
-    
+  const getCurrentPlan = useCallback(async () => {
     try {
-        const response = await fetch('/api/current_plan', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Subdomain': subdomain,
-          }
-        });
-        const data = await response.json();
-       
+      const response = await fetch('/api/current_plan', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setCurrentPlan(data.ppoe_plans);
+      }
+    } catch (error) {}
+  }, []);
 
-        if (response.ok) {
-            setCurrentPlan(data.ppoe_plans);
-        } else {
-        }
-    } catch (error) {
-    }
-  },
-  [],
-)
-
-
-useEffect(() => {
-    getCurrentPlan()
-}, [getCurrentPlan]);
+  useEffect(() => {
+    getCurrentPlan();
+  }, [getCurrentPlan]);
 
   const DeleteButton = ({ id }) => (
-    <IconButton style={{ color: '#8B0000' }} >
-      <DeleteIcon />
-    </IconButton>
+    <Tooltip title="Delete client">
+      <IconButton
+        size="small"
+        onClick={() => {
+          setRowData({ id });
+          setIsOpenDelete(true);
+        }}
+        className="!text-red-500 hover:!bg-red-50 dark:hover:!bg-red-500/10"
+      >
+        <DeleteIcon fontSize="small" />
+      </IconButton>
+    </Tooltip>
   );
 
-  const EditButton = ({rowData}) => (
-    <IconButton     style={{color: 'green'}}  onClick={() => handleOpenModal()} >
-    <EditIcon />
-  </IconButton>
-      );
+  const EditButton = () => (
+    <Tooltip title="Edit client">
+      <IconButton
+        size="small"
+        onClick={handleOpenModal}
+        className="!text-emerald-600 dark:!text-emerald-400 hover:!bg-emerald-50 dark:hover:!bg-emerald-500/10"
+      >
+        <EditIcon fontSize="small" />
+      </IconButton>
+    </Tooltip>
+  );
+
   return (
-    <>
-<AddClient open={addClient} onClose={handleCloseAddClient} currentPlan={currentPlan} formData={formData} 
-    handleChange={handleChange} hotspot_plans={hotspot_plans} plans={plans}
-    setFormData={setFormData}  handleInvite={handleInvite}
-    fetchingClients={fetchingClients} setFetchingClients={setFetchingClients}
-    loading={loading} clients={clients} setClients={setClients} errors={errors}
-    />
+    <div className="font-sans">
+      <AddClient
+        open={addClient}
+        onClose={handleCloseAddClient}
+        formData={formData}
+        handleChange={handleChange}
+        handleInvite={handleInvite}
+        fetchingClients={fetchingClients}
+        setFetchingClients={setFetchingClients}
+        clients={clients}
+        setClients={setClients}
+        errors={errors}
+      />
 
-
-    <EditClient open={isModalOpen} onClose={handleCloseModal} currentPlan={currentPlan} formData={formData} 
-    handleChange={handleChange} hotspot_plans={hotspot_plans} plans={plans}
-    setFormData={setFormData}  handleInvite={handleInvite}/>
-
+      <EditClient
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        formData={formData}
+        handleChange={handleChange}
+        setFormData={setFormData}
+        handleInvite={handleInvite}
+      />
 
       <Toaster />
       <DeleteClient
         id={row_data.id}
-        loading={loading}
+        isloading={loading}
         deleteClient={deleteClient}
         isOpenDelete={isOpenDelete}
         setIsOpenDelete={setIsOpenDelete}
       />
-      <ToastContainer position='top-center' autoClose={3000} hideProgressBar={false} closeOnClick draggable pauseOnHover />
+      <ToastContainer position="top-center" autoClose={3000} hideProgressBar={false} closeOnClick draggable pauseOnHover />
+
       {loading && (
         <Backdrop open={openLoad} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-          <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
+          <Lottie className="relative z-50" options={defaultOptions} height={400} width={400} />
         </Backdrop>
       )}
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        {/* <form onSubmit={handleInvite}>
-          <Slide direction="up" in={true} mountOnEnter unmountOnExit>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className='f text-black'
-            >
-              <Box sx={{
-                display: 'flex',
-                color: 'black',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                mb: 3
-              }}>
-                <h2 className='text-black'>Invite New Client</h2>
-                <Tooltip title="Refresh client list">
-                  <IconButton
-                    onClick={fetchClients}
-                    disabled={fetchingClients}
-                    sx={{ color: 'green' }}
-                  >
-                    <RefreshIcon />
-                  </IconButton>
-                </Tooltip>
-              </Box>
+      <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+        <div>
+          <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Clients</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            ISP accounts with access to this platform
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={handleAddClient}
+          className="flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-4 py-2.5 transition-colors"
+        >
+          <AddCircleIcon fontSize="small" />
+          Add client
+        </button>
+      </div>
 
-              <Box sx={{
-                display: 'flex',
-                color: 'black',
-                flexDirection: 'column',
-                gap: 2,
-                justifyContent: 'center',
-                justifyItems: 'center',
-                '& label.Mui-focused': { color: 'black' },
-                '& .MuiOutlinedInput-root': {
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "black",
-                    borderWidth: '3px'
-                  }
-                }
-              }} className='myTextField'>
-                <TextField
-                  label="User Name"
-                  variant="outlined"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  error={!!errors.username}
-                  helperText={errors.username}
-                  sx={{ borderRadius: 2 }}
-                />
-                <TextField
-                  label="Client Email"
-                  variant="outlined"
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  error={!!errors.email}
-                  helperText={errors.email}
-                  sx={{ borderRadius: 2 }}
-                />
-                <TextField
-                  label="Phone Number"
-                  variant="outlined"
-                  name="phoneNumber"
-                  value={formData.phone_number}
-                  onChange={handleChange}
-                  error={!!errors.phone_number}
-                  helperText={errors.phone_number}
-                  sx={{ borderRadius: 2 }}
-                />
+      <div className="relative mb-4">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+          </svg>
+        </div>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10 w-full sm:w-80 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg
+            focus:ring-emerald-500 focus:border-emerald-500 p-2.5
+            dark:bg-slate-800 dark:border-slate-700 dark:placeholder-slate-400 dark:text-white
+            dark:focus:ring-emerald-500 dark:focus:border-emerald-500"
+          placeholder="Search by company, name, email, or phone..."
+        />
+      </div>
 
-               
-               
-                <TextField
-                  label="Company Name"
-                  name="company_name"
-                  value={formData.company_name}
-                  onChange={handleChange}
-                  error={!!errors.company_name}
-                  helperText={errors.company_name}
-                  sx={{ borderRadius: 2 }}
-                
-                />
-
-
-<TextField
-                  label="Client Password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  error={!!errors.password}
-                  helperText={errors.password}
-                  sx={{ borderRadius: 2 }}
-                
-                />
-
-
-
-                <Button
-                  type='submit'
-                  variant="contained"
-                  color="success"
-                  disabled={loading}
-                >
-                  Send Invitation
-                </Button>
-              </Box>
-            </motion.div>
-          </Slide>
-        </form> */}
-
-
-
-
-        
-
+      <ThemeProvider theme={tableTheme}>
         <MaterialTable
           onRowClick={handleRowClick}
-          actions={[
-            {
-              icon: () => (
-                <Tooltip title="Add Client">
-                  <IconButton color="primary">
-                    <AddCircleIcon fontSize="large" onClick={() => handleAddClient()} />
-                  </IconButton>
-                </Tooltip>
-              ),
-              tooltip: 'Add Client',
-              isFreeAction: true,
-              // onClick: handleOpenAddDialog
-            },
-         
-          ]}
-
-          
           columns={[
-            { title: "Company Name", field: "subdomain" },
-            { title: "User Name", field: "username" },
-            { title: "Email", field: "email" },
-            // { title: "Plan", field: "plan" },
-            // { title: "Hotspot Plan", field: "hotspot_plan" },
-            { title: "Role", field: "role" },
-            { title: "Phone Number", field: "phone_number" },
-            { title: "Locked Account", field: "locked_account" },
-            {title: 'Action', field:'Action',
-
-              render: (rowData) =>  
-
-                
-                 <>
-                  
-                   <DeleteButton  id={rowData.id} />
-                   <EditButton  />
-                  
-                   </>
-            
-            }
+            { title: 'Company Name', field: 'subdomain' },
+            { title: 'User Name', field: 'username' },
+            { title: 'Email', field: 'email' },
+            { title: 'Role', field: 'role' },
+            { title: 'Phone Number', field: 'phone_number' },
+            { title: 'Locked Account', field: 'locked_account' },
+            {
+              title: 'Wallet Admin',
+              field: 'wallet_admin',
+              render: (rowData) =>
+                rowData.wallet_admin ? (
+                  <Chip label="Yes" size="small" color="success" icon={<AccountBalanceWallet />} />
+                ) : (
+                  <Chip label="No" size="small" variant="outlined" />
+                ),
+            },
+            {
+              title: 'Action',
+              field: 'Action',
+              sorting: false,
+              render: (rowData) => (
+                <div className="flex items-center gap-1">
+                  <DeleteButton id={rowData.id} />
+                  <EditButton />
+                </div>
+              ),
+            },
           ]}
-
-          
-          data={flattenedData}
+          data={filteredData}
           title="Clients"
           options={{
             paging: true,
@@ -684,13 +512,21 @@ useEffect(() => {
             search: false,
             exportButton: true,
             headerStyle: {
-              fontFamily: 'bold',
-              textTransform: 'uppercase'
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              fontSize: '12px',
+              backgroundColor: isDark ? '#2a2a2a' : '#f8fafc',
+              color: isDark ? '#f1f1f1' : '#1a1a1a',
             },
+            rowStyle: (rowData, index) => ({
+              backgroundColor: isDark ? (index % 2 === 0 ? '#1e1e1e' : '#262626') : index % 2 === 0 ? '#ffffff' : '#fafafa',
+              color: isDark ? '#f1f1f1' : '#1a1a1a',
+            }),
           }}
+          components={{ Container: (props) => <Paper {...props} elevation={0} className="!rounded-2xl !border !border-slate-200 dark:!border-slate-800" /> }}
         />
-      </Box>
-    </>
+      </ThemeProvider>
+    </div>
   );
 };
 

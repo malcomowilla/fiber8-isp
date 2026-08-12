@@ -9,8 +9,7 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "version": "node scripts/update-version.js && git add -A",
-    "postversion": "git push --follow-tags",
-    "postbuild": "purgecss --css build/static/css/*.css --content build/index.html build/static/js/*.js --output build/static/css"
+    "postversion": "git push --follow-tags"
   },
   "dependencies": {
     "@capacitor/android": "^7.1.0",
@@ -31,7 +30,6 @@
     "@hookform/resolvers": "^3.3.4",
     "@material-ui/core": "^4.12.4",
     "@material-ui/icons": "^4.11.3",
-    "@million/lint": "^1.0.14",
     "@mui/base": "^5.0.0-beta.40",
     "@mui/icons-material": "^5.17.1",
     "@mui/lab": "^5.0.0-alpha.170",

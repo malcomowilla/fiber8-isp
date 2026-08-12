@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import MaterialTable from 'material-table';
 import { 
   Dialog, 
@@ -47,6 +47,7 @@ import { TbDeviceImacPlus } from "react-icons/tb";
 import { RiSortNumberAsc } from "react-icons/ri";
 import { TbDeviceAnalytics } from "react-icons/tb";
 import { IoPersonSharp } from "react-icons/io5";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 
 
@@ -108,12 +109,66 @@ const EditEquipment = ({openDialog, setOpenDialog,loading, setLoading, editing, 
     { value: '32', label: 'Access Point' },
   ];
 
-  return (
 
-    <div>
+
+
+
+
+
+
+
+
+  
+  function useIsDarkMode() {
+    const [isDark, setIsDark] = useState(
+      () => typeof document !== 'undefined' &&
+        document.documentElement.classList.contains('dark')
+    );
+  
+    useEffect(() => {
+      const root = document.documentElement;
+  
+      const update = () => setIsDark(root.classList.contains('dark'));
+      update();
+  
+      const observer = new MutationObserver(update);
+      observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+  
+      return () => observer.disconnect();
+    }, []);
+  
+    return isDark;
+  }
+  
+  
+  
+  
+  const isDark = useIsDarkMode();
+  
+  const tableTheme = useMemo(() => createTheme({
+    palette: {
+      mode: isDark ? 'dark' : 'light',
+      background: {
+        paper: isDark ? '#1e1e1e' : '#ffffff',
+        default: isDark ? '#1e1e1e' : '#ffffff',
+      },
+      text: {
+        primary: isDark ? '#f1f1f1' : '#1a1a1a',
+        secondary: isDark ? '#a3a3a3' : '#6b7280',
+      },
+    },
+  }), [isDark]);
+  
+
+  return (
+              <ThemeProvider theme={tableTheme}>
+
+    <div className='font-sans'>
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ bgcolor: 'green', color: 'white' }}>
-          {editing ? 'Edit Equipment' : 'Add Equipment'}
+          {editing ? <p className='font-sans
+'>Edit Equipment</p> : <p className='font-sans
+'>Add Equipment</p>}
         </DialogTitle>
         <DialogContent sx={{ pt: 3 }}>
           <form  onSubmit={handleCreateEquipment}>
@@ -129,8 +184,8 @@ const EditEquipment = ({openDialog, setOpenDialog,loading, setLoading, editing, 
                   }}
                   options={customers}
                   getOptionLabel={(option) => {
-  if (typeof option === 'string') return option;  // If option is a string
-  if (option && typeof option === 'object') return option.name || ''; // If option is an object
+  if (typeof option === 'string') return option;  
+  if (option && typeof option === 'object') return option.name || ''; 
   return '';
 }}
                   renderOption={(props, option) => (
@@ -168,7 +223,8 @@ const EditEquipment = ({openDialog, setOpenDialog,loading, setLoading, editing, 
                       }
                     }}
                       {...params}
-                      label="Select Customer"
+                      label={<p className='font-sans
+'>Select Customer</p>}
                       InputProps={{
                         ...params.InputProps,
                         startAdornment: (
@@ -181,15 +237,14 @@ const EditEquipment = ({openDialog, setOpenDialog,loading, setLoading, editing, 
                   )}
                   value={user}
                 onChange={(event, newValue) => {
-                  console.log('equipment form',equipmentForm)
-   console.log('new value',newValue)
                   setEquipmentForm({
                     ...equipmentForm,
                     user: newValue?.name || ''
                   })
   }}
                 />
-              <small> The user who has rented this equipment.</small>
+              <small className='font-sans
+'> The user who has rented this equipment.</small>
             </Grid>
             <Grid item xs={12} sm={6}>
 
@@ -221,12 +276,12 @@ const EditEquipment = ({openDialog, setOpenDialog,loading, setLoading, editing, 
 
                 <Autocomplete
   fullWidth
-  name='device_type'
+  name={<p className='font-sans
+'>device_type</p>}
   options={equipmentTypeOptions}
   value={equipmentTypeOptions.find(option => option.label === equipmentForm.device_type) || null}
   
   onChange={(event, newValue) => {
-    console.log('new value type',newValue)
     onChange({
       target: {
         name: "device_type",
@@ -273,13 +328,15 @@ const EditEquipment = ({openDialog, setOpenDialog,loading, setLoading, editing, 
         startAdornment: <TbDeviceAnalytics className='mr-2'  />
       }}
 
-        name='name'
+        name={<p className='font-sans
+'>name</p>}
     onChange={onChange}
     value={name}
              >
 
              </TextField>
-              <small> name of the equipment.</small>
+              <small className='font-sans
+'> name of the equipment.</small>
 
             </Grid>
             <Grid item xs={12}>
@@ -289,8 +346,9 @@ const EditEquipment = ({openDialog, setOpenDialog,loading, setLoading, editing, 
     onChange={onChange}
     value={model}
          fullWidth
-className='myTextField'
-      label="Model"
+className='myTextField '
+      label={<p className='font-sans
+'>Model</p>}
       sx={{
     '& .MuiAutocomplete-inputRoot': {
       padding: '9px 14px', // Match Select component padding
@@ -303,7 +361,8 @@ className='myTextField'
     />
 
 
-<small>Make and model of the equipment.</small>
+<small className='font-sans
+'>Make and model of the equipment.</small>
 
 
     <TextField
@@ -327,7 +386,7 @@ className='myTextField'
     />
   
 
-<small> Serial number of the equipment.</small>
+<small className='font-sans'> Serial number of the equipment.</small>
 
 
 
@@ -386,7 +445,8 @@ className='myTextField'
               backgroundColor: 'black'
             }
           }}>
-            Cancel
+            <p className='font-sans
+'>Cancel </p>
           </Button>
 
           
@@ -397,7 +457,8 @@ className='myTextField'
             disabled={loading}
             startIcon={loading && <CircularProgress size={20} />}
           >
-            {editing ? loading ? 'Loading....' : 'Update' : loading ? 'Loading....' : 'Create'}
+           <p className='font-sans
+'>{editing ? loading ? 'Loading....' : 'Update' : loading ? 'Loading....' : 'Create'} </p>
           </Button>
         </DialogActions>
           </form>
@@ -405,6 +466,8 @@ className='myTextField'
       
       </Dialog>
     </div>
+             </ThemeProvider>
+    
   )
 }
 

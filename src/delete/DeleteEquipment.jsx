@@ -103,8 +103,10 @@ import {
               <WarningIcon color="error" sx={{ fontSize: 32 }} />
             </Box>
             <Typography variant="h5" component="span" fontWeight="bold">
-              Delete Equipment
+              <p className='font-sans
+'>Delete Equipment </p>
             </Typography>
+            
           </Box>
         </DialogTitle>
   
@@ -122,13 +124,15 @@ import {
             align="center"
             sx={{ mb: 2, fontWeight: 500 }}
           >
-            Are you sure you want to delete this equipment?   </Typography>
+            <p className='font-sans
+'>Are you sure you want to delete this equipment? </p>  </Typography>
           <Typography
             variant="body2"
             color="text.secondary"
             align="center"
           >
-            This action cannot be undone.
+            <p className='font-sans
+'>This action cannot be undone. </p>
           </Typography>
         </DialogContent>
   
@@ -156,7 +160,8 @@ import {
               }
             }}
           >
-            Cancel
+           <p className='font-sans
+'> Cancel </p>
           </Button>
           <Button
             variant="contained"
@@ -173,7 +178,8 @@ import {
             {loading ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
-              'Delete'
+              <p className='font-sans
+'>Delete </p>
             )}
           </Button>
         </DialogActions>
