@@ -1,30 +1,4 @@
 /**
- * NetworkMap
- * -----------------------------------------------------------------------
- * A Google-Earth-style network topology map for ISP / WISP infrastructure
- * (POPs, OLTs, switches, FATs, splitters, ONTs, access points, routers)
- * built entirely on free, key-less tile sources:
- *
- *   Streets   -> OpenStreetMap standard tiles
- *   Satellite -> Esri World Imagery
- *   Hybrid    -> Esri World Imagery + Esri reference/labels overlay
- *
- * No Google Maps, no Mapbox, no API keys, no billing.
- *
- * Styling: Tailwind CSS utility classes, LIGHT theme by default with
- * `dark:` variants for dark mode (driven by Tailwind's `class` strategy —
- * add/remove a `dark` class on a parent element, e.g. <html> or <body>,
- * to toggle). Font is `font-sans` throughout (set once on the root and
- * inherited by every child).
- *
- * Dependencies (install in your Rails/Webpacker/Vite React app):
- *   npm install leaflet
- *   Tailwind CSS configured with darkMode: 'class'
- *
- * This component talks to your Rails API through the `api` prop (see the
- * bottom of this file for the expected shape). If no `api` is supplied it
- * runs fully client-side against local state + localStorage, so you can
- * drop it in and see it work before wiring up the backend.
  * -----------------------------------------------------------------------
  */
 
@@ -36,10 +10,6 @@ import {
   Antenna, Cable, Search, RefreshCw, Layers, X, Plus, Trash2, Pencil,
   MapPin, ChevronRight, ChevronDown, Building2, CircleDot
 } from 'lucide-react';
-
-/* ------------------------------------------------------------------ */
-/* Domain constants                                                    */
-/* ------------------------------------------------------------------ */
 
 const DEVICE_TYPES = {
   olt:      { label: 'OLT',            full: 'Optical Line Terminal',   icon: Server,     color: '#0ea5e9' },
