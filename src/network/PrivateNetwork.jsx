@@ -511,15 +511,19 @@ setLoadButton(false)
 
       <ThemeProvider theme={tableTheme}>
 
-
+ <div style={{ overflowX: 'auto', width: '100%' }}>
       <MaterialTable
         title=""
         columns={[
           { title: <p className='text-sm text-black'>VPN Client Ip</p>, field: 'allowed_ips' },
           { title: <p className='text-sm text-black'>Date Created</p>, field: 'created_at' },
 
-          { title: <p className='text-sm text-black'>Connected Subnets </p>, field: 'private_ip' 
-          },
+        {
+  title: <p className='text-sm text-black'>Connected Subnets</p>,
+  field: 'private_ip',
+  cellStyle: { maxWidth: 220, whiteSpace: 'pre-wrap', wordBreak: 'break-word' },
+  headerStyle: { maxWidth: 220 }
+}
 
           { title: <p className='text-sm text-black'>Status</p>, field: 'status' },
         ]}
@@ -612,6 +616,7 @@ options={{
     }}
       />
 
+</div>
 </ThemeProvider>
 
 
