@@ -590,7 +590,7 @@ options={{
       paginationPosition: 'bottom',
       exportButton: true,
       exportAllData: true,
-      selection: true,
+      selection: false,
       search: false,
       searchAutoFocus: true,
       showSelectAllCheckbox: false,
