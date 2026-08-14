@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 
-/* ─── Gauge (matches ISPPortal's SpeedGauge) ─── */
+/* ─── Gauge (used during the live test) ─── */
 function Gauge({ label, value, max, unit, color }) {
   const pct = Math.min(value / max, 1)
   const r = 52, cx = 60, cy = 60
@@ -22,6 +22,36 @@ function Gauge({ label, value, max, unit, color }) {
         <text x={cx} y={cy + 12} textAnchor="middle" fontSize="11" fill="#6b7280">{unit}</text>
       </svg>
       <span className="text-xs font-semibold text-gray-500 tracking-wide uppercase">{label}</span>
+    </div>
+  )
+}
+
+/* ─── Ookla-style result hero (shown once the test finishes) ─── */
+function ResultHero({ result }) {
+  return (
+    <div className="text-center py-6">
+      <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-1">Download</p>
+      <div className="flex items-end justify-center gap-2 mb-5">
+        <span className="text-6xl font-black text-gray-900 tabular-nums leading-none">
+          {result.download_mbps.toFixed(1)}
+        </span>
+        <span className="text-lg font-bold text-gray-400 mb-1.5">Mbps</span>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto pt-4 border-t border-gray-100">
+        <div>
+          <p className="text-2xl font-extrabold text-gray-800 tabular-nums">{result.upload_mbps.toFixed(1)}</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-0.5">Upload Mbps</p>
+        </div>
+        <div>
+          <p className="text-2xl font-extrabold text-gray-800 tabular-nums">{result.ping_ms ?? '—'}</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-0.5">Ping ms</p>
+        </div>
+        <div>
+          <p className="text-2xl font-extrabold text-gray-800 tabular-nums">{result.jitter_ms ?? '—'}</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-0.5">Jitter ms</p>
+        </div>
+      </div>
     </div>
   )
 }
@@ -67,10 +97,7 @@ export default function SpeedTestCard({ planSpeed = "50 Mbps" }) {
   const [result, setResult] = useState(null)
   const [history, setHistory] = useState([])
   const [reportState, setReportState] = useState('idle') // idle | sending | sent
-    const [errorMsg, setErrorMsg] = useState(null)
-
-
-
+  const [errorMsg, setErrorMsg] = useState(null)
   const abortRef = useRef(null)
 
   const subdomain = window.location.hostname.split('.')[0]
@@ -78,7 +105,9 @@ export default function SpeedTestCard({ planSpeed = "50 Mbps" }) {
 
   const fetchHistory = useCallback(async () => {
     try {
-      const res = await fetch('/api/speed_test/history?limit=10', { headers: { 'X-Subdomain': subdomain } })
+      const res = await fetch('/api/speed_test/history?limit=10', {
+        headers: { 'X-Subdomain': subdomain }, credentials: 'include',
+      })
       if (res.ok) setHistory(await res.json())
     } catch {}
   }, [subdomain])
@@ -87,7 +116,9 @@ export default function SpeedTestCard({ planSpeed = "50 Mbps" }) {
     const samples = []
     for (let i = 0; i < 5; i++) {
       const t0 = performance.now()
-      await fetch('/api/speed_test/ping', { headers: { 'X-Subdomain': subdomain }, cache: 'no-store' })
+      await fetch('/api/speed_test/ping', {
+        headers: { 'X-Subdomain': subdomain }, cache: 'no-store', credentials: 'include',
+      })
       samples.push(performance.now() - t0)
       setLive(v => ({ ...v, ping: samples[samples.length - 1] }))
       await new Promise(r => setTimeout(r, 120))
@@ -99,8 +130,9 @@ export default function SpeedTestCard({ planSpeed = "50 Mbps" }) {
 
   const measureDownload = async () => {
     const res = await fetch(`/api/speed_test/download?size_mb=15`, {
-      headers: { 'X-Subdomain': subdomain }, cache: 'no-store',
+      headers: { 'X-Subdomain': subdomain }, cache: 'no-store', credentials: 'include',
     })
+    if (!res.ok) throw new Error(`Download test failed (HTTP ${res.status})`)
     const reader = res.body.getReader()
     let received = 0
     const start = performance.now()
@@ -131,6 +163,7 @@ export default function SpeedTestCard({ planSpeed = "50 Mbps" }) {
 
     const xhr = new XMLHttpRequest()
     xhr.open('POST', '/api/speed_test/upload')
+    xhr.withCredentials = true
     xhr.setRequestHeader('X-Subdomain', subdomain)
     xhr.setRequestHeader('Content-Type', 'application/octet-stream')
 
@@ -142,10 +175,14 @@ export default function SpeedTestCard({ planSpeed = "50 Mbps" }) {
       setLive(v => ({ ...v, upload: mbps }))
     }
     xhr.onload = () => {
+      if (xhr.status < 200 || xhr.status >= 300) {
+        reject(new Error(`Upload test failed (HTTP ${xhr.status})`))
+        return
+      }
       const totalSec = (performance.now() - start) / 1000
       resolve((size * 8) / 1e6 / totalSec)
     }
-    xhr.onerror = reject
+    xhr.onerror = () => reject(new Error('Upload test failed (network error)'))
     xhr.send(buf)
   })
 
@@ -153,52 +190,51 @@ export default function SpeedTestCard({ planSpeed = "50 Mbps" }) {
     const res = await fetch('/api/speed_test/results', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+      credentials: 'include',
       body: JSON.stringify({
         download_mbps: download, upload_mbps: upload, ping_ms: ping, jitter_ms: jitter,
       }),
     })
-    if (!res.ok) throw new Error('Failed to save result')
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      throw new Error(body.error || `Failed to save result (HTTP ${res.status})`)
+    }
     return res.json()
   }
 
+  const runTest = async () => {
+    setResult(null)
+    setReportState('idle')
+    setErrorMsg(null)
+    setLive({ download: 0, upload: 0, ping: 0, jitter: 0 })
 
-  
+    try {
+      setPhase('ping')
+      const { ping, jitter } = await measurePing()
 
-const runTest = async () => {
-  setResult(null)
-  setReportState('idle')
-  setErrorMsg(null)
-  setLive({ download: 0, upload: 0, ping: 0, jitter: 0 })
+      setPhase('download')
+      const download = await measureDownload()
 
-  try {
-    setPhase('ping')
-    const { ping, jitter } = await measurePing()
+      setPhase('upload')
+      const upload = await measureUpload()
 
-    setPhase('download')
-    const download = await measureDownload()
-
-    setPhase('upload')
-    const upload = await measureUpload()
-
-    setPhase('done')
-    const saved = await submitResult({ download, upload, ping, jitter })
-    setResult(saved)
-    fetchHistory()
-  } catch (e) {
-    console.error('Speed test failed:', e)
-    setErrorMsg(e.message || 'Something went wrong during the test.')
-    setPhase('error')
+      setPhase('done')
+      const saved = await submitResult({ download, upload, ping, jitter })
+      setResult(saved)
+      fetchHistory()
+    } catch (e) {
+      console.error('Speed test failed:', e)
+      setErrorMsg(e.message || 'Something went wrong during the test.')
+      setPhase('error')
+    }
   }
-}
-
-
 
   const reportIssue = async () => {
     if (!result) return
     setReportState('sending')
     try {
       const res = await fetch(`/api/speed_test/results/${result.id}/report`, {
-        method: 'POST', headers: { 'X-Subdomain': subdomain },
+        method: 'POST', headers: { 'X-Subdomain': subdomain }, credentials: 'include',
       })
       setReportState(res.ok ? 'sent' : 'idle')
     } catch { setReportState('idle') }
@@ -218,11 +254,16 @@ const runTest = async () => {
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100 py-4 px-2">
-        <Gauge label="Download" value={live.download} max={planMax} unit="Mbps" color="#10b981" />
-        <Gauge label="Upload" value={live.upload} max={planMax * 0.4 || 20} unit="Mbps" color="#3b82f6" />
-        <Gauge label="Ping" value={live.ping} max={150} unit="ms" color={live.ping > 60 ? '#ef4444' : '#f59e0b'} />
-      </div>
+      {/* Live gauges while running; result hero once done */}
+      {result ? (
+        <ResultHero result={result} />
+      ) : (
+        <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100 py-4 px-2">
+          <Gauge label="Download" value={live.download} max={planMax} unit="Mbps" color="#10b981" />
+          <Gauge label="Upload" value={live.upload} max={planMax * 0.4 || 20} unit="Mbps" color="#3b82f6" />
+          <Gauge label="Ping" value={live.ping} max={150} unit="ms" color={live.ping > 60 ? '#ef4444' : '#f59e0b'} />
+        </div>
+      )}
 
       <div className="px-5 pb-5">
         <button
@@ -261,20 +302,12 @@ const runTest = async () => {
           </div>
         )}
 
-{phase === 'error' && errorMsg && (
+        {phase === 'error' && errorMsg && (
           <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
             <p className="text-sm font-semibold text-red-700">Test failed</p>
             <p className="text-xs text-red-600 mt-1">{errorMsg}</p>
           </div>
         )}
-
-        {history.length > 1 && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Recent Tests</p>
-            <HistorySparkline history={history} planSpeed={planMax} />
-          </div>
-        )}
-
 
         {history.length > 1 && (
           <div className="mt-4 pt-4 border-t border-gray-100">
