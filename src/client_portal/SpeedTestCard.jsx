@@ -67,6 +67,10 @@ export default function SpeedTestCard({ planSpeed = "50 Mbps" }) {
   const [result, setResult] = useState(null)
   const [history, setHistory] = useState([])
   const [reportState, setReportState] = useState('idle') // idle | sending | sent
+    const [errorMsg, setErrorMsg] = useState(null)
+
+
+
   const abortRef = useRef(null)
 
   const subdomain = window.location.hostname.split('.')[0]
@@ -157,29 +161,37 @@ export default function SpeedTestCard({ planSpeed = "50 Mbps" }) {
     return res.json()
   }
 
-  const runTest = async () => {
-    setResult(null)
-    setReportState('idle')
-    setLive({ download: 0, upload: 0, ping: 0, jitter: 0 })
 
-    try {
-      setPhase('ping')
-      const { ping, jitter } = await measurePing()
+  
 
-      setPhase('download')
-      const download = await measureDownload()
+const runTest = async () => {
+  setResult(null)
+  setReportState('idle')
+  setErrorMsg(null)
+  setLive({ download: 0, upload: 0, ping: 0, jitter: 0 })
 
-      setPhase('upload')
-      const upload = await measureUpload()
+  try {
+    setPhase('ping')
+    const { ping, jitter } = await measurePing()
 
-      setPhase('done')
-      const saved = await submitResult({ download, upload, ping, jitter })
-      setResult(saved)
-      fetchHistory()
-    } catch (e) {
-      setPhase('error')
-    }
+    setPhase('download')
+    const download = await measureDownload()
+
+    setPhase('upload')
+    const upload = await measureUpload()
+
+    setPhase('done')
+    const saved = await submitResult({ download, upload, ping, jitter })
+    setResult(saved)
+    fetchHistory()
+  } catch (e) {
+    console.error('Speed test failed:', e)
+    setErrorMsg(e.message || 'Something went wrong during the test.')
+    setPhase('error')
   }
+}
+
+
 
   const reportIssue = async () => {
     if (!result) return
@@ -248,6 +260,21 @@ export default function SpeedTestCard({ planSpeed = "50 Mbps" }) {
             )}
           </div>
         )}
+
+{phase === 'error' && errorMsg && (
+          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
+            <p className="text-sm font-semibold text-red-700">Test failed</p>
+            <p className="text-xs text-red-600 mt-1">{errorMsg}</p>
+          </div>
+        )}
+
+        {history.length > 1 && (
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Recent Tests</p>
+            <HistorySparkline history={history} planSpeed={planMax} />
+          </div>
+        )}
+
 
         {history.length > 1 && (
           <div className="mt-4 pt-4 border-t border-gray-100">
