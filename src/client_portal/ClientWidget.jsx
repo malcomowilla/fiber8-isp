@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useApplicationSettings } from '../settings/ApplicationSettings'
+import SpeedTestCard from './SpeedTestCard'
 
 /* ─── Static demo data ─── */
 const PLANS = [
@@ -347,6 +348,7 @@ setSupportTickets(data)
   const nav = [
     { id: "dashboard",    icon: "⊞", label: "Dashboard"    },
     { id: "usage",        icon: "📶", label: "Live Usage"   },
+    { id: "speedtest",    icon: "⚡", label: "Speed Test"   },
     { id: "transactions", icon: "💳", label: "Transactions" },
     { id: "pay",          icon: "₿",  label: "Pay Bill"     },
     { id: "plans",        icon: "◈",  label: "Plans"        },
@@ -557,10 +559,6 @@ setSupportTickets(data)
                         <p className="text-sm font-bold text-gray-800">KES {t?.amount.toLocaleString()}</p>
                         <p className="text-xs text-gray-400">{t?.time_paid || t.date}</p>
                       </div>
-                      {/* <span className="text-[10px] font-bold px-2.5 py-1 rounded-full
-                        bg-emerald-100 text-emerald-700 border border-emerald-200 shrink-0">
-                        {t.status}
-                      </span> */}
                     </div>
                   ))}
                 </div>
@@ -614,6 +612,19 @@ setSupportTickets(data)
             </div>
           )}
 
+          {/* ══ SPEED TEST ══ */}
+          {activeTab === "speedtest" && (
+            <div className="space-y-5">
+              <div>
+                <h2 className="text-xl font-extrabold text-gray-800">Speed Test</h2>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  Check your connection against your {currentPlan.name} plan ({currentPlan.speed}).
+                </p>
+              </div>
+              <SpeedTestCard planSpeed={currentPlan.speed} />
+            </div>
+          )}
+
           {/* ══ TRANSACTIONS ══ */}
           {activeTab === "transactions" && (
             <div className="space-y-5">
@@ -627,7 +638,6 @@ setSupportTickets(data)
                 {[
                   { label: "Total Paid",     value: `KES ${transactions.reduce((a,t)=>a+t.amount,0).toLocaleString()}` },
                   { label: "Transactions",   value: transactions.length },
-                  // { label: "Last Payment",   value: transactions[0].date },
                 ].map(s => (
                   <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">{s.label}</p>
@@ -659,9 +669,6 @@ setSupportTickets(data)
                   ))}
                 </div>
 
-
-        
-
                 {filteredTx.map((t, i) => (
                   <div key={t.id}
                     className={`grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_1fr_1fr] gap-y-1 sm:gap-y-0
@@ -679,10 +686,6 @@ setSupportTickets(data)
                     <div className="flex items-center font-mono text-xs text-gray-400">{t?.reference || t.ref}</div>
                     <div className="flex items-center justify-between sm:justify-start gap-3">
                       <span className="text-sm font-bold text-gray-800">KES {t?.amount}</span>
-                      {/* <span className="text-[10px] font-bold px-2.5 py-1 rounded-full
-                        bg-emerald-100 text-emerald-700 border border-emerald-200">
-                        {t.status}
-                      </span> */}
                     </div>
                   </div>
                 ))}
@@ -1029,10 +1032,6 @@ setSupportTickets(data)
                       <p className="text-sm font-bold text-gray-800">KES {t.amount.toLocaleString()}</p>
                       <p className="text-xs text-gray-400">{t?.time_paid || t.date}</p>
                     </div>
-                    {/* <span className="text-[10px] font-bold px-2.5 py-1 rounded-full
-                      bg-emerald-100 text-emerald-700 border border-emerald-200 shrink-0">
-                      {t.status}
-                    </span> */}
                   </div>
                 ))}
               </div>
