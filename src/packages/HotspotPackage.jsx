@@ -274,6 +274,7 @@ const columns = [
         synced: { label: 'Synced', bg: '#d1fae5', color: '#065f46' },
         not_synced: { label: 'Not synced', bg: '#fef3c7', color: '#92400e' },
         failed: { label: 'Failed', bg: '#fee2e2', color: '#991b1b' },
+        syncing: { label: 'Syncing…', bg: '#dbeafe', color: '#1e40af' },
       };
       const s = isSyncing
         ? { label: 'Syncing…', bg: '#dbeafe', color: '#1e40af' }
