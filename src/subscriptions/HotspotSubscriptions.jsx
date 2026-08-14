@@ -9,9 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { IoIosQrScanner } from "react-icons/io";
 import EditVoucher from '../edit/EditVoucher';
 import toast, { Toaster } from 'react-hot-toast';
-import LoadingAnimation from '../loader/loading_animation.json'
-import Lottie from 'react-lottie';
-import Backdrop from '@mui/material/Backdrop';
+
 import {useApplicationSettings} from '../settings/ApplicationSettings'
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteVoucher from '../delete/DeleteVoucher';
@@ -199,15 +197,6 @@ const handleCloseVoucherDetails = () => {
     setOpenDelete(false);
   }
 
-
-  const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: LoadingAnimation,
-    rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice',
-    },
-  };
 
 
 
@@ -1289,11 +1278,7 @@ const downloadVoucherCard = (rowData) => {
         loading={loading}
       />
 
-      <Backdrop open={openLoad} sx={{ color: '#fff',
-         zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Lottie className='relative z-50' options={defaultOptions}
-         height={400} width={400} />
-      </Backdrop>
+    
 
       <Toaster />
 
