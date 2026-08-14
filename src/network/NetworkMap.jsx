@@ -1,5 +1,21 @@
 /**
  * -----------------------------------------------------------------------
+ * Changes from the previous version:
+ *  - Talks to real Rails endpoints via the `api` prop (see networkMapApi.js)
+ *    instead of silently falling back to localStorage as the primary store.
+ *    localStorage is now ONLY used if no `api` prop is passed at all, as an
+ *    offline/demo mode.
+ *  - Live updates over ActionCable (NetworkMapChannel): when a teammate on
+ *    another tab/device adds, edits, or deletes a node, this map updates
+ *    without a refresh. Small "Live" / "Offline" indicator in the top bar.
+ *  - Import from Google Earth: KML/KMZ upload modal, hits
+ *    POST /network_map/kml_import, and reports what was created vs skipped.
+ *  - Every marker now shows a hover tooltip with its name + exact
+ *    coordinates, and a live cursor-coordinates readout sits bottom-center
+ *    so you can always see exactly where you are on the map.
+ *  - Active-status markers get a soft pulsing ring so live/healthy
+ *    equipment reads at a glance instead of everything looking static.
+ * -----------------------------------------------------------------------
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -8,7 +24,8 @@ import 'leaflet/dist/leaflet.css';
 import {
   Radio, Router as RouterIcon, Split, GitBranch, Wifi, Server,
   Antenna, Cable, Search, RefreshCw, Layers, X, Plus, Trash2, Pencil,
-  MapPin, ChevronRight, ChevronDown, Building2, CircleDot
+  MapPin, ChevronRight, ChevronDown, Building2, CircleDot,
+  Milestone, Box, Lock, UploadCloud, Wifi as WifiIcon, WifiOff,
 } from 'lucide-react';
 
 const DEVICE_TYPES = {
@@ -20,6 +37,9 @@ const DEVICE_TYPES = {
   ap:       { label: 'Access Point',   full: 'Wireless Access Point',   icon: Antenna,     color: '#3b82f6' },
   bridge:   { label: 'Bridge Router',  full: 'Bridge Router',           icon: RouterIcon,  color: '#ec4899' },
   hotspot:  { label: 'Hotspot Router', full: 'Hotspot Router',          icon: Wifi,        color: '#06b6d4' },
+  pole:     { label: 'Pole',           full: 'Utility / Fiber Pole',    icon: Milestone,   color: '#78716c' },
+  cabinet:  { label: 'Cabinet',        full: 'Street Cabinet',          icon: Box,         color: '#64748b' },
+  closure:  { label: 'Closure',        full: 'Fiber Splice Closure',    icon: Lock,        color: '#a855f7' },
 };
 
 const CABLE_TYPES = {
@@ -64,7 +84,6 @@ const uid = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(
 
 /* ------------------------------------------------------------------ */
 /* Shared Tailwind class fragments                                     */
-/* (kept as constants so every instance of a control stays consistent) */
 /* ------------------------------------------------------------------ */
 
 const cx = (...parts) => parts.filter(Boolean).join(' ');
@@ -97,17 +116,15 @@ const FIELD_INPUT =
 
 /* ------------------------------------------------------------------ */
 /* Leaflet icon builders                                               */
-/* (Tailwind utility class *names* below are written out literally so  */
-/*  the build-time content scanner picks them up even though they're   */
-/*  injected via raw HTML strings.)                                    */
 /* ------------------------------------------------------------------ */
 
 function popDivIcon(status) {
   const c = STATUS[status]?.color || STATUS.unknown.color;
+  const pulse = status === 'active' ? 'nm-pulse-ring' : '';
   return L.divIcon({
     className: 'bg-transparent border-0',
-    html: `<div class="flex h-[30px] w-[30px] items-center justify-center rounded-t-lg rounded-b-[3px] bg-gradient-to-br from-teal-500 to-teal-700"
-                style="box-shadow:0 0 0 3px #ffffff, 0 0 0 5px ${c}, 0 6px 14px rgba(15,23,42,0.25)">
+    html: `<div class="flex h-[30px] w-[30px] items-center justify-center rounded-t-lg rounded-b-[3px] bg-gradient-to-br from-teal-500 to-teal-700 ${pulse}"
+                style="box-shadow:0 0 0 3px #ffffff, 0 0 0 5px ${c}, 0 6px 14px rgba(15,23,42,0.25))">
              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                <path d="M6 22V12a6 6 0 0 1 12 0v10"/><path d="M6 22h12"/><circle cx="12" cy="9" r="2" fill="white" stroke="none"/>
              </svg>
@@ -122,9 +139,10 @@ function deviceDivIcon(type, status, selected) {
   const sc = STATUS[status]?.color || STATUS.unknown.color;
   const scale = selected ? 'transform:scale(1.35);' : '';
   const ring = selected ? '#0f172a' : sc;
+  const pulse = status === 'active' && !selected ? 'nm-pulse-ring' : '';
   return L.divIcon({
     className: 'bg-transparent border-0',
-    html: `<div class="flex h-4 w-4 items-center justify-center rounded-full transition-transform"
+    html: `<div class="flex h-4 w-4 items-center justify-center rounded-full transition-transform ${pulse}"
                 style="background:${meta.color};box-shadow:0 0 0 3px #ffffff, 0 0 0 5px ${ring}, 0 4px 10px rgba(15,23,42,0.25);${scale}">
              <span class="h-[5px] w-[5px] rounded-full bg-white/85"></span>
            </div>`,
@@ -133,13 +151,20 @@ function deviceDivIcon(type, status, selected) {
   });
 }
 
+function fmtCoord(lat, lng) {
+  if (lat == null || lng == null || Number.isNaN(Number(lat)) || Number.isNaN(Number(lng))) return '—';
+  return `${Number(lat).toFixed(6)}, ${Number(lng).toFixed(6)}`;
+}
+
 /* ------------------------------------------------------------------ */
 /* Main component                                                      */
 /* ------------------------------------------------------------------ */
 
 export default function NetworkMap({
-  api = null,           // optional { fetchAll, createPop, createDevice, createConnection, updateNode, deleteNode, syncStatus }
-  routers = [],          // [{ id, name }] e.g. MikroTik routers from your Rails app, for "link to router"
+  api = null,               // { fetchAll, createPop, createDevice, createConnection, updateNode, deleteNode, syncStatus, importKml } — see networkMapApi.js
+  routers = [],              // [{ id, name }] MikroTik routers from your Rails app, for "link to router"
+  accountSubdomain = null,   // tenant subdomain, used to scope the ActionCable stream
+  cableConsumer = null,      // pass your app's existing ActionCable consumer if you have a shared one; otherwise a new one is created lazily
   initialCenter = [-1.2833, 36.8167], // Nairobi
   initialZoom = 12,
   height = '100vh',
@@ -157,25 +182,32 @@ export default function NetworkMap({
   const [placeMode, setPlaceMode] = useState(null); // null | 'pop' | 'device' | 'link'
   const [placeDeviceType, setPlaceDeviceType] = useState('olt');
   const [pendingLatLng, setPendingLatLng] = useState(null);
-  const [modal, setModal] = useState(null); // 'pop' | 'device' | 'connection' | null
-  const [editing, setEditing] = useState(null); // { kind: 'pop'|'device'|'connection', id } when the open modal is editing an existing item, else null
-  const [linkSource, setLinkSource] = useState(null); // { kind, id } first click for connection
+  const [modal, setModal] = useState(null); // 'pop' | 'device' | 'connection' | 'kml' | null
+  const [editing, setEditing] = useState(null);
+  const [linkSource, setLinkSource] = useState(null);
   const [hierarchyCollapsed, setHierarchyCollapsed] = useState(false);
   const [legendOpen, setLegendOpen] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [search, setSearch] = useState('');
+  const [cursorLatLng, setCursorLatLng] = useState(null);
+  const [wsConnected, setWsConnected] = useState(false);
+  const [loadError, setLoadError] = useState(null);
 
-  /* ---------------- persistence (localStorage fallback) ------------ */
+  /* ---------------- persistence: real backend, with localStorage as an offline-only fallback ---- */
 
   useEffect(() => {
     if (api?.fetchAll) {
-      api.fetchAll().then((data) => {
-        setPops(data.pops || []);
-        setDevices(data.devices || []);
-        setConnections(data.connections || []);
-      }).catch(() => {});
+      api.fetchAll()
+        .then((data) => {
+          setPops(data.pops || []);
+          setDevices(data.devices || []);
+          setConnections(data.connections || []);
+          setLoadError(null);
+        })
+        .catch((err) => setLoadError(err.message || 'Failed to load network map'));
       return;
     }
+    // No backend wired up at all — demo/offline mode only.
     try {
       const raw = localStorage.getItem('nm_state_v1');
       if (raw) {
@@ -191,6 +223,53 @@ export default function NetworkMap({
     if (api) return; // Rails backend owns persistence in that mode
     localStorage.setItem('nm_state_v1', JSON.stringify({ pops, devices, connections }));
   }, [pops, devices, connections, api]);
+
+  /* ---------------- live updates over ActionCable ------------------- */
+
+  useEffect(() => {
+    if (!api || !accountSubdomain) return; // live updates only make sense with a real backend
+
+    let consumer = cableConsumer;
+    let createdOwnConsumer = false;
+
+    async function connect() {
+      if (!consumer) {
+        const { createConsumer } = await import('@rails/actioncable');
+        consumer = createConsumer('/cable');
+        createdOwnConsumer = true;
+      }
+
+      const subscription = consumer.subscriptions.create(
+        { channel: 'NetworkMapChannel', subdomain: accountSubdomain },
+        {
+          connected() { setWsConnected(true); },
+          disconnected() { setWsConnected(false); },
+          rejected() { setWsConnected(false); },
+          received(payload) {
+            const { kind, node, destroyed } = payload;
+            const setters = { pop: setPops, device: setDevices, connection: setConnections };
+            const setFn = setters[kind];
+            if (!setFn) return;
+
+            setFn((list) => {
+              if (destroyed) return list.filter((x) => x.id !== node.id);
+              const exists = list.some((x) => x.id === node.id);
+              return exists ? list.map((x) => (x.id === node.id ? node : x)) : [...list, node];
+            });
+          },
+        }
+      );
+
+      return () => {
+        subscription.unsubscribe();
+        if (createdOwnConsumer) consumer.disconnect();
+      };
+    }
+
+    let cleanup;
+    connect().then((fn) => { cleanup = fn; });
+    return () => { if (cleanup) cleanup(); };
+  }, [api, accountSubdomain, cableConsumer]);
 
   /* ---------------- map init ---------------------------------------- */
 
@@ -208,6 +287,8 @@ export default function NetworkMap({
     layerGroupRef.current.links = L.layerGroup().addTo(map);
 
     map.on('click', (e) => handleMapClickRef.current?.(e));
+    map.on('mousemove', (e) => setCursorLatLng(e.latlng));
+    map.on('mouseout', () => setCursorLatLng(null));
 
     return () => { map.remove(); mapRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -245,10 +326,6 @@ export default function NetworkMap({
       setModal('device');
       setPlaceMode(null);
     } else if (placeMode === 'link') {
-      // BUG FIX: clicking empty map space while in Link mode used to do
-      // nothing at all — no feedback, so a missed click (very easy on a
-      // small marker) looked identical to a broken modal. Flash the hint
-      // bar instead so it's clear the click needs to land on a marker.
       setLinkMiss(true);
       clearTimeout(linkMissTimerRef.current);
       linkMissTimerRef.current = setTimeout(() => setLinkMiss(false), 600);
@@ -286,6 +363,10 @@ export default function NetworkMap({
 
     pops.forEach((p) => {
       const marker = L.marker([p.lat, p.lng], { icon: popDivIcon(p.status) }).addTo(group);
+      marker.bindTooltip(
+        `<strong>${p.name}</strong><br/><span class="nm-tooltip-coords">${fmtCoord(p.lat, p.lng)}</span>`,
+        { direction: 'top', offset: [0, -16], className: 'nm-tooltip', opacity: 1 }
+      );
       marker.on('click', (ev) => {
         L.DomEvent.stopPropagation(ev);
         onNodeClickedRef.current?.('pop', p.id);
@@ -296,6 +377,10 @@ export default function NetworkMap({
     devices.forEach((d) => {
       const isSel = selected?.kind === 'device' && selected.id === d.id;
       const marker = L.marker([d.lat, d.lng], { icon: deviceDivIcon(d.type, d.status, isSel) }).addTo(group);
+      marker.bindTooltip(
+        `<strong>${d.name}</strong> <span class="nm-tooltip-type">${DEVICE_TYPES[d.type]?.label || ''}</span><br/><span class="nm-tooltip-coords">${fmtCoord(d.lat, d.lng)}</span>`,
+        { direction: 'top', offset: [0, -12], className: 'nm-tooltip', opacity: 1 }
+      );
       marker.on('click', (ev) => {
         L.DomEvent.stopPropagation(ev);
         onNodeClickedRef.current?.('device', d.id);
@@ -329,6 +414,13 @@ export default function NetworkMap({
         className: `nm-link nm-link-${c.category}`,
       }).addTo(group);
 
+      const distLabel = c.distanceM ? `${c.distanceM} m` : '';
+      const bwLabel = c.bandwidthMbps ? `${c.bandwidthMbps} Mbps` : '';
+      line.bindTooltip(
+        `<strong>${c.label || cable.label}</strong>${distLabel || bwLabel ? `<br/><span class="nm-tooltip-coords">${[distLabel, bwLabel].filter(Boolean).join(' · ')}</span>` : ''}`,
+        { sticky: true, className: 'nm-tooltip', opacity: 1 }
+      );
+
       line.on('click', (ev) => {
         L.DomEvent.stopPropagation(ev);
         setSelected({ kind: 'connection', id: c.id });
@@ -348,7 +440,7 @@ export default function NetworkMap({
       if (!linkSource) {
         setLinkSource({ kind, id });
       } else if (linkSource.kind === kind && linkSource.id === id) {
-        setLinkSource(null); // clicked same node, cancel
+        setLinkSource(null);
       } else {
         setModal('connection');
       }
@@ -357,45 +449,40 @@ export default function NetworkMap({
     setSelected({ kind, id });
   }
 
-  // BUG FIX: the marker click handlers below are attached inside a useEffect
-  // that only reruns when [pops, devices, selected] change. Turning on
-  // placeMode === 'link' (or setting linkSource) does NOT rerun that effect,
-  // so the markers were holding a stale closure over onNodeClicked from an
-  // earlier render — one where placeMode was still null. Clicking a marker
-  // in Link mode was silently falling through to setSelected(...) instead of
-  // registering the link source/target, so the connection modal never
-  // opened. Routing every marker click through this always-current ref
-  // fixes it without forcing markers to be torn down and rebuilt on every
-  // mode change.
   const onNodeClickedRef = useRef(null);
   onNodeClickedRef.current = onNodeClicked;
 
   function addPop(data) {
-    const pop = { id: uid(), status: 'unknown', ...data };
-    if (api?.createPop) api.createPop(pop).then((saved) => setPops((p) => [...p, saved]));
-    else setPops((p) => [...p, pop]);
+    if (api?.createPop) {
+      api.createPop(data).then((saved) => setPops((p) => [...p, saved])).catch((e) => setLoadError(e.message));
+    } else {
+      setPops((p) => [...p, { id: uid(), status: 'unknown', ...data }]);
+    }
     setModal(null);
     setPendingLatLng(null);
   }
 
   function addDevice(data) {
-    const device = { id: uid(), status: 'unknown', ...data };
-    if (api?.createDevice) api.createDevice(device).then((saved) => setDevices((d) => [...d, saved]));
-    else setDevices((d) => [...d, device]);
+    if (api?.createDevice) {
+      api.createDevice(data).then((saved) => setDevices((d) => [...d, saved])).catch((e) => setLoadError(e.message));
+    } else {
+      setDevices((d) => [...d, { id: uid(), status: 'unknown', ...data }]);
+    }
     setModal(null);
     setPendingLatLng(null);
   }
 
   function addConnection(data) {
-    const connection = { id: uid(), status: 'unknown', ...data, sourceKind: linkSource.kind, sourceId: linkSource.id };
-    if (api?.createConnection) api.createConnection(connection).then((saved) => setConnections((c) => [...c, saved]));
-    else setConnections((c) => [...c, connection]);
+    const connection = { ...data, sourceKind: linkSource.kind, sourceId: linkSource.id };
+    if (api?.createConnection) {
+      api.createConnection(connection).then((saved) => setConnections((c) => [...c, saved])).catch((e) => setLoadError(e.message));
+    } else {
+      setConnections((c) => [...c, { id: uid(), status: 'unknown', ...connection }]);
+    }
     setModal(null);
     setLinkSource(null);
     setPlaceMode(null);
   }
-
-  // ---- Editing existing items ----
 
   function startEdit(kind, id) {
     setEditing({ kind, id });
@@ -403,9 +490,11 @@ export default function NetworkMap({
   }
 
   function updatePop(id, data) {
-    const updated = { ...pops.find((p) => p.id === id), ...data, id };
-    if (api?.updateNode) api.updateNode('pop', id, updated).then((saved) => setPops((p) => p.map((x) => (x.id === id ? saved : x)))).catch(() => {});
-    else setPops((p) => p.map((x) => (x.id === id ? updated : x)));
+    if (api?.updateNode) {
+      api.updateNode('pop', id, data).then((saved) => setPops((p) => p.map((x) => (x.id === id ? saved : x)))).catch((e) => setLoadError(e.message));
+    } else {
+      setPops((p) => p.map((x) => (x.id === id ? { ...x, ...data, id } : x)));
+    }
     setModal(null);
     setPendingLatLng(null);
     setEditing(null);
@@ -413,9 +502,11 @@ export default function NetworkMap({
   }
 
   function updateDevice(id, data) {
-    const updated = { ...devices.find((d) => d.id === id), ...data, id };
-    if (api?.updateNode) api.updateNode('device', id, updated).then((saved) => setDevices((d) => d.map((x) => (x.id === id ? saved : x)))).catch(() => {});
-    else setDevices((d) => d.map((x) => (x.id === id ? updated : x)));
+    if (api?.updateNode) {
+      api.updateNode('device', id, data).then((saved) => setDevices((d) => d.map((x) => (x.id === id ? saved : x)))).catch((e) => setLoadError(e.message));
+    } else {
+      setDevices((d) => d.map((x) => (x.id === id ? { ...x, ...data, id } : x)));
+    }
     setModal(null);
     setPendingLatLng(null);
     setEditing(null);
@@ -424,9 +515,11 @@ export default function NetworkMap({
 
   function updateConnection(id, data) {
     const existing = connections.find((c) => c.id === id);
-    const updated = { ...existing, ...data, id, sourceKind: existing.sourceKind, sourceId: existing.sourceId };
-    if (api?.updateNode) api.updateNode('connection', id, updated).then((saved) => setConnections((c) => c.map((x) => (x.id === id ? saved : x)))).catch(() => {});
-    else setConnections((c) => c.map((x) => (x.id === id ? updated : x)));
+    if (api?.updateNode) {
+      api.updateNode('connection', id, data).then((saved) => setConnections((c) => c.map((x) => (x.id === id ? saved : x)))).catch((e) => setLoadError(e.message));
+    } else {
+      setConnections((c) => c.map((x) => (x.id === id ? { ...existing, ...data, id, sourceKind: existing.sourceKind, sourceId: existing.sourceId } : x)));
+    }
     setModal(null);
     setLinkSource(null);
     setEditing(null);
@@ -436,7 +529,7 @@ export default function NetworkMap({
   function deleteSelected() {
     if (!selected) return;
     const { kind, id } = selected;
-    if (api?.deleteNode) api.deleteNode(kind, id).catch(() => {});
+    if (api?.deleteNode) api.deleteNode(kind, id).catch((e) => setLoadError(e.message));
     if (kind === 'pop') {
       setPops((p) => p.filter((x) => x.id !== id));
       setConnections((c) => c.filter((x) => !(x.sourceKind === 'pop' && x.sourceId === id) && !(x.targetKind === 'pop' && x.targetId === id)));
@@ -465,9 +558,19 @@ export default function NetworkMap({
       } else {
         await new Promise((r) => setTimeout(r, 900));
       }
+    } catch (e) {
+      setLoadError(e.message);
     } finally {
       setSyncing(false);
     }
+  }
+
+  function handleKmlImported(result) {
+    setDevices((d) => {
+      const existingIds = new Set(d.map((x) => x.id));
+      const fresh = (result.createdDevices || []).filter((x) => !existingIds.has(x.id));
+      return [...d, ...fresh];
+    });
   }
 
   const selectedNode = selected?.kind === 'connection'
@@ -478,7 +581,6 @@ export default function NetworkMap({
 
   return (
     <div className="relative w-full overflow-hidden bg-slate-100 font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-100" style={{ height }}>
-      {/* Minimal overrides for Leaflet's own DOM (can't take className props) */}
       <style>{`
         .leaflet-container { background: #e2e8f0; font-family: inherit; }
         .dark .leaflet-container { background: #0b1220; }
@@ -487,6 +589,20 @@ export default function NetworkMap({
         .dark .leaflet-control-zoom a { background: #101a2c !important; color: #cbd5e1 !important; border-color: rgba(148,163,184,0.15) !important; }
         .dark .leaflet-control-zoom a:hover { background: #16233b !important; color: #5eead4 !important; }
         .leaflet-control-attribution { font-size: 10px; }
+
+        @keyframes nm-pulse {
+          0%   { box-shadow: 0 0 0 0 rgba(22,163,74,0.55); }
+          70%  { box-shadow: 0 0 0 12px rgba(22,163,74,0); }
+          100% { box-shadow: 0 0 0 0 rgba(22,163,74,0); }
+        }
+        .nm-pulse-ring { animation: nm-pulse 2s ease-out infinite; }
+
+        .nm-tooltip { background: rgba(15,23,42,0.92) !important; color: #f8fafc !important; border: none !important;
+          border-radius: 8px !important; padding: 6px 9px !important; font-size: 11px !important; line-height: 1.4 !important;
+          box-shadow: 0 6px 16px rgba(15,23,42,0.3) !important; }
+        .nm-tooltip::before { border-top-color: rgba(15,23,42,0.92) !important; }
+        .nm-tooltip-coords { font-family: ui-monospace, monospace; color: #99f6e4; }
+        .nm-tooltip-type { color: #94a3b8; font-weight: 400; }
       `}</style>
 
       <div ref={mapElRef} className="absolute inset-0" />
@@ -504,7 +620,26 @@ export default function NetworkMap({
           <span className="h-[3px] w-[3px] rounded-full bg-slate-300 dark:bg-slate-600" />
           <span>{connections.length} Links</span>
         </div>
+        {api && accountSubdomain && (
+          <div
+            className={cx(
+              'hidden items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold sm:flex',
+              wsConnected
+                ? 'bg-teal-50 text-teal-600 dark:bg-teal-500/15 dark:text-teal-400'
+                : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
+            )}
+            title={wsConnected ? 'Live updates connected' : 'Live updates offline — reconnecting…'}
+          >
+            {wsConnected ? <WifiIcon size={12} /> : <WifiOff size={12} />}
+            {wsConnected ? 'Live' : 'Offline'}
+          </div>
+        )}
         <div className="ml-auto flex items-center gap-2.5">
+          {api?.importKml && (
+            <button className={BTN} onClick={() => setModal('kml')}>
+              <UploadCloud size={15} /> Import KML
+            </button>
+          )}
           <button className={cx(BTN, syncing && 'border-teal-300 text-teal-600 dark:border-teal-600 dark:text-teal-400')} onClick={handleSync} disabled={syncing}>
             <RefreshCw size={15} className={syncing ? 'animate-spin' : ''} /> Sync
           </button>
@@ -542,7 +677,14 @@ export default function NetworkMap({
         </div>
       </div>
 
-      {placeMode && (
+      {loadError && (
+        <div className="absolute left-1/2 top-[68px] z-[600] flex -translate-x-1/2 items-center gap-2.5 whitespace-nowrap rounded-full border border-red-300 bg-red-50 px-3.5 py-2 text-xs font-medium text-red-700 shadow-md dark:border-red-500/50 dark:bg-red-500/15 dark:text-red-200">
+          {loadError}
+          <button className="border-none bg-transparent text-current opacity-70 hover:opacity-100" onClick={() => setLoadError(null)}><X size={13} /></button>
+        </div>
+      )}
+
+      {placeMode && !loadError && (
         <div
           className={cx(
             'absolute left-1/2 top-[68px] z-[600] flex -translate-x-1/2 items-center gap-2.5 whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-medium shadow-md transition-colors',
@@ -601,7 +743,7 @@ export default function NetworkMap({
             {pops.length === 0 ? (
               <div className="px-1 py-4 text-center text-xs text-slate-400">
                 <p>No network devices yet.</p>
-                <p className="mt-1 text-slate-400">Add a central location (POP) to get started.</p>
+                <p className="mt-1 text-slate-400">Add a central location (POP) to get started, or import one from Google Earth.</p>
               </div>
             ) : (
               <ul className="m-0 list-none p-0">
@@ -657,21 +799,29 @@ export default function NetworkMap({
         )}
       </div>
 
-      {/* Basemap switcher */}
-      <div className={cx(PANEL, 'bottom-6 left-4 flex items-center gap-1.5 p-1.5 text-slate-400')}>
-        <Layers size={13} />
-        {Object.entries(BASEMAPS).map(([k, v]) => (
-          <button
-            key={k}
-            className={cx(
-              'rounded-md border-none bg-transparent px-3 py-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100',
-              basemap === k && 'bg-teal-50 text-teal-600 dark:bg-teal-500/15 dark:text-teal-400'
-            )}
-            onClick={() => setBasemap(k)}
-          >
-            {v.label}
-          </button>
-        ))}
+      {/* Basemap switcher + live cursor coordinates */}
+      <div className="absolute bottom-6 left-4 z-[500] flex items-center gap-2.5">
+        <div className={cx(PANEL, 'static flex items-center gap-1.5 p-1.5 text-slate-400')}>
+          <Layers size={13} />
+          {Object.entries(BASEMAPS).map(([k, v]) => (
+            <button
+              key={k}
+              className={cx(
+                'rounded-md border-none bg-transparent px-3 py-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100',
+                basemap === k && 'bg-teal-50 text-teal-600 dark:bg-teal-500/15 dark:text-teal-400'
+              )}
+              onClick={() => setBasemap(k)}
+            >
+              {v.label}
+            </button>
+          ))}
+        </div>
+        {cursorLatLng && (
+          <div className={cx(PANEL, 'static flex items-center gap-1.5 px-3 py-2 font-mono text-[11px] text-slate-500 dark:text-slate-400')}>
+            <MapPin size={12} className="text-teal-500" />
+            {fmtCoord(cursorLatLng.lat, cursorLatLng.lng)}
+          </div>
+        )}
       </div>
 
       {/* Legend */}
@@ -712,7 +862,7 @@ export default function NetworkMap({
               <h4 className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">Status</h4>
               {Object.entries(STATUS).map(([k, v]) => (
                 <div className="flex items-center gap-2 py-0.5 text-xs text-slate-700 dark:text-slate-200" key={k}>
-                  <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: v.color }} /> {v.label}
+                  <span className={cx('h-2.5 w-2.5 shrink-0 rounded-full', k === 'active' && 'nm-pulse-ring')} style={{ background: v.color }} /> {v.label}
                 </div>
               ))}
             </div>
@@ -747,13 +897,18 @@ export default function NetworkMap({
                   </span>
                 </div>
                 <div className="flex justify-between gap-2.5 text-xs">
-                  <span className="text-slate-400">Location</span>
-                  <span className="font-mono text-slate-800 dark:text-slate-100">{Number(selectedNode.lat).toFixed(6)}, {Number(selectedNode.lng).toFixed(6)}</span>
+                  <span className="text-slate-400">Coordinates</span>
+                  <span className="select-all font-mono text-slate-800 dark:text-slate-100">{fmtCoord(selectedNode.lat, selectedNode.lng)}</span>
                 </div>
                 {selectedNode.address && (
                   <div className="flex justify-between gap-2.5 text-xs">
                     <span className="text-slate-400">Address</span>
                     <span className="font-mono text-slate-800 dark:text-slate-100">{selectedNode.address}</span>
+                  </div>
+                )}
+                {selectedNode.source === 'kml_import' && (
+                  <div className="flex items-center gap-1.5 rounded-md bg-purple-50 px-2 py-1 text-[10.5px] font-medium text-purple-600 dark:bg-purple-500/10 dark:text-purple-300">
+                    <UploadCloud size={11} /> Imported from Google Earth
                   </div>
                 )}
               </>
@@ -839,6 +994,13 @@ export default function NetworkMap({
           onSave={(data) => (editing ? updateConnection(editing.id, data) : addConnection(data))}
         />
       )}
+      {modal === 'kml' && (
+        <KmlImportModal
+          api={api}
+          onCancel={() => setModal(null)}
+          onImported={(result) => { handleKmlImported(result); setModal(null); }}
+        />
+      )}
     </div>
   );
 }
@@ -848,11 +1010,6 @@ export default function NetworkMap({
 /* ------------------------------------------------------------------ */
 
 function ModalShell({ title, subtitle, onCancel, children, wide }) {
-  // BUG FIX: previously the backdrop closed on *any* bubbled click, and
-  // relied only on the modal card calling stopPropagation. That's fragile
-  // (any missed stopPropagation, or a click that starts on the card and
-  // ends on the backdrop, closed the modal unexpectedly). Now the backdrop
-  // only closes when the click's target *is* the backdrop itself.
   return (
     <div
       className="fixed inset-0 z-[2000] flex items-center justify-center bg-slate-900/40 p-6 backdrop-blur-sm dark:bg-black/70"
@@ -1144,20 +1301,73 @@ function ConnectionModal({ source, devices, pops, initial, onCancel, onSave }) {
   );
 }
 
+function KmlImportModal({ api, onCancel, onImported }) {
+  const [file, setFile] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [result, setResult] = useState(null);
+
+  async function submit() {
+    if (!file) { setError('Choose a .kml or .kmz file exported from Google Earth first.'); return; }
+    setBusy(true);
+    setError('');
+    try {
+      const res = await api.importKml(file);
+      setResult(res);
+      onImported(res);
+    } catch (e) {
+      setError(e.message || 'Import failed');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <ModalShell
+      title="Import from Google Earth"
+      subtitle="Export your project as .kml or .kmz (File → Save Place As… in Google Earth Pro), then upload it here. Points become network devices; lines (fiber routes) are listed for manual review since KML doesn't record which two devices they connect."
+      onCancel={onCancel}
+    >
+      <div className="flex flex-col gap-3.5 p-5">
+        <Field label="KML / KMZ File" required error={error}>
+          <input
+            type="file"
+            accept=".kml,.kmz"
+            className={FIELD_INPUT}
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+          />
+        </Field>
+
+        {result && (
+          <div className="flex flex-col gap-1.5 rounded-lg border border-teal-200 bg-teal-50 px-3 py-2.5 text-xs text-teal-700 dark:border-teal-500/30 dark:bg-teal-500/10 dark:text-teal-300">
+            <span className="font-semibold">{result.createdDevices?.length || 0} device(s) imported.</span>
+            {result.skipped?.length > 0 && <span>{result.skipped.length} placemark(s) skipped (no usable coordinates).</span>}
+            {result.unmappedLines?.length > 0 && (
+              <span>{result.unmappedLines.length} line(s) (fiber routes) found — connect them manually with the Link tool.</span>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="flex justify-end gap-2.5 border-t border-slate-100 px-5 py-3.5 dark:border-slate-800">
+        <button className={cx(BTN, BTN_GHOST)} onClick={onCancel}>{result ? 'Close' : 'Cancel'}</button>
+        {!result && (
+          <button className={cx(BTN, BTN_PRIMARY)} onClick={submit} disabled={busy}>
+            <UploadCloud size={14} /> {busy ? 'Importing…' : 'Import'}
+          </button>
+        )}
+      </div>
+    </ModalShell>
+  );
+}
+
 /* ------------------------------------------------------------------ *
- * Expected Rails API shape (pass as the `api` prop):
+ * Rails API: pass createNetworkMapApi({ subdomain }) from
+ * app/javascript/lib/networkMapApi.js as the `api` prop, and your
+ * tenant's subdomain as `accountSubdomain` (needed for live updates):
  *
- * const api = {
- *   fetchAll: () => fetch('/network_map.json').then(r => r.json()),
- *   createPop: (pop) => fetch('/pops', { method: 'POST', ... }).then(r => r.json()),
- *   createDevice: (device) => fetch('/network_devices', { method: 'POST', ... }).then(r => r.json()),
- *   createConnection: (conn) => fetch('/network_connections', { method: 'POST', ... }).then(r => r.json()),
- *   updateNode: (kind, id, data) => fetch(`/${kind}s/${id}`, { method: 'PATCH', body: JSON.stringify(data), ... }).then(r => r.json()),
- *   deleteNode: (kind, id) => fetch(`/${kind}s/${id}`, { method: 'DELETE' }),
- *   syncStatus: () => fetch('/network_map/sync', { method: 'POST' }).then(r => r.json()),
- * };
- *
- * <NetworkMap api={api} routers={mikrotikRouters} />
+ *   import { createNetworkMapApi } from '../lib/networkMapApi';
+ *   const api = createNetworkMapApi({ subdomain: currentAccount.subdomain });
+ *   <NetworkMap api={api} accountSubdomain={currentAccount.subdomain} routers={mikrotikRouters} />
  *
  * Dark mode: this component uses Tailwind's `dark:` variant and is LIGHT
  * by default. Make sure your tailwind.config.js has `darkMode: 'class'`,
