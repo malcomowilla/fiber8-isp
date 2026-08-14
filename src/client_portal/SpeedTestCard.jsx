@@ -26,17 +26,57 @@ function Gauge({ label, value, max, unit, color }) {
   )
 }
 
+/* ─── Verdict: plain-English read of what the numbers mean ─── */
+function getVerdict(downloadMbps, pingMs) {
+  let headline, detail, tone
+
+  if (downloadMbps < 3) {
+    headline = 'Your connection may struggle'
+    detail = 'This speed can be tight for basic browsing and video calls. Streaming video is likely to buffer.'
+    tone = 'critical'
+  } else if (downloadMbps < 10) {
+    headline = 'Your Internet speed is fine for light use'
+    detail = 'Good for browsing, email, and SD video streaming. HD video may buffer on a busy connection.'
+    tone = 'warning'
+  } else if (downloadMbps < 25) {
+    headline = 'Your Internet speed is fine'
+    detail = 'Your Internet connection should be able to handle streaming an HD video. If multiple devices are streaming video at the same time, you may run into some congestion.'
+    tone = 'healthy'
+  } else if (downloadMbps < 100) {
+    headline = 'Your Internet speed is great'
+    detail = 'This comfortably handles multiple HD streams, video calls, and online gaming at the same time, even with several devices connected.'
+    tone = 'healthy'
+  } else {
+    headline = 'Your Internet speed is excellent'
+    detail = '4K streaming, large downloads, and heavy multi-device use should all run smoothly with plenty of headroom to spare.'
+    tone = 'healthy'
+  }
+
+  let latencyNote = null
+  if (pingMs != null) {
+    if (pingMs < 20) latencyNote = 'Latency is excellent — great for online gaming and video calls.'
+    else if (pingMs < 50) latencyNote = 'Latency is good for most online gaming and video calls.'
+    else if (pingMs < 100) latencyNote = 'Latency is a bit high — you may notice some lag in fast-paced online games.'
+    else latencyNote = 'Latency is high, which can cause noticeable lag in video calls and online gaming.'
+  }
+
+  return { headline, detail, latencyNote, tone }
+}
+
 /* ─── Ookla-style result hero (shown once the test finishes) ─── */
-function ResultHero({ result }) {
+function ResultHero({ result, serverLocation }) {
   return (
     <div className="text-center py-6">
       <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-1">Download</p>
-      <div className="flex items-end justify-center gap-2 mb-5">
+      <div className="flex items-end justify-center gap-2 mb-1">
         <span className="text-6xl font-black text-gray-900 tabular-nums leading-none">
           {result.download_mbps.toFixed(1)}
         </span>
         <span className="text-lg font-bold text-gray-400 mb-1.5">Mbps</span>
       </div>
+      <p className="text-xs text-gray-400 mb-4">
+        Latency: {result.ping_ms ?? '—'} ms · Server: {serverLocation}
+      </p>
 
       <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto pt-4 border-t border-gray-100">
         <div>
@@ -50,6 +90,30 @@ function ResultHero({ result }) {
         <div>
           <p className="text-2xl font-extrabold text-gray-800 tabular-nums">{result.jitter_ms ?? '—'}</p>
           <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-0.5">Jitter ms</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─── Verdict card ─── */
+function VerdictCard({ result }) {
+  const { headline, detail, latencyNote, tone } = getVerdict(result.download_mbps, result.ping_ms)
+  const toneStyles = {
+    healthy:  { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', icon: '✓' },
+    warning:  { bg: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-700',   icon: '!' },
+    critical: { bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-700',     icon: '!' },
+  }
+  const s = toneStyles[tone]
+
+  return (
+    <div className={`rounded-xl border p-4 ${s.bg} ${s.border}`}>
+      <div className="flex items-start gap-2.5">
+        <span className={`text-sm font-black ${s.text} mt-0.5`}>{s.icon}</span>
+        <div>
+          <p className={`text-sm font-bold ${s.text}`}>{headline}</p>
+          <p className="text-xs text-gray-600 mt-1 leading-relaxed">{detail}</p>
+          {latencyNote && <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">{latencyNote}</p>}
         </div>
       </div>
     </div>
@@ -85,13 +149,51 @@ function HistorySparkline({ history, planSpeed }) {
   )
 }
 
+/* ─── History list — actual past results, not just the trend line ─── */
+function HistoryList({ history }) {
+  if (!history.length) return null
+
+  const statusDot = {
+    critical: 'bg-red-500',
+    warning:  'bg-amber-500',
+    healthy:  'bg-emerald-500',
+  }
+
+  const fmtDate = (iso) => {
+    const d = new Date(iso)
+    return d.toLocaleDateString('en-KE', { month: 'short', day: 'numeric' }) + ' · ' +
+      d.toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' })
+  }
+
+  return (
+    <div className="mt-3 divide-y divide-gray-100 border border-gray-100 rounded-xl overflow-hidden">
+      {[...history].reverse().map((h) => (
+        <div key={h.id} className="flex items-center justify-between px-3 py-2.5 bg-white">
+          <div className="flex items-center gap-2.5">
+            <span className={`w-2 h-2 rounded-full shrink-0 ${statusDot[h.status] || statusDot.healthy}`} />
+            <span className="text-xs text-gray-500">{fmtDate(h.tested_at)}</span>
+          </div>
+          <div className="flex items-center gap-4 text-xs">
+            <span className="font-semibold text-gray-800 tabular-nums">
+              {h.download_mbps.toFixed(1)} <span className="text-gray-400 font-normal">Mbps</span>
+            </span>
+            {h.percent_of_plan != null && (
+              <span className="text-gray-400 tabular-nums">{Math.round(h.percent_of_plan * 100)}%</span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 const STATUS_COPY = {
   healthy:  { label: 'Performing as expected', color: '#10b981', bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700' },
   warning:  { label: 'Below your plan speed',  color: '#f59e0b', bg: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-700' },
   critical: { label: 'Significantly degraded', color: '#ef4444', bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-700' },
 }
 
-export default function SpeedTestCard({ planSpeed = "50 Mbps" }) {
+export default function SpeedTestCard({ planSpeed = "50 Mbps", serverLocation = "Nairobi" }) {
   const [phase, setPhase] = useState('idle') // idle | ping | download | upload | done | error
   const [live, setLive] = useState({ download: 0, upload: 0, ping: 0, jitter: 0 })
   const [result, setResult] = useState(null)
@@ -256,7 +358,7 @@ export default function SpeedTestCard({ planSpeed = "50 Mbps" }) {
 
       {/* Live gauges while running; result hero once done */}
       {result ? (
-        <ResultHero result={result} />
+        <ResultHero result={result} serverLocation={serverLocation} />
       ) : (
         <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100 py-4 px-2">
           <Gauge label="Download" value={live.download} max={planMax} unit="Mbps" color="#10b981" />
@@ -278,27 +380,31 @@ export default function SpeedTestCard({ planSpeed = "50 Mbps" }) {
         </button>
 
         {result && (
-          <div className={`mt-4 rounded-xl border p-4 ${badge.bg} ${badge.border}`}>
-            <div className="flex items-center justify-between">
-              <span className={`text-sm font-bold ${badge.text}`}>{badge.label}</span>
-              {result.percent_of_plan != null && (
-                <span className={`text-xs font-semibold ${badge.text}`}>
-                  {Math.round(result.percent_of_plan * 100)}% of plan
-                </span>
+          <div className="mt-4 space-y-3">
+            <VerdictCard result={result} />
+
+            <div className={`rounded-xl border p-4 ${badge.bg} ${badge.border}`}>
+              <div className="flex items-center justify-between">
+                <span className={`text-sm font-bold ${badge.text}`}>{badge.label}</span>
+                {result.percent_of_plan != null && (
+                  <span className={`text-xs font-semibold ${badge.text}`}>
+                    {Math.round(result.percent_of_plan * 100)}% of plan
+                  </span>
+                )}
+              </div>
+              {result.status !== 'healthy' && (
+                <button
+                  onClick={reportIssue}
+                  disabled={reportState !== 'idle'}
+                  className="mt-3 w-full py-2 rounded-lg bg-white border border-gray-200 text-gray-700
+                    font-semibold text-xs hover:bg-gray-50 transition disabled:opacity-60"
+                >
+                  {reportState === 'sent' ? '✓ Ticket created — support notified'
+                    : reportState === 'sending' ? 'Reporting…'
+                    : 'Report this issue'}
+                </button>
               )}
             </div>
-            {result.status !== 'healthy' && (
-              <button
-                onClick={reportIssue}
-                disabled={reportState !== 'idle'}
-                className="mt-3 w-full py-2 rounded-lg bg-white border border-gray-200 text-gray-700
-                  font-semibold text-xs hover:bg-gray-50 transition disabled:opacity-60"
-              >
-                {reportState === 'sent' ? '✓ Ticket created — support notified'
-                  : reportState === 'sending' ? 'Reporting…'
-                  : 'Report this issue'}
-              </button>
-            )}
           </div>
         )}
 
@@ -313,6 +419,7 @@ export default function SpeedTestCard({ planSpeed = "50 Mbps" }) {
           <div className="mt-4 pt-4 border-t border-gray-100">
             <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Recent Tests</p>
             <HistorySparkline history={history} planSpeed={planMax} />
+            <HistoryList history={history} />
           </div>
         )}
       </div>
