@@ -24,7 +24,6 @@ import KeyboardArrowUpSharpIcon from '@mui/icons-material/KeyboardArrowUpSharp';
 import KeyboardArrowDownSharpIcon from '@mui/icons-material/KeyboardArrowDownSharp';
 import PaymentsSharpIcon from '@mui/icons-material/PaymentsSharp';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-// React Icons
 import {
   LuUsers,
   LuTicketsPlane,
@@ -62,10 +61,10 @@ import {
 } from '@mui/icons-material';
 import { BsRouter } from "react-icons/bs";
 import { GrTechnology } from "react-icons/gr";
-
 import { FaUsersBetweenLines } from "react-icons/fa6";
 import { Sparkles, Palette,  MapPinned, LogOut, AlertTriangle, LifeBuoy } from 'lucide-react'
 import { LuTv } from "react-icons/lu";
+import { MessageSquareText } from 'lucide-react'
 
 
 const Sidebar = () => {
@@ -275,7 +274,9 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
           icon: <AiOutlineWhatsApp className="w-6 h-6 text-green-500" />,
           label: "WhatsApp",
           path: "/admin/whatsapp"
-        }
+        },
+            { icon: <MessageSquareText className="w-6 h-6 text-teal-400" />, label: "SMS Templates", path: "/admin/hotspot-sms-templates" }
+
       ]
     },
     hotspot: {

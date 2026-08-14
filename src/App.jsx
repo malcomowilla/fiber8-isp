@@ -155,7 +155,7 @@ const HotspotPageDesigner = lazy(() => import("./hotspot_page/HotspotPageDesigne
 const NetworkMap = lazy(() => import("./network/NetworkMap"))
 const TvPlans = lazy(() => import("./hotspot_page/TvPlans"))
 const SupportTickets = lazy(()=> import("./support/SupportTickets"))
-
+const HotspotSmsAutomation = lazy(()=> import("./sms/HotspotSmsAutomation") )
 
 const App = ({client}) => {
 
@@ -764,7 +764,7 @@ hostname.endsWith('.aitechs.co.ke')
             <Route path="/admin/hotspot-promotions" element={<HotspotPromotionalPlans/>}/>
  <Route path="/admin/support-tickets" element={<SupportTickets/>}/>
             
-
+<Route path="/admin/hotspot-sms-templates" element={<HotspotSmsAutomation/>}/>
       
 
 
