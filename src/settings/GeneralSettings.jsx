@@ -962,12 +962,12 @@ const GeneralSettings = ({ children }) => {
                 </AccordionSummary>
                 <AccordionDetails sx={accordionDetailsSx}>
                   <div style={{ display: 'grid', gap: '4px', marginBottom: 16 }}>
-                    <SettingsCheckbox
+                    {/* <SettingsCheckbox
                       label="Customise templates and packages per location"
                       checked={hotspotCustomization.customize_template_and_package_per_location}
                       onChange={handleChangeHotspotCustomization}
                       name="customize_template_and_package_per_location"
-                    />
+                    /> */}
                     <SettingsCheckbox
                       label="Enable auto-login for hotspot users"
                       checked={hotspotCustomization.enable_autologin}
@@ -999,13 +999,13 @@ const GeneralSettings = ({ children }) => {
                     </Grid>
                   )}
 
-                  <SectionLabel>Free trial</SectionLabel>
+                  {/* <SectionLabel>Free trial</SectionLabel>
                   <SettingsCheckbox
                     label="Enable free trial for hotspot users"
                     checked={hotspotCustomization.enable_free_trial}
                     onChange={handleChangeHotspotCustomization}
                     name="enable_free_trial"
-                  />
+                  /> */}
                   {hotspotCustomization.enable_free_trial && (
                     <Grid container spacing={2} sx={{ mt: 0.5 }}>
                       <Grid item xs={12} sm={4}>
@@ -1059,7 +1059,20 @@ const GeneralSettings = ({ children }) => {
                       { name: 'customer_support_email', label: 'Support email', value: customer_support_email, icon: <MdOutlineMailOutline style={{ marginRight: 8, color: 'var(--text-secondary)' }} /> },
                     ].map(f => (
                       <Grid key={f.name} item xs={12} sm={6}>
-                        <TextField {...tf} name={f.name} value={f.value} onChange={handleFormDataChangeForCompany} label={f.label} InputProps={{ startAdornment: f.icon }} />
+                        <TextField {...tf} name={f.name} 
+                        className='myTextField'
+
+
+sx={{                 '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
+                        value={f.value} onChange={handleFormDataChangeForCompany} 
+                        label={f.label} InputProps={{ startAdornment: f.icon }} />
                       </Grid>
                     ))}
 
@@ -1113,7 +1126,7 @@ const GeneralSettings = ({ children }) => {
                   />
 
                   <SettingsCheckbox
-  label="Use FreeRADIUS for this router"
+  label="Use FreeRADIUS"
   description="When disabled, hotspot users/profiles are pushed directly to the MikroTik router — no RADIUS server config needed. Vouchers and packages sync natively instead."
   checked={nasSettingsForm.use_radius}
   onChange={handleChangeNasSettings}
@@ -1124,7 +1137,21 @@ const GeneralSettings = ({ children }) => {
                       <TextField {...tf} label="Alert after (minutes)" onChange={handleChangeNasSettings} name="unreachable_duration_minutes" value={unreachable_duration_minutes} helperText="How long a NAS must be unreachable before triggering an alert" />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <TextField {...tf} label="Notification phone number" onChange={handleChangeNasSettings} name="notification_phone_number" value={notification_phone_number} helperText="Number to receive unreachable alerts" InputProps={{ startAdornment: <FaPhone style={{ marginRight: 8, color: 'var(--text-secondary)' }} /> }} />
+                      <TextField {...tf} label="Notification phone number" onChange={handleChangeNasSettings}
+                       name="notification_phone_number" value={notification_phone_number} 
+                       helperText="Number to receive unreachable alerts" 
+                       className='myTextField'
+
+sx={{
+    '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
+                       InputProps={{ startAdornment: <FaPhone style={{ marginRight: 8, color: 'var(--text-secondary)' }} /> }} />
                     </Grid>
                   </Grid>
 
@@ -1175,6 +1202,18 @@ const GeneralSettings = ({ children }) => {
                     <Grid item xs={12} sm={6}>
                       <TextField
                         {...tf}
+
+sx={{
+                           '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
+
+                        className='myTextField'
                         label="System title"
                         value={formDataGeneralSettings.title || ''}
                         onChange={e => setFormDataGeneralSettings({ ...formDataGeneralSettings, title: e.target.value })}
@@ -1192,8 +1231,21 @@ const GeneralSettings = ({ children }) => {
                           <TextField
                             {...params}
                             label="Timezone"
-                            sx={fieldSx}
-                            InputProps={{ ...params.InputProps, startAdornment: <><InputAdornment position="start"><AccessTimeIcon sx={{ fontSize: 18, color: 'text.secondary' }} /></InputAdornment>{params.InputProps.startAdornment}</> }}
+                            className='myTextField'
+
+sx={{
+                           '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
+
+                        
+                        InputProps={{ ...params.InputProps, startAdornment: <><InputAdornment position="start">
+                              <AccessTimeIcon sx={{ fontSize: 18, color: 'text.secondary' }} /></InputAdornment>{params.InputProps.startAdornment}</> }}
                           />
                         )}
                         renderOption={(props, option) => (
@@ -1209,11 +1261,23 @@ const GeneralSettings = ({ children }) => {
                         {...tf}
                         multiline
                         rows={3}
+                        className='myTextField'
+
+sx={{
+                           '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
                         label="Allowed IP addresses (comma-separated)"
                         value={formDataGeneralSettings.allowed_ips || ''}
                         onChange={e => setFormDataGeneralSettings({ ...formDataGeneralSettings, allowed_ips: e.target.value })}
                         helperText="Only requests from these IPs will be allowed to access the system. Leave blank to allow all."
-                        InputProps={{ startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}><SecurityIcon sx={{ fontSize: 18, color: 'text.secondary' }} /></InputAdornment> }}
+                        InputProps={{ startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}>
+                          <SecurityIcon sx={{ fontSize: 18, color: 'text.secondary' }} /></InputAdornment> }}
                       />
                     </Grid>
                   </Grid>

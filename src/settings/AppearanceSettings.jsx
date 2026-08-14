@@ -362,3 +362,19 @@ const AppearanceSettings = () => {
 };
 
 export default AppearanceSettings;
+
+
+
+
+
+
+
+sx={{
+                           '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
