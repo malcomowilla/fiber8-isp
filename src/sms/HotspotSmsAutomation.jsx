@@ -31,6 +31,11 @@ import {
  *   GET    /api/hotspot_sms_templates            -> { templates: [...] }
  *   PATCH  /api/hotspot_sms_templates/:id         -> { template: {...} }
  *   POST   /api/hotspot_sms_templates             -> { template: {...} }
+ *
+ * NOTE: templates returned by the API carry the real numeric primary key as
+ * `id`, plus `group` ('single' | 'multi') and `kind` ('compact' |
+ * 'notification') derived server-side from `category`. Save/patch calls use
+ * that same `id` directly, so keep frontend and backend ids in lockstep.
  */
 
 const SINGLE_USER_VARIABLES = [
@@ -119,6 +124,15 @@ function interpolate(message, data) {
   return message.replace(/\{(\w+)\}/g, (match, key) =>
     Object.prototype.hasOwnProperty.call(data, key) ? data[key] : match
   )
+}
+
+// Backend always sends `group`/`kind` now, but this keeps the UI resilient
+// if an older API response (or a manually-added row) is missing them —
+// derives them from `category` instead of silently dropping the template.
+function normalizeTemplate(t) {
+  if (t.group) return t
+  const [group, ...rest] = String(t.category || '').split('_')
+  return { ...t, group, kind: rest.join('_') || t.kind }
 }
 
 function TemplateCard({ template, variables, onChange, onPreview }) {
@@ -363,7 +377,7 @@ export default function HotspotSmsAutomation() {
       if (!response.ok) return
       const data = await response.json()
       if (Array.isArray(data.templates) && data.templates.length) {
-        setTemplates(data.templates)
+        setTemplates(data.templates.map(normalizeTemplate))
       }
     } catch {
       // Falls back to the local defaults above if the endpoint isn't reachable yet.
@@ -400,6 +414,16 @@ export default function HotspotSmsAutomation() {
     }
   }
 
+  const handleNewTemplate = () => {
+    // Categories are currently a fixed set seeded server-side (see DEFAULTS
+    // in the controller) — there's no create-arbitrary-template endpoint
+    // yet, so this is a placeholder until that flow is built out.
+    toast('Custom templates are coming soon — for now you can edit the existing ones.', {
+      position: 'top-center',
+      duration: 3000,
+    })
+  }
+
   const singleTemplates = templates.filter((t) => t.group === 'single')
   const multiTemplates = templates.filter((t) => t.group === 'multi')
 
@@ -430,6 +454,7 @@ export default function HotspotSmsAutomation() {
               Variables Guide
             </button>
             <button
+              onClick={handleNewTemplate}
               className="inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-lg
                bg-teal-600 text-white hover:bg-teal-700 transition-colors shadow-sm"
             >
