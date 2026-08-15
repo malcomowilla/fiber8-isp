@@ -1,4 +1,4 @@
-=import { useContext, useCallback, useEffect, useState } from 'react'
+import { useContext, useCallback, useEffect, useState } from 'react'
 import { ApplicationContext } from '../context/ApplicationContext'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useApplicationSettings } from '../settings/ApplicationSettings'
