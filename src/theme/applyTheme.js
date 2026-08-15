@@ -45,7 +45,7 @@ export const DEFAULT_THEME = {
   displayFontItalic: false, // NEW — heading/display text italic
   radius: 'balanced',
   density: 'comfortable',
-  mode: 'system', // light | dark | system
+  mode: 'light', // light | dark | system
 };
 
 const ORG_CACHE_KEY = 'aitechs_appearance_org_cache';

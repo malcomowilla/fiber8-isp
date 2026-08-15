@@ -177,23 +177,9 @@ useCallback(
       clearTimeout(id);
 
       const newData = await response.json()
-      // if (response.status === 403) {
-      //   setopenopenAccessDenied3(true)
-        
-      // }
 
       if (response.status === 401) {
         if (adminFormSettings.enable_2fa_for_admin_passkeys) {
-         
-          // toast.error(
-          //   <div>
-          //     <p className='playwrite-de-grund font-extrabold text-xl'>Session expired please Login Again
-          //       <div> <span className='font-thin flex gap-3'>
-             
-          //         </span></div></p>
-          //   </div>,
-           
-          // );
 
           setSnackbar({
             open: true,
@@ -202,19 +188,7 @@ useCallback(
           })
        
           navigate('/signup2fa_passkey')
-          // setlogoutmessage(true)
-          // localStorage.setItem('logoutMessage', true)
         }else{
-          // toast.error(
-          //   <div>
-          //     <p className='playwrite-de-grund font-extrabold text-xl'>Session expired please Login Again
-          //       <div> <span className='font-thin flex gap-3'>
-             
-          //         </span></div></p>
-          //   </div>,
-           
-          // );
-
 
           setSnackbar({
             open: true,
@@ -222,21 +196,16 @@ useCallback(
             severity: 'error'
           })
            navigate('/signin')
-        // setlogoutmessage(true)
-        // localStorage.setItem('logoutMessage', true)
         }
        
       }
       if (response.ok) {
-        // setSms(newData)
         setSms(newData.filter((my_sms)=> {
           return search.toLowerCase() === '' ? my_sms : my_sms.message.toLowerCase().includes(search)
         }))
-        // console.log('customer data', newData)
       } else {
         if (response.status === 402) {
         setTimeout(() => {
-          // navigate('/license-expired')
           window.location.href='/license-expired'
          }, 1800);
         
@@ -247,7 +216,6 @@ if (response.status === 401) {
     duration: 4000,
   })
    setTimeout(() => {
-          // navigate('/license-expired')
           window.location.href='/signin'
          }, 1900);
 }
@@ -313,14 +281,6 @@ const visibleMessages = useMemo(() => {
                          className='w-8 h-8 cursor-pointer' alt="delete" onClick={handleDeleteOpen}/>
                       )
 
-
-
-
-
-
-
-                      
-                    
                       const statusChip = (status) => {
                         switch(status) {
                           case 'Success':
@@ -408,8 +368,17 @@ const visibleMessages = useMemo(() => {
   ]
 
   return (
-    
-<>
+    // NOTE: CssBaseline moved inside this single, top-level ThemeProvider.
+    // Previously CssBaseline sat OUTSIDE any local ThemeProvider, so it
+    // inherited whatever theme wraps the app higher up (materialuitheme /
+    // a parent provider) instead of `tableTheme`. That let CssBaseline's
+    // global background/text reset disagree with this component's own
+    // isDark logic — e.g. forcing a dark page background even when
+    // `isDark` here was false, or the reverse. Wrapping everything in one
+    // ThemeProvider makes CssBaseline and MaterialTable agree on the same
+    // palette, driven by the same `isDark` (which itself just mirrors
+    // whatever your global applyTheme() put on <html class="dark">).
+    <ThemeProvider theme={tableTheme}>
       <CssBaseline />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans">
         {/* Header Section */}
@@ -511,8 +480,6 @@ const visibleMessages = useMemo(() => {
 
         {/* Messages Table */}
         <div className="rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
-          <ThemeProvider theme={tableTheme}>
-          
           <MaterialTable
           title={<p className='font-semibold text-lg font-sans text-gray-900 dark:text-white'>Messages</p>}
 
@@ -563,7 +530,6 @@ const visibleMessages = useMemo(() => {
                 )
               },
             ]}
-            // data={sms}
             data={visibleMessages} // Sorted + status-filtered
             onRowClick={(event, rowData) => setMessage(rowData)}
            
@@ -602,12 +568,10 @@ options={{
       
             actions={[]}
           />
-          </ThemeProvider>
-          
         </div>
       </div>
 
-  </>
+  </ThemeProvider>
 
   )
 }
