@@ -386,26 +386,27 @@ setHotspotPackage({
   }, [getNodes]);
 
 
-useEffect(() => {
-  
-  const fetchHotspotPackages = async() => {
-    try {
-      setIsSearching(true)
-      const response = await fetch('/api/hotspot_packages', {
-        headers: {
-          'X-Subdomain': subdomain,
-        }
-      })
-      const newData = await response.json()
-
-
-      if (response.status === 402) {
-        setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/license-expired'
-         }, 1800);
-        
+// Pulled out of the old inline useEffect closure so it can also be called
+// from the bulk-sync poll below (bulk_sync_to_mikrotik dispatches an async
+// job — this is how we pick up the real end result afterwards).
+const fetchHotspotPackages = useCallback(async () => {
+  try {
+    setIsSearching(true)
+    const response = await fetch('/api/hotspot_packages', {
+      headers: {
+        'X-Subdomain': subdomain,
       }
+    })
+    const newData = await response.json()
+
+
+    if (response.status === 402) {
+      setTimeout(() => {
+        // navigate('/license-expired')
+        window.location.href='/license-expired'
+       }, 1800);
+      
+    }
 if (response.status === 401) {
   toast.error(<p  className="font-sans">newData.error</p>, {
     position: "top-center",
@@ -416,24 +417,24 @@ if (response.status === 401) {
           window.location.href='/signin'
          }, 1900);
 }
-      if (response.ok) {
+    if (response.ok) {
 
 
 
-        // setPackages(newData)
-        setIsSearching(false)
-        setPackages(newData.filter((package_name)=> {
-          return search.toLowerCase() === '' ? package_name : package_name.name.toLowerCase().includes(search)
-        }))
-      } else {
+      // setPackages(newData)
+      setIsSearching(false)
+      setPackages(newData.filter((package_name)=> {
+        return search.toLowerCase() === '' ? package_name : package_name.name.toLowerCase().includes(search)
+      }))
+    } else {
 
-        if (response.status === 402) {
-        setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/license-expired'
-         }, 1800);
-        
-      }
+      if (response.status === 402) {
+      setTimeout(() => {
+        // navigate('/license-expired')
+        window.location.href='/license-expired'
+       }, 1800);
+      
+    }
 if (response.status === 401) {
   toast.error(newData.error, {
     position: "top-center",
@@ -444,21 +445,23 @@ if (response.status === 401) {
           window.location.href='/signin'
          }, 1900);
 }
-        setIsSearching(false)
-        toast.error(<p  className="font-sans">failed to fetch hotspot packages</p>, {
-          duration: 7000,
-          position: "top-center",
-        });
-      }
-    } catch (error) {
       setIsSearching(false)
-      toast.error(<p className="font-sans">Something went wrong</p>, {
+      toast.error(<p  className="font-sans">failed to fetch hotspot packages</p>, {
         duration: 7000,
         position: "top-center",
       });
-      console.log(error)
     }
+  } catch (error) {
+    setIsSearching(false)
+    toast.error(<p className="font-sans">Something went wrong</p>, {
+      duration: 7000,
+      position: "top-center",
+    });
+    console.log(error)
   }
+}, [search, subdomain]);
+
+useEffect(() => {
   fetchHotspotPackages()
 }, [searchInput]);
 
@@ -610,6 +613,12 @@ const syncPackageToMikrotik = async (id) => {
   }
 };
 
+// bulk_sync_to_mikrotik is async on the backend: it dispatches a background
+// job and immediately returns { message, queued } — NOT a per-package
+// results array. So there's nothing to `.find()` here. We optimistically
+// keep the rows marked "syncing" (the backend already flipped their DB
+// sync_status to 'syncing') and poll fetchHotspotPackages twice to pick up
+// the job's real outcome once it finishes.
 const bulkSyncPackagesToMikrotik = async () => {
   const unsynced = packages.filter(p => p.sync_status !== 'synced').map(p => p.id);
   if (unsynced.length === 0) {
@@ -630,26 +639,36 @@ const bulkSyncPackagesToMikrotik = async () => {
       headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
       body: JSON.stringify({ ids: unsynced, router_name: settingsformData.router_name }),
     });
-    const results = await response.json();
+    const data = await response.json();
+
     if (response.ok) {
-      setPackages(prev => prev.map(p => {
-        const r = results.find(x => x.id === p.id);
-        return r ? { ...p, sync_status: r.sync_status, sync_error: r.sync_error } : p;
-      }));
-      const succeeded = results.filter(r => r.sync_status === 'synced').length;
-      toast.success(<p className="font-sans">Synced {succeeded}/{results.length} packages</p>, { position: 'top-center', duration: 4000 });
+      toast.success(<p className="font-sans">{data.message || `Sync queued for ${data.queued ?? unsynced.length} packages`}</p>, {
+        position: 'top-center',
+        duration: 4000,
+      });
+      // Job runs in the background — poll a couple of times to pick up
+      // the final sync_status/sync_error once it lands.
+      setTimeout(fetchHotspotPackages, 4000);
+      setTimeout(fetchHotspotPackages, 9000);
     } else {
-      toast.error(<p className="font-sans">Bulk sync failed</p>, { position: 'top-center', duration: 4000 });
+      toast.error(<p className="font-sans">{data.error || 'Bulk sync failed'}</p>, { position: 'top-center', duration: 4000 });
+      // Clear the optimistic syncing flags immediately since the job
+      // never got dispatched.
+      setSyncingIds(prev => {
+        const next = { ...prev };
+        unsynced.forEach(id => { delete next[id]; });
+        return next;
+      });
     }
   } catch {
     toast.error(<p className="font-sans">Network error during bulk sync</p>, { position: 'top-center', duration: 4000 });
-  } finally {
-    setBulkSyncing(false);
     setSyncingIds(prev => {
       const next = { ...prev };
       unsynced.forEach(id => { delete next[id]; });
       return next;
     });
+  } finally {
+    setBulkSyncing(false);
   }
 };
 
