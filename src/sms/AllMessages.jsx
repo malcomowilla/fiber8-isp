@@ -1,4 +1,3 @@
-
 import MaterialTable, {MTablePagination} from "material-table";
 import { createTheme, ThemeProvider, CssBaseline, Chip } from '@mui/material';
 import {useApplicationSettings} from '../settings/ApplicationSettings'
@@ -6,6 +5,10 @@ import { Button, Box } from '@mui/material';
 import {useCallback, useEffect, useState} from 'react'
 import AddIcon from '@mui/icons-material/Add';
 import GetAppIcon from '@mui/icons-material/GetApp';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { MdOutlineSupportAgent } from "react-icons/md";
  import {useNavigate} from 'react-router-dom'
  import { ToastContainer, toast,Bounce, Slide, Zoom, } from 'react-toastify';
@@ -15,9 +18,24 @@ import { MdOutlineSupportAgent } from "react-icons/md";
 import { FaPlus } from "react-icons/fa6";
 import { useMemo } from 'react';
 
+// Normalizes the raw `status` string coming back from the SMS provider
+// into one of three buckets the UI cares about. Anything unrecognized
+// falls into 'pending' rather than 'failed' — an unset/unknown status
+// isn't evidence of failure, it usually just means no delivery report
+// has come back yet.
+const getStatusCategory = (status) => {
+  if (status === 'Success') return 'delivered'
+  if (status === 'Sent') return 'pending'
+  if (status === 'failed') return 'failed'
+  return 'pending'
+}
 
-
-
+const STATUS_FILTERS = [
+  { key: 'all', label: 'All' },
+  { key: 'delivered', label: 'Delivered' },
+  { key: 'pending', label: 'Pending' },
+  { key: 'failed', label: 'Failed' },
+]
 
 const AllMessages = () => {
 
@@ -26,6 +44,7 @@ const navigate = useNavigate()
 
 const [search, setSearch] = useState('')
 const [searchInput] = useDebounce(search, 1000)
+const [statusFilter, setStatusFilter] = useState('all')
 
   const [sms, setSms] = useState([])
   const [isOpen, setIsOpen] = useState(false);
@@ -263,6 +282,23 @@ const sortedMessages = [...sms].sort((a, b) => {
   return parseCustomDate(b.date) - parseCustomDate(a.date);
 });
 
+// Search results, sorted, before the status tab/card filter is applied —
+// this is what the stat cards count against, so the numbers always
+// reflect "everything matching your search" regardless of which
+// category is currently selected.
+const statusCounts = useMemo(() => {
+  const counts = { all: sortedMessages.length, delivered: 0, pending: 0, failed: 0 }
+  sortedMessages.forEach((m) => {
+    counts[getStatusCategory(m.status)] += 1
+  })
+  return counts
+}, [sortedMessages])
+
+const visibleMessages = useMemo(() => {
+  if (statusFilter === 'all') return sortedMessages
+  return sortedMessages.filter((m) => getStatusCategory(m.status) === statusFilter)
+}, [sortedMessages, statusFilter])
+
         
 
                 const EditButton = ({rowData}) => (
@@ -322,9 +358,9 @@ const sortedMessages = [...sms].sort((a, b) => {
                           default:
                             return (
                               <Chip 
-                                icon={<FaRegTimesCircle />}
-                                label="Failed"
-                                color="error"
+                                icon={<FaRegCheckCircle />}
+                                label="Pending"
+                                color="warning"
                                 variant="outlined"
                                 size="small"
                               />
@@ -332,84 +368,153 @@ const sortedMessages = [...sms].sort((a, b) => {
                         }
                       };
 
+  const statCards = [
+    {
+      key: 'all',
+      label: 'Total messages',
+      value: statusCounts.all,
+      icon: ChatBubbleOutlineIcon,
+      accent: 'text-teal-600',
+      ring: 'ring-teal-500',
+      iconBg: 'bg-teal-50',
+    },
+    {
+      key: 'delivered',
+      label: 'Delivered',
+      value: statusCounts.delivered,
+      icon: CheckCircleIcon,
+      accent: 'text-emerald-600',
+      ring: 'ring-emerald-500',
+      iconBg: 'bg-emerald-50',
+    },
+    {
+      key: 'pending',
+      label: 'Pending',
+      value: statusCounts.pending,
+      icon: HourglassBottomIcon,
+      accent: 'text-amber-600',
+      ring: 'ring-amber-500',
+      iconBg: 'bg-amber-50',
+    },
+    {
+      key: 'failed',
+      label: 'Failed',
+      value: statusCounts.failed,
+      icon: ErrorOutlineIcon,
+      accent: 'text-rose-600',
+      ring: 'ring-rose-500',
+      iconBg: 'bg-rose-50',
+    },
+  ]
+
   return (
     
 <>
       <CssBaseline />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
-            <h1 className="text-3xl font-bold dark:text-white ">Message Center</h1>
-            <p className="mt-2 dark:text-white text-gray-500">Manage all your SMS communications</p>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Message Center</h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Track every SMS your platform has sent, and which ones need a resend.
+            </p>
           </div>
-          
-          <div className="flex gap-3 w-full md:w-auto">
-            {/* <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setIsOpen(true)}
-              sx={{
-                bgcolor: 'primary.main',
-                '&:hover': { bgcolor: 'primary.dark' },
-                textTransform: 'none',
-                fontWeight: 600,
-              }}
-            >
-              New Message
-            </Button> */}
-             <button className='bg-blue-200 p-3 rounded-lg shadow-sm' onClick={() => navigate('/admin/send-sms')}>
-              <div className='flex items-center gap-2'>
-                    <FaPlus className='text-blue-500' size={20} />
-                    <span className="not-sr-only text-blue-500">New Message</span>
-                    </div>
-                  </button>
-            {/* <Button
-              variant="outlined"
-              startIcon={<GetAppIcon />}
-              sx={{
-                borderColor: 'gray.300',
-                color: 'gray.700',
-                '&:hover': { borderColor: 'gray.400' },
-                textTransform: 'none',
-                fontWeight: 600,
-              }}
-            >
-              Import
-            </Button> */}
 
-             <button className='bg-green-200 p-3 rounded-lg shadow-sm' onClick={() => navigate('/admin/bulk-messages')}>
-              <div className='flex items-center gap-2'>
-                    <FaPlus className='text-green-500' size={20} />
-                    <span className="not-sr-only text-green-500">Bulk Message</span>
-                    </div>
-                  </button>
+          <div className="flex gap-2 w-full md:w-auto">
+            <button
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5
+               rounded-lg bg-teal-600 text-white text-sm font-medium shadow-sm hover:bg-teal-700 transition-colors"
+              onClick={() => navigate('/admin/send-sms')}
+            >
+              <FaPlus size={14} />
+              New message
+            </button>
+            <button
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5
+               rounded-lg border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors
+               dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+              onClick={() => navigate('/admin/bulk-messages')}
+            >
+              <FaPlus size={14} className="text-gray-400" />
+              Bulk message
+            </button>
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="mb-8 bg-white rounded-lg shadow-sm p-4">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <LiaSmsSolid className="text-gray-400" size={20} />
+        {/* Stat cards — click to filter the table below */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          {statCards.map(({ key, label, value, icon: Icon, accent, ring, iconBg }) => {
+            const active = statusFilter === key
+            return (
+              <button
+                key={key}
+                onClick={() => setStatusFilter(key)}
+                className={`text-left rounded-xl border bg-white dark:bg-[#1e1e1e] px-4 py-4 transition-all
+                 ${active
+                   ? `border-transparent ring-2 ${ring} shadow-sm`
+                   : 'border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700'}`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                    {label}
+                  </span>
+                  <span className={`h-8 w-8 rounded-lg ${iconBg} flex items-center justify-center shrink-0`}>
+                    <Icon className={accent} sx={{ fontSize: 18 }} />
+                  </span>
+                </div>
+                <p className={`mt-2 text-2xl font-semibold ${active ? accent : 'text-gray-900 dark:text-white'}`}>
+                  {value}
+                </p>
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Search + status tabs */}
+        <div className="mb-6 bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 p-4">
+          <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+            <div className="relative flex-1 max-w-md">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <LiaSmsSolid className="text-gray-400" size={18} />
+              </div>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="block w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg
+                 bg-gray-50 dark:bg-gray-900 dark:text-white text-sm
+                 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors"
+                placeholder="Search messages..."
+              />
             </div>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg
-               bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Search messages..."
-            />
+
+            <div className="flex gap-1.5 flex-wrap">
+              {STATUS_FILTERS.map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setStatusFilter(key)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors
+                   ${statusFilter === key
+                     ? 'bg-teal-600 text-white'
+                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'}`}
+                >
+                  {label}
+                  {key !== 'all' && (
+                    <span className="ml-1.5 opacity-70">{statusCounts[key]}</span>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Messages Table */}
-        <div className="bg-white rounded-xl shadow overflow-hidden">
+        <div className="rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
           <ThemeProvider theme={tableTheme}>
           
           <MaterialTable
-          title={<p className=' font-bold text-xl font-sans'>Messages</p>}
+          title={<p className='font-semibold text-lg font-sans text-gray-900 dark:text-white'>Messages</p>}
 
             columns={[
               { 
@@ -452,19 +557,19 @@ const sortedMessages = [...sms].sort((a, b) => {
                 field: "system_user",
                 render: (rowData) => (
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <MdOutlineSupportAgent className="text-indigo-600" />
+                    <MdOutlineSupportAgent className="text-teal-600" />
                     <span className="dark:text-white ">{rowData.system_user}</span>
                   </Box>
                 )
               },
             ]}
             // data={sms}
-            data={sortedMessages} // Using the sorted array
+            data={visibleMessages} // Sorted + status-filtered
             onRowClick={(event, rowData) => setMessage(rowData)}
            
 options={{
       sorting: true,
-      pageSizeOptions: [2, 5, 10, 20],
+      pageSizeOptions: [10, 20, 50],
       pageSize: 20,
       paginationPosition: 'bottom',
       exportButton: true,
@@ -477,67 +582,28 @@ options={{
       emptyRowsWhenPaging: false,
       actionsColumnIndex: -1,
       headerStyle: {
-        fontFamily: 'monospace',
+        fontFamily: 'inherit',
         textTransform: 'uppercase',
-        fontWeight: 700,
-        fontSize: '12px',
-        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
-        color: isDark ? '#f1f1f1' : '#1a1a1a',
-        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+        fontWeight: 600,
+        fontSize: '11px',
+        letterSpacing: '0.03em',
+        backgroundColor: isDark ? '#242424' : '#f0fdfa',
+        color: isDark ? '#e5e5e5' : '#0f766e',
+        borderBottom: isDark ? '1px solid #333' : '1px solid #ccfbf1',
       },
       rowStyle: (rowData, index) => ({
         backgroundColor: isDark
-          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
-          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+          ? (index % 2 === 0 ? '#1e1e1e' : '#242424')
+          : (index % 2 === 0 ? '#ffffff' : '#fafafa'),
         color: isDark ? '#f1f1f1' : '#1a1a1a',
-        fontFamily: 'monospace',
+        fontFamily: 'inherit',
       }),
     }}
       
-            actions={[
-              {
-                icon: () => (
-                  <Button 
-                    variant="contained" 
-                    startIcon={<AddIcon />}
-                    onClick={() => setIsOpen(true)}
-                    sx={{
-                      bgcolor: 'primary.main',
-                      '&:hover': { bgcolor: 'primary.dark' },
-                      textTransform: 'none',
-                      fontWeight: 600,
-                    }}
-                  >
-                    New Message
-                  </Button>
-                ),
-                isFreeAction: true,
-                position: 'toolbar'
-              }
-            ]}
+            actions={[]}
           />
           </ThemeProvider>
           
-        </div>
-
-        {/* Stats Footer */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-indigo-50 p-4 rounded-lg">
-            <h3 className="text-indigo-800 font-medium">Total Messages</h3>
-            <p className="text-3xl font-bold text-indigo-600 mt-2">{sms.length}</p>
-          </div>
-          <div className="bg-green-50 p-4 rounded-lg">
-            <h3 className="text-green-800 font-medium">Delivered</h3>
-            <p className="text-3xl font-bold text-green-600 mt-2">
-              {sms.filter(m => m.status === 'Success').length}
-            </p>
-          </div>
-          <div className="bg-amber-50 p-4 rounded-lg">
-            <h3 className="text-amber-800 font-medium">Pending</h3>
-            <p className="text-3xl font-bold text-amber-600 mt-2">
-              {sms.filter(m => !m.status || m.status === 'Pending').length}
-            </p>
-          </div>
         </div>
       </div>
 
@@ -547,7 +613,3 @@ options={{
 }
 
 export default AllMessages
-
-
-
-
