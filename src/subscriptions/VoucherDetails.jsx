@@ -1,11 +1,17 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Dialog from "@mui/material/Dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   X, Wifi, Clock, Gauge, Users, Phone, LogIn,
   CreditCard, Hash, Banknote, User, Calendar, LogOut, Loader2,
 } from "lucide-react";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+
+
+
+
 
 const statusStyles = {
   active: "bg-emerald-50 text-emerald-600 ring-emerald-200",
@@ -33,7 +39,51 @@ function VoucherDetails({
 }) {
   const [confirmLogout, setConfirmLogout] = useState(false);
 
+
+
+  function useIsDarkMode() {
+    const [isDark, setIsDark] = useState(
+      () => typeof document !== 'undefined' &&
+        document.documentElement.classList.contains('dark')
+    );
+  
+    useEffect(() => {
+      const root = document.documentElement;
+  
+      const update = () => setIsDark(root.classList.contains('dark'));
+      update();
+  
+      const observer = new MutationObserver(update);
+      observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+  
+      return () => observer.disconnect();
+    }, []);
+  
+    return isDark;
+  }
+  
+  
+  
+  
+  const isDark = useIsDarkMode();
+  
+  const tableTheme = useMemo(() => createTheme({
+    palette: {
+      mode: isDark ? 'dark' : 'light',
+      background: {
+        paper: isDark ? '#1e1e1e' : '#ffffff',
+        default: isDark ? '#1e1e1e' : '#ffffff',
+      },
+      text: {
+        primary: isDark ? '#f1f1f1' : '#1a1a1a',
+        secondary: isDark ? '#a3a3a3' : '#6b7280',
+      },
+    },
+  }), [isDark]);
+  
+
   return (
+     <ThemeProvider theme={tableTheme}>
     <Dialog
       open={openVoucherDetails}
       onClose={handleCloseVoucherDetails}
@@ -142,6 +192,7 @@ function VoucherDetails({
         </div>
       </div>
     </Dialog>
+    </ThemeProvider>
   );
 }
 

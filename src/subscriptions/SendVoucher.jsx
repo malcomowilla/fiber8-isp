@@ -1,13 +1,73 @@
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { FiSend, FiX, FiPhone } from 'react-icons/fi';
 import { HiOutlineWifi } from 'react-icons/hi2';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+
+
+
+
 
 const SendVoucher = ({ open, setOpen, voucher, useLimit, expiration }) => {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
+
+
+
+
+
+
+
+
+
+  function useIsDarkMode() {
+    const [isDark, setIsDark] = useState(
+      () => typeof document !== 'undefined' &&
+        document.documentElement.classList.contains('dark')
+    );
+  
+    useEffect(() => {
+      const root = document.documentElement;
+  
+      const update = () => setIsDark(root.classList.contains('dark'));
+      update();
+  
+      const observer = new MutationObserver(update);
+      observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+  
+      return () => observer.disconnect();
+    }, []);
+  
+    return isDark;
+  }
+  
+  
+  
+  
+  const isDark = useIsDarkMode();
+  
+  const tableTheme = useMemo(() => createTheme({
+    palette: {
+      mode: isDark ? 'dark' : 'light',
+      background: {
+        paper: isDark ? '#1e1e1e' : '#ffffff',
+        default: isDark ? '#1e1e1e' : '#ffffff',
+      },
+      text: {
+        primary: isDark ? '#f1f1f1' : '#1a1a1a',
+        secondary: isDark ? '#a3a3a3' : '#6b7280',
+      },
+    },
+  }), [isDark]);
+  
+
+
+
+
+
 
   const handleClose = () => {
     if (loading) return;
@@ -70,6 +130,7 @@ const SendVoucher = ({ open, setOpen, voucher, useLimit, expiration }) => {
   return (
     <div>
       <Toaster />
+       <ThemeProvider theme={tableTheme}>
       <Modal
         open={open}
         onClose={handleClose}
@@ -168,6 +229,7 @@ const SendVoucher = ({ open, setOpen, voucher, useLimit, expiration }) => {
           </div>
         </Box>
       </Modal>
+      </ThemeProvider>
     </div>
   );
 };

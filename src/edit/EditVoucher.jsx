@@ -1,11 +1,16 @@
 import * as React from "react";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import { Autocomplete } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Wifi, Users, Loader2, Plus } from "lucide-react";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+
+
+
 
 const textFieldSx = {
   "& .MuiOutlinedInput-root": {
@@ -49,7 +54,54 @@ function EditVoucher({
     fetchHotspotPackages();
   }, [fetchHotspotPackages]);
 
+
+
+
+
+
+
+      function useIsDarkMode() {
+        const [isDark, setIsDark] = useState(
+          () => typeof document !== 'undefined' &&
+            document.documentElement.classList.contains('dark')
+        );
+      
+        useEffect(() => {
+          const root = document.documentElement;
+      
+          const update = () => setIsDark(root.classList.contains('dark'));
+          update();
+      
+          const observer = new MutationObserver(update);
+          observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+      
+          return () => observer.disconnect();
+        }, []);
+      
+        return isDark;
+      }
+      
+      
+      
+      
+      const isDark = useIsDarkMode();
+      
+      const tableTheme = useMemo(() => createTheme({
+        palette: {
+          mode: isDark ? 'dark' : 'light',
+          background: {
+            paper: isDark ? '#1e1e1e' : '#ffffff',
+            default: isDark ? '#1e1e1e' : '#ffffff',
+          },
+          text: {
+            primary: isDark ? '#f1f1f1' : '#1a1a1a',
+            secondary: isDark ? '#a3a3a3' : '#6b7280',
+          },
+        },
+      }), [isDark]);
+
   return (
+    <ThemeProvider theme={tableTheme}>
     <Dialog
       open={open}
       onClose={loading ? undefined : handleClose}
@@ -168,6 +220,7 @@ function EditVoucher({
         </div>
       </form>
     </Dialog>
+    </ThemeProvider>
   );
 }
 
