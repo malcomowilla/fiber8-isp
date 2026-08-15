@@ -64,7 +64,6 @@ const [search, setSearch] = useState('')
 const [searchInput] = useDebounce(search, 1000)
 const [isSearching, setIsSearching] = useState(false); // New state for search loading
 
-// Per-row "syncing" flags, keyed by package id, and a flag for the
 // bulk-sync button — these drive the spinner / disabled states.
 const [syncingIds, setSyncingIds] = useState({});
 const [bulkSyncing, setBulkSyncing] = useState(false);
