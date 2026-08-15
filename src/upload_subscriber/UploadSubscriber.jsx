@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createConsumer } from '@rails/actioncable';
@@ -11,6 +10,16 @@ import {
 
 const SUBDOMAIN = window.location.hostname.split('.')[0];
 const H = { 'X-Subdomain': SUBDOMAIN };
+
+// Built once, module-level, and matches the wss://<host>/cable pattern used
+// everywhere else in this codebase (see HotspotSubscriptions.jsx). The old
+// relative `createConsumer('/cable')` is what was actually causing the
+// frontend to sit at "Processing… 1%" forever: on a subdomain-based
+// multi-tenant setup, a bare relative path can resolve against the wrong
+// origin/protocol, so the WebSocket subscription silently never connects —
+// the import job runs and finishes fine server-side, the browser just never
+// hears about it. Explicit wss://hostname/cable is what actually works.
+const cable = createConsumer(`wss://${window.location.hostname}/cable`);
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 const csrf = () => document.querySelector('meta[name="csrf-token"]')?.content || '';
@@ -38,7 +47,6 @@ export function SubscriberImportButton({ onImportComplete }) {
 
   // ── ActionCable subscription ─────────────────────────────────────────────
   const subscribeToJob = useCallback((id) => {
-    const cable = createConsumer('/cable');
     const sub = cable.subscriptions.create(
       { channel: 'ImportProgressChannel', job_id: id, subdomain: SUBDOMAIN },
       {
@@ -81,6 +89,9 @@ export function SubscriberImportButton({ onImportComplete }) {
   useEffect(() => () => subscription?.unsubscribe(), [subscription]);
 
   // ── Reset ────────────────────────────────────────────────────────────────
+  // Only ever called explicitly (the "Import another file" button) — never
+  // automatically on close, since closing should NOT kill an in-flight
+  // import or its subscription (see handleClose below).
   const reset = () => {
     setFile(null);
     setImporting(false);
@@ -93,7 +104,14 @@ export function SubscriberImportButton({ onImportComplete }) {
     setSubscription(null);
   };
 
-  const handleClose = () => { if (!importing) { reset(); setOpen(false); } };
+  // Closing just hides the modal. It does NOT reset state or unsubscribe —
+  // the import (and our ActionCable subscription) keep running in the
+  // background, so progress keeps updating even while the modal is hidden,
+  // and reopening it shows exactly where things are. onImportComplete still
+  // fires normally when the job finishes, whether or not the modal is open.
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   // ── File pick ────────────────────────────────────────────────────────────
   const handleFile = (f) => {
@@ -167,13 +185,23 @@ export function SubscriberImportButton({ onImportComplete }) {
 
   return (
     <>
-      {/* Trigger button */}
+      {/* Trigger button — shows a small live badge while an import is
+          running in the background, even if the modal has been closed. */}
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200
+        className="relative flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200
           text-slate-700 text-sm font-semibold shadow-sm hover:bg-slate-50 transition-colors">
-        <Upload size={15} className="text-slate-500" />
+        {importing ? (
+          <Loader2 size={15} className="text-violet-500 animate-spin" />
+        ) : (
+          <Upload size={15} className="text-slate-500" />
+        )}
         Import Subscribers
+        {importing && !open && (
+          <span className="ml-1 text-[10px] font-bold text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded-full">
+            {Math.round(progress?.pct || 0)}%
+          </span>
+        )}
       </button>
 
       {/* Modal */}
@@ -199,9 +227,11 @@ export function SubscriberImportButton({ onImportComplete }) {
                     <p className="text-xs text-slate-400">CSV or Excel · max 5 000 rows</p>
                   </div>
                 </div>
-                <button onClick={handleClose} disabled={importing}
+                {/* Always closeable now — closing hides the modal only,
+                    it does not cancel the import. */}
+                <button onClick={handleClose}
                   className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400
-                    hover:bg-slate-100 hover:text-slate-600 transition-colors disabled:opacity-40">
+                    hover:bg-slate-100 hover:text-slate-600 transition-colors">
                   <X size={15} />
                 </button>
               </div>
@@ -439,10 +469,16 @@ export function SubscriberImportButton({ onImportComplete }) {
                     </button>
                   </>
                 ) : importing ? (
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <Loader2 size={14} className="animate-spin text-violet-500" />
-                    Import running — do not close this window
-                  </div>
+                  <>
+                    <span className="flex items-center gap-2 text-sm text-slate-500">
+                      <Loader2 size={14} className="animate-spin text-violet-500" />
+                      Import running in background
+                    </span>
+                    <button onClick={handleClose}
+                      className="px-5 py-2 rounded-xl bg-slate-800 text-white text-sm font-semibold hover:bg-slate-700 transition-colors">
+                      Close
+                    </button>
+                  </>
                 ) : (
                   <>
                     <button onClick={handleClose}
