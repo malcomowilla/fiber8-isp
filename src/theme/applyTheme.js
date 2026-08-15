@@ -1,4 +1,4 @@
-// src/theme/applyTheme.js
+import { NEW_COLORS } from './colorPalette';
 
 export const FONT_LIBRARY = {
   inter:        { label: 'Inter',            google: 'Inter:wght@400;500;600;700;800',            stack: "'Inter', sans-serif",            vibe: 'Clean & neutral' },
@@ -21,8 +21,8 @@ export const FONT_LIBRARY = {
   plexMono:     { label: 'IBM Plex Mono',     google: 'IBM+Plex+Mono:wght@400;500;600;700',           stack: "'IBM Plex Mono', monospace",       vibe: 'Technical & monospaced' },
 };
 
+import { NEW_COLORS } from './colorPalette';
 
-// 
 export const COLOR_PRESETS = [
   { id: 'teal',    label: 'Teal (default)', hsl: '173 80% 24%' },
   { id: 'blue',    label: 'Ocean Blue',     hsl: '217 91% 40%' },
@@ -32,8 +32,8 @@ export const COLOR_PRESETS = [
   { id: 'rose',    label: 'Rose',           hsl: '347 77% 45%' },
   { id: 'amber',   label: 'Amber',          hsl: '38 92% 40%' },
   { id: 'slate',   label: 'Slate',          hsl: '215 25% 27%' },
+  ...NEW_COLORS.map(({ id, label, hsl }) => ({ id, label, hsl })), // drop hex, keep shape consistent
 ];
-
 export const RADIUS_PRESETS = { sharp: '4px', balanced: '10px', round: '18px' };
 export const DENSITY_PRESETS = { compact: '0.92', comfortable: '1', spacious: '1.08' };
 

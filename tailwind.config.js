@@ -36,12 +36,6 @@ export default {
         flexGrow: {
           10: '10'
         },
-
-        fontFamily: {
-  sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-  display: ['var(--font-display)', 'var(--font-sans)', 'sans-serif'],
-},
-
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
@@ -66,7 +60,32 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+
+        // ── new brand palette ──────────────────────────────────────────
+        // reads from CSS vars set by applyNewColorVars() in colorPalette.js,
+        // same pattern as primary/secondary/etc above. Use bg-amberOrange,
+        // text-navyBlue, border-paleCyan/50 (alpha modifiers work too).
+        amberOrange:    "hsl(var(--color-amberOrange) / <alpha-value>)",
+        paleYellow:     "hsl(var(--color-paleYellow) / <alpha-value>)",
+        deepForestTeal: "hsl(var(--color-deepForestTeal) / <alpha-value>)",
+        brightCyan:     "hsl(var(--color-brightCyan) / <alpha-value>)",
+        paleCyan:       "hsl(var(--color-paleCyan) / <alpha-value>)",
+        deepTeal:       "hsl(var(--color-deepTeal) / <alpha-value>)",
+        navyBlue:       "hsl(var(--color-navyBlue) / <alpha-value>)",
+        paleBlue:       "hsl(var(--color-paleBlue) / <alpha-value>)",
+        lightOrange:    "hsl(var(--color-lightOrange) / <alpha-value>)",
+        orange:         "hsl(var(--color-orange) / <alpha-value>)",
+        offWhite:       "hsl(var(--color-offWhite) / <alpha-value>)",
+        darkRed:        "hsl(var(--color-darkRed) / <alpha-value>)",
       },
+
+      // moved out of `colors` — this was nested incorrectly before and
+      // wouldn't have applied as font config
+      fontFamily: {
+        sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'var(--font-sans)', 'sans-serif'],
+      },
+
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
@@ -88,17 +107,10 @@ export default {
       },
     },
   },
-  // plugins: [
-  //   require("tailwindcss-animate"),
-  //   require('flowbite/plugin'),
-  //   require('@shrutibalasa/tailwind-grid-auto-fit'),
-
-  // ],
-
 
   plugins: [
     tailwindcssAnimate,
     flowbitePlugin,
     tailwindGridAutoFit,
   ],
-}
+};
