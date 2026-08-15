@@ -685,6 +685,19 @@ const syncVoucherToMikrotik = async (id) => {
   }
 };
 
+// bulk_sync_to_mikrotik may answer two different ways depending on how the
+// backend implements it: synchronously with an array of per-voucher
+// results, OR (like the hotspot_packages bulk endpoint) by dispatching an
+// async background job and immediately returning a plain
+// { message, queued } object. Blindly calling `.find()` on the response
+// assumes the first shape — if the backend actually does the second, that
+// throws inside a setVouchers(prev => prev.map(...)) updater. React runs
+// that updater during its own reconciliation, OUTSIDE this function's
+// try/catch, so the error is never caught here: it becomes an unhandled
+// exception that stops all further rendering (white screen), and every
+// row that was optimistically marked "syncing" stays stuck that way
+// forever since the `finally` block that would have cleared it never runs.
+// Handling both shapes explicitly avoids that entirely.
 const bulkSyncVouchersToMikrotik = async () => {
   const unsynced = vouchers.filter(v => v.sync_status !== 'synced').map(v => v.id);
   if (unsynced.length === 0) {
@@ -703,26 +716,60 @@ const bulkSyncVouchersToMikrotik = async () => {
       headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
       body: JSON.stringify({ ids: unsynced, router_name: settingsformData.router_name }),
     });
-    const results = await response.json();
+    const data = await response.json();
+
     if (response.ok) {
-      setVouchers(prev => prev.map(v => {
-        const r = results.find(x => x.id === v.id);
-        return r ? { ...v, sync_status: r.sync_status, sync_error: r.sync_error } : v;
-      }));
-      const succeeded = results.filter(r => r.sync_status === 'synced').length;
-      toast.success(`Synced ${succeeded}/${results.length} vouchers`, { position: 'top-center', duration: 4000 });
+      if (Array.isArray(data)) {
+        // Synchronous per-voucher results came back — original behaviour.
+        setVouchers(prev => prev.map(v => {
+          const r = data.find(x => x.id === v.id);
+          return r ? { ...v, sync_status: r.sync_status, sync_error: r.sync_error } : v;
+        }));
+        const succeeded = data.filter(r => r.sync_status === 'synced').length;
+        toast.success(`Synced ${succeeded}/${data.length} vouchers`, { position: 'top-center', duration: 4000 });
+        setSyncingIds(prev => {
+          const next = { ...prev };
+          unsynced.forEach(id => { delete next[id]; });
+          return next;
+        });
+      } else {
+        // Async job dispatched — nothing to read synchronously yet. Poll
+        // getHotspotVouchers to pick up real sync_status once it lands,
+        // and reconcile the syncing flags there (see getHotspotVouchers).
+        toast.success(data.message || `Sync queued for ${data.queued ?? unsynced.length} vouchers`, {
+          position: 'top-center',
+          duration: 4000,
+        });
+        setTimeout(getHotspotVouchers, 4000);
+        setTimeout(getHotspotVouchers, 9000);
+        setTimeout(getHotspotVouchers, 16000);
+        // Safety valve: force-clear any flags still stuck after 20s so a
+        // row can never spin forever even if the job silently stalls.
+        setTimeout(() => {
+          setSyncingIds(prev => {
+            const next = { ...prev };
+            unsynced.forEach(id => { delete next[id]; });
+            return next;
+          });
+        }, 20000);
+      }
     } else {
-      toast.error('Bulk sync failed', { position: 'top-center', duration: 4000 });
+      toast.error(data.error || 'Bulk sync failed', { position: 'top-center', duration: 4000 });
+      setSyncingIds(prev => {
+        const next = { ...prev };
+        unsynced.forEach(id => { delete next[id]; });
+        return next;
+      });
     }
   } catch {
     toast.error('Network error during bulk sync', { position: 'top-center', duration: 4000 });
-  } finally {
-    setBulkSyncing(false);
     setSyncingIds(prev => {
       const next = { ...prev };
       unsynced.forEach(id => { delete next[id]; });
       return next;
     });
+  } finally {
+    setBulkSyncing(false);
   }
 };
 
@@ -815,8 +862,7 @@ const getHotspotVouchers = useCallback(
       if (response.ok) {
         setIsSearching(false)
         setIsSpinning(false)
-        setVouchers(newData)
-        setVouchers(newData.filter((voucher)=> {
+        const filtered = newData.filter((voucher)=> {
           return search.trim() === ''
   ? voucher
   : (
@@ -826,7 +872,24 @@ const getHotspotVouchers = useCallback(
       voucher.status?.toLowerCase().includes(search.toLowerCase())
     )
 
-        }))
+        })
+        setVouchers(filtered)
+        // Reconcile optimistic "syncing" flags against the real
+        // sync_status this fetch just returned — without this a row can
+        // stay stuck showing "Syncing…" forever once a bulk job finishes,
+        // since syncingIds is otherwise only cleared on the request's own
+        // success/error path (see bulkSyncVouchersToMikrotik).
+        setSyncingIds(prev => {
+          let changed = false
+          const next = { ...prev }
+          filtered.forEach(v => {
+            if (next[v.id] && v.sync_status !== 'syncing') {
+              delete next[v.id]
+              changed = true
+            }
+          })
+          return changed ? next : prev
+        })
 
 
         

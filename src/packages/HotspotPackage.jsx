@@ -64,6 +64,7 @@ const [search, setSearch] = useState('')
 const [searchInput] = useDebounce(search, 1000)
 const [isSearching, setIsSearching] = useState(false); // New state for search loading
 
+// Per-row "syncing" flags, keyed by package id, and a flag for the
 // bulk-sync button — these drive the spinner / disabled states.
 const [syncingIds, setSyncingIds] = useState({});
 const [bulkSyncing, setBulkSyncing] = useState(false);
@@ -422,9 +423,25 @@ if (response.status === 401) {
 
       // setPackages(newData)
       setIsSearching(false)
-      setPackages(newData.filter((package_name)=> {
+      const filtered = newData.filter((package_name)=> {
         return search.toLowerCase() === '' ? package_name : package_name.name.toLowerCase().includes(search)
-      }))
+      })
+      setPackages(filtered)
+      // Reconcile the optimistic "syncing" flags against the real
+      // sync_status the backend just returned. Without this, a row stays
+      // stuck showing "Syncing…" forever once the bulk job finishes,
+      // because syncingIds was only ever cleared on the error path.
+      setSyncingIds(prev => {
+        let changed = false
+        const next = { ...prev }
+        filtered.forEach(pkg => {
+          if (next[pkg.id] && pkg.sync_status !== 'syncing') {
+            delete next[pkg.id]
+            changed = true
+          }
+        })
+        return changed ? next : prev
+      })
     } else {
 
       if (response.status === 402) {
@@ -645,10 +662,23 @@ const bulkSyncPackagesToMikrotik = async () => {
         position: 'top-center',
         duration: 4000,
       });
-      // Job runs in the background — poll a couple of times to pick up
-      // the final sync_status/sync_error once it lands.
+      // Job runs in the background — poll a few times to pick up the
+      // final sync_status/sync_error once it lands.
       setTimeout(fetchHotspotPackages, 4000);
       setTimeout(fetchHotspotPackages, 9000);
+      setTimeout(fetchHotspotPackages, 16000);
+      // Safety valve: if a job silently stalls and never flips sync_status
+      // away from 'syncing', force-clear the optimistic flags after 20s so
+      // the row doesn't spin forever — it'll just fall back to whatever
+      // sync_status is actually in the DB (which fetchHotspotPackages above
+      // already refreshed).
+      setTimeout(() => {
+        setSyncingIds(prev => {
+          const next = { ...prev }
+          unsynced.forEach(id => { delete next[id] })
+          return next
+        })
+      }, 20000);
     } else {
       toast.error(<p className="font-sans">{data.error || 'Bulk sync failed'}</p>, { position: 'top-center', duration: 4000 });
       // Clear the optimistic syncing flags immediately since the job
