@@ -24,8 +24,8 @@ import {
  * Lives under Communication > Automation.
  * Lets an ISP admin edit the SMS copy sent out automatically when a
  * hotspot voucher/plan is purchased (single device vs multiple devices),
- * toggle each template on/off, and preview it with sample data before
- * it goes live.
+ * or when a voucher expires, toggle each template on/off, and preview it
+ * with sample data before it goes live.
  *
  * Backend contract (see accompanying Rails files):
  *   GET    /api/hotspot_sms_templates            -> { templates: [...] }
@@ -33,9 +33,9 @@ import {
  *   POST   /api/hotspot_sms_templates             -> { template: {...} }
  *
  * NOTE: templates returned by the API carry the real numeric primary key as
- * `id`, plus `group` ('single' | 'multi') and `kind` ('compact' |
- * 'notification') derived server-side from `category`. Save/patch calls use
- * that same `id` directly, so keep frontend and backend ids in lockstep.
+ * `id`, plus `group` ('single' | 'multi' | 'expiration') and `kind`
+ * derived server-side from `category`. Save/patch calls use that same
+ * `id` directly, so keep frontend and backend ids in lockstep.
  */
 
 const SINGLE_USER_VARIABLES = [
@@ -56,6 +56,14 @@ const MULTI_USER_VARIABLES = [
   { token: 'voucher_list', label: 'Formatted list of all vouchers' },
   { token: 'validity', label: 'Validity period' },
   { token: 'price', label: 'Plan price' },
+  { token: 'company_name', label: 'Your company name' },
+]
+
+// NEW — matches HotspotSmsTemplate::EXPIRATION_VARIABLES in the model
+const EXPIRATION_VARIABLES = [
+  { token: 'customer_phone', label: 'Customer phone number' },
+  { token: 'voucher_code', label: 'Voucher code' },
+  { token: 'plan_name', label: 'Hotspot plan name' },
   { token: 'company_name', label: 'Your company name' },
 ]
 
@@ -110,10 +118,21 @@ const DEFAULT_TEMPLATES = [
     active: true,
     message: 'Thank you for your purchase!\nYour Voucher Codes:\n{voucher_list}\nValid for: {validity}',
   },
+  {
+    // NEW — local fallback so the section still renders (with a save
+    // that will fail gracefully) before the first successful fetch.
+    id: 'expiration',
+    category: 'expiration',
+    group: 'expiration',
+    kind: null,
+    title: 'Expiration Reminder',
+    active: true,
+    message: 'Hello, your voucher {voucher_code} has expired. Renew now to stay connected. (FROM: {company_name})',
+  },
 ]
 
+// 'Expiry Reminders' removed — it's now a real section below, not a placeholder.
 const COMING_SOON = [
-  { icon: Clock, label: 'Expiry Reminders' },
   { icon: RefreshCcw, label: 'Renewal Confirmations' },
   { icon: AlertCircle, label: 'Payment Shortfall' },
   { icon: CheckCircle2, label: 'Payment Received' },
@@ -235,7 +254,8 @@ function TemplateCard({ template, variables, onChange, onPreview }) {
 
 function VariablesGuideModal({ onClose }) {
   const [tab, setTab] = useState('single')
-  const variables = tab === 'single' ? SINGLE_USER_VARIABLES : MULTI_USER_VARIABLES
+  const variables =
+    tab === 'single' ? SINGLE_USER_VARIABLES : tab === 'multi' ? MULTI_USER_VARIABLES : EXPIRATION_VARIABLES
 
   return (
     <motion.div
@@ -279,12 +299,20 @@ function VariablesGuideModal({ onClose }) {
           >
             Multi-User Template
           </button>
+          <button
+            onClick={() => setTab('expiration')}
+            className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+              tab === 'expiration' ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            Expiration Template
+          </button>
         </div>
 
         <p className="px-6 pt-3 text-xs text-gray-500">
-          {tab === 'single'
-            ? 'Used when a customer purchases a plan with 1 user/device.'
-            : 'Used when a customer purchases a plan with multiple users/devices.'}
+          {tab === 'single' && 'Used when a customer purchases a plan with 1 user/device.'}
+          {tab === 'multi' && 'Used when a customer purchases a plan with multiple users/devices.'}
+          {tab === 'expiration' && 'Sent automatically when a hotspot voucher expires.'}
         </p>
 
         <div className="px-6 py-4 space-y-2 max-h-72 overflow-y-auto">
@@ -426,6 +454,10 @@ export default function HotspotSmsAutomation() {
 
   const singleTemplates = templates.filter((t) => t.group === 'single')
   const multiTemplates = templates.filter((t) => t.group === 'multi')
+  // NEW — the expiration template previously matched neither filter above
+  // (group derived from 'expiration'.split('_') is just 'expiration'),
+  // so it was fetched but never rendered anywhere.
+  const expirationTemplate = templates.find((t) => t.category === 'expiration' || t.group === 'expiration')
 
   return (
     <div className="min-h-full bg-gray-50/60 font-sans">
@@ -521,6 +553,33 @@ export default function HotspotSmsAutomation() {
             ))}
           </div>
         </section>
+
+        {/* NEW — Voucher expiration */}
+        {expirationTemplate && (
+          <section className="mb-10">
+            <div className="flex items-center gap-2 mb-3">
+              <Clock size={15} className="text-teal-600" />
+              <h2 className="text-sm font-semibold text-gray-800">Voucher Expiration</h2>
+              <span className="text-[11px] text-gray-400">sent when a voucher expires</span>
+            </div>
+            <div className="max-w-md space-y-2">
+              <TemplateCard
+                template={expirationTemplate}
+                variables={EXPIRATION_VARIABLES}
+                onChange={updateTemplate}
+                onPreview={setPreviewing}
+              />
+              <button
+                onClick={() => persistTemplate(expirationTemplate.id)}
+                disabled={saving === expirationTemplate.id}
+                className="w-full text-xs font-medium py-2 rounded-lg border border-teal-200 text-teal-700
+                 hover:bg-teal-50 transition-colors disabled:opacity-50"
+              >
+                {saving === expirationTemplate.id ? 'Saving…' : 'Save changes'}
+              </button>
+            </div>
+          </section>
+        )}
 
         {/* Coming soon */}
         <section>
