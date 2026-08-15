@@ -21,7 +21,6 @@ export const FONT_LIBRARY = {
   plexMono:     { label: 'IBM Plex Mono',     google: 'IBM+Plex+Mono:wght@400;500;600;700',           stack: "'IBM Plex Mono', monospace",       vibe: 'Technical & monospaced' },
 };
 
-import { NEW_COLORS } from './colorPalette';
 
 export const COLOR_PRESETS = [
   { id: 'teal',    label: 'Teal (default)', hsl: '173 80% 24%' },
