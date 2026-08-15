@@ -1,4 +1,4 @@
-import { useContext, useCallback, useEffect, useState } from 'react'
+=import { useContext, useCallback, useEffect, useState } from 'react'
 import { ApplicationContext } from '../context/ApplicationContext'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useApplicationSettings } from '../settings/ApplicationSettings'
@@ -19,10 +19,8 @@ import PaymentIcon from '@mui/icons-material/Payment';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import TextsmsSharpIcon from '@mui/icons-material/TextsmsSharp';
-import WifiSharpIcon from '@mui/icons-material/WifiSharp';
 import KeyboardArrowUpSharpIcon from '@mui/icons-material/KeyboardArrowUpSharp';
 import KeyboardArrowDownSharpIcon from '@mui/icons-material/KeyboardArrowDownSharp';
-import PaymentsSharpIcon from '@mui/icons-material/PaymentsSharp';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import {
   LuUsers,
@@ -50,21 +48,21 @@ import {
   GrLicense,
   TbHomeStats
 } from '../icons'; // Create an icons index file
-import { FaRegMap } from "react-icons/fa";
 import { ImStatsBars } from "react-icons/im";
 import { CiSettings } from "react-icons/ci";
 import { APP_VERSION, APP_DESCRIPTION } from '../version';
-import { CiReceipt } from "react-icons/ci";
 import {
   People as PeopleIcon,
-  
 } from '@mui/icons-material';
 import { BsRouter } from "react-icons/bs";
 import { GrTechnology } from "react-icons/gr";
 import { FaUsersBetweenLines } from "react-icons/fa6";
-import { Sparkles, Palette,  MapPinned, LogOut, AlertTriangle, LifeBuoy } from 'lucide-react'
+import {
+  Sparkles, Palette, MapPinned, LogOut, AlertTriangle, LifeBuoy,
+  MessageSquareText, TrendingUp, UserRound, CircleUserRound, Radar,
+  ShieldCheck, Users as UsersIcon,
+} from 'lucide-react'
 import { LuTv } from "react-icons/lu";
-import { MessageSquareText } from 'lucide-react'
 
 
 const Sidebar = () => {
@@ -80,10 +78,10 @@ const Sidebar = () => {
   const { company_name, logo_preview } = companySettings;
   const location = useLocation();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
-const [loggingOut, setLoggingOut] = useState(false)
-const navigate = useNavigate() // add useNavigate to your react-router-dom import
+  const [loggingOut, setLoggingOut] = useState(false)
+  const navigate = useNavigate()
   const subdomain = window.location.hostname.split('.')[0];
-  
+
   // Use a single state for all expanded menus
   const [expandedMenus, setExpandedMenus] = useState({
     dashboard: false,
@@ -127,6 +125,16 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
     }
   }
 
+  // Small helper so every leaf icon renders inside a consistent,
+  // softly-tinted chip — replaces the old mix of bare icons / raw
+  // gifs with one visual language sidebar-wide.
+  const IconChip = ({ children, tint = 'text-teal-200' }) => (
+    <span className={`flex items-center justify-center w-7 h-7 rounded-lg
+      bg-white/5 group-hover:bg-white/10 transition-colors shrink-0 ${tint}`}>
+      {children}
+    </span>
+  );
+
   // Menu items configuration
   const menuItems = {
     dashboard: {
@@ -135,17 +143,16 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
       path: "/admin/admin-dashboard",
       subItems: [
         {
-          icon: <ManageAccountsOutlinedIcon />,
+          icon: <IconChip tint="text-sky-300"><ManageAccountsOutlinedIcon style={{ fontSize: 18 }} /></IconChip>,
           label: "Activity Logs",
           path: "/admin/admin-dashboard"
         },
         {
-          icon: <img src="/images/icons8-increase.gif" className="rounded-full
-           w-6 h-6" alt="Analytics" />,
+          // was: <img src="/images/icons8-increase.gif" .../>
+          icon: <IconChip tint="text-emerald-300"><TrendingUp size={17} /></IconChip>,
           label: "Analytics",
           path: "/admin/analytics"
         },
-        
       ]
     },
     pppoe: {
@@ -153,25 +160,26 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
       label: "PPPoe",
       subItems: [
         {
-          icon: <div className="bg-white rounded-full w-8 h-8 
-          flex items-center justify-center">
-            <span className="text-xs font-bold text-black">MBPS</span>
+          icon: <div className="flex items-center justify-center w-7 h-7 rounded-lg
+            bg-white text-[9px] font-bold text-teal-900 tracking-tight shrink-0">
+            MBPS
           </div>,
           label: "PPOE Packages",
           path: "/admin/pppoe-packages"
         },
         {
-          icon: <img src="/images/icons8-person.gif" className="rounded-full w-8 h-8" alt="User" />,
+          // was: <img src="/images/icons8-person.gif" .../>
+          icon: <IconChip tint="text-sky-300"><UserRound size={17} /></IconChip>,
           label: "PPOE Subscribers",
           path: "/admin/pppoe-subscribers"
         },
         {
-          icon: <AssessmentIcon className="w-6 h-6 text-yellow-600" />,
+          icon: <IconChip tint="text-yellow-300"><AssessmentIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "Payment Analytics",
           path: "/admin/subscriber-payment-analytics"
         },
         {
-          icon: <FaUpload className="w-6 h-6 text-blue-500" />,
+          icon: <IconChip tint="text-blue-300"><FaUpload size={15} /></IconChip>,
           label: "Upload Subscribers",
           path: "/admin/upload-subscriber"
         }
@@ -182,44 +190,44 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
       label: "Network",
       subItems: [
         {
-          icon: <img src="/images/icons8-map-pin.gif" className="w-6 h-6 rounded-full" alt="Nodes" />,
+          // was: <img src="/images/icons8-map-pin.gif" .../>
+          icon: <IconChip tint="text-rose-300"><Radar size={17} /></IconChip>,
           label: "Nodes",
           path: "/admin/nodes"
         },
         {
-          icon: <MapPinned className="w-6 h-6 text-yellow-600" />,
+          icon: <IconChip tint="text-yellow-300"><MapPinned size={17} /></IconChip>,
           label: "Network Map",
           path: "/admin/network-map"
         },
         {
-          icon: <PiNetworkSlashLight className="w-6 h-6
-           text-blue-600" />,
+          icon: <IconChip tint="text-blue-300"><PiNetworkSlashLight size={17} /></IconChip>,
           label: "VPN Tunnel",
           path: "/admin/private-network"
         },
         {
-          icon: <RouterIcon  />,
+          icon: <IconChip><RouterIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "Routers",
           path: "/admin/nas"
         },
         {
-          icon: <TbCloudNetwork />,
+          icon: <IconChip><TbCloudNetwork size={17} /></IconChip>,
           label: "Ip Networks",
           path: "/admin/ip_networks"
         },
         {
-          icon: <RiRouterLine className="w-6 h-6 text-orange-500" />,
+          icon: <IconChip tint="text-orange-300"><RiRouterLine size={17} /></IconChip>,
           label: "ONU",
           path: "/admin/devices"
         },
         {
-          icon: < BsRouter />,
+          icon: <IconChip><BsRouter size={16} /></IconChip>,
           label: "Access Points",
           path: "/admin/access-point"
         },
         {
-          icon: <img src="/images/wireguard2.png" className="w-6 h-6 
-          rounded-full" alt="Wireguard" />,
+          // was: <img src="/images/wireguard2.png" .../>
+          icon: <IconChip tint="text-emerald-300"><ShieldCheck size={17} /></IconChip>,
           label: "Wireguard",
           path: "/admin/networks-wireguard-config"
         }
@@ -230,17 +238,17 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
       label: "Finance",
       subItems: [
         {
-          icon: <AssessmentIcon />,
+          icon: <IconChip><AssessmentIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "Finance Dashboard",
           path: "/admin/financial-dashboard"
         },
         {
-          icon: <PaymentIcon />,
+          icon: <IconChip tint="text-emerald-300"><PaymentIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "Hotspot Payments",
           path: "/admin/hotspot-payments"
         },
         {
-          icon: <PaymentIcon />,
+          icon: <IconChip tint="text-emerald-300"><PaymentIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "PpPoe Payments",
           path: "/admin/pppoe-payments"
         }
@@ -251,32 +259,35 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
       label: "Communication",
       subItems: [
         {
-          icon: <MailOutlineIcon />,
+          icon: <IconChip><MailOutlineIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "Email",
           path: "/admin/email"
         },
         {
-          icon: <TextsmsSharpIcon />,
+          icon: <IconChip><TextsmsSharpIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "SMS",
           path: "/admin/send-sms"
         },
         {
-          icon: <TextsmsSharpIcon />,
+          icon: <IconChip><TextsmsSharpIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "Bulk",
           path: "/admin/bulk-messages"
         },
         {
-          icon: <TextsmsSharpIcon />,
+          icon: <IconChip><TextsmsSharpIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "Messages",
           path: "/admin/messages"
         },
         {
-          icon: <AiOutlineWhatsApp className="w-6 h-6 text-green-500" />,
+          icon: <IconChip tint="text-green-300"><AiOutlineWhatsApp size={17} /></IconChip>,
           label: "WhatsApp",
           path: "/admin/whatsapp"
         },
-            { icon: <MessageSquareText className="w-6 h-6 text-teal-400" />, label: "SMS Templates", path: "/admin/hotspot-sms-templates" }
-
+        {
+          icon: <IconChip tint="text-teal-300"><MessageSquareText size={17} /></IconChip>,
+          label: "SMS Templates",
+          path: "/admin/hotspot-sms-templates"
+        }
       ]
     },
     hotspot: {
@@ -284,96 +295,96 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
       label: "Hotspot Bundle",
       subItems: [
         {
-          icon: <IoStatsChartOutline className="w-6 h-6" />,
+          icon: <IconChip><IoStatsChartOutline size={17} /></IconChip>,
           label: "Hotspot Dashboard",
           path: "/admin/hotspot-dashboard"
         },
         {
-            icon: <TbHomeStats className=''/>,
-            label: "Marketing",
-            path: "/admin/hotspot-marketing-dashboard"
+          icon: <IconChip><TbHomeStats size={17} /></IconChip>,
+          label: "Marketing",
+          path: "/admin/hotspot-marketing-dashboard"
         },
         {
-            icon: <GrTechnology className=''/>,
-            label: "Bypass Hotspot",
-            path: "/admin/hotspot-bypass"
+          icon: <IconChip><GrTechnology size={16} /></IconChip>,
+          label: "Bypass Hotspot",
+          path: "/admin/hotspot-bypass"
         },
         {
-          icon: <SiPaloaltonetworks className="w-6 h-6" />,
+          icon: <IconChip><SiPaloaltonetworks size={16} /></IconChip>,
           label: "Hotspot Package",
           path: "/admin/hotspot-package"
         },
         {
-          icon: <LuTv  className="w-6 h-6" />,
+          icon: <IconChip><LuTv size={17} /></IconChip>,
           label: "TV Plans",
           path: "/admin/tv-plans"
         },
         {
-          icon: <LuTicketsPlane className="w-6 h-6 text-yellow-500" />,
+          icon: <IconChip tint="text-yellow-300"><LuTicketsPlane size={17} /></IconChip>,
           label: "Vouchers",
           path: "/admin/hotspot-subscriptions"
         },
         {
-          icon: <Sparkles className="w-6 h-6 text-amber-400" />,
+          icon: <IconChip tint="text-amber-300"><Sparkles size={17} /></IconChip>,
           label: "Promotions",
           path: "/admin/hotspot-promotions"
         },
         {
-          icon: <LuLayoutTemplate />,
+          icon: <IconChip><LuLayoutTemplate size={17} /></IconChip>,
           label: "Templates",
           path: "/admin/hotspot-templates"
         },
         {
-          icon: <Palette className="w-6 h-6 text-fuchsia-400" />,
+          icon: <IconChip tint="text-fuchsia-300"><Palette size={17} /></IconChip>,
           label: "Page Designer",
           path: "/admin/hotspot-page-designer"
         },
         {
-          icon: <ImStatsBars className="w-6 h-6 text-yellow-500" />,
+          icon: <IconChip tint="text-yellow-300"><ImStatsBars size={16} /></IconChip>,
           label: "Revenue",
           path: "/admin/hotspot_anlytics"
         },
         {
-          icon: <CiSettings className="w-6 h-6 text-green-500" />,
+          icon: <IconChip tint="text-green-300"><CiSettings size={17} /></IconChip>,
           label: "Settings",
           path: "/admin/hotspot_settings"
         }
       ]
     },
     support: {
-      icon: <FcOnlineSupport className="w-6 h-6" />,
+      icon: <FcOnlineSupport size={20} />,
       label: "Support",
       subItems: [
         {
-          icon: <LuTicketsPlane className="w-6 h-6 text-yellow-500" />,
+          icon: <IconChip tint="text-yellow-300"><LuTicketsPlane size={17} /></IconChip>,
           label: "Tickets",
           path: "/admin/customer-tickets"
         }
       ]
     },
     users: {
-      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 18">
-        <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z"/>
-      </svg>,
+      // was: raw inline <svg> path
+      icon: <UsersIcon size={20} />,
       label: "Users",
       subItems: [
         {
-          icon: <img src="/images/icons8-male-user.gif" className="w-6 h-6 rounded-full" alt="User" />,
+          // was: <img src="/images/icons8-male-user.gif" .../>
+          icon: <IconChip tint="text-sky-300"><CircleUserRound size={17} /></IconChip>,
           label: "Users",
           path: "/admin/user"
         },
         {
-          icon: <LuUsers className="w-6 h-6" />,
+          icon: <IconChip><LuUsers size={17} /></IconChip>,
           label: "User Groups",
           path: "/admin/user-group"
         },
         {
-          icon: <FaUsersBetweenLines className="w-6 h-6" />,
+          icon: <IconChip><FaUsersBetweenLines size={16} /></IconChip>,
           label: "Free Trial",
           path: "/admin/free-trial-users"
         },
         {
-          icon: <PeopleIcon className="w-6 h-6 text-green-500" />,
+          icon: <IconChip tint="text-green-300"><PeopleIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "Partners",
           path: "/admin/partners-management"
         },
@@ -383,13 +394,13 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
 
   const quickLinks = [
     { icon: <ReceiptIcon />, label: "Billing Invoices", path: "/admin/invoice" },
-    { icon: <FaHandshake className="w-6 h-6" />, label: "Leads", path: "/admin/client-leads" },
-    { icon: <FaRegCalendarAlt className="w-6 h-6" />, label: "Scheduler", path: "/admin/scheduler" },
-    { icon: <MdOutlineSecurity className="w-6 h-6" />, label: "DDOS", path: "/admin/prevent-ddos" },
-    { icon: <MdDevices className="w-6 h-6" />, label: "Equipment", path: "/admin/equipment" },
-    { icon: <GrLicense className="w-6 h-6" />, label: "License", path: "/admin/license" },
+    { icon: <FaHandshake size={18} />, label: "Leads", path: "/admin/client-leads" },
+    { icon: <FaRegCalendarAlt size={18} />, label: "Scheduler", path: "/admin/scheduler" },
+    { icon: <MdOutlineSecurity size={19} />, label: "DDOS", path: "/admin/prevent-ddos" },
+    { icon: <MdDevices size={19} />, label: "Equipment", path: "/admin/equipment" },
+    { icon: <GrLicense size={17} />, label: "License", path: "/admin/license" },
     { icon: <PermDataSettingIcon />, label: "Settings", path: "/admin/settings" },
-    { icon: <LifeBuoy className="w-6 h-6" />, label: "Support Tickets", path: "/admin/support-tickets" },
+    { icon: <LifeBuoy size={19} />, label: "Support Tickets", path: "/admin/support-tickets" },
   ];
 
   const toggleMenu = (menu) => {
@@ -435,7 +446,7 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
 
     handleResize();
     window.addEventListener("resize", handleResize);
-    
+
     return () => window.removeEventListener("resize", handleResize);
   }, [setSeeSideBar]);
 
@@ -451,7 +462,7 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
         method: 'GET',
         headers: { 'X-Subdomain': subdomain },
       });
-      
+
       if (response.ok) {
         const newData = await response.json();
         setCompanySettings(prev => ({
@@ -474,15 +485,16 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
     const menu = menuItems[menuKey];
     const isOpen = expandedMenus[menuKey];
     const isHovered = hoveredMenu === menuKey;
+    const active = isActive(menu.path);
 
     return (
       <li key={menuKey} className="relative font-sans">
         {seeSidebar ? (
           // Collapsed sidebar view
           <div
-            className={`flex items-center p-3 rounded-lg transition-all
-               duration-300  cursor-pointer group ${
-              isActive(menu.path) ? 'bg-teal-800' : 'hover:bg-teal-700'
+            className={`relative flex items-center p-3 rounded-xl transition-all
+               duration-200 cursor-pointer group ${
+              active ? 'bg-white/10' : 'hover:bg-white/5'
             }`}
             onMouseEnter={() => setHoveredMenu(menuKey)}
             onMouseLeave={() => setHoveredMenu(null)}
@@ -492,49 +504,58 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
               }
             }}
           >
-            <div className="flex items-center justify-center w-6 h-6">
+            {active && (
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1
+                rounded-r-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]" />
+            )}
+            <div className="flex items-center justify-center w-6 h-6 mx-auto text-white/90">
               {menu.icon}
             </div>
-            
+
             {/* Hover tooltip for collapsed sidebar */}
             <AnimatePresence>
-              {isHovered && (
+              {isHovered && !menu.subItems && (
                 <motion.div
-                  initial={{ opacity: 0, x: 10 }}
+                  initial={{ opacity: 0, x: 6 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  className="absolute left-full 
-                  ml-2 top-1/2 -translate-y-1/2 bg-gray-900 
-                  text-white px-3 py-2 rounded-md shadow-lg 
-                  whitespace-nowrap z-50 font-sans"
+                  exit={{ opacity: 0, x: 6 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-gray-900/95
+                  backdrop-blur-sm text-white text-sm px-3 py-1.5 rounded-lg shadow-xl
+                  ring-1 ring-white/10 whitespace-nowrap z-50 font-sans"
                 >
                   {menu.label}
                 </motion.div>
               )}
             </AnimatePresence>
-            
-            {/* Submenu for collapsed sidebar */}
+
+            {/* Submenu flyout for collapsed sidebar */}
             {menu.subItems && isHovered && (
               <motion.div
-                initial={{ opacity: 0, x: 10 }}
+                initial={{ opacity: 0, x: 6 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 10 }}
-                className="absolute left-full ml-2 top-0 bg-gray-900
-                 text-white rounded-lg shadow-xl py-2 z-40 min-w-[200px] font-sans"
+                exit={{ opacity: 0, x: 6 }}
+                transition={{ duration: 0.15 }}
+                className="absolute left-full ml-3 top-0 bg-gray-900/95 backdrop-blur-sm
+                 text-white rounded-xl shadow-2xl ring-1 ring-white/10 py-2 z-40
+                 min-w-[210px] font-sans"
               >
-                <div className="px-3 py-2 font-semibold border-b border-gray-700">
+                <div className="px-3.5 py-2 text-xs font-semibold uppercase tracking-wider
+                  text-white/50 border-b border-white/10 mb-1">
                   {menu.label}
                 </div>
                 {menu.subItems.map((subItem, idx) => (
                   <Link
                     key={idx}
                     to={subItem.path}
-                    className="flex items-center gap-3 px-4 py-3
-                     hover:bg-gray-800 transition-colors"
+                    className={`flex items-center gap-2.5 px-3.5 py-2.5 mx-1 rounded-lg
+                     transition-colors ${
+                       isActive(subItem.path) ? 'bg-white/10' : 'hover:bg-white/5'
+                     }`}
                     onClick={() => window.innerWidth < 1080 && setSeeSideBar(true)}
                   >
                     <span className="flex-shrink-0">{subItem.icon}</span>
-                    <span>{subItem.label}</span>
+                    <span className="text-sm">{subItem.label}</span>
                   </Link>
                 ))}
               </motion.div>
@@ -545,22 +566,26 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
           <div className="space-y-1">
             <button
               onClick={() => menu.subItems ? toggleMenu(menuKey) : null}
-              className={`flex items-center justify-between w-full p-3
-                 rounded-lg transition-all duration-300 group ${
-                isActive(menu.path) ? 'bg-teal-800' : 'hover:bg-teal-700'
+              className={`relative flex items-center justify-between w-full p-3
+                 rounded-xl transition-all duration-200 group ${
+                active ? 'bg-white/10' : 'hover:bg-white/5'
               }`}
             >
+              {active && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1
+                  rounded-r-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]" />
+              )}
               <div className="flex items-center gap-3">
-                <span className="flex-shrink-0">{menu.icon}</span>
-                <span>{menu.label}</span>
+                <span className="flex-shrink-0 text-white/90">{menu.icon}</span>
+                <span className="text-sm font-medium text-white/90">{menu.label}</span>
               </div>
               {menu.subItems && (
-                <span className="transition-transform duration-300">
-                  {isOpen ? <KeyboardArrowUpSharpIcon /> : <KeyboardArrowDownSharpIcon />}
+                <span className="text-white/50 transition-transform duration-200">
+                  {isOpen ? <KeyboardArrowUpSharpIcon fontSize="small" /> : <KeyboardArrowDownSharpIcon fontSize="small" />}
                 </span>
               )}
             </button>
-            
+
             {/* Submenu for expanded sidebar */}
             {menu.subItems && (
               <AnimatePresence>
@@ -569,25 +594,29 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
                     className="overflow-hidden"
                   >
-                    <div className="ml-4 pl-4 border-l border-teal-600 space-y-1">
+                    <div className="ml-5 pl-4 border-l border-white/10 space-y-0.5 py-1">
                       {menu.subItems.map((subItem, idx) => (
                         <motion.div
                           key={idx}
-                          initial={{ opacity: 0, x: -10 }}
+                          initial={{ opacity: 0, x: -8 }}
                           animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: idx * 0.05 }}
+                          transition={{ delay: idx * 0.04 }}
                         >
                           <Link
                             to={subItem.path}
-                            className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${
-                              isActive(subItem.path) ? 'bg-teal-800/50' : 'hover:bg-teal-700/50'
+                            className={`group flex items-center gap-2.5 py-2 px-2.5 rounded-lg
+                             transition-colors duration-150 ${
+                              isActive(subItem.path)
+                                ? 'bg-white/10 text-white'
+                                : 'text-white/75 hover:bg-white/5 hover:text-white'
                             }`}
                             onClick={() => window.innerWidth < 1080 && setSeeSideBar(true)}
                           >
                             <span className="flex-shrink-0">{subItem.icon}</span>
-                            <span>{subItem.label}</span>
+                            <span className="text-sm">{subItem.label}</span>
                           </Link>
                         </motion.div>
                       ))}
@@ -608,76 +637,74 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
         id="sidebar"
         initial={false}
         animate={{
-          width: seeSidebar ? "64px" : "240px"
+          width: seeSidebar ? "68px" : "252px"
         }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        // font-sans instead of the old dead "font-montserat" class — this now
-        // resolves to var(--font-sans), so appearance-settings font changes
-        // (applyTheme -> --font-sans on <html>) apply here live, no reload needed.
-        className="fixed top-0 left-0 h-screen bg-gradient-to-b
-         bg-primary  to-teal-950 shadow-2xl overflow-hidden
-          flex flex-col text-white font-sans z-50"
+        // font-sans resolves to var(--font-sans) — appearance-settings font
+        // changes (applyTheme -> --font-sans on <html>) apply here live.
+        className="fixed top-0 left-0 h-screen bg-gradient-to-b from-teal-900
+         via-primary to-teal-950 shadow-2xl shadow-black/40 ring-1 ring-white/5
+         overflow-hidden flex flex-col text-white font-sans z-50"
       >
         {/* Header */}
-        <div className="p-4 border-b border-teal-700">
+        <div className="p-4 border-b border-white/10">
           <div className="flex items-center justify-between">
             {!seeSidebar ? (
               <>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                   <motion.img
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="h-12 w-12 rounded-full border-2 border-white"
+                    className="h-11 w-11 rounded-full border-2 border-white/80
+                     ring-2 ring-emerald-400/30 shrink-0 object-cover"
                     src={logo_preview || "/images/aitechs.png"}
                     alt={company_name || "Aitechs"}
                     onError={(e) => { e.target.src = "/images/aitechs.png"; }}
                   />
                   {/* Brand/company name uses the display font slot (--font-display)
-                      plus its own italic toggle (--font-style-display), independent
-                      of body copy — matches how headings behave elsewhere in the app. */}
+                      plus its own italic toggle (--font-style-display). */}
                   <motion.span
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="font-display font-bold text-white text-lg"
+                    className="font-display font-bold text-white text-base truncate"
                     style={{ fontStyle: 'var(--font-style-display)' }}
                   >
-                    {company_name  || "Aitechs"}
+                    {company_name || "Aitechs"}
                   </motion.span>
                 </div>
                 <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.92 }}
                   onClick={() => {
                     setSeeSideBar(!seeSidebar);
                     collapseAllMenus();
                   }}
-                  className="p-2 rounded-lg hover:bg-teal-800 
-                  transition-colors"
+                  className="p-2 rounded-lg hover:bg-white/10 transition-colors shrink-0"
                 >
-                  <MdMenuOpen className="w-8 h-8 text-white" />
+                  <MdMenuOpen className="w-6 h-6 text-white/80" />
                 </motion.button>
               </>
             ) : (
-              <div className="flex flex-col items-center gap-4">
+              <div className="flex flex-col items-center gap-3 w-full">
                 <motion.img
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="h-10 w-10 rounded-full border-2 border-white"
+                  className="h-9 w-9 rounded-full border-2 border-white/80
+                   ring-2 ring-emerald-400/30 object-cover"
                   src={logo_preview || "/images/aitechs.png"}
                   alt={company_name || "Aitechs"}
                   onError={(e) => { e.target.src = "/images/aitechs.png"; }}
                 />
                 <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.92 }}
                   onClick={() => {
                     setSeeSideBar(!seeSidebar);
                     collapseAllMenus();
                   }}
-                  className="p-2 rounded-lg hover:bg-teal-800 transition-colors"
+                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
                 >
-                  <MdMenuOpen className="w-8 h-8 text-white
-                   rotate-180" />
+                  <MdMenuOpen className="w-6 h-6 text-white/80 rotate-180" />
                 </motion.button>
               </div>
             )}
@@ -685,52 +712,49 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
         </div>
 
         {/* Menu Items */}
-        <nav className="flex-1 overflow-y-auto py-4 px-3">
-          <ul className="space-y-2">
+        <nav className="flex-1 overflow-y-auto py-4 px-3
+          [&::-webkit-scrollbar]:w-1.5
+          [&::-webkit-scrollbar-track]:bg-transparent
+          [&::-webkit-scrollbar-thumb]:bg-white/10
+          [&::-webkit-scrollbar-thumb]:rounded-full">
+          {!seeSidebar && (
+            <div className="text-xs uppercase text-white/40 font-semibold
+              mb-2 tracking-wider px-1">
+              Menu
+            </div>
+          )}
+          <ul className="space-y-1">
             {Object.keys(menuItems).map(renderMenuItem)}
           </ul>
 
           {/* Quick Links */}
-          <div className={`mt-8 ${seeSidebar ? 'px-0' : 'px-2'}`}>
+          <div className={`mt-6 ${seeSidebar ? 'px-0' : 'px-0'}`}>
             {!seeSidebar && (
-              <div className="text-xs uppercase text-teal-300 
-              font-semibold mb-2 tracking-wider">
+              <div className="text-xs uppercase text-white/40
+              font-semibold mb-2 tracking-wider px-1">
                 Quick Links
               </div>
             )}
-
-            {/* Logout */}
-            <div className={`mt-4 ${seeSidebar ? 'px-0' : 'px-2'}`}>
-              <button
-                onClick={() => setShowLogoutConfirm(true)}
-                className={`flex items-center gap-3 p-3 rounded-lg w-full transition-all duration-300
-                  text-red-300 hover:bg-red-900/30 hover:text-red-200
-                  ${seeSidebar ? 'justify-center' : ''}`}
-              >
-                <LogOut size={20} className="flex-shrink-0" />
-                {!seeSidebar && <span className="text-sm font-medium">Log out</span>}
-              </button>
-            </div>
 
             <ul className="space-y-1">
               {quickLinks.map((link, idx) => (
                 <li key={idx}>
                   <Link
                     to={link.path}
-                    className={`flex items-center gap-3 p-3 rounded-lg 
-                      transition-all duration-300 group ${
+                    className={`flex items-center gap-3 p-3 rounded-xl
+                      transition-all duration-200 group ${
                       seeSidebar ? 'justify-center' : ''
                     } ${
-                      isActive(link.path) ? 'bg-teal-800' : 'hover:bg-teal-700'
+                      isActive(link.path) ? 'bg-white/10' : 'hover:bg-white/5'
                     }`}
                     onClick={() => window.innerWidth < 1080 && setSeeSideBar(true)}
                   >
-                    <span className="flex-shrink-0">{link.icon}</span>
+                    <span className="flex-shrink-0 text-white/80">{link.icon}</span>
                     {!seeSidebar && (
                       <motion.span
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="text-sm"
+                        className="text-sm text-white/85"
                       >
                         {link.label}
                       </motion.span>
@@ -739,6 +763,19 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
                 </li>
               ))}
             </ul>
+
+            {/* Logout */}
+            <div className="mt-3 pt-3 border-t border-white/10">
+              <button
+                onClick={() => setShowLogoutConfirm(true)}
+                className={`flex items-center gap-3 p-3 rounded-xl w-full transition-all duration-200
+                  text-red-300 hover:bg-red-500/10 hover:text-red-200
+                  ${seeSidebar ? 'justify-center' : ''}`}
+              >
+                <LogOut size={19} className="flex-shrink-0" />
+                {!seeSidebar && <span className="text-sm font-medium">Log out</span>}
+              </button>
+            </div>
           </div>
         </nav>
 
@@ -747,11 +784,13 @@ const navigate = useNavigate() // add useNavigate to your react-router-dom impor
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="p-4 border-t border-teal-700"
+            className="p-4 border-t border-white/10"
           >
-            <div className="text-xs text-teal-300 text-center">
+            <div className="text-xs text-white/40 text-center">
               <p>© {new Date().getFullYear()} {company_name || "Aitechs"}</p>
-              <p className="mt-1 text-teal-400">{APP_VERSION}</p>
+              <p className="mt-1 inline-block px-2 py-0.5 rounded-full bg-white/5 text-white/50">
+                {APP_VERSION}
+              </p>
             </div>
           </motion.div>
         )}
