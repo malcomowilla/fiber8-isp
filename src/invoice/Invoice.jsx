@@ -315,8 +315,25 @@ const Invoice = () => {
                       <IconButton
                         size="small"
                         onClick={() =>
+                          // FIX: this used to build the URL with every field
+                          // (invoiceNumber, invoiceDate, dueDate,
+                          // invoiceDesciption, invoiceTotal, issuedDate)
+                          // interpolated raw into the query string with no
+                          // encoding. None of those extra params are even
+                          // read by InvoicePage.jsx — it refetches everything
+                          // from the API using just `id`. Worse,
+                          // invoice_desciption is free text that can contain
+                          // `&`, `#`, `%`, spaces, etc. Those characters can
+                          // break the query string outright (an `&` starts a
+                          // new param, a `#` truncates into a URL fragment).
+                          // Chrome's URL parser tends to silently tolerate
+                          // this; Firefox is stricter and will mangle or drop
+                          // `id` depending on what's in the description,
+                          // which is why the "Edit" page came up blank only
+                          // in Firefox for some invoices. Only `id` is
+                          // needed, and it's now encoded properly.
                           navigate(
-                            `/admin/invoice-page?id=${rowData.id}&invoiceNumber=${rowData.invoice_number}&invoiceDate=${rowData.date}&dueDate=${rowData.due_date}&invoiceDesciption=${rowData.invoice_desciption}&invoiceTotal=${rowData.total}&issuedDate=${rowData.invoice_date}`
+                            `/admin/invoice-page?id=${encodeURIComponent(rowData.id)}`
                           )
                         }
                       >
