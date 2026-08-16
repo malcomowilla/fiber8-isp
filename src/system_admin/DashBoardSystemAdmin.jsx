@@ -438,6 +438,7 @@ const DashboardSytemAdmin = () => {
                       {value === 13 && <MaintenancePanel />}
                       {value === 14 && <Payments />}
                       {value === 15 && <SystemAdminSupportOverview />}
+                      {value === 16 && <SystemAnnouncementsManager />}
                     </motion.div>
                   )}
                 </AnimatePresence>
