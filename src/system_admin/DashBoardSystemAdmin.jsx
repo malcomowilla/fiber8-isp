@@ -80,6 +80,7 @@ const NAV_SECTIONS = [
       { value: 2, label: 'Settings', Icon: SettingsIcon },
       { value: 13, label: 'Maintenance', Icon: BuildIcon },
       { value: 10, label: 'Changelogs', Icon: GiRecycle },
+       { value: 16, label: 'Announcements', Icon: Megaphone },
     ],
   },
   {
@@ -92,7 +93,6 @@ const NAV_SECTIONS = [
   },
 
 
-  { value: 16, label: 'Announcements', Icon: Megaphone },
 ];
 
 const ALL_NAV_ITEMS = NAV_SECTIONS.flatMap((section) => section.items);
