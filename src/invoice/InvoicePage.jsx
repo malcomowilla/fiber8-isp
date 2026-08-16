@@ -68,6 +68,13 @@ const InvoicePage = () => {
   const navigate = useNavigate();
   const subdomain = window.location.hostname.split('.')[0];
 
+  // -------------------------------------------------------------------------
+  // FIX: this used to be useCallback(..., []) which meant the function (and
+  // the `subdomain` it closed over) was frozen at first render forever.
+  // Harmless in practice since subdomain never changes mid-session, but kept
+  // consistent with the other fetchers below so this pattern doesn't bite us
+  // again if that assumption ever changes.
+  // -------------------------------------------------------------------------
   const handleGetCompanySettings = useCallback(async () => {
     try {
       const response = await fetch('/api/allow_get_company_settings', {
@@ -99,7 +106,7 @@ const InvoicePage = () => {
     } catch (error) {
       // silent: company letterhead is optional decoration
     }
-  }, []);
+  }, [subdomain]);
 
   useEffect(() => {
     handleGetCompanySettings();
@@ -142,6 +149,11 @@ const InvoicePage = () => {
           : null;
 
       if (response.ok) {
+        // FIX: destructuring `newData` when it's null (empty settings array)
+        // would throw and get swallowed by the catch below, silently
+        // aborting this fetcher. Guard it explicitly instead.
+        if (!newData) return;
+
         const { consumer_key, consumer_secret, passkey, short_code } = newData;
         setSelectedAccountTypeHotspot(newData.account_type);
         setHotspotMpesaSettings({
@@ -159,7 +171,7 @@ const InvoicePage = () => {
           }, 1800);
         }
         if (response.status === 401) {
-          toast.error(newData.error, { position: 'top-center', duration: 4000 });
+          toast.error(newData?.error, { position: 'top-center', duration: 4000 });
           setTimeout(() => {
             window.location.href = '/signin';
           }, 1900);
@@ -168,7 +180,7 @@ const InvoicePage = () => {
     } catch (error) {
       // ignore
     }
-  }, []);
+  }, [subdomain]);
 
   useEffect(() => {
     fetchSavedHotspotMpesaSettings();
@@ -222,18 +234,38 @@ const InvoicePage = () => {
     } catch (error) {
       // ignore
     }
-  }, [selectedAccountTypeHotspot]);
+  }, [selectedAccountTypeHotspot, subdomain]);
 
   useEffect(() => {
     if (selectedAccountTypeHotspot) {
       fetchHotspotMpesaSettings();
     }
   }, [fetchHotspotMpesaSettings, selectedAccountTypeHotspot]);
-const getInvoices = useCallback(async () => {
+
+  // -------------------------------------------------------------------------
+  // THE ACTUAL BUG: this was useCallback(..., []) — created once on first
+  // render and permanently closed over whatever `id` existed at that moment.
+  // Since the effect below only re-runs when the `getInvoices` reference
+  // changes, and that reference never changed, navigating between different
+  // invoices without a full remount (e.g. router keeping this route element
+  // alive) kept refetching the SAME stale/missing id forever. Combined with
+  // the empty `catch {}`, a bad request just failed silently and left every
+  // field at its `useState('N/A')` default — exactly the "N/A everywhere,
+  // KES NaN" screen you were seeing.
+  //
+  // Fix: put `id` (and `subdomain`) in the dependency array so the fetcher
+  // is recreated — and therefore actually refetches — whenever the invoice
+  // id changes, guard against a missing id, and surface failures instead of
+  // swallowing them.
+  // -------------------------------------------------------------------------
+  const getInvoices = useCallback(async () => {
     if (!id) {
-      toast.error('No invoice id in the URL — cannot load invoice', { duration: 5000 });
+      toast.error('No invoice id found in the URL — cannot load invoice', {
+        duration: 5000,
+      });
       return;
     }
+
     try {
       const response = await fetch(`/api/get_invoice?id=${id}`, {
         headers: { 'X-Subdomain': subdomain },
@@ -259,13 +291,15 @@ const getInvoices = useCallback(async () => {
             window.location.href = '/signin';
           }, 1900);
         } else {
-          toast.error(newData.error || 'Could not load this invoice', { duration: 5000 });
+          toast.error(newData.error || 'Could not load this invoice', {
+            duration: 5000,
+          });
         }
       }
     } catch (error) {
       toast.error('Something went wrong loading the invoice', { duration: 5000 });
     }
-  }, [id, subdomain]); // <-- was []
+  }, [id, subdomain]);
 
   useEffect(() => {
     getInvoices();
