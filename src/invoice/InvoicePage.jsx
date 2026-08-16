@@ -229,8 +229,11 @@ const InvoicePage = () => {
       fetchHotspotMpesaSettings();
     }
   }, [fetchHotspotMpesaSettings, selectedAccountTypeHotspot]);
-
-  const getInvoices = useCallback(async () => {
+const getInvoices = useCallback(async () => {
+    if (!id) {
+      toast.error('No invoice id in the URL — cannot load invoice', { duration: 5000 });
+      return;
+    }
     try {
       const response = await fetch(`/api/get_invoice?id=${id}`, {
         headers: { 'X-Subdomain': subdomain },
@@ -250,18 +253,19 @@ const InvoicePage = () => {
       } else {
         if (response.status === 403) {
           toast.error('permision denied to get invoices', { duration: 6000 });
-        }
-        if (response.status === 401) {
+        } else if (response.status === 401) {
           toast.error(newData.error, { position: 'top-center', duration: 4000 });
           setTimeout(() => {
             window.location.href = '/signin';
           }, 1900);
+        } else {
+          toast.error(newData.error || 'Could not load this invoice', { duration: 5000 });
         }
       }
     } catch (error) {
-      // ignore
+      toast.error('Something went wrong loading the invoice', { duration: 5000 });
     }
-  }, []);
+  }, [id, subdomain]); // <-- was []
 
   useEffect(() => {
     getInvoices();
