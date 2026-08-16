@@ -295,9 +295,50 @@ const Invoice = () => {
                   />
                 ),
               },
+              {
+                // Plain column instead of material-table's built-in `actions`
+                // prop. That prop routes through material-table's own
+                // icon-cloning renderer, which was silently failing to show
+                // anything no matter how the icon/Action override was fed to
+                // it. Every other column here uses a normal `render` function
+                // and renders fine, so Edit/Delete get the same treatment:
+                // just a cell that renders whatever JSX we want.
+                title: 'Actions',
+                field: 'actions',
+                sorting: false,
+                export: false,
+                headerStyle: { fontWeight: 'bold', textAlign: 'center' },
+                cellStyle: { textAlign: 'center', whiteSpace: 'nowrap' },
+                render: (rowData) => (
+                  <>
+                    <Tooltip title="Edit Invoice">
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          navigate(
+                            `/admin/invoice-page?id=${rowData.id}&invoiceNumber=${rowData.invoice_number}&invoiceDate=${rowData.date}&dueDate=${rowData.due_date}&invoiceDesciption=${rowData.invoice_desciption}&invoiceTotal=${rowData.total}&issuedDate=${rowData.invoice_date}`
+                          )
+                        }
+                      >
+                        <EditIcon color="success" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete Invoice">
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setInvoiceId(rowData.id);
+                          setOpenDeleteInvoice(true);
+                        }}
+                      >
+                        <DeleteIcon color="error" />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                ),
+              },
             ]}
             data={filteredInvoices}
-            actions={rowActions}
             localization={{
               body: {
                 emptyDataSourceMessage: searchTerm ? (
@@ -320,7 +361,6 @@ const Invoice = () => {
               showSelectAllCheckbox: false,
               showTextRowsSelected: false,
               emptyRowsWhenPaging: false,
-              actionsColumnIndex: -1,
               headerStyle: {
                 fontFamily: 'monospace',
                 textTransform: 'uppercase',
@@ -342,58 +382,18 @@ const Invoice = () => {
                 fontFamily: 'monospace',
               }),
             }}
-            components={{
-              Container: (props) => <Paper {...props} elevation={0} />,
-              // Fully own the rendering of each row action button instead of
-              // letting material-table clone the icon element itself — that
-              // clone path is what was making Edit/Delete invisible.
-              Action: (props) => {
-                const { action, data } = props;
-
-                // Toolbar/global actions (not used here, but keep this from
-                // silently swallowing anything unexpected) fall back to null.
-                if (!action || typeof action !== 'object') return null;
-
-                if (action.name === 'edit') {
-                  return (
-                    <Tooltip title={action.tooltip}>
-                      <IconButton
-                        size="small"
-                        onClick={(event) => action.onClick(event, data)}
-                      >
-                        <EditIcon color="success" />
-                      </IconButton>
-                    </Tooltip>
-                  );
-                }
-
-                if (action.name === 'delete') {
-                  return (
-                    <Tooltip title={action.tooltip}>
-                      <IconButton
-                        size="small"
-                        onClick={(event) => action.onClick(event, data)}
-                      >
-                        <DeleteIcon color="error" />
-                      </IconButton>
-                    </Tooltip>
-                  );
-                }
-
-                return null;
-              },
-            }}
+            components={{ Container: (props) => <Paper {...props} elevation={0} /> }}
           />
       </Paper>
               </ThemeProvider>
 
 
       {/*
-        Pins the actions column (last column, since actionsColumnIndex: -1)
-        to the right edge so it stays visible while the rest of the table
-        scrolls horizontally underneath it. MaterialTable doesn't expose a
-        prop for this, so it's done via a global style targeting the last
-        <th>/<td> in each row.
+        Pins the last column (the "Actions" column defined above) to the
+        right edge so it stays visible while the rest of the table scrolls
+        horizontally underneath it. MaterialTable doesn't expose a prop for
+        this, so it's done via a global style targeting the last <th>/<td>
+        in each row.
       */}
       <style>{`
         .MuiTableRow-root > *:last-child {
