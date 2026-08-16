@@ -5,6 +5,8 @@ import {
   Paper,
   Typography,
   CircularProgress,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -16,18 +18,6 @@ import { useApplicationSettings } from '../settings/ApplicationSettings';
 import toast, { Toaster } from 'react-hot-toast';
 import DeleteInvoice from '../delete/DeleteInvoice';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-
-// material-table clones action icons and attaches a ref to them internally.
-// Plain function components can't take a ref, which can cause the icon
-// to silently fail to render (or throw a console warning). Wrapping each
-// icon in React.forwardRef fixes this.
-const EditActionIcon = React.forwardRef((props, ref) => (
-  <EditIcon ref={ref} color="success" {...props} />
-));
-
-const DeleteActionIcon = React.forwardRef((props, ref) => (
-  <DeleteIcon ref={ref} color="error" {...props} />
-));
 
 const Invoice = () => {
   const [invoices, setInvoices] = useState([]);
@@ -307,24 +297,7 @@ const Invoice = () => {
               },
             ]}
             data={filteredInvoices}
-            actions={[
-              {
-                icon: () => <EditActionIcon />,
-                onClick: (event, rowData) =>
-                  navigate(
-                    `/admin/invoice-page?id=${rowData.id}&invoiceNumber=${rowData.invoice_number}&invoiceDate=${rowData.date}&dueDate=${rowData.due_date}&invoiceDesciption=${rowData.invoice_desciption}&invoiceTotal=${rowData.total}&issuedDate=${rowData.invoice_date}`
-                  ),
-                tooltip: 'Edit Invoice',
-              },
-              {
-                icon: () => <DeleteActionIcon />,
-                tooltip: 'Delete Invoice',
-                onClick: (event, rowData) => {
-                  setInvoiceId(rowData.id);
-                  setOpenDeleteInvoice(true);
-                },
-              },
-            ]}
+            actions={rowActions}
             localization={{
               body: {
                 emptyDataSourceMessage: searchTerm ? (
@@ -369,7 +342,47 @@ const Invoice = () => {
                 fontFamily: 'monospace',
               }),
             }}
-            components={{ Container: (props) => <Paper {...props} elevation={0} /> }}
+            components={{
+              Container: (props) => <Paper {...props} elevation={0} />,
+              // Fully own the rendering of each row action button instead of
+              // letting material-table clone the icon element itself — that
+              // clone path is what was making Edit/Delete invisible.
+              Action: (props) => {
+                const { action, data } = props;
+
+                // Toolbar/global actions (not used here, but keep this from
+                // silently swallowing anything unexpected) fall back to null.
+                if (!action || typeof action !== 'object') return null;
+
+                if (action.name === 'edit') {
+                  return (
+                    <Tooltip title={action.tooltip}>
+                      <IconButton
+                        size="small"
+                        onClick={(event) => action.onClick(event, data)}
+                      >
+                        <EditIcon color="success" />
+                      </IconButton>
+                    </Tooltip>
+                  );
+                }
+
+                if (action.name === 'delete') {
+                  return (
+                    <Tooltip title={action.tooltip}>
+                      <IconButton
+                        size="small"
+                        onClick={(event) => action.onClick(event, data)}
+                      >
+                        <DeleteIcon color="error" />
+                      </IconButton>
+                    </Tooltip>
+                  );
+                }
+
+                return null;
+              },
+            }}
           />
       </Paper>
               </ThemeProvider>
