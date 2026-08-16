@@ -21,8 +21,7 @@ import {
 } from 'lucide-react';
 import License from '../layout/License';
 import ChurnRateSection from './ChurnRateSection';
-
-
+import NotificationCenter from './NotificationCenter';
 const cable = createConsumer(`wss://${window.location.hostname}/cable`);
 
 // ── Dark-mode detection (drives chart theming; nothing here is dark by default) ─
@@ -847,6 +846,7 @@ const Analytics = () => {
                   {new Date().toLocaleDateString('en-KE',{ weekday:'long', year:'numeric', month:'long', day:'numeric' })}
                 </p>
               </div>
+              <NotificationCenter />
             </motion.div>
 
             {/* ── Top 4 KPI cards ──────────────────────────────────────────────── */}

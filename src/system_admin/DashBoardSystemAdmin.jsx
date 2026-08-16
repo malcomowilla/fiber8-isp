@@ -43,12 +43,11 @@ import Payments from './Payments';
 import { MaintenancePanel } from '../maintenace/MaintenanceMode';
 import SystemAdminSupportOverview from './SystemAdminSupportOverview';
 import { LifeBuoy } from 'lucide-react';
-// ---------------------------------------------------------------------------
-// Navigation is grouped by task rather than dumped in one flat list, so the
-// sidebar reads like a map of what a system admin actually does: keep an eye
-// on the network, manage customers & their money, configure plans, then
-// system/account housekeeping at the bottom.
-// ---------------------------------------------------------------------------
+import SystemAnnouncementsManager from './SystemAnnouncementsManager';
+import { Megaphone } from 'lucide-react';
+
+
+
 const NAV_SECTIONS = [
   {
     label: 'Overview',
@@ -91,6 +90,9 @@ const NAV_SECTIONS = [
       { value: 7, label: 'Passkeys', Icon: IoMdKey },
     ],
   },
+
+
+  { value: 16, label: 'Announcements', Icon: Megaphone },
 ];
 
 const ALL_NAV_ITEMS = NAV_SECTIONS.flatMap((section) => section.items);
