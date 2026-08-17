@@ -154,7 +154,7 @@ function EditVoucher({
               }}
               isOptionEqualToValue={(option, value) => option.name === value.name}
               renderInput={(params) => (
-                <TextField {...params} label="Package" variant="outlined" sx={textFieldSx} />
+                <TextField {...params} label="Package" variant="outlined" sx={textFieldSx} className="myTextField"/>
               )}
             />
 
@@ -165,6 +165,7 @@ function EditVoucher({
               type="number"
               placeholder="1"
               fullWidth
+              className="myTextField"
               sx={textFieldSx}
               InputProps={{
                 startAdornment: <Users className="w-4 h-4 text-gray-400 mr-2" />,
@@ -189,7 +190,8 @@ function EditVoucher({
             disabled={loading}
             whileHover={{ scale: loading ? 1 : 1.02 }}
             whileTap={{ scale: loading ? 1 : 0.98 }}
-            className="relative flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-md shadow-emerald-500/20 disabled:opacity-70 min-w-[150px]"
+            className="relative flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
+             text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-md shadow-emerald-500/20 disabled:opacity-70 min-w-[150px]"
           >
             <AnimatePresence mode="wait" initial={false}>
               {loading ? (
