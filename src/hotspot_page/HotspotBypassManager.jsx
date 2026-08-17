@@ -885,6 +885,58 @@ function MacVoucherDevicesTable({ devices, onEdit, onDelete, deleting, deleteTar
   );
 }
 
+
+
+
+
+
+
+
+
+
+
+function DeviceLimitSettings({ sd }) {
+  const [limit, setLimit] = useState(1);
+  const [selfService, setSelfService] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/hotspot_bypass_settings', { headers: { 'X-Subdomain': sd } })
+      .then(r => r.json())
+      .then(d => { setLimit(d.max_customer_bypass_devices ?? 1); setSelfService(!!d.allow_device_self_service); });
+  }, [sd]);
+
+  const save = async () => {
+    setSaving(true);
+    await fetch('/api/hotspot_bypass_settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'X-Subdomain': sd },
+      body: JSON.stringify({ max_customer_bypass_devices: limit, allow_device_self_service: selfService }),
+    });
+    setSaving(false);
+  };
+
+  return (
+    <div className="bp-card" style={{ padding: 16, marginBottom: 20, display: 'flex', gap: 20, alignItems: 'center' }}>
+      <div>
+        <span className="bp-label">Max devices per customer</span>
+        <input type="number" min="1" className="bp-input" style={{ width: 90 }}
+          value={limit} onChange={e => setLimit(Number(e.target.value))} />
+      </div>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600 }}>
+        <input type="checkbox" checked={selfService} onChange={e => setSelfService(e.target.checked)} />
+        Let customers add devices themselves (within limit, while plan is active)
+      </label>
+      <button className="bp-btn-primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
+    </div>
+  );
+}
+
+
+
+
+
+
 export default function HotspotBypassManager() {
   const [tvPlanDevices,     setTvPlanDevices]     = useState([]);
   const [macVoucherDevices, setMacVoucherDevices]  = useState([]);

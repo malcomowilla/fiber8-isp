@@ -18,25 +18,6 @@ import {
   ChevronRight,
 } from 'lucide-react'
 
-/**
- * Hotspot Notification Templates
- * --------------------------------
- * Lives under Communication > Automation.
- * Lets an ISP admin edit the SMS copy sent out automatically when a
- * hotspot voucher/plan is purchased (single device vs multiple devices),
- * or when a voucher expires, toggle each template on/off, and preview it
- * with sample data before it goes live.
- *
- * Backend contract (see accompanying Rails files):
- *   GET    /api/hotspot_sms_templates            -> { templates: [...] }
- *   PATCH  /api/hotspot_sms_templates/:id         -> { template: {...} }
- *   POST   /api/hotspot_sms_templates             -> { template: {...} }
- *
- * NOTE: templates returned by the API carry the real numeric primary key as
- * `id`, plus `group` ('single' | 'multi' | 'expiration') and `kind`
- * derived server-side from `category`. Save/patch calls use that same
- * `id` directly, so keep frontend and backend ids in lockstep.
- */
 
 const SINGLE_USER_VARIABLES = [
   { token: 'customer_phone', label: 'Customer phone number' },

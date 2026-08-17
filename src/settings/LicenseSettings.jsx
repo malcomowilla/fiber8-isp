@@ -292,6 +292,7 @@ const LicenseSettings = () => {
                     type="number"
                     value={formik.values.warningDays}
                     onChange={formik.handleChange}
+                    className='myTextField'
                     onBlur={formik.handleBlur}
                     error={formik.touched.warningDays && Boolean(formik.errors.warningDays)}
                     helperText={formik.touched.warningDays && formik.errors.warningDays}

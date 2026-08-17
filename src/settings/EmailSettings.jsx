@@ -75,9 +75,9 @@ const GradientButton = styled(motion.button)`
 const SectionCard = ({ title, subtitle, children }) => (
   <div className="rounded-2xl border border-indigo-500/15 dark:border-white/10 bg-indigo-500/[0.03] dark:bg-white/[0.03] p-5 sm:p-6 mb-5">
     <div className="mb-4">
-      <p className="dark:text-white text-black roboto-condensed font-semibold text-sm">{title}</p>
+      <p className="dark:text-white text-black  font-semibold text-sm">{title}</p>
       {subtitle && (
-        <p className="dark:text-white/45 text-black/45 text-xs roboto-condensed-light mt-0.5">{subtitle}</p>
+        <p className="dark:text-white/45 text-black/45 text-xs  mt-0.5">{subtitle}</p>
       )}
     </div>
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -293,7 +293,7 @@ const EmailSettings = () => {
                         }}
                       />
                     }
-                    label={<span className="dark:text-white/70 text-black/70 text-sm roboto-condensed">Use SSL</span>}
+                    label={<span className="dark:text-white/70 text-black/70 text-sm ">Use SSL</span>}
                   />
                 </FormGroup>
               </div>

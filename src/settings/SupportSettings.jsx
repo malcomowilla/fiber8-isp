@@ -274,10 +274,10 @@ const SupportSettings = () => {
                                         <SupportAgentRoundedIcon sx={{ fontSize: '1.4rem', color: 'white' }} />
                                     </motion.div>
                                     <div>
-                                        <p className="dark:text-white text-black roboto-condensed font-semibold text-base leading-tight">
+                                        <p className="dark:text-white text-black  font-semibold text-base leading-tight">
                                             Support Ticket Settings
                                         </p>
-                                        <p className="dark:text-white/50 text-black/45 text-xs roboto-condensed-light">
+                                        <p className="dark:text-white/50 text-black/45 text-xs ">
                                             Prefixes, numbering & ticket formatting
                                         </p>
                                     </div>
@@ -291,7 +291,7 @@ const SupportSettings = () => {
                                 py: 3,
                             }}
                         >
-                            <p className="dark:text-white/60 text-black/55 text-sm roboto-condensed mb-5 max-w-xl">
+                            <p className="dark:text-white/60 text-black/55 text-sm  mb-5 max-w-xl">
                                 Configure system-wide settings for support tickets — including ticket ID prefixes
                                 and minimum digit padding used across the platform.
                             </p>
@@ -325,7 +325,7 @@ const SupportSettings = () => {
                                         startAdornment: <PinRoundedIcon sx={{ fontSize: '1.1rem', mr: 1, color: '#6366f1' }} />,
                                     }}
                                     helperText={
-                                        <span className="dark:text-white/40 text-black/40 text-xs roboto-condensed">
+                                        <span className="dark:text-white/40 text-black/40 text-xs ">
                                             Zero-padded, e.g. SUB001 for three digits
                                         </span>
                                     }

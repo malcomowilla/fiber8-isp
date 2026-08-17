@@ -398,6 +398,13 @@ const HotspotPayments = () => {
       ),
     },
     {
+  title: 'Type',
+  field: 'voucher',
+  render: (rowData) => rowData.voucher?.startsWith('DEVICE-')
+    ? <Chip label="TV / Device plan" size="small" sx={{ bgcolor: '#e0f2fe', color: '#0369a1', fontWeight: 700 }} />
+    : <Chip label="Hotspot voucher" size="small" sx={{ bgcolor: '#f1f5f9', color: '#475569', fontWeight: 700 }} />
+},
+    {
       title: 'Payment Method',
       field: 'payment_method',
       headerClassName: 'dark:text-black font-semibold',
@@ -488,6 +495,9 @@ const HotspotPayments = () => {
         </Tooltip>
       ),
     },
+
+
+    
     {
       title: 'Status',
       field: 'status',
