@@ -210,7 +210,7 @@ const AppearanceSettings = () => {
         if (d && d.color_hsl) {
           const t = {
             colorHsl: d.color_hsl, colorPresetId: d.color_preset_id || 'custom',
-            fontKey: d.font_key || 'inter', displayFontKey: d.display_font_key || d.font_key || 'inter',
+            fontKey: d.font_key || 'plexMono', displayFontKey: d.display_font_key || d.font_key || 'plexMono',
             fontItalic: !!d.font_italic, displayFontItalic: !!d.display_font_italic,
             radius: d.radius || 'balanced', density: d.density || 'comfortable', mode: d.mode || 'system',
           };

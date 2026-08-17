@@ -11,7 +11,6 @@ export const FONT_LIBRARY = {
   lexend:       { label: 'Lexend',            google: 'Lexend:wght@400;500;600;700;800',             stack: "'Lexend', sans-serif",             vibe: 'Highly readable' },
   urbanist:     { label: 'Urbanist',          google: 'Urbanist:wght@400;500;600;700;800',           stack: "'Urbanist', sans-serif",           vibe: 'Light & elegant' },
   fraunces:     { label: 'Fraunces',          google: 'Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700', stack: "'Fraunces', serif",       vibe: 'Editorial & premium' },
-  // ── newly added ──────────────────────────────────────────────────────────
   poppins:      { label: 'Poppins',           google: 'Poppins:wght@400;500;600;700;800',            stack: "'Poppins', sans-serif",           vibe: 'Bold & geometric' },
   nunito:       { label: 'Nunito',            google: 'Nunito:wght@400;500;600;700;800',             stack: "'Nunito', sans-serif",             vibe: 'Soft & approachable' },
   workSans:     { label: 'Work Sans',         google: 'Work+Sans:wght@400;500;600;700;800',          stack: "'Work Sans', sans-serif",          vibe: 'Practical & tidy' },
@@ -20,7 +19,6 @@ export const FONT_LIBRARY = {
   merriweather: { label: 'Merriweather',      google: 'Merriweather:wght@400;700;900',                stack: "'Merriweather', serif",            vibe: 'Classic & readable serif' },
   plexMono:     { label: 'IBM Plex Mono',     google: 'IBM+Plex+Mono:wght@400;500;600;700',           stack: "'IBM Plex Mono', monospace",       vibe: 'Technical & monospaced' },
 };
-
 
 export const COLOR_PRESETS = [
   { id: 'teal',    label: 'Teal (default)', hsl: '173 80% 24%' },
@@ -31,7 +29,7 @@ export const COLOR_PRESETS = [
   { id: 'rose',    label: 'Rose',           hsl: '347 77% 45%' },
   { id: 'amber',   label: 'Amber',          hsl: '38 92% 40%' },
   { id: 'slate',   label: 'Slate',          hsl: '215 25% 27%' },
-  ...NEW_COLORS.map(({ id, label, hsl }) => ({ id, label, hsl })), // drop hex, keep shape consistent
+  ...NEW_COLORS.map(({ id, label, hsl }) => ({ id, label, hsl })),
 ];
 export const RADIUS_PRESETS = { sharp: '4px', balanced: '10px', round: '18px' };
 export const DENSITY_PRESETS = { compact: '0.92', comfortable: '1', spacious: '1.08' };
@@ -39,19 +37,18 @@ export const DENSITY_PRESETS = { compact: '0.92', comfortable: '1', spacious: '1
 export const DEFAULT_THEME = {
   colorHsl: COLOR_PRESETS[0].hsl,
   colorPresetId: 'teal',
-  fontKey: 'inter',
-  displayFontKey: 'inter',
-  fontItalic: false,        // NEW — body text italic
-  displayFontItalic: false, // NEW — heading/display text italic
+  fontKey: 'plexMono',
+  displayFontKey: 'plexMono',
+  fontItalic: false,
+  displayFontItalic: false,
   radius: 'balanced',
   density: 'comfortable',
-  mode: 'light', // light | dark | system
+  mode: 'light',
 };
 
 const ORG_CACHE_KEY = 'aitechs_appearance_org_cache';
 const personalKey = (userId) => `aitechs_appearance_personal_${userId || 'guest'}`;
 
-// ── Color helpers ────────────────────────────────────────────────────────────
 export function hexToHsl(hex) {
   let r = 0, g = 0, b = 0;
   if (hex.length === 7) {
@@ -92,7 +89,6 @@ export function hslToHex(hslStr) {
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
-// ── Font loading ──────────────────────────────────────────────────────────────
 let loadedFonts = new Set();
 function ensureGoogleFont(fontKey) {
   const font = FONT_LIBRARY[fontKey];
@@ -103,9 +99,6 @@ function ensureGoogleFont(fontKey) {
   document.head.appendChild(link);
   loadedFonts.add(fontKey);
 }
-
-
-
 
 function ensureDisplayFontClass() {
   if (document.getElementById('theme-utility-styles')) return;
@@ -120,12 +113,6 @@ function ensureDisplayFontClass() {
   document.head.appendChild(style);
 }
 
-
-
-
-
-
-// ── Apply to DOM ──────────────────────────────────────────────────────────────
 export function applyTheme(theme) {
   const t = { ...DEFAULT_THEME, ...theme };
   const root = document.documentElement;
@@ -134,17 +121,12 @@ export function applyTheme(theme) {
   ensureGoogleFont(t.displayFontKey);
   ensureDisplayFontClass();
 
-
-
   root.style.setProperty('--primary', t.colorHsl);
   root.style.setProperty('--ring', t.colorHsl);
   root.style.setProperty('--primary-foreground', '0 0% 100%');
   root.style.setProperty('--primary-muted', t.colorHsl);
-  root.style.setProperty('--font-sans', FONT_LIBRARY[t.fontKey]?.stack || FONT_LIBRARY.inter.stack);
-  root.style.setProperty('--font-display', FONT_LIBRARY[t.displayFontKey]?.stack || FONT_LIBRARY.inter.stack);
-  // NEW — italic is applied as a CSS style (synthetic slant), independent of which
-  // font family is loaded. This works for every font, including ones that don't
-  // ship true italic glyphs on Google Fonts.
+  root.style.setProperty('--font-sans', FONT_LIBRARY[t.fontKey]?.stack || FONT_LIBRARY.plexMono.stack);
+  root.style.setProperty('--font-display', FONT_LIBRARY[t.displayFontKey]?.stack || FONT_LIBRARY.plexMono.stack);
   root.style.setProperty('--font-style-sans', t.fontItalic ? 'italic' : 'normal');
   root.style.setProperty('--font-style-display', t.displayFontItalic ? 'italic' : 'normal');
   root.style.setProperty('--radius', RADIUS_PRESETS[t.radius] || RADIUS_PRESETS.balanced);
@@ -153,17 +135,12 @@ export function applyTheme(theme) {
   document.body.style.fontFamily = 'var(--font-sans)';
   document.body.style.fontSize = `calc(1rem * var(--font-scale))`;
   document.body.style.fontStyle = 'var(--font-style-sans)';
-  // Body italic cascades to any child that doesn't set its own font-style.
-  // Headings that explicitly use `fontFamily: 'var(--font-display)'` inline
-  // need `fontStyle: 'var(--font-style-display)'` added alongside it to pick
-  // up the display-italic toggle — see note below.
 
   const wantsDark = t.mode === 'dark' ||
     (t.mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   root.classList.toggle('dark', wantsDark);
 }
 
-// ── Local caches ──────────────────────────────────────────────────────────────
 export function cacheOrgTheme(theme) {
   localStorage.setItem(ORG_CACHE_KEY, JSON.stringify(theme));
 }
@@ -195,19 +172,18 @@ export function clearPersonalOverride(userId) {
   localStorage.removeItem(personalKey(userId));
 }
 
-// ── Resolve which theme wins: personal override > org default > hardcoded ────
 export function resolveActiveTheme(userId) {
   const org = readOrgCache() || DEFAULT_THEME;
   const personal = readPersonalOverride(userId);
   return personal || org;
 }
 
-// ── Boot sequence: call this once, as early as possible (main.jsx) ───────────
+// Boot sequence: call once, as early as possible (main.jsx).
+// localStorage cache is now just a fast paint before the tenant-scoped
+// backend value (fetched via X-Subdomain) lands and overwrites it.
 export async function bootTheme(userId, subdomain) {
-  // 1. Apply cached values instantly — avoids flash of unstyled/default theme
   applyTheme(resolveActiveTheme(userId));
 
-  // 2. Fetch the real org default in the background, then re-resolve
   try {
     const res = await fetch('/api/appearance_settings', { headers: { 'X-Subdomain': subdomain } });
     if (res.ok) {
@@ -215,7 +191,7 @@ export async function bootTheme(userId, subdomain) {
       if (d && d.color_hsl) {
         const orgTheme = {
           colorHsl: d.color_hsl, colorPresetId: d.color_preset_id || 'custom',
-          fontKey: d.font_key || 'inter', displayFontKey: d.display_font_key || d.font_key || 'inter',
+          fontKey: d.font_key || 'plexMono', displayFontKey: d.display_font_key || d.font_key || 'plexMono',
           fontItalic: !!d.font_italic, displayFontItalic: !!d.display_font_italic,
           radius: d.radius || 'balanced', density: d.density || 'comfortable', mode: d.mode || 'system',
         };
