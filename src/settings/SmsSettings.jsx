@@ -494,56 +494,9 @@ const SmsSettings = () => {
               </Card>
             </form>
 
-            {/* ── SMS templates ──────────────────────────────────────────────── */}
-            <form onSubmit={saveSmsTemplate}>
-              <Card>
-                <CardHeader
-                  icon={FileText}
-                  title="Message templates"
-                  description="Customise the messages sent to customers. Use the placeholder keywords exactly as shown."
-                />
-
-                <InfoBox>
-                  Use <code style={{ fontSize: '0.8125rem', fontFamily: 'monospace', background: 'rgba(0,0,0,0.06)', padding: '1px 5px', borderRadius: 4 }}>{'{{voucher_code}}'}</code> where the code should appear, and <code style={{ fontSize: '0.8125rem', fontFamily: 'monospace', background: 'rgba(0,0,0,0.06)', padding: '1px 5px', borderRadius: 4 }}>{'{{phone_number}}'}</code> for the customer's number.
-                </InfoBox>
-
-                <Grid container spacing={2} sx={{ mt: 0.5 }}>
-                  <Grid item xs={12}>
-                    <TextField
-                      {...tf}
-                      label="Voucher delivery message"
-                      name="send_voucher_template"
-                      value={send_voucher_template}
-                      onChange={e => setSmsTemplates(prev => ({ ...prev, [e.target.name]: e.target.value }))}
-                      multiline
-                      className='myTextField'
-                      rows={4}
-                      helperText="Sent to the customer when a voucher code is delivered"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      {...tf}
-                      label="Voucher confirmation message"
-                      name="voucher_template"
-                      value={voucher_template}
-                      onChange={e => setSmsTemplates(prev => ({ ...prev, [e.target.name]: e.target.value }))}
-                      multiline
-                      rows={4}
-                      className='myTextField'
-                      helperText="Sent to confirm the voucher code to the customer"
-                    />
-                  </Grid>
-                </Grid>
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-                  <SaveButton loading={savingTemplates}>Save templates</SaveButton>
-                </div>
-              </Card>
-            </form>
-
+          
             {/* ── PPPoE welcome message ──────────────────────────────────────── */}
-            <Card>
+            {/* <Card>
               <CardHeader
                 icon={MessageSquare}
                 title="PPPoE subscriber welcome message"
@@ -560,11 +513,11 @@ const SmsSettings = () => {
                 placeholder="Hi {{name}}, your account has been created…"
               />
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-                <SaveButton onClick={e => { e.preventDefault(); /* wire to API */ }}>
+                <SaveButton onClick={e => { e.preventDefault();  }}>
                   Save message
                 </SaveButton>
               </div>
-            </Card>
+            </Card> */}
 
           </div>
         </Suspense>
