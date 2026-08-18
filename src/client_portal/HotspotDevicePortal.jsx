@@ -11,8 +11,11 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 
 
-import { DeviceIcon } from 'lucide-react'
-
+import { 
+  Smartphone,  
+  Wifi,
+  // ... your other imports
+} from 'lucide-react'
 
 
 
@@ -514,7 +517,7 @@ function PortalDashboard({ token, customer, onLogout }) {
                         className="flex items-center gap-3 bg-white/4 border border-white/8 rounded-xl p-3"
                       >
                         <div className="w-9 h-9 bg-cyan-500/12 border border-cyan-500/20 rounded-xl flex items-center justify-center text-cyan-400 shrink-0">
-                          <DeviceIcon type={device.device_type} size={16} />
+                          <Smartphone type={device.device_type} size={16} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold truncate">{device.device_name}</p>
