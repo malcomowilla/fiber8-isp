@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bell, Sparkles, Wrench, AlertTriangle, Construction, Megaphone, X,
 } from 'lucide-react';
+import { createConsumer } from '@rails/actioncable';
 
 const TYPE_META = {
   feature:     { label: 'New feature',  Icon: Sparkles,      accent: '#a78bfa' },
@@ -27,6 +28,9 @@ const timeAgo = (dateStr) => {
   if (days < 7) return `${days}d ago`;
   return new Date(dateStr).toLocaleDateString('en-KE', { month: 'short', day: 'numeric' });
 };
+
+
+
 
 // ── Individual toast ─────────────────────────────────────────────────────────
 function Toast({ announcement, onDismiss }) {
@@ -138,6 +142,78 @@ const NotificationCenter = () => {
     const interval = setInterval(fetchAnnouncements, POLL_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [fetchAnnouncements]);
+
+
+
+
+const cable = useRef(null);
+const subscription = useRef(null);
+
+
+
+useEffect(() => {
+  const consumer = createConsumer(
+    `wss://${window.location.hostname}/cable`
+  );
+
+  subscription.current = consumer.subscriptions.create(
+    {
+      channel: 'MaintenanceChannel',
+      subdomain,
+    },
+    {
+      received(data) {
+        const announcement = data.announcement;
+
+        if (!announcement) return;
+
+        if (data.type === 'created') {
+          setAnnouncements((prev) => {
+            if (prev.some((a) => a.id === announcement.id)) {
+              return prev;
+            }
+
+            return [announcement, ...prev];
+          });
+
+          setToasts((prev) => {
+            if (prev.some((a) => a.id === announcement.id)) {
+              return prev;
+            }
+
+            return [announcement, ...prev].slice(0, 4);
+          });
+        }
+
+        if (data.type === 'updated') {
+          setAnnouncements((prev) =>
+            prev.map((a) =>
+              a.id === announcement.id ? announcement : a
+            )
+          );
+
+          // If the updated announcement is still live,
+          // show it as a new notification.
+          setToasts((prev) => {
+            const filtered = prev.filter(
+              (a) => a.id !== announcement.id
+            );
+
+            return [announcement, ...filtered].slice(0, 4);
+          });
+        }
+      },
+    }
+  );
+
+  return () => {
+    subscription.current?.unsubscribe();
+    consumer.disconnect();
+  };
+}, [subdomain]);
+
+
+
 
   useEffect(() => {
     const handleClickOutside = (e) => {
