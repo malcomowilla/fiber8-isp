@@ -645,16 +645,16 @@ export default function HotspotDevicePortal() {
         }}
       />
       <AnimatePresence mode="wait">
-        {token ? (
-          <motion.div key="login" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <PortalLogin onLogin={handleLogin} />
-          </motion.div>
-        ) : (
-          <motion.div key="dash" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <PortalDashboard token={token} customer={customer} onLogout={handleLogout} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+  {token ? (
+    <motion.div key="dash" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <PortalDashboard token={token} customer={customer} onLogout={handleLogout} />
+    </motion.div>
+  ) : (
+    <motion.div key="login" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <PortalLogin onLogin={handleLogin} />
+    </motion.div>
+  )}
+</AnimatePresence>
     </>
   );
 }
