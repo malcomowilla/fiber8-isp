@@ -15,7 +15,6 @@ import toast, { Toaster } from "react-hot-toast";
 
 
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const getSubdomain = () => window.location.hostname.split(".")[0];
 
@@ -424,7 +423,8 @@ function PortalDashboard({ token, customer, onLogout }) {
                             value={addForm.name}
                             onChange={(e) => setAddForm((p) => ({ ...p, name: e.target.value }))}
                             placeholder='e.g. "Bedroom TV"'
-                            className="w-full bg-white/6 border border-white/12 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/25 focus:outline-none focus:border-green-500/50"
+                            className="w-full bg-white/6 border border-white/12 rounded-xl px-4 py-2.5 text-sm
+                             text-black placeholder-white/25 focus:outline-none focus:border-green-500/50"
                           />
                         </div>
 
@@ -465,7 +465,7 @@ function PortalDashboard({ token, customer, onLogout }) {
                               if (addErr && isValidMac(v)) setAddErr("");
                             }}
                             placeholder="AA:BB:CC:DD:EE:FF"
-                            className="w-full bg-white/6 border border-white/12 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/25 font-mono focus:outline-none focus:border-green-500/50"
+                            className="w-full bg-white/6 border border-white/12 rounded-xl px-4 py-2.5 text-sm text-black placeholder-white/25 font-mono focus:outline-none focus:border-green-500/50"
                           />
                           {addErr && (
                             <p className="text-xs text-red-400 mt-1">{addErr}</p>
