@@ -89,7 +89,8 @@ function PortalLogin({ onLogin }) {
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
           <form onSubmit={submit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-semibold text-white
+              uppercase tracking-wide mb-1.5">
                 Phone number
               </label>
               <input
@@ -97,14 +98,16 @@ function PortalLogin({ onLogin }) {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="0712 345 678"
-                className="w-full bg-white/8 border border-white/12 rounded-xl px-4 py-3 text-sm text-white placeholder-white/25 focus:outline-none focus:border-green-500/60 focus:ring-1 focus:ring-green-500/20"
+                className="w-full bg-white/8 border border-white/12 rounded-xl px-4 py-3
+                 text-sm text-black placeholder-white/25 focus:outline-none focus:border-green-500/60 focus:ring-1 focus:ring-green-500/20"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-bold
+               rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <RefreshCw size={15} className="animate-spin" />
