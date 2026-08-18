@@ -11,12 +11,6 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 
 
-import { 
-  Smartphone,  
-  Wifi,
-  // ... your other imports
-} from 'lucide-react'
-
 
 
 
