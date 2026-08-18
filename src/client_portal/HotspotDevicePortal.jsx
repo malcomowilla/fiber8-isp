@@ -42,27 +42,25 @@ const DEVICE_TYPES = [
 
 
 
+
+
 function PortalLogin({ onLogin }) {
-  const [form, setForm]       = useState({ username: "", password: "" });
-  const [showPw, setShowPw]   = useState(false);
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const subdomain = getSubdomain();
 
   const submit = async (e) => {
     e.preventDefault();
-    if (!form.username.trim() || !form.password) {
-      toast.error("Enter your username and password");
-      return;
-    }
+    if (!phone.trim()) { toast.error("Enter your phone number"); return; }
     setLoading(true);
     try {
       const res = await fetch("/api/hotspot/portal/login", {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-Subdomain": subdomain },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ phone_number: phone }),
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error || "Invalid credentials"); return; }
+      if (!res.ok) { toast.error(data.error || "No account found for this number"); return; }
       onLogin(data.token, data.customer);
     } catch {
       toast.error("Could not connect. Check your internet.");
@@ -72,8 +70,7 @@ function PortalLogin({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4 font-sans
-">
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4 font-sans">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
@@ -85,7 +82,7 @@ function PortalLogin({ onLogin }) {
           </div>
           <h1 className="text-2xl font-bold text-white">My Hotspot Account</h1>
           <p className="text-sm text-gray-400 mt-1">
-            Manage devices, check balance, renew plan
+            Log in with the phone number you paid with
           </p>
         </div>
 
@@ -93,36 +90,15 @@ function PortalLogin({ onLogin }) {
           <form onSubmit={submit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">
-                Username / voucher
+                Phone number
               </label>
               <input
-                type="text"
-                value={form.username}
-                onChange={(e) => setForm((p) => ({ ...p, username: e.target.value }))}
-                placeholder="Your hotspot username"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="0712 345 678"
                 className="w-full bg-white/8 border border-white/12 rounded-xl px-4 py-3 text-sm text-white placeholder-white/25 focus:outline-none focus:border-green-500/60 focus:ring-1 focus:ring-green-500/20"
               />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPw ? "text" : "password"}
-                  value={form.password}
-                  onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
-                  placeholder="••••••••"
-                  className="w-full bg-white/8 border border-white/12 rounded-xl px-4 py-3 pr-11 text-sm text-white placeholder-white/25 focus:outline-none focus:border-green-500/60 focus:ring-1 focus:ring-green-500/20"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPw((p) => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
-                >
-                  {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
-                </button>
-              </div>
             </div>
 
             <button
@@ -141,12 +117,15 @@ function PortalLogin({ onLogin }) {
         </div>
 
         <p className="text-center text-xs text-gray-600 mt-4">
-          Use the username from your hotspot voucher or admin account
+          Use the same phone number you used to pay for your TV plan or voucher
         </p>
       </motion.div>
     </div>
   );
 }
+
+
+
 
 function PortalDashboard({ token, customer, onLogout }) {
   const subdomain = getSubdomain();

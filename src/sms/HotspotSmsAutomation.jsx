@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   PartyPopper,
   ChevronRight,
+  Tv,
 } from 'lucide-react'
 
 
@@ -45,6 +46,18 @@ const EXPIRATION_VARIABLES = [
   { token: 'customer_phone', label: 'Customer phone number' },
   { token: 'voucher_code', label: 'Voucher code' },
   { token: 'plan_name', label: 'Hotspot plan name' },
+  { token: 'company_name', label: 'Your company name' },
+]
+
+
+
+const TV_PLAN_VARIABLES = [
+  { token: 'customer_phone', label: 'Customer phone number' },
+  { token: 'device_name', label: 'TV / device name' },
+  { token: 'plan_name', label: 'TV plan name' },
+  { token: 'price', label: 'Plan price' },
+  { token: 'validity', label: 'Expiry date/time' },
+  { token: 'portal_url', label: 'Customer portal login link' },
   { token: 'company_name', label: 'Your company name' },
 ]
 
@@ -424,7 +437,6 @@ export default function HotspotSmsAutomation() {
   }
 
   const handleNewTemplate = () => {
-    // Categories are currently a fixed set seeded server-side (see DEFAULTS
     // in the controller) — there's no create-arbitrary-template endpoint
     // yet, so this is a placeholder until that flow is built out.
     toast('Custom templates are coming soon — for now you can edit the existing ones.', {
@@ -439,6 +451,7 @@ export default function HotspotSmsAutomation() {
   // (group derived from 'expiration'.split('_') is just 'expiration'),
   // so it was fetched but never rendered anywhere.
   const expirationTemplate = templates.find((t) => t.category === 'expiration' || t.group === 'expiration')
+const tvPlanTemplate = templates.find((t) => t.category === 'tv_plan_purchase')
 
   return (
     <div className="min-h-full bg-gray-50/60 font-sans">
@@ -534,6 +547,39 @@ export default function HotspotSmsAutomation() {
             ))}
           </div>
         </section>
+
+
+
+
+{tvPlanTemplate && (
+  <section className="mb-10">
+    <div className="flex items-center gap-2 mb-3">
+      <Tv size={15} className="text-teal-600" />
+      <h2 className="text-sm font-semibold text-gray-800">TV Plan Purchase</h2>
+      <span className="text-[11px] text-gray-400">sent when a customer buys a TV plan</span>
+    </div>
+    <div className="max-w-md space-y-2">
+      <TemplateCard
+        template={tvPlanTemplate}
+        variables={TV_PLAN_VARIABLES}
+        onChange={updateTemplate}
+        onPreview={setPreviewing}
+      />
+      <button
+        onClick={() => persistTemplate(tvPlanTemplate.id)}
+        disabled={saving === tvPlanTemplate.id}
+        className="w-full text-xs font-medium py-2 rounded-lg border border-teal-200 text-teal-700 hover:bg-teal-50 transition-colors disabled:opacity-50"
+      >
+        {saving === tvPlanTemplate.id ? 'Saving…' : 'Save changes'}
+      </button>
+    </div>
+  </section>
+)}
+
+
+
+
+
 
         {/* NEW — Voucher expiration */}
         {expirationTemplate && (

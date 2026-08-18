@@ -399,7 +399,9 @@ function DhcpLeasePicker({ router, onClose, onSelect }) {
             <button type="button" onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'#9ca3af' }}><X size={18}/></button>
           </div>
         </div>
+
         <div className="bp-lease-search">
+          <DeviceLimitSettings sd={sd} />
           <div className="bp-search-wrap">
             <Search size={13} className="bp-search-icon"/>
             <input className="bp-input bp-search-input" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, MAC or IP…" style={{ fontSize:13 }} autoFocus/>
@@ -798,6 +800,22 @@ function TvPlanDevicesTable({ devices, onEdit, onDelete, deleting, deleteTargetI
 
                   <div style={{ display:'flex', gap:6, justifyContent:'flex-end' }}>
                     <button className="bp-btn-edit" onClick={() => onEdit(d)}><Pencil size={12}/></button>
+
+<button
+                      className="bp-btn-edit"
+                      title="Allow this customer to replace the device once"
+                      onClick={async () => {
+                        await fetch(`/api/ip_bindings/${d.id}/allow_replacement`, {
+                          method: 'POST',
+                          headers: { 'X-Subdomain': getSubdomain(), 'X-CSRF-Token': getCsrf() },
+                        });
+                        toast.success('Replacement unlocked for this customer');
+                      }}
+                    >
+                      <Zap size={12}/>
+                    </button>
+
+
                     <button className="bp-btn-danger" onClick={() => onDelete(d)} disabled={deleting && deleteTargetId === d.id}>
                       {deleting && deleteTargetId === d.id
                         ? <span style={{ width:12, height:12, border:'2px solid #fca5a5', borderTop:'2px solid #dc2626', borderRadius:'50%', animation:'bp-spin 1s linear infinite', display:'inline-block' }}/>
@@ -893,17 +911,18 @@ function MacVoucherDevicesTable({ devices, onEdit, onDelete, deleting, deleteTar
 
 
 
-
-
 function DeviceLimitSettings({ sd }) {
-  const [limit, setLimit] = useState(1);
-  const [selfService, setSelfService] = useState(false);
+  const [maxReplacements, setMaxReplacements] = useState(1);
+  const [requiresUnlock, setRequiresUnlock] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetch('/api/hotspot_bypass_settings', { headers: { 'X-Subdomain': sd } })
       .then(r => r.json())
-      .then(d => { setLimit(d.max_customer_bypass_devices ?? 1); setSelfService(!!d.allow_device_self_service); });
+      .then(d => {
+        setMaxReplacements(d.max_tv_plan_replacements ?? 1);
+        setRequiresUnlock(d.tv_plan_replacement_requires_unlock ?? true);
+      });
   }, [sd]);
 
   const save = async () => {
@@ -911,27 +930,36 @@ function DeviceLimitSettings({ sd }) {
     await fetch('/api/hotspot_bypass_settings', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'X-Subdomain': sd },
-      body: JSON.stringify({ max_customer_bypass_devices: limit, allow_device_self_service: selfService }),
+      body: JSON.stringify({
+        max_tv_plan_replacements: maxReplacements,
+        tv_plan_replacement_requires_unlock: requiresUnlock,
+      }),
     });
     setSaving(false);
   };
 
   return (
-    <div className="bp-card" style={{ padding: 16, marginBottom: 20, display: 'flex', gap: 20, alignItems: 'center' }}>
-      <div>
-        <span className="bp-label">Max devices per customer</span>
-        <input type="number" min="1" className="bp-input" style={{ width: 90 }}
-          value={limit} onChange={e => setLimit(Number(e.target.value))} />
+    <div className="bp-card" style={{ padding: 16, marginBottom: 20 }}>
+      <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>TV Plan Device Replacements</p>
+      <p style={{ fontSize: 12, color: '#6b7280', marginBottom: 14 }}>
+        Customers can't add new devices from the portal — only replace a device's MAC/IP
+        when their TV connection breaks (e.g. MAC changed), and only while their plan is active.
+      </p>
+      <div style={{ display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap' }}>
+        <div>
+          <span className="bp-label">Max replacements per device</span>
+          <input type="number" min="1" className="bp-input" style={{ width: 90 }}
+            value={maxReplacements} onChange={e => setMaxReplacements(Number(e.target.value))} />
+        </div>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600 }}>
+          <input type="checkbox" checked={requiresUnlock} onChange={e => setRequiresUnlock(e.target.checked)} />
+          Require admin to unlock each replacement first
+        </label>
+        <button className="bp-btn-primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
       </div>
-      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600 }}>
-        <input type="checkbox" checked={selfService} onChange={e => setSelfService(e.target.checked)} />
-        Let customers add devices themselves (within limit, while plan is active)
-      </label>
-      <button className="bp-btn-primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
     </div>
   );
 }
-
 
 
 
