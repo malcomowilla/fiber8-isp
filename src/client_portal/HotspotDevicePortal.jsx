@@ -11,6 +11,7 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 
 
+import { DeviceIcon } from 'lucide-react'
 
 
 
