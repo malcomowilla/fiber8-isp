@@ -19,6 +19,7 @@ import Updates from './Updates'
 import  WelcomeMessage from './WelcomeMessage'
 import {RefreshCw} from 'lucide-react';
 
+import NotificationCenter from './NotificationCenter';
 
 
 const Layout = () => {
@@ -357,7 +358,7 @@ useEffect(() => {
     <Header />
     </div>
 
-    
+     <NotificationCenter />
     <div
       className={`h-screen flex flex-col  transition-all 
         duration-500 ease-in-out ${
