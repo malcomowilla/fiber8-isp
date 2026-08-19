@@ -19,7 +19,7 @@ import Updates from './Updates'
 import  WelcomeMessage from './WelcomeMessage'
 import {RefreshCw} from 'lucide-react';
 
-import NotificationCenter from './NotificationCenter';
+import NotificationCenter from '../analytics/NotificationCenter';
 
 
 const Layout = () => {
