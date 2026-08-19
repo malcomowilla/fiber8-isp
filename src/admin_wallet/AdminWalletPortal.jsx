@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   Wallet, 
   Wifi, 
@@ -88,7 +88,9 @@ const apiService = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        "X-Subdomain": window.location.hostname.split('.')[0]
+        "X-Subdomain": window.location.hostname.split('.')[0],
+        'X-Idempotency-Key': request.idempotencyKey
+
       },
       body: JSON.stringify(request)
     });
@@ -432,6 +434,9 @@ const AdminWalletPortal = () => {
     hotspot: { total: 0, pending: 0, paid: 0, lastPaidAt: null },
     pppoe: { total: 0, pending: 0, paid: 0, lastPaidAt: null }
   });
+
+  const isSubmittingRef = useRef(false);
+    const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID());
   const [loading, setLoading] = useState(true);
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -573,48 +578,62 @@ const AdminWalletPortal = () => {
     }
   };
 
-  const handleWithdrawalFlow = async (e) => {
-    e.preventDefault();
-    if (!pinVerified) { setShowPinModal(true); return; }
-    if (!otpVerified) {
-      try {
-        const response = await apiService.sendWithdrawalOtp(phoneNumber);
-        if (response.success) { setShowOtpModal(true); showNotification(`OTP sent via ${otpMethod}`, 'success'); }
-      } catch (error) { showNotification(error.message, 'error'); }
+
+  
+  // 4. processWithdrawal — hard-guard against re-entry, restore the min-amount check
+  const processWithdrawal = async () => {
+    if (isSubmittingRef.current) return; // already in flight, ignore
+    isSubmittingRef.current = true;
+
+    const amount = parseFloat(withdrawAmount);
+    if (isNaN(amount) || amount <= 0) {
+      showNotification('Please enter a valid amount', 'error');
+      isSubmittingRef.current = false;
       return;
     }
-    processWithdrawal();
-  };
+    if (!phoneNumber || phoneNumber.length < 10) {
+      showNotification('Please enter a valid phone number', 'error');
+      isSubmittingRef.current = false;
+      return;
+    }
 
-  const processWithdrawal = async () => {
-    const amount = parseFloat(withdrawAmount);
-    if (isNaN(amount) || amount <= 0) { showNotification
-      
-      (<p className='font-sans
-'>Please enter a valid amount</p>, 'error'); return; }
-    if (!phoneNumber || phoneNumber.length < 10) { showNotification(<p className='font-sans
-'>Please enter a valid phone number</p>, 'error'); return; }
-    const minAmount = payoutSettings[selectedWallet].minAmount;
-    // if (amount < minAmount) { showNotification(`Minimum withdrawal amount is ${formatCurrency(minAmount)}`, 'error'); return; }
+    const minAmount = payoutSettings[selectedWallet]?.minAmount ?? 0;
+    if (amount < minAmount) {
+      showNotification(`Minimum withdrawal amount is ${formatCurrency(minAmount)}`, 'error');
+      isSubmittingRef.current = false;
+      return;
+    }
+
     setIsProcessing(true);
     try {
       const result = await apiService.initiateWithdrawal({
-        amount, phonenumber: phoneNumber, wallettype: selectedWallet,
-        description: description || `Withdrawal from ${selectedWallet.toUpperCase()} wallet`
+        amount,
+        phonenumber: phoneNumber,
+        wallettype: selectedWallet,
+        description: description || `Withdrawal from ${selectedWallet.toUpperCase()} wallet`,
+        idempotencyKey
       });
-      if (result.success) { showNotification(<p className='font-sans
-'>Withdrawal initiated successfully!</p>, 'success'); resetWithdrawalForm(); await loadTransactionHistory(); }
+      if (result.success) {
+        showNotification('Withdrawal initiated successfully!', 'success');
+        resetWithdrawalForm();
+        await loadTransactionHistory();
+      }
     } catch (error) {
-      showNotification(<p className='font-sans
-'>{error.message}</p>, 'error');
+      showNotification(error.message, 'error');
     } finally {
       setIsProcessing(false);
+      isSubmittingRef.current = false;
     }
   };
-
+  // 5. Reset the idempotency key whenever the form resets, so a genuinely new
+  //    withdrawal gets a fresh key (don't reuse a key across separate withdrawals).
   const resetWithdrawalForm = () => {
-    setWithdrawAmount(''); setPhoneNumber(''); setDescription('');
-    setPinVerified(false); setOtpVerified(false);
+    setWithdrawAmount('');
+    setPhoneNumber('');
+    setDescription('');
+    setPinVerified(false);
+    setOtpVerified(false);
+    setIdempotencyKey(crypto.randomUUID());
   };
 
   const handleSaveSettings = async () => {
@@ -865,7 +884,8 @@ const AdminWalletPortal = () => {
                 </ol>
               </div>
 
-              <button type="submit" disabled={isProcessing || !withdrawAmount || !phoneNumber}
+              <button type="submit" disabled={isProcessing || isSubmittingRef.current || !withdrawAmount || !phoneNumber}
+
                 className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg">
                 {isProcessing ? (<><Loader2 size={20} className="animate-spin" /><span>Processing...</span></>) : (
                   <><ArrowUpRight size={20} /><span>{!pinVerified ? 'Verify PIN' : !otpVerified ? 'Send OTP' : 'Process Withdrawal'}</span></>
