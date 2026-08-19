@@ -486,6 +486,62 @@ const AdminWalletPortal = () => {
     fetchLoadAlredyPaidHotspotBalance();
   }, []);
 
+
+
+
+
+
+
+
+
+
+  const handleWithdrawalFlow = async (e) => {
+    e.preventDefault();
+
+    const amount = parseFloat(withdrawAmount);
+    if (isNaN(amount) || amount <= 0) {
+      showNotification('Please enter a valid amount', 'error');
+      return;
+    }
+    if (!phoneNumber || phoneNumber.length < 10) {
+      showNotification('Please enter a valid phone number', 'error');
+      return;
+    }
+
+    const minAmount = payoutSettings[selectedWallet]?.minAmount ?? 0;
+    if (amount < minAmount) {
+      showNotification(`Minimum withdrawal amount is ${formatCurrency(minAmount)}`, 'error');
+      return;
+    }
+
+    // Step 1: PIN not verified yet -> open PIN modal
+    if (!pinVerified) {
+      setShowPinModal(true);
+      return;
+    }
+
+    // Step 2: PIN verified but OTP not yet -> send OTP, then open OTP modal
+    if (!otpVerified) {
+      try {
+        const response = await apiService.sendWithdrawalOtp(phoneNumber);
+        if (response.success) {
+          setShowOtpModal(true);
+        } else {
+          showNotification(response.error || 'Failed to send OTP', 'error');
+        }
+      } catch (error) {
+        showNotification('Failed to send OTP: ' + error.message, 'error');
+      }
+      return;
+    }
+
+    // Step 3: Both verified -> process the withdrawal
+    processWithdrawal();
+  };
+
+
+
+
   const fetchLoadAvailablePPOEBalance = useCallback(async() => {
     try {
       setLoading(true);
