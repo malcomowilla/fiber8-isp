@@ -37,7 +37,8 @@ const apiService = {
     const response = await fetch('/api/admin/wallet_balances', {
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-Token': document.querySelector('[name="csrf-token"]')?.content
+        'X-CSRF-Token': document.querySelector('[name="csrf-token"]')?.content,
+        'X-Subdomain': window.location.hostname.split('.')[0]
       }
     });
     const data = await response.json();
@@ -124,14 +125,19 @@ const apiService = {
 
   async getTransactionHistory() {
     const response = await fetch('/api/admin/transactions', {
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json',
+
+        'X-Subdomain': window.location.hostname.split('.')[0]
+       }
     });
     return response.json();
   },
 
   async getPayoutSettings() {
     const response = await fetch('/api/admin/payout_settings', {
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json',
+        'X-Subdomain': window.location.hostname.split('.')[0]
+       }
     });
     return response.json();
   },
@@ -141,6 +147,7 @@ const apiService = {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'X-Subdomain': window.location.hostname.split('.')[0],
         'X-CSRF-Token': document.querySelector('[name="csrf-token"]')?.content
       },
       body: JSON.stringify(settings)
@@ -156,7 +163,9 @@ const apiService = {
 
   async getRevenueBreakdown(walletType, days = 30) {
     const response = await fetch(`/api/admin/revenue_breakdown?type=${walletType}&days=${days}`, {
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json',
+        'X-Subdomain': window.location.hostname.split('.')[0]
+       }
     });
     return response.json();
   },
@@ -167,6 +176,7 @@ const apiService = {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
+        'X-Subdomain': window.location.hostname.split('.')[0],
         'X-CSRF-Token': document.querySelector('[name="csrf-token"]')?.content
       }
     });
@@ -559,7 +569,8 @@ const AdminWalletPortal = () => {
   const fetchLoadAvailableHotspotBalance = useCallback(async() => {
     try {
       setLoading(true);
-      const response = await fetch('/api/pending_hotspot_balance', { method: 'GET', headers: { 'X-Subdomain': subdomain } });
+      const response = await fetch('/api/pending_hotspot_balance', { method: 'GET', headers: { 'X-Subdomain': subdomain, 
+       } });
       const data = await response.json();
       if (response.ok) setAvailableHotspotBalance(data);
       else showNotification('Failed to load hotspot balance', 'error');
@@ -573,7 +584,9 @@ const AdminWalletPortal = () => {
   const fetchLoadAlredyPaidPPOEBalance = useCallback(async() => {
     try {
       setLoading(true);
-      const response = await fetch('/api/already_paid_pppoebalance', { method: 'GET', headers: { 'X-Subdomain': subdomain } });
+      const response = await fetch('/api/already_paid_pppoebalance', { method: 'GET', headers: { 
+        'X-Subdomain': window.location.hostname.split('.')[0]
+       } });
       const data = await response.json();
       if (response.ok) setPaidPpoeBalance(data);
       else showNotification('Failed to load paid PPPOE balance', 'error');
