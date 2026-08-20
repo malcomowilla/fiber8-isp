@@ -13,7 +13,7 @@ const TumaSettings = lazy(() => import('./TumaSettings'))
 
 const AppearanceSettings = lazy(() => import('./AppearanceSettings'))
 import { Palette } from 'lucide-react'  
-const PaymentGatewaySettings = lazy(() => import('./PaymentGatewaySettings'))
+// const PaymentGatewaySettings = lazy(() => import('./PaymentGatewaySettings'))
 
 
 
