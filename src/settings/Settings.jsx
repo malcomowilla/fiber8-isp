@@ -30,7 +30,7 @@ const TABS = [
 
   { id: 'SMS',          label: 'SMS',           icon: MessageSquare },
   { id: 'LICENSE',      label: 'License',       icon: Award },
-  // { id: 'PAYMENT_GATEWAYS', label: 'Payment Gateways', icon: Wallet },
+  { id: 'PAYMENT_GATEWAYS', label: 'Payment Gateways', icon: Wallet },
 
   // { id: 'MPESA',        label: 'M-Pesa',        icon: CreditCard },
   // { id: 'TUMA',         label: 'Tuma',          icon: Zap },
