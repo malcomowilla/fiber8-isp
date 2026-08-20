@@ -1,4 +1,3 @@
-// src/components/settings/PaymentGatewaySettings.jsx
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
