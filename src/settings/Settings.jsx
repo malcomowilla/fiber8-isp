@@ -8,8 +8,8 @@ const RadiusSettings = lazy(() => import('./RadiusSettings'))
 const LicenseSettings = lazy(() => import('./LicenseSettings'))
 const TaskSettings = lazy(() => import('./TaskSettings'))
 import {useApplicationSettings} from './ApplicationSettings'
-const GoogleMapSetting = lazy(() => import('./GoogleMapSetting'))
-const TumaSettings = lazy(() => import('./TumaSettings'))
+// const GoogleMapSetting = lazy(() => import('./GoogleMapSetting'))
+// const TumaSettings = lazy(() => import('./TumaSettings'))
 
 const AppearanceSettings = lazy(() => import('./AppearanceSettings'))
 import { Palette } from 'lucide-react'  
