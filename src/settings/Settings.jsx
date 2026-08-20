@@ -9,7 +9,7 @@ const LicenseSettings = lazy(() => import('./LicenseSettings'))
 const TaskSettings = lazy(() => import('./TaskSettings'))
 import {useApplicationSettings} from './ApplicationSettings'
 // const GoogleMapSetting = lazy(() => import('./GoogleMapSetting'))
-// const TumaSettings = lazy(() => import('./TumaSettings'))
+const TumaSettings = lazy(() => import('./TumaSettings'))
 
 const AppearanceSettings = lazy(() => import('./AppearanceSettings'))
 import { Palette } from 'lucide-react'  
@@ -30,7 +30,7 @@ const TABS = [
 
   { id: 'SMS',          label: 'SMS',           icon: MessageSquare },
   { id: 'LICENSE',      label: 'License',       icon: Award },
-  { id: 'PAYMENT_GATEWAYS', label: 'Payment Gateways', icon: Wallet },
+  // { id: 'PAYMENT_GATEWAYS', label: 'Payment Gateways', icon: Wallet },
 
   // { id: 'MPESA',        label: 'M-Pesa',        icon: CreditCard },
   // { id: 'TUMA',         label: 'Tuma',          icon: Zap },
@@ -149,8 +149,8 @@ duration-200 ${isPending ? 'opacity-50' : 'opacity-100'}`}>
               </div>
             }>
               {selectedTab === 'GENERAL' && <GeneralSettings/>}
-              {/* {selectedTab === 'MPESA' && <MpesaSettings/>} */}
-              {/* {selectedTab === 'TUMA' && <TumaSettings/>} */}
+              {selectedTab === 'MPESA' && <MpesaSettings/>}
+              {selectedTab === 'TUMA' && <TumaSettings/>}
               {selectedTab === 'EMAIL' && <EmailSettings/>}
               {selectedTab === 'LICENSE' && <LicenseSettings/>}
               {selectedTab === 'SMS' && <SmsSettings/>}
@@ -158,7 +158,7 @@ duration-200 ${isPending ? 'opacity-50' : 'opacity-100'}`}>
               {selectedTab === 'SUPPORT' && <SupportSettings/>}
               {selectedTab === 'TASK' && <TaskSettings/>}
               {selectedTab === 'APPEARANCE' && <AppearanceSettings/>}
-              {selectedTab === 'PAYMENT_GATEWAYS' && <PaymentGatewaySettings/>}
+              {/* {selectedTab === 'PAYMENT_GATEWAYS' && <PaymentGatewaySettings/>} */}
               {/* {selectedTab === 'MAP' && <GoogleMapSetting/>} */}
             </Suspense>
           </div>

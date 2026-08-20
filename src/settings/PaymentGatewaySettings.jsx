@@ -9,10 +9,6 @@ import {
   CreditCard, Plus, X, Globe, Building2, Lock
 } from 'lucide-react';
 
-// ═══════════════════════════════════════════════════════════════
-// GATEWAY REGISTRY — add a new gateway here and it shows up
-// everywhere: the picker, the active-gateway selects, etc.
-// ═══════════════════════════════════════════════════════════════
 const GATEWAYS = [
   { id: 'mpesa',    name: 'M-Pesa',    icon: Smartphone, description: 'Direct Daraja STK push' },
   { id: 'tuma',     name: 'Tuma',      icon: Zap,         description: 'M-Pesa STK via Tuma, settles to you' },
