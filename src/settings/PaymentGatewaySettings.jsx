@@ -549,7 +549,7 @@ const SasaPayPanel = () => {
         <div>
           <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Merchant Code</label>
           <div className="relative">
-            <Business size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Building2 size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input type="text" name="merchant_code" value={form.merchant_code} onChange={handleChange} className={inputCls} />
           </div>
         </div>
