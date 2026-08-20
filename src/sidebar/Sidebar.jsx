@@ -57,10 +57,16 @@ import {
 import { BsRouter } from "react-icons/bs";
 import { GrTechnology } from "react-icons/gr";
 import { FaUsersBetweenLines } from "react-icons/fa6";
+// import {
+//   Sparkles, Palette, MapPinned, LogOut, AlertTriangle, LifeBuoy,
+//   MessageSquareText, TrendingUp, UserRound, CircleUserRound, Radar,
+//   ShieldCheck, Users as UsersIcon,
+// } from 'lucide-react'
+
 import {
   Sparkles, Palette, MapPinned, LogOut, AlertTriangle, LifeBuoy,
   MessageSquareText, TrendingUp, UserRound, CircleUserRound, Radar,
-  ShieldCheck, Users as UsersIcon,
+  ShieldCheck, Users as UsersIcon, Stethoscope,
 } from 'lucide-react'
 import { LuTv } from "react-icons/lu";
 
@@ -230,7 +236,14 @@ const Sidebar = () => {
           icon: <IconChip tint="text-emerald-300"><ShieldCheck size={17} /></IconChip>,
           label: "Wireguard",
           path: "/admin/networks-wireguard-config"
-        }
+        },
+
+        
+        {
+  icon: <IconChip tint="text-red-300"><Stethoscope size={17} /></IconChip>,
+  label: "Troubleshooting",
+  path: "/admin/network-troubleshooting"
+}
       ]
     },
     finance: {
