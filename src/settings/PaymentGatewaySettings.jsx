@@ -2,12 +2,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+
+import PaymentGatewayOtpGate from '../security/PaymentGatewayOtpGate';
 import {
   Zap, ShieldCheck, Mail, KeyRound, Wifi, Tv, CheckCircle2,
   XCircle, Loader2, ExternalLink, Smartphone, Wallet, ArrowRight,
-  CreditCard, Plus, X, Globe, Business, Lock
+  CreditCard, Plus, X, Globe, Building2, Lock
 } from 'lucide-react';
-import PaymentGatewayOtpGate from '../security/PaymentGatewayOtpGate';
 
 // ═══════════════════════════════════════════════════════════════
 // GATEWAY REGISTRY — add a new gateway here and it shows up
@@ -155,7 +156,7 @@ const MpesaPanel = ({ subdomain }) => {
     <form onSubmit={handleSave} className="space-y-5">
       <SectionCard title="Daraja credentials">
         {[
-          ['short_code', 'Short code', Business],
+        ['short_code', 'Short code', Building2],
           ['api_initiator_username', 'API initiator username', KeyRound],
           ['consumer_key', 'Consumer key', KeyRound],
           ['consumer_secret', 'Consumer secret', Lock],
