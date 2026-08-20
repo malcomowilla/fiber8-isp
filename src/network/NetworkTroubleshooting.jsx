@@ -61,17 +61,21 @@ export default function NetworkTroubleshooting() {
   const chatEndRef = useRef(null);
 
   const fetchRouters = useCallback(async () => {
-    try {
-      const res = await fetch('/api/router_troubleshooting', { headers });
-      const data = await res.json();
-      if (res.ok) {
-        setRouters(data);
-        if (data.length && !selected) setSelected(data[0]);
-      }
-    } catch {
-      toast.error('Failed to load routers');
+  try {
+    const res = await fetch('/api/router_troubleshooting', { headers });
+    const data = await res.json();
+    if (res.ok && Array.isArray(data)) {
+      setRouters(data);
+      if (data.length && !selected) setSelected(data[0]);
+    } else {
+      setRouters([]);
+      if (!res.ok) toast.error(data?.error || 'Failed to load routers');
     }
-  }, [selected]);
+  } catch {
+    setRouters([]);
+    toast.error('Failed to load routers');
+  }
+}, [selected]);
 
   useEffect(() => { fetchRouters(); }, []);
 
@@ -98,21 +102,21 @@ export default function NetworkTroubleshooting() {
   }, [selected]);
 
   const fetchTab = useCallback(async (tab) => {
-    if (!selected || tab === 'overview') { setTabData(null); return; }
-    setLoadingTab(true);
-    const endpointMap = {
-      wireguard: 'wireguard', firewall: 'firewall', dhcp: 'dhcp_leases', hotspot: 'hotspot'
-    };
-    try {
-      const res = await fetch(`/api/router_troubleshooting/${selected.id}/${endpointMap[tab]}`, { headers });
-      const data = await res.json();
-      setTabData(res.ok ? data : null);
-    } catch {
-      setTabData(null);
-    } finally {
-      setLoadingTab(false);
-    }
-  }, [selected]);
+  if (!selected || tab === 'overview') { setTabData(null); return; }
+  setLoadingTab(true);
+  const endpointMap = {
+    wireguard: 'wireguard', firewall: 'firewall', dhcp: 'dhcp_leases', hotspot: 'hotspot'
+  };
+  try {
+    const res = await fetch(`/api/router_troubleshooting/${selected.id}/${endpointMap[tab]}`, { headers });
+    const data = await res.json();
+    setTabData(res.ok ? data : null);
+  } catch {
+    setTabData(null);
+  } finally {
+    setLoadingTab(false);
+  }
+}, [selected]);
 
   useEffect(() => { fetchTab(activeTab); }, [activeTab, fetchTab]);
 
@@ -378,11 +382,15 @@ function StatCard({ icon, label, value, warn, critical }) {
   );
 }
 
+
+
+
+
 function TabContent({ tab, data, loading }) {
   if (loading) return <p className="text-sm text-gray-400">Loading…</p>;
   if (!data) return <p className="text-sm text-gray-400">No data available right now.</p>;
 
-    if (tab === 'wireguard') {
+  if (tab === 'wireguard') {
     return (
       <div className="space-y-2 text-sm">
         <Row label="Configured" value={data.configured ? 'Yes' : 'No'} />
@@ -390,13 +398,15 @@ function TabContent({ tab, data, loading }) {
         <Row label="Connected" value={data.connected ? 'Yes' : 'No'} warn={!data.connected} />
         <Row label="Reachable" value={data.reachable ? 'Yes' : 'No'} warn={!data.reachable} />
         <Row label="Since" value={data.since || '—'} />
-        <Row label="Last checked" value={`${data.last_checked_minutes_ago} min ago`}
+        <Row label="Last checked"
+          value={data.last_checked_minutes_ago != null ? `${data.last_checked_minutes_ago} min ago` : '—'}
           warn={data.last_checked_minutes_ago > 15} />
       </div>
     );
   }
 
   if (tab === 'firewall') {
+    if (!Array.isArray(data)) return <p className="text-sm text-gray-400">No firewall data available.</p>;
     return (
       <div className="max-h-[50vh] overflow-y-auto space-y-1.5 text-sm">
         {data.map((r, idx) => (
@@ -410,6 +420,7 @@ function TabContent({ tab, data, loading }) {
   }
 
   if (tab === 'dhcp') {
+    if (!Array.isArray(data)) return <p className="text-sm text-gray-400">No DHCP lease data available.</p>;
     return (
       <div className="max-h-[50vh] overflow-y-auto space-y-1.5 text-sm">
         {data.map((l, idx) => (
@@ -423,11 +434,12 @@ function TabContent({ tab, data, loading }) {
   }
 
   if (tab === 'hotspot') {
+    const users = Array.isArray(data.active_users) ? data.active_users : [];
     return (
       <div className="text-sm space-y-2">
-        <p className="font-medium">{data.active_user_count} active users</p>
+        <p className="font-medium">{data.active_user_count ?? users.length} active users</p>
         <div className="max-h-[45vh] overflow-y-auto space-y-1.5">
-          {data.active_users.map((u, idx) => (
+          {users.map((u, idx) => (
             <div key={idx} className="flex justify-between border-b border-gray-100 dark:border-white/5 py-1.5">
               <span>{u.user}</span>
               <span className="text-gray-400">{u.address} · up {u.uptime}</span>
@@ -440,6 +452,7 @@ function TabContent({ tab, data, loading }) {
 
   return null;
 }
+
 
 function Row({ label, value, warn }) {
   return (
