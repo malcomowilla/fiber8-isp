@@ -149,8 +149,8 @@ duration-200 ${isPending ? 'opacity-50' : 'opacity-100'}`}>
               </div>
             }>
               {selectedTab === 'GENERAL' && <GeneralSettings/>}
-              {selectedTab === 'MPESA' && <MpesaSettings/>}
-              {selectedTab === 'TUMA' && <TumaSettings/>}
+              {/* {selectedTab === 'MPESA' && <MpesaSettings/>} */}
+              {/* {selectedTab === 'TUMA' && <TumaSettings/>} */}
               {selectedTab === 'EMAIL' && <EmailSettings/>}
               {selectedTab === 'LICENSE' && <LicenseSettings/>}
               {selectedTab === 'SMS' && <SmsSettings/>}
