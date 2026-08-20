@@ -13,6 +13,7 @@ const TumaSettings = lazy(() => import('./TumaSettings'))
 
 const AppearanceSettings = lazy(() => import('./AppearanceSettings'))
 import { Palette } from 'lucide-react'  
+const PaymentGatewaySettings = lazy(() => import('./PaymentGatewaySettings'))
 
 
 
@@ -29,8 +30,10 @@ const TABS = [
 
   { id: 'SMS',          label: 'SMS',           icon: MessageSquare },
   { id: 'LICENSE',      label: 'License',       icon: Award },
-  { id: 'MPESA',        label: 'M-Pesa',        icon: CreditCard },
-  { id: 'TUMA',         label: 'Tuma',          icon: Zap },
+  { id: 'PAYMENT_GATEWAYS', label: 'Payment Gateways', icon: Wallet },
+
+  // { id: 'MPESA',        label: 'M-Pesa',        icon: CreditCard },
+  // { id: 'TUMA',         label: 'Tuma',          icon: Zap },
 
   // { id: 'MAP',          label: 'Map',           icon: Map },
   { id: 'SUPPORT',      label: 'Support',       icon: LifeBuoy },
@@ -155,6 +158,7 @@ duration-200 ${isPending ? 'opacity-50' : 'opacity-100'}`}>
               {selectedTab === 'SUPPORT' && <SupportSettings/>}
               {selectedTab === 'TASK' && <TaskSettings/>}
               {selectedTab === 'APPEARANCE' && <AppearanceSettings/>}
+              {selectedTab === 'PAYMENT_GATEWAYS' && <PaymentGatewaySettings/>}
               {/* {selectedTab === 'MAP' && <GoogleMapSetting/>} */}
             </Suspense>
           </div>

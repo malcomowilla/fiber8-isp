@@ -1134,8 +1134,22 @@ sx={{                 '& label.Mui-focused': { color: '#10b981' },
 />
                   <Grid container spacing={2} sx={{ mt: 0.5 }}>
                     <Grid item xs={12} sm={6}>
-                      <TextField {...tf} label="Alert after (minutes)" onChange={handleChangeNasSettings} name="unreachable_duration_minutes" value={unreachable_duration_minutes} helperText="How long a NAS must be unreachable before triggering an alert" />
+                      <TextField {...tf} label="Alert after (minutes)" onChange={handleChangeNasSettings} name="unreachable_duration_minutes"
+                      className='myTextField'
+                      value={unreachable_duration_minutes} helperText="How long a NAS must be unreachable before triggering an alert" />
+                      sx={{
+    '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
                     </Grid>
+
+
+
                     <Grid item xs={12} sm={6}>
                       <TextField {...tf} label="Notification phone number" onChange={handleChangeNasSettings}
                        name="notification_phone_number" value={notification_phone_number} 

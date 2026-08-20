@@ -2121,9 +2121,9 @@ const registerUrls = async() => {
          dark:border-teal-500 dark:text-blue-300 text-center w-full border-gray-800 hover:bg-green-500 hover:text-white transition-all duration-300">
           Save
         </button>
+      </motion.div>
       </form>
       </motion.div> */}
-
 
 
 
