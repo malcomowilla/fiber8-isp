@@ -360,13 +360,13 @@ useEffect(() => {
 
      <NotificationCenter />
     <div
-      className={`h-screen flex flex-col  transition-all 
+      className={` flex flex-col  transition-all 
         duration-500 ease-in-out ${
         seeSidebar ? 'ml-16' : 'sm:ml-64'
       }`}
     >
-      <div className="flex-grow p-4 overflow-x-hidden">
-        <div className={`p-4 h-full`}>
+      <div className="flex-grow p-4 ">
+        <div className={`p-4 `}>
           {location.pathname !== '/admin/pppoe-packages'
            && location.pathname !== '/admin/pppoe-subscribers' &&
             location.pathname !== '/admin/upload-subscriber'

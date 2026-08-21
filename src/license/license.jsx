@@ -34,7 +34,8 @@ const ModernLicenseLoader = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4"
+      className="flex items-center justify-center bg-gradient-to-br
+       from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4"
     >
       <div className="w-full max-w-md">
         {/* Main Card */}
@@ -195,9 +196,9 @@ const EmptyLicenseState = () => {
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// LICENSE STATUS CARD
-// ─────────────────────────────────────────────────────────
+
+
+
 const LicenseStatusCard = ({ 
   status, 
   planName, 
@@ -370,9 +371,7 @@ const LicenseStatusCard = ({
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// MAIN LICENSE COMPONENT
-// ─────────────────────────────────────────────────────────
+
 const License = () => {
   const theme = useTheme()
   const [licenseData, setLicenseData] = useState(null)
@@ -502,7 +501,7 @@ const License = () => {
     <>
       <Toaster />
       <ThemeProvider theme={tableTheme}>
-        <div className="min-h-screen bg-gradient-to-br
+        <div className="bg-gradient-to-br
          from-slate-50 to-slate-100 dark:from-slate-900
           dark:to-slate-800 p-4 sm:p-8 font-sans
 ">
