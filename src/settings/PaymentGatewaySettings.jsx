@@ -345,12 +345,39 @@ const TumaPanel = ({ subdomain }) => {
 // PAYSTACK PANEL — frontend only for now, per your instruction.
 // Backend wiring (settings table + controller) comes when you say go.
 // ═══════════════════════════════════════════════════════════════
-const PaystackPanel = () => {
-  const [form, setForm] = useState({ enabled: false, live_secret_key: '', live_public_key: '' });
+
+
+const PaystackPanel = ({ subdomain }) => {
+  const [form, setForm] = useState({ enabled: false, secret_key: '', public_key: '' });
+  const [secretPresent, setSecretPresent] = useState(false);
+  const [secretMasked, setSecretMasked] = useState(null);
   const [ipList, setIpList] = useState([]);
   const [ipInput, setIpInput] = useState('');
   const [ipError, setIpError] = useState('');
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState(null);
+
+  const fetchSettings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/paystack_settings', { headers: { 'X-Subdomain': subdomain } });
+      if (res.ok) {
+        const data = await res.json();
+        setForm((prev) => ({ ...prev, enabled: !!data.enabled, public_key: data.public_key || '' }));
+        setSecretPresent(!!data.secret_key_present);
+        setSecretMasked(data.secret_key_masked);
+        setIpList(data.ip_whitelist || []);
+      }
+    } catch {
+      toast.error('Could not load Paystack settings');
+    } finally {
+      setLoading(false);
+    }
+  }, [subdomain]);
+
+  useEffect(() => { fetchSettings(); }, [fetchSettings]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -369,36 +396,59 @@ const PaystackPanel = () => {
     setIpInput('');
     setIpError('');
   };
-
   const removeIp = (ip) => setIpList((prev) => prev.filter((i) => i !== ip));
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    // Frontend-only for now — no backend endpoint yet.
-    // Wire this up to POST /api/paystack_settings once the backend lands.
     setSaving(true);
-    setTimeout(() => {
-      setSaving(false);
-      toast.success('Paystack settings saved locally (backend wiring coming soon)', {
-        duration: 3000, position: 'top-center',
+    setTestResult(null);
+    try {
+      const payload = { ...form, ip_whitelist: ipList };
+      if (!payload.secret_key) delete payload.secret_key;
+      const res = await fetch('/api/paystack_settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+        body: JSON.stringify(payload),
       });
-    }, 400);
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('Paystack settings saved');
+        setSecretPresent(!!data.secret_key_present);
+        setSecretMasked(data.secret_key_masked);
+        setForm((prev) => ({ ...prev, secret_key: '' }));
+      } else {
+        toast.error(data.errors?.[0] || 'Could not save settings');
+      }
+    } catch {
+      toast.error('Something went wrong. Please try again');
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const handleTestConnection = async () => {
+    setTesting(true);
+    setTestResult(null);
+    try {
+      const res = await fetch('/api/paystack_settings/test_connection', {
+        method: 'POST', headers: { 'X-Subdomain': subdomain },
+      });
+      const data = await res.json();
+      setTestResult(data);
+      data.success ? toast.success('Connected to Paystack') : toast.error(data.message || 'Connection failed');
+    } catch {
+      setTestResult({ success: false, message: 'Network error while testing connection' });
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>;
+  }
 
   return (
     <form onSubmit={handleSave} className="space-y-5">
-      <SectionCard title="Where to get these">
-        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-          Log in to your{' '}
-          <a href="https://dashboard.paystack.com" target="_blank" rel="noreferrer"
-            className="text-indigo-500 hover:underline inline-flex items-center gap-0.5">
-            Paystack dashboard <ExternalLink size={10} />
-          </a>{' '}
-          → Settings → API Keys &amp; Webhooks to copy your live keys, and Settings → Preferences → IP Whitelisting
-          to see/add the IPs Paystack should accept requests from.
-        </p>
-      </SectionCard>
-
       <div className="flex items-center justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
         <div className="flex items-center gap-3">
           <ShieldCheck size={18} className="text-slate-400" />
@@ -422,32 +472,42 @@ const PaystackPanel = () => {
                 <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Live Public Key</label>
                 <div className="relative">
                   <Globe size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text" name="live_public_key" value={form.live_public_key} onChange={handleChange}
-                    placeholder="Enter your live pulic key"
-                    className={inputCls}
-                  />
+                  <input type="text" name="public_key" value={form.public_key} onChange={handleChange}
+                    placeholder="pk_live_..." className={inputCls} />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Live Secret Key</label>
+                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
+                  Live Secret Key {secretPresent && <span className="text-slate-400">— currently set</span>}
+                </label>
                 <div className="relative">
                   <KeyRound size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="password" name="live_secret_key" value={form.live_secret_key} onChange={handleChange}
-                    placeholder="Enter your live secret key"
-                    className={inputCls}
-                  />
+                  <input type="password" name="secret_key" value={form.secret_key} onChange={handleChange}
+                    placeholder={secretMasked || 'sk_live_...'} className={inputCls} />
                 </div>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5">
-                  Never shown again after saving — stored encrypted server-side once the backend is wired up.
-                </p>
               </div>
+              <button
+                type="button" onClick={handleTestConnection} disabled={testing || !secretPresent}
+                className="flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-lg
+                  bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300
+                  hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
+              >
+                {testing ? <Loader2 size={13} className="animate-spin" /> : <ShieldCheck size={13} />}
+                {testing ? 'Testing…' : 'Test connection'}
+              </button>
+              {testResult && (
+                <div className={`flex items-start gap-2 rounded-xl p-3 text-xs
+                  ${testResult.success ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
+                                       : 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
+                  {testResult.success ? <CheckCircle2 size={14} className="shrink-0 mt-0.5" /> : <XCircle size={14} className="shrink-0 mt-0.5" />}
+                  <span>{testResult.message}</span>
+                </div>
+              )}
             </SectionCard>
 
             <SectionCard title="IP whitelist">
               <p className="text-xs text-slate-500 dark:text-slate-400 -mt-2">
-                Server IPs Paystack should trust for this account. Should match what's configured in your Paystack dashboard.
+                Server IPs Paystack should trust for this account.
               </p>
               <div className="flex gap-2">
                 <div className="relative flex-1">
@@ -456,29 +516,22 @@ const PaystackPanel = () => {
                     type="text" value={ipInput}
                     onChange={(e) => { setIpInput(e.target.value); setIpError(''); }}
                     onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addIp(); } }}
-                    placeholder="e.g. 41.90.64.12"
-                    className={inputCls}
+                    placeholder="e.g. 41.90.64.12" className={inputCls}
                   />
                 </div>
-                <button
-                  type="button" onClick={addIp}
+                <button type="button" onClick={addIp}
                   className="flex items-center gap-1.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800
                     text-slate-700 dark:text-slate-300 text-sm font-semibold
-                    hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shrink-0"
-                >
+                    hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shrink-0">
                   <Plus size={14} /> Add
                 </button>
               </div>
               {ipError && <p className="text-xs text-red-500">{ipError}</p>}
-
               {ipList.length > 0 ? (
                 <div className="flex flex-wrap gap-2 pt-1">
                   {ipList.map((ip) => (
-                    <span
-                      key={ip}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 dark:bg-slate-800
-                        text-slate-700 dark:text-slate-300 text-xs font-mono px-3 py-1.5"
-                    >
+                    <span key={ip} className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 dark:bg-slate-800
+                      text-slate-700 dark:text-slate-300 text-xs font-mono px-3 py-1.5">
                       {ip}
                       <button type="button" onClick={() => removeIp(ip)} className="hover:text-red-500 transition-colors">
                         <X size={12} />
@@ -494,16 +547,23 @@ const PaystackPanel = () => {
         )}
       </AnimatePresence>
 
-      <button
-        type="submit" disabled={saving}
+      <button type="submit" disabled={saving}
         className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700
-          disabled:opacity-60 text-white text-sm font-semibold transition-colors"
-      >
+          disabled:opacity-60 text-white text-sm font-semibold transition-colors">
         {saving ? 'Saving…' : 'Save Paystack settings'}
       </button>
     </form>
   );
 };
+
+
+
+
+
+
+
+
+
 
 // ═══════════════════════════════════════════════════════════════
 // SASAPAY PANEL — moved over from MpesaSettings.jsx, still
@@ -580,13 +640,31 @@ const PaymentGatewaySettings = () => {
 
   const ActivePanel = useMemo(() => PANELS[configTab], [configTab]);
 
-  const handleActiveGatewayChange = (useCase, gatewayId) => {
-    setActiveGateways((prev) => ({ ...prev, [useCase]: gatewayId }));
-    // Backend note: this should PATCH the single source of truth
-    // (e.g. PATCH /api/payment_gateway_settings { hotspot: gatewayId })
-    // so `make_payment`/`check_payment_status` just read one field
-    // instead of checking each gateway's own enabled/use_for_* flags.
-  };
+
+
+useEffect(() => {
+  fetch('/api/payment_gateway_settings', { headers: { 'X-Subdomain': subdomain } })
+    .then((res) => res.ok ? res.json() : {})
+    .then((data) => setActiveGateways((prev) => ({ ...prev, ...data })))
+    .catch(() => {});
+}, [subdomain]);
+
+
+
+
+
+const handleActiveGatewayChange = async (useCase, gatewayId) => {
+  setActiveGateways((prev) => ({ ...prev, [useCase]: gatewayId }));
+  try {
+    await fetch('/api/payment_gateway_settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+      body: JSON.stringify({ gateways: { [useCase]: gatewayId } }),
+    });
+  } catch {
+    toast.error('Could not save active gateway');
+  }
+};
 
   return (
     <PaymentGatewayOtpGate title="Payment Gateways">
