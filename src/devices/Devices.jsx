@@ -471,7 +471,7 @@ const troubleshootingItems = [
           localization={{
             body: {
               emptyDataSourceMessage: <p className='font-sans
-'>No devices found. Create your first device to get started! </p>
+'>No devices found! </p>
             
             }
           }}
