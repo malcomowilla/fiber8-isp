@@ -158,7 +158,7 @@ const SupportTickets = lazy(()=> import("./support/SupportTickets"))
 const HotspotSmsAutomation = lazy(()=> import("./sms/HotspotSmsAutomation") )
 const NetworkTroubleshooting = lazy(() => import("./network/NetworkTroubleshooting"))
 const HotspotIncidents = lazy(() => import("./network/HotspotIncidents"))
-
+const HotspotCompensationStats = lazy(() => import("./network/HotspotCompensationStats"))
 
 
 const App = ({client}) => {
@@ -772,6 +772,7 @@ hostname.endsWith('.aitechs.co.ke')
       <Route path="/admin/network-troubleshooting" element={<NetworkTroubleshooting />}/>
 
 <Route path="/admin/incidents" element={<HotspotIncidents />} />
+<Route path="/admin/stats-uptime" element={<HotspotCompensationStats />}/>
 
 
 

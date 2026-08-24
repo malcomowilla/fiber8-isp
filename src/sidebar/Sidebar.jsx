@@ -238,6 +238,19 @@ const Sidebar = () => {
           path: "/admin/networks-wireguard-config"
         },
 
+        {
+          icon: <IconChip tint="text-red-300"><AlertTriangle size={17} /></IconChip>,
+          label: "Incidents",
+          path: "/admin/incidents"
+        },
+
+
+        {
+  icon: <IconChip tint="text-emerald-300"><TrendingUp size={17} /></IconChip>,
+  label: "Network Uptime",
+  path: "/admin/stats-uptime"
+},
+
         
         {
   icon: <IconChip tint="text-red-300"><Stethoscope size={17} /></IconChip>,
@@ -357,11 +370,7 @@ const Sidebar = () => {
           label: "Revenue",
           path: "/admin/hotspot_anlytics"
         },
-        {
-          icon: <IconChip tint="text-red-300"><AlertTriangle size={17} /></IconChip>,
-          label: "Incidents",
-          path: "/admin/incidents"
-        },
+        
         {
           icon: <IconChip tint="text-green-300"><CiSettings size={17} /></IconChip>,
           label: "Settings",
