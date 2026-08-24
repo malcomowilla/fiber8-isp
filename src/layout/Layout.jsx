@@ -432,6 +432,7 @@ useEffect(() => {
                                       location.pathname !== '/admin/support-tickets' &&
                                       location.pathname !== '/admin/hotspot-sms-templates' &&
                                       location.pathname !== '/admin/network-troubleshooting' &&
+                                      location.pathname !== '/admin/incidents' &&
                                       
                                       
 
@@ -504,6 +505,7 @@ location.pathname !== '/admin/network-map' &&
  location.pathname !== '/admin/support-tickets' &&
  location.pathname !== '/admin/hotspot-sms-templates' &&
  location.pathname !== '/admin/network-troubleshooting' &&
+ location.pathname !== '/admin/incidents' &&
 <div
  onClick={() => {
             setShowMenu1(false)
@@ -621,6 +623,7 @@ location.pathname !== '/admin/onu-details' && location.pathname !== '/admin/node
       location.pathname !== '/admin/support-tickets' && 
       location.pathname !== '/admin/hotspot-sms-templates' &&
       location.pathname !== '/admin/network-troubleshooting' &&
+      ocation.pathname !== '/admin/incidents' &&
 <div 
  onClick={() => {
             setShowMenu1(false)
@@ -726,6 +729,7 @@ location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/u
                      location.pathname !== '/admin/support-tickets' &&
                      location.pathname !== '/admin/hotspot-sms-templates' &&
                      location.pathname !== '/admin/network-troubleshooting' &&
+                     ocation.pathname !== '/admin/incidents' &&
            <div
             onClick={() => {
             setShowMenu1(false)

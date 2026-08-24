@@ -358,6 +358,11 @@ const Sidebar = () => {
           path: "/admin/hotspot_anlytics"
         },
         {
+          icon: <IconChip tint="text-red-300"><AlertTriangle size={17} /></IconChip>,
+          label: "Incidents",
+          path: "/admin/incidents"
+        },
+        {
           icon: <IconChip tint="text-green-300"><CiSettings size={17} /></IconChip>,
           label: "Settings",
           path: "/admin/hotspot_settings"
