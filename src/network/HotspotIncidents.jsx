@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
 import {
   AlertTriangle, Wrench, Activity, Plus, X, Send, Users, CheckCircle2,
-  Clock, Trash2, RefreshCw, Info, Phone, Settings, Wifi, ChevronDown,
-  ShieldCheck, Zap, CalendarDays
+  Clock, Trash2, RefreshCw, Info, Phone, Wifi, ChevronDown,
+  ShieldCheck, Zap, CalendarDays, History,
 } from 'lucide-react';
 
 const subdomain = window.location.hostname.split('.')[0];
@@ -27,14 +27,6 @@ const fmtDate = (d) => {
       day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
     });
   } catch { return d; }
-};
-
-const toDatetimeLocal = (d) => {
-  if (!d) return '';
-  const dt = new Date(d);
-  if (isNaN(dt)) return '';
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}T${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
 };
 
 /* ---------------------------------------------------------------- */
@@ -72,7 +64,7 @@ const RecordIncidentModal = ({ open, onClose, onCreated, routers, graceSetting }
     title: '', incident_type: 'outage', status: 'resolved',
     start_time: '', end_time: '', notes: '',
     service_type: 'hotspot', router_scope: 'all', affected_routers: [],
-    compensate: true, active_customers_only: false,
+    compensate: true, active_customers_only: false, expired_lookback_days: 3,
   };
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
@@ -101,6 +93,8 @@ const RecordIncidentModal = ({ open, onClose, onCreated, routers, graceSetting }
       const params = new URLSearchParams();
       params.set('router_scope', form.router_scope);
       params.set('active_customers_only', form.active_customers_only);
+      params.set('expired_lookback_days', form.expired_lookback_days || 3);
+      if (form.start_time) params.set('start_time', form.start_time);
       form.affected_routers.forEach((r) => params.append('affected_routers[]', r));
       const response = await fetch(`/api/incidents/preview_affected?${params.toString()}`, {
         headers: { 'X-Subdomain': subdomain },
@@ -109,7 +103,7 @@ const RecordIncidentModal = ({ open, onClose, onCreated, routers, graceSetting }
       if (response.ok) setPreview(data);
     } catch { /* silent — preview is best-effort */ }
     setPreviewLoading(false);
-  }, [form.compensate, form.router_scope, form.active_customers_only, form.affected_routers]);
+  }, [form.compensate, form.router_scope, form.active_customers_only, form.affected_routers, form.expired_lookback_days, form.start_time]);
 
   useEffect(() => {
     const t = setTimeout(fetchPreview, 350);
@@ -326,9 +320,25 @@ const RecordIncidentModal = ({ open, onClose, onCreated, routers, graceSetting }
                             onChange={(e) => set({ active_customers_only: e.target.checked })}
                             className="w-4 h-4 rounded accent-emerald-600" />
                         </label>
+
+                        {!form.active_customers_only && (
+                          <div className="pl-6 flex items-center gap-2">
+                            <History size={13} className="text-gray-400 shrink-0" />
+                            <span className="text-xs text-gray-600 dark:text-gray-300">
+                              Also include customers who expired within the last
+                            </span>
+                            <input type="number" min={1} value={form.expired_lookback_days}
+                              onChange={(e) => set({ expired_lookback_days: e.target.value })}
+                              className="w-14 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700
+                                px-1.5 py-0.5 text-xs text-center" />
+                            <span className="text-xs text-gray-600 dark:text-gray-300">day(s)</span>
+                          </div>
+                        )}
+
                         <p className="pl-6 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
-                          Active customers get their grace period applied at their expiry. Expired customers,
-                          when included, are graced immediately. Grace length uses your Grace Period Settings
+                          Active customers get their grace period applied at their expiry. Recently expired
+                          customers, when included, are graced immediately — vouchers that expired further back
+                          than the window above are left untouched. Grace length uses your Grace Period Settings
                           {graceSetting ? ` (currently ${graceSetting.grace_period_value} ${graceSetting.grace_period_unit})` : ''}.
                         </p>
                         <div className="pl-6 flex items-center gap-2 text-xs font-semibold text-gray-700 dark:text-gray-200">
@@ -336,7 +346,7 @@ const RecordIncidentModal = ({ open, onClose, onCreated, routers, graceSetting }
                           {previewLoading ? (
                             <span className="text-gray-400 flex items-center gap-1"><RefreshCw size={12} className="animate-spin" /> calculating…</span>
                           ) : preview ? (
-                            <span>{preview.total_count} customer(s) will be compensated ({preview.active_count} active, {preview.expired_count} expired)</span>
+                            <span>{preview.total_count} customer(s) will be compensated ({preview.active_count} active, {preview.expired_count} recently expired)</span>
                           ) : (
                             <span className="text-gray-400">—</span>
                           )}
@@ -375,13 +385,14 @@ const BulkCompensationModal = ({ open, onClose, graceSetting }) => {
   const [phones, setPhones] = useState('');
   const [graceValue, setGraceValue] = useState(graceSetting?.grace_period_value || 1);
   const [graceUnit, setGraceUnit] = useState(graceSetting?.grace_period_unit || 'days');
+  const [lookbackDays, setLookbackDays] = useState(3);
   const [notify, setNotify] = useState(true);
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState(null);
 
   useEffect(() => {
     if (open) {
-      setPhones(''); setResult(null); setNotify(true);
+      setPhones(''); setResult(null); setNotify(true); setLookbackDays(3);
       setGraceValue(graceSetting?.grace_period_value || 1);
       setGraceUnit(graceSetting?.grace_period_unit || 'days');
     }
@@ -401,7 +412,8 @@ const BulkCompensationModal = ({ open, onClose, graceSetting }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
         body: JSON.stringify({
-          phone_numbers: phoneList, grace_value: graceValue, grace_unit: graceUnit, notify,
+          phone_numbers: phoneList, grace_value: graceValue, grace_unit: graceUnit,
+          notify, expired_lookback_days: lookbackDays,
         }),
       });
       const data = await response.json();
@@ -479,7 +491,7 @@ const BulkCompensationModal = ({ open, onClose, graceSetting }) => {
                     <p className="text-xs text-gray-400 mt-1">{phoneList.length} number(s) detected</p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-3">
                     <div>
                       <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1.5">Grace Length</label>
                       <input type="number" min={1} value={graceValue} onChange={(e) => setGraceValue(e.target.value)}
@@ -496,7 +508,23 @@ const BulkCompensationModal = ({ open, onClose, graceSetting }) => {
                         <option value="days">Days</option>
                       </select>
                     </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1.5">
+                        Expired within
+                      </label>
+                      <div className="flex items-center gap-1">
+                        <input type="number" min={1} value={lookbackDays}
+                          onChange={(e) => setLookbackDays(e.target.value)}
+                          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50
+                            dark:bg-gray-700 dark:text-white px-2 py-2 text-sm" />
+                        <span className="text-xs text-gray-400 shrink-0">days</span>
+                      </div>
+                    </div>
                   </div>
+                  <p className="text-[11px] text-gray-400 -mt-2">
+                    Only vouchers currently active, or expired within this window, are compensated —
+                    older expired vouchers for these numbers are left alone.
+                  </p>
 
                   <label className="flex items-center justify-between cursor-pointer rounded-lg border
                     border-gray-200 dark:border-gray-700 p-3">
@@ -579,6 +607,11 @@ const IncidentCard = ({ incident, onRecompensate, onDelete, compensating }) => {
             {incident.router_scope === 'specific' && incident.affected_routers?.length > 0 && (
               <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300">
                 {incident.affected_routers.length} router(s)
+              </span>
+            )}
+            {incident.compensate && (
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
+                ≤{incident.expired_lookback_days ?? 3}d expired window
               </span>
             )}
 
