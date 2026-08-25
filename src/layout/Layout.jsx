@@ -20,7 +20,7 @@ import  WelcomeMessage from './WelcomeMessage'
 import {RefreshCw} from 'lucide-react';
 
 import NotificationCenter from '../analytics/NotificationCenter';
-
+import MaintenanceBanner from './MaintenanceBanner';
 
 const Layout = () => {
 
@@ -340,7 +340,7 @@ useEffect(() => {
 
   return (
     <>
-    
+    <MaintenanceBanner />
     <div onClick={() => {
             setShowMenu1(false)
             setShowMenu2(false)

@@ -122,7 +122,8 @@ const NotificationCenter = () => {
       // Anything not seen yet gets pushed out as an auto-popping toast —
       // that's the whole point of a notification, it shouldn't wait for a click.
       setSeenIds((currentSeen) => {
-        const unseen = data.filter((a) => !currentSeen.includes(a.id));
+        // const unseen = data.filter((a) => !currentSeen.includes(a.id));
+    const unseen = data.filter((a) => !currentSeen.includes(a.id) && a.priority !== 'high');
         if (unseen.length) {
           setToasts((prev) => {
             const existingIds = new Set(prev.map((t) => t.id));
