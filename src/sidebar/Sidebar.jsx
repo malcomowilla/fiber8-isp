@@ -739,11 +739,23 @@ const Sidebar = () => {
         </div>
 
         {/* Menu Items */}
-        <nav className="flex-1 overflow-y-auto py-4 px-3
-          [&::-webkit-scrollbar]:w-1.5
-          [&::-webkit-scrollbar-track]:bg-transparent
-          [&::-webkit-scrollbar-thumb]:bg-white/10
-          [&::-webkit-scrollbar-thumb]:rounded-full">
+                <nav
+          className="flex-1 overflow-y-auto py-4 px-3
+            [&::-webkit-scrollbar]:w-2.5
+            [&::-webkit-scrollbar-track]:bg-white/5
+            [&::-webkit-scrollbar-track]:rounded-full
+            [&::-webkit-scrollbar-track]:my-1
+            [&::-webkit-scrollbar-thumb]:bg-emerald-400/50
+            [&::-webkit-scrollbar-thumb]:rounded-full
+            [&::-webkit-scrollbar-thumb]:border-2
+            [&::-webkit-scrollbar-thumb]:border-solid
+            [&::-webkit-scrollbar-thumb]:border-transparent
+            [&::-webkit-scrollbar-thumb]:bg-clip-padding
+            hover:[&::-webkit-scrollbar-thumb]:bg-emerald-400/80"
+          style={{ scrollbarWidth: 'auto', scrollbarColor: 'rgba(52,211,153,0.5) rgba(255,255,255,0.05)' }}
+        >
+
+
           {!seeSidebar && (
             <div className="text-xs uppercase text-white/40 font-semibold
               mb-2 tracking-wider px-1">
