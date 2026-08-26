@@ -766,7 +766,6 @@ const Sidebar = () => {
             {Object.keys(menuItems).map(renderMenuItem)}
           </ul>
 
-          {/* Quick Links */}
           <div className={`mt-6 ${seeSidebar ? 'px-0' : 'px-0'}`}>
             {!seeSidebar && (
               <div className="text-xs uppercase text-white/40
