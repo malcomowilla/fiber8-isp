@@ -414,6 +414,7 @@ const SmsSettings = () => {
       fields.push(
         <Grid key="partnerID" item xs={12} sm={6}>
           <TextField {...tf} label="Partner ID" name="partnerID" value={partnerID} onChange={handleChange}
+          className='myTextField'
             InputProps={{ startAdornment: <InputAdornment position="start"><FaIdBadge style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
         </Grid>
       );
@@ -423,6 +424,7 @@ const SmsSettings = () => {
       fields.push(
         <Grid key="api_secret" item xs={12} sm={6}>
           <TextField {...tf} label="API secret" name="api_secret" value={api_secret} onChange={handleChange}
+          className='myTextField'
             InputProps={{ startAdornment: <InputAdornment position="start"><LiaUserSecretSolid style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
         </Grid>
       );
@@ -432,10 +434,12 @@ const SmsSettings = () => {
       fields.push(
         <Grid key="username" item xs={12} sm={6}>
           <TextField {...tf} label="Username" name="username" value={username} onChange={handleChange}
+          className='myTextField'
             InputProps={{ startAdornment: <InputAdornment position="start"><LiaUserSecretSolid style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
         </Grid>,
         <Grid key="short_code" item xs={12} sm={6}>
           <TextField {...tf} label="Short code" name="short_code" value={short_code} onChange={handleChange}
+          className='myTextField'
             InputProps={{ startAdornment: <InputAdornment position="start"><TbCircleDashedNumber4 style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
         </Grid>
       );
@@ -577,7 +581,8 @@ const SmsSettings = () => {
                         <TextField {...tf} label="API key" name="api_key" value={api_key}
                         className='myTextField'
                         onChange={handleChange}
-                          InputProps={{ startAdornment: <InputAdornment position="start"><IoIosKey style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
+                          InputProps={{ startAdornment: <InputAdornment position="start"><IoIosKey 
+                          style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
                       </Grid>
 
                       {renderProviderFields()}
