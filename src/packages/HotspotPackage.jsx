@@ -559,13 +559,13 @@ setTimeout(() => {
         });
 
 
-        toast.error(<p  className="font-sans">newData.error </p>, {
+        toast.error(<p  className="font-sans">{newData.error}</p>, {
           duration: 7000,
           position: "top-center",
         });
       }else{
 
-        toast.error(<p  className="font-sans">newData.error </p>, {
+        toast.error(<p  className="font-sans">{newData.error}</p>, {
           duration: 7000,
           position: "top-center",
         });
