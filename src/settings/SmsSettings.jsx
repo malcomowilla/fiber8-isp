@@ -246,24 +246,20 @@ const SmsSettings = () => {
   useEffect(() => { if (selectedProvider) getSmsBalance(selectedProvider); }, [getSmsBalance, selectedProvider]);
 
   const fetchSavedSmsSettings = useCallback(async () => {
-    try {
-      const response = await fetch('/api/saved_sms_settings', {
-        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
-      });
-      const data = await response.json();
-      const newData = data.length > 0
-        ? data.reduce((latest, item) => new Date(item.sms_setting_updated_at) > new Date(latest.sms_setting_updated_at) ? item : latest, data[0])
-        : null;
-      if (response.ok && newData) {
-        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID, username } = newData;
-        setSmsSettingId(newData.id);
-        setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID, username });
-        setSelectedProvider(sms_provider);
-      }
-    } catch {
-      toast.error('Failed to fetch SMS settings', { duration: 3000, position: 'top-center' });
+  try {
+    const response = await fetch('/api/active_sms_setting', {
+      headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+    });
+    const newData = await response.json();
+    if (response.ok && newData) {
+      const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID, username } = newData;
+      setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID, username });
+      setSelectedProvider(sms_provider);
     }
-  }, []);
+  } catch {
+    toast.error('Failed to fetch SMS settings', { duration: 3000, position: 'top-center' });
+  }
+}, []);
 
   useEffect(() => { fetchSavedSmsSettings(); }, [fetchSavedSmsSettings]);
 
