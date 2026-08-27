@@ -44,7 +44,7 @@ import { MaintenancePanel } from '../maintenace/MaintenanceMode';
 import SystemAdminSupportOverview from './SystemAdminSupportOverview';
 import { LifeBuoy } from 'lucide-react';
 import SystemAnnouncementsManager from './SystemAnnouncementsManager';
-import { Megaphone } from 'lucide-react';
+import { Megaphone, MessageSquare } from 'lucide-react';
 
 
 
@@ -116,6 +116,37 @@ const PAGE_TITLES = {
   14: 'Payments',
   15: 'Support Overview',
 };
+
+
+
+
+
+
+
+
+
+const PlatformSmsBalanceCard = () => {
+  const [balance, setBalance] = useState(null);
+  useEffect(() => {
+    fetch('/api/platform_sms_balance')
+      .then(r => r.json())
+      .then(d => setBalance(d.balance))
+      .catch(() => setBalance('—'));
+  }, []);
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
+      <MessageSquare size={18} className="text-emerald-500" />
+      <div>
+        <p className="text-xs text-slate-500">TextSMS balance</p>
+        <p className="text-lg font-semibold">{balance ?? '…'}</p>
+      </div>
+    </div>
+  );
+};
+
+
+
+
 
 const DashboardSytemAdmin = () => {
   const [value, setValue] = useState(0);
@@ -368,6 +399,10 @@ const DashboardSytemAdmin = () => {
               <div className="hidden md:block">
                 <UptimeDisplay />
               </div>
+
+              <div className="hidden md:block">
+    <PlatformSmsBalanceCard />
+  </div>
               <Tooltip title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}>
                 <button
                   type="button"

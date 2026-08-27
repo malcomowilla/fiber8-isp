@@ -15,6 +15,8 @@ import { TbCircleDashedNumber4 } from 'react-icons/tb';
 import { MdTextsms } from 'react-icons/md';
 import { RefreshCw, Save, MessageSquare, Wallet, FileText } from 'lucide-react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import OwitechBulkSmsPanel from './OwitechBulkSmsPanel';
 
 const SettingsNotification = lazy(() => import('../notification/SettingsNotification'));
 
@@ -148,6 +150,10 @@ const PROVIDER_OPTIONS = [
   { label: 'Ujumbe',         value: 'Ujumbe' },
 ];
 
+// The platform-managed option — not a real credential provider, so it's
+// handled entirely outside PROVIDER_OPTIONS/renderProviderFields.
+const PROVIDER_MODE_PLATFORM = 'Owitech Bulk SMS';
+
 function useIsDarkMode() {
   const [isDark, setIsDark] = useState(
     () => typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
@@ -180,6 +186,16 @@ const SmsSettings = () => {
   const [welcomeMessage, setWelcomeMessage] = useState('');
   const [savingTemplates, setSavingTemplates] = useState(false);
   const [savingCredentials, setSavingCredentials] = useState(false);
+
+  // ── Provider mode: platform-managed vs bring-your-own-credentials ─────────
+  const [providerMode, setProviderMode] = useState(
+    selectedProvider === PROVIDER_MODE_PLATFORM ? 'platform' : 'custom'
+  );
+  const [switchingMode, setSwitchingMode] = useState(false);
+
+  useEffect(() => {
+    setProviderMode(selectedProvider === PROVIDER_MODE_PLATFORM ? 'platform' : 'custom');
+  }, [selectedProvider]);
 
   const subdomain = window.location.hostname.split('.')[0];
   const { api_key, api_secret, sender_id, short_code, partnerID, username } = smsSettingsForm;
@@ -270,7 +286,11 @@ const SmsSettings = () => {
     }
   }, [selectedProvider, setSmsSettingsForm, subdomain]);
 
-  useEffect(() => { if (selectedProvider) fetchSmsSettings(); }, [fetchSmsSettings, selectedProvider]);
+  // Only fetch credential-shaped settings when we're actually in custom-provider
+  // mode — the platform mode has no credentials to fetch.
+  useEffect(() => {
+    if (selectedProvider && selectedProvider !== PROVIDER_MODE_PLATFORM) fetchSmsSettings();
+  }, [fetchSmsSettings, selectedProvider]);
 
   const saveSmsSettings = async e => {
     e.preventDefault();
@@ -353,6 +373,37 @@ const SmsSettings = () => {
   const handleClose = () => setOpen(false);
   const handleCloseNotifaction = () => setOpenSettings(false);
 
+  // ── Provider mode switch handlers ──────────────────────────────────────────
+  const handleUsePlatformSms = async () => {
+    setSwitchingMode(true);
+    try {
+      const response = await fetch('/api/sms_settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+        body: JSON.stringify({ sms_setting_id: smsSettingId, sms_provider: PROVIDER_MODE_PLATFORM }),
+      });
+      const newData = await response.json();
+      if (response.ok) {
+        setSmsSettingId(newData.id ?? smsSettingId);
+        setSelectedProvider(PROVIDER_MODE_PLATFORM);
+        setProviderMode('platform');
+        toast.success('Owitech Bulk SMS activated', { duration: 2500, position: 'top-center' });
+      } else {
+        toast.error('Failed to switch provider', { duration: 2500, position: 'top-center' });
+      }
+    } catch {
+      toast.error('Failed to switch provider', { duration: 2500, position: 'top-center' });
+    } finally {
+      setSwitchingMode(false);
+    }
+  };
+
+  const handleUseCustomProvider = () => {
+    setProviderMode('custom');
+    setSelectedProvider('');
+    setSmsSettingsForm({ api_key: '', api_secret: '', sender_id: '', short_code: '', partnerID: '', username: '' });
+  };
+
   // ── Provider-specific fields ───────────────────────────────────────────────
   const renderProviderFields = () => {
     if (!selectedProvider) return null;
@@ -407,92 +458,145 @@ const SmsSettings = () => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-            {/* ── SMS balance strip ──────────────────────────────────────────── */}
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '14px 20px',
-              border: '1px solid var(--divider)',
-              borderRadius: tokens.radius,
-              gap: 16,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Wallet size={16} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
-                <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>SMS balance</span>
-              </div>
-              <span style={{ fontSize: '0.9375rem', fontWeight: 500 }}>
-                {smsBalance ?? <span style={{ color: 'var(--text-tertiary)', fontStyle: 'italic', fontSize: '0.8125rem' }}>Not loaded</span>}
-              </span>
-            </div>
-
-            {/* ── Provider credentials ───────────────────────────────────────── */}
-            <form onSubmit={saveSmsSettings}>
-              <Card>
-                <CardHeader
-                  icon={MdTextsms}
-                  iconClass="text-green-500"
-                  title="Provider credentials"
-                  description="Select your SMS provider and enter the credentials from their dashboard."
-                />
-
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <Autocomplete
-                      options={PROVIDER_OPTIONS}
-                      value={PROVIDER_OPTIONS.find(o => o.value === selectedProvider) || null}
-                      onChange={(_, newValue) => setSelectedProvider(newValue?.value || '')}
-                      getOptionLabel={o => o.label}
-                      disableClearable
-                      isOptionEqualToValue={(o, v) => o.value === v.value}
-                      renderInput={params => (
-                        <TextField
-                        className='myTextField'
-                          {...params}
-                          label="Provider"
-                          sx={fieldSx}
-                          InputProps={{
-                            ...params.InputProps,
-                            startAdornment: (
-                              <>
-                                <InputAdornment position="start">
-                                  <MdTextsms style={{ color: 'var(--text-secondary)' }} />
-                                </InputAdornment>
-                                {params.InputProps.startAdornment}
-                              </>
-                            ),
-                          }}
-                        />
-                      )}
-                      renderOption={(props, option) => (
-                        <li {...props} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px' }}>
-                          <MdTextsms style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
-                          <span style={{ fontSize: '0.875rem' }}>{option.label}</span>
-                        </li>
-                      )}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <TextField {...tf} label="API key" name="api_key" value={api_key}
-                    className='myTextField'
-                    onChange={handleChange}
-                      InputProps={{ startAdornment: <InputAdornment position="start"><IoIosKey style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
-                  </Grid>
-
-                  {renderProviderFields()}
-
-                  <Grid item xs={12} sm={6}>
-                    <TextField {...tf} label="Sender ID" name="sender_id" value={sender_id} 
-                    onChange={handleChange} className='myTextField'
-                      InputProps={{ startAdornment: <InputAdornment position="start"><FaRegIdCard
-                       style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
-                  </Grid>
-                </Grid>
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-                  <SaveButton loading={savingCredentials}>Save credentials</SaveButton>
+            {/* ── SMS balance strip (custom-provider mode only) ──────────────── */}
+            {providerMode === 'custom' && (
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '14px 20px',
+                border: '1px solid var(--divider)',
+                borderRadius: tokens.radius,
+                gap: 16,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Wallet size={16} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
+                  <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>SMS balance</span>
                 </div>
-              </Card>
-            </form>
+                <span style={{ fontSize: '0.9375rem', fontWeight: 500 }}>
+                  {smsBalance ?? <span style={{ color: 'var(--text-tertiary)', fontStyle: 'italic', fontSize: '0.8125rem' }}>Not loaded</span>}
+                </span>
+              </div>
+            )}
+
+            {/* ── Provider mode switch ────────────────────────────────────────── */}
+            <Card>
+              <CardHeader
+                icon={AccountBalanceWalletIcon}
+                title="How do you want to send SMS?"
+                description="Choose a managed option with no setup, or connect your own provider."
+              />
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={handleUsePlatformSms}
+                  disabled={switchingMode}
+                  style={{
+                    flex: '1 1 220px', textAlign: 'left', padding: '14px 16px',
+                    borderRadius: tokens.radiusSm,
+                    border: providerMode === 'platform' ? '2px solid #2563eb' : '1px solid var(--divider)',
+                    background: providerMode === 'platform' ? 'rgba(37,99,235,0.06)' : 'transparent',
+                    cursor: switchingMode ? 'not-allowed' : 'pointer',
+                    opacity: switchingMode ? 0.7 : 1,
+                  }}
+                >
+                  <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Owitech Bulk SMS</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 4 }}>
+                    No API keys. Buy credits, we handle delivery.
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleUseCustomProvider}
+                  style={{
+                    flex: '1 1 220px', textAlign: 'left', padding: '14px 16px',
+                    borderRadius: tokens.radiusSm,
+                    border: providerMode === 'custom' ? '2px solid #2563eb' : '1px solid var(--divider)',
+                    background: providerMode === 'custom' ? 'rgba(37,99,235,0.06)' : 'transparent',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Custom provider</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 4 }}>
+                    Use your own SMS Leopard, TextSMS, Africa's Talking, etc. account.
+                  </div>
+                </button>
+              </div>
+            </Card>
+
+            {providerMode === 'platform' ? (
+              <OwitechBulkSmsPanel subdomain={subdomain} />
+            ) : (
+              <>
+                {/* ── Provider credentials ───────────────────────────────────────── */}
+                <form onSubmit={saveSmsSettings}>
+                  <Card>
+                    <CardHeader
+                      icon={MdTextsms}
+                      iconClass="text-green-500"
+                      title="Provider credentials"
+                      description="Select your SMS provider and enter the credentials from their dashboard."
+                    />
+
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <Autocomplete
+                          options={PROVIDER_OPTIONS}
+                          value={PROVIDER_OPTIONS.find(o => o.value === selectedProvider) || null}
+                          onChange={(_, newValue) => setSelectedProvider(newValue?.value || '')}
+                          getOptionLabel={o => o.label}
+                          disableClearable
+                          isOptionEqualToValue={(o, v) => o.value === v.value}
+                          renderInput={params => (
+                            <TextField
+                            className='myTextField'
+                              {...params}
+                              label="Provider"
+                              sx={fieldSx}
+                              InputProps={{
+                                ...params.InputProps,
+                                startAdornment: (
+                                  <>
+                                    <InputAdornment position="start">
+                                      <MdTextsms style={{ color: 'var(--text-secondary)' }} />
+                                    </InputAdornment>
+                                    {params.InputProps.startAdornment}
+                                  </>
+                                ),
+                              }}
+                            />
+                          )}
+                          renderOption={(props, option) => (
+                            <li {...props} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px' }}>
+                              <MdTextsms style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
+                              <span style={{ fontSize: '0.875rem' }}>{option.label}</span>
+                            </li>
+                          )}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField {...tf} label="API key" name="api_key" value={api_key}
+                        className='myTextField'
+                        onChange={handleChange}
+                          InputProps={{ startAdornment: <InputAdornment position="start"><IoIosKey style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
+                      </Grid>
+
+                      {renderProviderFields()}
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField {...tf} label="Sender ID" name="sender_id" value={sender_id} 
+                        onChange={handleChange} className='myTextField'
+                          InputProps={{ startAdornment: <InputAdornment position="start"><FaRegIdCard
+                           style={{ color: 'var(--text-secondary)' }} /></InputAdornment> }} />
+                      </Grid>
+                    </Grid>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                      <SaveButton loading={savingCredentials}>Save credentials</SaveButton>
+                    </div>
+                  </Card>
+                </form>
+              </>
+            )}
 
           
             {/* ── PPPoE welcome message ──────────────────────────────────────── */}
