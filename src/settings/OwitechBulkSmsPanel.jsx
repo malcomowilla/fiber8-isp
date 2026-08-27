@@ -113,6 +113,7 @@ const OwitechBulkSmsPanel = ({ subdomain }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth type="number" label="Quantity" value={quantity}
+                className='myTextField'
                 inputProps={{ min: MIN_PURCHASE }}
                 onChange={(e) => setQuantity(Number(e.target.value))}
                 helperText={`Minimum ${MIN_PURCHASE} credits`}
@@ -121,6 +122,7 @@ const OwitechBulkSmsPanel = ({ subdomain }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth label="M-Pesa phone number" value={phone}
+                className='myTextField'
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="07XXXXXXXX"
               />
