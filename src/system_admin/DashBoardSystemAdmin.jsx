@@ -45,8 +45,8 @@ import SystemAdminSupportOverview from './SystemAdminSupportOverview';
 import { LifeBuoy } from 'lucide-react';
 import SystemAnnouncementsManager from './SystemAnnouncementsManager';
 import { Megaphone, MessageSquare } from 'lucide-react';
-
-
+import SmsWalletPurchases from './SmsWalletPurchases';
+import SmsIcon from '@mui/icons-material/Sms';
 
 const NAV_SECTIONS = [
   {
@@ -64,6 +64,7 @@ const NAV_SECTIONS = [
           { value: 15, label: 'Support', Icon: LifeBuoy },
 
       { value: -1, label: 'Reset client password', Icon: LockResetIcon, action: 'resetPassword' },
+      { value: 17, label: 'SMS credit purchases', Icon: SmsIcon },
     ],
   },
   {
@@ -474,6 +475,7 @@ const DashboardSytemAdmin = () => {
                       {value === 14 && <Payments />}
                       {value === 15 && <SystemAdminSupportOverview />}
                       {value === 16 && <SystemAnnouncementsManager />}
+                      {value === 17 && <SmsWalletPurchases />}
                     </motion.div>
                   )}
                 </AnimatePresence>

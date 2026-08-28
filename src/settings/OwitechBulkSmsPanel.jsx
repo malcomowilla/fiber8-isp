@@ -1,44 +1,99 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { TextField, Grid } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import HistoryIcon from '@mui/icons-material/History';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import toast from 'react-hot-toast';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const MIN_PURCHASE = 10;
 
+const StatCard = ({ icon: Icon, label, value, highlight = false }) => (
+  <motion.div
+    animate={highlight ? { scale: [1, 1.04, 1] } : {}}
+    transition={{ duration: 0.5 }}
+    style={{
+      flex: '1 1 140px',
+      border: '1px solid var(--divider)',
+      borderRadius: '12px',
+      padding: '16px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 8,
+      background: highlight ? 'rgba(16,185,129,0.06)' : 'transparent',
+      borderColor: highlight ? 'rgba(16,185,129,0.35)' : 'var(--divider)',
+      transition: 'background 0.4s ease, border-color 0.4s ease',
+    }}
+  >
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)' }}>
+      <Icon style={{ width: 15, height: 15 }} />
+      <span style={{ fontSize: '0.75rem' }}>{label}</span>
+    </div>
+    <span style={{ fontSize: '1.5rem', fontWeight: 700, lineHeight: 1 }}>
+      {value === null || value === undefined ? '…' : value}
+    </span>
+  </motion.div>
+);
+
 const OwitechBulkSmsPanel = ({ subdomain }) => {
-  const [balance, setBalance] = useState(null);
+  const [stats, setStats] = useState({
+    balance: null, sent_this_month: null, total_sent: null, total_purchased: null,
+  });
   const [sellPrice, setSellPrice] = useState(null);
   const [quantity, setQuantity] = useState(20);
   const [phone, setPhone] = useState('');
   const [purchasing, setPurchasing] = useState(false);
   const [checkoutId, setCheckoutId] = useState(null);
   const [confirming, setConfirming] = useState(false);
+  const [justCredited, setJustCredited] = useState(null); // { quantity } — drives the success overlay
+  const [balanceFlash, setBalanceFlash] = useState(false);
+  const pollFailedRef = useRef(false);
 
-  const fetchBalance = useCallback(async () => {
+  const fetchStats = useCallback(async () => {
+    try {
+      const res = await fetch('/api/tenant_sms_wallet/stats', {
+        headers: { 'X-Subdomain': subdomain },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setStats(data);
+        setSellPrice((prev) => prev); // sell price comes from /balance below
+      }
+    } catch {
+      toast.error('Failed to load SMS stats', { duration: 2500, position: 'top-center' });
+    }
+  }, [subdomain]);
+
+  const fetchSellPrice = useCallback(async () => {
     try {
       const res = await fetch('/api/tenant_sms_wallet/balance', {
         headers: { 'X-Subdomain': subdomain },
       });
       const data = await res.json();
-      if (res.ok) {
-        setBalance(data.balance);
-        setSellPrice(data.sell_price_per_sms);
-      }
+      if (res.ok) setSellPrice(data.sell_price_per_sms);
     } catch {
-      toast.error('Failed to load SMS balance', { duration: 2500, position: 'top-center' });
+      /* non-critical — purchase form just won't show a live total */
     }
   }, [subdomain]);
 
-  useEffect(() => { fetchBalance(); }, [fetchBalance]);
+  useEffect(() => {
+    fetchStats();
+    fetchSellPrice();
+  }, [fetchStats, fetchSellPrice]);
 
-  // Poll for confirmation after STK push is triggered — mirrors the
-  // pattern your hotspot payment flow already uses (payment_reference_status).
+  // Poll for confirmation after STK push is triggered. Only treats the
+  // payment as done when the backend actually says status === 'completed'
+  // — previously any 200 response (including "still pending") was read
+  // as success, which showed "SMS credits added!" before the money had
+  // even landed.
   useEffect(() => {
     if (!checkoutId) return;
     setConfirming(true);
+    pollFailedRef.current = false;
+
     const interval = setInterval(async () => {
       try {
         const res = await fetch(
@@ -46,18 +101,46 @@ const OwitechBulkSmsPanel = ({ subdomain }) => {
           { method: 'POST', headers: { 'X-Subdomain': subdomain } }
         );
         const data = await res.json();
-        if (res.ok) {
+        if (!res.ok) return; // txn not found yet — keep polling
+
+        if (data.status === 'completed') {
           clearInterval(interval);
           setConfirming(false);
           setCheckoutId(null);
-          setBalance(data.balance);
-          toast.success('SMS credits added!', { duration: 3000, position: 'top-center' });
+          setJustCredited({ quantity: data.quantity });
+          setBalanceFlash(true);
+          setTimeout(() => setBalanceFlash(false), 900);
+          setTimeout(() => setJustCredited(null), 3200);
+          fetchStats();
+          toast.success(`${data.quantity} SMS credits added!`, { duration: 3000, position: 'top-center' });
+        } else if (data.status === 'underpaid' || data.status === 'failed') {
+          clearInterval(interval);
+          setConfirming(false);
+          setCheckoutId(null);
+          toast.error(
+            data.status === 'underpaid'
+              ? 'Payment amount did not match — contact support if you were charged'
+              : 'Payment failed. Please try again.',
+            { duration: 4000, position: 'top-center' }
+          );
         }
-      } catch { /* keep polling until it resolves or times out */ }
+        // status === 'pending' → keep polling
+      } catch {
+        /* transient network hiccup — keep polling until timeout */
+      }
     }, 3000);
-    const timeout = setTimeout(() => { clearInterval(interval); setConfirming(false); }, 90000);
+
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+      setConfirming(false);
+      pollFailedRef.current = true;
+      toast('Still waiting on confirmation — if you paid, your credits will appear shortly.', {
+        duration: 5000, position: 'top-center', icon: '⏳',
+      });
+    }, 90000);
+
     return () => { clearInterval(interval); clearTimeout(timeout); };
-  }, [checkoutId, subdomain]);
+  }, [checkoutId, subdomain, fetchStats]);
 
   const totalCost = sellPrice ? (quantity * sellPrice).toFixed(2) : '—';
 
@@ -94,15 +177,16 @@ const OwitechBulkSmsPanel = ({ subdomain }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '14px 20px', border: '1px solid var(--divider)', borderRadius: '12px',
-      }}>
-        <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>SMS credits</span>
-        <span style={{ fontSize: '1.25rem', fontWeight: 600 }}>{balance ?? '…'}</span>
+      {/* ── Stats strip ─────────────────────────────────────────────── */}
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        <StatCard icon={AccountBalanceWalletIcon} label="SMS balance" value={stats.balance} highlight={balanceFlash} />
+        <StatCard icon={ForwardToInboxIcon} label="Sent this month" value={stats.sent_this_month} />
+        <StatCard icon={TrendingUpIcon} label="Total sent" value={stats.total_sent} />
+        <StatCard icon={ShoppingCartIcon} label="Total purchased" value={stats.total_purchased} />
       </div>
 
-      <div style={{ border: '1px solid var(--divider)', borderRadius: '12px', padding: 24 }}>
+      {/* ── Purchase card ───────────────────────────────────────────── */}
+      <div style={{ border: '1px solid var(--divider)', borderRadius: '12px', padding: 24, position: 'relative', overflow: 'hidden' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
           <ShoppingCartIcon style={{ width: 18, height: 18 }} />
           <span style={{ fontWeight: 500, fontSize: '0.9375rem' }}>Buy SMS credits</span>
@@ -114,6 +198,7 @@ const OwitechBulkSmsPanel = ({ subdomain }) => {
               <TextField
                 fullWidth type="number" label="Quantity" value={quantity}
                 className='myTextField'
+                disabled={purchasing || confirming}
                 inputProps={{ min: MIN_PURCHASE }}
                 onChange={(e) => setQuantity(Number(e.target.value))}
                 helperText={`Minimum ${MIN_PURCHASE} credits`}
@@ -123,6 +208,7 @@ const OwitechBulkSmsPanel = ({ subdomain }) => {
               <TextField
                 fullWidth label="M-Pesa phone number" value={phone}
                 className='myTextField'
+                disabled={purchasing || confirming}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="07XXXXXXXX"
               />
@@ -141,6 +227,20 @@ const OwitechBulkSmsPanel = ({ subdomain }) => {
             </div>
           </div>
 
+          {confirming && (
+            <div style={{
+              marginTop: 12, display: 'flex', alignItems: 'center', gap: 8,
+              fontSize: '0.8125rem', color: 'var(--text-secondary)',
+            }}>
+              <motion.span
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                style={{ display: 'inline-block', width: 12, height: 12, borderRadius: '50%', border: '2px solid #2563eb', borderTopColor: 'transparent' }}
+              />
+              Waiting for you to complete the M-Pesa prompt on your phone…
+            </div>
+          )}
+
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
             <motion.button
               type="submit" disabled={purchasing || confirming}
@@ -158,6 +258,28 @@ const OwitechBulkSmsPanel = ({ subdomain }) => {
             </motion.button>
           </div>
         </form>
+
+        {/* Success overlay — brief, non-blocking, disappears on its own */}
+        <AnimatePresence>
+          {justCredited && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              style={{
+                position: 'absolute', top: 16, right: 16,
+                display: 'flex', alignItems: 'center', gap: 8,
+                background: 'rgba(16,185,129,0.12)', color: '#059669',
+                border: '1px solid rgba(16,185,129,0.3)',
+                borderRadius: '999px', padding: '6px 14px',
+                fontSize: '0.8125rem', fontWeight: 600,
+              }}
+            >
+              <CheckCircleIcon style={{ width: 16, height: 16 }} />
+              +{justCredited.quantity} credits added
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
