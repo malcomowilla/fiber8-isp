@@ -47,6 +47,9 @@ import SystemAnnouncementsManager from './SystemAnnouncementsManager';
 import { Megaphone, MessageSquare } from 'lucide-react';
 import SmsWalletPurchases from './SmsWalletPurchases';
 import SmsIcon from '@mui/icons-material/Sms';
+import ProxmoxDashboard from "./ProxmoxDashboard"
+
+
 
 const NAV_SECTIONS = [
   {
@@ -458,7 +461,10 @@ const DashboardSytemAdmin = () => {
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {value === 0 && <UbuntuStats />}
+                      
+                      {/* {value === 0 && <UbuntuStats />} */}
+                      {value === 0 && <ProxmoxDashboard />}
+
                       {value === 1 && <ClientList />}
                       {value === 2 && <Settings />}
                       {value === 3 && <InviteClient />}
