@@ -310,6 +310,7 @@ const EmailSettings = () => {
                 value={sender_email}
                 onChange={handleChange}
                 fullWidth
+                className="myTextField"
                 InputProps={{ startAdornment: <MdAlternateEmail className="mr-2" style={{ color: '#6366f1' }} /> }}
                 sx={fieldSx}
               />
@@ -320,6 +321,7 @@ const EmailSettings = () => {
                 <TextField
                   label="Api Key"
                   name="api_key"
+                  className="myTextField"
                   value={api_key}
                   onChange={handleChange}
                   fullWidth
