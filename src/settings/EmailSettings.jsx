@@ -239,6 +239,7 @@ const EmailSettings = () => {
                 value={smtp_host}
                 onChange={handleChange}
                 fullWidth
+                className="myTextField"
                 InputProps={{ startAdornment: <MdDns className="mr-2" style={{ color: '#6366f1' }} /> }}
                 sx={fieldSx}
               />
@@ -246,6 +247,7 @@ const EmailSettings = () => {
                 label="SMTP Port"
                 name="smtp_port"
                 value={smtp_port}
+                className="myTextField"
                 onChange={handleChange}
                 fullWidth
                 InputProps={{ startAdornment: <MdDns className="mr-2" style={{ color: '#6366f1' }} /> }}
@@ -255,6 +257,7 @@ const EmailSettings = () => {
                 label="SMTP Username"
                 name="smtp_username"
                 value={smtp_username}
+                className="myTextField"
                 onChange={handleChange}
                 fullWidth
                 InputProps={{ startAdornment: <MdAttachEmail className="mr-2" style={{ color: '#6366f1' }} /> }}
@@ -264,6 +267,7 @@ const EmailSettings = () => {
                 label="SMTP Password"
                 name="smtp_password"
                 value={smtp_password}
+                className="myTextField"
                 onChange={handleChange}
                 fullWidth
                 type={showPassword ? 'text' : 'password'}

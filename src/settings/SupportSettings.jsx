@@ -302,12 +302,15 @@ const SupportSettings = () => {
                                     onChange={handleChange}
                                     value={prefix}
                                     fullWidth
+                                    className="myTextField"
                                     label="Prefix"
                                     InputProps={{
-                                        startAdornment: <TagRoundedIcon sx={{ fontSize: '1.1rem', mr: 1, color: '#6366f1' }} />,
+                                        startAdornment: <TagRoundedIcon sx={{ fontSize: '1.1rem', mr: 1,
+                                             color: '#6366f1' }} />,
                                     }}
                                     helperText={
-                                        <span className="dark:text-white/40 text-black/40 text-xs roboto-condensed">
+                                        <span className="dark:text-white/40 text-black/40
+                                         text-xs roboto-condensed">
                                             Any short code, e.g. FK, TQ, QM, M, A
                                         </span>
                                     }
@@ -319,6 +322,7 @@ const SupportSettings = () => {
                                     value={minimum_digits}
                                     onChange={handleChange}
                                     type="number"
+                                    className="myTextField"
                                     fullWidth
                                     label="Minimum Digits"
                                     InputProps={{
