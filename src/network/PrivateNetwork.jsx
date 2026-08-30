@@ -41,8 +41,8 @@ const PrivateNetwork = () => {
   const [currentNetwork, setCurrentNetwork] = useState(null);
 
   // Multiple allowed networks — stored as an array of CIDR strings.
-  // The peer's own tunnel IP (private_ip) is assigned by the server and
-  // is never entered by the admin.
+  // private_ip (the peer's own WireGuard tunnel address) is never entered
+  // or assigned here — it's populated elsewhere, outside this feature.
   const [allowedIps, setAllowedIps] = useState([]);
   const [networkInput, setNetworkInput] = useState('');
   const [networkInputError, setNetworkInputError] = useState('');
@@ -300,9 +300,8 @@ const PrivateNetwork = () => {
   // ---------------------------------------------------------------------
   // Create / update
   //
-  // The peer's tunnel IP (private_ip) is assigned automatically by the
-  // server — the admin only supplies the private network(s) that should
-  // become reachable through WireGuard.
+  // private_ip is never sent from here. The admin only supplies the
+  // private network(s) that should become reachable through WireGuard.
   // ---------------------------------------------------------------------
 
   const handleSubmit = async () => {
@@ -424,7 +423,6 @@ const PrivateNetwork = () => {
             <Typography variant="body2" color="text.secondary" className="font-sans">
               Connect your private subnets (e.g. <code>10.0.0.0/24</code>) so this
               site can reach them over WireGuard — useful for TR-069 ONU management.
-              A peer IP is assigned automatically; you only need to add the network(s).
             </Typography>
           </Stack>
         </Paper>
@@ -437,6 +435,7 @@ const PrivateNetwork = () => {
                 {
                   title: <p className="text-sm font-sans font-semibold">Peer IP</p>,
                   field: 'private_ip',
+                  render: (rowData) => rowData.private_ip || '—',
                 },
                 {
                   title: <p className="text-sm font-sans font-semibold">Date Created</p>,
@@ -590,9 +589,13 @@ const PrivateNetwork = () => {
               <Grid item xs={12}>
                 <Typography variant="body2" color="text.secondary" className="font-sans">
                   {editing ? (
-                    <>WireGuard peer IP: <strong>{currentNetwork?.private_ip}</strong> (assigned automatically)</>
+                    currentNetwork?.private_ip ? (
+                      <>WireGuard peer IP: <strong>{currentNetwork.private_ip}</strong></>
+                    ) : (
+                      'WireGuard peer IP: not yet assigned'
+                    )
                   ) : (
-                    'A WireGuard peer IP will be assigned automatically once you save.'
+                    'The WireGuard peer IP is provisioned separately — you only need to add the network(s) below.'
                   )}
                 </Typography>
               </Grid>
