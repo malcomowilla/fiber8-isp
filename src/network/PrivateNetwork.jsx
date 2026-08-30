@@ -30,9 +30,8 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
-// Client-side sanity checks only — the backend is the source of truth.
+// Client-side sanity check only — the backend is the source of truth.
 const CIDR_REGEX = /^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/;
-const IPV4_REGEX = /^(\d{1,3}\.){3}\d{1,3}$/;
 
 const PrivateNetwork = () => {
   const subdomain = window.location.hostname.split('.')[0];
@@ -41,10 +40,9 @@ const PrivateNetwork = () => {
   const [editing, setEditing] = useState(false);
   const [currentNetwork, setCurrentNetwork] = useState(null);
 
-  // Single peer IP
-  const [privateIp, setPrivateIp] = useState('');
-
-  // Multiple allowed networks — stored as an array of CIDR strings
+  // Multiple allowed networks — stored as an array of CIDR strings.
+  // The peer's own tunnel IP (private_ip) is assigned by the server and
+  // is never entered by the admin.
   const [allowedIps, setAllowedIps] = useState([]);
   const [networkInput, setNetworkInput] = useState('');
   const [networkInputError, setNetworkInputError] = useState('');
@@ -202,7 +200,6 @@ const PrivateNetwork = () => {
   // ---------------------------------------------------------------------
 
   const resetForm = () => {
-    setPrivateIp('');
     setAllowedIps([]);
     setNetworkInput('');
     setNetworkInputError('');
@@ -210,6 +207,7 @@ const PrivateNetwork = () => {
 
   const handleOpenAddDialog = () => {
     setEditing(false);
+    setCurrentNetwork(null);
     resetForm();
     setOpenDialog(true);
   };
@@ -217,7 +215,6 @@ const PrivateNetwork = () => {
   const handleOpenEditDialog = (rowData) => {
     setEditing(true);
     setCurrentNetwork(rowData);
-    setPrivateIp(rowData.private_ip || '');
     setAllowedIps(splitNetworks(rowData.allowed_ips));
     setNetworkInput('');
     setNetworkInputError('');
@@ -302,11 +299,15 @@ const PrivateNetwork = () => {
 
   // ---------------------------------------------------------------------
   // Create / update
+  //
+  // The peer's tunnel IP (private_ip) is assigned automatically by the
+  // server — the admin only supplies the private network(s) that should
+  // become reachable through WireGuard.
   // ---------------------------------------------------------------------
 
   const handleSubmit = async () => {
-    if (!IPV4_REGEX.test(privateIp.trim())) {
-      showSnackbar('Enter a valid peer IP, e.g. 10.2.0.154', 'error');
+    if (allowedIps.length === 0) {
+      showSnackbar('Add at least one network to route through WireGuard', 'error');
       return;
     }
 
@@ -327,7 +328,6 @@ const PrivateNetwork = () => {
         },
         body: JSON.stringify({
           wireguard_peer: {
-            private_ip: privateIp.trim(),
             allowed_ips: allowedIps
           }
         })
@@ -424,6 +424,7 @@ const PrivateNetwork = () => {
             <Typography variant="body2" color="text.secondary" className="font-sans">
               Connect your private subnets (e.g. <code>10.0.0.0/24</code>) so this
               site can reach them over WireGuard — useful for TR-069 ONU management.
+              A peer IP is assigned automatically; you only need to add the network(s).
             </Typography>
           </Stack>
         </Paper>
@@ -587,15 +588,13 @@ const PrivateNetwork = () => {
           <DialogContent sx={{ pt: 3 }}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Peer IP"
-                  helperText="Single WireGuard peer address, e.g. 10.2.0.154"
-                  value={privateIp}
-                  onChange={(e) => setPrivateIp(e.target.value)}
-                  placeholder="10.2.0.154"
-                  required
-                />
+                <Typography variant="body2" color="text.secondary" className="font-sans">
+                  {editing ? (
+                    <>WireGuard peer IP: <strong>{currentNetwork?.private_ip}</strong> (assigned automatically)</>
+                  ) : (
+                    'A WireGuard peer IP will be assigned automatically once you save.'
+                  )}
+                </Typography>
               </Grid>
 
               <Grid item xs={12}>

@@ -497,6 +497,10 @@ const Analytics = () => {
   const [sysOnlineRouters, setSysOnlineRouters]           = useState(0);
   const [insightsLoading, setInsightsLoading]             = useState(true);
 
+  // ── Access Point stats ────────────────────────────────────────────────────
+  const [apStats, setApStats] = useState({ total: 0, online: 0, offline: 0, offline_list: [] });
+  const [apLoading, setApLoading] = useState(true);
+
   // Chart
   const maxDataPoints = 20;
   const dataHistory   = useRef([]);
@@ -725,6 +729,23 @@ const Analytics = () => {
     }
   }, [subdomain]);
 
+  // ── Access Point analytics ────────────────────────────────────────────────
+  const fetchAccessPointStats = useCallback(async () => {
+    try {
+      const res = await fetch('/api/access_points/analytics', { headers: { 'X-Subdomain': subdomain } });
+      if (res.ok) {
+        const d = await res.json();
+        setApStats({
+          total: d.total ?? 0,
+          online: d.online ?? 0,
+          offline: d.offline ?? 0,
+          offline_list: d.offline_list ?? [],
+        });
+      }
+    } catch (_) {}
+    finally { setApLoading(false); }
+  }, [subdomain]);
+
   useEffect(() => {
     getUnpaidInvoiceAmount();
     getCurrentHotspotPlan();
@@ -739,10 +760,12 @@ const Analytics = () => {
     fetchNewCustomers();
     fetchHotspotERevenueThisMonth();
     fetchSystemStatistics();
+    fetchAccessPointStats();
   }, [getUnpaidInvoiceAmount, getCurrentHotspotPlan, getPPOEstats, fetchtotalSubscribers,
     fetchtotalSubscribersOffline, fetchDashboardStats, fetchYesterdayRevenue, fetchPPPoERevenueToday,
     fetchExpiringSoon, fetchRecentlyExpired, fetchNewCustomers,
-    fetchSystemStatistics, fetchPPPoERevenueThisMonth, fetchHotspotERevenueThisMonth]);
+    fetchSystemStatistics, fetchPPPoERevenueThisMonth, fetchHotspotERevenueThisMonth,
+    fetchAccessPointStats]);
 
 
 
@@ -942,6 +965,122 @@ const Analytics = () => {
               calculateTimeRemaining={calculateTimeRemaining}
               smsBalance={smsBalance}
             />
+
+            {/* ── Access Point Warning Banner ──────────────────────────────────── */}
+            {!apLoading && apStats.offline > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-2xl overflow-hidden"
+                style={{
+                  background: 'rgba(239,68,68,.08)',
+                  border: '1px solid rgba(239,68,68,.25)',
+                }}
+              >
+                <div className="flex items-start gap-3 p-4">
+                  {/* Pulsing icon */}
+                  <div className="relative flex-shrink-0 mt-0.5">
+                    <span className="pulse-offline absolute inset-0 rounded-full" />
+                    <div className="relative w-8 h-8 rounded-full flex items-center justify-center"
+                      style={{ background: 'rgba(239,68,68,.15)' }}>
+                      <IoCloudOfflineOutline size={16} style={{ color: '#ef4444' }} />
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-red-600 dark:text-red-400 mb-1">
+                      ⚠️ {apStats.offline} Access Point{apStats.offline > 1 ? 's' : ''} Offline
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {apStats.offline_list.map(ap => (
+                        <span key={ap.id}
+                          className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full"
+                          style={{ background: 'rgba(239,68,68,.12)', color: '#ef4444' }}>
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
+                          {ap.name}
+                          {ap.location ? ` · ${ap.location}` : ''}
+                          {ap.ip ? ` (${ap.ip})` : ''}
+                        </span>
+                      ))}
+                    </div>
+                    {apStats.offline_list[0]?.last_seen_at && (
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
+                        Last seen: {new Date(apStats.offline_list[0].last_seen_at).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Summary pill */}
+                  <div className="flex-shrink-0 text-right">
+                    <p className="text-lg font-bold tabular-nums" style={{ color: '#ef4444' }}>
+                      {apStats.online}/{apStats.total}
+                    </p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">online</p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── Access Point Summary Card (always visible) ───────────────────── */}
+            {!apLoading && apStats.total > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 }}
+              >
+                <div className="mb-3">
+                  <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <GiWifiRouter size={16} style={{ color: '#38bdf8' }} />
+                    Access Points
+                  </h2>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  {/* Total */}
+                  <motion.div whileHover={{ y: -2 }}
+                    className="stat-card rounded-2xl p-4 relative overflow-hidden">
+                    <div className="absolute -top-6 -right-6 w-16 h-16 rounded-full pointer-events-none drift1"
+                      style={{ background: 'radial-gradient(circle,#38bdf820,transparent)' }} />
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-3"
+                      style={{ background: '#38bdf818', border: '1px solid #38bdf828' }}>
+                      <GiWifiRouter size={16} style={{ color: '#38bdf8' }} />
+                    </div>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{apStats.total}</p>
+                    <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">Total APs</p>
+                  </motion.div>
+
+                  {/* Online */}
+                  <motion.div whileHover={{ y: -2 }}
+                    className="stat-card rounded-2xl p-4 relative overflow-hidden">
+                    <div className="absolute -top-6 -right-6 w-16 h-16 rounded-full pointer-events-none drift2"
+                      style={{ background: 'radial-gradient(circle,#34d39920,transparent)' }} />
+                    <div className="relative w-8 h-8 rounded-lg flex items-center justify-center mb-3"
+                      style={{ background: '#34d39918', border: '1px solid #34d39928' }}>
+                      {apStats.online > 0 && <span className="pulse-online absolute inset-0 rounded-full" />}
+                      <MdOutlineOnlinePrediction size={16} style={{ color: '#34d399' }} className="relative z-10" />
+                    </div>
+                    <p className="text-2xl font-bold tabular-nums" style={{ color: '#34d399' }}>{apStats.online}</p>
+                    <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">Online</p>
+                  </motion.div>
+
+                  {/* Offline */}
+                  <motion.div whileHover={{ y: -2 }}
+                    className="stat-card rounded-2xl p-4 relative overflow-hidden">
+                    <div className="absolute -top-6 -right-6 w-16 h-16 rounded-full pointer-events-none drift1"
+                      style={{ background: 'radial-gradient(circle,#ef444420,transparent)' }} />
+                    <div className="relative w-8 h-8 rounded-lg flex items-center justify-center mb-3"
+                      style={{ background: '#ef444418', border: '1px solid #ef444428' }}>
+                      {apStats.offline > 0 && <span className="pulse-offline absolute inset-0 rounded-full" />}
+                      <IoCloudOfflineOutline size={16} style={{ color: '#ef4444' }} className="relative z-10" />
+                    </div>
+                    <p className="text-2xl font-bold tabular-nums" style={{ color: apStats.offline > 0 ? '#ef4444' : '#94a3b8' }}>
+                      {apStats.offline}
+                    </p>
+                    <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">Offline</p>
+                  </motion.div>
+                </div>
+              </motion.div>
+            )}
 
             {/* ── Hotspot Performance · Revenue ───────────────────────────────── */}
             <motion.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:.08 }}>
