@@ -1,14 +1,12 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import MaterialTable from 'material-table';
-import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  TextField, 
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
   Button,
- 
   Divider,
   Typography,
   Grid,
@@ -16,112 +14,108 @@ import {
   Tooltip,
   CircularProgress,
   Snackbar,
-  Alert
+  Alert,
+  Chip,
+  Stack,
+  Paper
 } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CloudIcon from '@mui/icons-material/Cloud';
 import WarningIcon from '@mui/icons-material/Warning';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import RouteIcon from '@mui/icons-material/Route';
 import toast, { Toaster } from 'react-hot-toast';
 import { useApplicationSettings } from '../settings/ApplicationSettings';
-import { IoInformationCircleOutline } from "react-icons/io5";
-import {RefreshCw} from 'lucide-react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { useMemo } from 'react';
 
-
-
+// Client-side sanity checks only — the backend is the source of truth.
+const CIDR_REGEX = /^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/;
+const IPV4_REGEX = /^(\d{1,3}\.){3}\d{1,3}$/;
 
 const PrivateNetwork = () => {
   const subdomain = window.location.hostname.split('.')[0];
+
   const [openDialog, setOpenDialog] = useState(false);
   const [editing, setEditing] = useState(false);
   const [currentNetwork, setCurrentNetwork] = useState(null);
-  const [formData, setFormData] = useState({
-    title: '',
-    network: '',
-    subnet_mask: '24',
-    private_ip: '',
-    nas: ''
-  });
-  const [nas, setNas] = useState([]);
+
+  // Single peer IP
+  const [privateIp, setPrivateIp] = useState('');
+
+  // Multiple allowed networks — stored as an array of CIDR strings
+  const [allowedIps, setAllowedIps] = useState([]);
+  const [networkInput, setNetworkInput] = useState('');
+  const [networkInputError, setNetworkInputError] = useState('');
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadButton, setLoadButton] = useState(false);
+  const [loadRefresh, setLoadRefresh] = useState(false);
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'success'
   });
-  const [loadRefresh, setLoadRefresh] = useState(false);
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [networkToDelete, setNetworkToDelete] = useState(null);
-const {
-showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
-      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
-       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
-        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
 
-} = useApplicationSettings();
-  const subnetOptions = [
-    { value: '8', label: '/8 (16,777,214 hosts)' },
-    { value: '16', label: '/16 (65,534 hosts)' },
-    { value: '24', label: '/24 (254 hosts)' },
-    { value: '32', label: '/32 (1 host)' },
-    {value: '20', label: '/20 (4096 host)'},
-    { value: '30', label: '/30 (2 hosts)' },
-  ];
+  const {
+    setShowMenu1, setShowMenu2, setShowMenu3, setShowMenu4, setShowMenu5,
+    setShowMenu6, setShowMenu7, setShowMenu8, setShowMenu9, setShowMenu10,
+    setShowMenu11, setShowMenu12,
+  } = useApplicationSettings();
 
+  const closeAllMenus = () => {
+    setShowMenu1(false); setShowMenu2(false); setShowMenu3(false);
+    setShowMenu4(false); setShowMenu5(false); setShowMenu6(false);
+    setShowMenu7(false); setShowMenu8(false); setShowMenu9(false);
+    setShowMenu10(false); setShowMenu11(false); setShowMenu12(false);
+  };
 
-function useIsDarkMode() {
-  const [isDark, setIsDark] = useState(
-    () => typeof document !== 'undefined' &&
-      document.documentElement.classList.contains('dark')
-  );
+  function useIsDarkMode() {
+    const [isDark, setIsDark] = useState(
+      () => typeof document !== 'undefined' &&
+        document.documentElement.classList.contains('dark')
+    );
 
-  useEffect(() => {
-    const root = document.documentElement;
+    useEffect(() => {
+      const root = document.documentElement;
+      const update = () => setIsDark(root.classList.contains('dark'));
+      update();
 
-    const update = () => setIsDark(root.classList.contains('dark'));
-    update();
+      const observer = new MutationObserver(update);
+      observer.observe(root, { attributes: true, attributeFilter: ['class'] });
 
-    const observer = new MutationObserver(update);
-    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+      return () => observer.disconnect();
+    }, []);
 
-    return () => observer.disconnect();
-  }, []);
+    return isDark;
+  }
 
-  return isDark;
-}
+  const isDark = useIsDarkMode();
 
-
-
-
-
-
-// inside PPPOEpackages component:
-const isDark = useIsDarkMode();
-
-const tableTheme = useMemo(() => createTheme({
-  palette: {
-    mode: isDark ? 'dark' : 'light',
-    background: {
-      paper: isDark ? '#1e1e1e' : '#ffffff',
-      default: isDark ? '#1e1e1e' : '#ffffff',
+  const tableTheme = useMemo(() => createTheme({
+    palette: {
+      mode: isDark ? 'dark' : 'light',
+      background: {
+        paper: isDark ? '#1e1e1e' : '#ffffff',
+        default: isDark ? '#1e1e1e' : '#ffffff',
+      },
+      text: {
+        primary: isDark ? '#f1f1f1' : '#1a1a1a',
+        secondary: isDark ? '#a3a3a3' : '#6b7280',
+      },
     },
-    text: {
-      primary: isDark ? '#f1f1f1' : '#1a1a1a',
-      secondary: isDark ? '#a3a3a3' : '#6b7280',
-    },
-  },
-}), [isDark]);
+  }), [isDark]);
 
+  // ---------------------------------------------------------------------
+  // Data fetching
+  // ---------------------------------------------------------------------
 
-
-
-  // Fetch data from backend
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -129,55 +123,22 @@ const tableTheme = useMemo(() => createTheme({
         headers: { 'X-Subdomain': subdomain }
       });
       const result = await response.json();
-      if (response.status === 401) {
 
-  toast.error(response.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
       if (response.ok) {
-        
         setData(result);
-      } else {
-        
-
-        if (response.status === 401) {
-  toast.error(result.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
-
-
-        if (response.status === 401) {
-  toast.error(result.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
-        if (response.status === 402) {
-        setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/license-expired'
-         }, 1800);
-        
+        return;
       }
 
-        throw new Error('Failed to fetch IP networks');
+      if (response.status === 401) {
+        toast.error(result.error, { position: 'top-center', duration: 4000 });
+        setTimeout(() => { window.location.href = '/signin'; }, 1900);
       }
+
+      if (response.status === 402) {
+        setTimeout(() => { window.location.href = '/license-expired'; }, 1800);
+      }
+
+      throw new Error(result.error || 'Failed to fetch IP networks');
     } catch (error) {
       showSnackbar(error.message, 'error');
     } finally {
@@ -185,166 +146,177 @@ const tableTheme = useMemo(() => createTheme({
     }
   };
 
-
-
-
-
-
-
-
-
-
-
   const refreshNetwork = async (e) => {
+    e.preventDefault();
     setLoading(true);
-setLoadRefresh(true);
-e.preventDefault();
+    setLoadRefresh(true);
 
     try {
       const response = await fetch('/api/wireguard_peers', {
         headers: { 'X-Subdomain': subdomain }
       });
       const result = await response.json();
-      if (response.status === 401) {
 
-  toast.error(response.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
       if (response.ok) {
-        
         setData(result);
-        setLoadRefresh(false)
         toast.success('IP networks refreshed successfully', {
-          position: "top-center",
+          position: 'top-center',
           duration: 5000,
         });
-      } else {
-        
-
-        toast.error('Failed to refresh IP networks', {
-          position: "top-center",
-          duration: 5000,
-        });
-         setLoadRefresh(false)
-        if (response.status === 401) {
-  toast.error(result.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
-
-
-        if (response.status === 401) {
-  toast.error(result.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
-        if (response.status === 402) {
-        setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/license-expired'
-         }, 1800);
-        
+        return;
       }
 
-        throw new Error('Failed to fetch IP networks');
+      toast.error('Failed to refresh IP networks', {
+        position: 'top-center',
+        duration: 5000,
+      });
+
+      if (response.status === 401) {
+        toast.error(result.error, { position: 'top-center', duration: 4000 });
+        setTimeout(() => { window.location.href = '/signin'; }, 1900);
       }
+
+      if (response.status === 402) {
+        setTimeout(() => { window.location.href = '/license-expired'; }, 1800);
+      }
+
+      throw new Error(result.error || 'Failed to fetch IP networks');
     } catch (error) {
-       setLoadRefresh(false)
       showSnackbar(error.message, 'error');
     } finally {
       setLoading(false);
-    }
-  };
-
-
-
-
-
-  const fetchNasRouters = async () => {
-    try {
-      const response = await fetch('/api/routers', {
-        headers: { 'X-Subdomain': subdomain }
-      });
-      if (response.ok) {
-        const result = await response.json();
-        setNas(result);
-        // setFormData(prev => ({ ...prev, nas: `"${result[0].ip_address}"` }));
-        // console.log('ip',result[0].ip_address);
-      }
-    } catch (error) {
-      console.error('Failed to fetch NAS routers:', error);
+      setLoadRefresh(false);
     }
   };
 
   useEffect(() => {
     fetchData();
-    fetchNasRouters();
   }, []);
 
   const showSnackbar = (message, severity = 'success') => {
     setSnackbar({ open: true, message, severity });
   };
 
+  // ---------------------------------------------------------------------
+  // Dialog helpers
+  // ---------------------------------------------------------------------
+
+  const resetForm = () => {
+    setPrivateIp('');
+    setAllowedIps([]);
+    setNetworkInput('');
+    setNetworkInputError('');
+  };
+
   const handleOpenAddDialog = () => {
     setEditing(false);
-    setFormData({
-      title: '',
-      network: '',
-      subnet_mask: '24',
-      private_ip: '',
-      nas: ''
-    });
+    resetForm();
     setOpenDialog(true);
   };
 
-  const [cleanIp, setCleanIp] = useState('')
   const handleOpenEditDialog = (rowData) => {
     setEditing(true);
     setCurrentNetwork(rowData);
-    setFormData({
-      title: rowData.title,
-      network: rowData.network,
-      // subnet_mask: rowData.private_ip.sp,
-      nas: rowData.nas,
-      private_ip: rowData.private_ip
-    });
+    setPrivateIp(rowData.private_ip || '');
+    setAllowedIps(splitNetworks(rowData.allowed_ips));
+    setNetworkInput('');
+    setNetworkInputError('');
     setOpenDialog(true);
-    // const {private_ip} = rowData
-    // const cleanIp = private_ip.split('/')[0]
-    // setCleanIp(cleanIp)
   };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
 
-  const handleInputChange = (e) => {
-    console.log(e.target.value);
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  // ---------------------------------------------------------------------
+  // Allowed networks — add one at a time, or paste/type several at once
+  // separated by commas, spaces, or newlines.
+  // ---------------------------------------------------------------------
+
+  const splitNetworks = (value) =>
+    (value || '')
+      .split(/[,\s]+/)
+      .map((n) => n.trim())
+      .filter(Boolean);
+
+  // Takes raw text that may contain several networks and adds every
+  // valid, not-yet-added one. Returns the list of invalid entries (if any).
+  const addNetworksFromText = (text) => {
+    const candidates = splitNetworks(text);
+    if (candidates.length === 0) return;
+
+    const invalid = [];
+    const toAdd = [];
+
+    candidates.forEach((candidate) => {
+      if (!CIDR_REGEX.test(candidate)) {
+        invalid.push(candidate);
+        return;
+      }
+      if (allowedIps.includes(candidate) || toAdd.includes(candidate)) {
+        return; // silently skip duplicates
+      }
+      toAdd.push(candidate);
+    });
+
+    if (toAdd.length > 0) {
+      setAllowedIps((prev) => [...prev, ...toAdd]);
+    }
+
+    if (invalid.length > 0) {
+      setNetworkInputError(
+        `Skipped invalid network${invalid.length > 1 ? 's' : ''}: ${invalid.join(', ')}`
+      );
+    } else {
+      setNetworkInputError('');
+    }
   };
 
+  const handleAddNetwork = () => {
+    if (!networkInput.trim()) return;
+    addNetworksFromText(networkInput);
+    setNetworkInput('');
+  };
+
+  const handleNetworkInputKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      handleAddNetwork();
+    }
+  };
+
+  const handleNetworkInputPaste = (e) => {
+    const pasted = e.clipboardData.getData('text');
+    // If the paste clearly contains multiple networks, handle it ourselves
+    // and skip the default paste-into-input behavior.
+    if (/[,\s]/.test(pasted.trim())) {
+      e.preventDefault();
+      addNetworksFromText(pasted);
+      setNetworkInput('');
+    }
+  };
+
+  const handleRemoveNetwork = (network) => {
+    setAllowedIps((prev) => prev.filter((n) => n !== network));
+  };
+
+  // ---------------------------------------------------------------------
+  // Create / update
+  // ---------------------------------------------------------------------
+
   const handleSubmit = async () => {
+    if (!IPV4_REGEX.test(privateIp.trim())) {
+      showSnackbar('Enter a valid peer IP, e.g. 10.2.0.154', 'error');
+      return;
+    }
+
     try {
       setLoading(true);
-      setLoadButton(true)
-      const url = editing ? `/api/wireguard_peers/${currentNetwork.id}` : '/api/wireguard_peers';
+      setLoadButton(true);
+
+      const url = editing
+        ? `/api/wireguard_peers/${currentNetwork.id}`
+        : '/api/wireguard_peers';
       const method = editing ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -355,88 +327,47 @@ e.preventDefault();
         },
         body: JSON.stringify({
           wireguard_peer: {
-            ...formData,
-            nas: formData.nas,
-            total_ip_addresses: calculateTotalIps(formData.subnet_mask),
-            client_host_range: calculateHostRange(formData.network, formData.subnet_mask),
-            private_ip:  formData.private_ip
+            private_ip: privateIp.trim(),
+            allowed_ips: allowedIps
           }
         })
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        setLoadButton(false)
-
-        throw new Error(errorData.errors?.join(', ') || 'Request failed');
-        
+        throw new Error(
+          errorData.error ||
+          (Array.isArray(errorData.errors) ? errorData.errors.join(', ') : null) ||
+          'Request failed'
+        );
       }
-setLoadButton(false)
+
       showSnackbar(
         editing ? 'Network updated successfully' : 'Network created successfully'
       );
-      fetchData(); // Refresh data
+      fetchData();
       setOpenDialog(false);
     } catch (error) {
       showSnackbar(error.message, 'error');
-      setLoadButton(false)
-
     } finally {
       setLoading(false);
-      setLoadButton(false)
-
+      setLoadButton(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/ip_networks/${id}`, {
-        method: 'DELETE',
-        headers: { 'X-Subdomain': subdomain }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete network');
-      }
-
-      showSnackbar('Network deleted successfully');
-      fetchData(); // Refresh data
-    } catch (error) {
-      showSnackbar(error.message, 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const calculateHostRange = (network, subnet) => {
-    try {
-      const ip = new IPAddress(`${network}/${subnet}`);
-      return `${ip.first_host()} - ${ip.last_host()}`;
-    } catch {
-      return 'Invalid network';
-    }
-  };
-
-  const calculateTotalIps = (subnet) => {
-    if (subnet === '8') return 16777214;
-    if (subnet === '16') return 65534;
-    if (subnet === '24') return 254;
-    if (subnet === '30') return 2;
-    return 0;
-  };
+  // ---------------------------------------------------------------------
+  // Delete
+  // ---------------------------------------------------------------------
 
   const handleDeleteClick = (id) => {
     setNetworkToDelete(id);
     setDeleteConfirmOpen(true);
   };
 
-
   const handleDeleteCancel = () => {
     setDeleteConfirmOpen(false);
     setNetworkToDelete(null);
   };
-
 
   const handleDeleteConfirm = async () => {
     try {
@@ -451,7 +382,7 @@ setLoadButton(false)
       }
 
       showSnackbar('Network deleted successfully');
-      fetchData(); // Refresh data
+      fetchData();
     } catch (error) {
       showSnackbar(error.message, 'error');
     } finally {
@@ -460,355 +391,297 @@ setLoadButton(false)
       setNetworkToDelete(null);
     }
   };
+
+  // ---------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------
+
   return (
     <>
-    <Toaster />
+      <Toaster />
 
-     <div role="alert" className="alert alert-info bg-green-500 rounded-lg w-fit
-          p-2 flex items-center gap-2 justify-center mb-3">
- <IoInformationCircleOutline className='text-white text-xl '/>
-  <span className='text-white font-sans'>connect your private subnets
-     eg 10.0.0.0/24 to connect to tr069 for onu management</span>
-</div>
-    <div 
-    onClick={() =>{
-      setShowMenu1(false)
-      setShowMenu2(false)
-      setShowMenu3(false)
-      setShowMenu4(false) 
-      setShowMenu5(false)
-      setShowMenu6(false)   
-      setShowMenu7(false)
-      setShowMenu8(false)
-      setShowMenu9(false)
-      setShowMenu10(false)
-      setShowMenu11(false)  
-      setShowMenu12(false)
-    }}
-    >
-      <Typography
-      onClick={() => {
-        setShowMenu1(false)
-        setShowMenu2(false)
-        setShowMenu3(false)
-        setShowMenu4(false) 
-        setShowMenu5(false)
-        setShowMenu6(false)
-        setShowMenu7(false)   
-        setShowMenu8(false)
-        setShowMenu9(false)
-        setShowMenu10(false)
-        setShowMenu11(false)  
-        setShowMenu12(false)
-      }}
-       variant="h4" gutterBottom sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
-        <CloudIcon sx={{ mr: 2, color: 'success.main' }} />
-
-
-        <p className='font-sans
- font-bold '>Private Routes Management </p>
-      </Typography>
-
-      <ThemeProvider theme={tableTheme}>
-<div style={{ overflowX: 'auto', width: '100%' }}>
-
-      <MaterialTable
-        title=""
-        columns={[
-          { title: <p className='text-sm text-black'>VPN Client Ip</p>, field: 'allowed_ips' },
-          { title: <p className='text-sm text-black'>Date Created</p>, field: 'created_at' },
-
-          {
-  title: <p className='text-sm text-black'>Connected Subnets</p>,
-  field: 'private_ip',
-  cellStyle: { maxWidth: 220, whiteSpace: 'pre-wrap', wordBreak: 'break-word' },
-  headerStyle: { maxWidth: 220 }
-},
-
-          { title: <p className='text-sm text-black'>Status</p>, field: 'status' },
-        ]}
-        data={data}
-        isLoading={loading}
-        actions={[
-          {
-            icon: () => (
-              <Tooltip title="Add Private Network">
-                <IconButton color="primary">
-                  <AddCircleIcon fontSize="large" />
-                </IconButton>
-              </Tooltip>
-            ),
-            tooltip: 'Add Private Network',
-            isFreeAction: true,
-            onClick: handleOpenAddDialog
-          },
-
-          {
-              icon: () => (
-                <Tooltip title="Refresh For Latest Data">
-<button className=' bg-blue-500 text-white  flex
-            justify-center items-center gap-2
-            p-2 font-sans text-lg
-            rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2  focus:ring-blue-500'>
-              Refresh 
-                <RefreshCw className={`${loadRefresh ? 'animate-spin text-white w-4 h-4 mx-auto ' : 'text-white w-5 h-5'}`} />
-
-</button>
-                </Tooltip>
-
-              ),
-              isFreeAction: true,
-              onClick: refreshNetwork
-          },
-
-          {
-            icon: () => <EditIcon color="primary" />,
-            tooltip: 'Edit Network',
-            onClick: (event, rowData) => handleOpenEditDialog(rowData)
-          },
-          {
-            icon: () => <DeleteIcon color="error" />,
-            tooltip: 'Delete Network',
-            // onClick: (event, rowData) => handleDelete(rowData.id)
-            onClick: (event, rowData) => handleDeleteClick(rowData.id)
-          }
-        ]}
-       
-localization={{
-                body: {
-                  emptyDataSourceMessage:  <p className='font-sans'>No private networks found. Create your first private network to get started! </p>
-                },
-               
-              
-              
-              }}
-
-options={{
-      sorting: true,
-      pageSizeOptions: [2, 5, 10, 20],
-      pageSize: 20,
-      paginationPosition: 'bottom',
-      exportButton: true,
-      exportAllData: true,
-      selection: false,
-      search: false,
-      searchAutoFocus: true,
-      showSelectAllCheckbox: false,
-      showTextRowsSelected: false,
-      emptyRowsWhenPaging: false,
-      actionsColumnIndex: -1,
-      headerStyle: {
-        fontFamily: 'monospace',
-        textTransform: 'uppercase',
-        fontWeight: 700,
-        fontSize: '12px',
-        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
-        color: isDark ? '#f1f1f1' : '#1a1a1a',
-        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
-      },
-      rowStyle: (rowData, index) => ({
-        backgroundColor: isDark
-          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
-          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
-        color: isDark ? '#f1f1f1' : '#1a1a1a',
-        fontFamily: 'monospace',
-      }),
-    }}
-      />
- </div>
-</ThemeProvider>
-
-
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteConfirmOpen} onClose={handleDeleteCancel}>
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
-          <WarningIcon color="warning" sx={{ mr: 1 }} />
-          Confirm Deletion
-        </DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to delete this private network?</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            This action cannot be undone.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button 
-            onClick={handleDeleteCancel} 
-            variant="outlined" 
-            startIcon={<DeleteIcon />}
-          >
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleDeleteConfirm} 
-            variant="contained" 
-            color="error"
-            startIcon={<WarningIcon />}
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={20} /> : 'Delete'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-
-
-      {/* Add/Edit Dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog}
-       maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>
-          {editing ? 'Edit Private Network' : 'Add Private Network'}
-        </DialogTitle>
-        <DialogContent sx={{ pt: 3 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              {/* <TextField
-              sx={{mt: 2}}
-                fullWidth
-                label="Title"
-                name="title"
-                className='myTextField'
-                value={formData.title}
-                onChange={handleInputChange}
-                required
-              /> */}
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                 multiline
-            rows={3}
-                label="Private Routes"
-                name="private_ip"
-                  className='myTextField'
-                value={formData.private_ip}
-                onChange={handleInputChange}
-                placeholder="e.g., 10.0.0.1"
-                // required
-              />
-            </Grid>
-            {/* <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Subnet Mask</InputLabel>
-                <Select
-                  name="subnet_mask"
-                    className='myTextField'
-                  value={formData.subnet_mask}
-                  onChange={handleInputChange}
-                  label="Subnet Mask"
-                  required
-                >
-                  {subnetOptions.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid> */}
-
-
-
-
-            {/* <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>NAS Router</InputLabel>
-                <Select
-                  name="nas"
-                  value={formData.nas}
-                  onChange={handleInputChange}
-                  // onChange={(e) => {
-                  //   const selectedNas = nas.find(n => n.id === e.target.value);
-                  //   setFormData(prev => ({ ...prev, nas: selectedNas }));
-                  // }}
-                  label="NAS Router"
-                  required
-                >
-                  {nas.map(nas => (
-                    <MenuItem key={nas.id} value={nas.name}>
-                      {nas.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid> */}
-            <Grid item xs={12}>
-              <Divider sx={{ my: 2 }} />
-              {/* <Typography variant="subtitle1" color="text.secondary">
-                Network Details:
-              </Typography> */}
-              {/* <Typography>
-                <strong>Total IP Addresses:</strong> {calculateTotalIps(formData.subnet_mask)}
-              </Typography> */}
-              {/* <Typography>
-                <strong>Client Host Range:</strong> {calculateHostRange(formData.network, formData.subnet_mask)}
-              </Typography> */}
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions sx={{ p: 3 }}>
-          <Button onClick={handleCloseDialog} variant="outlined"
-           color="secondary">
-            Cancel
-          </Button>
-
-{/* !formData.private_ip */}
-
-          <Button 
-            onClick={handleSubmit} 
-            variant="contained" 
-            color="primary"
-            disabled={loadButton}
-            startIcon={loadButton && <CircularProgress size={20} />}
-          >
-            {editing ? 'Update' : 'Create'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Snackbar for notifications */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-      >
-        <Alert 
-          severity={snackbar.severity}
-          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+      <div onClick={closeAllMenus}>
+        <Paper
+          elevation={0}
+          className="font-sans"
+          sx={{
+            p: 2.5,
+            mb: 3,
+            border: '1px solid',
+            borderColor: isDark ? '#2a2a2a' : '#e5e0d5',
+            borderRadius: 2,
+          }}
         >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+            <RouteIcon color="success" />
+            <Typography variant="h5" className="font-sans" sx={{ fontWeight: 700 }}>
+              Private Routes Management
+            </Typography>
+          </Stack>
+
+          <Stack direction="row" spacing={1} alignItems="flex-start">
+            <InfoOutlinedIcon fontSize="small" color="action" sx={{ mt: '2px' }} />
+            <Typography variant="body2" color="text.secondary" className="font-sans">
+              Connect your private subnets (e.g. <code>10.0.0.0/24</code>) so this
+              site can reach them over WireGuard — useful for TR-069 ONU management.
+            </Typography>
+          </Stack>
+        </Paper>
+
+        <ThemeProvider theme={tableTheme}>
+          <div style={{ overflowX: 'auto', width: '100%' }}>
+            <MaterialTable
+              title=""
+              columns={[
+                {
+                  title: <p className="text-sm font-sans font-semibold">Peer IP</p>,
+                  field: 'private_ip',
+                },
+                {
+                  title: <p className="text-sm font-sans font-semibold">Date Created</p>,
+                  field: 'created_at',
+                },
+                {
+                  title: <p className="text-sm font-sans font-semibold">Connected Subnets</p>,
+                  field: 'allowed_ips',
+                  cellStyle: { maxWidth: 280, whiteSpace: 'normal' },
+                  headerStyle: { maxWidth: 280 },
+                  render: (rowData) => (
+                    <Stack direction="row" flexWrap="wrap" gap={0.5}>
+                      {splitNetworks(rowData.allowed_ips).length === 0 && (
+                        <Typography variant="body2" color="text.secondary">—</Typography>
+                      )}
+                      {splitNetworks(rowData.allowed_ips).map((network) => (
+                        <Chip key={network} label={network} size="small" variant="outlined" />
+                      ))}
+                    </Stack>
+                  ),
+                },
+                {
+                  title: <p className="text-sm font-sans font-semibold">Status</p>,
+                  field: 'status',
+                },
+              ]}
+              data={data}
+              isLoading={loading}
+              actions={[
+                {
+                  icon: () => (
+                    <Tooltip title="Add Private Network">
+                      <IconButton color="primary">
+                        <AddCircleIcon fontSize="large" />
+                      </IconButton>
+                    </Tooltip>
+                  ),
+                  tooltip: 'Add Private Network',
+                  isFreeAction: true,
+                  onClick: handleOpenAddDialog
+                },
+                {
+                  icon: () => (
+                    <Tooltip title="Refresh For Latest Data">
+                      <Button
+                        variant="contained"
+                        className="font-sans"
+                        sx={{ textTransform: 'none' }}
+                        startIcon={
+                          <RefreshIcon className={loadRefresh ? 'animate-spin' : ''} />
+                        }
+                      >
+                        Refresh
+                      </Button>
+                    </Tooltip>
+                  ),
+                  isFreeAction: true,
+                  onClick: refreshNetwork
+                },
+                {
+                  icon: () => <EditIcon color="primary" />,
+                  tooltip: 'Edit Network',
+                  onClick: (event, rowData) => handleOpenEditDialog(rowData)
+                },
+                {
+                  icon: () => <DeleteIcon color="error" />,
+                  tooltip: 'Delete Network',
+                  onClick: (event, rowData) => handleDeleteClick(rowData.id)
+                }
+              ]}
+              localization={{
+                body: {
+                  emptyDataSourceMessage: (
+                    <p className="font-sans">
+                      No private networks found. Create your first private network to get started!
+                    </p>
+                  )
+                },
+              }}
+              options={{
+                sorting: true,
+                pageSizeOptions: [2, 5, 10, 20],
+                pageSize: 20,
+                paginationPosition: 'bottom',
+                exportButton: true,
+                exportAllData: true,
+                selection: false,
+                search: false,
+                searchAutoFocus: true,
+                showSelectAllCheckbox: false,
+                showTextRowsSelected: false,
+                emptyRowsWhenPaging: false,
+                actionsColumnIndex: -1,
+                headerStyle: {
+                  fontFamily: 'monospace',
+                  textTransform: 'uppercase',
+                  fontWeight: 700,
+                  fontSize: '12px',
+                  backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
+                  color: isDark ? '#f1f1f1' : '#1a1a1a',
+                  borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
+                },
+                rowStyle: (rowData, index) => ({
+                  backgroundColor: isDark
+                    ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
+                    : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
+                  color: isDark ? '#f1f1f1' : '#1a1a1a',
+                }),
+              }}
+            />
+          </div>
+        </ThemeProvider>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={deleteConfirmOpen} onClose={handleDeleteCancel}>
+          <DialogTitle sx={{ display: 'flex', alignItems: 'center' }} className="font-sans">
+            <WarningIcon color="warning" sx={{ mr: 1 }} />
+            Confirm Deletion
+          </DialogTitle>
+          <DialogContent>
+            <Typography className="font-sans">
+              Are you sure you want to delete this private network?
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }} className="font-sans">
+              This action cannot be undone.
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDeleteCancel} variant="outlined" color="secondary">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteConfirm}
+              variant="contained"
+              color="error"
+              startIcon={<WarningIcon />}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={20} /> : 'Delete'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Add/Edit Dialog */}
+        <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+          <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }} className="font-sans">
+            {editing ? 'Edit Private Network' : 'Add Private Network'}
+          </DialogTitle>
+          <DialogContent sx={{ pt: 3 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Peer IP"
+                  helperText="Single WireGuard peer address, e.g. 10.2.0.154"
+                  value={privateIp}
+                  onChange={(e) => setPrivateIp(e.target.value)}
+                  placeholder="10.2.0.154"
+                  required
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <Divider sx={{ mb: 2 }} />
+                <Typography variant="subtitle2" color="text.secondary" className="font-sans" sx={{ mb: 1 }}>
+                  Allowed Networks
+                </Typography>
+
+                <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Add network(s)"
+                    placeholder="10.5.0.0/24 — or paste several at once"
+                    value={networkInput}
+                    onChange={(e) => {
+                      setNetworkInput(e.target.value);
+                      if (networkInputError) setNetworkInputError('');
+                    }}
+                    onKeyDown={handleNetworkInputKeyDown}
+                    onPaste={handleNetworkInputPaste}
+                    error={!!networkInputError}
+                    helperText={
+                      networkInputError ||
+                      'Press Enter to add, or paste/type several separated by commas, spaces, or new lines'
+                    }
+                  />
+                  <Button
+                    variant="outlined"
+                    onClick={handleAddNetwork}
+                    sx={{ whiteSpace: 'nowrap' }}
+                  >
+                    Add
+                  </Button>
+                </Stack>
+
+                <Stack direction="row" flexWrap="wrap" gap={1}>
+                  {allowedIps.length === 0 && (
+                    <Typography variant="body2" color="text.secondary" className="font-sans">
+                      No networks added yet.
+                    </Typography>
+                  )}
+                  {allowedIps.map((network) => (
+                    <Chip
+                      key={network}
+                      label={network}
+                      onDelete={() => handleRemoveNetwork(network)}
+                      variant="outlined"
+                    />
+                  ))}
+                </Stack>
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions sx={{ p: 3 }}>
+            <Button onClick={handleCloseDialog} variant="outlined" color="secondary">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              variant="contained"
+              color="primary"
+              disabled={loadButton}
+              startIcon={loadButton && <CircularProgress size={20} />}
+            >
+              {editing ? 'Update' : 'Create'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Snackbar for notifications */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        >
+          <Alert
+            severity={snackbar.severity}
+            onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </div>
     </>
   );
 };
-
-// Simple IPAddress class - replace with a proper library in production
-class IPAddress {
-  constructor(cidr) {
-    const [ip, mask] = cidr.split('/');
-    this.ip = ip;
-    this.mask = parseInt(mask, 10);
-  }
-  
-  first_host() {
-    const octets = this.ip.split('.').map(Number);
-    octets[3] += 1;
-    return octets.join('.');
-  }
-  
-  last_host() {
-    const octets = this.ip.split('.').map(Number);
-    const hostBits = 32 - this.mask;
-    if (hostBits >= 8) {
-      octets[3] = 254;
-    } else {
-      octets[3] = (1 << (8 - hostBits)) - 2;
-    }
-    return octets.join('.');
-  }
-}
 
 export default PrivateNetwork;
