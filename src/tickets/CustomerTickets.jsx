@@ -18,9 +18,8 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useDebounce } from 'use-debounce';
-import { toast, Toaster as ToastifyToaster } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import toaster, { Toaster } from 'react-hot-toast';
-
 import TicketForm from './TicketForm';
 import TicketSubmit from './TicketSubmit';
 import DeleteTicket from './DeleteTicket';
@@ -280,8 +279,8 @@ const CustomerTickets = () => {
 
   return (
     <>
-      <Toaster />
-      <ToastifyToaster />
+     <Toaster />
+<ToastContainer />
       <TicketForm phone={phone} customer_name={customer_name} ticketNo={ticketNo} loading={loading}
         openLoad={openLoad} handleAddTicket={handleAddTicket} isOpen={isOpen} setIsOpen={setIsOpen}
         agentRole={agentRole} ticketForm={ticketForm} setTicketForm={setTicketForm} handleChange={handleChange}
