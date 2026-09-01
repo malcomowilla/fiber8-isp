@@ -22,7 +22,7 @@ const TechnicianTicketUpdate = () => {
 
   const fetchTicket = useCallback(async () => {
     try {
-      const res = await fetch(`/technician/tickets/${token}`, { headers: { 'X-Subdomain': subdomain } });
+      const res = await fetch(`/api/technician/tickets/${token}`, { headers: { 'X-Subdomain': subdomain } });
       const data = await res.json();
       if (res.ok) {
         setTicketInfo(data);
