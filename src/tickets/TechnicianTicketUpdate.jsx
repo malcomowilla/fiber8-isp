@@ -42,7 +42,7 @@ const TechnicianTicketUpdate = () => {
   const submit = async () => {
     setSubmitting(true);
     try {
-      const res = await fetch(`/technician/tickets/${token}`, {
+      const res = await fetch(`/api/technician/tickets/${token}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
         body: JSON.stringify({ ticket_update: { status, remark } }),
