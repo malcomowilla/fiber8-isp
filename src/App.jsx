@@ -159,7 +159,7 @@ const HotspotSmsAutomation = lazy(()=> import("./sms/HotspotSmsAutomation") )
 const NetworkTroubleshooting = lazy(() => import("./network/NetworkTroubleshooting"))
 const HotspotIncidents = lazy(() => import("./network/HotspotIncidents"))
 const HotspotCompensationStats = lazy(() => import("./network/HotspotCompensationStats"))
-
+const TechnicianTicketUpdate = lazy(() => import("./tickets/TechnicianTicketUpdate"))
 
 const App = ({client}) => {
 
@@ -828,7 +828,7 @@ hostname.endsWith('.aitechs.co.ke')
       <Route  path='/hotspot-customer-portal' element={< HotspotDevicePortal />} />
 
      
-
+<Route path="/technician/tickets/:token" element={<TechnicianTicketUpdate />} />
 <Route element={<ProtectAuthWallet
  />}>
     <Route path = '/admin-wallet' element={<AdminWalletPortal/>}/>

@@ -1,779 +1,487 @@
-
-import MaterialTable, {MTablePagination} from "material-table";
-
+import MaterialTable from "material-table";
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import GetAppIcon from '@mui/icons-material/GetApp';
-import TicketForm from './TicketForm'
-import {useState, useCallback, useEffect} from 'react'
-import TicketSubmit from './TicketSubmit'
-import DeleteTicket from './DeleteTicket'
-
-import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
-import { styled } from '@mui/material/styles';
-import {useNavigate} from 'react-router-dom'
-import QuestionMarkAnimation from '../loader/question_mark.json'
-import Lottie from 'react-lottie';
-import {  toast, } from 'react-toastify';
-import { useDebounce } from 'use-debounce';
-import { BsTicketDetailed } from "react-icons/bs";
-import toaster, { Toaster } from 'react-hot-toast';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { IconButton } from '@mui/material';
-
 import EditIcon from '@mui/icons-material/Edit';
-import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading animation
-import { 
-   RefreshCw,
-  BarChart3, TrendingDown, Download, Upload
-} from 'lucide-react';
-import TicketStatistics from './TicketStatistics'
+import ViewListIcon from '@mui/icons-material/ViewList';
+import ViewKanbanIcon from '@mui/icons-material/ViewKanban';
+import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import {
+  Box, Paper, Grid, Typography, ToggleButtonGroup, ToggleButton,
+  Tabs, Tab, IconButton, TextField, InputAdornment, Chip, Avatar, Stack
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import { useDebounce } from 'use-debounce';
+import { toast, Toaster as ToastifyToaster } from 'react-toastify';
+import toaster, { Toaster } from 'react-hot-toast';
 
+import TicketForm from './TicketForm';
+import TicketSubmit from './TicketSubmit';
+import DeleteTicket from './DeleteTicket';
 
-
-
-
-const CustomerTickets = () => {
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [isOpenTicket, setIsOpenTicket] = useState(false);
-const [agentRole, setAgentRole] = useState([])
-const [ticket, setTicket] = useState([])
-const [loading, setloading] = useState(false)
-const [openLoad, setOpenLoad] = useState(false);
-const [isOpenDelete, setisOpenDelete] = useState(false)
-const [openCreateTicketAlert, setopenCreateTicketAlert] = useState(false)
-const [openUpdateTicketAlert, setopenUpdateTicketAlert] = useState(false)
-const [openDeleteTicketAlert, setopenDeleteTicketAlert] = useState(false)
-const [phone, setPhone] = useState('')
-
-const [ticketNo, setTicketNo] = useState('') 
-const [updatedDate, setUpdatedDate] = useState('')
-const [customers, setCustomers] = useState([])
-
-const [customer_name, setName] = useState('')
-const [ticketForm, setTicketForm] = useState({
-      customer: '',
-      ticket_category: '',
-      priority: '',
-      agent: '',
-      name: '',
-      email: '',
-      phone_number: '',
-      status: '',
-      issue_description: '',
-      agent_review: '',
-      agent_response: ''
-
-})
-
-
-    const navigate = useNavigate()
- 
-const [search, setSearch] = useState('')
-const [searchInput] = useDebounce(search, 1000)
-const [isSearching, setIsSearching] = useState(false); // New state for search loading
-const [seeTicketError, setSeeTicketError] = useState(false)
-const [ticketError, setTicketError] = useState('')
-
-const handleCloseDeleteTicketAlert = ()=> {
-  setopenDeleteTicketAlert(false)
-}
-
-const handleCloseUpdateTicketAlert = ()=> {
-  setopenUpdateTicketAlert(false)
-}
-
-const handleCloseCreateTicketAlert = ()=> {
-  setopenCreateTicketAlert(false)
-}
-
-
-
-
-
-
-const defaultOptions = {
-  loop: true,
-  autoplay: true, 
-  animationData: QuestionMarkAnimation,
-  rendererSettings: {
-    preserveAspectRatio: 'xMidYMid slice'
-  }
+const STATUS_META = {
+  Open: { color: '#DC2626', bg: '#FEE2E2', icon: LockOpenIcon },
+  'In Progress': { color: '#D97706', bg: '#FEF3C7', icon: PendingActionsIcon },
+  Pending: { color: '#6B7280', bg: '#F3F4F6', icon: PendingActionsIcon },
+  Resolved: { color: '#15803D', bg: '#DCFCE7', icon: TaskAltIcon },
 };
 
+const PRIORITY_META = {
+  Urgent: '#DC2626',
+  Medium: '#D97706',
+  Low: '#15803D',
+};
 
+const StatCard = ({ label, value, icon: Icon, tint }) => (
+  <Paper
+    elevation={0}
+    sx={{
+      p: 2.25,
+      borderRadius: 3,
+      border: '1px solid',
+      borderColor: 'divider',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 2,
+    }}
+  >
+    <Box
+      sx={{
+        width: 44, height: 44, borderRadius: 2.5,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        bgcolor: tint, color: '#fff', flexShrink: 0,
+      }}
+    >
+      <Icon fontSize="small" />
+    </Box>
+    <Box>
+      <Typography variant="h5" sx={{ fontWeight: 700, lineHeight: 1.1 }}>{value}</Typography>
+      <Typography variant="caption" color="text.secondary">{label}</Typography>
+    </Box>
+  </Paper>
+);
 
-const handleChange = (e)=> {
-const {name,  value} = e.target
-setTicketForm((prev)=> ({...prev, [name]: value}))
-} 
+const CustomerTickets = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenTicket, setIsOpenTicket] = useState(false);
+  const [agentRole, setAgentRole] = useState([]);
+  const [ticket, setTicket] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [loading, setloading] = useState(false);
+  const [openLoad, setOpenLoad] = useState(false);
+  const [isOpenDelete, setisOpenDelete] = useState(false);
+  const [phone, setPhone] = useState('');
+  const [customer_name, setName] = useState('');
+  const [ticketNo, setTicketNo] = useState('');
+  const [updatedDate, setUpdatedDate] = useState('');
+  const [ticketForm, setTicketForm] = useState({
+    customer: '', ticket_category: '', priority: '', agent: '', name: '',
+    email: '', phone_number: '', status: '', issue_description: '',
+    agent_review: '', agent_response: '', ticket_updates: []
+  });
 
+  const [search, setSearch] = useState('');
+  const [searchInput] = useDebounce(search, 500);
+  const [isSearching, setIsSearching] = useState(false);
+  const [seeTicketError, setSeeTicketError] = useState(false);
+  const [ticketError, setTicketError] = useState('');
+  const [statusTab, setStatusTab] = useState('All');
+  const [view, setView] = useState('table');
+  const [stats, setStats] = useState({ total: 0, open: 0, resolved: 0, urgent: 0 });
 
-const CustomTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: 'white',
-    color: 'black',
-  },
-}));
+  const subdomain = window.location.hostname.split('.')[0];
 
+  const fetchStats = useCallback(async () => {
+    try {
+      const [t, o, s, u] = await Promise.all([
+        fetch('/api/total_tickets', { headers: { 'X-Subdomain': subdomain } }).then(r => r.json()),
+        fetch('/api/open_tickets', { headers: { 'X-Subdomain': subdomain } }).then(r => r.json()),
+        fetch('/api/solved_tickets', { headers: { 'X-Subdomain': subdomain } }).then(r => r.json()),
+        fetch('/api/high_priority_tickets', { headers: { 'X-Subdomain': subdomain } }).then(r => r.json()),
+      ]);
+      setStats({
+        total: t.total_tickets ?? 0,
+        open: o.open_tickets ?? 0,
+        resolved: s.solved_tickets ?? 0,
+        urgent: u.high_priority_tickets ?? 0,
+      });
+    } catch (e) { /* stat cards are non-critical */ }
+  }, [subdomain]);
 
-
-
-const subdomain = window.location.hostname.split('.')[0]; 
-
-    
-const fetchSubscribers = useCallback(
-  async() => {
-    
-  try {
-    const response = await fetch('/api/subscribers',{
-      headers: {
-        'X-Subdomain': subdomain,
-      },
-  
+  const fetchSubscribers = useCallback(async () => {
+    try {
+      const response = await fetch('/api/subscribers', { headers: { 'X-Subdomain': subdomain } });
+      const newData = await response.json();
+      if (response.ok) {
+        setCustomers(newData);
+      } else {
+        if (response.status === 401) {
+          toast.error(newData.error, { position: 'top-center', duration: 4000 });
+          setTimeout(() => { window.location.href = '/signin' }, 1900);
+        }
+        toast.error('Failed to get subscribers', { position: 'top-center', duration: 3000 });
+      }
+    } catch (error) {
+      toast.error('Failed to get subscribers, please retry in a moment', { position: 'top-center', duration: 3000 });
     }
-  
-  
-  )
-  
-    const newData = await response.json()
-  if (response.ok) {
-    setCustomers(newData)
+  }, [subdomain]);
 
-  } else {
-     if (response.status === 401) {
-  toast.error(newData.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
-toast.error(
-  'Failed to get subscribers',
-  {
-    position: 'top-center',
-    duration: 3000,
-  }
-)
-  }
-  
-  } catch (error) {
-    toast.error('Failed to get subscribers , Please retry in a moment', {
-      position: 'top-center',
-      duration: 3000,
-    })
-  
-  }
-  },
-  [],
-)
+  useEffect(() => { fetchSubscribers(); fetchStats(); }, [fetchSubscribers, fetchStats]);
 
+  const getAgentsCustomerSupportAndTechnicians = useCallback(async () => {
+    try {
+      const response = await fetch('/api/get_all_admins', { headers: { 'X-Subdomain': subdomain } });
+      const newData = await response.json();
+      if (response.ok) setAgentRole(newData);
+    } catch (error) { /* noop */ }
+  }, [subdomain]);
 
+  useEffect(() => { getAgentsCustomerSupportAndTechnicians(); }, [getAgentsCustomerSupportAndTechnicians]);
 
-  useEffect(() => {
-    fetchSubscribers()
-  }, [fetchSubscribers]);
+  const getTicket = useCallback(async () => {
+    try {
+      setIsSearching(true);
+      const response = await fetch('/api/get_tickets', { headers: { 'X-Subdomain': subdomain } });
+      const newData = await response.json();
+      if (response.ok) {
+        setTicket(newData.filter((t) =>
+          search.toLowerCase() === '' ? true : t.ticket_number.toLowerCase().includes(search.toLowerCase())
+        ));
+      } else if (response.status === 401) {
+        toast.error(newData.error, { position: 'top-center', duration: 4000 });
+        setTimeout(() => { window.location.href = '/signin' }, 1900);
+      }
+    } catch (error) {
+      toaster.error('Failed to load tickets, please retry in a moment', { position: 'top-right', duration: 3000 });
+    } finally {
+      setIsSearching(false);
+    }
+  }, [searchInput, subdomain]);
 
+  useEffect(() => { getTicket(); }, [getTicket]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setTicketForm((prev) => ({ ...prev, [name]: value }));
+  };
 
-            const handleAddTicket = async (e)=> {
-              e.preventDefault()
-              
-              try {
-              setloading(true)
-              setOpenLoad(true)
-                const url = ticketForm.id ? `/api/update_ticket/${ticketForm.id}` : '/api/create_ticket';
-                    const method = ticketForm.id ? 'PATCH' : 'POST';
-              
-              
-                    const response = await fetch(url, {
-                      method: method,
+  const handleAddTicket = async (e) => {
+    e.preventDefault();
+    try {
+      setloading(true);
+      setOpenLoad(true);
+      const url = ticketForm.id ? `/api/update_ticket/${ticketForm.id}` : '/api/create_ticket';
+      const method = ticketForm.id ? 'PATCH' : 'POST';
 
-                      headers: {
-                'Content-Type': 'application/json',
-                'X-Subdomain': subdomain
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+        body: JSON.stringify(ticketForm),
+      });
+      const newData = await response.json();
 
-                      },
-                      body: JSON.stringify(ticketForm),
-                
-                      })
-                
-                      const newData = await response.json()
-
-                     
-                if (response.ok) {
-                  
-              setOpenLoad(false)
-                  if (ticketForm.id) {
-                    setloading(false)
-//   setSnackbar({ open: true, message: 'Ticket updated successfully!', severity: 'success' });
-toaster.success('Ticket updated successfully!', {
-    position: "top-center",
-    duration: 4000,
-})
-
-                    setIsOpen(false)
-                    // setopenUpdateTicketAlert(true)
-                    setTicket(ticket.map(item => (item.id === ticketForm.id ? newData : item)));
-                    setIsOpen(false)
-                    setIsOpenTicket(false)
-                   
-              
-                  } else {
-//   setSnackbar({ open: true, message: 'Ticket added successfully!', severity: 'success' });
-toaster.success('Ticket created successfully!', {
-    position: "top-center",
-    duration: 4000,
-})
-                    setIsOpen(false)
-                    setIsOpenTicket(false)
-                    // Add newly created package to tableData
-                    setopenCreateTicketAlert(true)
-                    setTicket((prevData)=> (
-                    [...prevData, newData]
-                    ));
-
-                    
-              setloading(false)
-                  }
-                } else {
-                  setloading(false)
-                  setIsOpen(false)
-                  setOpenLoad(false)
-                  setSeeTicketError(true)
-                  setTicketError(newData.error)
-      
-
- if (response.status === 401) {
-  toast.error(newData.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
-
-
-toaster.error('error creating ticket', {
-    position: "top-center",
-    duration: 3000,
-})
-
-                 
-                }
-              } catch (error) {
-                setSeeTicketError(true)
-                toaster.error('error creating tickets, Please retry in a moment', {
-                    position: "top-center",
-                    duration: 3000,
-                })  
-                setOpenLoad(false)
-                setloading(false)
-                setIsOpen(false)
-              }
-              }
-
-
-
-
-
-              const controller = new AbortController();
-              const id = setTimeout(() => controller.abort(), 9000)
-              
-              
-              const getTicket = 
-              useCallback(
-                async() => {
-              
-                  try {
-                    setIsSearching(true)
-                    const response = await fetch('/api/get_tickets', {
-                      headers: {
-                        'X-Subdomain': subdomain
-                      }
-                    //   signal: controller.signal,  
-              
-                    })
-                    clearTimeout(id);
-              
-                    const newData = await response.json()
-
-                  
-                 
-                    if (response.ok) {
-                      setIsSearching(false)
-                      // setTicket(newData)
-                      setTicket(newData.filter((my_ticket)=> {
-                        return search.toLowerCase() === '' ? my_ticket : my_ticket.ticket_number.toLowerCase().includes(search)
-                      }))
-                    } else {
-                       if (response.status === 401) {
-  toast.error(newData.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          // navigate('/license-expired')
-          window.location.href='/signin'
-         }, 1900);
-}
-                      setIsSearching(false)
-                      toaster.error('Failed to Search Ticket, Please retry in a moment', {
-                        position: 'top-right',
-                        duration: 3000,
-                      })
-              
-                    }
-                  } catch (error) {
-                    setIsSearching(false)
-                    toaster.error('Failed to Search Ticket, We’re having trouble completing this request', {
-                        position: 'top-right',
-                        duration: 3000,
-                      })
-              
-                  }
-                },
-                [searchInput],
-                )
-              
-              
-              
-              useEffect(() => {
-                getTicket()
-              }, [getTicket]);
-
-
-
-              const deleteTicket = async (id)=> {
-
-                try {
-                  setloading(true)
-                  
-              const response = await fetch(`/api/support_tickets/${id}`, {
-                method: 'DELETE',
-                headers: {
-                  'X-Subdomain': subdomain
-                }
-                })
-                
-                
-                if (response.ok) {
-                  setTicket(ticket.filter((tik)=> tik.id !==  id))
-                  setloading(false)
-                  toaster.success('Ticket Deleted Successfully', {
-                    position: 'top-right',
-                    duration: 4000,
-                  })
-                  setisOpenDelete(false)
-                  setopenDeleteTicketAlert(true)
-                } else {
-                    toaster.error('Failed to Delete Ticket', {
-                    position: 'top-right',
-                    duration: 4000,
-                  })
-                  console.log('failed to delete')
-                  setloading(false)
-                  setisOpenDelete(false)
-                }
-                } catch (error) {
-                    toaster.error('Failed to Delete Ticket, We’re having trouble completing this request', {
-                    position: 'top-right',
-                    duration: 3000,
-                  })
-                  console.log(error)
-                  setisOpenDelete(false)
-                  setloading(false)
-                  
-                }
-                
-              }
-              
-
-
-
-        const handleAddButton = ()=> {
-          // setIsOpen(true)
-          setIsOpenTicket(true)
-          setTicketForm('')
+      if (response.ok) {
+        setOpenLoad(false);
+        if (ticketForm.id) {
+          toaster.success('Ticket updated successfully!', { position: 'top-center', duration: 4000 });
+          setTicket(ticket.map((item) => (item.id === ticketForm.id ? newData : item)));
+        } else {
+          toaster.success('Ticket created successfully!', { position: 'top-center', duration: 4000 });
+          setTicket((prev) => [...prev, newData]);
         }
-
-
-        const handleRowClick = (event, rowData)=> {
-          const customerData = customers.find(my_customer => my_customer.name === rowData.customer);
-  // setPhone(customerData.phone_number)
-    setPhone(rowData.phone_number)
-
-          setTicketForm(rowData)
-          setName(customerData.name)
-          setTicketNo(rowData.ticket_number)
-          setUpdatedDate(rowData.formatted_date_closed)
+        setIsOpen(false);
+        setIsOpenTicket(false);
+        fetchStats();
+      } else {
+        setOpenLoad(false);
+        setIsOpen(false);
+        setSeeTicketError(true);
+        setTicketError(newData.error);
+        if (response.status === 401) {
+          toast.error(newData.error, { position: 'top-center', duration: 4000 });
+          setTimeout(() => { window.location.href = '/signin' }, 1900);
         }
+        toaster.error('Error creating ticket', { position: 'top-center', duration: 3000 });
+      }
+    } catch (error) {
+      setSeeTicketError(true);
+      toaster.error('Error creating ticket, please retry in a moment', { position: 'top-center', duration: 3000 });
+      setOpenLoad(false);
+      setIsOpen(false);
+    } finally {
+      setloading(false);
+    }
+  };
 
+  const deleteTicket = async (id) => {
+    try {
+      setloading(true);
+      const response = await fetch(`/api/support_tickets/${id}`, {
+        method: 'DELETE',
+        headers: { 'X-Subdomain': subdomain },
+      });
+      if (response.ok) {
+        setTicket(ticket.filter((t) => t.id !== id));
+        toaster.success('Ticket deleted successfully', { position: 'top-right', duration: 4000 });
+        fetchStats();
+      } else {
+        toaster.error('Failed to delete ticket', { position: 'top-right', duration: 4000 });
+      }
+    } catch (error) {
+      toaster.error('Failed to delete ticket, please retry in a moment', { position: 'top-right', duration: 3000 });
+    } finally {
+      setisOpenDelete(false);
+      setloading(false);
+    }
+  };
 
+  const handleAddButton = () => {
+    setIsOpenTicket(true);
+    setTicketForm({
+      customer: '', ticket_category: '', priority: '', agent: '', name: '',
+      email: '', phone_number: '', status: '', issue_description: '',
+      agent_review: '', agent_response: '', ticket_updates: []
+    });
+  };
 
+  const handleRowClick = (event, rowData) => {
+    const customerData = customers.find((c) => c.name === rowData.customer);
+    setPhone(rowData.phone_number);
+    setTicketForm(rowData);
+    setName(customerData?.name || rowData.customer);
+    setTicketNo(rowData.ticket_number);
+    setUpdatedDate(rowData.formatted_date_closed);
+    setIsOpen(true);
+  };
 
+  const DeleteButton = () => (
+    <IconButton size="small" sx={{ color: '#8B0000' }} onClick={() => setisOpenDelete(true)}>
+      <DeleteIcon fontSize="small" />
+    </IconButton>
+  );
+  const EditButton = () => (
+    <IconButton size="small" sx={{ color: '#15803D' }} onClick={() => setIsOpen(true)}>
+      <EditIcon fontSize="small" />
+    </IconButton>
+  );
 
-        const DeleteButton = ({ id }) => (
-            <IconButton style={{ color: '#8B0000' }} onClick={()=> setisOpenDelete(true)}>
-              <DeleteIcon />
-            </IconButton>
-          );
-          const EditButton = () => (
-            <IconButton style={{color: 'green'}} onClick={()=> setIsOpen(true)} >
-              <EditIcon />
-            </IconButton>
-          )
+  const filteredTickets = useMemo(
+    () => statusTab === 'All' ? ticket : ticket.filter((t) => t.status === statusTab),
+    [ticket, statusTab]
+  );
 
-
-        const getAgentsCustomerSupportAndTechnicians = useCallback(
-          async() => {
-            try {
-              const response = await fetch('/api/get_all_admins', {
-                headers: {
-                  'X-Subdomain': subdomain,
-                },
-              })
-              const newData = await response.json()
-              if (response.ok) {
-                setAgentRole(newData)
-              }
-            } catch (error) {
-              
-            }
-          },
-          [],
-        )
-        
-
-
-          useEffect(() => {
-            
-            getAgentsCustomerSupportAndTechnicians()
-          }, [getAgentsCustomerSupportAndTechnicians]);
+  const kanbanColumns = ['Open', 'In Progress', 'Pending', 'Resolved'];
 
   return (
-
     <>
-    <Toaster />
-<TicketStatistics />
-     <TicketForm phone={phone} customer_name={customer_name}  
-     ticketNo={ticketNo} loading={loading}
-      openLoad={openLoad}
-     handleAddTicket={handleAddTicket} isOpen={isOpen} setIsOpen={setIsOpen} agentRole={agentRole}
-      ticketForm={ticketForm}
-      setTicketForm={setTicketForm} handleChange={handleChange} updatedDate={updatedDate}
-      
-       seeTicketError={seeTicketError} setSeeTicketError={setSeeTicketError}
-      ticketError={ticketError} setTicketError={setTicketError}
-      />
+      <Toaster />
+      <ToastifyToaster />
+      <TicketForm phone={phone} customer_name={customer_name} ticketNo={ticketNo} loading={loading}
+        openLoad={openLoad} handleAddTicket={handleAddTicket} isOpen={isOpen} setIsOpen={setIsOpen}
+        agentRole={agentRole} ticketForm={ticketForm} setTicketForm={setTicketForm} handleChange={handleChange}
+        updatedDate={updatedDate} seeTicketError={seeTicketError} setSeeTicketError={setSeeTicketError}
+        ticketError={ticketError} setTicketError={setTicketError} />
 
+      <TicketSubmit openLoad={openLoad} isloading={loading} handleAddTicket={handleAddTicket}
+        handleChange={handleChange} isOpenTicket={isOpenTicket} setIsOpenTicket={setIsOpenTicket}
+        customers={customers} agentRole={agentRole} ticketForm={ticketForm} setTicketForm={setTicketForm}
+        seeTicketError={seeTicketError} setSeeTicketError={setSeeTicketError}
+        ticketError={ticketError} setTicketError={setTicketError} />
 
-    <TicketSubmit  openLoad={openLoad}  isloading={loading}  handleAddTicket={handleAddTicket} handleChange={handleChange} 
-     isOpenTicket={isOpenTicket} setIsOpenTicket={setIsOpenTicket}
-     customers={customers} agentRole={agentRole} ticketForm={ticketForm}
-      setTicketForm={setTicketForm}
-      seeTicketError={seeTicketError} setSeeTicketError={setSeeTicketError}
-      ticketError={ticketError} setTicketError={setTicketError}
+      <DeleteTicket deleteTicket={deleteTicket} id={ticketForm.id} isOpenDelete={isOpenDelete}
+        setisOpenDelete={setisOpenDelete} isloading={loading} />
 
-    /> 
+      <Box sx={{ p: { xs: 1.5, md: 3 } }}>
+        {/* Header */}
+        <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between"
+          alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={1.5} sx={{ mb: 3 }}>
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>Support Tickets</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Track issues from open to resolved, with live technician updates.
+            </Typography>
+          </Box>
+          <Stack direction="row" spacing={1}>
+            <IconButton onClick={() => { getTicket(); fetchStats(); }} title="Refresh">
+              <RefreshIcon />
+            </IconButton>
+            <ToggleButtonGroup value={view} exclusive size="small"
+              onChange={(e, v) => v && setView(v)}>
+              <ToggleButton value="table"><ViewListIcon fontSize="small" /></ToggleButton>
+              <ToggleButton value="board"><ViewKanbanIcon fontSize="small" /></ToggleButton>
+            </ToggleButtonGroup>
+            <Box onClick={handleAddButton} sx={{
+              bgcolor: '#15803D', color: '#fff', borderRadius: 2, px: 2.5, py: 1,
+              display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer',
+              fontSize: 14, fontWeight: 600, '&:hover': { bgcolor: '#166534' }
+            }}>
+              <AddIcon fontSize="small" /> New Ticket
+            </Box>
+          </Stack>
+        </Stack>
 
-    <DeleteTicket  deleteTicket={deleteTicket} id={ticketForm.id} isOpenDelete={isOpenDelete} 
-    setisOpenDelete={setisOpenDelete} isloading={loading}/>
+        {/* Stat cards */}
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid item xs={6} md={3}>
+            <StatCard label="Total tickets" value={stats.total} icon={ConfirmationNumberIcon} tint="#334155" />
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <StatCard label="Open" value={stats.open} icon={LockOpenIcon} tint="#DC2626" />
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <StatCard label="Resolved" value={stats.resolved} icon={TaskAltIcon} tint="#15803D" />
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <StatCard label="Urgent" value={stats.urgent} icon={PriorityHighIcon} tint="#D97706" />
+          </Grid>
+        </Grid>
 
+        {/* Filters */}
+        <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between"
+          alignItems={{ xs: 'stretch', sm: 'center' }} spacing={1.5} sx={{ mb: 2 }}>
+          <Tabs value={statusTab} onChange={(e, v) => setStatusTab(v)} variant="scrollable">
+            <Tab label="All" value="All" />
+            <Tab label="Open" value="Open" />
+            <Tab label="In Progress" value="In Progress" />
+            <Tab label="Pending" value="Pending" />
+            <Tab label="Resolved" value="Resolved" />
+          </Tabs>
+          <TextField
+            size="small" value={search} onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search ticket number..."
+            InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
+            sx={{ minWidth: 260 }}
+          />
+        </Stack>
 
-
-    <div className="flex items-center max-w-sm mx-auto p-3">   
-    <label htmlFor="simple-search" className="sr-only">Search</label>
-    <div className="relative w-full">
-        <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-           
-            <BsTicketDetailed className='text-black w-5 h-5'/>
-            
-        </div>
-        <input type="text" value={search} onChange={(e)=> setSearch(e.target.value)}
-         className="bg-gray-50 border border-gray-300 text-gray-900 
-        text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full ps-10 p-2.5 
-          dark:border-gray-600 dark:placeholder-gray-400 dark:text-black
-          dark:focus:ring-green-500 dark:focus:border-green-500" placeholder="Search for tickets..."  />
-    </div>
-    <button type="" className="p-2.5 ms-2 text-sm font-medium text-white bg-green-700 
-    rounded-lg border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
-     focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-        <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-             strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-        </svg>
-        <span className="sr-only">Search</span>
-    </button>
-</div>
-
-
-<div style={{ maxWidth: "100%", position: "relative" }}>
-  
-
-  {isSearching ? (
-  
-  <div className="absolute inset-0 flex justify-center cursor-pointer items-center  
-   bg-opacity-70 z-[2] mb-[50rem]">
-      <RefreshCw className='animate-spin text-blue-500 w-12 h-12 mx-auto ' />
-      
-      </div>
-    
-  ) : (
-    <div className='hidden'>
-    <svg
-      className="w-4 h-4"
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 20 20"
-    >
-      <path
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-      />
-    </svg>
-    </div>
-  )} 
-
-
-    <div style={{ maxWidth: "100%" }}>
-    <MaterialTable
-   
-      columns={[
-        { title: "Ticket Status", field: "status",  align: 'left',
-          render: (rowData)=> 
-            
-            <>
-              <CustomTooltip className='myTextField' sx={{
-                background: 'white',
-  "& .MuiTooltip-tooltip": {
-    background: 'white',
-    
-  }
-}} title=  {<div className='text-sm flex justify-center items-center p-3 flex-col '>
-
-  <p className='font-extrabold text-lg'>Subject</p>
-   <p> {rowData.issue_description}  </p> </div>}  >
-
-<div className={`   ${rowData.status === 'In Progress' && 'bg-orange-600'}
-    ${rowData.status === 'Open' && 'bg-red-600'}
-    ${rowData.status === 'Resolved' && 'bg-green-600'}
-    ${rowData.status === 'Pending' && 'bg-gray-600'}
-    
-
-
-rounded-md  playwrite-de-grund text-sm w-20 flex justify-center p-1 items-center
-             h-[3rem]`}>
-             <p style={{
-              color: 'white',
-              
-              
-            }}>{rowData.status}</p>
-
-
-
-            
-            </div>
-</CustomTooltip>
-            </>,
-
-
-          
-
-
-          
-         },
-        { title: "Customer", field: "customer" , render: (rowData)=> 
-
-          <>
-          <div className={`flex gap-3  `}>
-
-          
-         <div className={`${rowData.status === 'In Progress' && 'bg-orange-600 '}
-          ${rowData.status === 'Open' && 'bg-red-600 '}
-          ${rowData.status === 'Resolved' && 'bg-green-600 '}
-          ${rowData.status === 'Pending' && 'bg-gray-600 '}
-          
-         p-3 rounded-full `    }>
-          <p className={`  text-white text-2xl font-extralight`}>
-            { rowData.customer   &&   rowData.customer.split(' ').map((my_name)=>{
-            return my_name.charAt(0)
-          }).join('')}</p></div>
-
-
-          <p>{rowData.customer}</p>
-          
-          </div>
-          </>
-        },
-        { title: "Category", field: "ticket_category", align: 'left' },
-        
-
-        {
-          title: "Priority",
-
-
-          field: "priority",
-          render: (rowData)=> 
-            <>
-            <div className={`  h-10 w-20 text-sm flex justify-center items-center rounded-md playwrite-de-grund
-               ${rowData.priority === 'Urgent' && 'bg-red-800 '}
-               ${rowData.priority === 'Medium' && 'bg-yellow-500 '}
-               ${rowData.priority === 'Low' && 'bg-green-800 '}
-               `}>
-            <p className='text-white'>{rowData.priority}</p>
-
-            </div>
-
-            </>
-        },
-        
-        {
-          title: 'Assigned To',
-          field: 'agent',
-          render: (rowData) => 
-            <>
-        {rowData.agent === '' || rowData.agent === null || rowData.agent === 'null' ?  (
-          <Lottie options={defaultOptions} width={70} height={70}/>
-        ): rowData.agent}
-            </>
-        },
-        {
-          title: 'Ticket Number',
-          field: 'ticket_number'
-        },
-
-
-        {
-          title: 'Date',
-          field: 'formatted_date_of_creation',
-          render: (rowData)=>
-            <>
-<p> Created: <span className='font-bold'>{rowData.
-formatted_date_of_creation
-} </span></p>
-
-<p className=''>Resolved: <span className='font-bold'>{rowData.status === 'Resolved' && rowData.formatted_date_closed
-} </span> </p>
-            </>
-        },
-
-        {title: 'Action', field:'Action',  headerClassName: 'dark:text-black',
-            render: (params) =>  
-            
-            <>
-             
-              <DeleteButton {...params} />
-              <EditButton {...params}/>
-             
-              </>
-          
-          
-          }
-      ]}
-
-
-
-      
-
-
-
-      actions={[
-        {
-          icon: () => <div onClick={handleAddButton}    className='bg-teal-700 p-2 w-14 rounded-lg'><AddIcon
-           style={{color: 'white'}}/></div>,
-          isFreeAction: true, // This makes the action always visible
-          tooltip: 'Add Ticket',
-        },
-        {
-          icon: () => <GetAppIcon />,
-          isFreeAction: true, // This makes the action always visible
-      
-          tooltip: 'Import',
-        },
-      ]}
-      title="Support Tickets"
-
-data={ticket}
-
-
-onRowClick={handleRowClick}
-
-
-localization={{
-                body: {
-                  emptyDataSourceMessage: 'No tickets found. Create your first ticket to get started!'
+        {/* Board view */}
+        {view === 'board' ? (
+          <Grid container spacing={2}>
+            {kanbanColumns.map((col) => {
+              const meta = STATUS_META[col];
+              const Icon = meta.icon;
+              const columnTickets = ticket.filter((t) => t.status === col);
+              return (
+                <Grid item xs={12} sm={6} md={3} key={col}>
+                  <Paper elevation={0} sx={{ p: 1.5, borderRadius: 3, bgcolor: '#FAFAFA', minHeight: 200 }}>
+                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5, px: 0.5 }}>
+                      <Icon sx={{ color: meta.color }} fontSize="small" />
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{col}</Typography>
+                      <Chip label={columnTickets.length} size="small" sx={{ ml: 'auto', bgcolor: meta.bg, color: meta.color, fontWeight: 700 }} />
+                    </Stack>
+                    <Stack spacing={1}>
+                      {columnTickets.map((t) => (
+                        <Paper key={t.id} elevation={0} onClick={(e) => handleRowClick(e, t)}
+                          sx={{ p: 1.5, borderRadius: 2, cursor: 'pointer', border: '1px solid', borderColor: 'divider', '&:hover': { borderColor: meta.color } }}>
+                          <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>{t.ticket_number}</Typography>
+                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: PRIORITY_META[t.priority] || '#9CA3AF', mt: 0.7 }} />
+                          </Stack>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                            {t.ticket_category}
+                          </Typography>
+                          <Stack direction="row" alignItems="center" spacing={1}>
+                            <Avatar sx={{ width: 22, height: 22, fontSize: 11, bgcolor: meta.color }}>
+                              {(t.customer || '?').charAt(0)}
+                            </Avatar>
+                            <Typography variant="caption">{t.customer}</Typography>
+                          </Stack>
+                        </Paper>
+                      ))}
+                      {columnTickets.length === 0 && (
+                        <Typography variant="caption" color="text.secondary" sx={{ px: 0.5 }}>No tickets</Typography>
+                      )}
+                    </Stack>
+                  </Paper>
+                </Grid>
+              );
+            })}
+          </Grid>
+        ) : (
+          <Paper elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
+            <MaterialTable
+              columns={[
+                {
+                  title: 'Status', field: 'status', width: 140,
+                  render: (rowData) => {
+                    const meta = STATUS_META[rowData.status] || {};
+                    return (
+                      <Chip label={rowData.status} size="small"
+                        sx={{ bgcolor: meta.bg, color: meta.color, fontWeight: 700 }} />
+                    );
+                  },
                 },
-               
-              
-              
+                {
+                  title: 'Customer', field: 'customer',
+                  render: (rowData) => (
+                    <Stack direction="row" spacing={1.25} alignItems="center">
+                      <Avatar sx={{ width: 32, height: 32, fontSize: 13, bgcolor: '#334155' }}>
+                        {(rowData.customer || '?').split(' ').map((n) => n.charAt(0)).join('')}
+                      </Avatar>
+                      <Typography variant="body2">{rowData.customer}</Typography>
+                    </Stack>
+                  ),
+                },
+                { title: 'Category', field: 'ticket_category' },
+                {
+                  title: 'Priority', field: 'priority',
+                  render: (rowData) => (
+                    <Chip label={rowData.priority} size="small" variant="outlined"
+                      sx={{ borderColor: PRIORITY_META[rowData.priority], color: PRIORITY_META[rowData.priority], fontWeight: 700 }} />
+                  ),
+                },
+                { title: 'Assigned To', field: 'agent', render: (r) => r.agent || '—' },
+                { title: 'Ticket #', field: 'ticket_number' },
+                {
+                  title: 'Last update', field: 'technician_updated_at',
+                  render: (rowData) => {
+                    const updates = rowData.ticket_updates || [];
+                    const latest = updates[0];
+                    return latest
+                      ? <Typography variant="caption">{latest.status} · {new Date(latest.created_at).toLocaleString()}</Typography>
+                      : <Typography variant="caption" color="text.secondary">No technician updates yet</Typography>;
+                  },
+                },
+                {
+                  title: 'Actions', field: 'actions', sorting: false,
+                  render: () => <Stack direction="row"><EditButton /><DeleteButton /></Stack>,
+                },
+              ]}
+              actions={[
+                { icon: () => <AddIcon />, isFreeAction: true, tooltip: 'Add Ticket', onClick: handleAddButton },
+                { icon: () => <GetAppIcon />, isFreeAction: true, tooltip: 'Export' },
+              ]}
+              title=""
+              data={filteredTickets}
+              onRowClick={handleRowClick}
+              isLoading={isSearching}
+              localization={{ body: { emptyDataSourceMessage: 'No tickets found. Create your first ticket to get started.' } }}
+              options={{
+                sorting: true,
+                pageSizeOptions: [10, 25, 50],
+                pageSize: 10,
+                exportButton: true,
+                exportAllData: true,
+                search: false,
+                showSelectAllCheckbox: false,
+                showTextRowsSelected: false,
+                emptyRowsWhenPaging: false,
+                toolbar: false,
+                headerStyle: { fontFamily: 'inherit', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4 },
+                rowStyle: { fontFamily: 'inherit' },
               }}
+            />
+          </Paper>
+        )}
+      </Box>
+    </>
+  );
+};
 
-
-options={{
-  sorting: true,
-  pageSizeOptions:[1, 2, 5, 10],
-  pageSize: 10,
-  paginationPosition: 'bottom',
-exportButton: true,
-exportAllData: true,
-selection: true,
-search:false,
-searchAutoFocus: true,
-showSelectAllCheckbox: false,
-showTextRowsSelected: false,
-  emptyRowsWhenPaging: false,
-headerStyle:{
-  fontFamily: 'bold',
-  textTransform: 'uppercase'
-  } ,
-  
-  
-  fontFamily: 'mono'
-}}
-    />
-  </div>
-  </div>
-
-  </>
-
-  )
-}
-
-export default CustomerTickets
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default CustomerTickets;

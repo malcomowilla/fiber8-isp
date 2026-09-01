@@ -595,6 +595,7 @@ const PrivateNetwork = () => {
                 <TextField
                   fullWidth
                   label="Peer IP"
+                  className="myTextField"
                   helperText="Existing WireGuard peer's tunnel address, e.g. 10.2.0.154"
                   value={privateIp}
                   onChange={(e) => setPrivateIp(e.target.value)}
@@ -613,6 +614,7 @@ const PrivateNetwork = () => {
                   <TextField
                     fullWidth
                     size="small"
+                    className="myTextField"
                     label="Add network(s)"
                     placeholder="10.5.50.0/24 — or paste several at once"
                     value={networkInput}

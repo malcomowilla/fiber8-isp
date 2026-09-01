@@ -311,6 +311,8 @@ setLoadSendingTicket(true)
             </Stack>
           </Paper>
 
+
+
           <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
             <Typography variant="body1" color="text.secondary" paragraph>
               {issue_description}
@@ -319,6 +321,37 @@ setLoadSendingTicket(true)
              <div className='flex gap-2'> Last updated: <p className='font-bold'>{updatedDate} </p> </div>
             </Typography>
           </Paper>
+
+
+
+<Paper elevation={0} sx={{ p: 2, mb: 2 }}>
+  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5 }}>
+    Activity
+  </Typography>
+  <Stack spacing={1.5}>
+    {(ticketForm.ticket_updates || []).length === 0 && (
+      <Typography variant="body2" color="text.secondary">
+        No updates yet — the technician's status changes and remarks will show up here once they respond to the SMS.
+      </Typography>
+    )}
+    {(ticketForm.ticket_updates || []).map((u, i) => (
+      <Stack key={i} direction="row" spacing={1.5}>
+        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'green', mt: 0.7, flexShrink: 0 }} />
+        <Box>
+          <Typography variant="body2">
+            <b>{u.status}</b> {u.source === 'technician' ? 'by technician' : 'by admin'}
+            {u.updated_by ? ` (${u.updated_by})` : ''}
+          </Typography>
+          {u.remark && <Typography variant="body2" color="text.secondary">{u.remark}</Typography>}
+          <Typography variant="caption" color="text.secondary">
+            {new Date(u.created_at).toLocaleString()}
+          </Typography>
+        </Box>
+      </Stack>
+    ))}
+  </Stack>
+</Paper>
+
 
           <List sx={{ p: 0 }}>
             <ListItem>
