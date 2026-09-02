@@ -101,7 +101,7 @@ const OwitechBulkSmsPanel = ({ subdomain }) => {
           { method: 'POST', headers: { 'X-Subdomain': subdomain } }
         );
         const data = await res.json();
-        if (!res.ok) return; // txn not found yet — keep polling
+        if (!res.ok) return; 
 
         if (data.status === 'completed') {
           clearInterval(interval);
