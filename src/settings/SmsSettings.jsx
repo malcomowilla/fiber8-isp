@@ -1,6 +1,6 @@
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import { Grid, InputAdornment } from '@mui/material';
+import { Grid, InputAdornment, Chip } from '@mui/material';
 import Backdrop from '../backdrop/Backdrop';
 import UiLoader from '../uiloader/UiLoader';
 import { useApplicationSettings } from '../settings/ApplicationSettings';
@@ -13,7 +13,7 @@ import { FaRegIdCard } from 'react-icons/fa6';
 import { LiaUserSecretSolid } from 'react-icons/lia';
 import { TbCircleDashedNumber4 } from 'react-icons/tb';
 import { MdTextsms } from 'react-icons/md';
-import { RefreshCw, Save, MessageSquare, Wallet, FileText } from 'lucide-react';
+import { RefreshCw, Save, MessageSquare, Wallet, FileText, Zap } from 'lucide-react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import OwitechBulkSmsPanel from './OwitechBulkSmsPanel';
@@ -150,6 +150,8 @@ const PROVIDER_OPTIONS = [
   { label: 'Ujumbe',         value: 'Ujumbe' },
 ];
 
+const providerLabel = (value) => PROVIDER_OPTIONS.find(o => o.value === value)?.label || value;
+
 // The platform-managed option — not a real credential provider, so it's
 // handled entirely outside PROVIDER_OPTIONS/renderProviderFields.
 const PROVIDER_MODE_PLATFORM = 'Owitech Bulk SMS';
@@ -186,6 +188,13 @@ const SmsSettings = () => {
   const [welcomeMessage, setWelcomeMessage] = useState('');
   const [savingTemplates, setSavingTemplates] = useState(false);
   const [savingCredentials, setSavingCredentials] = useState(false);
+
+  // ── Which provider is "live" system-wide (used for OTPs, notifications,
+  // reminders, etc). Previously configured on a separate GeneralSettings
+  // screen via /api/sms_provider_settings — folded in here so credential
+  // setup and activation live in one place.
+  const [savedProviders, setSavedProviders] = useState([]);
+  const [activatingProvider, setActivatingProvider] = useState(false);
 
   // ── Provider mode: platform-managed vs bring-your-own-credentials ─────────
   const [providerMode, setProviderMode] = useState(
@@ -230,7 +239,52 @@ const SmsSettings = () => {
 
   useEffect(() => { handleGetSmsProviderSettings(); }, [handleGetSmsProviderSettings]);
 
-  const getSmsBalance = useCallback(async () => {
+  // List of providers that already have saved credentials, so the admin can
+  // switch which one is "active" without re-entering credentials.
+  const fetchConfiguredProviders = useCallback(async () => {
+    try {
+      const response = await fetch('/api/saved_sms_settings', {
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+      });
+      const data = await response.json();
+      if (response.ok) setSavedProviders(data);
+    } catch {
+      /* non-critical — quick-switch list just won't show */
+    }
+  }, []);
+
+  useEffect(() => { fetchConfiguredProviders(); }, [fetchConfiguredProviders]);
+
+  // Marks a provider as the system-wide active one (used for OTPs,
+  // notifications, expiry reminders, etc). `silent` skips the toast when
+  // this is called as a side effect of another action (e.g. saving creds).
+  const setActiveProvider = useCallback(async (providerName, { silent = false } = {}) => {
+    setActivatingProvider(true);
+    try {
+      const response = await fetch('/api/sms_provider_settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+        body: JSON.stringify({ sms_provider_setting: { sms_provider: providerName } }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setProviderSms(data.sms_provider);
+        if (!silent) toast.success(`${providerLabel(providerName)} is now the active provider`, { duration: 2500, position: 'top-center' });
+        return true;
+      }
+      if (!silent) toast.error('Failed to activate provider', { duration: 2500, position: 'top-center' });
+      return false;
+    } catch {
+      if (!silent) toast.error('Failed to activate provider', { duration: 2500, position: 'top-center' });
+      return false;
+    } finally {
+      setActivatingProvider(false);
+    }
+  }, [subdomain, setProviderSms]);
+
+  const fetchSellPriceUnused = null; // (removed — belongs to OwitechBulkSmsPanel only)
+
+  const fetchSmsBalance = useCallback(async () => {
     try {
       const response = await fetch(`/api/get_sms_balance?selected_provider=${providerSms}`, {
         headers: { 'X-Subdomain': subdomain },
@@ -241,25 +295,25 @@ const SmsSettings = () => {
     } catch {
       toast.error('Failed to fetch SMS balance', { duration: 3000, position: 'top-center' });
     }
-  }, []);
+  }, [providerSms]);
 
-  useEffect(() => { if (selectedProvider) getSmsBalance(selectedProvider); }, [getSmsBalance, selectedProvider]);
+  useEffect(() => { if (providerSms) fetchSmsBalance(); }, [fetchSmsBalance, providerSms]);
 
   const fetchSavedSmsSettings = useCallback(async () => {
-  try {
-    const response = await fetch('/api/active_sms_setting', {
-      headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
-    });
-    const newData = await response.json();
-    if (response.ok && newData) {
-      const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID, username } = newData;
-      setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID, username });
-      setSelectedProvider(sms_provider);
+    try {
+      const response = await fetch('/api/active_sms_setting', {
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+      });
+      const newData = await response.json();
+      if (response.ok && newData) {
+        const { api_key, api_secret, sender_id, short_code, sms_provider, partnerID, username } = newData;
+        setSmsSettingsForm({ api_key, api_secret, sender_id, short_code, partnerID, username });
+        setSelectedProvider(sms_provider);
+      }
+    } catch {
+      toast.error('Failed to fetch SMS settings', { duration: 3000, position: 'top-center' });
     }
-  } catch {
-    toast.error('Failed to fetch SMS settings', { duration: 3000, position: 'top-center' });
-  }
-}, []);
+  }, []);
 
   useEffect(() => { fetchSavedSmsSettings(); }, [fetchSavedSmsSettings]);
 
@@ -306,6 +360,10 @@ const SmsSettings = () => {
         setSmsSettingsForm({ ...smsSettingsForm, api_key: k, api_secret: s, sender_id: sid, short_code: sc, partnerID: pid, username: u });
         setOpenSettings(true); setOpen(false);
         toast.success('SMS credentials saved', { duration: 3000, position: 'top-center' });
+        // Saving credentials for a provider also makes it the active
+        // provider — no separate activation step needed.
+        await setActiveProvider(newData.sms_provider, { silent: true });
+        fetchConfiguredProviders();
       } else {
         setSavingCredentials(false);
         setOpen(false);
@@ -469,7 +527,9 @@ const SmsSettings = () => {
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <Wallet size={16} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>SMS balance</span>
+                  <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                    SMS balance {providerSms ? <span style={{ color: 'var(--text-tertiary)' }}>· {providerLabel(providerSms)}</span> : null}
+                  </span>
                 </div>
                 <span style={{ fontSize: '0.9375rem', fontWeight: 500 }}>
                   {smsBalance ?? <span style={{ color: 'var(--text-tertiary)', fontStyle: 'italic', fontSize: '0.8125rem' }}>Not loaded</span>}
@@ -533,8 +593,38 @@ const SmsSettings = () => {
                       icon={MdTextsms}
                       iconClass="text-green-500"
                       title="Provider credentials"
-                      description="Select your SMS provider and enter the credentials from their dashboard."
+                      description="Select your SMS provider and enter the credentials from their dashboard. Saving activates it as the system-wide sender."
                     />
+
+                    {/* Quick-switch between providers that already have saved
+                        credentials — no need to retype anything to reactivate one. */}
+                    {savedProviders.length > 1 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                        {savedProviders.map(p => {
+                          const isActive = p.sms_provider === providerSms;
+                          return (
+                            <Chip
+                              key={p.sms_provider}
+                              size="small"
+                              icon={isActive ? <Zap size={12} /> : undefined}
+                              label={providerLabel(p.sms_provider)}
+                              onClick={() => !isActive && setActiveProvider(p.sms_provider)}
+                              disabled={activatingProvider}
+                              sx={{
+                                borderRadius: '999px',
+                                fontSize: '0.75rem',
+                                fontWeight: 500,
+                                cursor: isActive ? 'default' : 'pointer',
+                                color: isActive ? '#2563eb' : 'text.secondary',
+                                background: isActive ? 'rgba(37,99,235,0.08)' : 'transparent',
+                                border: '1px solid',
+                                borderColor: isActive ? 'rgba(37,99,235,0.35)' : 'var(--divider)',
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    )}
 
                     <Grid container spacing={2}>
                       <Grid item xs={12} sm={6}>
@@ -592,7 +682,7 @@ const SmsSettings = () => {
                     </Grid>
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-                      <SaveButton loading={savingCredentials}>Save credentials</SaveButton>
+                      <SaveButton loading={savingCredentials}>Save & activate</SaveButton>
                     </div>
                   </Card>
                 </form>

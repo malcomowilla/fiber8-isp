@@ -784,7 +784,7 @@ const GeneralSettings = ({ children }) => {
             </form>
 
             {/* ── SMS Settings ───────────────────────────────────────────────── */}
-            <form onSubmit={saveSmsProviderSetting}>
+            {/* <form onSubmit={saveSmsProviderSetting}>
               <Accordion sx={accordionSx}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ fontSize: 20 }} />} sx={accordionSummarySx}>
                   <SectionHeader icon={MdTextsms} iconClass="text-green-500" label="SMS settings" />
@@ -811,7 +811,7 @@ const GeneralSettings = ({ children }) => {
               },
                       }}
                        InputProps={{ ...params.InputProps, startAdornment: <MdTextsms 
-                        style={{ marginRight: 8, flexShrink: 0 }} /> }} sx={fieldSx} />
+                        style={{ marginRight: 8, flexShrink: 0 }} /> }} />
                     )}
                     onChange={(_, newValue) => setSmsProvider({ sms_provider: newValue ? newValue.sms_provider : '' })}
                     renderOption={(props, option) => (
@@ -826,7 +826,12 @@ const GeneralSettings = ({ children }) => {
                   </div>
                 </AccordionDetails>
               </Accordion>
-            </form>
+            </form> */}
+
+
+
+
+
 
             {/* ── Subscriber Settings ────────────────────────────────────────── */}
             <form onSubmit={saveSubcriberSettings}>
