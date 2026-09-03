@@ -22,6 +22,7 @@ import {
 import License from '../layout/License';
 import ChurnRateSection from './ChurnRateSection';
 import NotificationCenter from './NotificationCenter';
+import RecentHotspotPayments from './RecentHotspotPayments';
 const cable = createConsumer(`wss://${window.location.hostname}/cable`);
 
 // ── Dark-mode detection (drives chart theming; nothing here is dark by default) ─
@@ -1164,6 +1165,15 @@ const Analytics = () => {
                 </motion.div>
               </motion.div>
             </motion.div>
+
+
+
+            {/* ── Recent Hotspot Payments (live) ──────────────────────────────── */}
+<motion.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:.09 }}>
+  <RecentHotspotPayments cable={cable} subdomain={subdomain} />
+</motion.div>
+
+
 
             {/* ── Customer Insights ───────────────────────────────────────────── */}
             <motion.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:.1 }}>
