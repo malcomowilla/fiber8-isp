@@ -30,9 +30,9 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
-// Client-side sanity checks only — the backend is the source of truth.
+// Client-side sanity check only — the backend is the source of truth.
+// Private networks are always CIDR blocks (e.g. 10.5.50.0/24).
 const CIDR_REGEX = /^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/;
-const IPV4_REGEX = /^(\d{1,3}\.){3}\d{1,3}$/;
 
 const PrivateNetwork = () => {
   const subdomain = window.location.hostname.split('.')[0];
@@ -41,13 +41,11 @@ const PrivateNetwork = () => {
   const [editing, setEditing] = useState(false);
   const [currentNetwork, setCurrentNetwork] = useState(null);
 
-  // The peer's own WireGuard tunnel IP — a single, already-existing
-  // 10.2.x.x address (NOT a subnet). Identifies which peer this route
-  // belongs to.
-  const [privateIp, setPrivateIp] = useState('');
-
-  // The private LAN(s) that become reachable through that peer —
-  // stored as an array of CIDR strings, e.g. 10.5.50.0/24.
+  // The private LAN(s) reachable THROUGH this peer over WireGuard —
+  // e.g. 10.5.50.0/24. This is the `private_ip` column on the backend.
+  // (The peer's own tunnel address, `allowed_ips` / e.g. 10.2.0.154,
+  // is server-assigned and never edited here — see the read-only
+  // "Peer IP" display in the dialog and table below.)
   const [allowedIps, setAllowedIps] = useState([]);
   const [networkInput, setNetworkInput] = useState('');
   const [networkInputError, setNetworkInputError] = useState('');
@@ -205,7 +203,6 @@ const PrivateNetwork = () => {
   // ---------------------------------------------------------------------
 
   const resetForm = () => {
-    setPrivateIp('');
     setAllowedIps([]);
     setNetworkInput('');
     setNetworkInputError('');
@@ -221,8 +218,8 @@ const PrivateNetwork = () => {
   const handleOpenEditDialog = (rowData) => {
     setEditing(true);
     setCurrentNetwork(rowData);
-    setPrivateIp(rowData.private_ip || '');
-    setAllowedIps(splitNetworks(rowData.allowed_ips));
+    // private_ip holds the LAN network(s) behind this peer
+    setAllowedIps(splitNetworks(rowData.private_ip));
     setNetworkInput('');
     setNetworkInputError('');
     setOpenDialog(true);
@@ -233,7 +230,7 @@ const PrivateNetwork = () => {
   };
 
   // ---------------------------------------------------------------------
-  // Allowed networks — add one at a time, or paste/type several at once
+  // Private networks — add one at a time, or paste/type several at once
   // separated by commas, spaces, or newlines.
   // ---------------------------------------------------------------------
 
@@ -291,8 +288,6 @@ const PrivateNetwork = () => {
 
   const handleNetworkInputPaste = (e) => {
     const pasted = e.clipboardData.getData('text');
-    // If the paste clearly contains multiple networks, handle it ourselves
-    // and skip the default paste-into-input behavior.
     if (/[,\s]/.test(pasted.trim())) {
       e.preventDefault();
       addNetworksFromText(pasted);
@@ -306,11 +301,16 @@ const PrivateNetwork = () => {
 
   // ---------------------------------------------------------------------
   // Create / update
+  //
+  // NOTE: this form only ever edits `private_ip` (the LAN networks
+  // behind an existing peer). The peer's own tunnel address
+  // (`allowed_ips`, always 10.2.x.x) is server-assigned and never
+  // sent from here.
   // ---------------------------------------------------------------------
 
   const handleSubmit = async () => {
-    if (!IPV4_REGEX.test(privateIp.trim())) {
-      showSnackbar('Enter a valid peer IP, e.g. 10.2.0.154', 'error');
+    if (allowedIps.length === 0) {
+      showSnackbar('Add at least one private network, e.g. 10.5.50.0/24', 'error');
       return;
     }
 
@@ -331,8 +331,7 @@ const PrivateNetwork = () => {
         },
         body: JSON.stringify({
           wireguard_peer: {
-            private_ip: privateIp.trim(),
-            allowed_ips: allowedIps
+            private_ip: allowedIps
           }
         })
       });
@@ -426,9 +425,11 @@ const PrivateNetwork = () => {
           <Stack direction="row" spacing={1} alignItems="flex-start">
             <InfoOutlinedIcon fontSize="small" color="action" sx={{ mt: '2px' }} />
             <Typography variant="body2" color="text.secondary" className="font-sans">
-              Enter the existing WireGuard peer's tunnel IP (e.g. <code>10.2.0.154</code>)
-              and the private subnet(s) behind it (e.g. <code>10.5.50.0/24</code>) so this
-              site can reach them over WireGuard — useful for TR-069 ONU management.
+              Each row is an existing WireGuard peer (identified by its own
+              tunnel address, e.g. <code>10.2.0.154</code>). Add the private
+              subnet(s) behind that peer (e.g. <code>10.5.50.0/24</code>) so
+              this site can reach them over WireGuard — useful for TR-069
+              ONU management.
             </Typography>
           </Stack>
         </Paper>
@@ -439,24 +440,27 @@ const PrivateNetwork = () => {
               title=""
               columns={[
                 {
+                  // The peer's own WireGuard tunnel address — always
+                  // 10.2.x.x, server-assigned, read-only here.
                   title: <p className="text-sm font-sans font-semibold">Peer IP</p>,
-                  field: 'private_ip',
+                  field: 'allowed_ips',
                 },
                 {
                   title: <p className="text-sm font-sans font-semibold">Date Created</p>,
                   field: 'created_at',
                 },
                 {
-                  title: <p className="text-sm font-sans font-semibold">Connected Subnets</p>,
-                  field: 'allowed_ips',
+                  // The LAN network(s) reachable through that peer.
+                  title: <p className="text-sm font-sans font-semibold">Private Networks</p>,
+                  field: 'private_ip',
                   cellStyle: { maxWidth: 280, whiteSpace: 'normal' },
                   headerStyle: { maxWidth: 280 },
                   render: (rowData) => (
                     <Stack direction="row" flexWrap="wrap" gap={0.5}>
-                      {splitNetworks(rowData.allowed_ips).length === 0 && (
+                      {splitNetworks(rowData.private_ip).length === 0 && (
                         <Typography variant="body2" color="text.secondary">—</Typography>
                       )}
-                      {splitNetworks(rowData.allowed_ips).map((network) => (
+                      {splitNetworks(rowData.private_ip).map((network) => (
                         <Chip key={network} label={network} size="small" variant="outlined" />
                       ))}
                     </Stack>
@@ -591,23 +595,18 @@ const PrivateNetwork = () => {
           </DialogTitle>
           <DialogContent sx={{ pt: 3 }}>
             <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Peer IP"
-                  className="myTextField"
-                  helperText="Existing WireGuard peer's tunnel address, e.g. 10.2.0.154"
-                  value={privateIp}
-                  onChange={(e) => setPrivateIp(e.target.value)}
-                  placeholder="10.2.0.154"
-                  required
-                />
-              </Grid>
+              {editing && (
+                <Grid item xs={12}>
+                  <Typography variant="body2" color="text.secondary" className="font-sans">
+                    Peer IP: <code>{currentNetwork?.allowed_ips}</code> (assigned automatically, cannot be changed)
+                  </Typography>
+                </Grid>
+              )}
 
               <Grid item xs={12}>
                 <Divider sx={{ mb: 2 }} />
                 <Typography variant="subtitle2" color="text.secondary" className="font-sans" sx={{ mb: 1 }}>
-                  Allowed Networks
+                  Private Networks (reachable through this peer)
                 </Typography>
 
                 <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
