@@ -134,9 +134,9 @@ const Sidebar = () => {
   // Small helper so every leaf icon renders inside a consistent,
   // softly-tinted chip — replaces the old mix of bare icons / raw
   // gifs with one visual language sidebar-wide.
-  const IconChip = ({ children, tint = 'text-teal-200' }) => (
+  const IconChip = ({ children, tint = 'text-teal-600' }) => (
     <span className={`flex items-center justify-center w-7 h-7 rounded-lg
-      bg-white/5 group-hover:bg-white/10 transition-colors shrink-0 ${tint}`}>
+      bg-gray-100 group-hover:bg-gray-200 transition-colors shrink-0 ${tint}`}>
       {children}
     </span>
   );
@@ -149,13 +149,13 @@ const Sidebar = () => {
       path: "/admin/admin-dashboard",
       subItems: [
         {
-          icon: <IconChip tint="text-sky-300"><ManageAccountsOutlinedIcon style={{ fontSize: 18 }} /></IconChip>,
+          icon: <IconChip tint="text-sky-600"><ManageAccountsOutlinedIcon style={{ fontSize: 18 }} /></IconChip>,
           label: "Activity Logs",
           path: "/admin/admin-dashboard"
         },
         {
           // was: <img src="/images/icons8-increase.gif" .../>
-          icon: <IconChip tint="text-emerald-300"><TrendingUp size={17} /></IconChip>,
+          icon: <IconChip tint="text-emerald-600"><TrendingUp size={17} /></IconChip>,
           label: "Analytics",
           path: "/admin/analytics"
         },
@@ -167,7 +167,7 @@ const Sidebar = () => {
       subItems: [
         {
           icon: <div className="flex items-center justify-center w-7 h-7 rounded-lg
-            bg-white text-[9px] font-bold text-teal-900 tracking-tight shrink-0">
+            bg-teal-600 text-[9px] font-bold text-white tracking-tight shrink-0">
             MBPS
           </div>,
           label: "PPOE Packages",
@@ -175,17 +175,17 @@ const Sidebar = () => {
         },
         {
           // was: <img src="/images/icons8-person.gif" .../>
-          icon: <IconChip tint="text-sky-300"><UserRound size={17} /></IconChip>,
+          icon: <IconChip tint="text-sky-600"><UserRound size={17} /></IconChip>,
           label: "PPOE Subscribers",
           path: "/admin/pppoe-subscribers"
         },
         {
-          icon: <IconChip tint="text-yellow-300"><AssessmentIcon style={{ fontSize: 17 }} /></IconChip>,
+          icon: <IconChip tint="text-yellow-600"><AssessmentIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "Payment Analytics",
           path: "/admin/subscriber-payment-analytics"
         },
         {
-          icon: <IconChip tint="text-blue-300"><FaUpload size={15} /></IconChip>,
+          icon: <IconChip tint="text-blue-600"><FaUpload size={15} /></IconChip>,
           label: "Upload Subscribers",
           path: "/admin/upload-subscriber"
         }
@@ -197,17 +197,17 @@ const Sidebar = () => {
       subItems: [
         {
           // was: <img src="/images/icons8-map-pin.gif" .../>
-          icon: <IconChip tint="text-rose-300"><Radar size={17} /></IconChip>,
+          icon: <IconChip tint="text-rose-600"><Radar size={17} /></IconChip>,
           label: "Nodes",
           path: "/admin/nodes"
         },
         {
-          icon: <IconChip tint="text-yellow-300"><MapPinned size={17} /></IconChip>,
+          icon: <IconChip tint="text-yellow-600"><MapPinned size={17} /></IconChip>,
           label: "Network Map",
           path: "/admin/network-map"
         },
         {
-          icon: <IconChip tint="text-blue-300"><PiNetworkSlashLight size={17} /></IconChip>,
+          icon: <IconChip tint="text-blue-600"><PiNetworkSlashLight size={17} /></IconChip>,
           label: "VPN Tunnel",
           path: "/admin/private-network"
         },
@@ -222,7 +222,7 @@ const Sidebar = () => {
           path: "/admin/ip_networks"
         },
         {
-          icon: <IconChip tint="text-orange-300"><RiRouterLine size={17} /></IconChip>,
+          icon: <IconChip tint="text-orange-600"><RiRouterLine size={17} /></IconChip>,
           label: "ONU",
           path: "/admin/devices"
         },
@@ -233,27 +233,27 @@ const Sidebar = () => {
         },
         {
           // was: <img src="/images/wireguard2.png" .../>
-          icon: <IconChip tint="text-emerald-300"><ShieldCheck size={17} /></IconChip>,
+          icon: <IconChip tint="text-emerald-600"><ShieldCheck size={17} /></IconChip>,
           label: "Wireguard",
           path: "/admin/networks-wireguard-config"
         },
 
         {
-          icon: <IconChip tint="text-red-300"><AlertTriangle size={17} /></IconChip>,
+          icon: <IconChip tint="text-red-600"><AlertTriangle size={17} /></IconChip>,
           label: "Incidents",
           path: "/admin/incidents"
         },
 
 
         {
-  icon: <IconChip tint="text-emerald-300"><TrendingUp size={17} /></IconChip>,
+  icon: <IconChip tint="text-emerald-600"><TrendingUp size={17} /></IconChip>,
   label: "Network Uptime",
   path: "/admin/stats-uptime"
 },
 
         
         {
-  icon: <IconChip tint="text-red-300"><Stethoscope size={17} /></IconChip>,
+  icon: <IconChip tint="text-red-600"><Stethoscope size={17} /></IconChip>,
   label: "Troubleshooting",
   path: "/admin/network-troubleshooting"
 }
@@ -269,12 +269,12 @@ const Sidebar = () => {
           path: "/admin/financial-dashboard"
         },
         {
-          icon: <IconChip tint="text-emerald-300"><PaymentIcon style={{ fontSize: 17 }} /></IconChip>,
+          icon: <IconChip tint="text-emerald-600"><PaymentIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "Hotspot Payments",
           path: "/admin/hotspot-payments"
         },
         {
-          icon: <IconChip tint="text-emerald-300"><PaymentIcon style={{ fontSize: 17 }} /></IconChip>,
+          icon: <IconChip tint="text-emerald-600"><PaymentIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "PpPoe Payments",
           path: "/admin/pppoe-payments"
         }
@@ -305,12 +305,12 @@ const Sidebar = () => {
           path: "/admin/messages"
         },
         {
-          icon: <IconChip tint="text-green-300"><AiOutlineWhatsApp size={17} /></IconChip>,
+          icon: <IconChip tint="text-green-600"><AiOutlineWhatsApp size={17} /></IconChip>,
           label: "WhatsApp",
           path: "/admin/whatsapp"
         },
         {
-          icon: <IconChip tint="text-teal-300"><MessageSquareText size={17} /></IconChip>,
+          icon: <IconChip tint="text-teal-600"><MessageSquareText size={17} /></IconChip>,
           label: "SMS Templates",
           path: "/admin/hotspot-sms-templates"
         }
@@ -346,12 +346,12 @@ const Sidebar = () => {
           path: "/admin/tv-plans"
         },
         {
-          icon: <IconChip tint="text-yellow-300"><LuTicketsPlane size={17} /></IconChip>,
+          icon: <IconChip tint="text-yellow-600"><LuTicketsPlane size={17} /></IconChip>,
           label: "Vouchers",
           path: "/admin/hotspot-subscriptions"
         },
         {
-          icon: <IconChip tint="text-amber-300"><Sparkles size={17} /></IconChip>,
+          icon: <IconChip tint="text-amber-600"><Sparkles size={17} /></IconChip>,
           label: "Promotions",
           path: "/admin/hotspot-promotions"
         },
@@ -361,18 +361,18 @@ const Sidebar = () => {
           path: "/admin/hotspot-templates"
         },
         {
-          icon: <IconChip tint="text-fuchsia-300"><Palette size={17} /></IconChip>,
+          icon: <IconChip tint="text-fuchsia-600"><Palette size={17} /></IconChip>,
           label: "Page Designer",
           path: "/admin/hotspot-page-designer"
         },
         {
-          icon: <IconChip tint="text-yellow-300"><ImStatsBars size={16} /></IconChip>,
+          icon: <IconChip tint="text-yellow-600"><ImStatsBars size={16} /></IconChip>,
           label: "Revenue",
           path: "/admin/hotspot_anlytics"
         },
         
         {
-          icon: <IconChip tint="text-green-300"><CiSettings size={17} /></IconChip>,
+          icon: <IconChip tint="text-green-600"><CiSettings size={17} /></IconChip>,
           label: "Settings",
           path: "/admin/hotspot_settings"
         }
@@ -383,7 +383,7 @@ const Sidebar = () => {
       label: "Support",
       subItems: [
         {
-          icon: <IconChip tint="text-yellow-300"><LuTicketsPlane size={17} /></IconChip>,
+          icon: <IconChip tint="text-yellow-600"><LuTicketsPlane size={17} /></IconChip>,
           label: "Tickets",
           path: "/admin/customer-tickets"
         }
@@ -396,7 +396,7 @@ const Sidebar = () => {
       subItems: [
         {
           // was: <img src="/images/icons8-male-user.gif" .../>
-          icon: <IconChip tint="text-sky-300"><CircleUserRound size={17} /></IconChip>,
+          icon: <IconChip tint="text-sky-600"><CircleUserRound size={17} /></IconChip>,
           label: "Users",
           path: "/admin/user"
         },
@@ -411,7 +411,7 @@ const Sidebar = () => {
           path: "/admin/free-trial-users"
         },
         {
-          icon: <IconChip tint="text-green-300"><PeopleIcon style={{ fontSize: 17 }} /></IconChip>,
+          icon: <IconChip tint="text-green-600"><PeopleIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "Partners",
           path: "/admin/partners-management"
         },
@@ -521,7 +521,7 @@ const Sidebar = () => {
           <div
             className={`relative flex items-center p-3 rounded-xl transition-all
                duration-200 cursor-pointer group ${
-              active ? 'bg-white/10' : 'hover:bg-white/5'
+              active ? 'bg-gray-100' : 'hover:bg-gray-50'
             }`}
             onMouseEnter={() => setHoveredMenu(menuKey)}
             onMouseLeave={() => setHoveredMenu(null)}
@@ -533,9 +533,9 @@ const Sidebar = () => {
           >
             {active && (
               <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1
-                rounded-r-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]" />
+                rounded-r-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
             )}
-            <div className="flex items-center justify-center w-6 h-6 mx-auto text-white/90">
+            <div className="flex items-center justify-center w-6 h-6 mx-auto text-gray-600">
               {menu.icon}
             </div>
 
@@ -595,19 +595,19 @@ const Sidebar = () => {
               onClick={() => menu.subItems ? toggleMenu(menuKey) : null}
               className={`relative flex items-center justify-between w-full p-3
                  rounded-xl transition-all duration-200 group ${
-                active ? 'bg-white/10' : 'hover:bg-white/5'
+                active ? 'bg-gray-100' : 'hover:bg-gray-50'
               }`}
             >
               {active && (
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1
-                  rounded-r-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]" />
+                  rounded-r-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
               )}
               <div className="flex items-center gap-3">
-                <span className="flex-shrink-0 text-white/90">{menu.icon}</span>
-                <span className="text-sm font-medium text-white/90">{menu.label}</span>
+                <span className="flex-shrink-0 text-gray-600">{menu.icon}</span>
+                <span className="text-sm font-medium text-gray-800">{menu.label}</span>
               </div>
               {menu.subItems && (
-                <span className="text-white/50 transition-transform duration-200">
+                <span className="text-gray-400 transition-transform duration-200">
                   {isOpen ? <KeyboardArrowUpSharpIcon fontSize="small" /> : <KeyboardArrowDownSharpIcon fontSize="small" />}
                 </span>
               )}
@@ -624,7 +624,7 @@ const Sidebar = () => {
                     transition={{ duration: 0.2, ease: "easeInOut" }}
                     className="overflow-hidden"
                   >
-                    <div className="ml-5 pl-4 border-l border-white/10 space-y-0.5 py-1">
+                    <div className="ml-5 pl-4 border-l border-gray-200 space-y-0.5 py-1">
                       {menu.subItems.map((subItem, idx) => (
                         <motion.div
                           key={idx}
@@ -637,8 +637,8 @@ const Sidebar = () => {
                             className={`group flex items-center gap-2.5 py-2 px-2.5 rounded-lg
                              transition-colors duration-150 ${
                               isActive(subItem.path)
-                                ? 'bg-white/10 text-white'
-                                : 'text-white/75 hover:bg-white/5 hover:text-white'
+                                ? 'bg-gray-100 text-gray-900'
+                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                             }`}
                             onClick={() => window.innerWidth < 1080 && setSeeSideBar(true)}
                           >
@@ -669,12 +669,12 @@ const Sidebar = () => {
         transition={{ duration: 0.3, ease: "easeInOut" }}
         // font-sans resolves to var(--font-sans) — appearance-settings font
         // changes (applyTheme -> --font-sans on <html>) apply here live.
-        className="fixed top-0 left-0 h-screen bg-gradient-to-b from-teal-900
-         via-primary to-teal-950 shadow-2xl shadow-black/40 ring-1 ring-white/5
-         overflow-hidden flex flex-col text-white font-sans z-50"
+        className="fixed top-0 left-0 h-screen bg-white
+         shadow-xl shadow-black/5 ring-1 ring-gray-200
+         overflow-hidden flex flex-col text-gray-800 font-sans z-50"
       >
         {/* Header */}
-        <div className="p-4 border-b border-white/10">
+        <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             {!seeSidebar ? (
               <>
@@ -682,8 +682,8 @@ const Sidebar = () => {
                   <motion.img
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="h-11 w-11 rounded-full border-2 border-white/80
-                     ring-2 ring-emerald-400/30 shrink-0 object-cover"
+                    className="h-11 w-11 rounded-full border-2 border-gray-200
+                     ring-2 ring-emerald-500/20 shrink-0 object-cover"
                     src={logo_preview || "/images/aitechs.png"}
                     alt={company_name || "Aitechs"}
                     onError={(e) => { e.target.src = "/images/aitechs.png"; }}
@@ -693,7 +693,7 @@ const Sidebar = () => {
                   <motion.span
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="font-display font-bold text-white text-base truncate"
+                    className="font-display font-bold text-gray-900 text-base truncate"
                     style={{ fontStyle: 'var(--font-style-display)' }}
                   >
                     {company_name || "Aitechs"}
@@ -706,9 +706,9 @@ const Sidebar = () => {
                     setSeeSideBar(!seeSidebar);
                     collapseAllMenus();
                   }}
-                  className="p-2 rounded-lg hover:bg-white/10 transition-colors shrink-0"
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors shrink-0"
                 >
-                  <MdMenuOpen className="w-6 h-6 text-white/80" />
+                  <MdMenuOpen className="w-6 h-6 text-gray-500" />
                 </motion.button>
               </>
             ) : (
@@ -716,8 +716,8 @@ const Sidebar = () => {
                 <motion.img
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="h-9 w-9 rounded-full border-2 border-white/80
-                   ring-2 ring-emerald-400/30 object-cover"
+                  className="h-9 w-9 rounded-full border-2 border-gray-200
+                   ring-2 ring-emerald-500/20 object-cover"
                   src={logo_preview || "/images/aitechs.png"}
                   alt={company_name || "Aitechs"}
                   onError={(e) => { e.target.src = "/images/aitechs.png"; }}
@@ -729,9 +729,9 @@ const Sidebar = () => {
                     setSeeSideBar(!seeSidebar);
                     collapseAllMenus();
                   }}
-                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                 >
-                  <MdMenuOpen className="w-6 h-6 text-white/80 rotate-180" />
+                  <MdMenuOpen className="w-6 h-6 text-gray-500 rotate-180" />
                 </motion.button>
               </div>
             )}
@@ -742,22 +742,22 @@ const Sidebar = () => {
                 <nav
           className="flex-1 overflow-y-auto py-4 px-3
             [&::-webkit-scrollbar]:w-2.5
-            [&::-webkit-scrollbar-track]:bg-white/5
+            [&::-webkit-scrollbar-track]:bg-gray-100
             [&::-webkit-scrollbar-track]:rounded-full
             [&::-webkit-scrollbar-track]:my-1
-            [&::-webkit-scrollbar-thumb]:bg-emerald-400/50
+            [&::-webkit-scrollbar-thumb]:bg-emerald-500/40
             [&::-webkit-scrollbar-thumb]:rounded-full
             [&::-webkit-scrollbar-thumb]:border-2
             [&::-webkit-scrollbar-thumb]:border-solid
             [&::-webkit-scrollbar-thumb]:border-transparent
             [&::-webkit-scrollbar-thumb]:bg-clip-padding
-            hover:[&::-webkit-scrollbar-thumb]:bg-emerald-400/80"
-          style={{ scrollbarWidth: 'auto', scrollbarColor: 'rgba(52,211,153,0.5) rgba(255,255,255,0.05)' }}
+            hover:[&::-webkit-scrollbar-thumb]:bg-emerald-500/70"
+          style={{ scrollbarWidth: 'auto', scrollbarColor: 'rgba(16,185,129,0.4) rgba(0,0,0,0.05)' }}
         >
 
 
           {!seeSidebar && (
-            <div className="text-xs uppercase text-white/40 font-semibold
+            <div className="text-xs uppercase text-gray-400 font-semibold
               mb-2 tracking-wider px-1">
               Menu
             </div>
@@ -768,7 +768,7 @@ const Sidebar = () => {
 
           <div className={`mt-6 ${seeSidebar ? 'px-0' : 'px-0'}`}>
             {!seeSidebar && (
-              <div className="text-xs uppercase text-white/40
+              <div className="text-xs uppercase text-gray-400
               font-semibold mb-2 tracking-wider px-1">
                 Quick Links
               </div>
@@ -783,16 +783,16 @@ const Sidebar = () => {
                       transition-all duration-200 group ${
                       seeSidebar ? 'justify-center' : ''
                     } ${
-                      isActive(link.path) ? 'bg-white/10' : 'hover:bg-white/5'
+                      isActive(link.path) ? 'bg-gray-100' : 'hover:bg-gray-50'
                     }`}
                     onClick={() => window.innerWidth < 1080 && setSeeSideBar(true)}
                   >
-                    <span className="flex-shrink-0 text-white/80">{link.icon}</span>
+                    <span className="flex-shrink-0 text-gray-600">{link.icon}</span>
                     {!seeSidebar && (
                       <motion.span
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="text-sm text-white/85"
+                        className="text-sm text-gray-700"
                       >
                         {link.label}
                       </motion.span>
@@ -803,11 +803,11 @@ const Sidebar = () => {
             </ul>
 
             {/* Logout */}
-            <div className="mt-3 pt-3 border-t border-white/10">
+            <div className="mt-3 pt-3 border-t border-gray-200">
               <button
                 onClick={() => setShowLogoutConfirm(true)}
                 className={`flex items-center gap-3 p-3 rounded-xl w-full transition-all duration-200
-                  text-red-300 hover:bg-red-500/10 hover:text-red-200
+                  text-red-600 hover:bg-red-50 hover:text-red-700
                   ${seeSidebar ? 'justify-center' : ''}`}
               >
                 <LogOut size={19} className="flex-shrink-0" />
@@ -822,11 +822,11 @@ const Sidebar = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="p-4 border-t border-white/10"
+            className="p-4 border-t border-gray-200"
           >
-            <div className="text-xs text-white/40 text-center">
+            <div className="text-xs text-gray-400 text-center">
               <p>© {new Date().getFullYear()} {company_name || "Aitechs"}</p>
-              <p className="mt-1 inline-block px-2 py-0.5 rounded-full bg-white/5 text-white/50">
+              <p className="mt-1 inline-block px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
                 {APP_VERSION}
               </p>
             </div>
