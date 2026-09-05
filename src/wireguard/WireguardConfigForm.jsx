@@ -1,5 +1,5 @@
 /**
- * MikrotikWireguardOnboarding.jsx
+ * WireguardConfigForm.jsx
  *
  * Multi-step wizard that:
  *   1. Collects device identity + optional custom IP
@@ -7,6 +7,9 @@
  *   3. Shows the ready-to-paste MikroTik terminal script with copy button
  *   4. Polls a reachability check to confirm the tunnel is up
  *   5. Optionally configures PPPoE / Hotspot on the same device
+ *
+ * WireguardAppConnect (own-device QR/app connect) is rendered above this
+ * wizard — it's independent and doesn't depend on any step here.
  */
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
@@ -15,14 +18,11 @@ import {
   Router, Shield, Terminal, CheckCircle, Copy, Check,
   ChevronRight, ChevronLeft, Wifi, Server, AlertCircle,
   RefreshCw, Key, Globe, Network, Zap, Eye, EyeOff,
-  Download, QrCode, Info, ArrowRight, Loader
+  Download, Info, ArrowRight, Loader
 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useLayoutEffect } from "react";
-
-
-
-
+import WireguardAppConnect from './WireguardAppConnect';
 
 // ── CSS ────────────────────────────────────────────────────────────────────────
 const CSS = `
@@ -176,7 +176,6 @@ function Field({ label, hint, required, children }) {
 function HighlightedScript({ text }) {
   const lines = text.split('\n').map((line, i) => {
     if (line.startsWith('#')) return <div key={i}><span className="cmt">{line}</span></div>;
-    // key=value pairs
     const parts = line.split(/(?<==)/);
     return (
       <div key={i}>
@@ -198,52 +197,15 @@ function HighlightedScript({ text }) {
   return <pre>{lines}</pre>;
 }
 
-
-
-// ── QR Modal ──────────────────────────────────────────────────────────────────
-function QrModal({ qrDataUrl, onClose }) {
-  return (
-    <div style={{
-      position:'fixed', inset:0, zIndex:9999,
-      background:'rgba(0,0,0,.55)', backdropFilter:'blur(6px)',
-      display:'flex', alignItems:'center', justifyContent:'center', padding:24,
-    }} onClick={onClose}>
-      <motion.div initial={{ scale:.88, opacity:0 }} 
-      animate={{ scale:1, opacity:1 }}
-        transition={{ type:'spring', stiffness:220, damping:22 }}
-        className="wg-card" style={{ padding:32, textAlign:'center', maxWidth:320 }}
-        onClick={e => e.stopPropagation()}>
-        <h3 style={{ fontSize:16, fontWeight:700, color:'#111827', marginBottom:4 }}>Scan with WireGuard App</h3>
-        <p style={{ fontSize:12, color:'#9ca3af', marginBottom:20 }}>Open the WireGuard mobile app and scan this QR code to import the tunnel</p>
-        <img src={qrDataUrl} 
-        alt="WireGuard QR"
-        //  style={{ width:220, height:220, 
-        //  borderRadius:8, margin:'0 auto', display:'block',
-        //  border:'1px solid #e5e7eb' }}
-         style={{ 
-                    maxWidth: '100%', 
-                    height: 'auto',
-                    maxHeight: '400px',
-                    objectFit: 'contain'
-                  }} 
-         
-         />
-        <button onClick={onClose} className="wg-btn-ghost" style={{ marginTop:20, width:'100%', justifyContent:'center' }}>Close</button>
-      </motion.div>
-    </div>
-  );
-}
-
 // ══════════════════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ══════════════════════════════════════════════════════════════════════════════
-export default function MikrotikWireguardOnboarding({ onComplete }) {
+export default function WireguardConfigForm({ onComplete }) {
   const subdomain = window.location.hostname.split('.')[0];
   const { copied, copy } = useCopy();
 
   const [step,        setStep]        = useState(0);
   const [loading,     setLoading]     = useState(false);
-  const [showQr,      setShowQr]      = useState(false);
   const [showPrivKey, setShowPrivKey] = useState(false);
   const [polling,     setPolling]     = useState(false);
   const [tunnelUp,    setTunnelUp]    = useState(false);
@@ -264,28 +226,22 @@ export default function MikrotikWireguardOnboarding({ onComplete }) {
   const [wgConfig, setWgConfig] = useState(null);
   const [userScript, setUserScript] = useState(null);
   const [showSecrets, setShowSecrets] = useState(false);
-  // { mikrotik_config, server_config, client_ip, server_ip, network,
-  //   private_key, public_key, qr_code_data_url }
 
   // ── Step 5 services ──────────────────────────────────────────────────────────
   const [services, setServices] = useState({
     pppoe:   false,
     hotspot: false,
-    bridges:       false,           // ← add this
+    bridges:       false,
 
     pppoe_pool:   '192.168.100.2-192.168.100.254',
     hotspot_pool: '10.3.0.2-10.3.0.254',
-      pppoe_ports:   'ether2,ether3',  // ← add this
-  hotspot_ports: 'ether4,ether5',  // ← add this
+    pppoe_ports:   'ether2,ether3',
+    hotspot_ports: 'ether4,ether5',
     pppoe_secret_prefix: 'client',
   });
 
   // ── Generate WireGuard config (Step 1 → 2) ───────────────────────────────────
   const generateConfig = async () => {
-    // if (!deviceForm.identity.trim()) {
-    //   toast.error('Please enter the MikroTik identity name.');
-    //   return;
-    // }
     setLoading(true);
     try {
       const res = await fetch('/api/wireguard/generate_config', {
@@ -305,8 +261,6 @@ export default function MikrotikWireguardOnboarding({ onComplete }) {
       });
       const data = await res.json();
       if (!res.ok) { toast.error(data.error || 'Failed to generate config'); return; }
-      // setWgConfig(data);
-
 
       const apiUserScript = `
 /user add name=${data.api_username} password=${data.api_password} group=full comment="Owitech API User"
@@ -324,31 +278,9 @@ export default function MikrotikWireguardOnboarding({ onComplete }) {
 setUserScript(apiUserScript)
 setWgConfig({ ...data, api_user_script: apiUserScript })
       toast.success('WireGuard configuration generated!');
-      setStep(2); // Jump straight to script view
+      setStep(2);
     } catch (e) {
       toast.error('Network error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ── Also supports QR (mobile app flow) ───────────────────────────────────────
-  const generateAppConfig = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/wireguard/generate_wireguard_app_config', {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json',
-           'X-Subdomain':subdomain,  },
-        body: JSON.stringify({ network_address: deviceForm.network_address }),
-      });
-      const data = await res.json();
-      if (!res.ok) { toast.error(data.error || 'Failed'); return; }
-      // setWgConfig(data);
-      setWgConfig(prev => ({ ...prev, ...data }));
-      setShowQr(true);
-    } catch (_) {
-      toast.error('Failed to generate QR config.');
     } finally {
       setLoading(false);
     }
@@ -372,11 +304,8 @@ setWgConfig({ ...data, api_user_script: apiUserScript })
           clearInterval(pollRef.current);
           setTunnelUp(true);
           setPolling(false);
-          // toast.success('Tunnel is UP! MikroTik connected successfully.');
             toast.success(<p className='font-sans'> Tunnel is UP! Provisioning router…</p>)
 
-
-             // Auto-provision: push API user to router
   try {
     const provRes = await fetch('/api/wireguard/provision_router', {
       method: 'POST',
@@ -396,7 +325,7 @@ setWgConfig({ ...data, api_user_script: apiUserScript })
           setTimeout(() => setStep(4), 1200);
         }
       } catch (_) {}
-      if (count >= 24) { // 2 min timeout
+      if (count >= 24) {
         clearInterval(pollRef.current);
         setPolling(false);
       }
@@ -411,13 +340,6 @@ setWgConfig({ ...data, api_user_script: apiUserScript })
 /ppp profile add name=pppoe-profile local-address=192.168.100.1 remote-address=pppoe-pool use-encryption=yes
 /interface pppoe-server server add service-name=pppoe interface=ether1 authentication=mschap2 default-profile=pppoe-profile enabled=yes max-sessions=500
 /ip firewall nat add chain=srcnat out-interface=ether1 action=masquerade`;
-
-
-
-
-
-
-
 
 const bridgeSetupScript = useMemo(() => {
   const pppoePorts = services.pppoe_ports
@@ -463,15 +385,11 @@ ${services.use_radius
 /ip firewall nat add chain=srcnat action=masquerade out-interface=bridge-hotspot`;
 
 const activeService = (() => {
-  // Check which services are enabled and return the first one
   if (services.bridges) return { label: 'Bridge Setup', badge: 'Active', color: '#8b5cf6' };
   if (services.pppoe) return { label: 'PPPoE Server', badge: 'Active', color: '#6366f1' };
   if (services.hotspot) return { label: 'Hotspot', badge: 'Active', color: '#0ea5e9' };
-  return null; // No active service
+  return null;
 })();
-
-
-
 
 useLayoutEffect(() => {
   const style = document.createElement("style");
@@ -483,20 +401,19 @@ useLayoutEffect(() => {
 
   return (
     <>
-      {/* <style>{CSS}</style> */}
       <Toaster position="top-right" 
       toastOptions={{ style:{ fontFamily:'DM Sans,sans-serif', fontSize:13 } }}/>
-      {showQr && wgConfig?.qr_code_data_url && (
-        <QrModal qrDataUrl={wgConfig.qr_code_data_url} onClose={() => setShowQr(false)}/>
-      )}
 
       <div className="wg-root" style={{
         minHeight:'100vh',
-        
         padding:'32px 16px', display:'flex',
          flexDirection:'column', alignItems:'center',
       }}>
         <div style={{ width:'100%', maxWidth:760 }}>
+
+          {/* Own-device WireGuard app connect — independent of the router wizard below */}
+          <WireguardAppConnect />
+          <div style={{ height: 24 }} />
 
 <p style={{ fontSize:14, fontWeight:600, color:'#111827', margin:'0 0 2px' }}>
   {activeService?.label || 'MikroTik Router'}
@@ -509,8 +426,6 @@ useLayoutEffect(() => {
     }}>{activeService.badge}</span>
   )}
 </p>
-
-
 
           {/* Page header */}
           <motion.div initial={{ opacity:0, y:-12 }}
@@ -554,9 +469,6 @@ useLayoutEffect(() => {
                   </div>
 
                   <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-                    
-
-                 
                     <Field label="WireGuard Network" hint="VPN subnet to assign">
                       <input className="wg-input" value={deviceForm.network_address}
                         onChange={e=>setDeviceForm(p=>({...p,network_address:e.target.value}))}
@@ -572,15 +484,6 @@ useLayoutEffect(() => {
                         onChange={e=>setDeviceForm(p=>({...p,client_ip:e.target.value}))}
                         placeholder="10.2.0.10 (optional)"/>
                     </Field>
-
-
-                    {/* <Field label="Notes" hint="Internal reference only">
-                      <input className="wg-input" value={deviceForm.notes}
-                        onChange={e=>setDeviceForm(p=>({...p,notes:e.target.value}))}
-                        placeholder="e.g. Nairobi tower - rooftop"/>
-                    </Field> */}
-
-
                   </div>
 
                   {/* Info banner */}
@@ -655,35 +558,22 @@ useLayoutEffect(() => {
                       {wgConfig.private_key}
                     </p>
                   </div>
-{/* apiUserScript */}
+
                   {/* MikroTik script */}
                   <div style={{ marginBottom:8 }}>
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
                       <span style={{ fontSize:13, fontWeight:600, color:'#374151' }}>MikroTik Terminal Script</span>
                       <div style={{ display:'flex', gap:8 }}>
-                        <button onClick={() => {
-                          copy(wgConfig.mikrotik_config, 'script')
-                          // copy(userScript, 'script')
-                          
-                        }}
+                        <button onClick={() => copy(wgConfig.mikrotik_config, 'script')}
                           className="wg-btn-ghost" style={{ padding:'6px 12px', fontSize:12 }}>
                           {copied==='script' ? <><Check size={12}/> Copied!</> : <><Copy size={12}/> Copy Script</>}
-                        </button>
-
-                        
-                        <button onClick={generateAppConfig} disabled={loading}
-                          className="wg-btn-ghost" style={{ padding:'6px 12px', fontSize:12 }}>
-                          <QrCode size={12}/> QR Code
                         </button>
                       </div>
                     </div>
                     <div className="wg-code-block">
                       <HighlightedScript text={wgConfig.mikrotik_config}/>
-                      {/* <HighlightedScript text={wgConfig.mikrotik_config + '\n' + wgConfig.api_user_script} /> */}
-
                     </div>
                   </div>
-
 
                         {/* API User Script — separate block with blurred secrets */}
 <div style={{ marginTop: 16, marginBottom: 8 }}>
@@ -712,7 +602,6 @@ useLayoutEffect(() => {
   <div className="wg-code-block">
     <pre>
       {wgConfig.api_user_script?.split('\n').map((line, i) => {
-        // Blur password= and secret= values
         const sensitivePatterns = [/password=(\S+)/, /secret=(\S+)/];
         let rendered = line;
         let hasSensitive = sensitivePatterns.some(p => p.test(line));
@@ -747,7 +636,6 @@ useLayoutEffect(() => {
     Paste this in a <strong>second terminal pass</strong> after the WireGuard script above.
   </p>
 </div>
-
 
                   <div style={{ padding:'10px 14px', borderRadius:8, background:'#f0fdf4', border:'1px solid #bbf7d0', marginTop:12, marginBottom:20 }}>
                     <p style={{ fontSize:12, color:'#166534', margin:0 }}>
@@ -798,7 +686,6 @@ useLayoutEffect(() => {
                           : 'After applying the script, click below to check if the WireGuard handshake succeeded.'}
                     </p>
 
-                    {/* Progress bar */}
                     {polling && (
                       <div style={{ height:4, background:'#e5e7eb', borderRadius:99, overflow:'hidden', maxWidth:320, margin:'0 auto 24px' }}>
                         <div className="wg-progress-bar" style={{ height:'100%', background:'linear-gradient(90deg,#6366f1,#8b5cf6)', width:`${(pollCount/24)*100}%`, borderRadius:99 }}/>
@@ -842,14 +729,6 @@ useLayoutEffect(() => {
 
               {/* ══ STEP 4 — Services ══ */}
               {step === 4 && (
-
-
-
-
-
-
-
-
                 <motion.div key="step4"
                   initial={{ opacity:0, x:20 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-20 }}
                   transition={{ duration:.22 }}>
@@ -863,7 +742,6 @@ useLayoutEffect(() => {
                     </div>
                   </div>
 
-                  
 {wgConfig?.router_id && (
   <div className="flex gap-3 p-4 bg-green-50 border border-green-200 rounded-xl mb-5">
     <span className="text-green-600 text-xl">✅</span>
@@ -878,17 +756,15 @@ useLayoutEffect(() => {
   </div>
 )}
 
-
                   {/* Toggle cards */}
                   {[
-                   
                     {
   key: 'bridges',
   icon: Network,
   color: '#8b5cf6',
   label: 'Bridge Setup (Run First)',
   desc: 'Create PPPoE and Hotspot bridges and assign LAN ports — run before PPPoE/Hotspot scripts',
-      badge: '① Run First',        // ← add badge field
+      badge: '① Run First',
 
   extras: (
     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
@@ -907,8 +783,6 @@ useLayoutEffect(() => {
   script: bridgeSetupScript,
   scriptKey: 'bridge_script',
 },
-
-
  {
                       key:'pppoe', icon:Server, color:'#6366f1', label:'PPPoE Server',
                       badge: '② After bridges', 
@@ -924,16 +798,6 @@ useLayoutEffect(() => {
                       script: pppoeScript,
                       scriptKey: 'pppoe_script',
                     },
-
-
-
-
-
-
-
-
-
-                    
                     {
                       key:'hotspot', icon:Wifi, color:'#0ea5e9', label:'Hotspot',
                       desc:'Set up a captive portal hotspot for guest access',
@@ -969,7 +833,6 @@ useLayoutEffect(() => {
                             <p style={{ fontSize:14, fontWeight:600, color:'#111827', margin:'0 0 2px' }}>{svc.label}</p>
                             <p style={{ fontSize:12, color:'#6b7280', margin:0 }}>{svc.desc}</p>
                           </div>
-                          {/* Toggle switch */}
                           <div style={{
                             width:42, height:24, borderRadius:12, padding:3,
                             background: enabled ? svc.color : '#e5e7eb',
