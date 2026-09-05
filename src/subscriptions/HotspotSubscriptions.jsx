@@ -1172,7 +1172,8 @@ const downloadVoucherCard = (rowData) => {
     hour: '2-digit', minute: '2-digit'
   });
 
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(rowData.voucher)}`;
+  const qrTargetUrl = `http://neverssl.com/?voucher=${encodeURIComponent(rowData.voucher)}`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrTargetUrl)}`;
 
   const html = `<!DOCTYPE html>
 <html>
