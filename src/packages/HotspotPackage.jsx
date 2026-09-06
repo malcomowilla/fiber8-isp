@@ -416,18 +416,12 @@ const columns = [
   },
   {title: 'Action', field:'Action', align: 'right',
 
-  // NOTE: `params` here IS the row object itself (material-table passes the
-  // row data straight into `render`), not a wrapper with a `rowData` key.
-  // Spreading it onto <EditButton {...params} /> used to leave `rowData`
-  // undefined inside EditButton, which then called
-  // handleClickOpen(undefined) -> setHotspotPackage(undefined) and crashed
-  // EditHotspotPackage's destructuring. Pass it explicitly instead.
   render: (params) =>  
     
      <>
       
        <DeleteButton {...params} />
-       <EditButton rowData={params}/>
+       <EditButton {...params}/>
       
        </>
 
@@ -834,29 +828,18 @@ const deleteHotspotPackage = async (id) => {
     < DeleteHotspotPackage isOpenDelete={isOpenDelete} setisOpenDelete={setisOpenDelete}
     deleteHotspotPackage={deleteHotspotPackage} loading={loading} id={hotspotPackage.id}
     />
-    <EditHotspotPackage
-  open={open}
-  handleClose={handleClose}
-  handleChangeTimeFrom={handleChangeTimeFrom}
-  handleChangeTimeUntil={handleChangeTimeUntil}
-  loading={loading}
-  isloading={loading}
-  formData={hotspotPackage}
-  setFormData={setHotspotPackage}
-  createPackage={createHotspotPackage}
-  handleWeekdayChange={handleWeekdayChange}
-  nodes={nodes}
-  setNodes={setNodes}
-  editPackage={editing}
-  allPackages={packages}
-  selectedRouter={selectedRouter}
-  setSelectedRouter={setSelectedRouter}
-/>
+    <EditHotspotPackage open={open} handleClose={handleClose}
+    handleChangeTimeFrom={handleChangeTimeFrom} handleChangeTimeUntil={handleChangeTimeUntil}
+    loading={loading} hotspotPackage={hotspotPackage} setHotspotPackage={setHotspotPackage}
+    createHotspotPackage={createHotspotPackage}
+    handleWeekdayChange={handleWeekdayChange} nodes={nodes} setNodes={setNodes}
+    editing={editing} selectedRouter={selectedRouter} setSelectedRouter={setSelectedRouter}
+    />
 
 
 
 
-    {loading &&  <Backdrop open={openLoad} sx={{ color:'#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+    {loading &&    <Backdrop open={openLoad} sx={{ color:'#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
   
   <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
     

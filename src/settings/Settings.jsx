@@ -80,7 +80,7 @@ const Settings = () => {
               className={`flex items-center gap-1.5 whitespace-nowrap px-3 py-2 rounded-lg text-sm font-medium 
                 transition-colors duration-200
                 ${selectedTab === id
-                  ? 'bg-blue-600 text-white shadow-sm'
+                  ? 'bg-green-600 text-white shadow-sm'
                   : disabled
                     ? 'text-slate-400 dark:text-slate-600 cursor-not-allowed'
                     : 'text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-800'
@@ -112,7 +112,7 @@ const Settings = () => {
               transition-all duration-200 text-left font-sans
 
               ${selectedTab === id
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                ? 'bg-green-600 text-white shadow-md shadow-blue-600/20'
                 : disabled
                   ? 'text-slate-400 dark:text-slate-600 cursor-not-allowed'
                   : 'text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-800 hover:translate-x-0.5'
@@ -145,7 +145,7 @@ const Settings = () => {
 duration-200 ${isPending ? 'opacity-50' : 'opacity-100'}`}>
             <Suspense fallback={
               <div className="flex justify-center items-center p-16">
-                <RefreshCw className="animate-spin text-blue-500 w-10 h-10" />
+                <RefreshCw className="animate-spin text-green-500 w-10 h-10" />
               </div>
             }>
               {selectedTab === 'GENERAL' && <GeneralSettings/>}
