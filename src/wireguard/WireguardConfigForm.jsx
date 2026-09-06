@@ -888,12 +888,12 @@ useLayoutEffect(() => {
           </div>
 
           {/* Help footer */}
-          <div style={{ textAlign:'center', marginTop:20 }}>
+          {/* <div style={{ textAlign:'center', marginTop:20 }}>
             <p style={{ fontSize:12, color:'#9ca3af' }}>
               Need help? Contact support via WhatsApp or check the{' '}
               <a href="#" style={{ color:'#6366f1', textDecoration:'none', fontWeight:500 }}>MikroTik setup guide</a>.
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
     </>

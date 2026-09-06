@@ -115,8 +115,8 @@ const [editing, setEditing] = useState(false);
 const handleWeekdayChange = (day) => {
   setHotspotPackage((prev) => {
     const updatedWeekdays = prev.weekdays?.includes(day)
-      ? prev.weekdays?.filter((d) => d !== day) 
-      : [...(prev.weekdays || []), day]; 
+      ? prev.weekdays?.filter((d) => d !== day) // Remove day if already selected
+      : [...(prev.weekdays || []), day]; // Add day if not selected
 
     return { ...prev, weekdays: updatedWeekdays };
   });
