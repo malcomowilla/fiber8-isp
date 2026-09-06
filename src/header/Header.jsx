@@ -206,13 +206,16 @@ const Header = () => {
             {providerSms ? (
               isOwitech ? (
                 // Owitech Bulk SMS — platform-managed wallet balance
-                <div className="flex items-center gap-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg px-4 py-3 border border-blue-200 dark:border-blue-800/50 shadow-sm">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
-                    <Wallet size={18} className="text-blue-600 dark:text-blue-400" />
+                <div className="flex items-center gap-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 
+                rounded-lg px-4 py-3 border border-blue-200 dark:border-blue-800/50 shadow-sm">
+                  <div className="w-10 h-10 rounded-lg bg-green-100
+                   dark:bg-green-900/50 flex items-center justify-center">
+                    <Wallet size={18} className="text-green-600
+                     dark:text-green-400" />
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-medium text-gray-600 dark:text-gray-300">Owitech SMS Wallet</p>
-                    <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                    <p className="text-sm font-semibold text-green-600 dark:text-green-400">
                       {walletLoading
                         ? 'Loading…'
                         : walletBalance !== null
@@ -235,7 +238,10 @@ const Header = () => {
                 </div>
               )
             ) : (
-              <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg px-4 py-3 border border-amber-200 dark:border-amber-800/50 shadow-sm w-full sm:w-auto">
+              <div className="flex items-start gap-3 bg-amber-50
+               dark:bg-amber-900/20 rounded-lg px-4 py-3 border
+                border-amber-200 dark:border-amber-800/50 shadow-sm w-full
+                 sm:w-auto">
                 <AlertCircle size={18} className="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-1">SMS not configured</p>
@@ -258,7 +264,8 @@ const Header = () => {
             {/* Theme Toggle */}
             <button
               onClick={handleThemeSwitch}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300"
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+               transition-colors text-gray-700 dark:text-gray-300"
               aria-label="Toggle theme"
             >
               {preferDarkMode ? (

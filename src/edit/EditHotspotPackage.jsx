@@ -481,12 +481,7 @@ const EditHotspotPackage = ({
   handleClose,
   loading,
   open,
-  // Defensive default: if the caller (HotspotPackage's Action column) ever
-  // passes `undefined` again — e.g. a future onClick regression, or this
-  // component being reused somewhere before a package is picked — this
-  // stops the destructure below from throwing and crashing the whole
-  // dialog. See HotspotPackage.jsx's EditButton for the actual fix.
-  hotspotPackage = {},
+  hotspotPackage,
   setHotspotPackage,
   createHotspotPackage,
   handleChangeTimeFrom,
