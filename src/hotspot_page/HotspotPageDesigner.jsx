@@ -344,7 +344,7 @@ export default function HotspotPageDesigner() {
               return (
                 <button key={t.id} onClick={() => setTab(t.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                    active ? 'bg-slate-100 dark:bg-slate-800 text-sky-600 dark:text-sky-300' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200'
+                    active ? 'bg-slate-100 dark:bg-slate-800 text-green-600 dark:text-green-300' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}>
                   <Icon size={16} /> {t.label}
                 </button>
@@ -379,7 +379,7 @@ export default function HotspotPageDesigner() {
                             <div className="min-w-0">
                               <p className="text-sm font-semibold flex items-center gap-2" style={{ color: t.theme.text }}>
                                 {t.label}
-                                {active && <Check size={13} className="text-sky-400" />}
+                                {active && <Check size={13} className="text-green-400" />}
                               </p>
                               <p className="text-xs mt-0.5" style={{ color: t.theme.muted }}>{t.description}</p>
                               <p className="text-[10px] mt-1 opacity-70" style={{ color: t.theme.muted }}>
@@ -401,7 +401,7 @@ export default function HotspotPageDesigner() {
                         {Object.entries(COLOR_SCHEMES).map(([key, scheme]) => (
                           <button key={key} onClick={() => applyScheme(key)}
                             className={`relative p-3 rounded-xl border text-left transition-all ${
-                              design.color_scheme === key ? 'border-sky-400 ring-2 ring-sky-400/30' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                              design.color_scheme === key ? 'border-green-400 ring-2 ring-sky-400/30' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                             }`}
                             style={{ background: scheme.theme.background }}>
                             <div className="flex gap-1.5 mb-2">
@@ -411,7 +411,7 @@ export default function HotspotPageDesigner() {
                             </div>
                             <p className="text-xs font-semibold" style={{ color: scheme.theme.text }}>{scheme.label}</p>
                             {design.color_scheme === key && (
-                              <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-sky-400 flex items-center justify-center">
+                              <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-green-400 flex items-center justify-center">
                                 <Check size={10} className="text-slate-950" />
                               </div>
                             )}
@@ -445,7 +445,7 @@ export default function HotspotPageDesigner() {
                         {FONT_OPTIONS.map(f => (
                           <button key={f} onClick={() => set('typography.font_family', f)}
                             className={`p-3 rounded-xl border text-sm text-left transition-colors ${
-                              design.typography.font_family === f ? 'border-sky-400 bg-sky-50 dark:bg-sky-400/10 text-sky-600 dark:text-sky-300' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300'
+                              design.typography.font_family === f ? 'border-green-400 bg-sky-50 dark:bg-sky-400/10 text-green-600 dark:text-sky-300' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300'
                             }`} style={{ fontFamily: f }}>
                             {f}
                           </button>
@@ -457,21 +457,21 @@ export default function HotspotPageDesigner() {
                         <span>Base font size</span><span className="text-slate-500 dark:text-slate-500">{design.typography.base_size}px</span>
                       </label>
                       <input type="range" min="12" max="18" value={design.typography.base_size}
-                        onChange={e => set('typography.base_size', Number(e.target.value))} className="w-full accent-sky-400" />
+                        onChange={e => set('typography.base_size', Number(e.target.value))} className="w-full accent-green-400" />
                     </div>
                     <div>
                       <label className="text-sm text-slate-700 dark:text-slate-300 flex justify-between mb-1">
                         <span>Heading size</span><span className="text-slate-500 dark:text-slate-500">{design.typography.heading_size}px</span>
                       </label>
                       <input type="range" min="18" max="36" value={design.typography.heading_size}
-                        onChange={e => set('typography.heading_size', Number(e.target.value))} className="w-full accent-sky-400" />
+                        onChange={e => set('typography.heading_size', Number(e.target.value))} className="w-full accent-green-400" />
                     </div>
                     <div>
                       <label className="text-sm text-slate-700 dark:text-slate-300 flex justify-between mb-1">
                         <span>Heading weight</span><span className="text-slate-500 dark:text-slate-500">{design.typography.weight_heading}</span>
                       </label>
                       <input type="range" min="400" max="800" step="100" value={design.typography.weight_heading}
-                        onChange={e => set('typography.weight_heading', Number(e.target.value))} className="w-full accent-sky-400" />
+                        onChange={e => set('typography.weight_heading', Number(e.target.value))} className="w-full accent-green-400" />
                     </div>
                   </div>
                 )}
@@ -483,14 +483,14 @@ export default function HotspotPageDesigner() {
                         <span>Card width</span><span className="text-slate-500 dark:text-slate-500">{design.layout.card_width}px</span>
                       </label>
                       <input type="range" min="320" max="560" value={design.layout.card_width}
-                        onChange={e => set('layout.card_width', Number(e.target.value))} className="w-full accent-sky-400" />
+                        onChange={e => set('layout.card_width', Number(e.target.value))} className="w-full accent-green-400" />
                     </div>
                     <div>
                       <label className="text-sm text-slate-700 dark:text-slate-300 flex justify-between mb-1">
                         <span>Corner radius</span><span className="text-slate-500 dark:text-slate-500">{design.layout.corner_radius}px</span>
                       </label>
                       <input type="range" min="0" max="40" value={design.layout.corner_radius}
-                        onChange={e => set('layout.corner_radius', Number(e.target.value))} className="w-full accent-sky-400" />
+                        onChange={e => set('layout.corner_radius', Number(e.target.value))} className="w-full accent-green-400" />
                     </div>
                   </div>
                 )}
@@ -534,14 +534,14 @@ export default function HotspotPageDesigner() {
 
                     <div>
                       <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block">Support Label</label>
-                      <input className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:border-sky-400"
+                      <input className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:border-green-400"
                         placeholder="Need help?"
                         value={design.footer.support_label} onChange={e => set('footer.support_label', e.target.value)} />
                     </div>
 
                     <div>
                       <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block">Support Phone</label>
-                      <input className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:border-sky-400"
+                      <input className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:border-green-400"
                         placeholder="07XX XXX XXX"
                         value={design.footer.support_phone} onChange={e => set('footer.support_phone', e.target.value)} />
                     </div>
@@ -586,7 +586,7 @@ export default function HotspotPageDesigner() {
             <div className="flex items-center gap-2 mb-4 text-xs text-slate-500 dark:text-slate-400">
               <Smartphone size={13} />
               Live preview
-              {previewLoading && <RefreshCw size={11} className="animate-spin text-sky-400" />}
+              {previewLoading && <RefreshCw size={11} className="animate-spin text-green-400" />}
             </div>
             {/* Device frame stays dark — it represents the physical phone bezel, not app theming */}
             <div className="relative rounded-[2.5rem] border-8 border-slate-800 shadow-2xl bg-black overflow-hidden"
@@ -615,7 +615,7 @@ export default function HotspotPageDesigner() {
               className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 max-w-sm w-full mx-4"
               onClick={e => e.stopPropagation()}>
               <div className="flex items-center gap-2 mb-4">
-                <UploadCloud className="text-sky-500 dark:text-sky-400" size={20} />
+                <UploadCloud className="text-green-500 dark:text-green-400" size={20} />
                 <h3 className="font-bold text-slate-900 dark:text-slate-100">Publish to Router</h3>
               </div>
               <label className="text-xs text-slate-500 dark:text-slate-400 mb-1.5 block">Target router</label>

@@ -323,10 +323,10 @@ echo "Hotspot configuration completed successfully"`;
   className="mb-4"
 >
   <div className="bg-gradient-to-r from-blue-50
-   to-cyan-50 border border-blue-200 rounded-lg p-4 font-sans">
+   to-cyan-50 border border-green-200 rounded-lg p-4 font-sans">
     <div className="flex items-center gap-3 mb-3">
-      <FaServer className="text-xl text-blue-500" />
-      <h3 className="font-semibold text-blue-800 ">Select Target Router</h3>
+      <FaServer className="text-xl text-green-500" />
+      <h3 className="font-semibold text-green-800 ">Select Target Router</h3>
     </div>
     
     <Autocomplete

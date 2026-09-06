@@ -192,13 +192,13 @@ export function SubscriberImportButton({ onImportComplete }) {
         className="relative flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200
           text-slate-700 text-sm font-semibold shadow-sm hover:bg-slate-50 transition-colors">
         {importing ? (
-          <Loader2 size={15} className="text-violet-500 animate-spin" />
+          <Loader2 size={15} className="text-green-500 animate-spin" />
         ) : (
           <Upload size={15} className="text-slate-500" />
         )}
         Import Subscribers
         {importing && !open && (
-          <span className="ml-1 text-[10px] font-bold text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded-full">
+          <span className="ml-1 text-[10px] font-bold text-green-600 bg-violet-50 px-1.5 py-0.5 rounded-full">
             {Math.round(progress?.pct || 0)}%
           </span>
         )}
@@ -220,7 +220,7 @@ export function SubscriberImportButton({ onImportComplete }) {
               <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center">
-                    <Users size={15} className="text-violet-600" />
+                    <Users size={15} className="text-green-600" />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-800">Import Subscribers</p>
@@ -247,7 +247,7 @@ export function SubscriberImportButton({ onImportComplete }) {
                       onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
                       onClick={() => fileRef.current?.click()}
                       className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
-                        dragOver ? 'border-violet-400 bg-violet-50' : file ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                        dragOver ? 'border-green-400 bg-green-50' : file ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                       }`}>
                       <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" className="hidden"
                         onChange={e => handleFile(e.target.files[0])} />
@@ -471,7 +471,7 @@ export function SubscriberImportButton({ onImportComplete }) {
                 ) : importing ? (
                   <>
                     <span className="flex items-center gap-2 text-sm text-slate-500">
-                      <Loader2 size={14} className="animate-spin text-violet-500" />
+                      <Loader2 size={14} className="animate-spin text-green-500" />
                       Import running in background
                     </span>
                     <button onClick={handleClose}
@@ -486,8 +486,9 @@ export function SubscriberImportButton({ onImportComplete }) {
                       Cancel
                     </button>
                     <button onClick={handleSubmit} disabled={!file}
-                      className="flex items-center gap-2 px-5 py-2 rounded-xl bg-violet-600 text-white text-sm font-semibold
-                        hover:bg-violet-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                      className="flex items-center gap-2 px-5 py-2 rounded-xl
+                       bg-green-600 text-white text-sm font-semibold
+                        hover:bg-green-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                       <Upload size={14} /> Start Import
                     </button>
                   </>

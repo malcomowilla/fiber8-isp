@@ -85,7 +85,9 @@ function PlanModal({ plan, routers, onClose, onSaved }) {
             <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} />
             Active (visible to customers)
           </label>
-          <button type="submit" disabled={saving || !form.nas_router_id} className="w-full py-2.5 bg-purple-600 text-white rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+          <button type="submit" disabled={saving || !form.nas_router_id} 
+          className="w-full py-2.5 bg-green-600 text-white rounded-lg 
+          font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
             {saving ? 'Saving…' : 'Save Plan'}
           </button>
         </form>
@@ -135,14 +137,16 @@ export default function TvPlans() {
       <Toaster />
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold dark:text-white flex items-center gap-2"><Tv className="w-6 h-6 text-purple-500" /> TV Plans</h1>
+          <h1 className="text-2xl font-bold dark:text-white flex items-center gap-2"><Tv className="w-6 h-6 text-green-500" /> TV Plans</h1>
           <p className="text-sm text-gray-500">Plans customers can buy to connect a TV/console by MAC address.</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={load} className="flex items-center gap-2 border rounded-lg px-3 py-2 text-sm">
+          <button onClick={load} className="flex items-center gap-2 border 
+          rounded-lg px-3 py-2 text-sm">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
-          <button onClick={openAdd} className="flex items-center gap-2 bg-purple-600 text-white rounded-lg px-4 py-2 text-sm">
+          <button onClick={openAdd} className="flex items-center gap-2
+           bg-green-600 text-white rounded-lg px-4 py-2 text-sm">
             <Plus className="w-4 h-4" /> Add TV Plan
           </button>
         </div>
