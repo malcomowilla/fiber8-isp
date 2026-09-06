@@ -828,13 +828,24 @@ const deleteHotspotPackage = async (id) => {
     < DeleteHotspotPackage isOpenDelete={isOpenDelete} setisOpenDelete={setisOpenDelete}
     deleteHotspotPackage={deleteHotspotPackage} loading={loading} id={hotspotPackage.id}
     />
-    <EditHotspotPackage open={open} handleClose={handleClose}
-    handleChangeTimeFrom={handleChangeTimeFrom} handleChangeTimeUntil={handleChangeTimeUntil}
-    loading={loading} hotspotPackage={hotspotPackage} setHotspotPackage={setHotspotPackage}
-    createHotspotPackage={createHotspotPackage}
-    handleWeekdayChange={handleWeekdayChange} nodes={nodes} setNodes={setNodes}
-    editing={editing} selectedRouter={selectedRouter} setSelectedRouter={setSelectedRouter}
-    />
+    <EditHotspotPackage
+  open={open}
+  handleClose={handleClose}
+  handleChangeTimeFrom={handleChangeTimeFrom}
+  handleChangeTimeUntil={handleChangeTimeUntil}
+  loading={loading}
+  isloading={loading}
+  formData={hotspotPackage}
+  setFormData={setHotspotPackage}
+  createPackage={createHotspotPackage}
+  handleWeekdayChange={handleWeekdayChange}
+  nodes={nodes}
+  setNodes={setNodes}
+  editPackage={editing}
+  allPackages={packages}
+  selectedRouter={selectedRouter}
+  setSelectedRouter={setSelectedRouter}
+/>
 
 
 
