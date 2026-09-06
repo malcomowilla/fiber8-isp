@@ -416,12 +416,18 @@ const columns = [
   },
   {title: 'Action', field:'Action', align: 'right',
 
+  // NOTE: `params` here IS the row object itself (material-table passes the
+  // row data straight into `render`), not a wrapper with a `rowData` key.
+  // Spreading it onto <EditButton {...params} /> used to leave `rowData`
+  // undefined inside EditButton, which then called
+  // handleClickOpen(undefined) -> setHotspotPackage(undefined) and crashed
+  // EditHotspotPackage's destructuring. Pass it explicitly instead.
   render: (params) =>  
     
      <>
       
        <DeleteButton {...params} />
-       <EditButton {...params}/>
+       <EditButton rowData={params}/>
       
        </>
 
@@ -850,7 +856,7 @@ const deleteHotspotPackage = async (id) => {
 
 
 
-    {loading &&    <Backdrop open={openLoad} sx={{ color:'#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+    {loading &&  <Backdrop open={openLoad} sx={{ color:'#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
   
   <Lottie className='relative z-50' options={defaultOptions} height={400} width={400} />
     

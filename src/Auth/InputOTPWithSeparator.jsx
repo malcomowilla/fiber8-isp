@@ -388,7 +388,7 @@ function InputOTPWithSeparator() {
                   disabled={isBusy}
                   className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/20 rounded-lg
                     text-white placeholder-white/40 text-sm font-sans
-                    focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent
+                    focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent
                     disabled:opacity-60 transition-all"
                   placeholder="Network Admin Email"
                   required
@@ -409,7 +409,7 @@ function InputOTPWithSeparator() {
                   disabled={isBusy}
                   className="block w-full pl-10 pr-10 py-3 bg-white/5 border border-white/20 rounded-lg
                     text-white placeholder-white/40 text-sm font-sans
-                    focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent
+                    focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent
                     disabled:opacity-60 transition-all"
                   placeholder="Access Key"
                   required
@@ -447,9 +447,9 @@ function InputOTPWithSeparator() {
                 disabled={isBusy}
                 className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl font-sans
                   text-sm font-medium text-white
-                  bg-gradient-to-r from-blue-500 to-blue-600
+                  bg-gradient-to-r from-green-500 to-green-600
                   shadow-lg shadow-blue-900/30
-                  hover:from-blue-600 hover:to-blue-700
+                  hover:from-green-600 hover:to-green-700
                   transition-all duration-200
                   disabled:opacity-80 disabled:cursor-not-allowed"
               >

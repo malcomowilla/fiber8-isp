@@ -231,7 +231,7 @@ const PasskeySignin = () => {
               className="fixed top-0 left-0 right-0 h-1 z-50 overflow-hidden bg-white/10"
             >
               <motion.div
-                className="h-full bg-blue-400"
+                className="h-full bg-green-400"
                 initial={{ x: '-100%' }}
                 animate={{ x: '100%' }}
                 transition={{ repeat: Infinity, duration: 1.1, ease: 'linear' }}
@@ -319,7 +319,7 @@ const PasskeySignin = () => {
               />
 
               <div className="flex justify-center pt-1">
-                <MdFingerprint className={`text-4xl ${isBusy ? 'text-blue-400 animate-pulse' : 'text-white/70'}`} />
+                <MdFingerprint className={`text-4xl ${isBusy ? 'text-green-400 animate-pulse' : 'text-white/70'}`} />
               </div>
 
               <AnimatePresence>
@@ -342,9 +342,9 @@ const PasskeySignin = () => {
                   type="submit"
                   disabled={isBusy}
                   className="w-full py-3 px-4 rounded-xl font-medium font-sans text-white
-                    bg-gradient-to-r from-blue-500 to-blue-600
+                    bg-gradient-to-r from-green-500 to-green-600
                     shadow-lg shadow-blue-900/30
-                    hover:from-blue-600 hover:to-blue-700
+                    hover:from-green-600 hover:to-green-700
                     transition-all duration-200
                     disabled:opacity-80 disabled:cursor-not-allowed
                     flex items-center justify-center gap-2"
@@ -391,18 +391,17 @@ const PasskeySignin = () => {
     </>
   )
 }
-
-const textFieldStyles = {
-  '& .MuiInputBase-input': { color: 'white' },
-  '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
-  '& label.Mui-focused': { color: 'white' },
-  '& .MuiOutlinedInput-root': {
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: '10px',
-    '& fieldset': { borderColor: 'rgba(255,255,255,0.25)' },
-    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.4)' },
-    '&.Mui-focused fieldset': { borderColor: '#60a5fa', borderWidth: '2px' },
-  },
-}
+const textFieldStyles = { 
+  '& .MuiInputBase-input': { color: 'white' }, 
+  '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' }, 
+  '& label.Mui-focused': { color: '#4ade80' }, // Changed label focus color to green
+  '& .MuiOutlinedInput-root': { 
+    backgroundColor: 'rgba(255,255,255,0.05)', 
+    borderRadius: '10px', 
+    '& fieldset': { borderColor: 'rgba(255,255,255,0.25)' }, 
+    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.4)' }, 
+    '&.Mui-focused fieldset': { borderColor: '#4ade80', borderWidth: '2px' }, // Changed border focus color to green
+  }, 
+};
 
 export default PasskeySignin
