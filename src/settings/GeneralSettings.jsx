@@ -924,10 +924,10 @@ const GeneralSettings = ({ children }) => {
                   </Grid>
 
                   <div style={{ marginTop: 16 }}>
-                    <Alert severity="info" sx={{ borderRadius: tokens.radiusSm, fontSize: '0.8125rem' }}>
-                      <AlertTitle sx={{ fontSize: '0.875rem', fontWeight: 500 }}>Account number counter</AlertTitle>
-                      Set the starting counter value after importing customers to continue numbering from the right point. Enter the highest existing account number (without prefix).
-                    </Alert>
+                   <Alert severity="success" sx={{ borderRadius: tokens.radiusSm, fontSize: '0.8125rem' }}>
+  <AlertTitle sx={{ fontSize: '0.875rem', fontWeight: 500 }}>Account number counter</AlertTitle>
+  Set the starting counter value after importing customers to continue numbering from the right point. Enter the highest existing account number (without prefix).
+</Alert>
                     <TextField {...tf} sx={{ ...fieldSx, width: '100%', mt: 1.5,
 
 
@@ -1035,79 +1035,19 @@ const GeneralSettings = ({ children }) => {
                 </AccordionSummary>
                 <AccordionDetails sx={accordionDetailsSx}>
                   <div style={{ display: 'grid', gap: '4px', marginBottom: 16 }}>
-                    {/* <SettingsCheckbox
-                      label="Customise templates and packages per location"
-                      checked={hotspotCustomization.customize_template_and_package_per_location}
-                      onChange={handleChangeHotspotCustomization}
-                      name="customize_template_and_package_per_location"
-                    /> */}
+                    
                     <SettingsCheckbox
                       label="Enable auto-login for hotspot users"
                       checked={hotspotCustomization.enable_autologin}
                       onChange={handleChangeHotspotCustomization}
                       name="enable_autologin"
                     />
-                    <SettingsCheckbox
-                      label="Enable session compensation"
-                      description="Grant users extra time when the hotspot has an outage."
-                      checked={hotspotCustomization.enable_compensation}
-                      onChange={handleChangeHotspotCustomization}
-                      name="enable_compensation"
-                    />
+                  
                   </div>
 
-                  {hotspotCustomization.enable_compensation && (
-                    <Grid container spacing={2} sx={{ mb: 2 }}>
-                      <Grid item xs={12} sm={6}>
-                        <TextField {...tf} InputProps={{ startAdornment: <IoTimeOutline style={{ marginRight: 8 }} /> }} 
-                        name="compensation_minutes" 
-                        value={hotspotCustomization.compensation_minutes}
-                         onChange={handleChangeHotspotCustomization} className='myTextField' label="Compensation (minutes)" type="text" />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <TextField {...tf} InputProps={{ startAdornment: <IoTimeOutline style={{ marginRight: 8 }} /> }}
-                         name="compensation_hours" value={hotspotCustomization.compensation_hours}
-                          onChange={handleChangeHotspotCustomization} className='myTextField' label="Compensation (hours)" type="text" />
-                      </Grid>
-                    </Grid>
-                  )}
+                  
 
-                  {/* <SectionLabel>Free trial</SectionLabel>
-                  <SettingsCheckbox
-                    label="Enable free trial for hotspot users"
-                    checked={hotspotCustomization.enable_free_trial}
-                    onChange={handleChangeHotspotCustomization}
-                    name="enable_free_trial"
-                  /> */}
-                  {hotspotCustomization.enable_free_trial && (
-                    <Grid container spacing={2} sx={{ mt: 0.5 }}>
-                      <Grid item xs={12} sm={4}>
-                        <TextField {...tf} InputProps={{ startAdornment: <IoTimeOutline style={{ marginRight: 8 }} /> }} 
-                        name="free_trial_duration_minutes"
-                        className='myTextField'
-                         value={hotspotCustomization.free_trial_duration_minutes || ''}
-                          onChange={handleChangeHotspotCustomization} label="Trial duration (minutes)" type="number" inputProps={{ min: 1 }} 
-                          helperText="Session length" />
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <TextField {...tf} InputProps={{ startAdornment: <FaLongArrowAltDown style={{ marginRight: 8 }} /> }}
-                         name="free_trial_download_limit" value={hotspotCustomization.free_trial_download_limit || ''}
-                          onChange={handleChangeHotspotCustomization} label="Download limit (Mbps)" 
-                          type="number" inputProps={{ min: 0 }} className='myTextField'
-                           helperText="Max download speed during trial" />
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <TextField {...tf} InputProps={{ startAdornment: <FaLongArrowAltUp style={{ marginRight: 8 }} /> }} 
-                        
-                        name="free_trial_upload_limit" value={hotspotCustomization.free_trial_upload_limit || ''}
-                        
-                        onChange={handleChangeHotspotCustomization} label="Upload limit (Mbps)" type="number" 
-                        className='myTextField'
-                        inputProps={{ min: 0 }} helperText="Max upload speed during trial" />
-                      </Grid>
-                    </Grid>
-                  )}
-
+              
                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <SaveButton loading={loadHotspotCustomization}>Save hotspot settings</SaveButton>
                   </div>
@@ -1207,16 +1147,34 @@ sx={{                 '& label.Mui-focused': { color: '#10b981' },
 />
                   <Grid container spacing={2} sx={{ mt: 0.5 }}>
                     <Grid item xs={12} sm={6}>
-                      <TextField {...tf} label="Alert after (minutes)" onChange={handleChangeNasSettings} name="unreachable_duration_minutes" value={unreachable_duration_minutes} helperText="How long a NAS must be unreachable before triggering an alert" />
+                      <TextField {...tf} label="Alert after (minutes)"
+                       onChange={handleChangeNasSettings} 
+                        sx={{
+                           '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
+                        className='myTextField'
+                       name="unreachable_duration_minutes"
+                        value={unreachable_duration_minutes} 
+                        helperText="How long a NAS must be unreachable
+                         before triggering an alert" 
+                         
+                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField {...tf} label="Notification phone number" onChange={handleChangeNasSettings}
-                       name="notification_phone_number" value={notification_phone_number} 
+                       name="notification_phone_number"
+                       
+                       value={notification_phone_number} 
                        helperText="Number to receive unreachable alerts" 
                        className='myTextField'
-
-sx={{
-    '& label.Mui-focused': { color: '#10b981' },
+ sx={{
+                           '& label.Mui-focused': { color: '#10b981' },
               '& .MuiOutlinedInput-root': {
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                   borderColor: '#10b981',
@@ -1235,6 +1193,8 @@ sx={{
               </Accordion>
             </form>
 
+
+
             {/* ── Access Point Settings ──────────────────────────────────────── */}
             <form onSubmit={handleSaveAccessPointSettings}>
               <Accordion sx={accordionSx}>
@@ -1250,10 +1210,37 @@ sx={{
                   />
                   <Grid container spacing={2} sx={{ mt: 0.5 }}>
                     <Grid item xs={12} sm={6}>
-                      <TextField {...tf} label="Alert after (minutes)" onChange={handleChanageAccessPointSettings} name="unreachable_duration_minutes" value={accessPointSettingsForm.unreachable_duration_minutes} helperText="How long an access point must be unreachable before triggering an alert" />
+                      <TextField {...tf} label="Alert after (minutes)"
+                       onChange={handleChanageAccessPointSettings}
+                        name="unreachable_duration_minutes"
+                        className='myTextField'
+                         sx={{
+                           '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
+                         value={accessPointSettingsForm.unreachable_duration_minutes} helperText="How long an access point must be unreachable before triggering an alert" 
+                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <TextField {...tf} label="Notification phone number" onChange={handleChanageAccessPointSettings} name="notification_phone_number" value={accessPointSettingsForm.notification_phone_number} helperText="Number to receive unreachable alerts" InputProps={{ startAdornment: <FaPhone style={{ marginRight: 8, color: 'var(--text-secondary)' }} /> }} />
+                      <TextField {...tf} label="Notification phone number"
+                       onChange={handleChanageAccessPointSettings} 
+                       className='myTextField'
+                        sx={{
+                           '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
+                       name="notification_phone_number" value={accessPointSettingsForm.notification_phone_number} 
+                       helperText="Number to receive unreachable alerts" InputProps={{ startAdornment: <FaPhone style={{ marginRight: 8, color: 'var(--text-secondary)' }} /> }} />
                     </Grid>
                   </Grid>
 
