@@ -148,7 +148,6 @@ const AdminLogin = lazy(() => import('./admin_wallet/AdminLogin') )
 const ProtectAuthWallet = lazy(()=> import('./Auth/ProtectAuthWallet'))
 const FreeTrialUsers = lazy(()=> import("./user/FreeTrialUsers"))
 const HotspotDevicePortal = lazy(()=> import("./client_portal/HotspotDevicePortal"))
-
 import { MaintenanceGate } from './maintenace/MaintenanceMode';
 const HotspotPromotionalPlans = lazy(()=> import("./promotion/HotspotPromotionalPlans"))
 const HotspotPageDesigner = lazy(() => import("./hotspot_page/HotspotPageDesigner"))
@@ -690,12 +689,9 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path="/admin/network-map" element={<NetworkMap />}/>
 
 <Route exact path='/admin/license' element={
-   <Suspense fallback={  <RefreshCw className='animate-spin text-blue-500 w-12 
-    h-12 mx-auto ' />
-}>
-  <License/>
   
-  </Suspense>
+    <License/>
+
   }/>
 
 

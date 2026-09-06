@@ -118,17 +118,22 @@ const SettingsCheckbox = ({ label, description, checked, onChange, name }) => (
           name={name}
           size="small"
           sx={{
-            color: 'text.secondary',
-            '&.Mui-checked': { color: 'primary.main' },
-            padding: '6px 8px 6px 9px',
-          }}
+  color: 'text.secondary',
+  '&.Mui-checked': { color: 'success.main' },
+  padding: '6px 8px 6px 9px',
+}}
+
+
+          
         />
       }
       label={
         <div>
-          <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 500, lineHeight: 1.4 }}>{label}</p>
+          <p style={{ margin: 0, fontSize: '0.875rem',
+             fontWeight: 500, lineHeight: 1.4 }}>{label}</p>
           {description && (
-            <p style={{ margin: '2px 0 0', fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+            <p style={{ margin: '2px 0 0', fontSize: '0.75rem', 
+            color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               {description}
             </p>
           )}
@@ -749,7 +754,8 @@ const GeneralSettings = ({ children }) => {
                     ))}
                   </Grid>
 
-                  <InfoBox>
+                  <InfoBox variant="green">
+                    
                     The session ends after <strong>whichever limit is reached first</strong>. For example, setting 2 hours, 1 day, and 30 minutes triggers a logout after 30 minutes of inactivity.
                   </InfoBox>
 
@@ -839,6 +845,8 @@ const GeneralSettings = ({ children }) => {
                 <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ fontSize: 20 }} />} sx={accordionSummarySx}>
                   <SectionHeader icon={CiUser} label="Subscriber settings" />
                 </AccordionSummary>
+
+
                 <AccordionDetails sx={accordionDetailsSx}>
 
                   <SectionLabel>Notifications</SectionLabel>
@@ -881,12 +889,37 @@ const GeneralSettings = ({ children }) => {
                   />
                   <Grid container spacing={2} sx={{ mt: 0.5 }}>
                     <Grid item xs={12} sm={6}>
-                      <TextField {...tf} name="prefix" label="Account number prefix" onChange={handleChangeSubscriberSettings} value={prefix} />
+                      <TextField {...tf} name="prefix" 
+                      label="Account number prefix"
+                       onChange={handleChangeSubscriberSettings}
+                       sx={{
+                           '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
+                        className='myTextField'
+                       value={prefix} />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <TextField {...tf} name="minimum_digits" label="Minimum digits" 
+                      <TextField {...tf} name="minimum_digits" 
+                      sx={{
+                           '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
+                        
+                      label="Minimum digits" 
                       type="number" helperText="Zeros are prepended — e.g. SUB001 for 3 digits" 
-                      onChange={handleChangeSubscriberSettings} value={minimum_digits} className='myTextField' />
+                      onChange={handleChangeSubscriberSettings}
+                       value={minimum_digits} className='myTextField' />
                     </Grid>
                   </Grid>
 
@@ -895,7 +928,22 @@ const GeneralSettings = ({ children }) => {
                       <AlertTitle sx={{ fontSize: '0.875rem', fontWeight: 500 }}>Account number counter</AlertTitle>
                       Set the starting counter value after importing customers to continue numbering from the right point. Enter the highest existing account number (without prefix).
                     </Alert>
-                    <TextField {...tf} sx={{ ...fieldSx, width: '100%', mt: 1.5 }} label="Current account number (exclude prefix)"
+                    <TextField {...tf} sx={{ ...fieldSx, width: '100%', mt: 1.5,
+
+
+
+                           '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                     }}
+
+
+
+                     label="Current account number (exclude prefix)"
                     className='myTextField'
                      />
                   </div>
@@ -925,6 +973,16 @@ const GeneralSettings = ({ children }) => {
                        onChange={handleChangeSubscriberSettings} 
                        value={installation_fee} name="installation_fee"
                        className='myTextField'
+                        sx={{
+                           '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
+
                         InputProps={{ startAdornment: <span style={{ marginRight: 6, color: 'var(--text-secondary)' }}>KES</span> }} />
                     </Grid>
                   </Grid>
@@ -943,12 +1001,22 @@ const GeneralSettings = ({ children }) => {
                       { id: 'expiration_reminder_minutes', label: 'Minutes before expiration', name: 'expiration_reminder_minutes', value: expiration_reminder_minutes },
                     ].map(f => (
                       <Grid key={f.id} item xs={12} sm={4}>
-                        <TextField {...tf} id={f.id} label={f.label} onChange={handleChangeSubscriberSettings}
+                        <TextField {...tf} id={f.id} label={f.label}
+                         onChange={handleChangeSubscriberSettings}
+                          sx={{
+                           '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
                          name={f.name} value={f.value} className='myTextField' />
                       </Grid>
                     ))}
                   </Grid>
-                  <InfoBox>
+                  <InfoBox variant="green">
                     Reminders are sent to clients before their subscriptions expire so they can renew in time. All three intervals are active simultaneously.
                   </InfoBox>
 

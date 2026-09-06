@@ -55,18 +55,20 @@ const AuthLoader = () => {
           {/* mid ring, spinning */}
           <div className="absolute inset-0 rounded-full border-4 border-slate-200 dark:border-slate-800" />
           <div
-            className="absolute inset-0 rounded-full border-4 border-transparent border-t-indigo-500 border-r-indigo-500 animate-spin"
+            className="absolute inset-0 rounded-full border-4 border-transparent
+             border-t-green-500 border-r-green-500 animate-spin"
             style={{ animationDuration: '0.9s' }}
           />
           {/* inner dot */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-3 w-3 rounded-full bg-indigo-500 animate-pulse" />
+            <div className="h-3 w-3 rounded-full bg-green-500 animate-pulse" />
           </div>
         </div>
 
         {/* Status text */}
         <div className="space-y-1">
-          <p className="text-xl font-semibold tracking-wide text-slate-700 dark:text-slate-200">
+          <p className="text-xl font-semibold tracking-wide text-slate-700
+           dark:text-slate-200">
             Verifying your session
           </p>
           <p className="text-lg text-slate-400 dark:text-slate-500">
@@ -76,7 +78,8 @@ const AuthLoader = () => {
 
         {/* progress bar */}
         <div className="h-1 w-40 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-          <div className="h-full w-1/3 animate-[loaderBar_1.2s_ease-in-out_infinite] rounded-full bg-indigo-500" />
+          <div className="h-full w-1/3 animate-[loaderBar_1.2s_ease-in-out_infinite] 
+          rounded-full bg-green-500" />
         </div>
       </div>
 

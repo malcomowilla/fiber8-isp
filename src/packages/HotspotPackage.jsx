@@ -963,7 +963,8 @@ const deleteHotspotPackage = async (id) => {
         !settingsformData?.use_radius && {
           icon: () => (
             <button
-              className="flex items-center gap-2 bg-purple-500 text-white px-3 py-2 rounded-lg hover:bg-purple-600 disabled:opacity-60 disabled:cursor-not-allowed transition-colors font-sans"
+              className="flex items-center gap-2 bg-green-500 text-white px-3 py-2 rounded-lg
+               hover:bg-green-600 disabled:opacity-60 disabled:cursor-not-allowed transition-colors font-sans"
               onClick={bulkSyncPackagesToMikrotik}
               disabled={bulkSyncing}
             >

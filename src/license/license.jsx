@@ -442,7 +442,8 @@ const License = () => {
     <>
       <Toaster />
       <ThemeProvider theme={tableTheme}>
-        <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 sm:p-8 font-sans">
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100
+         dark:from-slate-900 dark:to-slate-800 p-4 sm:p-8 font-sans">
           <div className="max-w-2xl mx-auto">
 
             <motion.div
