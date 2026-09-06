@@ -1,877 +1,967 @@
-import React from "react";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@mui/material/styles";
-import FormControl from "@mui/material/FormControl";
-import Alert from "@mui/material/Alert";
-import AlertTitle from "@mui/material/AlertTitle";
-import { useApplicationSettings } from "../settings/ApplicationSettings";
-import { Button } from "../components/ui/button";
-import { ReloadIcon } from "@radix-ui/react-icons";
-import Autocomplete from "@mui/material/Autocomplete";
-import { IoWifiOutline } from "react-icons/io5";
-import { FaLongArrowAltUp, FaLongArrowAltDown } from "react-icons/fa";
-import { LuCalendar1 } from "react-icons/lu";
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Select, MenuItem, InputLabel, Stack, Divider, CircularProgress } from "@mui/material";
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import * as React from 'react';
 import {
-  Tv, Smartphone, Monitor, Printer, Router, Globe, ShieldAlert, Server
-} from 'lucide-react';
-
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+  renderTimeViewClock,
+} from '@mui/x-date-pickers/timeViewRenderers';
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
+import AlertTitle from '@mui/material/AlertTitle';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import Switch from '@mui/material/Switch';
+import InputAdornment from '@mui/material/InputAdornment';
+import PackageNotification  from '.././notification/PackageNotification'
+import {useApplicationSettings} from '../settings/ApplicationSettings'
+import { useDebounce } from 'use-debounce';
+import { Autocomplete} from '@mui/material';
 import toast, { Toaster } from 'react-hot-toast';
+import { PiMoneyThin } from "react-icons/pi";
+import { CiWifiOn } from "react-icons/ci";
+import { FaLongArrowAltUp } from "react-icons/fa";
+import { FaLongArrowAltDown } from "react-icons/fa";
+import { IoMdTime } from "react-icons/io";
+import { PiNumberOne } from "react-icons/pi";
+import { MdOutlineAttachMoney } from "react-icons/md";
+import GaugeIcon from '@mui/icons-material/Speed';
+import ShieldAlertIcon from '@mui/icons-material/GppMaybe';
+import DatabaseIcon from '@mui/icons-material/Storage';
+import ServerIcon from '@mui/icons-material/Dns';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import {useState,useMemo, useEffect, useCallback} from 'react'
+
+import { 
+  
+  CircularProgress, 
+} from '@mui/material'
+
+
+
+const EditPackage = ({open, handleClose, formData, loading, setFormData, showNotification, 
+  nameError, validityError,
+  uploadBurstSpeedError, downloadBurstSpeedError,
+  priceError, uploadLimitError, downloadLimitError,
+  createPackage,offlineerror,isloading, validityPeriodUnitError,
+  editPackage, allPackages,selectedRouter, setSelectedRouter
+  
+   }) => {
+const [error, setError] = useState('')
+const [message, setMessage] = useState('')
+const [routers, setRouters]= useState ([])
+const [formComplete, setFormComplete] = useState(false);
+const [submitting, setSubmitting] = useState(false);
+const [mikrotik_router, setRouter] = useState(null)
+const [ipPool, setIpPool] = useState([])
+const [loadingRouters, setLoadingRouters] = useState(false)
+const [routerDetails, setRouterDetails] = useState(null)
+const {router_name} = formData
+const { settingsformData } = useApplicationSettings()
 
 
 
 
-// ─── Shared MUI focus styles ──────────────────────────────────────────────────
-const focusSx = {
-  "& label.Mui-focused": { color: "black", fontSize: "17px" },
-  "& .MuiOutlinedInput-root": {
-    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-      borderColor: "black",
-      borderWidth: "3px",
+
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+
+
+
+const isDark = useIsDarkMode();
+
+const tableTheme = useMemo(() => createTheme({
+  palette: {
+    mode: isDark ? 'dark' : 'light',
+    background: {
+      paper: isDark ? '#1e1e1e' : '#ffffff',
+      default: isDark ? '#1e1e1e' : '#ffffff',
     },
-    "&.Mui-focused fieldset": { borderColor: "black" },
+    text: {
+      primary: isDark ? '#f1f1f1' : '#1a1a1a',
+      secondary: isDark ? '#a3a3a3' : '#6b7280',
+    },
   },
-};
+}), [isDark]);
 
-const DEVICE_TYPES = [
-  { value: 'tv',      label: 'Smart TV',      icon: Tv,        emoji: '📺' },
-  { value: 'phone',   label: 'Phone/Tablet',  icon: Smartphone, emoji: '📱' },
-  { value: 'pc',      label: 'PC/Laptop',     icon: Monitor,    emoji: '💻' },
-  { value: 'printer', label: 'Printer',       icon: Printer,    emoji: '🖨️' },
-  { value: 'router',  label: 'Router',        icon: Router,     emoji: '📡' },
-  { value: null,      label: 'All Devices',   icon: Globe,      emoji: '🌐' },
-];
 
-// ─── BurstSection ─────────────────────────────────────────────────────────────
-function BurstSection({ hotspotPackage, setHotspotPackage }) {
-  const enabled = !!hotspotPackage.burst_enabled;
 
-  const set = (field, value) =>
-    setHotspotPackage((prev) => ({ ...prev, [field]: value }));
+useEffect(() => {
+  
+  setRouter(router_name)
 
-  const disable = () =>
-    setHotspotPackage((prev) => ({
-      ...prev,
-      burst_enabled: false,
-      burst_limit_download: "",
-      burst_limit_upload: "",
-      burst_threshold_download: "",
-      burst_threshold_upload: "",
-      burst_time: "",
-    }));
+}, [router_name]);
+
+const [routerName] = useDebounce(router_name, 1000)
+
+const subdomain = window.location.hostname.split('.')[0]
+
+const fetchRouters = useCallback(async () => {
+  try {
+    setLoadingRouters(true)
+    const response = await fetch('/api/routers', {
+      headers: { 'X-Subdomain': subdomain }
+    })
+    const data = await response.json()
+    setRouters(data || [])
+    
+    // Pre-select if editing
+    if (formData?.id && formData?.nas_router) {
+      setSelectedRouter(formData.nas_router)
+      const router = data.find(r => r.name === formData.nas_router)
+      if (router) setRouterDetails(router)
+    }
+  } catch (error) {
+    toast.error('Failed to load routers')
+  } finally {
+    setLoadingRouters(false)
+  }
+}, [formData, subdomain])
+
+
+
+
+useEffect(() => {
+  if (open) {
+    fetchRouters()
+  }
+}, [open, fetchRouters])
+
+
+// ── FUP helpers ───────────────────────────────────────────────────────────
+const fupEnabled = !!formData.fup_enabled
+const fupDataUnit = formData.fup_data_unit || 'GB'
+
+// Plans eligible as a throttle target: must have a lower download speed
+// than the plan currently being edited.
+const eligibleFupPlans = useMemo(() => {
+  const currentDownload = Number(formData.download_limit) || 0
+  if (!Array.isArray(allPackages)) return []
+  return allPackages.filter((pkg) => {
+    if (editPackage && pkg.id === formData.id) return false
+    return Number(pkg.download_limit) < currentDownload
+  })
+}, [allPackages, formData.download_limit, formData.id, editPackage])
+
+const toggleFup = (e) => {
+  const checked = e.target.checked
+  setFormData({
+    ...formData,
+    fup_enabled: checked,
+    ...(checked ? {} : { fup_data_limit: '', fup_throttle_plan_id: '' }),
+  })
+}
+
+const onFupUnitChange = (e) => {
+  setFormData({ ...formData, fup_data_unit: e.target.value })
+}
+
+const onFupThrottlePlanChange = (e) => {
+  setFormData({ ...formData, fup_throttle_plan_id: e.target.value })
+}
+
+// Whether this package is visible as an option on the customer-facing
+// hotspot page. Treat undefined (new/unsaved packages, or rows from
+// before the enabled column existed) as enabled.
+const packageEnabled = formData.enabled !== false
+
+const toggleEnabled = (e) => {
+  setFormData({ ...formData, enabled: e.target.checked })
+}
+
+
+
+const handleRouterChange = (e) => {
+  const routerName = e.target.value
+  setSelectedRouter(routerName)
+  const selected = routers.find(r => r.name === routerName)
+  setRouterDetails(selected || null)
+  setFormData({
+    ...formData,
+    router_name: selected?.name || '',
+     nas_router: selected?.name || ''
+  })
+}
+
+
+
+const onChange = (e) =>{
+  setFormData({ ...formData, [e.target.id]: e.target.value });
+
+  }
+
+  
+  const theme = useTheme();
+
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm', 'lg', 'md'));
+ 
+  const fecthIpPools = useCallback(
+    async() => {
+  
+  try {
+      const response = await fetch('/api/ip_pools', {
+          headers: {
+            'X-Subdomain': subdomain,
+          },
+      })
+  
+      const newData = await response.json()
+      if (response.ok) {
+  setIpPool(newData)
+    
+      }else{
+  toast.error(
+      'Failed to get ip pools',
+      {
+        position: 'top-center',
+        duration: 4000,
+      }
+  )
+      }
+  } catch (error) {
+      toast.error('Failed to get ip pools internal server error', {
+        position: 'top-center',
+        duration: 3000,
+      })
+  }
+    },
+    [],
+  
+  
+  )
+  
+  
+  useEffect(() => {
+      
+     fecthIpPools()
+  }, [fecthIpPools]);
+
 
   return (
-    <div className="mt-6 rounded-xl border-2 border-gray-200 overflow-hidden font-sans">
-      {/* ── Toggle header ── */}
-      <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-50 to-cyan-50 border-b border-blue-200">
-        <div>
-          <p className="text-sm font-semibold text-gray-800">
-            ⚡ Enable Speed Burst?
-          </p>
-          <p className="text-xs text-gray-500 mt-0.5">
-            Allow users to temporarily exceed normal speed limits
-          </p>
-        </div>
+          <ThemeProvider theme={tableTheme}>
+    
+    <React.Fragment>
+      <Toaster />
+     {/* onClick={handleClickOpen */}
 
-        {/* Yes / No toggle */}
-        <div className="flex rounded-lg border-2 border-gray-300 overflow-hidden text-sm font-semibold shadow-sm">
-          <button
-            type="button"
-            onClick={() => set("burst_enabled", true)}
-            className={`px-4 py-2 transition-all cursor-pointer border-none font-medium
-              ${
-                enabled
-                  ? "bg-green-500 text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-50"
-              }`}
-          >
-            Yes
-          </button>
-          <button
-            type="button"
-            onClick={disable}
-            className={`px-4 py-2 transition-all cursor-pointer border-none border-l border-gray-300 font-medium
-              ${
-                !enabled
-                  ? "bg-red-500 text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-50"
-              }`}
-          >
-            No
-          </button>
-        </div>
-      </div>
+      {/* <IconButton  style={{color: 'black'}} >
+      <EditIcon />
+    </IconButton> */}
+      <Dialog
+      sx={{
+        borderRadius: '150px'
+      }}
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        fullScreen={fullScreen}
+        fullWidth={true}
+        maxWidth={'lg'}
+      >
+        
+        <DialogContent >
+            <form onSubmit={createPackage} >
+            <Box
+      sx={{
+        '&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': { m: 1, width: '50ch' , border: 0},
+        "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+        {
+          border: 0,
+        },
+      }}>
+            <TextField   sx={{
 
-      {/* ── Burst fields ── */}
-      {enabled && (
-        <div className="px-4 py-5 bg-white grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Burst Limit Download */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-              Burst Download Limit <span className="text-red-500">*</span>
-            </label>
-            <TextField
-              fullWidth
-              size="small"
-              className="myTextField"
-              placeholder="e.g., 20M"
-              value={hotspotPackage.burst_limit_download || ""}
-              onChange={(e) => set("burst_limit_download", e.target.value)}
-              helperText="Max burst download speed"
-              sx={focusSx}
-              InputProps={{
-                startAdornment: (
-                  <FaLongArrowAltDown className="mr-2 text-blue-500" />
-                ),
+'& label.Mui-focused': {
+  color: 'black',
+  fontSize: '17px'
+
+  },
+'& .MuiOutlinedInput-root': {
+"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+  borderColor: "black",
+  borderWidth: '3px'
+  },
+'&.Mui-focused fieldset':  {
+  borderColor: 'black', 
+  
+
+}
+},
+         
+        }}   id='name'  className='myTextField' 
+         InputProps={{
+                startAdornment: <CiWifiOn  className='mr-2 w-6 h-6'/>,
               }}
-            />
-          </div>
+          value={formData.name} onChange={(e)=> onChange(e) } 
+             placeholder='enter name...' label='package-name' fullWidth ></TextField>
 
-          {/* Burst Limit Upload */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-              Burst Upload Limit <span className="text-red-500">*</span>
-            </label>
-            <TextField
-              fullWidth
-              size="small"
-              className="myTextField"
-              placeholder="e.g., 10M"
-              value={hotspotPackage.burst_limit_upload || ""}
-              onChange={(e) => set("burst_limit_upload", e.target.value)}
-              helperText="Max burst upload speed"
-              sx={focusSx}
-              InputProps={{
-                startAdornment: (
-                  <FaLongArrowAltUp className="mr-2 text-blue-500" />
-                ),
+
+
+            </Box>
+
+           
+
+            <div className='flex  gap-3 mt-4 font-sans
+'>
+          <TextField label='bundle-price'   sx={{
+
+'& label.Mui-focused': {
+  color: 'black',
+  fontSize: '17px'
+
+  },
+'& .MuiOutlinedInput-root': {
+"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+  borderColor: "black",
+  borderWidth: '3px'
+  },
+'&.Mui-focused fieldset':  {
+  borderColor: 'black', // Set border color to transparent when focused
+
+}
+},
+         
+        }
+      
+      } 
+        
+         InputProps={{
+                startAdornment: <PiMoneyThin  className='mr-2 w-6 h-6'/>,
               }}
-            />
-          </div>
+        value={formData.price} className='myTextField'      id='price'
+            onChange={e =>onChange(e)  }  type='number' fullWidth></TextField>
 
-          {/* Burst Threshold Download */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-              Download Threshold <span className="text-red-500">*</span>
-            </label>
-            <TextField
-              fullWidth
-              size="small"
-              className="myTextField"
-              placeholder="e.g., 10M"
-              value={hotspotPackage.burst_threshold_download || ""}
-              onChange={(e) => set("burst_threshold_download", e.target.value)}
-              helperText="Speed at which burst activates"
-              sx={focusSx}
+
+
+            <TextField label='upload-speed-limit(mbps)'
               InputProps={{
-                startAdornment: (
-                  <FaLongArrowAltDown className="mr-2 text-gray-400" />
-                ),
+                startAdornment: <FaLongArrowAltUp  className='mr-2 w-5 h-5'/>,
               }}
-            />
-          </div>
+            
+              
+            id='upload_limit'  sx={{
 
-          {/* Burst Threshold Upload */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-              Upload Threshold <span className="text-red-500">*</span>
-            </label>
-            <TextField
-              fullWidth
-              size="small"
-              className="myTextField"
-              placeholder="e.g., 5M"
-              value={hotspotPackage.burst_threshold_upload || ""}
-              onChange={(e) => set("burst_threshold_upload", e.target.value)}
-              helperText="Speed at which burst activates"
-              sx={focusSx}
-              InputProps={{
-                startAdornment: (
-                  <FaLongArrowAltUp className="mr-2 text-gray-400" />
-                ),
+'& label.Mui-focused': {
+  color: 'black'
+  },
+'& .MuiOutlinedInput-root': {
+"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+  borderColor: "black",
+  borderWidth: '3px',
+  },
+'&.Mui-focused fieldset':  {
+  borderColor: 'black', // Set border color to transparent when focused
+
+}
+},
+         
+        }}   value={formData.upload_limit}         className='myTextField' onChange={e =>onChange(e)} 
+            type='number' placeholder='upload-speed-limit(mbps)...' fullWidth></TextField>
+
+
+            <TextField  label='download-speed-limit(mbps)'
+             InputProps={{
+                startAdornment: <FaLongArrowAltDown  className='mr-2 w-5 h-5'/>,
               }}
-            />
-          </div>
+            id='download_limit'   sx={{
 
-          {/* Burst Duration */}
-          <div className="sm:col-span-2">
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-              Burst Duration (seconds) <span className="text-red-500">*</span>
-            </label>
-            <TextField
-              fullWidth
-              size="small"
-              className="myTextField"
-              type="number"
-              placeholder="e.g., 10"
-              inputProps={{ min: 1 }}
-              value={hotspotPackage.burst_time || ""}
-              onChange={(e) => set("burst_time", e.target.value)}
-              helperText="How long the burst lasts"
-              sx={focusSx}
-            />
+'& label.Mui-focused': {
+  color: 'black'
+  },
+'& .MuiOutlinedInput-root': {
+"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+  borderColor: "black",
+  borderWidth: '3px'
+  },
+'&.Mui-focused fieldset':  {
+  borderColor: 'black', // Set border color to transparent when focused
+
+}
+},
+         
+        }}   className='myTextField' value={formData.download_limit}    
+            onChange={e =>onChange(e)} type='number' 
+      fullWidth></TextField>
+
+
+
+
+             <TextField   
+              
+               InputProps={{
+                startAdornment:<> <PiNumberOne className='mr-2 w-5 h-5'/> <p 
+                className='text-black dark:text-white'
+                >:</p> </>,
+              }}
+              sx={{
+  
+  '& label.Mui-focused': {
+    color: 'black'
+    },
+  '& .MuiOutlinedInput-root': {
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+  '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
+  
+  }
+  },
+           
+          }}   label='Aggregation'
+  
+             onChange={e => onChange(e)}
+           value={formData.aggregation}
+                 className='myTextField'  id='aggregation'
+             fullWidth></TextField>
+            </div>
+           
+          
+
+          
+          <div className='mt-2'>
+ <TextField  label='daily charge'
+   InputProps={{
+                startAdornment: <MdOutlineAttachMoney  className='mr-2 w-5 h-5'/>,
+              }}
+             onChange={e => onChange(e)}
+
+               value={formData.daily_charge}
+                    sx={{
+  
+  '& label.Mui-focused': {
+    color: 'black'
+    },
+  '& .MuiOutlinedInput-root': {
+  "&.Mui-focused .2MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+  '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
+  
+  }
+  },
+           
+          }}  
+                 fullWidth id='daily_charge' className='myTextField'></TextField>
+
+
+
+          </div>
+         
+
+
+<div className='flex  gap-3 mt-4'>
+  <TextField  label='Burst Threshold Download(mbps)'
+   InputProps={{
+                startAdornment: <FaLongArrowAltDown  className='mr-2 w-5 h-5'/>,
+              }}
+             onChange={e => onChange(e)}
+
+               value={formData.burst_threshold_download}
+                    sx={{
+  
+  '& label.Mui-focused': {
+    color: 'black'
+    },
+  '& .MuiOutlinedInput-root': {
+  "&.Mui-focused .2MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+  '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
+  
+  }
+  },
+           
+          }}  
+                 fullWidth id='burst_threshold_download' className='myTextField'></TextField>
+
+
+
+        <TextField  label='Burst Threshold Upload(mbps)'
+   InputProps={{
+                startAdornment: <FaLongArrowAltUp  className='mr-2 w-5 h-5'/>,
+              }}
+             onChange={e => onChange(e)}
+
+               value={formData.burst_threshold_upload}
+                    sx={{
+  
+  '& label.Mui-focused': {
+    color: 'black'
+    },
+  '& .MuiOutlinedInput-root': {
+  "&.Mui-focused .2MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+  '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
+  
+  }
+  },
+           
+          }}  
+                 fullWidth id='burst_threshold_upload' className='myTextField'></TextField>
+</div>
+           <Stack sx={{ width: '100%', mt: 2 }} spacing={2}>
+      
+      <Alert severity="info">
+        <AlertTitle> <p className='font-sans
+'>Speed Boost </p></AlertTitle>
+
+        <p className='font-sans
+'>You can provide your customers with boosted speeds during off-peak hours. The boosted speeds will apply between the specified hours 
+        and revert to regular limits during other hours </p>
+      </Alert>
+      
+    
+    </Stack>
+
+            <div className='flex  mt-2'>
+
+           <Box
+      sx={{
+        '& > :not(style)': { m: 1, width: '40ch' },
+      }}>
+
+        
+  <>
+  <TextField  label='upload-burst-speed(mbps)' 
+   InputProps={{
+                startAdornment: <FaLongArrowAltUp  className='mr-2 w-5 h-5'/>,
+              }}
+             onChange={e => onChange(e)}
+
+               value={formData.burst_upload_speed}    
+                    sx={{
+  
+  '& label.Mui-focused': {
+    color: 'black'
+    },
+  '& .MuiOutlinedInput-root': {
+  "&.Mui-focused .2MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+  '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
+  
+  }
+  },
+           
+          }}  
+                 fullWidth id='burst_upload_speed' className='myTextField'></TextField>
+
+
+
+              <TextField   
+
+
+
+
+
+
+              
+               InputProps={{
+                startAdornment: <FaLongArrowAltDown className='mr-2 w-5 h-5'/>,
+              }}
+              sx={{
+  
+  '& label.Mui-focused': {
+    color: 'black'
+    },
+  '& .MuiOutlinedInput-root': {
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+  '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
+  
+  }
+  },
+           
+          }}   label='download-burst-speed(mbps)'    onChange={e =>onChange(e)}
+  
+           value={formData.burst_download_speed}      
+                 className='myTextField'  id='burst_download_speed'
+             fullWidth></TextField>
+
+
+
+              <TextField   
+              
+               InputProps={{
+                startAdornment: <IoMdTime className='mr-2 w-5 h-5'/>,
+              }}
+              sx={{
+  
+  '& label.Mui-focused': {
+    color: 'black'
+    },
+  '& .MuiOutlinedInput-root': {
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "black",
+    borderWidth: '3px'
+    },
+  '&.Mui-focused fieldset':  {
+    borderColor: 'black', // Set border color to transparent when focused
+  
+  }
+  },
+           
+          }}   label='burst time(s)'
+  
+           value={formData.burst_time}
+            onChange={e => onChange(e)}
+                type='number' className='myTextField'  id='burst_time'
+             fullWidth></TextField>
+  
+  </>
+           
+</Box> 
+           </div>
+
+
+
+
+
+
+
+
+{/* Router Selection */}
+<div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+  <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+    <ServerIcon fontSize="small" />
+    Select Router *
+  </h3>
+
+  {loadingRouters ? (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <CircularProgress size={30} />
+      <span style={{ marginLeft: '12px' }}>Loading routers...</span>
+    </div>
+  ) : routers.length === 0 ? (
+    <Alert severity="warning">No routers found. Add a router first.</Alert>
+  ) : (
+    <>
+      <FormControl fullWidth style={{ marginBottom: '12px' }}>
+        <InputLabel>Select Router</InputLabel>
+        <Select value={selectedRouter} onChange={handleRouterChange} label="Select Router">
+          <MenuItem value=""><em>Choose a router...</em></MenuItem>
+          {routers.map((router) => (
+            <MenuItem key={router.id} value={router.name}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ServerIcon fontSize="small" />
+                {router.name}
+              </div>
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      {routerDetails && (
+        <div style={{ padding: '12px', backgroundColor: 'white', borderRadius: '6px', borderLeft: '4px solid #2196F3' }}>
+          <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>Selected Router:</p>
+          <div style={{ fontSize: '13px' }}>
+            <div>Name: <strong>{routerDetails.name}</strong></div>
+            <div>IP: <strong>{routerDetails.ip_address}</strong></div>
           </div>
         </div>
       )}
-    </div>
-  );
-}
+    </>
+  )}
+</div>
 
-// ─── DeviceTypeSection ────────────────────────────────────────────────────────
-function DeviceTypeSection({ hotspotPackage, setHotspotPackage }) {
-  return (
-    <Stack sx={{ width: '100%', mt: 3 }}>
-      <Alert severity="success">
-        <AlertTitle><p className="font-sans">📱 Device Type (Optional)</p></AlertTitle>
-        <p className="font-sans"> Select which device this package is optimized for. Leave empty if it's for all devices. </p>
-      </Alert>
 
-      <Box
+
+{/* ── Visibility on the hotspot page ───────────────────────────────────── */}
+<Stack sx={{ width: '100%', mt: 3 }}>
+  <Box
+    sx={{
+      border: '1px solid',
+      borderColor: packageEnabled ? 'rgba(5,150,105,0.4)' : 'rgba(0,0,0,0.12)',
+      borderRadius: '20px',
+      p: { xs: 2, sm: 3 },
+      transition: 'border-color .3s ease, background-color .3s ease',
+      backgroundColor: packageEnabled ? 'rgba(5,150,105,0.04)' : 'transparent',
+    }}
+  >
+    <div className='flex items-start justify-between gap-3 flex-wrap'>
+      <div className='flex items-start gap-3'>
+        <div
+          className='flex items-center justify-center rounded-2xl shrink-0'
+          style={{
+            width: 44, height: 44,
+            background: packageEnabled ? 'rgba(5,150,105,0.12)' : 'rgba(0,0,0,0.05)',
+            color: packageEnabled ? '#059669' : '#6b7280',
+          }}
+        >
+          {packageEnabled ? <VisibilityIcon /> : <VisibilityOffIcon />}
+        </div>
+        <div>
+          <p className='font-semibold text-base m-0 font-sans'>Show on Hotspot Page</p>
+          <p className='text-sm text-gray-500 font-sans dark:text-gray-400 m-0 mt-1 max-w-md'>
+            When off, customers won't see this package as an option on the WiFi login page.
+            Customers already connected on this plan keep their session — this only affects
+            whether it's offered to new logins.
+          </p>
+        </div>
+      </div>
+
+      <Switch
+        checked={packageEnabled}
+        onChange={toggleEnabled}
         sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)' },
-          gap: 2,
-          mt: 2,
+          '& .MuiSwitch-switchBase.Mui-checked': { color: '#059669' },
+          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#059669' },
         }}
-      >
-        {DEVICE_TYPES.map(({ value, label, icon: IconComponent, emoji }) => {
-          const isSelected = hotspotPackage.intended_device_type === value;
-          return (
-            <Box
-              key={value || 'all'}
-              onClick={() =>
-                setHotspotPackage({
-                  ...hotspotPackage,
-                  intended_device_type: value,
-                  device_icon: emoji,
-                })
-              }
-              sx={{
-                p: 2.5,
-                border: '2px solid',
-                borderColor: isSelected ? '#10b981' : '#e5e7eb',
-                borderRadius: '12px',
-                cursor: 'pointer',
-                transition: 'all .2s ease',
-                backgroundColor: isSelected ? 'rgba(16,185,129,0.08)' : 'transparent',
-                '&:hover': {
+        inputProps={{ 'aria-label': 'Show this package on the hotspot page' }}
+      />
+    </div>
+  </Box>
+</Stack>
+
+
+
+{/* ── Fair Usage Policy (FUP) ─────────────────────────────────────────── */}
+<Stack sx={{ width: '100%', mt: 3 }}>
+  <Box
+    sx={{
+      border: '1px solid',
+      borderColor: fupEnabled ? 'rgba(16,185,129,0.4)' : 'rgba(0,0,0,0.12)',
+      borderRadius: '20px',
+      p: { xs: 2, sm: 3 },
+      transition: 'border-color .3s ease, background-color .3s ease',
+      backgroundColor: fupEnabled ? 'rgba(16,185,129,0.04)' : 'transparent',
+    }}
+  >
+    <div className='flex items-start justify-between gap-3 flex-wrap'>
+      <div className='flex items-start gap-3'>
+        <div
+          className='flex items-center justify-center rounded-2xl shrink-0'
+          style={{
+            width: 44, height: 44,
+            background: fupEnabled ? 'rgba(16,185,129,0.12)' : 'rgba(0,0,0,0.05)',
+            color: fupEnabled ? '#10b981' : '#6b7280',
+          }}
+        >
+          <GaugeIcon />
+        </div>
+        <div>
+          <p className='font-semibold text-base m-0' font-sans
+>Fair Usage Policy (FUP)</p>
+          <p className='text-sm text-gray-500 font-sans
+ dark:text-gray-400 m-0 mt-1 max-w-md'>
+            FUP automatically throttles customers to a lower-speed plan when they exceed
+            their data limit within a billing cycle. The customer is restored to their
+            original plan when they renew.
+          </p>
+        </div>
+      </div>
+
+      <Switch
+        checked={fupEnabled}
+        onChange={toggleFup}
+        sx={{
+          '& .MuiSwitch-switchBase.Mui-checked': { color: '#10b981' },
+          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#10b981' },
+        }}
+        inputProps={{ 'aria-label': 'Enable FUP for this plan' }}
+      />
+    </div>
+
+    {fupEnabled && (
+      <div className='mt-4 space-y-4' style={{ animation: 'fupFadeIn .25s ease' }}>
+
+        {/* Data limit + unit */}
+        <div className='flex gap-3 items-start flex-wrap sm:flex-nowrap'>
+          <TextField
+            label='Data Limit'
+            type='number'
+            id='fup_data_limit'
+            placeholder='e.g. 500'
+            className="myTextField"
+            value={formData.fup_data_limit || ''}
+            onChange={(e) => onChange(e)}
+            InputProps={{
+              startAdornment: <DatabaseIcon className='mr-2 w-5 h-5 text-gray-500' fontSize="small" />,
+            }}
+            helperText={
+              formData.fup_data_limit
+                ? `Limit: ${Number(formData.fup_data_limit).toLocaleString()} ${fupDataUnit}`
+                : 'Set the data threshold for this plan'
+            }
+            sx={{
+              flex: 2,
+              '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                   borderColor: '#10b981',
-                  backgroundColor: 'rgba(16,185,129,0.04)',
+                  borderWidth: '2px',
+                },
+              },
+            }}
+            fullWidth
+          />
+
+          <FormControl sx={{ flex: 1, minWidth: 120 }}>
+            <InputLabel id='fup-unit-label'>Unit</InputLabel>
+            <Select
+              labelId='fup-unit-label'
+              id='fup_data_unit'
+              value={fupDataUnit}
+              label='Unit'
+              onChange={onFupUnitChange}
+              sx={{
+                borderRadius: '8px',
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
                 },
               }}
             >
-              <div className="flex flex-col items-center gap-2 font-sans">
-                <div className="text-2xl">{emoji}</div>
-                <div className="flex items-center gap-1.5">
-                  <IconComponent size={16} />
-                  <span className="text-sm font-medium text-center">{label}</span>
-                </div>
-              </div>
-            </Box>
-          );
-        })}
-      </Box>
-
-      {hotspotPackage.intended_device_type && (
-        <Alert severity="info" sx={{ mt: 2 }}>
-          ✓ This package is tagged for:{' '}
-          <strong>
-            {DEVICE_TYPES.find(d => d.value === hotspotPackage.intended_device_type)?.label}
-          </strong>
-        </Alert>
-      )}
-    </Stack>
-  );
-}
-
-// ─── RouterSelectionSection ───────────────────────────────────────────────────
-// Pulled out into its own component and rendered unconditionally so it never
-// gets hidden by the Free Trial toggle (or any other toggle in the future).
-function RouterSelectionSection({ loadingRouters, routers, selectedRouter, handleRouterChange, routerDetails }) {
-  return (
-    <div
-      className="font-sans"
-      style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}
-    >
-      <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-        <Server className="w-5 h-5" />
-        Select Router *
-      </h3>
-
-      {loadingRouters ? (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <CircularProgress size={30} />
-          <span style={{ marginLeft: '12px' }}>Loading routers...</span>
-        </div>
-      ) : routers.length === 0 ? (
-        <Alert severity="warning">No routers found. Add a router first.</Alert>
-      ) : (
-        <>
-          <FormControl fullWidth style={{ marginBottom: '12px' }}>
-            <InputLabel>Select Router</InputLabel>
-            <Select value={selectedRouter} onChange={handleRouterChange} label="Select Router">
-              <MenuItem value=""><em>Choose a router...</em></MenuItem>
-              {routers.map((router) => (
-                <MenuItem key={router.id} value={router.name}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Server className="w-4 h-4" />
-                    {router.name}
-                  </div>
-                </MenuItem>
-              ))}
+              <MenuItem value='GB'>GB</MenuItem>
+              <MenuItem value='TB'>TB</MenuItem>
             </Select>
           </FormControl>
-
-          {routerDetails && (
-            <div style={{ padding: '12px', backgroundColor: 'white', borderRadius: '6px', borderLeft: '4px solid #2196F3' }}>
-              <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>Selected Router:</p>
-              <div style={{ fontSize: '13px' }}>
-                <div>Name: <strong>{routerDetails.name}</strong></div>
-                <div>IP: <strong>{routerDetails.ip_address}</strong></div>
-              </div>
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
-}
-
-// ─── FreeTrial Section ────────────────────────────────────────────────────────
-function FreeTrialSection({ hotspotPackage, setHotspotPackage }) {
-  const enabled = !!hotspotPackage.enable_free_trial;
-
-  const set = (field, value) =>
-    setHotspotPackage((prev) => ({ ...prev, [field]: value }));
-
-  const disable = () =>
-    setHotspotPackage((prev) => ({
-      ...prev,
-      enable_free_trial: false,
-      free_trial_duration_minutes: "",
-      free_trial_download_limit: "",
-      free_trial_upload_limit: "",
-    }));
-
-  return (
-    <div className="mt-6 rounded-xl border-2 border-amber-200 overflow-hidden font-sans">
-      {/* ── Toggle header ── */}
-      <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-amber-50 to-yellow-50 border-b border-amber-300">
-        <div>
-          <p className="text-sm font-semibold text-gray-800">
-            🎁 Offer Free Trial?
-          </p>
-          <p className="text-xs text-gray-500 mt-0.5">
-            Give new users free access for a limited time
-          </p>
         </div>
 
-        {/* Yes / No toggle */}
-        <div className="flex rounded-lg border-2 border-gray-300 overflow-hidden text-sm font-semibold shadow-sm">
-          <button
-            type="button"
-            onClick={() => set("enable_free_trial", true)}
-            className={`px-4 py-2 transition-all cursor-pointer border-none font-medium
-              ${
-                enabled
-                  ? "bg-green-500 text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-50"
-              }`}
+        {/* Throttle plan */}
+        <FormControl fullWidth error={eligibleFupPlans.length === 0}>
+          <InputLabel id='fup-throttle-plan-label'>
+            Throttle Plan (plan to switch to when limit exceeded)
+          </InputLabel>
+          <Select
+            labelId='fup-throttle-plan-label'
+            id='fup_throttle_plan_id'
+            value={formData.fup_throttle_plan_id || ''}
+            label='Throttle Plan (plan to switch to when limit exceeded)'
+            onChange={onFupThrottlePlanChange}
+            disabled={eligibleFupPlans.length === 0}
+            sx={{
+              borderRadius: '8px',
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#10b981',
+                borderWidth: '2px',
+              },
+            }}
           >
-            Yes
-          </button>
-          <button
-            type="button"
-            onClick={disable}
-            className={`px-4 py-2 transition-all cursor-pointer border-none border-l border-gray-300 font-medium
-              ${
-                !enabled
-                  ? "bg-red-500 text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-50"
-              }`}
+            {eligibleFupPlans.map((pkg) => (
+              <MenuItem key={pkg.id} value={pkg.id}>
+                {pkg.name} — {pkg.download_limit} Mbps
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        {eligibleFupPlans.length === 0 && (
+          <Alert
+            severity='warning'
+            icon={<ShieldAlertIcon fontSize="small" />}
+            sx={{ borderRadius: '12px' }}
           >
-            No
-          </button>
-        </div>
+            No eligible FUP plans found. Create a plan with a lower download speed first.
+            Current plan speed: {formData.download_limit || 0} Mbps.
+          </Alert>
+        )}
       </div>
+    )}
+  </Box>
+</Stack>
 
-      {/* ── Free Trial fields ── */}
-      {enabled && (
-        <div className="px-4 py-5 bg-white grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Trial Duration */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-              Trial Duration (minutes) <span className="text-red-500">*</span>
-            </label>
-            <TextField
-              fullWidth
-              size="small"
-              className="myTextField"
-              type="number"
-              placeholder="e.g., 30"
-              inputProps={{ min: 1 }}
-              value={hotspotPackage.free_trial_duration_minutes || ""}
-              onChange={(e) => set("free_trial_duration_minutes", e.target.value)}
-              helperText="How long the trial lasts"
-              sx={focusSx}
-            />
-          </div>
+<style>{`
+  @keyframes fupFadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+`}</style>
 
-          {/* Trial Download Limit */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-              Trial Download Limit <span className="text-red-500">*</span>
-            </label>
-            <TextField
-              fullWidth
-              size="small"
-              className="myTextField"
-              placeholder="e.g., 100MB, 1GB"
-              value={hotspotPackage.free_trial_download_limit || ""}
-              onChange={(e) => set("free_trial_download_limit", e.target.value)}
-              helperText="Max download during trial"
-              sx={focusSx}
-              InputProps={{
-                startAdornment: (
-                  <FaLongArrowAltDown className="mr-2 text-amber-500" />
-                ),
-              }}
-            />
-          </div>
 
-          {/* Trial Upload Limit */}
-          <div className="sm:col-span-2">
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-              Trial Upload Limit <span className="text-red-500">*</span>
-            </label>
-            <TextField
-              fullWidth
-              size="small"
-              className="myTextField"
-              placeholder="e.g., 50MB, 500MB"
-              value={hotspotPackage.free_trial_upload_limit || ""}
-              onChange={(e) => set("free_trial_upload_limit", e.target.value)}
-              helperText="Max upload during trial"
-              sx={focusSx}
-              InputProps={{
-                startAdornment: (
-                  <FaLongArrowAltUp className="mr-2 text-amber-500" />
-                ),
-              }}
-            />
-          </div>
-        </div>
-      )}
-    </div>
-  );
+           <DialogActions>
+  <button
+    onClick={(e) => {
+      handleClose()
+      e.preventDefault()
+    }}
+    disabled={isloading}
+    className='bg-red-600 text-white rounded-3xl px-4 py-2
+      transform hover:scale-110 transition duration-500 hover:bg-red-200
+      text-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100' font-sans
+
+  >
+    Cancel
+  </button>
+
+  <button
+    type="submit"
+    disabled={isloading}
+    className='bg-black text-white rounded-3xl px-4 py-2 min-w-[110px]
+      transform hover:scale-110 transition duration-500 hover:bg-green-500
+      text-lg flex items-center justify-center gap-2
+      disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100'
+  >
+    {isloading ? (
+      <>
+        <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full
+         animate-spin" />
+        {editPackage ? <p className='font-sans
+'>Updating…</p> : <p className='font-sans
+'>Saving… </p>}
+      </>
+    ) : (
+      editPackage ? <p className='font-sans
+'>Update</p> : <p className='font-sans
+'>Save</p>
+    )}
+  </button>
+</DialogActions>
+            </form>
+          {showNotification &&   <PackageNotification/>}
+          {offlineerror   && <p className='text-red-500 font-sans font-extrabold '>Something went wrong please try again later
+          </p>}
+        </DialogContent>
+      
+      </Dialog>
+    </React.Fragment>
+     </ThemeProvider>
+
+
+  )
 }
 
-// ─── EditHotspotPackage ───────────────────────────────────────────────────────
-const EditHotspotPackage = ({
-  handleClose,
-  loading,
-  open,
-  hotspotPackage,
-  setHotspotPackage,
-  createHotspotPackage,
-  handleChangeTimeFrom,
-  handleChangeTimeUntil,
-  handleWeekdayChange,
-  editing,
-  nodes,
-  setNodes,
-  setSelectedRouter,
-  selectedRouter
-}) => {
-  const {
-    name,
-    validity,
-    download_limit,
-    upload_limit,
-    price,
-    validity_period_units,
-    shared_users,
-    location,
-  } = hotspotPackage;
-
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
-
-  const handleChangeHotspotPackage = (e) => {
-    const { value, id } = e.target;
-    setHotspotPackage({ ...hotspotPackage, [id]: value });
-  };
-
-  const { dateTimeValue } = useApplicationSettings();
-  const enable = !!hotspotPackage.enable_free_trial;
-
-  const [loadingRouters, setLoadingRouters] = useState(false);
-  const [routerDetails, setRouterDetails] = useState(null);
-  const [routers, setRouters] = useState([]);
-
-  const subdomain = window.location.hostname.split('.')[0];
-
-  const fetchRouters = useCallback(async () => {
-    try {
-      setLoadingRouters(true);
-      const response = await fetch('/api/routers', {
-        headers: { 'X-Subdomain': subdomain }
-      });
-      const data = await response.json();
-      setRouters(data || []);
-
-      // Pre-select if editing
-      // NOTE: was referencing an undefined `formData` before — fixed to use
-      // hotspotPackage, which is the actual source of truth for this form.
-      if (hotspotPackage?.id && hotspotPackage?.nas_router) {
-        setSelectedRouter(hotspotPackage.nas_router);
-        const router = data.find(r => r.name === hotspotPackage.nas_router);
-        if (router) setRouterDetails(router);
-      }
-    } catch (error) {
-      toast.error('Failed to load routers');
-    } finally {
-      setLoadingRouters(false);
-    }
-  }, [hotspotPackage, subdomain]);
-
-  useEffect(() => {
-    if (open) {
-      fetchRouters();
-    }
-  }, [open, fetchRouters]);
-
-  const handleRouterChange = (e) => {
-    const routerName = e.target.value;
-    setSelectedRouter(routerName);
-    const selected = routers.find(r => r.name === routerName);
-    setRouterDetails(selected || null);
-    setHotspotPackage({
-      ...hotspotPackage,
-      nas_router: selected?.name || ''
-    });
-  };
-
-  function useIsDarkMode() {
-    const [isDark, setIsDark] = useState(
-      () => typeof document !== 'undefined' &&
-        document.documentElement.classList.contains('dark')
-    );
-
-    useEffect(() => {
-      const root = document.documentElement;
-
-      const update = () => setIsDark(root.classList.contains('dark'));
-      update();
-
-      const observer = new MutationObserver(update);
-      observer.observe(root, { attributes: true, attributeFilter: ['class'] });
-
-      return () => observer.disconnect();
-    }, []);
-
-    return isDark;
-  }
-
-  const isDark = useIsDarkMode();
-
-  const tableTheme = useMemo(() => createTheme({
-    palette: {
-      mode: isDark ? 'dark' : 'light',
-      background: {
-        paper: isDark ? '#1e1e1e' : '#ffffff',
-        default: isDark ? '#1e1e1e' : '#ffffff',
-      },
-      text: {
-        primary: isDark ? '#f1f1f1' : '#1a1a1a',
-        secondary: isDark ? '#a3a3a3' : '#6b7280',
-      },
-    },
-  }), [isDark]);
-
-  return (
-    <ThemeProvider theme={tableTheme}>
-      <Toaster />
-
-      <React.Fragment>
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="alert-dialog-title"
-          fullScreen={fullScreen}
-          fullWidth={true}
-          maxWidth="lg"
-        >
-          <DialogContent sx={{ maxHeight: "90vh", overflowY: "auto" }}>
-            <form onSubmit={createHotspotPackage}>
-              {/* ── Header ── */}
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  {editing ? <p className="font-sans">Edit Hotspot Package</p> : <p className="font-sans">Create New Hotspot Package</p>}
-                </h2>
-                <p className="text-sm text-gray-500 mt-1 font-sans">
-                  Configure package details, limits, burst, and free trial options
-                </p>
-              </div>
-
-              <TextField
-                fullWidth
-                label="Package Name"
-                id="name"
-                value={name || ""}
-                onChange={handleChangeHotspotPackage}
-                className="myTextField"
-                placeholder="e.g., Daily Lite Bundle"
-                sx={focusSx}
-                margin="normal"
-                InputProps={{
-                  startAdornment: <IoWifiOutline className="mr-2" />,
-                }}
-              />
-
-              {/* ── Router Selection ──
-                  Always rendered regardless of the Free Trial toggle — a
-                  package (trial or not) still needs to be tied to a router. */}
-              <RouterSelectionSection
-                loadingRouters={loadingRouters}
-                routers={routers}
-                selectedRouter={selectedRouter}
-                handleRouterChange={handleRouterChange}
-                routerDetails={routerDetails}
-              />
-
-              {!enable && (
-                <>
-                  <div className="bg-blue-50 p-4 rounded-lg mb-6 font-sans">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                      📋 Basic Information
-                    </h3>
-
-                    {/* Price / Upload / Download row */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
-                      <TextField
-                        label={<p className="font-sans">Price (KES)</p>}
-                        id="price"
-                        type="number"
-                        value={price || ""}
-                        onChange={handleChangeHotspotPackage}
-                        className="myTextField"
-                        sx={focusSx}
-                        InputProps={{
-                          startAdornment: <span className="mr-2 font-bold">KES</span>,
-                        }}
-                      />
-
-                      <TextField
-                        label={<p className="font-sans">Upload Speed (Mbps) </p>}
-                        id="upload_limit"
-                        type="number"
-                        value={upload_limit || ""}
-                        onChange={handleChangeHotspotPackage}
-                        className="myTextField"
-                        sx={focusSx}
-                        InputProps={{
-                          startAdornment: (
-                            <FaLongArrowAltUp className="mr-2 text-blue-500" />
-                          ),
-                        }}
-                      />
-
-                      <TextField
-                        label={<p className="font-sans">Download Speed (Mbps)</p>}
-                        id="download_limit"
-                        type="number"
-                        value={download_limit || ""}
-                        onChange={handleChangeHotspotPackage}
-                        className="myTextField"
-                        sx={focusSx}
-                        InputProps={{
-                          startAdornment: (
-                            <FaLongArrowAltDown className="mr-2 text-green-500" />
-                          ),
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* ── SECTION 2: Validity & Timing ── */}
-                  <div className="bg-green-50 p-4 rounded-lg mb-6 font-sans">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                      ⏱️ Validity & Timing
-                    </h3>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                      <TextField
-                        label={<p className="font-sans">Validity Period </p>}
-                        id="validity"
-                        type="number"
-                        value={validity || ""}
-                        onChange={handleChangeHotspotPackage}
-                        className="myTextField"
-                        sx={focusSx}
-                        InputProps={{
-                          startAdornment: <LuCalendar1 className="mr-2" />,
-                        }}
-                      />
-
-                      <Autocomplete
-                        options={["days", "hours", "minutes"]}
-                        value={validity_period_units || ""}
-                        onChange={(event, newValue) => {
-                          setHotspotPackage({
-                            ...hotspotPackage,
-                            validity_period_units: newValue,
-                          });
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            label={<p className="font-sans">Period Units </p>}
-                            className="myTextField"
-                            sx={focusSx}
-                          />
-                        )}
-                        fullWidth
-                      />
-                    </div>
-
-                    <TextField
-                      fullWidth
-                      label={<p className="font-sans">Simultaneous Users Allowed </p>}
-                      id="shared_users"
-                      value={shared_users || ""}
-                      onChange={handleChangeHotspotPackage}
-                      className="myTextField"
-                      sx={focusSx}
-                      margin="normal"
-                      helperText={<p className="font-sans">Number of devices that can use this package simultaneously </p>}
-                    />
-
-                    {/* Time Pickers */}
-                    <DemoContainer components={["TimePicker", "TimePicker"]} sx={{ mt: 3 }}>
-                      <TimePicker
-                        label={<p className="font-sans"> Valid From </p>}
-                        value={hotspotPackage.valid_from}
-                        onChange={handleChangeTimeFrom}
-                        viewRenderers={{
-                          hours: renderTimeViewClock,
-                          minutes: renderTimeViewClock,
-                          seconds: renderTimeViewClock,
-                        }}
-                      />
-                      <TimePicker
-                        label={<p className="font-sans">Valid Until </p>}
-                        value={hotspotPackage.valid_until}
-                        onChange={handleChangeTimeUntil}
-                        viewRenderers={{
-                          hours: renderTimeViewClock,
-                          minutes: renderTimeViewClock,
-                          seconds: renderTimeViewClock,
-                        }}
-                      />
-                    </DemoContainer>
-
-                    {/* Weekdays */}
-                    <div className="mt-6">
-                      <p className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3 font-sans">
-                        📅 Valid Days
-                      </p>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-sans">
-                        {[
-                          "Monday",
-                          "Tuesday",
-                          "Wednesday",
-                          "Thursday",
-                          "Friday",
-                          "Saturday",
-                          "Sunday",
-                        ].map((day) => (
-                          <label
-                            key={day}
-                            className="flex items-center space-x-2 p-3 bg-white rounded-lg border-2 border-gray-200 cursor-pointer hover:border-green-500 hover:bg-green-50 transition"
-                          >
-                            <input
-                              type="checkbox"
-                              className="w-4 h-4 text-green-600 rounded border-gray-300"
-                              checked={hotspotPackage.weekdays?.includes(day) || false}
-                              onChange={() => handleWeekdayChange(day)}
-                            />
-                            <span className="text-sm font-medium text-gray-700">
-                              {day.slice(0, 3)}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {/* <Divider sx={{ my: 3 }} />
-
-            
-              <DeviceTypeSection
-                hotspotPackage={hotspotPackage}
-                setHotspotPackage={setHotspotPackage}
-              /> */}
-
-              <Divider sx={{ my: 3 }} />
-
-              {/* ── SECTION 4: Burst ── */}
-              {!enable && (
-                <BurstSection
-                  hotspotPackage={hotspotPackage}
-                  setHotspotPackage={setHotspotPackage}
-                />
-              )}
-
-              {/* ── SECTION 5: Free Trial ── */}
-              <FreeTrialSection
-                hotspotPackage={hotspotPackage}
-                setHotspotPackage={setHotspotPackage}
-              />
-
-              {/* ── Actions ── */}
-              <DialogActions sx={{ mt: 6, gap: 2 }}>
-                <button
-                  type="button"
-                  className="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg font-semibold hover:bg-gray-400 transition font-sans"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleClose();
-                  }}
-                >
-                  Cancel
-                </button>
-
-                <Button
-                  variant="default"
-                  type="submit"
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition flex items-center gap-2"
-                >
-                  {editing ? <p className="font-sans">Update Package</p> : <p className="font-sans">Create Package</p>}
-
-                  {loading && (
-                    <span className="w-4 h-4 border-2 border-white/40 border-t-blue-600 rounded-full animate-spin" />
-                  )}
-                </Button>
-              </DialogActions>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </React.Fragment>
-    </ThemeProvider>
-  );
-};
-
-export default EditHotspotPackage;
+export default EditPackage

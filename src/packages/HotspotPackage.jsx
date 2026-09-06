@@ -8,7 +8,8 @@ import { IconButton, Typography,
   Divider, 
    Card,
   CardContent,
-  Grid, } from '@mui/material';
+  Grid,
+  Switch, } from '@mui/material';
   import {
   Payment as PaymentIcon,
   Description as DescriptionIcon,
@@ -19,7 +20,10 @@ import { IconButton, Typography,
   Save as SaveIcon,
   Close as CloseIcon,
   CheckCircle as CheckCircleIcon,
-  Cancel as CancelIcon
+  Cancel as CancelIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+  Sync as SyncIcon
 } from '@mui/icons-material';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import {  useState, useCallback} from 'react'
@@ -45,7 +49,6 @@ import { useMemo } from 'react';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Chip, Tooltip } from '@mui/material';
-import { RefreshCw } from 'lucide-react';
 
 
 
@@ -68,6 +71,10 @@ const [isSearching, setIsSearching] = useState(false); // New state for search l
 // bulk-sync button — these drive the spinner / disabled states.
 const [syncingIds, setSyncingIds] = useState({});
 const [bulkSyncing, setBulkSyncing] = useState(false);
+
+// Per-row "toggling" flags for the enable/disable-on-hotspot-page switch —
+// mirrors the syncingIds pattern above.
+const [togglingIds, setTogglingIds] = useState({});
 
 const [hotspotPackage, setHotspotPackage] = useState({
   name: '',
@@ -93,7 +100,8 @@ const [hotspotPackage, setHotspotPackage] = useState({
   free_trial_duration_minutes: '',
   free_trial_download_limit: '',
   free_trial_upload_limit: '',
-  nas_router: ''
+  nas_router: '',
+  enabled: true
 
 })
 const [selectedRouter, setSelectedRouter] = useState('')
@@ -107,8 +115,8 @@ const [editing, setEditing] = useState(false);
 const handleWeekdayChange = (day) => {
   setHotspotPackage((prev) => {
     const updatedWeekdays = prev.weekdays?.includes(day)
-      ? prev.weekdays?.filter((d) => d !== day) // Remove day if already selected
-      : [...(prev.weekdays || []), day]; // Add day if not selected
+      ? prev.weekdays?.filter((d) => d !== day) 
+      : [...(prev.weekdays || []), day]; 
 
     return { ...prev, weekdays: updatedWeekdays };
   });
@@ -227,6 +235,79 @@ const handleChangeTimeUntil = (date)=> {
   );
 
 
+// Syncs a single package. Sets syncingIds[id] = true for the duration of the
+// request so the row's Sync button/chip can show a spinner and disable
+// itself.
+const syncPackageToMikrotik = async (id) => {
+  setSyncingIds(prev => ({ ...prev, [id]: true }));
+  try {
+    const response = await fetch(`/api/hotspot_packages/${id}/sync_to_mikrotik?router_name=${settingsformData.router_name}`, {
+      method: 'POST',
+      headers: { 'X-Subdomain': subdomain },
+    });
+    const newData = await response.json();
+    if (response.ok) {
+      setPackages(prev => prev.map(p => p.id === id ? { ...p, ...newData } : p));
+      if (newData.sync_status === 'synced') {
+        toast.success(<p className="font-sans">Package synced to router</p>, { position: 'top-center', duration: 3000 });
+      } else {
+        toast.error(<p className="font-sans">{newData.sync_error || 'Sync failed'}</p>, { position: 'top-center', duration: 4000 });
+      }
+    } else {
+      toast.error(<p className="font-sans">{newData.error || 'Sync request failed'}</p>, { position: 'top-center', duration: 4000 });
+    }
+  } catch {
+    toast.error(<p className="font-sans">Network error syncing package</p>, { position: 'top-center', duration: 4000 });
+  } finally {
+    setSyncingIds(prev => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }
+};
+
+// Flips whether a package shows up as an option on the customer-facing
+// hotspot page. Optimistically updates the row, then reconciles with
+// whatever the server actually persisted; reverts on failure.
+const togglePackageStatus = async (id, nextEnabled) => {
+  setTogglingIds(prev => ({ ...prev, [id]: true }));
+  setPackages(prev => prev.map(p => p.id === id ? { ...p, enabled: nextEnabled } : p));
+  try {
+    const response = await fetch(`/api/hotspot_packages/${id}/toggle_status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Subdomain': subdomain,
+      },
+      body: JSON.stringify({ enabled: nextEnabled }),
+    });
+    const newData = await response.json();
+    if (response.ok) {
+      setPackages(prev => prev.map(p => p.id === id ? { ...p, ...newData } : p));
+      toast.success(
+        <p className="font-sans">
+          {nextEnabled ? 'Package is now visible on the hotspot page' : 'Package is now hidden from the hotspot page'}
+        </p>,
+        { position: 'top-center', duration: 3000 }
+      );
+    } else {
+      setPackages(prev => prev.map(p => p.id === id ? { ...p, enabled: !nextEnabled } : p));
+      toast.error(<p className="font-sans">{newData.error || 'Failed to update package status'}</p>, { position: 'top-center', duration: 4000 });
+    }
+  } catch {
+    setPackages(prev => prev.map(p => p.id === id ? { ...p, enabled: !nextEnabled } : p));
+    toast.error(<p className="font-sans">Network error updating package status</p>, { position: 'top-center', duration: 4000 });
+  } finally {
+    setTogglingIds(prev => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }
+};
+
+
 const columns = [
   {title: 'names', field: 'name', render: (rowData) => (
     <span className="font-sans font-medium text-gray-800 dark:text-white">{rowData.name}</span>
@@ -261,6 +342,37 @@ const columns = [
       <span className="font-sans text-xs text-gray-600 dark:text-gray-300">{rowData.nas_router || 'N/A'}</span>
     ) },
 {
+  title: 'On Hotspot Page',
+  field: 'enabled',
+  cellStyle: { minWidth: 150, whiteSpace: 'nowrap' },
+  headerStyle: { minWidth: 150, whiteSpace: 'nowrap' },
+  render: (rowData) => {
+    const isToggling = !!togglingIds[rowData.id];
+    const isEnabled = rowData.enabled !== false; // undefined (pre-migration rows) treated as enabled
+
+    return (
+      <div className="flex items-center gap-1.5 font-sans" onClick={(e) => e.stopPropagation()}>
+        <Tooltip title={isEnabled ? 'Visible to customers on the hotspot page' : 'Hidden from the hotspot page'}>
+          <span style={{ display: 'flex', alignItems: 'center' }}>
+            {isEnabled ? (
+              <VisibilityIcon fontSize="small" style={{ color: '#059669' }} />
+            ) : (
+              <VisibilityOffIcon fontSize="small" style={{ color: '#9ca3af' }} />
+            )}
+          </span>
+        </Tooltip>
+        <Switch
+          size="small"
+          checked={isEnabled}
+          disabled={isToggling}
+          onChange={(e) => togglePackageStatus(rowData.id, e.target.checked)}
+        />
+        {isToggling && <CircularProgress size={14} />}
+      </div>
+    );
+  }
+},
+{
     title: 'Sync',
     field: 'sync_status',
     cellStyle: { minWidth: 170, whiteSpace: 'nowrap' },
@@ -294,7 +406,7 @@ const columns = [
                 disabled={isSyncing}
                 onClick={(e) => { e.stopPropagation(); syncPackageToMikrotik(rowData.id); }}
               >
-                <RefreshCw className={`w-3.5 h-3.5 text-blue-500 ${isSyncing ? 'animate-spin' : ''}`} />
+                <SyncIcon className={isSyncing ? 'animate-spin' : ''} fontSize="small" style={{ color: '#3b82f6' }} />
               </IconButton>
             </span>
           </Tooltip>
@@ -590,45 +702,6 @@ setTimeout(() => {
 
 
 
-
-
-
-
-
-
-
-// Syncs a single package. Sets syncingIds[id] = true for the duration of the
-// request so the row's Sync button/chip can show a spinner and disable
-// itself — this is the loading state that was previously missing entirely.
-const syncPackageToMikrotik = async (id) => {
-  setSyncingIds(prev => ({ ...prev, [id]: true }));
-  try {
-    const response = await fetch(`/api/hotspot_packages/${id}/sync_to_mikrotik?router_name=${settingsformData.router_name}`, {
-      method: 'POST',
-      headers: { 'X-Subdomain': subdomain },
-    });
-    const newData = await response.json();
-    if (response.ok) {
-      setPackages(prev => prev.map(p => p.id === id ? { ...p, ...newData } : p));
-      if (newData.sync_status === 'synced') {
-        toast.success(<p className="font-sans">Package synced to router</p>, { position: 'top-center', duration: 3000 });
-      } else {
-        toast.error(<p className="font-sans">{newData.sync_error || 'Sync failed'}</p>, { position: 'top-center', duration: 4000 });
-      }
-    } else {
-      toast.error(<p className="font-sans">{newData.error || 'Sync request failed'}</p>, { position: 'top-center', duration: 4000 });
-    }
-  } catch {
-    toast.error(<p className="font-sans">Network error syncing package</p>, { position: 'top-center', duration: 4000 });
-  } finally {
-    setSyncingIds(prev => {
-      const next = { ...prev };
-      delete next[id];
-      return next;
-    });
-  }
-};
-
 // bulk_sync_to_mikrotik is async on the backend: it dispatches a background
 // job and immediately returns { message, queued } — NOT a per-package
 // results array. So there's nothing to `.find()` here. We optimistically
@@ -881,7 +954,7 @@ const deleteHotspotPackage = async (id) => {
         {
           icon: () => <AddIcon  onClick={()=> {
             setOpen(true)
-            setHotspotPackage({})
+            setHotspotPackage({ enabled: true })
             setEditing(false)
           }  } />,
           isFreeAction: true,
@@ -894,7 +967,7 @@ const deleteHotspotPackage = async (id) => {
               onClick={bulkSyncPackagesToMikrotik}
               disabled={bulkSyncing}
             >
-              <RefreshCw className={`w-4 h-4 ${bulkSyncing ? 'animate-spin' : ''}`} />
+              <SyncIcon className={bulkSyncing ? 'animate-spin' : ''} fontSize="small" />
               <span className="text-sm font-medium font-sans">{bulkSyncing ? 'Syncing…' : 'Sync All'}</span>
             </button>
           ),

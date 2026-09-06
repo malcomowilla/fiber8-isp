@@ -426,14 +426,15 @@ useEffect(() => {
                  location.pathname !== '/admin/hotspot-bypass' &&
                   location.pathname !== '/admin/free-trial-users' &&
                    location.pathname !== '/admin/hotspot-promotions' &&
-                                      location.pathname !== '/admin/hotspot-page-designer' &&
-                                      location.pathname !== '/admin/network-map' &&
-                                      location.pathname !== '/admin/tv-plans' &&
-                                      location.pathname !== '/admin/support-tickets' &&
-                                      location.pathname !== '/admin/hotspot-sms-templates' &&
-                                      location.pathname !== '/admin/network-troubleshooting' &&
-                                      location.pathname !== '/admin/incidents' &&
-                                      location.pathname !== '/admin/stats-uptime' &&
+                       location.pathname !== '/admin/hotspot-page-designer' &&
+                location.pathname !== '/admin/network-map' &&
+                 location.pathname !== '/admin/tv-plans' &&
+                  location.pathname !== '/admin/support-tickets' &&
+                    location.pathname !== '/admin/hotspot-sms-templates' &&
+                    location.pathname !== '/admin/network-troubleshooting' &&
+                    location.pathname !== '/admin/incidents' &&
+                location.pathname !== '/admin/stats-uptime' &&
+                location.pathname !== '/admin/networks-wireguard-config' &&
                                       
                                       
 
