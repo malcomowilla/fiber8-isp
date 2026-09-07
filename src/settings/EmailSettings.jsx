@@ -23,26 +23,28 @@ const fieldSx = {
   width: '100%',
   '& .MuiOutlinedInput-root': {
     borderRadius: '14px',
-    backgroundColor: 'rgba(99, 102, 241, 0.04)',
+    backgroundColor: 'rgba(16, 185, 129, 0.04)', // 4% Emerald Green background
+
     transition: 'background-color 0.2s ease',
     '& fieldset': {
-      borderColor: 'rgba(99, 102, 241, 0.18)',
+      borderColor: 'rgba(16, 185, 129, 0.18)', // 18% Green border
     },
     '&:hover fieldset': {
-      borderColor: 'rgba(99, 102, 241, 0.4)',
+      borderColor: 'rgba(16, 185, 129, 0.4)', // 40% Green hover border
     },
     '&.Mui-focused': {
-      backgroundColor: 'rgba(99, 102, 241, 0.06)',
+      backgroundColor: 'rgba(16, 185, 129, 0.06)', // 6% Green focused background
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#6366f1',
+      borderColor: '#10b981', // Solid Emerald Green focused border
       borderWidth: '2px',
     },
   },
   '& label.Mui-focused': {
-    color: '#6366f1',
+    color: '#10b981', // Solid Emerald Green focused label text
   },
 };
+
 
 const iconSx = { fontSize: '1.05rem', color: '#6366f1' };
 
@@ -55,7 +57,8 @@ const GradientButton = styled(motion.button)`
   font-size: 0.95rem;
   font-weight: 600;
   color: white;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+
   border: none;
   border-radius: 999px;
   cursor: pointer;
@@ -73,7 +76,9 @@ const GradientButton = styled(motion.button)`
 `;
 
 const SectionCard = ({ title, subtitle, children }) => (
-  <div className="rounded-2xl border border-indigo-500/15 dark:border-white/10 bg-indigo-500/[0.03] dark:bg-white/[0.03] p-5 sm:p-6 mb-5">
+  <div className="rounded-2xl border border-indigo-500/15
+   dark:border-white/10 bg-green-500/[0.03] dark:bg-white/[0.03]
+    p-5 sm:p-6 mb-5">
     <div className="mb-4">
       <p className="dark:text-white text-black  font-semibold text-sm">{title}</p>
       {subtitle && (

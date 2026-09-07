@@ -15,33 +15,36 @@ import { useState, useEffect, useCallback, lazy } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 import Backdrop from '../backdrop/Backdrop'
 
-const SettingsNotification = lazy(() => import('../notification/SettingsNotification'))
 
-// Shared field styling — a single source of truth instead of a repeated sx block per field
+const SettingsNotification = lazy(() => import('../notification/SettingsNotification'))
 const fieldSx = {
   width: '100%',
   '& .MuiOutlinedInput-root': {
     borderRadius: '14px',
-    backgroundColor: 'rgba(99, 102, 241, 0.04)',
-    transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
+    backgroundColor: 'rgba(16, 185, 129, 0.04)', // 4% Emerald Green background
+
+    transition: 'background-color 0.2s ease',
     '& fieldset': {
-      borderColor: 'rgba(99, 102, 241, 0.18)',
+      borderColor: 'rgba(16, 185, 129, 0.18)', // 18% Green border
     },
     '&:hover fieldset': {
-      borderColor: 'rgba(99, 102, 241, 0.4)',
+      borderColor: 'rgba(16, 185, 129, 0.4)', // 40% Green hover border
     },
     '&.Mui-focused': {
-      backgroundColor: 'rgba(99, 102, 241, 0.06)',
+      backgroundColor: 'rgba(16, 185, 129, 0.06)', // 6% Green focused background
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#6366f1',
+      borderColor: '#10b981', // Solid Emerald Green focused border
       borderWidth: '2px',
     },
   },
   '& label.Mui-focused': {
-    color: '#6366f1',
+    color: '#10b981', // Solid Emerald Green focused label text
   },
 };
+
+
+
 
 const GradientButton = styled(motion.button)`
   margin-top: 28px;
@@ -52,7 +55,8 @@ const GradientButton = styled(motion.button)`
   font-size: 0.92rem;
   font-weight: 600;
   color: white;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+
   border: none;
   border-radius: 999px;
   cursor: pointer;
