@@ -328,9 +328,11 @@ export default function HotspotPageDesigner() {
               {saving ? <RefreshCw size={15} className="animate-spin" /> : <Save size={15} />}
               {saving ? 'Saving…' : 'Save Design'}
             </button>
+
+            
             <button onClick={() => setShowPublishConfirm(true)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white"
-              style={{ background: 'linear-gradient(135deg,#38bdf8,#a78bfa)' }}>
+              style={{ background: 'green' }}>
               <UploadCloud size={15} /> Publish to Router
             </button>
           </div>

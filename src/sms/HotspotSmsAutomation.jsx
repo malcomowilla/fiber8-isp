@@ -180,7 +180,7 @@ function TemplateCard({ template, variables, onChange, onPreview }) {
           <span className="text-sm font-semibold text-gray-800">{template.title}</span>
           <span
             className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${
-              template.active ? 'bg-teal-50 text-teal-700' : 'bg-gray-100 text-gray-500'
+              template.active ? ' text-teal-700' : ' text-gray-500'
             }`}
           >
             {template.active ? 'Active' : 'Inactive'}
