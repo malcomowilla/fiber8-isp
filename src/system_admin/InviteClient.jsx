@@ -32,31 +32,35 @@ function useIsDarkMode() {
   return isDark;
 }
 
-const InviteClient = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    phone_number: '',
-    userName: '',
-    domainSubdomain: '',
-    emailApiKey: '',
-    senderEmail: '',
-    smtpPassword: '',
-    smtpHost: '',
-    smtpUsername: '',
-    plan: '',
-    hotspot_plan: '',
-    password: '',
-    company_name: '',
-    wallet_admin: false,
-  });
+const EMPTY_FORM_DATA = {
+  email: '',
+  phone_number: '',
+  username: '',
+  domainSubdomain: '',
+  emailApiKey: '',
+  senderEmail: '',
+  smtpPassword: '',
+  smtpHost: '',
+  smtpUsername: '',
+  plan: '',
+  hotspot_plan: '',
+  password: '',
+  company_name: '',
+  wallet_admin: false,
+};
 
-  const [errors, setErrors] = useState({
-    email: '',
-    phone_number: '',
-    username: '',
-    plan: '',
-    company_name: '',
-  });
+const EMPTY_ERRORS = {
+  email: '',
+  phone_number: '',
+  username: '',
+  plan: '',
+  company_name: '',
+};
+
+const InviteClient = () => {
+  const [formData, setFormData] = useState(EMPTY_FORM_DATA);
+
+  const [errors, setErrors] = useState(EMPTY_ERRORS);
 
   const [loading, setLoading] = useState(false);
   const [openLoad, setOpenLoad] = useState(false);
@@ -95,7 +99,15 @@ const InviteClient = () => {
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const handleCloseAddClient = () => setAddClient(false);
-  const handleAddClient = () => setAddClient(true);
+
+  // Reset formData/errors before opening the Add modal — otherwise stale
+  // data from a previously clicked row (e.g. an id) lingers in formData
+  // and handleInvite mistakes this for an edit (PATCH instead of POST).
+  const handleAddClient = () => {
+    setFormData(EMPTY_FORM_DATA);
+    setErrors(EMPTY_ERRORS);
+    setAddClient(true);
+  };
 
   const subdomain = window.location.hostname.split('.')[0];
 
@@ -267,20 +279,8 @@ const InviteClient = () => {
           toaster.success('Client added successfully', { duration: 5000, icon: '✅' });
           fetchClients();
         }
-        setFormData({
-          email: '',
-          phone_number: '',
-          user_name: '',
-          company_name: '',
-          domainSubdomain: '',
-          emailApiKey: '',
-          senderEmail: '',
-          smtpPassword: '',
-          password: '',
-          smtpHost: '',
-          smtpUsername: '',
-          plan: '',
-        });
+        setFormData(EMPTY_FORM_DATA);
+        setErrors(EMPTY_ERRORS);
       } else {
         setAddClient(false);
         toaster.error('Something went wrong, please try again', { duration: 5000, position: 'top-center' });
