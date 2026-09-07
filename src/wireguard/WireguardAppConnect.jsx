@@ -26,7 +26,7 @@ const CSS = `
   .wgac-mono   { font-family: 'JetBrains Mono', monospace; }
 
   @keyframes wgac-spin { to { transform: rotate(360deg); } }
-  @keyframes wgac-glow { from { box-shadow: 0 0 0 rgba(99,102,241,0); } to { box-shadow: 0 0 24px rgba(99,102,241,.22); } }
+  @keyframes wgac-glow { from { box-shadow: 0 0 0 rgba(16,185,129,0); } to { box-shadow: 0 0 24px rgba(16,185,129,.22); } }
 
   .wgac-card {
     background: #fff; border: 1px solid #e5e7eb; border-radius: 16px;
@@ -38,16 +38,16 @@ const CSS = `
     color:#6b7280; font-size:13px; font-weight:600; cursor:pointer;
     transition: all .15s; white-space: nowrap;
   }
-  .wgac-tab.active { background:#eef2ff; border-color:#6366f1; color:#4f46e5; }
+  .wgac-tab.active { background:#ecfdf5; border-color:#10b981; color:#059669; }
   .wgac-tab:hover:not(.active) { border-color:#d1d5db; color:#374151; }
 
   .wgac-btn-primary {
     display:inline-flex; align-items:center; gap:8px; padding:11px 22px;
-    background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff;
+    background:linear-gradient(135deg,#10b981,#059669); color:#fff;
     border:none; border-radius:10px; font-size:14px; font-weight:600;
     cursor:pointer; transition: transform .15s, box-shadow .15s; font-family:'DM Sans',sans-serif;
   }
-  .wgac-btn-primary:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 8px 24px rgba(99,102,241,.3); }
+  .wgac-btn-primary:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 8px 24px rgba(16,185,129,.3); }
   .wgac-btn-primary:disabled { opacity:.5; cursor:not-allowed; }
   .wgac-btn-ghost {
     display:inline-flex; align-items:center; gap:6px; padding:9px 16px;
@@ -246,8 +246,8 @@ export default function WireguardAppConnect() {
       <div className="wgac-card" style={{ padding: '28px 32px' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 22 }}>
-          <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(99,102,241,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <ShieldOutlinedIcon style={{ fontSize: 18, color: '#6366f1' }} />
+          <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(16,185,129,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ShieldOutlinedIcon style={{ fontSize: 18, color: '#10b981' }} />
           </div>
           <div>
             <h2 style={{ fontSize: 17, fontWeight: 700, color: '#111827', margin: 0 }}>Connect Your Device via WireGuard App</h2>
@@ -255,9 +255,9 @@ export default function WireguardAppConnect() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 8, padding: '10px 14px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, marginBottom: 24 }}>
-          <InfoOutlinedIcon style={{ fontSize: 16, color: '#2563eb', flexShrink: 0, marginTop: 1 }} />
-          <p style={{ fontSize: 12, color: '#1e40af', margin: 0, lineHeight: 1.5 }}>
+        <div style={{ display: 'flex', gap: 8, padding: '10px 14px', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: 10, marginBottom: 24 }}>
+          <InfoOutlinedIcon style={{ fontSize: 16, color: '#059669', flexShrink: 0, marginTop: 1 }} />
+          <p style={{ fontSize: 12, color: '#065f46', margin: 0, lineHeight: 1.5 }}>
             This gives your device its own tunnel into the network. It doesn't touch or depend on any
             router onboarding — generate it whenever you need it.
           </p>
@@ -279,7 +279,7 @@ export default function WireguardAppConnect() {
           {/* Left: instructions */}
           <div>
             <a href={active.downloadUrl} target="_blank" rel="noreferrer"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#4f46e5', textDecoration: 'none', marginBottom: 16 }}>
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#059669', textDecoration: 'none', marginBottom: 16 }}>
               <DownloadIcon style={{ fontSize: 16 }} /> {active.downloadLabel} <OpenInNewIcon style={{ fontSize: 13 }} />
             </a>
 
@@ -303,7 +303,7 @@ export default function WireguardAppConnect() {
           <div style={{ borderLeft: '1px solid #f3f4f6', paddingLeft: 28 }}>
             {!conn ? (
               <div style={{ textAlign: 'center', padding: '24px 0' }}>
-                <QrCode2Icon style={{ fontSize: 40, color: '#c7d2fe', marginBottom: 12 }} />
+                <QrCode2Icon style={{ fontSize: 40, color: '#a7f3d0', marginBottom: 12 }} />
                 <p style={{ fontSize: 12, color: '#9ca3af', margin: '0 0 16px', maxWidth: 220, marginLeft: 'auto', marginRight: 'auto' }}>
                   Generate a QR code (and config file) for this device.
                 </p>
@@ -334,16 +334,16 @@ export default function WireguardAppConnect() {
                 {/* Tunnel status */}
                 <div style={{
                   padding: '14px 16px', borderRadius: 10,
-                  background: tunnelUp ? '#f0fdf4' : polling ? '#eef2ff' : '#f9fafb',
-                  border: `1px solid ${tunnelUp ? '#bbf7d0' : polling ? '#c7d2fe' : '#e5e7eb'}`,
+                  background: tunnelUp ? '#f0fdf4' : polling ? '#ecfdf5' : '#f9fafb',
+                  border: `1px solid ${tunnelUp ? '#bbf7d0' : polling ? '#a7f3d0' : '#e5e7eb'}`,
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: tunnelUp || polling ? 4 : 0 }}>
                     {tunnelUp
                       ? <CheckCircleIcon style={{ fontSize: 18, color: '#10b981' }} />
                       : polling
-                        ? <div style={{ width: 14, height: 14, border: '2px solid rgba(99,102,241,.25)', borderTop: '2px solid #6366f1', borderRadius: '50%', animation: 'wgac-spin 1s linear infinite' }} />
+                        ? <div style={{ width: 14, height: 14, border: '2px solid rgba(16,185,129,.25)', borderTop: '2px solid #10b981', borderRadius: '50%', animation: 'wgac-spin 1s linear infinite' }} />
                         : <ErrorOutlineIcon style={{ fontSize: 17, color: '#9ca3af' }} />}
-                    <span style={{ fontSize: 13, fontWeight: 600, color: tunnelUp ? '#166534' : polling ? '#4338ca' : '#6b7280' }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: tunnelUp ? '#166534' : polling ? '#065f46' : '#6b7280' }}>
                       {tunnelUp ? 'Your VPN tunnel is up!' : polling ? 'Checking for handshake…' : 'Not connected yet'}
                     </span>
                   </div>

@@ -245,7 +245,8 @@ const EmailSettings = () => {
                 onChange={handleChange}
                 fullWidth
                 className="myTextField"
-                InputProps={{ startAdornment: <MdDns className="mr-2" style={{ color: '#6366f1' }} /> }}
+                InputProps={{ startAdornment: <MdDns className="mr-2" style={{ color: '#10b981'
+ }} /> }}
                 sx={fieldSx}
               />
               <TextField
@@ -255,7 +256,8 @@ const EmailSettings = () => {
                 className="myTextField"
                 onChange={handleChange}
                 fullWidth
-                InputProps={{ startAdornment: <MdDns className="mr-2" style={{ color: '#6366f1' }} /> }}
+                InputProps={{ startAdornment: <MdDns className="mr-2" style={{ color: '#10b981'
+ }} /> }}
                 sx={fieldSx}
               />
               <TextField
@@ -265,7 +267,8 @@ const EmailSettings = () => {
                 className="myTextField"
                 onChange={handleChange}
                 fullWidth
-                InputProps={{ startAdornment: <MdAttachEmail className="mr-2" style={{ color: '#6366f1' }} /> }}
+                InputProps={{ startAdornment: <MdAttachEmail className="mr-2" style={{ color: '#10b981'
+ }} /> }}
                 sx={fieldSx}
               />
               <TextField
@@ -277,7 +280,8 @@ const EmailSettings = () => {
                 fullWidth
                 type={showPassword ? 'text' : 'password'}
                 InputProps={{
-                  startAdornment: <TbLockPassword className="mr-2" style={{ color: '#6366f1' }} />,
+                  startAdornment: <TbLockPassword className="mr-2" style={{ color: '#10b981'
+ }} />,
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={() => setShowPassword((v) => !v)} edge="end" size="small">
@@ -316,7 +320,8 @@ const EmailSettings = () => {
                 onChange={handleChange}
                 fullWidth
                 className="myTextField"
-                InputProps={{ startAdornment: <MdAlternateEmail className="mr-2" style={{ color: '#6366f1' }} /> }}
+                InputProps={{ startAdornment: <MdAlternateEmail className="mr-2" style={{ color: '#10b981'
+ }} /> }}
                 sx={fieldSx}
               />
             </SectionCard>
@@ -332,7 +337,8 @@ const EmailSettings = () => {
                   fullWidth
                   type={showApiKey ? 'text' : 'password'}
                   InputProps={{
-                    startAdornment: <FaKey className="mr-2" style={{ color: '#6366f1' }} />,
+                    startAdornment: <FaKey className="mr-2" style={{ color: '#10b981'
+ }} />,
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton onClick={() => setShowApiKey((v) => !v)} edge="end" size="small">

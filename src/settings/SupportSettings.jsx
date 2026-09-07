@@ -273,7 +273,9 @@ const SupportSettings = () => {
                                         whileHover={{ scale: 1.08, rotate: [0, 8, -8, 0] }}
                                         transition={{ duration: 0.45 }}
                                         className="flex items-center justify-center w-10 h-10 rounded-xl shadow-md"
-                                        style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' }}
+                                        style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}
+
+
                                     >
                                         <SupportAgentRoundedIcon sx={{ fontSize: '1.4rem', color: 'white' }} />
                                     </motion.div>
@@ -310,7 +312,8 @@ const SupportSettings = () => {
                                     label="Prefix"
                                     InputProps={{
                                         startAdornment: <TagRoundedIcon sx={{ fontSize: '1.1rem', mr: 1,
-                                             color: '#6366f1' }} />,
+                                             color: '#10b981'
+ }} />,
                                     }}
                                     helperText={
                                         <span className="dark:text-white/40 text-black/40
@@ -330,7 +333,8 @@ const SupportSettings = () => {
                                     fullWidth
                                     label="Minimum Digits"
                                     InputProps={{
-                                        startAdornment: <PinRoundedIcon sx={{ fontSize: '1.1rem', mr: 1, color: '#6366f1' }} />,
+                                        startAdornment: <PinRoundedIcon sx={{ fontSize: '1.1rem', mr: 1, color: '#10b981'
+ }} />,
                                     }}
                                     helperText={
                                         <span className="dark:text-white/40 text-black/40 text-xs ">

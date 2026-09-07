@@ -16,7 +16,6 @@ import {
   Phone,
   Person,
   Business,
-  Lock,
   Close,
   PersonAddAlt,
 } from '@mui/icons-material';
@@ -212,25 +211,9 @@ const AddClient = ({
                       ),
                     }}
                   />
-                  <TextField
-                    label="Client password"
-                    name="password"
-                    type="password"
-                    className='myTextField'
-                    value={formData.password}
-                    onChange={handleChange}
-                    error={!!errors.password}
-                    helperText={errors.password}
-                    fullWidth
-                    sx={fieldSx}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Lock fontSize="small" color="action" />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
+                  <p className="text-xs text-slate-400 dark:text-slate-500 -mt-1">
+                    A password will be generated automatically and emailed to the client along with their login link.
+                  </p>
                 </div>
 
                 <div className="flex gap-3 mt-6">

@@ -243,7 +243,12 @@ const InviteClient = () => {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
-        body: JSON.stringify({ ...formData, plan: formData.plan, wallet_admin: formData.wallet_admin }),
+        body: JSON.stringify({
+          ...formData,
+          plan: formData.plan,
+          wallet_admin: formData.wallet_admin,
+          onboarding: !formData.id, // true on create, false on plain edits
+        }),
       });
 
       const newData = await response.json();
@@ -287,7 +292,6 @@ const InviteClient = () => {
       setOpenLoad(false);
     }
   };
-
   const defaultOptions = {
     loop: true,
     autoplay: true,
