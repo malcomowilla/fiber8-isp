@@ -323,7 +323,8 @@ export default function HotspotPageDesigner() {
           </div>
           <div className="flex items-center gap-3">
             <button onClick={saveDesign} disabled={saving}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-green-100 dark:bg-green-800
+               hover:bg-green-200 dark:hover:bg-green-700 transition-colors">
               {saving ? <RefreshCw size={15} className="animate-spin" /> : <Save size={15} />}
               {saving ? 'Saving…' : 'Save Design'}
             </button>
@@ -631,7 +632,7 @@ export default function HotspotPageDesigner() {
                 </button>
                 <button onClick={publishDesign} disabled={publishing}
                   className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white"
-                  style={{ background: 'linear-gradient(135deg,#38bdf8,#a78bfa)' }}>
+                  style={{ background: 'linear-gradient(135deg, #34d399, #059669)' }}>
                   {publishing ? 'Publishing…' : 'Confirm Publish'}
                 </button>
               </div>
