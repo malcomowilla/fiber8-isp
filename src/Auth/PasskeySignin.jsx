@@ -341,7 +341,8 @@ const PasskeySignin = () => {
                   whileTap={{ scale: isBusy ? 1 : 0.98 }}
                   type="submit"
                   disabled={isBusy}
-                  className="w-full py-3 px-4 rounded-xl font-medium font-sans text-white
+                  className="w-full py-3 px-4 rounded-xl font-medium
+                   font-sans text-white
                     bg-gradient-to-r from-green-500 to-green-600
                     shadow-lg shadow-blue-900/30
                     hover:from-green-600 hover:to-green-700

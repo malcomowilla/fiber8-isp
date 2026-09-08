@@ -53,7 +53,7 @@ function ResetPassword() {
         setMessage(data.message);
         setError("");
       } else {
-        toast.error('failed to send reset email', {
+        toast.error(data.error, {
           duration: 4000,
           position: 'top-center',
         })
@@ -97,7 +97,7 @@ function ResetPassword() {
 
           <div className="absolute inset-0 z-0">
     <img
-      src="/images/Telecommunications-Aitechs.jpg" // 
+      src="/images/Telecommunications-Aitechs.jpg" 
       alt="Network Background"
       className="w-full h-full object-cover"
     />
@@ -109,7 +109,7 @@ function ResetPassword() {
     {[...Array(20)].map((_, i) => (
       <div 
         key={i}
-        className="absolute rounded-full bg-blue-400 animate-spin"
+        className="absolute rounded-full bg-green-400 animate-spin"
         style={{
           width: `${Math.random() * 10 + 5}px`,
           height: `${Math.random() * 10 + 5}px`,
@@ -126,12 +126,14 @@ function ResetPassword() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="w-full max-w-md p-6 z-10
-          bg-white/10 backdrop-blur-md rounded-xl shadow-2xl p-8 border border-white/20"
+          className="w-full max-w-md  z-10
+          bg-white/10 backdrop-blur-md rounded-xl shadow-2xl p-8 border
+           border-white/20"
         >
           <div className="flex flex-col items-center">
           <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center p-4 bg-blue-600/20 rounded-full">
+        <div className="inline-flex items-center justify-center p-4
+         bg-green-600/20 rounded-full">
         
 <img
 className="w-24 h-24 mx-auto rounded-full"
@@ -150,12 +152,7 @@ className="w-24 h-24 mx-auto rounded-full"
                 transition={{ delay: 0.6, duration: 0.5 }}
               >
                 <TextField
-                sx={{
-                  "& label.Mui-focused": {
-                    color: "black",
-                    fontSize: "16px",
-                  },
-                }}
+                sx={textFieldStyles}
                   fullWidth
                   type="email"
                   placeholder="Enter your email"
@@ -186,7 +183,7 @@ className="w-24 h-24 mx-auto rounded-full"
                 <Link
                   to="/signin"
                   className="flex items-center relative cursor-pointer
-                   text-blue-600 hover:text-blue-500 dark:text-blue-400"
+                   text-green-600 hover:text-green-500 dark:text-green-400"
                 >
                   <ArrowBack className="mr-2 text-white" />
                   <span className='text-white'>Back to Login</span>
@@ -202,7 +199,8 @@ className="w-24 h-24 mx-auto rounded-full"
                 <Button
                   type="submit"
                   variant="contained"
-                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white 
+                  className="w-full py-3 bg-green-600 hover:bg-green-700
+                   text-white 
                   font-medium rounded-lg transition-all duration-300"
                   disabled={loading}
                 >
@@ -221,5 +219,20 @@ className="w-24 h-24 mx-auto rounded-full"
     </>
   );
 }
+
+
+
+const textFieldStyles = { 
+  '& .MuiInputBase-input': { color: 'white' }, 
+  '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' }, 
+  '& label.Mui-focused': { color: '#4ade80', fontSize: "16px", }, // Changed label focus color to green
+  '& .MuiOutlinedInput-root': { 
+    backgroundColor: 'rgba(255,255,255,0.05)', 
+    borderRadius: '10px', 
+    '& fieldset': { borderColor: 'rgba(255,255,255,0.25)' }, 
+    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.4)' }, 
+    '&.Mui-focused fieldset': { borderColor: '#4ade80', borderWidth: '2px' }, // Changed border focus color to green
+  }, 
+};
 
 export default ResetPassword;

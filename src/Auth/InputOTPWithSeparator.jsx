@@ -437,7 +437,7 @@ function InputOTPWithSeparator() {
 
               <div className="flex items-center justify-end">
                 <Link to="/reset-password" className="text-sm text-white/60 hover:text-white transition-colors font-sans">
-                  Forgot Access Key?
+                  Forgot Password?
                 </Link>
               </div>
 
