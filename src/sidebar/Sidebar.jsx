@@ -370,6 +370,12 @@ const Sidebar = () => {
           label: "Revenue",
           path: "/admin/hotspot_anlytics"
         },
+
+        {
+  icon: <IconChip tint="text-emerald-600"><UserRound size={17} /></IconChip>,
+  label: "Customers",
+  path: "/admin/hotspot-customers"
+},
         
         {
           icon: <IconChip tint="text-green-600"><CiSettings size={17} /></IconChip>,
