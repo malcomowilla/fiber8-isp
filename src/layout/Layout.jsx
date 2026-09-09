@@ -436,6 +436,7 @@ useEffect(() => {
                 location.pathname !== '/admin/stats-uptime' &&
                 location.pathname !== '/admin/networks-wireguard-config' &&
                 location.pathname !== '/admin/referrals' &&
+                 location.pathname !== '/admin/hotspot-customers' &&
                                       
                                       
 
