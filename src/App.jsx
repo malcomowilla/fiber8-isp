@@ -829,7 +829,7 @@ hostname.endsWith('.aitechs.co.ke')
       {/* <Route  path='/hotspot-customer-portal' element={<HotspotCustomerPortal />}/> */}
       <Route  path='/hotspot-customer-portal' element={< HotspotDevicePortal />} />
       <Route path='/outside-referrer-auth' element={<OutsideReferrerAuth />} />
-      <Route path='/outside-referrer-dashboard' element={<OutsideReferrerDashboard />} />
+      <Route path='/referrer-dashboard' element={<OutsideReferrerDashboard />} />
 
      
 <Route path="/technician/tickets/:token" element={<TechnicianTicketUpdate />} />
