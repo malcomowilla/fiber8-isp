@@ -211,10 +211,39 @@ const AddClient = ({
                       ),
                     }}
                   />
+
+
+
+                  {/* NEW: optional referral code — only set on create, never edited later */}
+{!formData.id && (
+  <TextField
+    label="Referral code (optional)"
+    name="referral_code"
+    className='myTextField'
+    value={formData.referral_code || ''}
+    onChange={handleChange}
+    fullWidth
+    sx={fieldSx}
+    helperText="If this ISP was referred by an admin or an outside referrer, paste their code here"
+    InputProps={{
+      startAdornment: (
+        <InputAdornment position="start">
+          <PersonAddAlt fontSize="small" color="action" />
+        </InputAdornment>
+      ),
+    }}
+  />
+)}
                   <p className="text-xs text-slate-400 dark:text-slate-500 -mt-1">
                     A password will be generated automatically and emailed to the client along with their login link.
                   </p>
                 </div>
+
+
+
+
+
+
 
                 <div className="flex gap-3 mt-6">
                   <Button

@@ -1025,7 +1025,6 @@ const Signup = () => {
             </div>
           </div>
         </section>
-jdd1&FDNyv237#%
         {/* ── CTA strip ───────────────────────────────────────────────────── */}
         <section className="py-20 px-6 relative overflow-hidden"
           style={{ background:'linear-gradient(135deg,#1a1040 0%,#0f1f3d 50%,#0a2218 100%)' }}>

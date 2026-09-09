@@ -47,6 +47,7 @@ const EMPTY_FORM_DATA = {
   password: '',
   company_name: '',
   wallet_admin: false,
+  referral_code: '',
 };
 
 const EMPTY_ERRORS = {
