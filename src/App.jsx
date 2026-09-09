@@ -161,7 +161,8 @@ const HotspotCompensationStats = lazy(() => import("./network/HotspotCompensatio
 const TechnicianTicketUpdate = lazy(() => import("./tickets/TechnicianTicketUpdate"))
 const ReferralDashboard = lazy(() => import("./referrals/ReferralDashboard"))
 const HotspotLoyaltyCustomers = lazy(() => import('./hotspot_page/HotspotLoyaltyCustomers'))
-
+const OutsideReferrerAuth = lazy(() => import('./referrals/OutsideReferrerAuth'))
+const OutsideReferrerDashboard = lazy(() => import('./referrals/OutsideReferrerDashboard'))
 
 const App = ({client}) => {
 
@@ -827,6 +828,8 @@ hostname.endsWith('.aitechs.co.ke')
       <Route  path='/partner-login' element={<PartnerLogin/>}/>
       {/* <Route  path='/hotspot-customer-portal' element={<HotspotCustomerPortal />}/> */}
       <Route  path='/hotspot-customer-portal' element={< HotspotDevicePortal />} />
+      <Route path='/outside-referrer-auth' element={<OutsideReferrerAuth />} />
+      <Route path='/outside-referrer-dashboard' element={<OutsideReferrerDashboard />} />
 
      
 <Route path="/technician/tickets/:token" element={<TechnicianTicketUpdate />} />
