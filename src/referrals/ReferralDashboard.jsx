@@ -9,10 +9,11 @@ import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import PhoneIphoneRoundedIcon from '@mui/icons-material/PhoneIphoneRounded';
 import ArrowOutwardRoundedIcon from '@mui/icons-material/ArrowOutwardRounded';
+import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRounded';
 import toast, { Toaster } from 'react-hot-toast';
 
 const STATUS_STYLES = {
-  awaiting_subscription: { label: 'Awaiting subscription', dot: 'bg-slate-400', text: 'text-slate-500 dark:text-slate-400' },
+  awaiting_subscription: { label: 'Account created — awaiting first payment', dot: 'bg-slate-400', text: 'text-slate-500 dark:text-slate-400' },
   pending: { label: 'Clearing', dot: 'bg-amber-400', text: 'text-amber-600 dark:text-amber-400' },
   available: { label: 'Available', dot: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' },
   processing: { label: 'Processing', dot: 'bg-sky-400', text: 'text-sky-600 dark:text-sky-400' },
@@ -80,19 +81,27 @@ const ReferralDashboard = () => {
   const [phone, setPhone] = useState('');
   const [withdrawing, setWithdrawing] = useState(false);
 
+  const [invoice, setInvoice] = useState(null); // null = no unpaid invoice
+  const [applyingCredit, setApplyingCredit] = useState(false);
+
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [codeRes, earningsRes, referralsRes, termsRes] = await Promise.all([
+      const [codeRes, earningsRes, referralsRes, termsRes, invoiceRes] = await Promise.all([
         fetch('/api/referrals/my_code', { headers }),
         fetch('/api/referrals/my_earnings', { headers }),
         fetch('/api/referrals/my_referrals', { headers }),
         fetch('/api/referrals/terms', { headers }),
+        fetch('/api/referrals/current_invoice', { headers }),
       ]);
       if (codeRes.ok) setCode(await codeRes.json());
       if (earningsRes.ok) setEarnings(await earningsRes.json());
       if (referralsRes.ok) setReferrals(await referralsRes.json());
       if (termsRes.ok) setTerms((await termsRes.json()).terms || []);
+      if (invoiceRes.ok) {
+        const invoiceData = await invoiceRes.json();
+        setInvoice(invoiceData.invoice === null ? null : invoiceData);
+      }
     } catch (error) {
       toast.error('Failed to load referral data');
     } finally {
@@ -140,6 +149,35 @@ const ReferralDashboard = () => {
     }
   };
 
+  const handleApplyCredit = async () => {
+    if (!invoice) return;
+    setApplyingCredit(true);
+    try {
+      const response = await fetch('/api/referrals/apply_credit', {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invoice_id: invoice.id }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        if (data.fully_paid) {
+          toast.success('Your subscription is fully covered by referral credit — license renewed');
+        } else {
+          toast.success(
+            `KSh ${data.credit_applied} applied. KSh ${data.remaining_due} still due — pay that via M-Pesa as usual.`
+          );
+        }
+        fetchAll();
+      } else {
+        toast.error(data.error || 'Could not apply credit');
+      }
+    } catch (error) {
+      toast.error('Something went wrong, please try again');
+    } finally {
+      setApplyingCredit(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
@@ -147,6 +185,9 @@ const ReferralDashboard = () => {
       </div>
     );
   }
+
+  const hasCredit = Number(earnings.available_balance) > 0;
+  const hasUnpaidInvoice = invoice && invoice.id;
 
   return (
     <div className="font-sans space-y-6">
@@ -161,10 +202,11 @@ const ReferralDashboard = () => {
           <div>
             <p className="text-emerald-50/80 text-xs font-semibold uppercase tracking-widest">Refer & Earn</p>
             <h1 className="text-white text-2xl sm:text-3xl font-bold mt-1">
-              KSh 300 per ISP that subscribes
+              KSh 300 when they pay their first bill
             </h1>
             <p className="text-emerald-50/90 text-sm mt-2 max-w-md">
-              Share your code with other ISP owners. Once they sign up and pay, you get paid.
+              Share your code with other ISP owners. Nothing is paid out just for an account being created —
+              only once that ISP actually makes their first successful subscription payment.
             </p>
           </div>
 
@@ -261,7 +303,7 @@ const ReferralDashboard = () => {
                       {r.company_name}
                     </p>
                     <p className="text-xs text-slate-400 dark:text-slate-500">
-                      {new Date(r.signed_up_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                      Account created {new Date(r.signed_up_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
                   </div>
                   <div className="text-right shrink-0">
@@ -278,12 +320,61 @@ const ReferralDashboard = () => {
           )}
         </div>
 
-        {/* Withdraw + terms */}
+        {/* Withdraw + apply credit + terms */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Use credit for own subscription */}
           <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
-            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1">Withdraw</p>
+            <div className="flex items-center gap-2 mb-1">
+              <WorkspacePremiumRoundedIcon fontSize="small" className="!text-emerald-600 dark:!text-emerald-400" />
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Use credit for your subscription</p>
+            </div>
             <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">
-              Sends your entire available balance in one go.
+              Put your earned balance toward your own platform license instead of withdrawing it.
+            </p>
+
+            {hasUnpaidInvoice ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-500 dark:text-slate-400">Invoice {invoice.invoice_number}</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    KSh {Number(invoice.total).toLocaleString()} due
+                  </span>
+                </div>
+                {Number(invoice.credit_applied) > 0 && (
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                    KSh {Number(invoice.credit_applied).toLocaleString()} already covered by referral credit
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={handleApplyCredit}
+                  disabled={applyingCredit || !hasCredit}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-600
+                    disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold py-2.5 transition-colors"
+                >
+                  {applyingCredit ? (
+                    <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <WorkspacePremiumRoundedIcon fontSize="small" />
+                  )}
+                  Apply KSh {Number(earnings.available_balance).toLocaleString()} to this invoice
+                </button>
+                <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                  If your balance doesn't fully cover it, the remaining amount is paid the normal way via M-Pesa.
+                </p>
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400 dark:text-slate-500 py-2">
+                No unpaid license invoice right now — nothing to apply credit to yet.
+              </p>
+            )}
+          </div>
+
+          {/* Cash withdrawal */}
+          <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1">Withdraw as cash</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">
+              Sends your entire available balance to M-Pesa in one go.
             </p>
             <form onSubmit={handleWithdraw} className="space-y-3">
               <div className="relative">
@@ -303,9 +394,9 @@ const ReferralDashboard = () => {
               </div>
               <button
                 type="submit"
-                disabled={withdrawing || Number(earnings.available_balance) <= 0}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-900 dark:bg-emerald-500
-                  hover:bg-slate-800 dark:hover:bg-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed
+                disabled={withdrawing || !hasCredit}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-900 dark:bg-slate-700
+                  hover:bg-slate-800 dark:hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed
                   text-white text-sm font-semibold py-2.5 transition-colors"
               >
                 {withdrawing ? (
