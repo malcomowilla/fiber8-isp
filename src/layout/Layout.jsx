@@ -435,6 +435,7 @@ useEffect(() => {
                     location.pathname !== '/admin/incidents' &&
                 location.pathname !== '/admin/stats-uptime' &&
                 location.pathname !== '/admin/networks-wireguard-config' &&
+                location.pathname !== '/admin/referrals' &&
                                       
                                       
 
@@ -509,6 +510,7 @@ location.pathname !== '/admin/network-map' &&
  location.pathname !== '/admin/network-troubleshooting' &&
  location.pathname !== '/admin/incidents' &&
  location.pathname !== '/admin/stats-uptime' &&
+ location.pathname !== '/admin/referrals' &&
 <div
  onClick={() => {
             setShowMenu1(false)
@@ -628,6 +630,7 @@ location.pathname !== '/admin/onu-details' && location.pathname !== '/admin/node
       location.pathname !== '/admin/network-troubleshooting' &&
       location.pathname !== '/admin/incidents' &&
       location.pathname !== '/admin/stats-uptime' &&
+      location.pathname !== '/admin/referrals' &&
 <div 
  onClick={() => {
             setShowMenu1(false)
@@ -735,6 +738,7 @@ location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/u
                      location.pathname !== '/admin/network-troubleshooting' &&
                      location.pathname !== '/admin/incidents' &&
                      location.pathname !== '/admin/stats-uptime' &&
+                     location.pathname !== '/admin/referrals' &&
            <div
             onClick={() => {
             setShowMenu1(false)

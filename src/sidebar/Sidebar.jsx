@@ -422,7 +422,7 @@ const Sidebar = () => {
   const quickLinks = [
     { icon: <ReceiptIcon />, label: "Billing Invoices", path: "/admin/invoice" },
     { icon: <FaHandshake size={18} />, label: "Leads", path: "/admin/client-leads" },
-    { icon: <FaRegCalendarAlt size={18} />, label: "Scheduler", path: "/admin/scheduler" },
+    { icon: <FaHandshake size={18} />, label: "Referrals", path: "/admin/referrals" },
     { icon: <MdOutlineSecurity size={19} />, label: "DDOS", path: "/admin/prevent-ddos" },
     { icon: <MdDevices size={19} />, label: "Equipment", path: "/admin/equipment" },
     { icon: <GrLicense size={17} />, label: "License", path: "/admin/license" },
@@ -517,7 +517,6 @@ const Sidebar = () => {
     return (
       <li key={menuKey} className="relative font-sans">
         {seeSidebar ? (
-          // Collapsed sidebar view
           <div
             className={`relative flex items-center p-3 rounded-xl transition-all
                duration-200 cursor-pointer group ${
