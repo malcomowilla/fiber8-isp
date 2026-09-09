@@ -160,7 +160,7 @@ const HotspotIncidents = lazy(() => import("./network/HotspotIncidents"))
 const HotspotCompensationStats = lazy(() => import("./network/HotspotCompensationStats"))
 const TechnicianTicketUpdate = lazy(() => import("./tickets/TechnicianTicketUpdate"))
 const ReferralDashboard = lazy(() => import("./referrals/ReferralDashboard"))
-
+const HotspotLoyaltyCustomers = lazy(() => import('./hotspot_page/HotspotLoyaltyCustomers'))
 
 
 const App = ({client}) => {
@@ -773,6 +773,7 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path="/admin/incidents" element={<HotspotIncidents />} />
 <Route path="/admin/stats-uptime" element={<HotspotCompensationStats />}/>
 <Route path="/admin/referrals" element={<ReferralDashboard />} />
+<Route path="/admin/hotspot-customers" element={<HotspotLoyaltyCustomers />} />
 
 
 

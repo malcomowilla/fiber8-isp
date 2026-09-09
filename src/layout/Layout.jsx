@@ -511,6 +511,7 @@ location.pathname !== '/admin/network-map' &&
  location.pathname !== '/admin/incidents' &&
  location.pathname !== '/admin/stats-uptime' &&
  location.pathname !== '/admin/referrals' &&
+ location.pathname !== '/admin/hotspot-customers' &&
 <div
  onClick={() => {
             setShowMenu1(false)
@@ -631,6 +632,7 @@ location.pathname !== '/admin/onu-details' && location.pathname !== '/admin/node
       location.pathname !== '/admin/incidents' &&
       location.pathname !== '/admin/stats-uptime' &&
       location.pathname !== '/admin/referrals' &&
+      location.pathname !== '/admin/hotspot-customers' &&
 <div 
  onClick={() => {
             setShowMenu1(false)
@@ -739,6 +741,7 @@ location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/u
                      location.pathname !== '/admin/incidents' &&
                      location.pathname !== '/admin/stats-uptime' &&
                      location.pathname !== '/admin/referrals' &&
+                     location.pathname !== '/admin/hotspot-customers' &&
            <div
             onClick={() => {
             setShowMenu1(false)
