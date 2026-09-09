@@ -828,7 +828,7 @@ hostname.endsWith('.aitechs.co.ke')
       <Route  path='/partner-login' element={<PartnerLogin/>}/>
       {/* <Route  path='/hotspot-customer-portal' element={<HotspotCustomerPortal />}/> */}
       <Route  path='/hotspot-customer-portal' element={< HotspotDevicePortal />} />
-      <Route path='/outside-referrer-auth' element={<OutsideReferrerAuth />} />
+      <Route path='/referrer-login' element={<OutsideReferrerAuth />} />
       <Route path='/referrer-dashboard' element={<OutsideReferrerDashboard />} />
 
      
