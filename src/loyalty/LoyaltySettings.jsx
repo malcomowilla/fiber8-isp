@@ -154,13 +154,15 @@ export default function LoyaltySettings() {
   const earnRate = Number(setting.earn_rate_percent) || 0;
 
   return (
-    <div className="min-h-screen bg-[#F6F8F4] px-4 py-10 font-mono" style={{ fontFamily: "'IBM Plex Mono', ui-monospace, monospace" }}>
+    <div className="min-h-screen  px-4 py-10 
+    font-mono" style={{ fontFamily: "'IBM Plex Mono', ui-monospace, monospace" }}>
       <style>{FONT_IMPORT}</style>
 
       <div className="mx-auto max-w-[640px]">
         {/* Header */}
         <div className="mb-6 flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#0B1F16] text-[#34C77B]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg
+           bg-[#0B1F16] text-[#34C77B]">
             <Ticket size={18} strokeWidth={2} />
           </div>
           <div>

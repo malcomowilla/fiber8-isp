@@ -172,7 +172,7 @@ const HotspotLoyaltyCustomers = () => {
   }, [detail])
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className="min-h-screen  font-sans">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
         {/* Header */}
