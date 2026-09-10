@@ -427,11 +427,11 @@ const HotspotLoyaltyCustomers = () => {
                     ))}
                   </div>
 
-                  {detailTab === 'activity' ? (
-                    <ActivityList items={detail.activity || []} />
-                  ) : (
-                    <PaymentsList items={(detail.activity || []).filter((a) => a.kind === 'earn')} />
-                  )}
+                 {detailTab === 'activity' ? (
+  <ActivityList items={detail.activity || []} />
+) : (
+  <PaymentsList items={detail.payments || []} />
+)}
                 </div>
               )}
             </motion.aside>
