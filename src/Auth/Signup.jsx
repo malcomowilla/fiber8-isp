@@ -14,13 +14,11 @@ import {
   MessageSquare, Sparkles, TrendingUp, Server,
   Router, Bell, ShieldCheck, MapPin, Sun, Moon
 } from 'lucide-react';
-
-// ── Styles ─────────────────────────────────────────────────────────────────────
 const Styles = () => (
   <style>{`
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
-    .landing-root { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .mono { font-family: 'Space Mono', monospace; }
+    .landing-root { font-family: 'IBM Plex Mono', monospace; }
+    .mono { font-family: 'IBM Plex Mono', monospace; }
 
     /* ── Theme tokens ─────────────────────────────────────────────────── */
     .landing-root {
@@ -48,9 +46,9 @@ const Styles = () => (
     .landing-root[data-theme='light'] {
       --bg-page: #f8fafc;
       --bg-page-alt: #eef2f7;
-      --bg-hero-1: #eef2ff;
-      --bg-hero-2: #e0e7ff;
-      --bg-hero-3: #dbeafe;
+      --bg-hero-1: #eefff5;
+      --bg-hero-2: #e0f5ea;
+      --bg-hero-3: #dbf5ea;
       --bg-nav: rgba(255,255,255,.85);
       --bg-card: rgba(255,255,255,.75);
       --bg-card-strong: rgba(255,255,255,.9);
@@ -115,7 +113,7 @@ const Styles = () => (
       background: linear-gradient(135deg, var(--bg-hero-1) 0%, var(--bg-hero-2) 40%, var(--bg-hero-3) 70%, var(--bg-hero-1) 100%);
     }
     .gradient-text {
-      background: linear-gradient(135deg, #22d3ee, #6366f1, #8b5cf6, #22d3ee);
+      background: linear-gradient(135deg, #22d3ee, #10b981, #14b8a6, #22d3ee);
       background-size: 300% 300%;
       animation: shimmerText 5s ease infinite;
       -webkit-background-clip: text;
@@ -149,8 +147,8 @@ const Styles = () => (
     }
     .pricing-card:hover { transform: translateY(-6px); box-shadow: 0 24px 64px var(--shadow-color); }
     .pricing-featured {
-      border-color: rgba(99,102,241,.5) !important;
-      box-shadow: 0 0 40px rgba(99,102,241,.15) !important;
+      border-color: rgba(16,185,129,.5) !important;
+      box-shadow: 0 0 40px rgba(16,185,129,.15) !important;
     }
     .btn-primary {
       background: linear-gradient(135deg, #10b981, #14b8a6);
@@ -160,10 +158,10 @@ const Styles = () => (
     }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(16,185,129,.35); }
     .btn-cta {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      background: linear-gradient(135deg, #10b981, #14b8a6);
       transition: transform .15s, box-shadow .15s;
     }
-    .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(99,102,241,.35); }
+    .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(16,185,129,.35); }
     .drift1 { animation: drift 12s ease-in-out infinite; }
     .drift2 { animation: drift 16s ease-in-out infinite reverse; }
     .drift3 { animation: drift 9s ease-in-out infinite 2s; }
@@ -190,15 +188,15 @@ const Styles = () => (
       transition: background-color .3s, border-color .3s;
     }
     .feature-icon {
-      background: linear-gradient(135deg, rgba(99,102,241,.15), rgba(139,92,246,.1));
-      border: 1px solid rgba(99,102,241,.2);
+      background: linear-gradient(135deg, rgba(16,185,129,.15), rgba(20,184,166,.1));
+      border: 1px solid rgba(16,185,129,.2);
     }
     .integration-item {
       background: var(--bg-soft);
       border: 1px solid var(--border-subtle-2);
       transition: border-color .2s, transform .2s;
     }
-    .integration-item:hover { border-color: rgba(99,102,241,.3); transform: translateY(-2px); }
+    .integration-item:hover { border-color: rgba(16,185,129,.3); transform: translateY(-2px); }
     .whatsapp-btn {
       background: linear-gradient(135deg, #25d366, #128c7e);
       animation: gradientShift 3s ease infinite;
@@ -454,8 +452,8 @@ const Signup = () => {
         <nav className={`nav-glass fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'shadow-2xl' : ''}`}>
           <div className="max-w-7xl mx-auto px-5 py-3.5 flex items-center justify-between">
             <a href="/" className="flex items-center gap-2.5">
-              <img src="/images/aitechs.png" className="h-8" alt="Aitechs" />
-              <span className="text-xl font-bold text-theme-primary">Aitechs</span>
+              <img src="/images/owitech-logo.png" className="h-8" alt="Owitech" />
+              <span className="text-xl font-bold text-theme-primary">Owitech</span>
             </a>
 
             {/* Desktop links */}
@@ -653,11 +651,13 @@ const Signup = () => {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <SectionLabel text="Platform Features" />
-              <motion.h2 initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
+              <motion.h2 initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once: true }}
                 className="text-4xl md:text-5xl font-black text-theme-primary mb-4">
                 Enterprise-Grade<br /><span className="gradient-text">ISP Management</span>
               </motion.h2>
               <p className="text-theme-muted max-w-2xl mx-auto">
+
+
                 A comprehensive suite of tools designed to automate operations, maximize revenue,
                 and deliver exceptional service to your subscribers.
               </p>
@@ -1105,11 +1105,11 @@ const Signup = () => {
         <footer className="border-t py-8 px-6 text-center"
           style={{ borderColor:'var(--border-subtle-3)', background:'var(--bg-page)' }}>
           <div className="flex items-center justify-center gap-2 mb-3">
-            <img src="/images/aitechs.png" className="h-6 opacity-60" alt="Aitechs" />
-            <span className="text-sm font-semibold text-theme-muted">Aitechs</span>
+            <img src="/images/aitechs.png" className="h-6 opacity-60" alt="Owitech" />
+            <span className="text-sm font-semibold text-theme-muted">Owitech</span>
           </div>
           <p className="text-xs text-theme-dim">
-            © {new Date().getFullYear()} Aitechs. Built for Kenyan ISPs. · <a href="/hotspot-pricing" className="hover:text-theme-muted">Hotspot Pricing</a>
+            © {new Date().getFullYear()} Owitech. Built for Kenyan ISPs. · <a href="/hotspot-pricing" className="hover:text-theme-muted">Hotspot Pricing</a>
           </p>
         </footer>
 

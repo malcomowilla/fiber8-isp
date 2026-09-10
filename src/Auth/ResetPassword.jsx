@@ -97,7 +97,7 @@ function ResetPassword() {
 
           <div className="absolute inset-0 z-0">
     <img
-      src="/images/Telecommunications-Aitechs.jpg" 
+      src="/images/owitech-logo.png" 
       alt="Network Background"
       className="w-full h-full object-cover"
     />
@@ -137,9 +137,9 @@ function ResetPassword() {
         
 <img
 className="w-24 h-24 mx-auto rounded-full"
-  src={logo_preview || "/images/aitechs.png"}
-  alt={company_name || "Aitechs"}
-  onError={(e) => { e.target.src = "/images/aitechs.png"; }}
+  src={logo_preview || "/images/owitech-logo.png"}
+  alt={company_name || "Owitech"}
+  onError={(e) => { e.target.src = "/images/owitech-logo.png"; }}
 />
         </div>
         
@@ -190,6 +190,7 @@ className="w-24 h-24 mx-auto rounded-full"
                 </Link>
               </motion.div>
 
+
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -199,7 +200,9 @@ className="w-24 h-24 mx-auto rounded-full"
                 <Button
                   type="submit"
                   variant="contained"
-                  className="w-full py-3 bg-green-600 hover:bg-green-700
+                    color="success"
+
+                  className="w-full py-3 
                    text-white 
                   font-medium rounded-lg transition-all duration-300"
                   disabled={loading}

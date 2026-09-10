@@ -258,9 +258,9 @@ const PasskeySignin = () => {
             <div className="text-center mb-6">
               <img
                 className="w-20 h-20 mx-auto rounded-full ring-2 ring-white/20 object-cover"
-                src={logo_preview || "/images/aitechs.png"}
-                alt={company_name || "Aitechs"}
-                onError={(e) => { e.target.src = "/images/aitechs.png" }}
+                src={logo_preview || "/images/owitech-logo.png"}
+                alt={company_name || "Owitech"}
+                onError={(e) => { e.target.src = "/images/owitech-logo.png" }}
               />
               <h2 className="text-xl font-semibold text-white mt-4 font-sans">
                 Sign in with Passkey

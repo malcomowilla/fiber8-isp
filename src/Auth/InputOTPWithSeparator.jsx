@@ -300,10 +300,11 @@ function InputOTPWithSeparator() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed top-0 left-0 right-0 h-1 z-50 overflow-hidden bg-white/10"
+              className="fixed top-0 left-0 right-0 h-1 z-50 overflow-hidden
+               bg-white/10"
             >
               <motion.div
-                className="h-full bg-blue-400"
+                className="h-full bg-green-400"
                 initial={{ x: '-100%' }}
                 animate={{ x: '100%' }}
                 transition={{ repeat: Infinity, duration: 1.1, ease: 'linear' }}
@@ -315,7 +316,7 @@ function InputOTPWithSeparator() {
 
         <div className="absolute inset-0 z-0">
           <img
-            src="/images/Telecommunications-Aitechs.jpg"
+            src="/images/owitech-logo.png"
             alt="Network Background"
             className="w-full h-full object-cover"
           />
@@ -336,7 +337,7 @@ function InputOTPWithSeparator() {
               </svg>
             </div>
             <p className="text-white text-2xl font-semibold font-sans">
-              {company_name || 'Aitechs'}
+              {company_name || 'Owitech'}
             </p>
             <p className="text-white/60 mt-1 text-sm font-sans">Secure ISP Management Portal</p>
           </div>

@@ -689,8 +689,8 @@ const Sidebar = () => {
                     animate={{ scale: 1 }}
                     className="h-11 w-11 rounded-full border-2 border-gray-200
                      ring-2 ring-emerald-500/20 shrink-0 object-cover"
-                    src={logo_preview || "/images/aitechs.png"}
-                    alt={company_name || "Aitechs"}
+                    src={logo_preview || "/images/owitech-logo.png"}
+                    alt={company_name || "Owitech"}
                     onError={(e) => { e.target.src = "/images/aitechs.png"; }}
                   />
                   {/* Brand/company name uses the display font slot (--font-display)
