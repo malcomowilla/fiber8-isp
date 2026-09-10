@@ -57,16 +57,12 @@ import {
 import { BsRouter } from "react-icons/bs";
 import { GrTechnology } from "react-icons/gr";
 import { FaUsersBetweenLines } from "react-icons/fa6";
-// import {
-//   Sparkles, Palette, MapPinned, LogOut, AlertTriangle, LifeBuoy,
-//   MessageSquareText, TrendingUp, UserRound, CircleUserRound, Radar,
-//   ShieldCheck, Users as UsersIcon,
-// } from 'lucide-react'
 
 import {
   Sparkles, Palette, MapPinned, LogOut, AlertTriangle, LifeBuoy,
   MessageSquareText, TrendingUp, UserRound, CircleUserRound, Radar,
   ShieldCheck, Users as UsersIcon, Stethoscope,
+   Award,
 } from 'lucide-react'
 import { LuTv } from "react-icons/lu";
 
@@ -429,7 +425,12 @@ const Sidebar = () => {
     { icon: <ReceiptIcon />, label: "Billing Invoices", path: "/admin/invoice" },
     { icon: <FaHandshake size={18} />, label: "Leads", path: "/admin/client-leads" },
     { icon: <FaHandshake size={18} />, label: "Referrals", path: "/admin/referrals" },
-    { icon: <MdOutlineSecurity size={19} />, label: "DDOS", path: "/admin/prevent-ddos" },
+    {
+  icon: <IconChip tint="text-amber-500"><Award size={17} /></IconChip>,
+  label: "Loyalty",
+  path: "/admin/loyalty"
+},
+    // { icon: <MdOutlineSecurity size={19} />, label: "DDOS", path: "/admin/prevent-ddos" },
     { icon: <MdDevices size={19} />, label: "Equipment", path: "/admin/equipment" },
     { icon: <GrLicense size={17} />, label: "License", path: "/admin/license" },
     { icon: <PermDataSettingIcon />, label: "Settings", path: "/admin/settings" },

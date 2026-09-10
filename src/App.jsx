@@ -163,6 +163,9 @@ const ReferralDashboard = lazy(() => import("./referrals/ReferralDashboard"))
 const HotspotLoyaltyCustomers = lazy(() => import('./hotspot_page/HotspotLoyaltyCustomers'))
 const OutsideReferrerAuth = lazy(() => import('./referrals/OutsideReferrerAuth'))
 const OutsideReferrerDashboard = lazy(() => import('./referrals/OutsideReferrerDashboard'))
+const LoyaltySettings = lazy(() => import('./loyalty/LoyaltySettings'))
+
+
 
 const App = ({client}) => {
 
@@ -775,6 +778,7 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path="/admin/stats-uptime" element={<HotspotCompensationStats />}/>
 <Route path="/admin/referrals" element={<ReferralDashboard />} />
 <Route path="/admin/hotspot-customers" element={<HotspotLoyaltyCustomers />} />
+<Route path="/admin/loyalty" element={<LoyaltySettings />} />
 
 
 
