@@ -1105,7 +1105,7 @@ const Signup = () => {
         <footer className="border-t py-8 px-6 text-center"
           style={{ borderColor:'var(--border-subtle-3)', background:'var(--bg-page)' }}>
           <div className="flex items-center justify-center gap-2 mb-3">
-            <img src="/images/aitechs.png" className="h-6 opacity-60" alt="Owitech" />
+            <img src="/images/owitech-logo.png" className="h-6 opacity-60" alt="Owitech" />
             <span className="text-sm font-semibold text-theme-muted">Owitech</span>
           </div>
           <p className="text-xs text-theme-dim">

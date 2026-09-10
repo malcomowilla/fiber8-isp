@@ -691,7 +691,7 @@ const Sidebar = () => {
                      ring-2 ring-emerald-500/20 shrink-0 object-cover"
                     src={logo_preview || "/images/owitech-logo.png"}
                     alt={company_name || "Owitech"}
-                    onError={(e) => { e.target.src = "/images/aitechs.png"; }}
+                    onError={(e) => { e.target.src = "/images/owitech-logo.png"; }}
                   />
                   {/* Brand/company name uses the display font slot (--font-display)
                       plus its own italic toggle (--font-style-display). */}
