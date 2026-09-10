@@ -701,7 +701,7 @@ const Sidebar = () => {
                     className="font-display font-bold text-gray-900 text-base truncate"
                     style={{ fontStyle: 'var(--font-style-display)' }}
                   >
-                    {company_name || "Aitechs"}
+                    {company_name || "Owitech"}
                   </motion.span>
                 </div>
                 <motion.button
