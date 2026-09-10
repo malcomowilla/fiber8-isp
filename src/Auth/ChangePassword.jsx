@@ -185,7 +185,7 @@ export default function ChangePassword({ onSuccess }) {
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 16px' }}>
  <div className="absolute inset-0 z-0">
     <img
-      src="/images/owitech-logo.png" 
+     src="/images/Telecommunications-Aitechs.jpg"
       alt="Network Background"
       className="w-full h-full object-cover"
     />

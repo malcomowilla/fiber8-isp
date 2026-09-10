@@ -274,7 +274,7 @@ const [openFailedPasswordAlert, setopenFailedPasswordAlert] = useState(false)
     {[...Array(20)].map((_, i) => (
       <div 
         key={i}
-        className="absolute rounded-full bg-blue-400 animate-spin"
+        className="absolute rounded-full bg-green-400 animate-spin"
         style={{
           width: `${Math.random() * 10 + 5}px`,
           height: `${Math.random() * 10 + 5}px`,
@@ -346,7 +346,8 @@ const [openFailedPasswordAlert, setopenFailedPasswordAlert] = useState(false)
               </motion.div>
 
               <motion.div variants={itemVariants}>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                <label className="block text-sm font-medium text-gray-700
+                 dark:text-gray-200">
                   Confirm Password
                 </label>
                 <div className="relative mt-1">
@@ -377,10 +378,10 @@ const [openFailedPasswordAlert, setopenFailedPasswordAlert] = useState(false)
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 px-4 bg-blue-600 text-white font-medium 
-                    rounded-xl shadow-lg hover:bg-blue-700 
-                    hover:shadow-blue-500/25 transition-all duration-200
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 
+                  className="w-full py-3 px-4 bg-green-600 text-white font-medium 
+                    rounded-xl shadow-lg hover:bg-green-700 
+                    hover:shadow-green-500/25 transition-all duration-200
+                    focus:outline-none focus:ring-2 focus:ring-green-500 
                     focus:ring-offset-2 disabled:opacity-50 flex items-center 
                     justify-center space-x-2"
                 >

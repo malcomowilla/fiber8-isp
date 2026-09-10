@@ -94,10 +94,11 @@ function ResetPassword() {
  flex items-center justify-center relative overflow-hidden font-sans
 "
       >
+        
 
           <div className="absolute inset-0 z-0">
     <img
-      src="/images/owitech-logo.png" 
+     src="/images/Telecommunications-Aitechs.jpg"
       alt="Network Background"
       className="w-full h-full object-cover"
     />
