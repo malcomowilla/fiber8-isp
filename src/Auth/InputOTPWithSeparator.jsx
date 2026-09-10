@@ -291,7 +291,8 @@ function InputOTPWithSeparator() {
     <>
       <Toaster />
 
-      <main className="min-h-screen flex items-center font-sans justify-center relative overflow-hidden">
+      <main className="min-h-screen flex items-center font-sans justify-center
+       relative overflow-hidden">
         {/* thin top progress bar while busy */}
         <AnimatePresence>
           {isBusy && (
@@ -316,7 +317,7 @@ function InputOTPWithSeparator() {
 
         <div className="absolute inset-0 z-0">
           <img
-            src="/images/owitech-logo.png"
+            src="/images/Telecommunications-Aitechs.jpg"
             alt="Network Background"
             className="w-full h-full object-cover"
           />

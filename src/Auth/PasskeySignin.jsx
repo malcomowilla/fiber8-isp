@@ -218,7 +218,8 @@ const PasskeySignin = () => {
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="min-h-screen flex items-center justify-center relative overflow-hidden font-sans"
+        className="min-h-screen flex items-center justify-center relative
+         overflow-hidden font-sans"
       >
         {/* thin top progress bar while busy */}
         <AnimatePresence>
