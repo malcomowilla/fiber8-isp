@@ -518,7 +518,7 @@ const GeneralSettings = ({ children }) => {
 
   useEffect(() => { handleGetHotspotCustomizations(); }, [handleGetHotspotCustomizations]);
 
-  
+
   const handleSaveSystemGeneralSettings = async e => {
     e.preventDefault();
     setLoadGeneralSettings(true)
@@ -1343,10 +1343,11 @@ sx={{
                 },
               },
                         }}
-                        label="Allowed IP addresses (comma-separated)"
+                        label="Blocked IP addresses (comma-separated)"
                         value={formDataGeneralSettings.allowed_ips || ''}
                         onChange={e => setFormDataGeneralSettings({ ...formDataGeneralSettings, allowed_ips: e.target.value })}
                         helperText="Only requests from these IPs will be allowed to access the system. Leave blank to allow all."
+
                         InputProps={{ startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}>
                           <SecurityIcon sx={{ fontSize: 18, color: 'text.secondary' }} /></InputAdornment> }}
                       />
