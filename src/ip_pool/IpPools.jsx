@@ -79,7 +79,7 @@ const IpPools = () => {
 
   const fetchRouters = useCallback(async () => {
     try {
-      const res = await fetch('/api/nas_routers', { headers, credentials: 'include' });
+      const res = await fetch('/api/routers', { headers, credentials: 'include' });
       if (res.ok) setRouters(await res.json());
     } catch {
       // non-fatal, router select just stays empty
