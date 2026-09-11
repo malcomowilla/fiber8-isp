@@ -368,7 +368,7 @@ function InputOTPWithSeparator() {
               <img
                 className="w-20 h-20 mx-auto rounded-full ring-2 ring-white/20 object-cover"
                 src={logo_preview || "/images/owitech-logo.png"}
-                alt={company_name || "Aitechs"}
+                alt={company_name || "Owitech"}
                 onError={(e) => { e.target.src = "/images/owitech-logo.png" }}
               />
               <h2 className="mt-4 text-lg font-semibold text-white font-sans">
