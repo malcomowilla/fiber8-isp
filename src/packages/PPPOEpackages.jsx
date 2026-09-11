@@ -15,7 +15,7 @@ import AlertTitle from '@mui/material/AlertTitle';
 import Stack from '@mui/material/Stack';
 import { useDebounce } from 'use-debounce';
 import { useApplicationSettings } from '../settings/ApplicationSettings'
-import { Search } from 'lucide-react';
+import { Search, RefreshCw, CheckCircle2, XCircle, RotateCw } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
@@ -65,6 +65,8 @@ const PPPOEpackages = () => {
   const [error, setError] = useState([])
   const [deleteNotification, setDeleteNotification] = useState(false)
   const [planTypeFilter, setPlanTypeFilter] = useState('all')
+  const [syncingId, setSyncingId] = useState(null)
+  const [syncingAll, setSyncingAll] = useState(false)
 
   const initialValue = {
     name: '',
@@ -93,6 +95,7 @@ const PPPOEpackages = () => {
     fup_data_limit: '',
     fup_data_unit: 'GB',
     fup_throttle_plan_id: '',
+    sync_immediately: true,
   }
 
   const [formData, setFormData] = useState(initialValue)
@@ -201,7 +204,8 @@ const PPPOEpackages = () => {
             router_name: settingsformData.router_name,
             use_radius: settingsformData.use_radius,
             nas_router: formData.nas_router,
-          }
+          },
+          sync_immediately: formData.sync_immediately !== false,
         })
       });
 
@@ -298,6 +302,56 @@ const PPPOEpackages = () => {
     }
   }
 
+  const handleSyncOne = async (pkg) => {
+    setSyncingId(pkg.id)
+    try {
+      const response = await fetch(`/api/packages/${pkg.id}/sync`, {
+        method: 'POST',
+        headers: { 'X-Subdomain': subdomain },
+      })
+      const newData = await response.json()
+      if (response.ok) {
+        setTableData((prev) => prev.map((item) => (item.id === pkg.id ? newData : item)))
+        toast.success(`${pkg.name} synced to router`, { position: 'top-center', duration: 3000 })
+      } else {
+        toast.error(newData.error || 'Sync failed', { position: 'top-center', duration: 4000 })
+      }
+    } catch (error) {
+      toast.error('Sync failed, server error', { position: 'top-center', duration: 4000 })
+    } finally {
+      setSyncingId(null)
+    }
+  }
+
+  const handleSyncAll = async () => {
+    setSyncingAll(true)
+    try {
+      const response = await fetch('/api/packages/sync_all', {
+        method: 'POST',
+        headers: { 'X-Subdomain': subdomain },
+      })
+      const newData = await response.json()
+      if (response.ok) {
+        toast.success(`Queued ${newData.queued} package(s) for sync`, { position: 'top-center', duration: 3000 })
+        setTimeout(fetchPackages, 2500)
+      } else {
+        toast.error(newData.error || 'Failed to queue sync', { position: 'top-center', duration: 4000 })
+      }
+    } catch (error) {
+      toast.error('Failed to queue sync, server error', { position: 'top-center', duration: 4000 })
+    } finally {
+      setSyncingAll(false)
+    }
+  }
+
+  // A package is considered synced when it has at least one router assignment
+  // and every assignment reports synced === true.
+  const packageSyncState = (pkg) => {
+    const routers = pkg.package_routers || []
+    if (routers.length === 0) return 'unknown'
+    return routers.every((pr) => pr.synced) ? 'synced' : 'pending'
+  }
+
   const filteredData = useMemo(() => {
     if (planTypeFilter === 'all') return tableData
     return tableData.filter((pkg) => (pkg.plan_type || 'standard') === planTypeFilter)
@@ -367,6 +421,29 @@ const PPPOEpackages = () => {
       render: (rowData) => statusChip(rowData.status),
     },
     {
+      title: 'Sync', field: 'sync',
+      render: (rowData) => {
+        const state = packageSyncState(rowData)
+        const isSyncing = syncingId === rowData.id
+        return (
+          <IconButton
+            size="small"
+            title={state === 'synced' ? 'Synced — click to re-sync' : 'Not synced — click to sync now'}
+            onClick={(e) => { e.stopPropagation(); handleSyncOne(rowData) }}
+            disabled={isSyncing}
+          >
+            {isSyncing ? (
+              <RotateCw size={16} className='animate-spin' color={GREEN} />
+            ) : state === 'synced' ? (
+              <CheckCircle2 size={16} color={GREEN} />
+            ) : (
+              <XCircle size={16} color='#d97706' />
+            )}
+          </IconButton>
+        )
+      },
+    },
+    {
       title: 'Action', field: 'Action',
       render: (rowData) => (
         <>
@@ -413,14 +490,25 @@ const PPPOEpackages = () => {
           </p>
           <div className='flex items-center justify-between flex-wrap gap-2'>
             <p className='m-0 text-xl font-bold dark:text-white' style={{ fontFamily: fontStack }}>PPPoE Packages</p>
-            <button
-              onClick={handleClickOpen}
-              style={{ fontFamily: fontStack, backgroundColor: GREEN }}
-              className='rounded-full px-5 py-2 text-sm font-semibold text-white flex items-center gap-1
-                hover:opacity-90 transition'
-            >
-              <AddIcon fontSize='small' /> New plan
-            </button>
+            <div className='flex items-center gap-2'>
+              <button
+                onClick={handleSyncAll}
+                disabled={syncingAll}
+                style={{ fontFamily: fontStack, borderColor: GREEN, color: GREEN_DARK }}
+                className='rounded-full px-4 py-2 text-sm font-semibold border flex items-center gap-1.5
+                  hover:bg-[rgba(15,157,88,0.08)] transition disabled:opacity-50 disabled:cursor-not-allowed'
+              >
+                <RefreshCw size={15} className={syncingAll ? 'animate-spin' : ''} /> Sync all
+              </button>
+              <button
+                onClick={handleClickOpen}
+                style={{ fontFamily: fontStack, backgroundColor: GREEN }}
+                className='rounded-full px-5 py-2 text-sm font-semibold text-white flex items-center gap-1
+                  hover:opacity-90 transition'
+              >
+                <AddIcon fontSize='small' /> New plan
+              </button>
+            </div>
           </div>
         </div>
 

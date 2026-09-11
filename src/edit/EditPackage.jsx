@@ -20,7 +20,7 @@ import { useDebounce } from 'use-debounce';
 import toast, { Toaster } from 'react-hot-toast';
 import {
   Gauge, ShieldAlert, Database, Server, Wifi, DollarSign,
-  ArrowUp, ArrowDown, Clock, Hash, Layers, CheckCircle2,
+  ArrowUp, ArrowDown, Clock, Hash, Layers, CheckCircle2, RefreshCw,
 } from 'lucide-react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useState, useMemo, useEffect, useCallback } from 'react';
@@ -560,6 +560,27 @@ const EditPackage = ({
                       </div>
                     </div>
                   )}
+
+                  <div
+                    className="flex items-center gap-2 mt-3 dark:bg-[#1c1c1c]"
+                    style={{ padding: '10px 14px', background: GREEN_SOFT, borderRadius: '10px' }}
+                  >
+                    <RefreshCw size={16} color={GREEN} />
+                    <label className="flex items-center gap-2 cursor-pointer flex-1" style={{ fontFamily: fontStack }}>
+                      <span className="text-sm dark:text-gray-200">Sync to router immediately</span>
+                    </label>
+                    <Switch
+                      checked={formData.sync_immediately !== false}
+                      onChange={(e) => setFormData({ ...formData, sync_immediately: e.target.checked })}
+                      sx={{
+                        '& .MuiSwitch-switchBase.Mui-checked': { color: GREEN },
+                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: GREEN },
+                      }}
+                    />
+                  </div>
+                  <p className="m-0 mt-1 text-xs text-gray-500 dark:text-gray-400" style={{ fontFamily: fontStack }}>
+                    Creates or updates the PPP profile on every selected router as soon as you save.
+                  </p>
                 </>
               )}
             </SectionCard>
