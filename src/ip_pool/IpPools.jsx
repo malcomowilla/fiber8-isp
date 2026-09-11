@@ -28,12 +28,12 @@ const StatusBadge = ({ status }) => {
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px]
         uppercase tracking-wider font-medium border ${
         active
-          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-          : 'bg-gray-500/10 text-gray-400 border-gray-500/30'
+          ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'
+          : 'bg-gray-100 text-gray-500 border-gray-200 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/30'
       }`}
       style={FONT}
     >
-      <span className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-emerald-400' : 'bg-gray-500'}`} />
+      <span className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-emerald-500 dark:bg-emerald-400' : 'bg-gray-400 dark:bg-gray-500'}`} />
       {status}
     </span>
   );
@@ -43,7 +43,7 @@ const UsageBar = ({ used, total }) => {
   const pct = total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0;
   const color = pct > 85 ? 'bg-red-500' : pct > 60 ? 'bg-amber-500' : 'bg-emerald-500';
   return (
-    <div className="w-24 h-1.5 rounded-full bg-white/5 overflow-hidden">
+    <div className="w-24 h-1.5 rounded-full bg-gray-200 dark:bg-white/5 overflow-hidden">
       <div className={`h-full ${color} transition-all`} style={{ width: `${pct}%` }} />
     </div>
   );
@@ -202,20 +202,21 @@ const IpPools = () => {
   };
 
   return (
-    <div className="min-h-screen  text-gray-200 p-6" style={FONT}>
+    <div className="min-h-screen bg-white dark:bg-[#0a0f0d] text-gray-800 dark:text-gray-200 p-6" style={FONT}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-xl font-semibold text-white tracking-tight">PPPoE IP Pools</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage PPPoE IP address pools</p>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">PPPoE IP Pools</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Manage PPPoE IP address pools</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handleSyncAll}
             disabled={syncingAll}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-              bg-white/5 text-emerald-400 border border-emerald-500/30
-              hover:bg-emerald-500/10 transition-colors disabled:opacity-50"
+              bg-gray-50 text-emerald-700 border border-emerald-300
+              hover:bg-emerald-50 transition-colors disabled:opacity-50
+              dark:bg-white/5 dark:text-emerald-400 dark:border-emerald-500/30 dark:hover:bg-emerald-500/10"
           >
             <RefreshCw size={15} className={syncingAll ? 'animate-spin' : ''} />
             Sync
@@ -223,8 +224,8 @@ const IpPools = () => {
           <button
             onClick={openCreate}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-              bg-emerald-500 text-black hover:bg-emerald-400 transition-colors shadow-lg
-              shadow-emerald-500/20"
+              bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-500/10
+              dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400 dark:shadow-emerald-500/20"
           >
             <Plus size={15} />
             Create Pool
@@ -234,24 +235,26 @@ const IpPools = () => {
 
       {/* Search */}
       <div className="relative mb-4 max-w-sm">
-        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600" />
+        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by pool name or IP range..."
-          className="w-full pl-9 pr-3 py-2 rounded-lg bg-white/5 border border-white/10
-            text-sm text-gray-200 placeholder:text-gray-600 focus:outline-none
-            focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30"
+          className="w-full pl-9 pr-3 py-2 rounded-lg bg-white border border-gray-300
+            text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none
+            focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30
+            dark:bg-white/5 dark:border-white/10 dark:text-gray-200 dark:placeholder:text-gray-600
+            dark:focus:border-emerald-500/50 dark:focus:ring-emerald-500/30"
         />
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden">
+      <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.02] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/10 text-left text-[11px] uppercase
-                tracking-wider text-gray-500">
+              <tr className="border-b border-gray-200 dark:border-white/10 text-left text-[11px] uppercase
+                tracking-wider text-gray-500 dark:text-gray-500">
                 <th className="px-4 py-3 font-medium">Pool Name</th>
                 <th className="px-4 py-3 font-medium">Router</th>
                 <th className="px-4 py-3 font-medium">IP Range</th>
@@ -264,25 +267,26 @@ const IpPools = () => {
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-600">Loading pools…</td></tr>
+                <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-400 dark:text-gray-600">Loading pools…</td></tr>
               )}
               {!loading && filtered.length === 0 && (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-600">No pools found.</td></tr>
+                <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-400 dark:text-gray-600">No pools found.</td></tr>
               )}
               {!loading && filtered.map((pool) => (
-                <tr key={pool.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.03] transition-colors">
-                  <td className="px-4 py-3 font-medium text-white">{pool.name}</td>
-                  <td className="px-4 py-3 text-gray-400">
+                <tr key={pool.id} className="border-b border-gray-100 dark:border-white/5 last:border-0
+                  hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors">
+                  <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{pool.name}</td>
+                  <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
                     <span className="inline-flex items-center gap-1.5">
-                      <Server size={13} className="text-emerald-500/70" />
+                      <Server size={13} className="text-emerald-600/70 dark:text-emerald-500/70" />
                       {pool.router_name || '—'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-gray-400 whitespace-nowrap">
+                  <td className="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                     {pool.ip_range_start} - {pool.ip_range_end}
                   </td>
-                  <td className="px-4 py-3 text-right text-gray-300">{pool.total_ips?.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-right text-gray-300">{pool.used_ips?.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{pool.total_ips?.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{pool.used_ips?.toLocaleString()}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <UsageBar used={pool.used_ips} total={pool.total_ips} />
@@ -296,24 +300,27 @@ const IpPools = () => {
                         title={pool.synced ? 'Re-sync to MikroTik' : 'Sync to MikroTik'}
                         onClick={() => handleSyncOne(pool)}
                         disabled={syncingId === pool.id}
-                        className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-emerald-400 transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10
+                          text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                       >
                         {syncingId === pool.id
                           ? <RotateCw size={15} className="animate-spin" />
                           : pool.synced
-                            ? <CheckCircle2 size={15} className="text-emerald-500" />
+                            ? <CheckCircle2 size={15} className="text-emerald-600 dark:text-emerald-500" />
                             : <XCircle size={15} className="text-amber-500" />}
                       </button>
                       <button
                         title="Edit"
-                        className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10
+                          text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                       >
                         <Pencil size={14} />
                       </button>
                       <button
                         title="Delete"
                         onClick={() => setDeleteTarget(pool)}
-                        className="p-1.5 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10
+                          text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -333,7 +340,7 @@ const IpPools = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70
+            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 dark:bg-black/70
               backdrop-blur-sm px-4"
             onClick={() => !saving && setShowModal(false)}
           >
@@ -345,11 +352,13 @@ const IpPools = () => {
               onClick={(e) => e.stopPropagation()}
               style={FONT}
               className="w-full max-w-lg max-h-[88vh] overflow-y-auto rounded-2xl
-                bg-[#0d1512] border border-emerald-500/20 shadow-2xl shadow-black/50 p-6"
+                bg-white dark:bg-[#0d1512] border border-gray-200 dark:border-emerald-500/20
+                shadow-2xl shadow-black/10 dark:shadow-black/50 p-6"
             >
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-base font-semibold text-white">Create PPPoE IP Pool</h3>
-                <button type="button" onClick={() => setShowModal(false)} className="text-gray-500 hover:text-white">
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white">Create PPPoE IP Pool</h3>
+                <button type="button" onClick={() => setShowModal(false)}
+                  className="text-gray-400 hover:text-gray-900 dark:text-gray-500 dark:hover:text-white">
                   <X size={18} />
                 </button>
               </div>
@@ -372,8 +381,9 @@ const IpPools = () => {
                   </select>
                 </Field>
 
-                <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
-                  <p className="text-xs text-gray-400 mb-2">
+                <div className="rounded-lg border border-emerald-200 dark:border-emerald-500/20
+                  bg-emerald-50 dark:bg-emerald-500/5 p-3">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
                     Auto-generate a conflict-free /19 block (~8,000+ IPs) from the 10.x.x.x private range. All fields remain editable.
                   </p>
                   <button
@@ -381,8 +391,9 @@ const IpPools = () => {
                     onClick={handleAutoGenerate}
                     disabled={generating}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium
-                      bg-emerald-500/10 text-emerald-400 border border-emerald-500/30
-                      hover:bg-emerald-500/20 transition-colors disabled:opacity-50"
+                      bg-emerald-100 text-emerald-700 border border-emerald-300
+                      hover:bg-emerald-200 transition-colors disabled:opacity-50
+                      dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30 dark:hover:bg-emerald-500/20"
                   >
                     <Wand2 size={13} className={generating ? 'animate-pulse' : ''} />
                     {generating ? 'Generating…' : 'Auto Generate'}
@@ -434,7 +445,7 @@ const IpPools = () => {
                     className={inputCls} />
                 </Field>
 
-                <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+                <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
                   <input type="checkbox" checked={form.sync_immediately}
                     onChange={(e) => setForm({ ...form, sync_immediately: e.target.checked })}
                     className="w-4 h-4 rounded accent-emerald-500" />
@@ -444,13 +455,14 @@ const IpPools = () => {
 
               <div className="flex gap-3 mt-6">
                 <button type="button" onClick={() => setShowModal(false)}
-                  className="flex-1 py-2.5 rounded-lg text-sm font-medium text-gray-300
-                    bg-white/5 hover:bg-white/10 transition-colors">
+                  className="flex-1 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300
+                    bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
                   Cancel
                 </button>
                 <button type="submit" disabled={saving}
-                  className="flex-1 py-2.5 rounded-lg text-sm font-medium text-black
-                    bg-emerald-500 hover:bg-emerald-400 transition-colors disabled:opacity-60
+                  className="flex-1 py-2.5 rounded-lg text-sm font-medium text-white dark:text-black
+                    bg-emerald-600 dark:bg-emerald-500 hover:bg-emerald-700 dark:hover:bg-emerald-400
+                    transition-colors disabled:opacity-60
                     flex items-center justify-center gap-2">
                   {saving && <RotateCw size={14} className="animate-spin" />}
                   {saving ? 'Creating…' : 'Create Pool'}
@@ -466,22 +478,24 @@ const IpPools = () => {
         {deleteTarget && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
+            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 dark:bg-black/70 backdrop-blur-sm px-4"
             onClick={() => setDeleteTarget(null)}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }}
               onClick={(e) => e.stopPropagation()}
               style={FONT}
-              className="w-full max-w-sm rounded-2xl bg-[#0d1512] border border-red-500/20 shadow-2xl p-6"
+              className="w-full max-w-sm rounded-2xl bg-white dark:bg-[#0d1512]
+                border border-gray-200 dark:border-red-500/20 shadow-2xl p-6"
             >
-              <h3 className="text-base font-semibold text-white mb-2">Delete pool?</h3>
-              <p className="text-sm text-gray-400 mb-6">
-                This removes <span className="text-white">{deleteTarget.name}</span> from your account. It will not be removed from the router automatically.
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">Delete pool?</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                This removes <span className="text-gray-900 dark:text-white">{deleteTarget.name}</span> from your account. It will not be removed from the router automatically.
               </p>
               <div className="flex gap-3">
                 <button onClick={() => setDeleteTarget(null)}
-                  className="flex-1 py-2.5 rounded-lg text-sm font-medium text-gray-300 bg-white/5 hover:bg-white/10">
+                  className="flex-1 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300
+                    bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10">
                   Cancel
                 </button>
                 <button onClick={handleDelete}
@@ -497,13 +511,15 @@ const IpPools = () => {
   );
 };
 
-const inputCls = "w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm " +
-  "text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 " +
-  "focus:ring-1 focus:ring-emerald-500/30";
+const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-gray-300 text-sm " +
+  "text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-emerald-500 " +
+  "focus:ring-1 focus:ring-emerald-500/30 " +
+  "dark:bg-white/5 dark:border-white/10 dark:text-gray-200 dark:placeholder:text-gray-600 " +
+  "dark:focus:border-emerald-500/50 dark:focus:ring-emerald-500/30";
 
 const Field = ({ label, children }) => (
   <div>
-    <label className="block text-xs text-gray-500 mb-1">{label}</label>
+    <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">{label}</label>
     {children}
   </div>
 );
