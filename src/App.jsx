@@ -36,7 +36,6 @@ const SignupNotification = lazy(()=> import('./notification/SignupNotification')
 const HotspotLogin = lazy(()=> import('./hotspot_page/HotspotLogin'))
 const PasskeySignin = lazy(()=> import('./Auth/PasskeySignin'))
 const DashboardSytemAdmin = lazy(()=> import('./system_admin/DashBoardSystemAdmin'))
-const IpPoolTable = lazy(() => import('./ip_pool/IpPoolTable'))
 const IpPools = lazy(() => import('./ip_pool/IpPools'))
 const ResetPassword = lazy(()=> import('./Auth/ResetPassword')
 ) 
@@ -726,10 +725,8 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/nas' element={<Nas/>}/>
 <Route path='/admin/router_details' element={<RouterDetails/>}/>
 <Route path='/admin/passkeys' element={<PasskeyList/>}/>
-<Route path='/admin/ip-pool' element={<IpPoolTable/>}/>
 <Route path='/admin/hotspot_settings' element={<HotspotSettings/>}/>
 <Route path='/admin/customer-tickets' element={<CustomerTickets/>}/>
-<Route path='/admin/ip-pool-table' element={<IpPoolTable/>}/>
 <Route path='/admin/network-components' element={<NetworkComponents/>}/>
 <Route path='/admin/messages' element={<AllMessages/>}/>
 <Route path='/admin/bulk-messages' element={<BulkMessage/>}/>
