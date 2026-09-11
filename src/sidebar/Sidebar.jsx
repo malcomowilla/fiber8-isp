@@ -65,6 +65,12 @@ import {
    Award,
 } from 'lucide-react'
 import { LuTv } from "react-icons/lu";
+import { Network } from 'lucide-react'
+
+
+
+
+
 
 
 const Sidebar = () => {
@@ -175,6 +181,12 @@ const Sidebar = () => {
           label: "PPOE Subscribers",
           path: "/admin/pppoe-subscribers"
         },
+
+        {
+  icon: <IconChip tint="text-emerald-600"><Network size={17} /></IconChip>,
+  label: "IP Pools",
+  path: "/admin/pppoe-ip-pools"
+},
         {
           icon: <IconChip tint="text-yellow-600"><AssessmentIcon style={{ fontSize: 17 }} /></IconChip>,
           label: "Payment Analytics",
@@ -724,9 +736,9 @@ const Sidebar = () => {
                   animate={{ scale: 1 }}
                   className="h-9 w-9 rounded-full border-2 border-gray-200
                    ring-2 ring-emerald-500/20 object-cover"
-                  src={logo_preview || "/images/aitechs.png"}
+                  src={logo_preview || "/images/owitech-logo.png"}
                   alt={company_name || "Aitechs"}
-                  onError={(e) => { e.target.src = "/images/aitechs.png"; }}
+                  onError={(e) => { e.target.src = "/images/owitech-logo.png"; }}
                 />
                 <motion.button
                   whileHover={{ scale: 1.08 }}

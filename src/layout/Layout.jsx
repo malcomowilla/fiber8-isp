@@ -438,6 +438,7 @@ useEffect(() => {
                 location.pathname !== '/admin/referrals' &&
                  location.pathname !== '/admin/hotspot-customers' &&
                  location.pathname !== '/admin/loyalty' &&
+                 location.pathname !== '/admin/pppoe-ip-pools' &&
                 
                                       
                                       
@@ -516,6 +517,7 @@ location.pathname !== '/admin/network-map' &&
  location.pathname !== '/admin/referrals' &&
  location.pathname !== '/admin/hotspot-customers' &&
  location.pathname !== '/admin/loyalty' &&
+ location.pathname !== '/admin/pppoe-ip-pools' &&
 <div
  onClick={() => {
             setShowMenu1(false)
@@ -638,6 +640,7 @@ location.pathname !== '/admin/onu-details' && location.pathname !== '/admin/node
       location.pathname !== '/admin/referrals' &&
       location.pathname !== '/admin/hotspot-customers' &&
       location.pathname !== '/admin/loyalty' &&
+      location.pathname !== '/admin/pppoe-ip-pools' &&
 <div 
  onClick={() => {
             setShowMenu1(false)
@@ -748,6 +751,7 @@ location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/u
                      location.pathname !== '/admin/referrals' &&
                      location.pathname !== '/admin/hotspot-customers' &&
                      location.pathname !== '/admin/loyalty' &&
+                     location.pathname !== '/admin/pppoe-ip-pools' &&
            <div
             onClick={() => {
             setShowMenu1(false)

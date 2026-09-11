@@ -37,7 +37,7 @@ const HotspotLogin = lazy(()=> import('./hotspot_page/HotspotLogin'))
 const PasskeySignin = lazy(()=> import('./Auth/PasskeySignin'))
 const DashboardSytemAdmin = lazy(()=> import('./system_admin/DashBoardSystemAdmin'))
 const IpPoolTable = lazy(() => import('./ip_pool/IpPoolTable'))
-
+const IpPools = lazy(() => import('./ip_pool/IpPools'))
 const ResetPassword = lazy(()=> import('./Auth/ResetPassword')
 ) 
 const Signup = lazy(()=> import('./Auth/Signup')
@@ -779,6 +779,8 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path="/admin/referrals" element={<ReferralDashboard />} />
 <Route path="/admin/hotspot-customers" element={<HotspotLoyaltyCustomers />} />
 <Route path="/admin/loyalty" element={<LoyaltySettings />} />
+
+<Route  path='/admin/pppoe-ip-pools' element={<IpPools/>}/>
 
 
 
