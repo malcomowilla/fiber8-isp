@@ -65,6 +65,28 @@ const IpPools = () => {
   const subdomain = window.location.hostname.split('.')[0];
   const headers = { 'Content-Type': 'application/json', 'X-Subdomain': subdomain };
 
+
+
+  const [editTarget, setEditTarget] = useState(null);
+
+
+const openEdit = (pool) => {
+  setForm({
+    name: pool.name || '',
+    nas_router_id: pool.nas_router_id || '',
+    ip_range_start: pool.ip_range_start || '',
+    ip_range_end: pool.ip_range_end || '',
+    subnet_mask: pool.subnet_mask || '',
+    gateway: pool.gateway || '',
+    primary_dns: pool.primary_dns || '',
+    secondary_dns: pool.secondary_dns || '',
+    description: pool.description || '',
+    sync_immediately: true
+  });
+  setEditTarget(pool);
+  setShowModal(true);
+};
+
   const fetchPools = useCallback(async () => {
     try {
       const res = await fetch('/api/ip_pools', { headers, credentials: 'include' });
@@ -145,16 +167,21 @@ const IpPools = () => {
   };
 
   const openCreate = () => {
+      setForm(emptyForm);
+
     setForm(emptyForm);
     setShowModal(true);
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      const res = await fetch('/api/ip_pools', {
-        method: 'POST',
+  e.preventDefault();
+  setSaving(true);
+  const isEdit = !!editTarget;
+  try {
+    const res = await fetch(
+      isEdit ? `/api/ip_pools/${editTarget.id}` : '/api/ip_pools',
+      {
+        method: isEdit ? 'PATCH' : 'POST',
         headers,
         credentials: 'include',
         body: JSON.stringify({
@@ -171,19 +198,26 @@ const IpPools = () => {
           },
           sync_immediately: form.sync_immediately
         })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error((data.errors || [data.error]).filter(Boolean).join(', '));
-      toast.success('Pool created');
-      if (data.sync_error) toast.error(`Created, but sync failed: ${data.sync_error}`);
-      setShowModal(false);
-      fetchPools();
-    } catch (e) {
-      toast.error(e.message || 'Failed to create pool');
-    } finally {
-      setSaving(false);
-    }
-  };
+      }
+    );
+    const data = await res.json();
+    if (!res.ok) throw new Error((data.errors || [data.error]).filter(Boolean).join(', '));
+    toast.success(isEdit ? 'Pool updated' : 'Pool created');
+    if (data.sync_error) toast.error(`Saved, but sync failed: ${data.sync_error}`);
+    setShowModal(false);
+    setEditTarget(null);
+    fetchPools();
+  } catch (e) {
+    toast.error(e.message || 'Failed to save pool');
+  } finally {
+    setSaving(false);
+  }
+};
+
+
+
+
+
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -311,6 +345,7 @@ const IpPools = () => {
                       </button>
                       <button
                         title="Edit"
+                         onClick={() => openEdit(pool)}
                         className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10
                           text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                       >
