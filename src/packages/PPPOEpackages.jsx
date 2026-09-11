@@ -178,6 +178,10 @@ const PPPOEpackages = () => {
       toast.error(<p className='font-sans'>Please select a router</p>)
       return
     }
+    if (!formData.ip_pool_id) {
+      toast.error(<p className='font-sans'>Please select an IP pool for this router</p>)
+      return
+    }
 
     try {
       setNameError(false);
@@ -204,6 +208,11 @@ const PPPOEpackages = () => {
             router_name: settingsformData.router_name,
             use_radius: settingsformData.use_radius,
             nas_router: formData.nas_router,
+            // The join table (package_routers) needs BOTH ids — this is what
+            // router_attrs() on the backend actually reads to attach a router.
+            routers: [
+              { nas_router_id: formData.nas_router_id, ip_pool_id: formData.ip_pool_id },
+            ],
           },
           sync_immediately: formData.sync_immediately !== false,
         })
