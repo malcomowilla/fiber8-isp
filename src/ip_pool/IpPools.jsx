@@ -202,7 +202,7 @@ const IpPools = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f0d] text-gray-200 p-6" style={FONT}>
+    <div className="min-h-screen  text-gray-200 p-6" style={FONT}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
