@@ -518,13 +518,24 @@ const GeneralSettings = ({ children }) => {
 
   useEffect(() => { handleGetHotspotCustomizations(); }, [handleGetHotspotCustomizations]);
 
+  
   const handleSaveSystemGeneralSettings = async e => {
     e.preventDefault();
     setLoadGeneralSettings(true)
     try {
       const response = await fetch('/api/general_settings', { method: 'POST',
          headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
-          body: JSON.stringify({ title: formDataGeneralSettings.title, timezone: formDataGeneralSettings.timezone, allowed_ips: formDataGeneralSettings.allowed_ips }) });
+body: JSON.stringify({
+  general_setting: {
+    title: formDataGeneralSettings.title,
+    timezone: formDataGeneralSettings.timezone,
+    allowed_ips: formDataGeneralSettings.allowed_ips
+  }
+})
+
+         });
+
+          
       const newData = await response.json();
       if (response.ok) {
         setLoadGeneralSettings(false)
