@@ -281,17 +281,22 @@ const EditPackage = ({
               <div className="flex flex-col sm:flex-row gap-3">
                 <TextField
                   id="name" label="Plan name" placeholder="e.g. Home 10M"
+
+                  className='myTextField'
                   value={formData.name || ''} onChange={onChange}
-                  InputProps={{ startAdornment: <Wifi className="mr-2 w-4 h-4" color={GREEN} /> }}
+                  InputProps={{ startAdornment: <Wifi className="mr-2 w-4 h-4"
+                     color={GREEN} /> }}
                   sx={fieldSx} fullWidth
                 />
                 <TextField
+                className='myTextField'
                   id="router_profile_name" label="Router profile name" placeholder="Leave empty to use the plan name"
                   value={formData.router_profile_name || ''} onChange={onChange}
                   sx={fieldSx} fullWidth
                 />
               </div>
               <TextField
+
                 id="description" label="Description" placeholder="Optional. Shown on the customer portal and invoices."
                 value={formData.description || ''} onChange={onChange}
                 sx={{ ...fieldSx, mt: 2 }} fullWidth multiline minRows={2}
@@ -330,18 +335,21 @@ const EditPackage = ({
               </p>
               <div className="flex gap-3 flex-wrap">
                 <TextField
+                className='myTextField'
                   id="download_limit" label="Download (mbps)" type="number"
                   value={formData.download_limit || ''} onChange={onChange}
                   InputProps={{ startAdornment: <ArrowDown className="mr-2 w-4 h-4" color={GREEN} /> }}
                   sx={fieldSx} fullWidth
                 />
                 <TextField
+                className='myTextField'
                   id="upload_limit" label="Upload (mbps)" type="number"
                   value={formData.upload_limit || ''} onChange={onChange}
                   InputProps={{ startAdornment: <ArrowUp className="mr-2 w-4 h-4" color={GREEN} /> }}
                   sx={fieldSx} fullWidth
                 />
                 <TextField
+                className='myTextField'
                   id="aggregation" label="Aggregation"
                   value={formData.aggregation || ''} onChange={onChange}
                   InputProps={{ startAdornment: <Hash className="mr-2 w-4 h-4" color={GREEN} /> }}
@@ -360,28 +368,35 @@ const EditPackage = ({
 
               <div className="flex gap-3 flex-wrap mt-3">
                 <TextField
+                className='myTextField'
                   id="burst_download_speed" label="Burst download (mbps)"
                   value={formData.burst_download_speed || ''} onChange={onChange}
                   InputProps={{ startAdornment: <ArrowDown className="mr-2 w-4 h-4" /> }}
                   sx={fieldSx} fullWidth
                 />
                 <TextField
+                  className='myTextField'
                   id="burst_upload_speed" label="Burst upload (mbps)"
                   value={formData.burst_upload_speed || ''} onChange={onChange}
                   InputProps={{ startAdornment: <ArrowUp className="mr-2 w-4 h-4" /> }}
                   sx={fieldSx} fullWidth
                 />
                 <TextField
+                  className='myTextField'
                   id="burst_threshold_download" label="Burst threshold down (mbps)"
                   value={formData.burst_threshold_download || ''} onChange={onChange}
                   sx={fieldSx} fullWidth
                 />
                 <TextField
+
+                  className='myTextField'
                   id="burst_threshold_upload" label="Burst threshold up (mbps)"
                   value={formData.burst_threshold_upload || ''} onChange={onChange}
                   sx={fieldSx} fullWidth
                 />
                 <TextField
+                  className='myTextField'
+
                   id="burst_time" label="Burst time (s)" type="number"
                   value={formData.burst_time || ''} onChange={onChange}
                   InputProps={{ startAdornment: <Clock className="mr-2 w-4 h-4" /> }}
@@ -395,12 +410,14 @@ const EditPackage = ({
               <SectionHeader index="03" title="Price" subtitle="What it costs. Price per validity period, before tax." />
               <div className="flex gap-3 flex-wrap items-start">
                 <TextField
+                  className='myTextField'
                   id="price" label="Price (KES)" type="number"
                   value={formData.price || ''} onChange={onChange}
                   InputProps={{ startAdornment: <DollarSign className="mr-2 w-4 h-4" color={GREEN} /> }}
                   sx={fieldSx} fullWidth
                 />
                 <TextField
+                className='myTextField'
                   id="validity" label="Validity" type="number"
                   value={formData.validity || ''} onChange={onChange}
                   sx={fieldSx} fullWidth
@@ -417,6 +434,7 @@ const EditPackage = ({
                   </Select>
                 </FormControl>
                 <TextField
+                className='myTextField'
                   id="daily_charge" label="Daily charge"
                   value={formData.daily_charge || ''} onChange={onChange}
                   sx={fieldSx} fullWidth
@@ -451,6 +469,7 @@ const EditPackage = ({
                 <div className="mt-3 space-y-3" style={{ animation: 'fupFadeIn .2s ease' }}>
                   <div className="flex gap-3 flex-wrap">
                     <TextField
+                    className='myTextField'
                       id="fup_data_limit" label="Fair usage cap" type="number" placeholder="e.g. 500"
                       value={formData.fup_data_limit || ''} onChange={onChange}
                       InputProps={{ startAdornment: <Database className="mr-2 w-4 h-4" color={GREEN} /> }}
