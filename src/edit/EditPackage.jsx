@@ -193,9 +193,10 @@ const EditPackage = ({
   useEffect(() => { if (open) fetchIpPools(); }, [open, fetchIpPools]);
 
   const poolsForRouter = useMemo(() => {
-    if (!selectedRouter) return [];
-    return ipPools.filter(p => p.router_name === selectedRouter || p.nas_router === selectedRouter);
-  }, [ipPools, selectedRouter]);
+    const routerId = routers.find(r => r.name === selectedRouter)?.id;
+    if (!routerId) return [];
+    return ipPools.filter(p => p.nas_router_id === routerId);
+  }, [ipPools, selectedRouter, routers]);
 
   const handleIpPoolChange = (e) => setFormData({ ...formData, ip_pool: e.target.value });
 
@@ -231,7 +232,7 @@ const EditPackage = ({
     setRouterDetails(selected || null);
     // Auto-fill the pool when the router only has one — most routers do.
     // Only leaves it blank (forcing a manual pick) when there's a real choice.
-    const matchingPools = ipPools.filter(p => p.router_name === routerName || p.nas_router === routerName);
+    const matchingPools = ipPools.filter(p => p.nas_router_id === selected?.id);
     setFormData({
       ...formData,
       router_name: selected?.name || '',
