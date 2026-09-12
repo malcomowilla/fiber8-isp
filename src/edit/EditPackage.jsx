@@ -198,7 +198,15 @@ const EditPackage = ({
     return ipPools.filter(p => p.nas_router_id === routerId);
   }, [ipPools, selectedRouter, routers]);
 
-  const handleIpPoolChange = (e) => setFormData({ ...formData, ip_pool: e.target.value });
+  const selectedPoolNames = useMemo(() => {
+    return (formData.ip_pool || '').split(',').map(s => s.trim()).filter(Boolean);
+  }, [formData.ip_pool]);
+
+  const handleIpPoolChange = (e) => {
+    const value = e.target.value; // MUI multi-select gives an array here
+    const names = typeof value === 'string' ? value.split(',') : value;
+    setFormData({ ...formData, ip_pool: names.join(',') });
+  };
 
   // ── FUP helpers ──────────────────────────────────────────────────────
   const fupEnabled = !!formData.fup_enabled;
@@ -230,8 +238,8 @@ const EditPackage = ({
     setSelectedRouter(routerName);
     const selected = routers.find(r => r.name === routerName);
     setRouterDetails(selected || null);
-    // Auto-fill the pool when the router only has one — most routers do.
-    // Only leaves it blank (forcing a manual pick) when there's a real choice.
+    // Auto-select the pool when the router only has one — most routers do.
+    // Multiple pools are left for the person to pick from the multi-select below.
     const matchingPools = ipPools.filter(p => p.nas_router_id === selected?.id);
     setFormData({
       ...formData,
@@ -600,37 +608,37 @@ const EditPackage = ({
                     </div>
                   )}
 
-                  {poolsForRouter.length > 1 ? (
+                  {poolsForRouter.length > 0 ? (
                     <FormControl
                       fullWidth
                       disabled={!selectedRouter}
                       sx={{ mt: 1.5, ...fieldSx }}
                     >
-                      <InputLabel id="ip-pool-select-label">Select IP pool</InputLabel>
+                      <InputLabel id="ip-pool-select-label">Select IP pool(s)</InputLabel>
                       <Select
                         labelId="ip-pool-select-label"
-                        value={formData.ip_pool || ''}
+                        multiple
+                        value={selectedPoolNames}
                         onChange={handleIpPoolChange}
-                        label="Select IP pool"
+                        label="Select IP pool(s)"
+                        renderValue={(selected) => selected.join(', ')}
                       >
-                        <MenuItem value=""><em>Choose a pool…</em></MenuItem>
                         {poolsForRouter.map((pool) => (
                           <MenuItem key={pool.id} value={pool.name}>
+                            <input
+                              type="checkbox"
+                              readOnly
+                              checked={selectedPoolNames.includes(pool.name)}
+                              style={{ marginRight: 8, accentColor: GREEN }}
+                            />
                             {pool.name} ({pool.ip_range_start} – {pool.ip_range_end})
                           </MenuItem>
                         ))}
                       </Select>
+                      <p className="m-0 mt-1 text-xs text-gray-500 dark:text-gray-400" style={{ fontFamily: fontStack }}>
+                        Pick one, or several — the router draws from whichever pool has room, in the order picked.
+                      </p>
                     </FormControl>
-                  ) : poolsForRouter.length === 1 ? (
-                    <div
-                      className="mt-3 dark:bg-[#1e1e1e]"
-                      style={{ padding: '10px 14px', background: '#f7faf8', borderRadius: '10px', fontFamily: fontStack }}
-                    >
-                      <span className="text-xs text-gray-500 dark:text-gray-400">Pool: </span>
-                      <span className="text-sm font-semibold dark:text-white">
-                        {poolsForRouter[0].name} ({poolsForRouter[0].ip_range_start} – {poolsForRouter[0].ip_range_end})
-                      </span>
-                    </div>
                   ) : null}
                   {selectedRouter && !loadingIpPools && poolsForRouter.length === 0 && (
                     <Alert severity="warning" sx={{ mt: 1, borderRadius: '12px', fontFamily: fontStack }}>
