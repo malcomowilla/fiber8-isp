@@ -64,6 +64,7 @@ const PPPOEpackages = () => {
   const [creationError, setCreationError] = useState(false)
   const [error, setError] = useState([])
   const [deleteNotification, setDeleteNotification] = useState(false)
+  const [formErrors, setFormErrors] = useState([])
   const [planTypeFilter, setPlanTypeFilter] = useState('all')
   const [syncingId, setSyncingId] = useState(null)
   const [syncingAll, setSyncingAll] = useState(false)
@@ -119,6 +120,7 @@ const PPPOEpackages = () => {
   const handleRowClick = (event, rowData) => {
     setFormData(rowData);
     setEditPackage(true)
+    setFormErrors([])
   };
 
   function useIsDarkMode() {
@@ -162,6 +164,7 @@ const PPPOEpackages = () => {
     setOpen(true);
     setFormData(initialValue)
     setEditPackage(false)
+    setFormErrors([])
   };
 
   const handleClose = () => setOpen(false);
@@ -230,6 +233,7 @@ const PPPOEpackages = () => {
       if (response.ok) {
         setOpen(false);
         setloading(false);
+        setFormErrors([]);
         setShowNotification(true);
         setTimeout(() => { setShowNotification(false) }, 10000);
         setofflineerror(false);
@@ -240,16 +244,27 @@ const PPPOEpackages = () => {
           setTableData([...tableData, newData]);
           toast.success('package created successfully', { position: "top-center", duration: 4000 })
         }
+        if (newData.sync_error) {
+          toast.error(`Saved, but sync failed: ${newData.sync_error}`, { position: 'top-center', duration: 6000 })
+        }
       } else {
         setOpen(true)
         setloading(false);
-        toast.error(newData.error, { position: "top-center", duration: 8000 })
-        setError(newData.error);
+        // Rails validation failures come back as { errors: [...] } (plural,
+        // an array of full messages) — other failures (auth, tenant, sync)
+        // come back as { error: "..." } (singular, a string). Normalize
+        // both into one array so the dialog can list them consistently.
+        const messages = Array.isArray(newData.errors)
+          ? newData.errors
+          : [newData.error || 'Something went wrong, please try again.']
+        setFormErrors(messages)
+        toast.error(messages.join(', '), { position: "top-center", duration: 8000 })
       }
     } catch (error) {
-      setOpen(false);
+      setOpen(true);
       setloading(false);
       setofflineerror(true);
+      setFormErrors(['Failed to reach the server. Please try again.']);
       toast.error('failed to update package server error', { position: "top-center", duration: 4000 })
     }
   }
@@ -477,6 +492,7 @@ const PPPOEpackages = () => {
           tableData={tableData} allPackages={tableData} routerName={routerName} setRouterName={setRouterName}
           editPackage={editPackage} setEditPackage={setEditPackage}
           selectedRouter={selectedRouter} setSelectedRouter={setSelectedRouter}
+          formErrors={formErrors}
         />
 
         <DeletePackage

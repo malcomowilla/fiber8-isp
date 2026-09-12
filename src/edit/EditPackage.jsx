@@ -103,6 +103,7 @@ const EditPackage = ({
   open, handleClose, formData, loading, setFormData, showNotification,
   createPackage, offlineerror, isloading,
   editPackage, allPackages, selectedRouter, setSelectedRouter,
+  formErrors,
 }) => {
   const [routers, setRouters] = useState([]);
   const [mikrotik_router, setRouter] = useState(null);
@@ -284,6 +285,19 @@ const EditPackage = ({
               Name it, set the speed and price, pick the routers. Everything else is optional.
             </p>
           </div>
+
+          {Array.isArray(formErrors) && formErrors.length > 0 && (
+            <Alert severity="error" sx={{ mt: 2, borderRadius: '12px', fontFamily: fontStack }}>
+              <AlertTitle sx={{ fontFamily: fontStack, fontWeight: 700 }}>
+                Couldn't save this plan
+              </AlertTitle>
+              <ul style={{ margin: 0, paddingLeft: '1.1em', fontFamily: fontStack }}>
+                {formErrors.map((msg, i) => (
+                  <li key={i} style={{ fontSize: '13px' }}>{msg}</li>
+                ))}
+              </ul>
+            </Alert>
+          )}
 
           <form onSubmit={createPackage}>
 
