@@ -19,9 +19,6 @@ import { Search, RefreshCw, CheckCircle2, XCircle, RotateCw } from 'lucide-react
 import toast, { Toaster } from 'react-hot-toast';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
-// ─────────────────────────────────────────────────────────────────────────
-// Design tokens — green / IBM Plex Mono, matches EditPackage.jsx
-// ─────────────────────────────────────────────────────────────────────────
 const GREEN = '#0f9d58';
 const GREEN_DARK = '#0b7a44';
 const GREEN_SOFT = 'rgba(15,157,88,0.08)';
@@ -527,6 +524,18 @@ const PPPOEpackages = () => {
               </button>
             </div>
           </div>
+        </div>
+
+        <div className='px-3 pt-3'>
+          <Alert
+            severity="info"
+            sx={{ borderRadius: '12px', fontFamily: fontStack, backgroundColor: GREEN_SOFT, color: 'inherit' }}
+          >
+            <AlertTitle sx={{ fontFamily: fontStack, fontWeight: 700 }}>Before adding plans</AlertTitle>
+            <span style={{ fontFamily: fontStack, fontSize: '13px' }}>
+              Make sure you have set up an IP pool for your router before creating plans. Plans require an IP pool to assign addresses to customers.
+            </span>
+          </Alert>
         </div>
 
         {/* Plan-type filter chips */}
