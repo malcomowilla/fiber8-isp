@@ -170,11 +170,10 @@ const EditPackage = ({
   useEffect(() => { if (open) fetchRouters(); }, [open, fetchRouters]);
 
   // ── IP pools ─────────────────────────────────────────────────────────
-  // A package_router row needs BOTH a nas_router_id and an ip_pool_id — the
-  // backend's router_attrs() builds package_routers from
-  // params[:package][:routers] = [{ nas_router_id, ip_pool_id }]. The old
-  // flat `nas_router` name field is display-only and isn't even permitted
-  // by the controller, so it was never actually wiring up the router.
+  // Package.nas_router and Package.ip_pool are plain name strings — same
+  // flat pattern as HotspotPackage/NasRouter.find_by(name:) elsewhere in
+  // the app. No join table, no _id juggling: pick a router, pick one of
+  // its pools, done.
   const [ipPools, setIpPools] = useState([]);
   const [loadingIpPools, setLoadingIpPools] = useState(false);
 
@@ -193,29 +192,12 @@ const EditPackage = ({
 
   useEffect(() => { if (open) fetchIpPools(); }, [open, fetchIpPools]);
 
-  // Pre-fill nas_router_id / ip_pool_id from the package's existing
-  // package_routers when opening the edit dialog for an existing plan.
-  useEffect(() => {
-    if (open && formData?.package_routers?.length && !formData.ip_pool_id) {
-      const pr = formData.package_routers[0];
-      setFormData({
-        ...formData,
-        nas_router_id: pr.nas_router_id || pr.nas_router?.id || formData.nas_router_id,
-        ip_pool_id: pr.ip_pool_id || pr.ip_pool?.id || formData.ip_pool_id,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
-  const selectedRouterObj = routers.find(r => r.name === selectedRouter);
-
   const poolsForRouter = useMemo(() => {
-    const routerId = selectedRouterObj?.id;
-    if (!routerId) return [];
-    return ipPools.filter(p => p.nas_router_id === routerId);
-  }, [ipPools, selectedRouterObj]);
+    if (!selectedRouter) return [];
+    return ipPools.filter(p => p.router_name === selectedRouter || p.nas_router === selectedRouter);
+  }, [ipPools, selectedRouter]);
 
-  const handleIpPoolChange = (e) => setFormData({ ...formData, ip_pool_id: e.target.value });
+  const handleIpPoolChange = (e) => setFormData({ ...formData, ip_pool: e.target.value });
 
   // ── FUP helpers ──────────────────────────────────────────────────────
   const fupEnabled = !!formData.fup_enabled;
@@ -247,12 +229,14 @@ const EditPackage = ({
     setSelectedRouter(routerName);
     const selected = routers.find(r => r.name === routerName);
     setRouterDetails(selected || null);
+    // Auto-fill the pool when the router only has one — most routers do.
+    // Only leaves it blank (forcing a manual pick) when there's a real choice.
+    const matchingPools = ipPools.filter(p => p.router_name === routerName || p.nas_router === routerName);
     setFormData({
       ...formData,
       router_name: selected?.name || '',
       nas_router: selected?.name || '',
-      nas_router_id: selected?.id || '',
-      ip_pool_id: '', // reset — pools are router-specific
+      ip_pool: matchingPools.length === 1 ? matchingPools[0].name : '',
     });
   };
 
@@ -615,26 +599,38 @@ const EditPackage = ({
                     </div>
                   )}
 
-                  <FormControl
-                    fullWidth
-                    disabled={!selectedRouter}
-                    sx={{ mt: 1.5, ...fieldSx }}
-                  >
-                    <InputLabel id="ip-pool-select-label">Select IP pool</InputLabel>
-                    <Select
-                      labelId="ip-pool-select-label"
-                      value={formData.ip_pool_id || ''}
-                      onChange={handleIpPoolChange}
-                      label="Select IP pool"
+                  {poolsForRouter.length > 1 ? (
+                    <FormControl
+                      fullWidth
+                      disabled={!selectedRouter}
+                      sx={{ mt: 1.5, ...fieldSx }}
                     >
-                      <MenuItem value=""><em>Choose a pool…</em></MenuItem>
-                      {poolsForRouter.map((pool) => (
-                        <MenuItem key={pool.id} value={pool.id}>
-                          {pool.name} ({pool.ip_range_start} – {pool.ip_range_end})
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                      <InputLabel id="ip-pool-select-label">Select IP pool</InputLabel>
+                      <Select
+                        labelId="ip-pool-select-label"
+                        value={formData.ip_pool || ''}
+                        onChange={handleIpPoolChange}
+                        label="Select IP pool"
+                      >
+                        <MenuItem value=""><em>Choose a pool…</em></MenuItem>
+                        {poolsForRouter.map((pool) => (
+                          <MenuItem key={pool.id} value={pool.name}>
+                            {pool.name} ({pool.ip_range_start} – {pool.ip_range_end})
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  ) : poolsForRouter.length === 1 ? (
+                    <div
+                      className="mt-3 dark:bg-[#1e1e1e]"
+                      style={{ padding: '10px 14px', background: '#f7faf8', borderRadius: '10px', fontFamily: fontStack }}
+                    >
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Pool: </span>
+                      <span className="text-sm font-semibold dark:text-white">
+                        {poolsForRouter[0].name} ({poolsForRouter[0].ip_range_start} – {poolsForRouter[0].ip_range_end})
+                      </span>
+                    </div>
+                  ) : null}
                   {selectedRouter && !loadingIpPools && poolsForRouter.length === 0 && (
                     <Alert severity="warning" sx={{ mt: 1, borderRadius: '12px', fontFamily: fontStack }}>
                       No IP pools found on this router. Create one on the IP Pools page first.

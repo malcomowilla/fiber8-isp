@@ -178,7 +178,7 @@ const PPPOEpackages = () => {
       toast.error(<p className='font-sans'>Please select a router</p>)
       return
     }
-    if (!formData.ip_pool_id) {
+    if (!formData.ip_pool) {
       toast.error(<p className='font-sans'>Please select an IP pool for this router</p>)
       return
     }
@@ -208,11 +208,7 @@ const PPPOEpackages = () => {
             router_name: settingsformData.router_name,
             use_radius: settingsformData.use_radius,
             nas_router: formData.nas_router,
-            // The join table (package_routers) needs BOTH ids — this is what
-            // router_attrs() on the backend actually reads to attach a router.
-            routers: [
-              { nas_router_id: formData.nas_router_id, ip_pool_id: formData.ip_pool_id },
-            ],
+            ip_pool: formData.ip_pool,
           },
           sync_immediately: formData.sync_immediately !== false,
         })
@@ -353,13 +349,9 @@ const PPPOEpackages = () => {
     }
   }
 
-  // A package is considered synced when it has at least one router assignment
-  // and every assignment reports synced === true.
-  const packageSyncState = (pkg) => {
-    const routers = pkg.package_routers || []
-    if (routers.length === 0) return 'unknown'
-    return routers.every((pr) => pr.synced) ? 'synced' : 'pending'
-  }
+  // Package.synced is a flat boolean set directly by MikrotikProfileSyncService —
+  // same pattern as HotspotVoucher.sync_status, no join-table lookups needed.
+  const packageSyncState = (pkg) => (pkg.synced ? 'synced' : 'pending')
 
   const filteredData = useMemo(() => {
     if (planTypeFilter === 'all') return tableData
