@@ -549,12 +549,13 @@ const tableTheme = useMemo(() => createTheme({
                 <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
-              <h2 className="font-sans font-bold text-base text-  tracking-tight text-lack dark:text-white">
+              <h2 className="font-sans font-bold text-base text-  tracking-tight text-black dark:text-white">
                 {routerInfo || 'Router'}
-                <span className="ml-2 text-gray-600 font-normal">/ online</span>
+                <span className="ml-2 text-black dark:text-white font-normal">/ online</span>
               </h2>
             </div>
-            <span className="font-mono text-xs text-gray-600">{event.toLocaleTimeString('en-US')}</span>
+            <span className="font-mono text-xs text-black
+             dark:text-white">{event.toLocaleTimeString('en-US')}</span>
           </div>
 
           {/* Stat cards */}
@@ -587,7 +588,7 @@ const tableTheme = useMemo(() => createTheme({
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider
                  text-black dark:text-white">
-                  <GoServer className="text-sky-400 w-3.5 h-3.5" />
+                  <GoServer className="text-green-400 w-3.5 h-3.5" />
                   Router Board
                 </div>
                 {currentRouterImage && (
@@ -607,7 +608,7 @@ const tableTheme = useMemo(() => createTheme({
                   className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/8
                    bg-white/[0.03] hover:bg-white/[0.07] dark:text-gray-300 text-black text-sm font-medium 
                    py-2.5 transition-colors">
-                  <FiActivity className="w-4 h-4 text-sky-400" />
+                  <FiActivity className="w-4 h-4 text-green-400" />
                   View system logs
                 </button>
 

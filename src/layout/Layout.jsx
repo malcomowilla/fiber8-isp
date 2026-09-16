@@ -439,7 +439,7 @@ useEffect(() => {
                  location.pathname !== '/admin/hotspot-customers' &&
                  location.pathname !== '/admin/loyalty' &&
                  location.pathname !== '/admin/pppoe-ip-pools' &&
-                
+                 location.pathname !== '/admin/router-details' &&
                                       
                                       
 
