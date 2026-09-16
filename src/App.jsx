@@ -162,6 +162,8 @@ const HotspotLoyaltyCustomers = lazy(() => import('./hotspot_page/HotspotLoyalty
 const OutsideReferrerAuth = lazy(() => import('./referrals/OutsideReferrerAuth'))
 const OutsideReferrerDashboard = lazy(() => import('./referrals/OutsideReferrerDashboard'))
 const LoyaltySettings = lazy(() => import('./loyalty/LoyaltySettings'))
+import InstallPwaBanner from './pwa/InstallPwaBanner'
+import InstallPwaButton from './pwa/InstallPwaButton'
 
 
 
@@ -551,6 +553,11 @@ const isSubdomainOfRoot = ROOT_DOMAINS.some(domain => hostname.endsWith(`.${doma
     <main>
 
 <TourGuide />
+
+<InstallPwaBanner delayMs={5000} />
+<div className="fixed top-3 right-3 z-50">
+  <InstallPwaButton compact />
+</div>
 
 <Helmet>
                 <meta charSet="utf-8" />

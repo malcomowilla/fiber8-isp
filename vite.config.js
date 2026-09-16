@@ -1,129 +1,122 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from "path"
+import path from 'path'
 // import MillionLint from "@million/lint";
 
 import million from 'million/compiler'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  plugins: [react(),
+  plugins: [
+    react(),
     //  MillionLint.vite({ auto: true })
     VitePWA({
-       registerType: 'autoUpdate',
-       devOptions: {
-        enabled: true
-      },
+      registerType: 'autoUpdate',
       strategies: 'injectManifest',
       srcDir: 'src',
       filename: 'sw.js',
-       injectManifest: {
-          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
+      injectRegister: null, // we register manually in main.jsx
+      devOptions: {
+        enabled: true,
+        type: 'module', // required for injectManifest in dev
+        navigateFallback: 'index.html',
       },
-
-      
+      injectManifest: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
+      },
       manifest: {
+        id: '/',
         name: 'Owitech Isp',
         short_name: 'Owitech',
-        description: 'Owitech is a simple ISP billing and network management system for internet service providers.',
+        description:
+          'Owitech is a simple ISP billing and network management system for internet service providers.',
 
-        theme_color: '#38bdf8',
+        display: 'standalone', // REQUIRED — without this no install prompt fires
+        display_override: ['standalone', 'minimal-ui'],
+        scope: '/',
         start_url: '/',
-        background_color: '#1e293b',
         orientation: 'portrait',
 
+        theme_color: '#38bdf8',
+        background_color: '#1e293b',
 
         icons: [
-    {
-      "src": "/images/pwa-64x64.png",
-      "sizes": "64x64",
-      "type": "image/png"
-    },
-    {
-      "src": "/images/pwa-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/images/pwa-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "/images/maskable-icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ]
-      }
-
-      
-      }),
-        million.vite({ auto: true })
+          {
+            src: '/images/pwa-64x64.png',
+            sizes: '64x64',
+            type: 'image/png',
+          },
+          {
+            src: '/images/pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: '/images/pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: '/images/maskable-icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
+      },
+    }),
+    million.vite({ auto: true }),
   ],
   server: {
-    
     proxy: {
       '/api': {
-        // target: 'http://localhost:4000',
-        // // // target: 'http://0.0.0.0:3000',
-        // changeOrigin: true,
-        // rewrite: (path) => path.replace(/^\/api/, ''),
-
-        
         target: (req) => {
-          const host = req.headers.host; 
-      
+          const host = req.headers.host || ''
+
           if (host === 'aitechs.co.ke' || host.endsWith('.aitechs.co.ke')) {
-            return `https://${host}`; 
-          }else{
-           host.endsWith('.owitech.co.ke') 
+            return `https://${host}`
           }
-          return 'http://0.0.0.0:3000'; 
+
+          if (host.endsWith('.owitech.co.ke')) {
+            return `https://${host}`
+          }
+
+          return 'http://0.0.0.0:3000'
         },
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
-
-        
-      }
-    }
-
-    
-
+      },
+    },
   },
-
-
-
   build: {
-     cssCodeSplit: true,
-    minify: "esbuild",
+    cssCodeSplit: true,
+    minify: 'esbuild',
     chunkSizeWarningLimit: 1000,
-
-
-    outDir: 'dist', 
-        sourcemap: false,
-
-    assetsDir: 'assets', 
-    emptyOutDir: true, 
+    outDir: 'dist',
+    sourcemap: false,
+    assetsDir: 'assets',
+    emptyOutDir: true,
     commonjsOptions: {
       include: [/node_modules/],
-      transformMixedEsModules: true
-    }
+      transformMixedEsModules: true,
+    },
   },
   optimizeDeps: {
     include: ['react-lottie'],
     esbuildOptions: {
-      target: 'es2020'
-    }
+      target: 'es2020',
+    },
   },
   base: '/',
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
     },
-    define: {
-      "process.env": {},
-    },
+  },
+  define: {
+    'process.env': {},
   },
 })
