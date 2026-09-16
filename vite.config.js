@@ -4,10 +4,60 @@ import path from "path"
 // import MillionLint from "@million/lint";
 
 import million from 'million/compiler'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   plugins: [react(),
     //  MillionLint.vite({ auto: true })
+    VitePWA({
+       registerType: 'autoUpdate',
+       devOptions: {
+        enabled: true
+      },
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.js',
+      
+
+
+      manifest: {
+        name: 'Owitech Isp',
+        short_name: 'Owitech',
+        description: 'Owitech is a simple ISP billing and network management system for internet service providers.',
+
+        theme_color: '#38bdf8',
+        start_url: '/',
+        background_color: '#1e293b',
+        orientation: 'portrait',
+
+
+        icons: [
+    {
+      "src": "pwa-64x64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+      }
+
+      
+      }),
         million.vite({ auto: true })
   ],
   server: {
