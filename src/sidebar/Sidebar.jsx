@@ -63,9 +63,10 @@ import {
   MessageSquareText, TrendingUp, UserRound, CircleUserRound, Radar,
   ShieldCheck, Users as UsersIcon, Stethoscope,
    Award,
+   HelpCircle,
+   Network
 } from 'lucide-react'
 import { LuTv } from "react-icons/lu";
-import { Network } from 'lucide-react'
 
 
 
@@ -446,7 +447,7 @@ const Sidebar = () => {
     { icon: <MdDevices size={19} />, label: "Equipment", path: "/admin/equipment" },
     { icon: <GrLicense size={17} />, label: "License", path: "/admin/license" },
     { icon: <PermDataSettingIcon />, label: "Settings", path: "/admin/settings" },
-    { icon: <LifeBuoy size={19} />, label: "Support Tickets", path: "/admin/support-tickets" },
+{ icon: <HelpCircle size={19} />, label: "Help", path: "/admin/support-tickets" },
   ];
 
   const toggleMenu = (menu) => {

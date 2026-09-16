@@ -88,14 +88,16 @@ const NewTicketModal = ({ open, onClose, onCreated }) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto"
+            className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 
+            max-h-[90vh] overflow-y-auto"
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center">
-                  <LifeBuoy size={18} className="text-indigo-600 dark:text-indigo-400" />
+                <div className="w-9 h-9 rounded-xl bg-green-50 dark:bg-green-500/10 flex items-center justify-center">
+                  <LifeBuoy size={18} className="text-green-600 dark:text-green-400" />
                 </div>
-                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Raise a support ticket</h3>
+                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Tell us what went wrong
+</h3>
               </div>
               <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
                 <X size={18} />
@@ -115,7 +117,7 @@ const NewTicketModal = ({ open, onClose, onCreated }) => {
                       onClick={() => setForm((f) => ({ ...f, category: key }))}
                       className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-colors
                         ${form.category === key
-                          ? 'border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-400'
+                          ? 'border-green-400 bg-green-50 text-green-700 dark:border-green-500 dark:bg-green-500/10 dark:text-green-400'
                           : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800/60'}`}
                     >
                       <Icon size={15} />
@@ -137,7 +139,7 @@ const NewTicketModal = ({ open, onClose, onCreated }) => {
                       onClick={() => setForm((f) => ({ ...f, priority: p }))}
                       className={`flex-1 px-3 py-2 rounded-xl border text-xs font-semibold capitalize transition-colors
                         ${form.priority === p
-                          ? 'border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-400'
+                          ? 'border-green-400 bg-green-50 text-green-700 dark:border-green-500 dark:bg-green-500/10 dark:text-green-400'
                           : 'border-slate-200 text-slate-500 hover:bg-slate-50 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800/60'}`}
                     >
                       {p}
@@ -157,7 +159,7 @@ const NewTicketModal = ({ open, onClose, onCreated }) => {
                   placeholder="Brief summary of the issue"
                   className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60
                     px-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400
-                    focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:focus:ring-indigo-500"
+                    focus:outline-none focus:ring-2 focus:ring-green-400 dark:focus:ring-green-500"
                 />
               </div>
 
@@ -172,14 +174,14 @@ const NewTicketModal = ({ open, onClose, onCreated }) => {
                   placeholder="Describe the issue in detail — what happened, when, and any error messages"
                   className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60
                     px-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 resize-none
-                    focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:focus:ring-indigo-500"
+                    focus:outline-none focus:ring-2 focus:ring-green-400 dark:focus:ring-green-500"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-green-600 hover:bg-green-700
                   disabled:opacity-60 text-white text-sm font-semibold py-2.5 transition-colors"
               >
                 <Send size={15} />
@@ -244,7 +246,7 @@ const SupportTickets = () => {
         </div>
         <button
           onClick={() => setModalOpen(true)}
-          className="flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 transition-colors"
+          className="flex items-center gap-2 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2.5 transition-colors"
         >
           <Plus size={16} />
           New ticket
