@@ -542,14 +542,10 @@ const hostname = window.location.hostname;
 
 
   const shouldShowReferalRoutes = () => {
-    const { hostname } = window.location;
-    const domainParts = hostname.split('.');
-    
-    if (domainParts.length < 3) return false; 
-    
-    const firstChar = domainParts[0].charAt(0).toLowerCase();
-    return firstChar === 'r';
-  };
+  const { hostname } = window.location;
+
+  return hostname === 'referals.owitech.co.ke';
+};
 
   const showAdmin = shouldShowAdminRoutes();
   const showReferal = shouldShowReferalRoutes();
@@ -557,12 +553,10 @@ const hostname = window.location.hostname;
 
 
   const ROOT_DOMAINS = ['aitechs.co.ke', 'owitech.co.ke'];
-    const REFERAL_SUBDOMAINS = ['referals.owitech.co.ke'];
 
 const isRootDomain = ROOT_DOMAINS.includes(hostname);
 const isSubdomainOfRoot = ROOT_DOMAINS.some(domain => hostname.endsWith(`.${domain}`));
 
-const isReferralSubdomain = REFERAL_SUBDOMAINS.includes(hostname);
   return (
     <main>
 
