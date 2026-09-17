@@ -544,7 +544,7 @@ const hostname = window.location.hostname;
 
 
   const ROOT_DOMAINS = ['aitechs.co.ke', 'owitech.co.ke'];
-    const REFERAL_SUBDOMAINS = ['referral.aitechs.co.ke', 'referral.owitech.co.ke'];
+    const REFERAL_SUBDOMAINS = ['referals.owitech.co.ke'];
 
 const isRootDomain = ROOT_DOMAINS.includes(hostname);
 const isSubdomainOfRoot = ROOT_DOMAINS.some(domain => hostname.endsWith(`.${domain}`));
