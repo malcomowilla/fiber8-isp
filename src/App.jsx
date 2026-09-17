@@ -873,7 +873,7 @@ hostname.endsWith('.aitechs.co.ke')
 {/*       
       <Route path='/referrer-login' element={<OutsideReferrerAuth />} />
       <Route path='/referrer-dashboard' element={<OutsideReferrerDashboard />} /> */}
-
+<Route path='/referrer-login' element={<OutsideReferrerAuth />} />
      
 <Route path="/technician/tickets/:token" element={<TechnicianTicketUpdate />} />
 <Route element={<ProtectAuthWallet
