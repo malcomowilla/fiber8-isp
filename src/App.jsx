@@ -544,11 +544,12 @@ const hostname = window.location.hostname;
 
 
   const ROOT_DOMAINS = ['aitechs.co.ke', 'owitech.co.ke'];
+    const REFERAL_SUBDOMAINS = ['referral.aitechs.co.ke', 'referral.owitech.co.ke'];
 
 const isRootDomain = ROOT_DOMAINS.includes(hostname);
 const isSubdomainOfRoot = ROOT_DOMAINS.some(domain => hostname.endsWith(`.${domain}`));
 
-
+const isReferralSubdomain = REFERAL_SUBDOMAINS.includes(hostname);
   return (
     <main>
 
@@ -837,8 +838,18 @@ hostname.endsWith('.aitechs.co.ke')
       <Route  path='/partner-login' element={<PartnerLogin/>}/>
       {/* <Route  path='/hotspot-customer-portal' element={<HotspotCustomerPortal />}/> */}
       <Route  path='/hotspot-customer-portal' element={< HotspotDevicePortal />} />
+
+
+      {isReferralSubdomain && (
+        <Route path='/referrer-login' element={<OutsideReferrerAuth />} />
+      )}
+
+      {isReferralSubdomain && (
+        <Route path='/referrer-dashboard' element={<OutsideReferrerDashboard />} />
+      )}
+{/*       
       <Route path='/referrer-login' element={<OutsideReferrerAuth />} />
-      <Route path='/referrer-dashboard' element={<OutsideReferrerDashboard />} />
+      <Route path='/referrer-dashboard' element={<OutsideReferrerDashboard />} /> */}
 
      
 <Route path="/technician/tickets/:token" element={<TechnicianTicketUpdate />} />
