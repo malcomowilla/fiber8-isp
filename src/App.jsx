@@ -625,10 +625,10 @@ hostname.endsWith('.aitechs.co.ke')
       element={<OutsideReferrerAuth />}
     />
 
-    <Route
+    {/* <Route
       path="/referrer-login"
       element={<OutsideReferrerAuth />}
-    />
+    /> */}
 
     <Route
       path="/referrer-dashboard"

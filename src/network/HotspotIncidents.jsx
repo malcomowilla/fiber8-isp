@@ -467,7 +467,7 @@ const BulkCompensationModal = ({ open, onClose, graceSetting }) => {
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                   <div className="flex items-center gap-2.5">
                     <span className="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                      <Phone size={16} className="text-purple-600 dark:text-purple-400" />
+                      <Phone size={16} className="text-green-600 dark:text-green-400" />
                     </span>
                     <div>
                       <h3 className="text-base font-bold text-gray-900 dark:text-white">Bulk Compensate</h3>
@@ -541,8 +541,8 @@ const BulkCompensationModal = ({ open, onClose, graceSetting }) => {
                     Cancel
                   </button>
                   <button type="submit" disabled={saving}
-                    className="flex-1 py-2.5 rounded-lg text-sm font-semibold text-white bg-purple-600
-                      hover:bg-purple-700 disabled:opacity-60 transition-colors flex items-center justify-center gap-2">
+                    className="flex-1 py-2.5 rounded-lg text-sm font-semibold text-white bg-green-600
+                      hover:bg-green-700 disabled:opacity-60 transition-colors flex items-center justify-center gap-2">
                     {saving && <RefreshCw size={14} className="animate-spin" />}
                     {saving ? 'Sending…' : (<><Send size={14} /> Compensate</>)}
                   </button>
@@ -739,7 +739,7 @@ const HotspotIncidents = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-9 h-9 rounded-lg bg-gradient-to-r from-red-500 to-orange-500
+            <span className="w-9 h-9 rounded-lg bg-red-500
               flex items-center justify-center shadow-sm">
               <AlertTriangle size={18} className="text-white" />
             </span>
@@ -752,7 +752,7 @@ const HotspotIncidents = () => {
         <div className="flex items-center gap-2">
           <button onClick={() => setShowBulk(true)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white
-              bg-purple-600 hover:bg-purple-700 shadow-sm transition-colors">
+              bg-green-600 hover:bg-green-700 shadow-sm transition-colors">
             <Phone size={15} /> Bulk Compensate
           </button>
           <button onClick={() => setShowRecord(true)}
