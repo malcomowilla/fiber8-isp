@@ -547,6 +547,7 @@ const hostname = window.location.hostname;
   return hostname === 'referals.owitech.co.ke';
 };
 
+
   const showAdmin = shouldShowAdminRoutes();
   const showReferal = shouldShowReferalRoutes();
 
@@ -617,13 +618,13 @@ hostname.endsWith('.aitechs.co.ke')
       <Route index path="/" element={<PPPoEPackages />} />
     ) : null}  */}
 
-
-{isRootDomain ? (
+{hostname === 'referals.owitech.co.ke' ? (
+  <Route index path="/" element={<OutsideReferrerAuth />} />
+) : isRootDomain ? (
   <Route index path="/" element={<Signup />} />
 ) : isSubdomainOfRoot ? (
   <Route index path="/" element={<PPPoEPackages />} />
 ) : null}
-    
 
 
 
@@ -846,14 +847,14 @@ hostname.endsWith('.aitechs.co.ke')
       {/* <Route  path='/hotspot-customer-portal' element={<HotspotCustomerPortal />}/> */}
       <Route  path='/hotspot-customer-portal' element={< HotspotDevicePortal />} />
 
-
+{/* 
       {showReferal && (
         <Route path='/referrer-login' element={<OutsideReferrerAuth />} />
       )}
 
       {showReferal && (
         <Route path='/referrer-dashboard' element={<OutsideReferrerDashboard />} />
-      )}
+      )} */}
 {/*       
       <Route path='/referrer-login' element={<OutsideReferrerAuth />} />
       <Route path='/referrer-dashboard' element={<OutsideReferrerDashboard />} /> */}
