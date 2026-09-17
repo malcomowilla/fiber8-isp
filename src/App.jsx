@@ -539,7 +539,20 @@ const hostname = window.location.hostname;
     return firstChar === 's';
   };
 
+
+
+  const shouldShowReferalRoutes = () => {
+    const { hostname } = window.location;
+    const domainParts = hostname.split('.');
+    
+    if (domainParts.length < 3) return false; 
+    
+    const firstChar = domainParts[0].charAt(0).toLowerCase();
+    return firstChar === 'r';
+  };
+
   const showAdmin = shouldShowAdminRoutes();
+  const showReferal = shouldShowReferalRoutes();
 
 
 
@@ -840,11 +853,11 @@ hostname.endsWith('.aitechs.co.ke')
       <Route  path='/hotspot-customer-portal' element={< HotspotDevicePortal />} />
 
 
-      {isReferralSubdomain && (
+      {showReferal && (
         <Route path='/referrer-login' element={<OutsideReferrerAuth />} />
       )}
 
-      {isReferralSubdomain && (
+      {showReferal && (
         <Route path='/referrer-dashboard' element={<OutsideReferrerDashboard />} />
       )}
 {/*       
