@@ -617,9 +617,24 @@ hostname.endsWith('.aitechs.co.ke')
     ) : hostname.endsWith('.aitechs.co.ke') ? (
       <Route index path="/" element={<PPPoEPackages />} />
     ) : null}  */}
-
 {hostname === 'referals.owitech.co.ke' ? (
-  <Route index path="/" element={<OutsideReferrerAuth />} />
+  <>
+    <Route
+      index
+      path="/"
+      element={<OutsideReferrerAuth />}
+    />
+
+    <Route
+      path="/referrer-login"
+      element={<OutsideReferrerAuth />}
+    />
+
+    <Route
+      path="/referrer-dashboard"
+      element={<OutsideReferrerDashboard />}
+    />
+  </>
 ) : isRootDomain ? (
   <Route index path="/" element={<Signup />} />
 ) : isSubdomainOfRoot ? (
