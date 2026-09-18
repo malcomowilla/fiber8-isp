@@ -638,7 +638,7 @@ hostname.endsWith('.aitechs.co.ke')
 ) : isRootDomain ? (
   <Route index path="/" element={<Signup />} />
 ) : isSubdomainOfRoot ? (
-  <Route index path="/" element={<PPPoEPackages />} />
+  <Route index path="/signin" element={<PPPoEPackages />} />
 ) : null}
 
 
@@ -873,6 +873,8 @@ hostname.endsWith('.aitechs.co.ke')
 {/*       
       <Route path='/referrer-login' element={<OutsideReferrerAuth />} />
       <Route path='/referrer-dashboard' element={<OutsideReferrerDashboard />} /> */}
+
+      
 <Route path='/referrer-login' element={<OutsideReferrerAuth />} />
      
 <Route path="/technician/tickets/:token" element={<TechnicianTicketUpdate />} />

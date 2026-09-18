@@ -15,10 +15,10 @@ export default defineConfig({
       strategies: 'injectManifest',
       srcDir: 'src',
       filename: 'sw.js',
-      injectRegister: null, // we register manually in main.jsx
+      injectRegister: null, 
       devOptions: {
         enabled: true,
-        type: 'module', // required for injectManifest in dev
+        type: 'module', 
         navigateFallback: 'index.html',
       },
       injectManifest: {
