@@ -638,7 +638,7 @@ hostname.endsWith('.aitechs.co.ke')
 ) : isRootDomain ? (
   <Route index path="/" element={<Signup />} />
 ) : isSubdomainOfRoot ? (
-  <Route index path="/signin" element={<PPPoEPackages />} />
+  <Route index path="/" element={<PPPoEPackages />} />
 ) : null}
 
 
