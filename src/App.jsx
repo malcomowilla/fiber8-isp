@@ -635,10 +635,11 @@ hostname.endsWith('.aitechs.co.ke')
       element={<OutsideReferrerDashboard />}
     />
   </>
-)  : isRootDomain ? (
- <Route index path="/" element={<Signup />} />
-)
- : null}
+) : isRootDomain ? (
+  <Route index path="/" element={<Signup />} />
+) : isSubdomainOfRoot ? (
+  <Route index path="/" element={<PPPoEPackages />} />
+) : null}
 
 
 
