@@ -519,7 +519,8 @@ const hostname = window.location.hostname;
   const navigate = useNavigate();
 
   const LAST_ROUTE_KEY = 'owitech:last-route';
-  const LAST_ROUTE_MAX_AGE_MS = 1000 * 60 * 30; // 30 minutes
+const LAST_ROUTE_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 365.25; 
+
 
   const isStandaloneLaunch =
     window.matchMedia?.('(display-mode: standalone)').matches ||
