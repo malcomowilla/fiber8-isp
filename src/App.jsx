@@ -2,7 +2,8 @@
 import {
  
   Route,
-  Routes
+  Routes,
+  useLocation, useNavigate
 } from "react-router-dom";
 import {useState, useEffect, lazy, Suspense, useCallback} from 'react'
 import {ApplicationContext} from './context/ApplicationContext'
@@ -515,10 +516,54 @@ const hostname = window.location.hostname;
   });
 
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const LAST_ROUTE_KEY = 'owitech:last-route';
+  const LAST_ROUTE_MAX_AGE_MS = 1000 * 60 * 30; // 30 minutes
+
+  const isStandaloneLaunch =
+    window.matchMedia?.('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+
+  useEffect(() => {
+    if (location.pathname === '/') return;
+
+    try {
+      window.localStorage.setItem(
+        LAST_ROUTE_KEY,
+        JSON.stringify({
+          path: location.pathname + location.search,
+          ts: Date.now(),
+        })
+      );
+    } catch {
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (!isStandaloneLaunch) return;
+    if (location.pathname !== '/') return;
+
+    try {
+      const raw = window.localStorage.getItem(LAST_ROUTE_KEY);
+      if (!raw) return;
+
+      const { path, ts } = JSON.parse(raw);
+      const isFresh = Date.now() - ts < LAST_ROUTE_MAX_AGE_MS;
+
+      if (path && path !== '/' && isFresh) {
+        navigate(path, { replace: true });
+      }
+    } catch {
+    }
+    
+  }, []);
+
+
 
 
   useEffect(() => {
-    const pageTitle = location.pathname.split("/")[2] || `${company_name || 'Aitechs'} | ${location.pathname.split("/")[1]}` || `Aitechs | ${location.pathname.split("/")[1]}`;
+    const pageTitle = location.pathname.split("/")[2] || `${company_name || 'Owitech'} | ${location.pathname.split("/")[1]}` || `Owitech | ${location.pathname.split("/")[1]}`;
     document.title = pageTitle;
   }, [location]);
 
