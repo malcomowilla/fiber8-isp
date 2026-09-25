@@ -302,7 +302,7 @@ const PPPOE_PLAN_FEATURES = {
 function SectionLabel({ text }) {
   return (
     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4"
-      style={{ background: 'rgba(99,102,241,.12)', border: '1px solid rgba(99,102,241,.25)' }}>
+      style={{ background: 'green', border: '1px solid rgba(99,102,241,.25)' }}>
       <Sparkles size={12} style={{ color: '#818cf8' }} />
       <span className="text-xs font-semibold tracking-wider uppercase" style={{ color: '#818cf8' }}>{text}</span>
     </div>
@@ -1108,67 +1108,6 @@ const Signup = () => {
 
 
 
-{/* ── Terms & Conditions ──────────────────────────────────────────── */}
-<section id="terms" className="py-20 px-6" style={{ background: 'var(--bg-page-alt)' }}>
-  <div className="max-w-4xl mx-auto">
-    <div className="text-center mb-12">
-      <SectionLabel text="Terms & Conditions" />
-      <motion.h2 initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-        className="text-3xl md:text-4xl font-black text-theme-primary mb-4">
-        The <span className="gradient-green">fine print</span>, simplified
-      </motion.h2>
-      <p className="text-theme-muted max-w-xl mx-auto">
-        A quick summary of how billing, cancellation and support work. 
-        Full legal terms available on request.
-      </p>
-    </div>
-
-    <div className="space-y-4">
-      {[
-        {
-          title: 'Billing & Payments',
-          body: 'Hotspot plans are billed at a flat KES 1,000 per router per month. PPPoE plans are billed monthly based on active connected subscribers at KES 10 per client. All payments are processed via M-Pesa. Charges are non-refundable once a billing cycle has started.',
-        },
-        {
-          title: 'Free Trial',
-          body: 'New accounts receive a 7-day free trial with full platform access. No credit card is required to start. You may cancel at any time during the trial with no charges applied.',
-        },
-        {
-          title: 'Cancellation',
-          body: 'There are no long-term contracts. You may cancel your subscription at any time; service continues until the end of the current paid billing cycle, after which access is suspended.',
-        },
-        {
-          title: 'Reseller Commissions',
-          body: 'Commission rates for resellers are set by the parent ISP and may be adjusted with prior notice. Payouts are calculated on collected revenue and disbursed monthly via M-Pesa, subject to a minimum payout threshold.',
-        },
-        {
-          title: 'Acceptable Use',
-          body: 'The platform may not be used for unlawful purposes, network abuse, or to circumvent fair-usage and bandwidth policies set by the ISP administrator. Violations may result in suspension without refund.',
-        },
-        {
-          title: 'Service Availability',
-          body: 'We target 99.9% uptime but do not guarantee uninterrupted service. Scheduled maintenance will be communicated in advance where possible.',
-        },
-        {
-          title: 'Changes to Terms',
-          body: 'These terms may be updated periodically. Continued use of the platform after changes are posted constitutes acceptance of the revised terms.',
-        },
-      ].map((t, i) => (
-        <motion.div key={t.title}
-          initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }} transition={{ delay: i * 0.05 }}
-          className="card-glass rounded-2xl p-5">
-          <h3 className="text-sm font-bold text-theme-primary mb-1.5">{t.title}</h3>
-          <p className="text-xs text-theme-muted leading-relaxed">{t.body}</p>
-        </motion.div>
-      ))}
-    </div>
-
-    <p className="text-center text-xs text-theme-faint mt-8">
-      Questions about these terms? <a href="#contact" className="underline hover:text-theme-muted">Contact us</a> — full legal documentation available on request.
-    </p>
-  </div>
-</section>
 
 
 
@@ -1181,9 +1120,12 @@ const Signup = () => {
             <img src="/images/owitech-logo.png" className="h-6 opacity-60" alt="Owitech" />
             <span className="text-sm font-semibold text-theme-muted">Owitech</span>
           </div>
-          <p className="text-xs text-theme-dim">
-            © {new Date().getFullYear()} Owitech. Built for Kenyan ISPs. · <a href="/hotspot-pricing" className="hover:text-theme-muted">Hotspot Pricing</a>
-          </p>
+
+
+          <p className="text-xs text-black dark:text-white">
+  © {new Date().getFullYear()} Owitech. Built for Kenyan ISPs. · <a href="/hotspot-pricing" className="hover:text-theme-muted"></a> · <Link to="/terms-and-conditions" className="hover:text-theme-muted">Terms & Conditions</Link>
+</p>
+
         </footer>
 
         {/* ── Lingering-visitor lead capture ─────────────────────────────── */}

@@ -165,7 +165,7 @@ const OutsideReferrerDashboard = lazy(() => import('./referrals/OutsideReferrerD
 const LoyaltySettings = lazy(() => import('./loyalty/LoyaltySettings'))
 import InstallPwaBanner from './pwa/InstallPwaBanner'
 import InstallPwaButton from './pwa/InstallPwaButton'
-
+const TermsAndConditions = lazy(() => import("./terms_and_conditions/TermsAndConditions"))
 
 
 const App = ({client}) => {
@@ -907,6 +907,7 @@ hostname.endsWith('.aitechs.co.ke')
       <Route  path='/partner-login' element={<PartnerLogin/>}/>
       {/* <Route  path='/hotspot-customer-portal' element={<HotspotCustomerPortal />}/> */}
       <Route  path='/hotspot-customer-portal' element={< HotspotDevicePortal />} />
+      <Route path='/terms-and-conditions' element={<TermsAndConditions />} />
 
 {/* 
       {showReferal && (
