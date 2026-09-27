@@ -220,7 +220,11 @@ const RouterReachabilityStats = ({ routerId }) => {
                     {stats.recent_outages.map((o, i) => (
                       <tr key={i} className="border-t border-white/5 text-black dark:text-white">
                         <td className="px-3 py-2">{new Date(o.went_offline_at).toLocaleString()}</td>
-                        <td className="px-3 py-2">{new Date(o.back_online_at).toLocaleString()}</td>
+                        <td className="px-3 py-2">
+                          {o.back_online_at
+                            ? new Date(o.back_online_at).toLocaleString()
+                            : <span className="text-red-500 font-semibold">still offline</span>}
+                        </td>
                         <td className="px-3 py-2 text-right text-red-500 font-semibold">
                           {o.duration_minutes}m
                         </td>
