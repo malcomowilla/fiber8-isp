@@ -1,8 +1,10 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { IconButton,Tooltip,
+import { IconButton,Tooltip, Dialog, DialogTitle, DialogContent, IconButton as MuiIconButton,
  } from '@mui/material';
 import GetAppIcon from '@mui/icons-material/GetApp';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
+import CloseIcon from '@mui/icons-material/Close';
 import {  useState, useEffect, useMemo, useCallback} from 'react'
 import EditNas from '../edit/EditNas' 
 import AddIcon from '@mui/icons-material/Add';
@@ -19,6 +21,7 @@ import FreeRadiusLogo from "../../public/images/free_radius.svg";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { LuMonitorSmartphone } from "react-icons/lu";
 import RemoteWinboxModal from './RemoteWinboxModal'; 
+import RouterReachabilityStats from './RouterReachabilityStats';
 
 
 
@@ -37,6 +40,11 @@ const [openDelete, setOpenDelete] = useState(false);
 const [winboxModalOpen, setWinboxModalOpen] = useState(false);
 const [winboxRouter, setWinboxRouter] = useState(null);
 const [winboxClosing, setWinboxClosing] = useState(false);
+
+// Reachability history modal — independent of the router's live
+// online/offline state, so it stays usable while a router is down.
+const [reachabilityModalOpen, setReachabilityModalOpen] = useState(false);
+const [reachabilityRouter, setReachabilityRouter] = useState(null);
 
 
 
@@ -496,6 +504,18 @@ const columns = [
           </IconButton>
         </Tooltip>
 
+        <Tooltip title="Reachability History">
+          <IconButton
+            size="small"
+            onClick={() => {
+              setReachabilityRouter(rowData);
+              setReachabilityModalOpen(true);
+            }}
+          >
+            <ShowChartIcon className='text-emerald-600' style={{ width: 22, height: 22 }} />
+          </IconButton>
+        </Tooltip>
+
 
 <Tooltip title="Remote WinBox">
   <IconButton size="small" onClick={() => {
@@ -582,6 +602,26 @@ const handleCloseLoading = () => {
   routerId={winboxRouter?.id}
   routerName={winboxRouter?.name}
 />
+
+{/* Reachability history modal — always opens regardless of whether the
+    router currently shows reachable or not, since checking past outages
+    is most useful exactly when the router looks down right now. */}
+<Dialog
+  open={reachabilityModalOpen}
+  onClose={() => setReachabilityModalOpen(false)}
+  maxWidth="md"
+  fullWidth
+>
+  <DialogTitle className="flex items-center justify-between !pr-3">
+    <span>{reachabilityRouter?.name || 'Router'} — Reachability</span>
+    <MuiIconButton size="small" onClick={() => setReachabilityModalOpen(false)}>
+      <CloseIcon style={{ width: 20, height: 20 }} />
+    </MuiIconButton>
+  </DialogTitle>
+  <DialogContent className="!p-0">
+    <RouterReachabilityStats routerId={reachabilityRouter?.id} />
+  </DialogContent>
+</Dialog>
 
 
 
