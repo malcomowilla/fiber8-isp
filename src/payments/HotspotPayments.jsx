@@ -156,10 +156,25 @@ function AbandonedRow({ session, index }) {
         <StageChip stage={session.stage} />
       </td>
       <td className="py-3 px-4">
-        <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
-          <AccessTime className="w-3.5 h-3.5" />
-          {session.minutes_since < 1 ? 'just now' : `${session.minutes_since}m ago`}
+        <div className="flex items-start gap-1.5 text-sm text-gray-700 dark:text-gray-200">
+          <AccessTime className="w-3.5 h-3.5 mt-0.5 shrink-0 text-gray-400" />
+          <div>
+            <p className="font-sans whitespace-nowrap">{session.started_at || '—'}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">
+              {session.minutes_since < 1 ? 'just now' : `${session.minutes_since}m ago`}
+            </p>
+          </div>
         </div>
+      </td>
+      <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-200">
+        {session.paid_at ? (
+          <div className="flex items-start gap-1.5">
+            <CheckCircle className="w-3.5 h-3.5 mt-0.5 shrink-0 text-gray-400" />
+            <p className="font-sans whitespace-nowrap">{session.paid_at}</p>
+          </div>
+        ) : (
+          <span className="text-gray-400 dark:text-gray-500">—</span>
+        )}
       </td>
       <td className="py-3 px-4 text-sm text-gray-500 dark:text-gray-400">
         {session.connected ? (
@@ -687,6 +702,7 @@ const HotspotPayments = () => {
                         <th className="py-2.5 px-4 font-semibold">Package</th>
                         <th className="py-2.5 px-4 font-semibold">Stage</th>
                         <th className="py-2.5 px-4 font-semibold">Started</th>
+                        <th className="py-2.5 px-4 font-semibold">Paid at</th>
                         <th className="py-2.5 px-4 font-semibold">Router status</th>
                       </tr>
                     </thead>
@@ -704,11 +720,14 @@ const HotspotPayments = () => {
       </div>
 
       {/* Search and Actions Bar */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between p-4 bg-white dark:bg-gray-800
-        rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+      <div className="flex flex-col md:flex-row gap-4 items-center 
+      justify-between p-4 bg-white dark:bg-gray-800
+        rounded-xl shadow-sm border border-gray-200 dark:border-gray-700
+         transition-colors duration-300">
         <div className="flex-1 w-full md:w-auto">
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center 
+            pointer-events-none">
               <SearchIcon className="text-gray-400" />
             </div>
             <input
