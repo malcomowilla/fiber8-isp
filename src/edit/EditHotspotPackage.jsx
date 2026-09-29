@@ -20,7 +20,9 @@ import { IoWifiOutline } from "react-icons/io5";
 import { FaLongArrowAltUp, FaLongArrowAltDown } from "react-icons/fa";
 import { LuCalendar1 } from "react-icons/lu";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Select, MenuItem, InputLabel, Stack, Divider, CircularProgress } from "@mui/material";
+import { Select, MenuItem, InputLabel, Stack, Divider, CircularProgress, Chip } from "@mui/material";
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import DataUsageIcon from '@mui/icons-material/DataUsage';
 import {
   Tv, Smartphone, Monitor, Printer, Router, Globe, ShieldAlert, Server
 } from 'lucide-react';
@@ -51,6 +53,185 @@ const DEVICE_TYPES = [
   { value: 'router',  label: 'Router',        icon: Router,     emoji: '📡' },
   { value: null,      label: 'All Devices',   icon: Globe,      emoji: '🌐' },
 ];
+
+// ─── Limits presets ───────────────────────────────────────────────────────────
+const TIME_UNITS = [
+  { value: 'minutes', label: 'Minutes' },
+  { value: 'hours',   label: 'Hours' },
+  { value: 'days',    label: 'Days' },
+];
+
+const TIME_PRESETS = [
+  { label: '30 min',   value: 30, unit: 'minutes' },
+  { label: '1 hour',   value: 1,  unit: 'hours' },
+  { label: '24 hours', value: 24, unit: 'hours' },
+  { label: '7 days',   value: 7,  unit: 'days' },
+  { label: '30 days',  value: 30, unit: 'days' },
+];
+
+const DATA_UNITS = [
+  { value: 'MB', label: 'MB' },
+  { value: 'GB', label: 'GB' },
+];
+
+const DATA_PRESETS = [
+  { label: '500 MB', value: 500, unit: 'MB' },
+  { label: '1 GB',   value: 1,   unit: 'GB' },
+  { label: '5 GB',   value: 5,   unit: 'GB' },
+  { label: '20 GB',  value: 20,  unit: 'GB' },
+  { label: '100 GB', value: 100, unit: 'GB' },
+];
+
+// ─── LimitsSection (Data & Time Limits) ───────────────────────────────────────
+function LimitsSection({ hotspotPackage, setHotspotPackage }) {
+  const timeValue = String(hotspotPackage.validity ?? '');
+  const timeUnit = hotspotPackage.validity_period_units || 'hours';
+
+  const dataValue = String(hotspotPackage.data_limit_value ?? '');
+  const dataUnit = hotspotPackage.data_limit_unit || 'GB';
+
+  const setTime = (value, unit) =>
+    setHotspotPackage((prev) => ({
+      ...prev,
+      validity: value,
+      validity_period_units: unit,
+    }));
+
+  const setData = (value, unit) =>
+    setHotspotPackage((prev) => ({
+      ...prev,
+      data_limit_value: value,
+      data_limit_unit: unit,
+    }));
+
+  // whole numbers only
+  const sanitizeWhole = (v) => v.replace(/\D/g, '');
+  // decimals allowed, single dot
+  const sanitizeDecimal = (v) =>
+    v.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+
+  return (
+    <div className="bg-gray-50 p-4 rounded-lg mb-6 font-sans">
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        Data & Time Limits
+      </h3>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {/* ── Data limit ── */}
+        <div>
+          <p className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+            <DataUsageIcon fontSize="small" />
+            Data Limit
+          </p>
+
+          <div className="flex gap-2">
+            <TextField
+              fullWidth
+              size="small"
+              className="myTextField"
+              placeholder="Leave blank for unlimited"
+              value={dataValue}
+              onChange={(e) => setData(sanitizeDecimal(e.target.value), dataUnit)}
+              inputProps={{ inputMode: 'decimal' }}
+              sx={focusSx}
+            />
+            <Select
+              size="small"
+              value={dataUnit}
+              onChange={(e) => setData(dataValue, e.target.value)}
+              sx={{ minWidth: 90 }}
+            >
+              {DATA_UNITS.map((u) => (
+                <MenuItem key={u.value} value={u.value}>{u.label}</MenuItem>
+              ))}
+            </Select>
+          </div>
+
+          <p className="text-xs text-gray-500 mt-1">
+            Blank means unlimited. Decimals are fine, e.g. 1.5 GB.
+          </p>
+
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            <Chip
+              label="Unlimited"
+              size="small"
+              clickable
+              variant={dataValue === '' ? 'filled' : 'outlined'}
+              onClick={() => setData('', dataUnit)}
+              sx={{ fontFamily: 'inherit' }}
+            />
+            {DATA_PRESETS.map((p) => {
+              const selected = dataValue === String(p.value) && dataUnit === p.unit;
+              return (
+                <Chip
+                  key={p.label}
+                  label={p.label}
+                  size="small"
+                  clickable
+                  variant={selected ? 'filled' : 'outlined'}
+                  onClick={() => setData(String(p.value), p.unit)}
+                  sx={{ fontFamily: 'inherit' }}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Time limit ── */}
+        <div>
+          <p className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+            <AccessTimeIcon fontSize="small" />
+            Time Limit <span className="text-red-500">*</span>
+          </p>
+
+          <div className="flex gap-2">
+            <TextField
+              fullWidth
+              size="small"
+              className="myTextField"
+              placeholder="e.g. 24"
+              value={timeValue}
+              onChange={(e) => setTime(sanitizeWhole(e.target.value), timeUnit)}
+              inputProps={{ inputMode: 'numeric' }}
+              sx={focusSx}
+            />
+            <Select
+              size="small"
+              value={timeUnit}
+              onChange={(e) => setTime(timeValue, e.target.value)}
+              sx={{ minWidth: 120 }}
+            >
+              {TIME_UNITS.map((u) => (
+                <MenuItem key={u.value} value={u.value}>{u.label}</MenuItem>
+              ))}
+            </Select>
+          </div>
+
+          <p className="text-xs text-gray-500 mt-1">
+            How long the plan stays valid, shown to customers as entered. Whole numbers only: use minutes for 1.5 hours.
+          </p>
+
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {TIME_PRESETS.map((p) => {
+              const selected = timeValue === String(p.value) && timeUnit === p.unit;
+              return (
+                <Chip
+                  key={p.label}
+                  label={p.label}
+                  size="small"
+                  clickable
+                  variant={selected ? 'filled' : 'outlined'}
+                  onClick={() => setTime(String(p.value), p.unit)}
+                  sx={{ fontFamily: 'inherit' }}
+                />
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── BurstSection ─────────────────────────────────────────────────────────────
 function BurstSection({ hotspotPackage, setHotspotPackage }) {
@@ -495,11 +676,9 @@ const EditHotspotPackage = ({
 }) => {
   const {
     name,
-    validity,
     download_limit,
     upload_limit,
     price,
-    validity_period_units,
     shared_users,
     location,
   } = hotspotPackage;
@@ -521,6 +700,12 @@ const EditHotspotPackage = ({
 
   const subdomain = window.location.hostname.split('.')[0];
 
+  // Depends only on the package id / router name (NOT the whole package),
+  // otherwise every keystroke in the form refetched routers and flashed the
+  // "Loading routers..." spinner.
+  const packageId = hotspotPackage?.id;
+  const packageRouter = hotspotPackage?.nas_router;
+
   const fetchRouters = useCallback(async () => {
     try {
       setLoadingRouters(true);
@@ -531,11 +716,9 @@ const EditHotspotPackage = ({
       setRouters(data || []);
 
       // Pre-select if editing
-      // NOTE: was referencing an undefined `formData` before — fixed to use
-      // hotspotPackage, which is the actual source of truth for this form.
-      if (hotspotPackage?.id && hotspotPackage?.nas_router) {
-        setSelectedRouter(hotspotPackage.nas_router);
-        const router = data.find(r => r.name === hotspotPackage.nas_router);
+      if (packageId && packageRouter) {
+        setSelectedRouter(packageRouter);
+        const router = (data || []).find(r => r.name === packageRouter);
         if (router) setRouterDetails(router);
       }
     } catch (error) {
@@ -543,13 +726,20 @@ const EditHotspotPackage = ({
     } finally {
       setLoadingRouters(false);
     }
-  }, [hotspotPackage, subdomain]);
+  }, [packageId, packageRouter, subdomain]);
 
   useEffect(() => {
     if (open) {
       fetchRouters();
     }
   }, [open, fetchRouters]);
+
+  // Default the time-limit unit so a fresh form never submits without one.
+  useEffect(() => {
+    if (open && !hotspotPackage.validity_period_units) {
+      setHotspotPackage((prev) => ({ ...prev, validity_period_units: 'hours' }));
+    }
+  }, [open]);
 
   const handleRouterChange = (e) => {
     const routerName = e.target.value;
@@ -560,6 +750,34 @@ const EditHotspotPackage = ({
       ...hotspotPackage,
       nas_router: selected?.name || ''
     });
+  };
+
+  // Client-side validation (UX only — Rails re-validates everything).
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!hotspotPackage.enable_free_trial) {
+      const time = Number(hotspotPackage.validity);
+      if (!Number.isInteger(time) || time <= 0) {
+        toast.error(<p className="font-sans">Time limit is required (whole number, e.g. 24)</p>, { position: 'top-center' });
+        return;
+      }
+      if (!hotspotPackage.validity_period_units) {
+        toast.error(<p className="font-sans">Pick a time unit</p>, { position: 'top-center' });
+        return;
+      }
+
+      const rawData = String(hotspotPackage.data_limit_value ?? '').trim();
+      if (rawData !== '') {
+        const data = Number(rawData);
+        if (!Number.isFinite(data) || data <= 0) {
+          toast.error(<p className="font-sans">Data limit must be a positive number, or blank for unlimited</p>, { position: 'top-center' });
+          return;
+        }
+      }
+    }
+
+    createHotspotPackage(e);
   };
 
   function useIsDarkMode() {
@@ -613,7 +831,7 @@ const EditHotspotPackage = ({
           maxWidth="lg"
         >
           <DialogContent sx={{ maxHeight: "90vh", overflowY: "auto" }}>
-            <form onSubmit={createHotspotPackage}>
+            <form onSubmit={handleSubmit}>
               {/* ── Header ── */}
               <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">
@@ -682,7 +900,7 @@ const EditHotspotPackage = ({
                         sx={focusSx}
                         InputProps={{
                           startAdornment: (
-                            <FaLongArrowAltUp className="mr-2 text-blue-500" />
+                            <FaLongArrowAltUp className="mr-2 text-green-500" />
                           ),
                         }}
                       />
@@ -704,46 +922,17 @@ const EditHotspotPackage = ({
                     </div>
                   </div>
 
-                  {/* ── SECTION 2: Validity & Timing ── */}
+                  {/* ── Data & Time Limits ── */}
+                  <LimitsSection
+                    hotspotPackage={hotspotPackage}
+                    setHotspotPackage={setHotspotPackage}
+                  />
+
+                  {/* ── Access & Timing ── */}
                   <div className="bg-green-50 p-4 rounded-lg mb-6 font-sans">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                      ⏱️ Validity & Timing
+                      ⏱️ Access & Timing
                     </h3>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                      <TextField
-                        label={<p className="font-sans">Validity Period </p>}
-                        id="validity"
-                        type="number"
-                        value={validity || ""}
-                        onChange={handleChangeHotspotPackage}
-                        className="myTextField"
-                        sx={focusSx}
-                        InputProps={{
-                          startAdornment: <LuCalendar1 className="mr-2" />,
-                        }}
-                      />
-
-                      <Autocomplete
-                        options={["days", "hours", "minutes"]}
-                        value={validity_period_units || ""}
-                        onChange={(event, newValue) => {
-                          setHotspotPackage({
-                            ...hotspotPackage,
-                            validity_period_units: newValue,
-                          });
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            label={<p className="font-sans">Period Units </p>}
-                            className="myTextField"
-                            sx={focusSx}
-                          />
-                        )}
-                        fullWidth
-                      />
-                    </div>
 
                     <TextField
                       fullWidth
@@ -817,17 +1006,9 @@ const EditHotspotPackage = ({
                 </>
               )}
 
-              {/* <Divider sx={{ my: 3 }} />
-
-            
-              <DeviceTypeSection
-                hotspotPackage={hotspotPackage}
-                setHotspotPackage={setHotspotPackage}
-              /> */}
-
               <Divider sx={{ my: 3 }} />
 
-              {/* ── SECTION 4: Burst ── */}
+              {/* ── Burst ── */}
               {!enable && (
                 <BurstSection
                   hotspotPackage={hotspotPackage}
@@ -835,7 +1016,7 @@ const EditHotspotPackage = ({
                 />
               )}
 
-              {/* ── SECTION 5: Free Trial ── */}
+              {/* ── Free Trial ── */}
               <FreeTrialSection
                 hotspotPackage={hotspotPackage}
                 setHotspotPackage={setHotspotPackage}
@@ -862,7 +1043,7 @@ const EditHotspotPackage = ({
                   {editing ? <p className="font-sans">Update Package</p> : <p className="font-sans">Create Package</p>}
 
                   {loading && (
-                    <span className="w-4 h-4 border-2 border-white/40 border-t-blue-600 rounded-full animate-spin" />
+                    <span className="w-4 h-4 border-2 border-white/40 border-t-green-600 rounded-full animate-spin" />
                   )}
                 </Button>
               </DialogActions>

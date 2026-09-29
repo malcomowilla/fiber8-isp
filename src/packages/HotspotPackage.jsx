@@ -335,8 +335,11 @@ const columns = [
    },
 
   // {title: 'Validity', field: 'Validity', type: 'numeric',  align: 'right'},
-  {title: 'validity', field: 'valid', render: (rowData) => (
+    {title: 'time limit', field: 'valid', render: (rowData) => (
     <span className="font-sans text-gray-700 dark:text-gray-200">{rowData.valid}</span>
+  ) },
+  {title: 'data limit', field: 'data_limit_label', render: (rowData) => (
+    <span className="font-sans text-gray-700 dark:text-gray-200">{rowData.data_limit_label || 'Unlimited'}</span>
   ) },
     {title: 'Router', field: 'nas_router', render: (rowData) => (
       <span className="font-sans text-xs text-gray-600 dark:text-gray-300">{rowData.nas_router || 'N/A'}</span>
