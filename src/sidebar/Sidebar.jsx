@@ -377,7 +377,7 @@ const Sidebar = () => {
         {
           icon: <IconChip tint="text-yellow-600"><ImStatsBars size={16} /></IconChip>,
           label: "Revenue",
-          path: "/admin/hotspot_anlytics"
+          path: "/admin/hotspot_revenue_analytics"
         },
 
         {

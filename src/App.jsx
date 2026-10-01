@@ -24,7 +24,7 @@ const UserGroup = lazy(()=> import('./user/UserGroup'))
 const Nas = lazy(()=> import('./NAS_IDENTIFIER/Nas'))
 const HotspotPricing = lazy(()=> import('./pricing/HotspotPricing.jsx'))
 const Analytics = lazy(()=> import('./analytics/Analytics'))
-const Hotspotanalytics = lazy(()=> import('./analytics/HotspotAnalytics'))
+const HotspotRevenueAnalytics = lazy(()=> import('./analytics/HotspotRevenueAnalytics'))
 const Settings = lazy(()=> import('./settings/Settings'))
 import {DatePicker} from './date-picker/Date'
 import LocalizeDate from './date-picker/LocalizeDate'
@@ -166,6 +166,8 @@ const LoyaltySettings = lazy(() => import('./loyalty/LoyaltySettings'))
 import InstallPwaBanner from './pwa/InstallPwaBanner'
 import InstallPwaButton from './pwa/InstallPwaButton'
 const TermsAndConditions = lazy(() => import("./terms_and_conditions/TermsAndConditions"))
+const HotspotAnalytics = lazy(() => import("./hotspot_page/HotspotAnalytics"))
+
 
 
 const App = ({client}) => {
@@ -796,7 +798,7 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/scheduler' element={<Calendar/>}/>
 <Route path='/admin/user-group' element={<UserGroup/>}/>
 <Route path='/admin/analytics' element={<Analytics/>}/>
-<Route path='/admin/hotspot_anlytics' element={<Hotspotanalytics/>}/>
+<Route path='/admin/hotspot_revenue_analytics' element={<HotspotRevenueAnalytics/>}/>
 <Route path='/admin/settings' element={<Settings/>}/>
 <Route path='/admin/date' element={<DatePicker/>}></Route>
 <Route path='/admin/nas' element={<Nas/>}/>
@@ -854,6 +856,7 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path="/admin/loyalty" element={<LoyaltySettings />} />
 
 <Route  path='/admin/pppoe-ip-pools' element={<IpPools/>}/>
+<Route  path='/admin/hotspot_analytics' element={<HotspotAnalytics/>}/>
 
 
 

@@ -390,7 +390,7 @@ useEffect(() => {
               location.pathname !== '/admin/hotspot-subscriptions' &&
               location.pathname !== '/admin/hotspot-templates' &&
               location.pathname !== '/admin/hotspot_settings' &&
-              location.pathname !== '/admin/hotspot_anlytics' &&
+              location.pathname !== '/admin/hotspot_revenue_analytics' &&
               location.pathname !== '/admin/send-sms' &&
               location.pathname !== '/admin/messages' &&
               location.pathname !== '/admin/bulk-messages' &&
@@ -412,7 +412,7 @@ useEffect(() => {
                location.pathname !== '/admin/hotspot-marketing-dashboard' &&
                 location.pathname !== '/admin/add-settings' &&
                 location.pathname !== '/admin/financial-dashboard' &&
-                location.pathname !== '/admin/hotspot_anlytics' &&
+                location.pathname !== '/admin/hotspot_revenue_analytics' &&
                 location.pathname !== '/admin/subscriber-payment-analytics' &&
                 location.pathname !== '/admin/unpaid-invoices' &&
                 location.pathname !== '/admin/ip-pool' &&
@@ -448,7 +448,7 @@ useEffect(() => {
               <WelcomeMessage/>
  }
          
-{location.pathname !== '/admin/hotspot_anlytics' &&
+{location.pathname !== '/admin/hotspot_revenue_analytics' &&
  location.pathname !== '/admin/admin-dashboard'  && location.pathname !== '/admin/pppoe-subscribers' 
  && location.pathname !== '/admin/networks-wireguard-config' &&
  location.pathname !== '/admin/network-components' &&
@@ -578,7 +578,7 @@ currentPPOEPlan={currentPPOEPlan} currentHotspotPlan={currentHotspotPlan}
 
 
 
-  {location.pathname !== '/admin/hotspot_anlytics' && location.pathname !== '/admin/pppoe-subscribers' 
+  {location.pathname !== '/admin/hotspot_revenue_analytics' && location.pathname !== '/admin/pppoe-subscribers' 
   && location.pathname !== '/admin/networks-wireguard-config' && location.pathname !== '/admin/ip_networks' && 
   location.pathname !== '/admin/network-components' &&
   location.pathname !== '/admin/nas' &&
@@ -687,7 +687,7 @@ onClick={() => {
 className='mt-4'>
           {location.pathname !== '/admin/customer-tickets' && location.pathname 
           !== '/admin/hotspot-dashboard' && location.pathname !== '/admin/pppoe-subscribers' 
-          &&  location.pathname !== '/admin/hotspot_anlytics' 
+          &&  location.pathname !== '/admin/hotspot_revenue_analytics'
            && location.pathname !== '/admin/nodes'
            
            && location.pathname !== '/admin/user'

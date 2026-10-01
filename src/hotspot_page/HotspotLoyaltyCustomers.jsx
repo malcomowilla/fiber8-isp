@@ -7,9 +7,6 @@ import {
   Gift, Wallet, CalendarClock, Ban,
 } from 'lucide-react'
 
-// ---------------------------------------------------------------------------
-// Small formatters — kept local, no external date lib assumed installed.
-// ---------------------------------------------------------------------------
 const money = (n) =>
   `KES ${Number(n || 0).toLocaleString('en-KE', { maximumFractionDigits: 0 })}`
 

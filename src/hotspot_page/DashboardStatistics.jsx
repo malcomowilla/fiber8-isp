@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import { useNavigate } from 'react-router-dom';
 import { motion } from "framer-motion";
 import { useApplicationSettings } from '../settings/ApplicationSettings';
 import { createConsumer } from "@rails/actioncable";
@@ -15,6 +16,8 @@ import EditPayment from '../edit/EditPayment';
 import {
   IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, Button,
 } from '@mui/material';
+import InsightsIcon from '@mui/icons-material/Insights';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { IoEyeOutline } from "react-icons/io5";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
@@ -220,6 +223,39 @@ const StatCard = ({ title, value, icon, accent = "sky", trend, index = 0 }) => {
 };
 
 /* ---------------------------------------------------------------------- */
+/*  Usage statistics card (links to the Hotspot analytics page)           */
+/* ---------------------------------------------------------------------- */
+
+const UsageStatisticsCard = ({ onClick, onlineUsers }) => (
+  <motion.button
+    type="button"
+    onClick={onClick}
+    initial={{ opacity: 0, y: 12 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.35, delay: 0.2 }}
+    whileHover={{ y: -2 }}
+    className="mt-6 flex w-full items-center justify-between gap-4 rounded-2xl border border-gray-200/80 bg-white p-5 text-left font-sans shadow-sm transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900"
+  >
+    <div className="flex min-w-0 items-center gap-4">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200">
+        <InsightsIcon fontSize="small" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">Usage statistics</p>
+        <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+          Data and time used, peak hours, session length, plan performance and heaviest devices
+          {onlineUsers ? ` · ${onlineUsers} online now` : ''}
+        </p>
+      </div>
+    </div>
+    <div className="flex shrink-0 items-center gap-1 text-xs font-semibold text-gray-700 dark:text-gray-200">
+      <span className="hidden sm:inline">View analytics</span>
+      <ArrowForwardIcon fontSize="small" />
+    </div>
+  </motion.button>
+);
+
+/* ---------------------------------------------------------------------- */
 /*  Table                                                                  */
 /* ---------------------------------------------------------------------- */
 
@@ -344,6 +380,7 @@ const DetailRow = ({ label, value }) => (
 /* ---------------------------------------------------------------------- */
 
 const DashboardStatistics = () => {
+  const navigate = useNavigate();
   const [expiredVouchers, setExpiredVouchers] = useState(0);
   const [activeVouchers, setActiveVouchers] = useState(0);
   const [onlineUsers, setOnlineUsers] = useState(0);
@@ -748,6 +785,11 @@ const DashboardStatistics = () => {
         ))}
       </div>
 
+      <UsageStatisticsCard
+        onClick={() => navigate('/admin/hotspot_analytics')}
+        onlineUsers={onlineUsers}
+      />
+
       <div className="mt-6 rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:p-6">
         <div className="mb-2 flex items-center justify-between">
           <div>
@@ -779,3 +821,4 @@ const DashboardStatistics = () => {
 };
 
 export default DashboardStatistics;
+

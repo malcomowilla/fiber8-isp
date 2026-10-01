@@ -172,7 +172,7 @@ function LiveDot() {
 }
 
 // ── Main Dashboard ─────────────────────────────────────────────────────────────
-const HotspotAnalytics = () => {
+const HotspotRevenueAnalytics = () => {
   const subdomain = window.location.hostname.split('.')[0];
 
   // ── State ──────────────────────────────────────────────────────────────────
@@ -926,4 +926,4 @@ style={{ borderColor:'rgba(148,163,184,.1)', backdropFilter:'blur(16px)' }}
   );
 };
 
-export default HotspotAnalytics;
+export default HotspotRevenueAnalytics;
