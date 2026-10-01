@@ -391,6 +391,7 @@ useEffect(() => {
               location.pathname !== '/admin/hotspot-templates' &&
               location.pathname !== '/admin/hotspot_settings' &&
               location.pathname !== '/admin/hotspot_revenue_analytics' &&
+              location.pathname !== '/admin/hotspot_analytics' &&
               location.pathname !== '/admin/send-sms' &&
               location.pathname !== '/admin/messages' &&
               location.pathname !== '/admin/bulk-messages' &&
@@ -518,6 +519,7 @@ location.pathname !== '/admin/network-map' &&
  location.pathname !== '/admin/hotspot-customers' &&
  location.pathname !== '/admin/loyalty' &&
  location.pathname !== '/admin/pppoe-ip-pools' &&
+ location.pathname !== '/admin/hotspot_analytics' &&
 <div
  onClick={() => {
             setShowMenu1(false)
@@ -641,6 +643,7 @@ location.pathname !== '/admin/onu-details' && location.pathname !== '/admin/node
       location.pathname !== '/admin/hotspot-customers' &&
       location.pathname !== '/admin/loyalty' &&
       location.pathname !== '/admin/pppoe-ip-pools' &&
+      location.pathname !== '/admin/hotspot_analytics' &&
 <div 
  onClick={() => {
             setShowMenu1(false)
@@ -684,6 +687,7 @@ onClick={() => {
             setShowMenu11(false)  
             setShowMenu12(false)
           }}
+          
 className='mt-4'>
           {location.pathname !== '/admin/customer-tickets' && location.pathname 
           !== '/admin/hotspot-dashboard' && location.pathname !== '/admin/pppoe-subscribers' 
@@ -752,6 +756,7 @@ location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/u
                      location.pathname !== '/admin/hotspot-customers' &&
                      location.pathname !== '/admin/loyalty' &&
                      location.pathname !== '/admin/pppoe-ip-pools' &&
+                     location.pathname !== '/admin/hotspot_analytics' &&
            <div
             onClick={() => {
             setShowMenu1(false)
