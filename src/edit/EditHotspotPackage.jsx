@@ -752,9 +752,21 @@ const EditHotspotPackage = ({
     });
   };
 
-  // Client-side validation (UX only — Rails re-validates everything).
+ 
+
+
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!selectedRouter) {
+      toast.error(
+        <p className="font-sans">Please fill in all required fields (including at least one router)</p>,
+        { position: 'top-center', duration: 5000 }
+      );
+      return;
+    }
 
     if (!hotspotPackage.enable_free_trial) {
       const time = Number(hotspotPackage.validity);
@@ -779,6 +791,8 @@ const EditHotspotPackage = ({
 
     createHotspotPackage(e);
   };
+
+
 
   function useIsDarkMode() {
     const [isDark, setIsDark] = useState(

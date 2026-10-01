@@ -599,13 +599,18 @@ useEffect(() => {
 
 
 const createHotspotPackage = async (e) => {
-  e.preventDefault();
+   e.preventDefault();
 
-   if (!selectedRouter) {
-      toast.error(<p className='font-sans'>Please select a router</p>)
-      return
-    }
+  if (!selectedRouter) {
+    toast.error(
+      <p className="font-sans">Please fill in all required fields (including at least one router)</p>,
+      { position: 'top-center', duration: 5000 }
+    );
+    return;
+  }
 setLoading(true)
+
+
   try {
     
     const url = hotspotPackage.id ? `/api/update_hotspot_package/${hotspotPackage.id}?router_name=${settingsformData.router_name}` : '/api/hotspot_packages';
