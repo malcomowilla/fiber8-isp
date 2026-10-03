@@ -1191,13 +1191,17 @@ const Signup = () => {
         </AnimatePresence>
 
         {/* ── Scroll to top ────────────────────────────────────────────────── */}
-        <motion.button
-          onClick={scrollToTop}
-          whileHover={{ scale: 1.1 }} whileTap={{ scale: .95 }}
-          className="fixed bottom-6 right-6 w-12 h-12 rounded-2xl flex items-center justify-center z-50 shadow-2xl"
-          style={{ background:'rgba(99,102,241,.3)', border:'1px solid rgba(99,102,241,.4)', backdropFilter:'blur(12px)' }}>
-          <FaRegArrowAltCircleUp size={20} style={{ color:'#818cf8' }} />
-        </motion.button>
+       <motion.button
+  onClick={scrollToTop}
+  whileHover={{ scale: 1.1 }}
+  whileTap={{ scale: 0.95 }}
+  aria-label="Scroll to top"
+  className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-2xl border border-green-500/40 bg-green-500/30 shadow-2xl backdrop-blur-md transition-colors hover:bg-green-500/40"
+>
+  <FaRegArrowAltCircleUp size={20} className="text-green-500 dark:text-green-400" />
+</motion.button>
+
+
       </div>
     </>
   );
