@@ -1113,26 +1113,22 @@ const Signup = () => {
 
 
 
-        {/* ── Footer ──────────────────────────────────────────────────────── */}
-        <footer className="border-t py-8 px-6 text-center"
-          style={{ borderColor:'var(--border-subtle-3)', background:'var(--bg-page)' }}>
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <img src="/images/owitech-logo.png" className="h-6 opacity-60" alt="Owitech" />
-            <span className="text-sm font-semibold text-black dark:text-white">Owitech</span>
-          </div>
+       <footer className="border-t border-gray-300 bg-white px-6 py-8 text-center shadow-[0_-1px_0_0_rgba(0,0,0,0.04)] dark:border-gray-700 dark:bg-gray-900 dark:shadow-none">
+  <div className="mb-3 flex items-center justify-center gap-2">
+    <img src="/images/owitech-logo.png" className="h-6 opacity-60" alt="Owitech" />
+    <span className="text-lg font-semibold text-black dark:text-white">Owitech</span>
+  </div>
 
-
-          <p className="text-lg text-black dark:text-white">
-  © {new Date().getFullYear()} Owitech. Built for Kenyan ISPs.{" "}
-  <Link
-    to="/terms-and-conditions"
-    className="font-medium text-blue-600 underline underline-offset-4 decoration-2 transition-colors hover:text-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
-  >
-    Terms &amp; Conditions
-  </Link>
-</p>
-
-        </footer>
+  <p className="text-lg text-black dark:text-white">
+    © {new Date().getFullYear()} Owitech. Built for Kenyan ISPs.{" "}
+    <Link
+      to="/terms-and-conditions"
+      className="font-medium text-blue-600 underline underline-offset-4 decoration-2 transition-colors hover:text-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+    >
+      Terms &amp; Conditions
+    </Link>
+  </p>
+</footer>
 
         {/* ── Lingering-visitor lead capture ─────────────────────────────── */}
         <AnimatePresence>
