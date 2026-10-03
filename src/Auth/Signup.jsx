@@ -1118,12 +1118,18 @@ const Signup = () => {
           style={{ borderColor:'var(--border-subtle-3)', background:'var(--bg-page)' }}>
           <div className="flex items-center justify-center gap-2 mb-3">
             <img src="/images/owitech-logo.png" className="h-6 opacity-60" alt="Owitech" />
-            <span className="text-sm font-semibold text-theme-muted">Owitech</span>
+            <span className="text-sm font-semibold text-black dark:text-white">Owitech</span>
           </div>
 
 
-          <p className="text-xs text-black dark:text-white">
-  © {new Date().getFullYear()} Owitech. Built for Kenyan ISPs. · <a href="/hotspot-pricing" className="hover:text-theme-muted"></a> · <Link to="/terms-and-conditions" className="hover:text-theme-muted">Terms & Conditions</Link>
+          <p className="text-lg text-black dark:text-white">
+  © {new Date().getFullYear()} Owitech. Built for Kenyan ISPs.{" "}
+  <Link
+    to="/terms-and-conditions"
+    className="font-medium text-blue-600 underline underline-offset-4 decoration-2 transition-colors hover:text-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+  >
+    Terms &amp; Conditions
+  </Link>
 </p>
 
         </footer>
