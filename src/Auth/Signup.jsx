@@ -704,137 +704,6 @@ const Signup = () => {
 
 
 
-{/* ── Partner / Reseller ──────────────────────────────────────────────── */}
-<section className="py-24 px-6" style={{ background: 'var(--bg-page-alt)' }}>
-  <div className="max-w-5xl mx-auto">
-    <div className="text-center mb-16">
-      <SectionLabel text="Partner & Reseller Program" />
-      <motion.h2 initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
-        className="text-4xl md:text-5xl font-black text-theme-primary mb-4">
-        Earn by reselling Aitechs<br />
-        <span className="gradient-green">hotspot to your tenants</span>
-      </motion.h2>
-      <p className="text-theme-muted max-w-xl mx-auto">
-        Are you a landlord, estate manager, or agent? Deploy hotspot equipment,
-        sell internet to your customers — and earn a commission on every sale, automatically.
-      </p>
-    </div>
-
-    {/* How it works */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
-      {RESELLER_STEPS.map((s, i) => (
-        <motion.div key={s.num}
-          initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }}
-          viewport={{ once:true }} transition={{ delay: i*0.08 }}
-          className="card-glass rounded-2xl p-5 relative overflow-hidden">
-          <div className="text-4xl font-black mono mb-3" style={{ color:`${s.accent}30` }}>{s.num}</div>
-          <h3 className="text-sm font-bold text-theme-primary mb-2">{s.title}</h3>
-          <p className="text-xs text-theme-muted leading-relaxed">{s.desc}</p>
-        </motion.div>
-      ))}
-    </div>
-
-    {/* Commission example */}
-    <motion.div initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
-      className="card-glass rounded-3xl p-8 mb-10"
-      style={{ border:'1px solid rgba(16,185,129,.2)', background:'rgba(16,185,129,.04)' }}>
-      <div className="flex items-center gap-3 mb-2">
-        <TrendingUp size={18} style={{ color:'#34d399' }} />
-        <h3 className="text-sm font-bold text-theme-primary">Example earnings — 20% commission rate</h3>
-        <span className="ml-auto text-xs px-2.5 py-1 rounded-full font-semibold"
-          style={{ background:'rgba(52,211,153,.12)', color:'#34d399' }}>Monthly</span>
-      </div>
-      <p className="text-xs text-theme-muted mb-5">Your tenants generate KES 30,000 in hotspot sales this month</p>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {[
-          { label:'Total sales revenue', value:'KES 30,000', note:'From your customers',  accent:'#38bdf8' },
-          { label:'Your commission rate', value:'20%',        note:'Set by the ISP',       accent:'#818cf8' },
-          { label:'You earn',             value:'KES 6,000',  note:'Paid to your M-Pesa', accent:'#34d399' },
-          { label:'ISP earns',            value:'KES 24,000', note:'Before platform fees', accent:'#f97316' },
-        ].map(r => (
-          <div key={r.label} className="rounded-xl p-4 text-center"
-            style={{ background:`${r.accent}0a`, border:`1px solid ${r.accent}20` }}>
-            <p className="text-xl font-bold mono" style={{ color: r.accent }}>{r.value}</p>
-            <p className="text-xs font-semibold text-theme-primary mt-1">{r.label}</p>
-            <p className="text-xs text-theme-muted mt-0.5">{r.note}</p>
-          </div>
-        ))}
-      </div>
-    </motion.div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    {/* Reseller portal mockup */}
-    <motion.div initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
-      className="card-glass rounded-3xl p-7 mb-10"
-      style={{ border:'1px solid rgba(99,102,241,.2)' }}>
-      <div className="flex items-center justify-between mb-5">
-        <div>
-          <p className="text-sm font-bold text-theme-primary">Reseller portal</p>
-          <p className="text-xs text-theme-muted mt-0.5">Your personal dashboard to track earnings & sales</p>
-        </div>
-        <span className="text-xs px-2.5 py-1 rounded-full font-semibold"
-          style={{ background:'rgba(52,211,153,.12)', color:'#34d399' }}>Live</span>
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-        {[
-          { label:'This month',      value:'KES 6,200', accent:'#818cf8' },
-          { label:'Total earned',    value:'KES 41,800', accent:'#818cf8' },
-          { label:'Active customers', value:'87',        accent:'#818cf8' },
-          { label:'Commission rate', value:'20%',        accent:'#818cf8' },
-        ].map(s => (
-          <div key={s.label} className="rounded-xl p-3 text-center"
-            style={{ background:'rgba(99,102,241,.08)', border:'1px solid rgba(99,102,241,.15)' }}>
-            <p className="text-lg font-bold mono" style={{ color: s.accent }}>{s.value}</p>
-            <p className="text-xs text-theme-muted mt-1">{s.label}</p>
-          </div>
-        ))}
-      </div>
-      <p className="text-xs font-semibold text-theme-secondary mb-2">Payout history</p>
-      {[
-        { month:'April 2025', amount:'KES 5,400', paid: true },
-        { month:'March 2025', amount:'KES 4,900', paid: true },
-        { month:'May 2025',   amount:'KES 6,200', paid: false },
-      ].map(p => (
-        <div key={p.month} className="flex items-center justify-between py-2.5"
-          style={{ borderTop:'1px solid var(--border-subtle-3)' }}>
-          <span className="text-xs text-theme-secondary">{p.month}</span>
-          <span className="text-xs font-bold mono" style={{ color:'#34d399' }}>+ {p.amount}</span>
-          <span className="text-xs px-2.5 py-1 rounded-full font-semibold"
-            style={p.paid
-              ? { background:'rgba(52,211,153,.12)', color:'#34d399' }
-              : { background:'rgba(251,191,36,.1)', color:'#fbbf24' }}>
-            {p.paid ? 'Paid' : 'Pending'}
-          </span>
-        </div>
-      ))}
-    </motion.div>
-
-    <div className="text-center">
-      <p className="text-theme-muted text-sm mb-4">
-        Interested in becoming a reseller? Contact us to get set up.
-      </p>
-      <WaBtn text="Become a Reseller" large />
-    </div>
-  </div>
-</section>
-
-
 
 
 
@@ -849,7 +718,7 @@ const Signup = () => {
                 Hotspot — <span className="gradient-green">Pay fixed price</span>
               </motion.h2>
 <p className="text-theme-secondary max-w-xl mx-auto text-lg">
-  <strong className="text-theme-primary">KES 1,000/month per router</strong> — unlimited users,
+  <strong className="text-theme-primary">KES 1,000/month</strong> — unlimited users,
   unlimited packages. No hidden fees.
 </p>
             </div>
