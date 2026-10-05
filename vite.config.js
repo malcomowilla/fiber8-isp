@@ -32,7 +32,7 @@ export default defineConfig({
         description:
           'Owitech is a simple ISP billing and network management system for internet service providers.',
 
-        display: 'standalone', // REQUIRED — without this no install prompt fires
+        display: 'standalone', 
         display_override: ['standalone', 'minimal-ui'],
         scope: '/',
         start_url: '/',

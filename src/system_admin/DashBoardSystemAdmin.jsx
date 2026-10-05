@@ -15,6 +15,7 @@ import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import ClientList from './ClientList';
 import InviteClient from './InviteClient';
 import Settings from './Settings';
@@ -47,9 +48,8 @@ import SystemAnnouncementsManager from './SystemAnnouncementsManager';
 import { Megaphone, MessageSquare } from 'lucide-react';
 import SmsWalletPurchases from './SmsWalletPurchases';
 import SmsIcon from '@mui/icons-material/Sms';
-import ProxmoxDashboard from "./ProxmoxDashboard"
-
-
+import ProxmoxDashboard from './ProxmoxDashboard';
+import CollectorRegistrations from './CollectorRegistrations';
 
 const NAV_SECTIONS = [
   {
@@ -64,10 +64,15 @@ const NAV_SECTIONS = [
       { value: 3, label: 'Invite client', Icon: PeopleIcon },
       { value: 14, label: 'Payments', Icon: PaymentIcon },
       { value: 12, label: 'Financial dashboard', Icon: AssessmentIcon },
-          { value: 15, label: 'Support', Icon: LifeBuoy },
-
+      { value: 15, label: 'Support', Icon: LifeBuoy },
       { value: -1, label: 'Reset client password', Icon: LockResetIcon, action: 'resetPassword' },
       { value: 17, label: 'SMS credit purchases', Icon: SmsIcon },
+    ],
+  },
+  {
+    label: 'TakaPick',
+    items: [
+      { value: 18, label: 'Collector registrations', Icon: AppRegistrationIcon },
     ],
   },
   {
@@ -84,7 +89,7 @@ const NAV_SECTIONS = [
       { value: 2, label: 'Settings', Icon: SettingsIcon },
       { value: 13, label: 'Maintenance', Icon: BuildIcon },
       { value: 10, label: 'Changelogs', Icon: GiRecycle },
-       { value: 16, label: 'Announcements', Icon: Megaphone },
+      { value: 16, label: 'Announcements', Icon: Megaphone },
     ],
   },
   {
@@ -95,8 +100,6 @@ const NAV_SECTIONS = [
       { value: 7, label: 'Passkeys', Icon: IoMdKey },
     ],
   },
-
-
 ];
 
 const ALL_NAV_ITEMS = NAV_SECTIONS.flatMap((section) => section.items);
@@ -119,22 +122,17 @@ const PAGE_TITLES = {
   13: 'Maintenance',
   14: 'Payments',
   15: 'Support Overview',
+  16: 'Announcements',
+  17: 'SMS Credit Purchases',
+  18: 'TakaPick · Collector Registrations',
 };
-
-
-
-
-
-
-
-
 
 const PlatformSmsBalanceCard = () => {
   const [balance, setBalance] = useState(null);
   useEffect(() => {
     fetch('/api/platform_sms_balance')
-      .then(r => r.json())
-      .then(d => setBalance(d.balance))
+      .then((r) => r.json())
+      .then((d) => setBalance(d.balance))
       .catch(() => setBalance('—'));
   }, []);
   return (
@@ -147,10 +145,6 @@ const PlatformSmsBalanceCard = () => {
     </div>
   );
 };
-
-
-
-
 
 const DashboardSytemAdmin = () => {
   const [value, setValue] = useState(0);
@@ -405,8 +399,8 @@ const DashboardSytemAdmin = () => {
               </div>
 
               <div className="hidden md:block">
-    <PlatformSmsBalanceCard />
-  </div>
+                <PlatformSmsBalanceCard />
+              </div>
               <Tooltip title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}>
                 <button
                   type="button"
@@ -461,7 +455,6 @@ const DashboardSytemAdmin = () => {
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ duration: 0.2 }}
                     >
-                      
                       {/* {value === 0 && <UbuntuStats />} */}
                       {value === 0 && <ProxmoxDashboard />}
 
@@ -482,6 +475,7 @@ const DashboardSytemAdmin = () => {
                       {value === 15 && <SystemAdminSupportOverview />}
                       {value === 16 && <SystemAnnouncementsManager />}
                       {value === 17 && <SmsWalletPurchases />}
+                      {value === 18 && <CollectorRegistrations />}
                     </motion.div>
                   )}
                 </AnimatePresence>
