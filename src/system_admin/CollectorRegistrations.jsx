@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 const STATUS_FILTERS = ['all', 'active', 'pending', 'suspended'];
 
@@ -22,6 +23,11 @@ const CollectorRegistrations = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [busyId, setBusyId] = useState(null);
+
+  // delete confirmation
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [confirmText, setConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -53,13 +59,44 @@ const CollectorRegistrations = () => {
       });
       if (!res.ok) throw new Error('Could not update status');
       const updated = await res.json();
-      setRegistrations((rows) => rows.map((r) => (r.id === updated.id ? updated : r)));
+      setRegistrations((rows) => rows.map((r) => (r.id === updated.id ? { ...r, ...updated } : r)));
       toast.success(`${admin.company_name} is now ${status}`);
       load();
     } catch (err) {
       toast.error(err.message);
     } finally {
       setBusyId(null);
+    }
+  };
+
+  const openDelete = (row) => {
+    setConfirmText('');
+    setDeleteTarget(row);
+  };
+
+  const closeDelete = () => {
+    if (deleting) return;
+    setDeleteTarget(null);
+    setConfirmText('');
+  };
+
+  const deleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/collector_registrations/${deleteTarget.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Could not delete account');
+      toast.success(data.message || 'Account deleted');
+      setDeleteTarget(null);
+      setConfirmText('');
+      load();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -73,6 +110,8 @@ const CollectorRegistrations = () => {
       return matchesStatus && matchesSearch;
     });
   }, [registrations, search, statusFilter]);
+
+  const canConfirmDelete = deleteTarget && confirmText.trim() === deleteTarget.company_name;
 
   return (
     <div className="space-y-5">
@@ -126,16 +165,17 @@ const CollectorRegistrations = () => {
               <th className="px-4 py-3 font-medium">Contact</th>
               <th className="px-4 py-3 font-medium">Registered</th>
               <th className="px-4 py-3 font-medium">Last sign in</th>
+              <th className="px-4 py-3 font-medium">Data</th>
               <th className="px-4 py-3 font-medium">Status</th>
               <th className="px-4 py-3 font-medium text-right">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-slate-800 dark:text-slate-200">
             {loading && (
-              <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-500">Loading registrations…</td></tr>
+              <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-500">Loading registrations…</td></tr>
             )}
             {!loading && visible.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-500">No registrations match.</td></tr>
+              <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-500">No registrations match.</td></tr>
             )}
             {!loading &&
               visible.map((r) => (
@@ -152,6 +192,11 @@ const CollectorRegistrations = () => {
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <p>{formatDate(r.last_sign_in_at)}</p>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-xs text-slate-500">
+                    <p>{r.buildings_count ?? 0} buildings</p>
+                    <p>{r.customers_count ?? 0} customers</p>
+                    <p>{r.transactions_count ?? 0} transactions</p>
                   </td>
                   <td className="px-4 py-3">
                     <span className="rounded-full border border-slate-300 dark:border-slate-600 px-2.5 py-0.5 text-xs font-medium capitalize">
@@ -179,12 +224,76 @@ const CollectorRegistrations = () => {
                         Suspend
                       </button>
                     )}
+                    <button
+                      type="button"
+                      onClick={() => openDelete(r)}
+                      aria-label={`Delete ${r.company_name}`}
+                      className="ml-2 inline-flex items-center gap-1 rounded-lg border border-red-300 px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-500/40 dark:text-red-400 dark:hover:bg-red-500/10"
+                    >
+                      <DeleteOutlineIcon sx={{ fontSize: 16 }} /> Delete
+                    </button>
                   </td>
                 </tr>
               ))}
           </tbody>
         </table>
       </div>
+
+      {/* Delete confirmation */}
+      {deleteTarget && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"
+          onClick={closeDelete}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-collector-title"
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900"
+          >
+            <h2 id="delete-collector-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+              Delete {deleteTarget.company_name}?
+            </h2>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+              This permanently deletes the company, its admin login,{' '}
+              <strong>{deleteTarget.buildings_count ?? 0}</strong> buildings,{' '}
+              <strong>{deleteTarget.customers_count ?? 0}</strong> customers and{' '}
+              <strong>{deleteTarget.transactions_count ?? 0}</strong> transactions. This cannot be undone.
+            </p>
+
+            <label htmlFor="confirm-company" className="mt-4 block text-sm text-slate-700 dark:text-slate-300">
+              Type <strong>{deleteTarget.company_name}</strong> to confirm
+            </label>
+            <input
+              id="confirm-company"
+              autoFocus
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+            />
+
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeDelete}
+                disabled={deleting}
+                className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={deleteAccount}
+                disabled={!canConfirmDelete || deleting}
+                className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {deleting ? 'Deleting…' : 'Delete everything'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
