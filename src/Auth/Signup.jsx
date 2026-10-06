@@ -14,6 +14,8 @@ import {
   MessageSquare, Sparkles, TrendingUp, Server,
   Router, Bell, ShieldCheck, MapPin, Sun, Moon
 } from 'lucide-react';
+
+
 const Styles = () => (
   <style>{`
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
@@ -887,7 +889,7 @@ const Signup = () => {
 
             <div className="text-center">
               <p className="text-theme-muted text-sm mb-4">
-                All plans include a <strong className="text-theme-primary">free 7-day trial</strong>.
+                All plans include a <strong className="text-theme-primary">free 5-day trial</strong>.
                 No credit card required.
               </p>
               <WaBtn text="Talk to Sales — Get Custom Quote" large />
