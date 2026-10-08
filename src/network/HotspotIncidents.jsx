@@ -6,6 +6,11 @@ import {
   Clock, Trash2, RefreshCw, Info, Phone, Wifi, ChevronDown,
   ShieldCheck, Zap, CalendarDays, History,
 } from 'lucide-react';
+import PaidNotConnectedPanel from './PaidNotConnectedPanel';
+
+
+
+
 
 const subdomain = window.location.hostname.split('.')[0];
 
@@ -763,6 +768,13 @@ const HotspotIncidents = () => {
           </button>
         </div>
       </div>
+
+
+
+
+ <PaidNotConnectedPanel />
+
+
 
       {/* About + classification guide */}
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">

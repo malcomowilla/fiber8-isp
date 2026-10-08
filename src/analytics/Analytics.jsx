@@ -17,8 +17,10 @@ import ReactApexChart from 'react-apexcharts';
 import {
   CreditCard, TrendingUp, Activity, Zap, ChevronRight, Wifi,
   Ticket, UserPlus, Radio, Sun, Moon, CalendarDays,
-  AlarmClock, History, BarChart3
+  AlarmClock, History, BarChart3, AlertTriangle
 } from 'lucide-react';
+
+
 import License from '../layout/License';
 import ChurnRateSection from './ChurnRateSection';
 import NotificationCenter from './NotificationCenter';
@@ -501,6 +503,8 @@ const Analytics = () => {
   // ── Access Point offline alert ────────────────────────────────────────────
   const [apStats, setApStats] = useState({ total: 0, online: 0, offline: 0, offline_list: [] });
   const [apLoading, setApLoading] = useState(true);
+  // ── Paid-but-not-connected (needs compensation) ───────────────────────────
+  const [pncStats, setPncStats] = useState({ count: 0, amount: 0, auto_eligible_count: 0 });
 
   // Chart
   const maxDataPoints = 20;
@@ -747,6 +751,21 @@ const Analytics = () => {
     finally { setApLoading(false); }
   }, [subdomain]);
 
+
+    const fetchPaidNotConnected = useCallback(async () => {
+    try {
+      const res = await fetch('/api/paid_not_connected/summary', { headers: { 'X-Subdomain': subdomain } });
+      if (res.ok) {
+        const d = await res.json();
+        setPncStats({
+          count: d.count ?? 0,
+          amount: d.amount ?? 0,
+          auto_eligible_count: d.auto_eligible_count ?? 0,
+        });
+      }
+    } catch (_) {}
+  }, [subdomain]);
+
   useEffect(() => {
     getUnpaidInvoiceAmount();
     getCurrentHotspotPlan();
@@ -762,11 +781,12 @@ const Analytics = () => {
     fetchHotspotERevenueThisMonth();
     fetchSystemStatistics();
     fetchAccessPointStats();
+    fetchPaidNotConnected();
   }, [getUnpaidInvoiceAmount, getCurrentHotspotPlan, getPPOEstats, fetchtotalSubscribers,
     fetchtotalSubscribersOffline, fetchDashboardStats, fetchYesterdayRevenue, fetchPPPoERevenueToday,
     fetchExpiringSoon, fetchRecentlyExpired, fetchNewCustomers,
     fetchSystemStatistics, fetchPPPoERevenueThisMonth, fetchHotspotERevenueThisMonth,
-    fetchAccessPointStats]);
+    fetchAccessPointStats, fetchPaidNotConnected]);
 
 
 
@@ -1015,6 +1035,39 @@ const Analytics = () => {
                 </div>
               </motion.div>
             )}
+
+
+            {/* ── Paid but not connected: needs compensation ─────────────────── */}
+            {pncStats.count > 0 && (
+              <Link to="/admin/hotspot-incidents#paid-not-connected" className="block">
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  whileHover={{ y: -2 }}
+                  className="stat-card rounded-2xl p-4 flex items-center gap-3"
+                >
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: 'rgba(148,163,184,.15)' }}>
+                    <AlertTriangle size={17} className="text-slate-700 dark:text-slate-200" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">
+                      {pncStats.count} customer{pncStats.count === 1 ? '' : 's'} paid but never connected
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      {fmtKsh(pncStats.amount)} paid · {pncStats.auto_eligible_count} eligible for quick compensation
+                    </p>
+                  </div>
+                  <span className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-200">
+                    Review <ChevronRight size={12} className="card-arrow" />
+                  </span>
+                </motion.div>
+              </Link>
+            )}
+
+
+
+
 
             {/* ── Access Point Summary (Total / Online / Offline) ──────────────── */}
             {!apLoading && apStats.total > 0 && (
