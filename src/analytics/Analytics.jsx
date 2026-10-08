@@ -1039,7 +1039,7 @@ const Analytics = () => {
 
             {/* ── Paid but not connected: needs compensation ─────────────────── */}
             {pncStats.count > 0 && (
-              <Link to="/admin/hotspot-incidents#paid-not-connected" className="block">
+              <Link to="/admin/incidents#paid-not-connected" className="block">
                 <motion.div
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
