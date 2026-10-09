@@ -200,11 +200,6 @@ const validCode = (v) => {
   const d = digitsOnly(v);
   return d.length >= 4 && d.length <= 10 ? d : null;
 };
-
-
-
-const DIGITS = /^\d{4,8}$/;
-
 const channelSub = (c) => {
   if (c.channel_type === 'till') return `Till ${c.short_code}`;
   if (c.channel_type === 'bank') return `Account ${c.account_number} · Paybill ${c.short_code}`;
@@ -477,151 +472,6 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
         </SectionCard>
       </form>
     </div>
-  );
-};
-
-// ═══════════════════════════════════════════════════════════════
-// TUMA PANEL
-// ═══════════════════════════════════════════════════════════════
-const TumaPanel = ({ subdomain, onSaved }) => {
-  const [form, setForm] = useState({ business_email: '', api_key: '', enabled: false });
-  const [apiKeyPresent, setApiKeyPresent] = useState(false);
-  const [apiKeyMasked, setApiKeyMasked] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState(null);
-
-  const fetchSettings = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/tuma_settings', { headers: { 'X-Subdomain': subdomain } });
-      if (res.ok) {
-        const data = await res.json();
-        setForm((prev) => ({ ...prev, business_email: data.business_email || '', enabled: !!data.enabled }));
-        setApiKeyPresent(!!data.api_key_present);
-        setApiKeyMasked(data.api_key_masked);
-      }
-    } catch {
-      toast.error('Could not load Tuma settings');
-    } finally {
-      setLoading(false);
-    }
-  }, [subdomain]);
-
-  useEffect(() => { fetchSettings(); }, [fetchSettings]);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-  };
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    setTestResult(null);
-    try {
-      const payload = { ...form };
-      if (!payload.api_key) delete payload.api_key;
-      const res = await fetch('/api/tuma_settings', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        toast.success('Tuma settings saved');
-        setApiKeyPresent(!!data.api_key_present);
-        setApiKeyMasked(data.api_key_masked);
-        setForm((prev) => ({ ...prev, api_key: '' }));
-        onSaved?.();
-      } else {
-        toast.error(data.errors?.[0] || 'Could not save settings');
-      }
-    } catch {
-      toast.error('Something went wrong. Please try again');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleTestConnection = async () => {
-    setTesting(true);
-    setTestResult(null);
-    try {
-      const res = await fetch('/api/tuma_settings/test_connection', {
-        method: 'POST', headers: { 'X-Subdomain': subdomain },
-      });
-      const data = await res.json();
-      setTestResult(data);
-      data.success ? toast.success('Connected to Tuma') : toast.error(data.message || 'Connection failed');
-    } catch {
-      setTestResult({ success: false, message: 'Network error while testing connection' });
-    } finally {
-      setTesting(false);
-    }
-  };
-
-  if (loading) return <Spinner />;
-
-  return (
-    <form onSubmit={handleSave} className="space-y-5">
-      <div className="flex items-center justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-        <div className="flex items-center gap-3">
-          <ShieldCheck size={18} className="text-slate-400" />
-          <div>
-            <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Enable Tuma integration</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Turn on to use your own Tuma account</p>
-          </div>
-        </div>
-        <Toggle checked={form.enabled} onChange={handleChange} name="enabled" />
-      </div>
-
-      <AnimatePresence initial={false}>
-        {form.enabled && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }}
-            className="overflow-hidden space-y-5"
-          >
-            <SectionCard title="Business credentials">
-              <div>
-                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Business email</label>
-                <div className="relative">
-                  <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input type="email" name="business_email" value={form.business_email} onChange={handleChange}
-                    placeholder="you@yourbusiness.com" className={inputCls} />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
-                  API key {apiKeyPresent && <span className="text-slate-400">— currently set</span>}
-                </label>
-                <div className="relative">
-                  <KeyRound size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input type="password" name="api_key" value={form.api_key} onChange={handleChange}
-                    placeholder={apiKeyMasked || 'tuma_xxxxxxxxxxxxxxxx'} className={inputCls} />
-                </div>
-              </div>
-              <button
-                type="button" onClick={handleTestConnection} disabled={testing || !apiKeyPresent}
-                className="flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-lg
-                  bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300
-                  hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
-              >
-                {testing ? <Loader2 size={13} className="animate-spin" /> : <ShieldCheck size={13} />}
-                {testing ? 'Testing…' : 'Test connection'}
-              </button>
-              <TestResult result={testResult} />
-            </SectionCard>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <button type="submit" disabled={saving} className={primaryBtn}>
-        {saving ? 'Saving…' : 'Save Tuma settings'}
-      </button>
-    </form>
   );
 };
 
@@ -1204,3 +1054,100 @@ const PaymentGatewaySettings = () => {
 };
 
 export default PaymentGatewaySettings;
+
+
+
+
+// ═══════════════════════════════════════════════════════════════
+// TUMA PANEL
+// ═══════════════════════════════════════════════════════════════
+const TumaPanel = ({ subdomain, onSaved }) => {
+  const [form, setForm] = useState({ enabled: false, api_key: '' });
+  const [keyPresent, setKeyPresent] = useState(false);
+  const [keyMasked, setKeyMasked] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const fetchSettings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/tuma_settings', { headers: { 'X-Subdomain': subdomain } });
+      if (res.ok) {
+        const data = await res.json();
+        setForm((prev) => ({ ...prev, enabled: !!data.enabled }));
+        setKeyPresent(!!data.api_key_present);
+        setKeyMasked(data.api_key_masked || null);
+      }
+    } catch {
+      toast.error('Could not load Tuma settings');
+    } finally {
+      setLoading(false);
+    }
+  }, [subdomain]);
+
+  useEffect(() => { fetchSettings(); }, [fetchSettings]);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const payload = { ...form };
+      if (!payload.api_key) delete payload.api_key; // keep the stored key
+      const res = await fetch('/api/tuma_settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('Tuma settings saved');
+        setKeyPresent(!!data.api_key_present);
+        setKeyMasked(data.api_key_masked || null);
+        setForm((prev) => ({ ...prev, api_key: '' }));
+        onSaved?.();
+      } else {
+        toast.error(data.error || data.errors?.[0] || 'Could not save settings');
+      }
+    } catch {
+      toast.error('Something went wrong. Please try again');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <Spinner />;
+
+  return (
+    <form onSubmit={handleSave} className="space-y-5">
+      <div className="flex items-center justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+        <div className="flex items-center gap-3">
+          <ShieldCheck size={18} className="text-slate-400" />
+          <div>
+            <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Enable Tuma integration</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">M-Pesa STK push via Tuma</p>
+          </div>
+        </div>
+        <Toggle checked={form.enabled} onChange={handleChange} name="enabled" />
+      </div>
+
+      <SectionCard title="Tuma credentials">
+        <TextField
+          label={<>API key {keyPresent && <span className="text-slate-400">— currently set</span>}</>}
+          icon={KeyRound} type="password" name="api_key" value={form.api_key}
+          onChange={handleChange} autoComplete="off"
+          placeholder={keyMasked || 'Paste your Tuma API key'}
+          hint="Leave blank to keep the saved key."
+        />
+      </SectionCard>
+
+      <button type="submit" disabled={saving} className={primaryBtn}>
+        {saving ? 'Saving…' : 'Save Tuma settings'}
+      </button>
+    </form>
+  );
+};
