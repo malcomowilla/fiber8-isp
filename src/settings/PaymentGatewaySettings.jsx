@@ -5,17 +5,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import PaymentGatewayOtpGate from '../security/PaymentGatewayOtpGate';
 import {
   Zap, ShieldCheck, Mail, KeyRound, CheckCircle2, XCircle, Loader2,
-  Smartphone, Wallet, CreditCard, Plus, X, Globe, Building2, Lock, ArrowLeft,
+  Smartphone, Wallet, CreditCard, Plus, X, Globe, Building2, Lock, ArrowLeft, AlertCircle,
 } from 'lucide-react';
 
 const FONT = "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
 
 const GATEWAYS = [
-  { id: 'mpesa',    name: 'M-Pesa',   icon: Smartphone, meta: 'KES · Kenya · Paybill or Till',          description: 'Direct Daraja STK push with C2B confirmation.',          canActivate: true },
-  { id: 'tuma',     name: 'Tuma',     icon: Zap,        meta: 'KES · Kenya',                            description: 'M-Pesa STK via Tuma, settles straight to you.',         canActivate: true },
-  { id: 'paystack', name: 'Paystack', icon: CreditCard, meta: 'KES / NGN / GHS · Africa',               description: 'Cards, mobile money and bank transfer through Paystack.', canActivate: true },
-  { id: 'sasapay',  name: 'SasaPay',  icon: Wallet,     meta: 'KES · Kenya',                            description: 'Mobile money and bank collection for Kenyan merchants.', canActivate: false },
+  { id: 'mpesa',    name: 'M-Pesa',   icon: Smartphone, meta: 'KES · Kenya · Paybill or Till',   description: 'Direct Daraja STK push with C2B confirmation.',           canActivate: true },
+  { id: 'tuma',     name: 'Tuma',     icon: Zap,        meta: 'KES · Kenya',                     description: 'M-Pesa STK via Tuma, settles straight to you.',          canActivate: true },
+  { id: 'paystack', name: 'Paystack', icon: CreditCard, meta: 'KES / NGN / GHS · Africa',        description: 'Cards, mobile money and bank transfer through Paystack.', canActivate: true },
+  { id: 'sasapay',  name: 'SasaPay',  icon: Wallet,     meta: 'KES · Kenya',                     description: 'Mobile money and bank collection for Kenyan merchants.',  canActivate: false },
 ];
+
+const nameOf = (id) => GATEWAYS.find((g) => g.id === id)?.name || id;
 
 // ═══════════════════════════════════════════════════════════════
 // SHARED UI BITS
@@ -75,7 +77,8 @@ const MpesaPanel = ({ subdomain, onSaved }) => {
         headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
       });
       const data = await res.json();
-      if (res.ok && data && !Array.isArray(data)) setForm((prev) => ({ ...prev, ...data }));
+      const record = Array.isArray(data) ? data[0] : data;
+      if (res.ok && record) setForm((prev) => ({ ...prev, ...record }));
     } catch {
       toast.error('Could not load M-Pesa settings');
     } finally {
@@ -119,6 +122,9 @@ const MpesaPanel = ({ subdomain, onSaved }) => {
   return (
     <form onSubmit={handleSave} className="space-y-5">
       <SectionCard title="Daraja credentials">
+        <p className="text-xs text-slate-500 dark:text-slate-400 -mt-2">
+          Leave these empty to use the platform's default M-Pesa account.
+        </p>
         {[
           ['short_code', 'Short code', Building2],
           ['api_initiator_username', 'API initiator username', KeyRound],
@@ -541,7 +547,11 @@ const SasaPayPanel = () => {
 const PANELS = { mpesa: MpesaPanel, tuma: TumaPanel, paystack: PaystackPanel, sasapay: SasaPayPanel };
 
 // ═══════════════════════════════════════════════════════════════
-// GATEWAY CARD
+// STATUS BADGE + GATEWAY CARD
+// One primary action per card:
+//   active          -> "Collecting payments" (+ Manage)
+//   ready           -> "Start collecting"    (+ Manage)
+//   not ready       -> "Set up"
 // ═══════════════════════════════════════════════════════════════
 const Badge = ({ tone, children }) => {
   const tones = {
@@ -550,19 +560,22 @@ const Badge = ({ tone, children }) => {
     off:    'bg-slate-50 text-slate-400 dark:bg-slate-800/60 dark:text-slate-500',
   };
   return (
-    <span className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-1 rounded-full ${tones[tone]}`}>
+    <span className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-1 rounded-full whitespace-nowrap ${tones[tone]}`}>
       {children}
     </span>
   );
 };
 
-const GatewayCard = ({ gateway, isActive, configured, activating, onActivate, onManage }) => {
-  const { name, icon: Icon, meta, description, canActivate } = gateway;
+const ghostBtn = "px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 " +
+  "text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors";
 
-  let badge = <Badge tone="off">Not configured</Badge>;
+const GatewayCard = ({ gateway, isActive, ready, onStart, onManage }) => {
+  const { id, name, icon: Icon, meta, description, canActivate } = gateway;
+
+  let badge = <Badge tone="off">Not set up</Badge>;
   if (isActive) badge = <Badge tone="active">Active</Badge>;
-  else if (!canActivate) badge = <Badge tone="off">Backend pending</Badge>;
-  else if (configured) badge = <Badge tone="ready">Configured</Badge>;
+  else if (!canActivate) badge = <Badge tone="off">Coming soon</Badge>;
+  else if (ready) badge = <Badge tone="ready">Ready</Badge>;
 
   return (
     <div
@@ -585,22 +598,110 @@ const GatewayCard = ({ gateway, isActive, configured, activating, onActivate, on
 
       <div className="flex gap-2 mt-4">
         {isActive ? (
-          <button type="button" disabled
-            className="flex-1 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-semibold flex items-center justify-center gap-1.5">
-            <CheckCircle2 size={13} /> Collecting payments
+          <>
+            <div className="flex-1 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-semibold flex items-center justify-center gap-1.5">
+              <CheckCircle2 size={13} /> Collecting payments
+            </div>
+            <button type="button" onClick={() => onManage(id)} className={ghostBtn}>Manage</button>
+          </>
+        ) : canActivate && ready ? (
+          <>
+            <button type="button" onClick={() => onStart(id)}
+              className="flex-1 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors">
+              Start collecting
+            </button>
+            <button type="button" onClick={() => onManage(id)} className={ghostBtn}>Manage</button>
+          </>
+        ) : (
+          <button type="button" onClick={() => onManage(id)}
+            className="flex-1 py-2 rounded-lg border border-emerald-600 text-emerald-700 dark:text-emerald-400 dark:border-emerald-500
+              hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-xs font-semibold transition-colors">
+            Set up
           </button>
-        ) : canActivate && configured ? (
-          <button type="button" onClick={() => onActivate(gateway.id)} disabled={activating}
-            className="flex-1 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1.5">
-            {activating && <Loader2 size={13} className="animate-spin" />} Activate
-          </button>
-        ) : null}
-        <button type="button" onClick={() => onManage(gateway.id)}
-          className={`${isActive || (canActivate && configured) ? 'px-3' : 'flex-1'} py-2 rounded-lg border border-slate-200 dark:border-slate-700
-            text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors`}>
-          {configured || isActive ? 'Manage' : 'Set up'}
-        </button>
+        )}
       </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
+// CONFIRM DIALOG — always names what gets switched off
+// ═══════════════════════════════════════════════════════════════
+const ConfirmSwitch = ({ target, current, busy, onCancel, onConfirm }) => (
+  <AnimatePresence>
+    {target && (
+      <motion.div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        onClick={busy ? undefined : onCancel}
+      >
+        <motion.div
+          className="w-full max-w-sm rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-xl"
+          style={{ fontFamily: FONT }}
+          initial={{ scale: 0.96, y: 8 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 8 }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
+            <AlertCircle size={19} className="text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <h3 className="mt-3 text-sm font-semibold text-slate-900 dark:text-slate-100">
+            Start collecting with {nameOf(target)}?
+          </h3>
+          <p className="mt-1.5 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            {current && current !== target
+              ? <>This switches off <b>{nameOf(current)}</b>, your current provider. </>
+              : null}
+            New hotspot voucher and TV plan payments will go through {nameOf(target)}. Payments already in progress are not affected.
+          </p>
+          <div className="mt-5 flex gap-2">
+            <button type="button" onClick={onCancel} disabled={busy}
+              className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 transition-colors">
+              Cancel
+            </button>
+            <button type="button" onClick={onConfirm} disabled={busy}
+              className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1.5">
+              {busy && <Loader2 size={13} className="animate-spin" />} Start collecting
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
+
+// ═══════════════════════════════════════════════════════════════
+// STATUS BAR shown at the top of a gateway's own page
+// ═══════════════════════════════════════════════════════════════
+const GatewayStatusBar = ({ gateway, isActive, ready, current, onStart }) => {
+  if (isActive) {
+    return (
+      <div className="mb-5 flex items-center gap-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-4 py-3 text-xs text-emerald-800 dark:text-emerald-300">
+        <CheckCircle2 size={14} className="shrink-0" />
+        {gateway.name} is collecting payments for hotspot vouchers and TV plans.
+      </div>
+    );
+  }
+  if (!gateway.canActivate) {
+    return (
+      <div className="mb-5 flex items-center gap-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 px-4 py-3 text-xs text-slate-600 dark:text-slate-400">
+        <AlertCircle size={14} className="shrink-0" />
+        {gateway.name} can't collect payments yet. It's coming soon.
+      </div>
+    );
+  }
+  return (
+    <div className="mb-5 flex flex-col sm:flex-row sm:items-center gap-3 justify-between rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 px-4 py-3">
+      <p className="text-xs text-slate-600 dark:text-slate-400">
+        {ready
+          ? <>{gateway.name} is ready but not active. <b>{nameOf(current)}</b> is collecting payments right now.</>
+          : <>Save your {gateway.name} details below, then start collecting.</>}
+      </p>
+      {ready && (
+        <button type="button" onClick={() => onStart(gateway.id)}
+          className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors shrink-0">
+          Start collecting
+        </button>
+      )}
     </div>
   );
 };
@@ -610,13 +711,13 @@ const GatewayCard = ({ gateway, isActive, configured, activating, onActivate, on
 // One active gateway — used for hotspot vouchers AND TV plan devices.
 // ═══════════════════════════════════════════════════════════════
 const PaymentGatewaySettings = () => {
-  const [view, setView] = useState(null); // null = grid, else gateway id
+  const [view, setView] = useState(null);           // null = grid, else gateway id
   const [activeGateway, setActiveGateway] = useState('');
-  const [configured, setConfigured] = useState({});
-  const [activating, setActivating] = useState('');
+  const [ready, setReady] = useState({});
+  const [pending, setPending] = useState(null);     // gateway awaiting confirmation
+  const [switching, setSwitching] = useState(false);
   const subdomain = window.location.hostname.split('.')[0];
 
-  // IBM Plex Mono
   useEffect(() => {
     const id = 'ibm-plex-mono-font';
     if (document.getElementById(id)) return;
@@ -627,7 +728,7 @@ const PaymentGatewaySettings = () => {
     document.head.appendChild(link);
   }, []);
 
-  const loadConfigured = useCallback(async () => {
+  const loadReady = useCallback(async () => {
     const headers = { 'X-Subdomain': subdomain };
     const get = async (url) => {
       try {
@@ -635,13 +736,13 @@ const PaymentGatewaySettings = () => {
         return res.ok ? await res.json() : null;
       } catch { return null; }
     };
-    const [mpesa, tuma, paystack] = await Promise.all([
-      get('/api/hotspot_mpesa_settings'),
+    const [tuma, paystack] = await Promise.all([
       get('/api/tuma_settings'),
       get('/api/paystack_settings'),
     ]);
-    setConfigured({
-      mpesa: !!(mpesa && !Array.isArray(mpesa) && mpesa.short_code && mpesa.consumer_key),
+    setReady({
+      // M-Pesa always works: tenant keys if saved, platform defaults otherwise
+      mpesa: true,
       tuma: !!(tuma && tuma.enabled && tuma.api_key_present),
       paystack: !!(paystack && paystack.enabled && paystack.secret_key_present),
       sasapay: false,
@@ -653,31 +754,39 @@ const PaymentGatewaySettings = () => {
       .then((res) => (res.ok ? res.json() : {}))
       .then((data) => setActiveGateway(data.hotspot || 'mpesa'))
       .catch(() => {});
-    loadConfigured();
-  }, [subdomain, loadConfigured]);
+    loadReady();
+  }, [subdomain, loadReady]);
 
-  const handleActivate = async (gatewayId) => {
+  const confirmSwitch = async () => {
+    const target = pending;
     const previous = activeGateway;
-    setActivating(gatewayId);
-    setActiveGateway(gatewayId);
+    setSwitching(true);
     try {
       const res = await fetch('/api/payment_gateway_settings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
-        body: JSON.stringify({ gateways: { hotspot: gatewayId } }),
+        body: JSON.stringify({ gateways: { hotspot: target } }),
       });
       if (!res.ok) throw new Error();
-      toast.success(`${GATEWAYS.find((g) => g.id === gatewayId)?.name} is now collecting payments`);
+      setActiveGateway(target);
+      toast.success(`${nameOf(target)} is now collecting payments`);
+      setPending(null);
     } catch {
       setActiveGateway(previous);
-      toast.error('Could not switch gateway');
+      toast.error('Could not switch provider');
     } finally {
-      setActivating('');
+      setSwitching(false);
     }
   };
 
   const current = GATEWAYS.find((g) => g.id === view);
   const ActivePanel = view ? PANELS[view] : null;
+
+  // Active first, then ready, then the rest
+  const sorted = [...GATEWAYS].sort((a, b) => {
+    const rank = (g) => (g.id === activeGateway ? 0 : ready[g.id] && g.canActivate ? 1 : 2);
+    return rank(a) - rank(b);
+  });
 
   return (
     <PaymentGatewayOtpGate title="Payment Gateways">
@@ -694,27 +803,26 @@ const PaymentGatewaySettings = () => {
                 <div>
                   <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Payment collection</h2>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                    Choose how customers pay. Set up a provider, then activate it. One provider is live at a time and covers hotspot vouchers and TV plans.
+                    Pick the provider your customers pay through. One is live at a time and covers hotspot vouchers and TV plans.
                   </p>
                 </div>
               </div>
 
-              {activeGateway && configured[activeGateway] && (
+              {activeGateway && (
                 <div className="mb-5 flex items-center gap-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-4 py-3 text-xs text-emerald-800 dark:text-emerald-300">
                   <CheckCircle2 size={14} className="shrink-0" />
-                  {GATEWAYS.find((g) => g.id === activeGateway)?.name} is configured and active for customer payments.
+                  {nameOf(activeGateway)} is collecting customer payments.
                 </div>
               )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {GATEWAYS.map((g) => (
+                {sorted.map((g) => (
                   <GatewayCard
                     key={g.id}
                     gateway={g}
                     isActive={activeGateway === g.id}
-                    configured={!!configured[g.id]}
-                    activating={activating === g.id}
-                    onActivate={handleActivate}
+                    ready={!!ready[g.id]}
+                    onStart={setPending}
                     onManage={setView}
                   />
                 ))}
@@ -722,12 +830,12 @@ const PaymentGatewaySettings = () => {
             </motion.div>
           ) : (
             <motion.div key={view} className="max-w-3xl" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.15 }}>
-              <button type="button" onClick={() => { setView(null); loadConfigured(); }}
+              <button type="button" onClick={() => { setView(null); loadReady(); }}
                 className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 mb-4 transition-colors">
                 <ArrowLeft size={14} /> Back to providers
               </button>
 
-              <div className="flex items-start gap-3 mb-6">
+              <div className="flex items-start gap-3 mb-5">
                 <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center shrink-0">
                   <current.icon size={19} className="text-emerald-600 dark:text-emerald-400" />
                 </div>
@@ -737,10 +845,26 @@ const PaymentGatewaySettings = () => {
                 </div>
               </div>
 
-              <ActivePanel subdomain={subdomain} onSaved={loadConfigured} />
+              <GatewayStatusBar
+                gateway={current}
+                isActive={activeGateway === current.id}
+                ready={!!ready[current.id]}
+                current={activeGateway}
+                onStart={setPending}
+              />
+
+              <ActivePanel subdomain={subdomain} onSaved={loadReady} />
             </motion.div>
           )}
         </AnimatePresence>
+
+        <ConfirmSwitch
+          target={pending}
+          current={activeGateway}
+          busy={switching}
+          onCancel={() => setPending(null)}
+          onConfirm={confirmSwitch}
+        />
       </div>
     </PaymentGatewayOtpGate>
   );
