@@ -303,9 +303,9 @@ const [openFailedPasswordAlert, setopenFailedPasswordAlert] = useState(false)
             <img
   className="mx-auto h-20 w-20 rounded-full shadow-lg ring-4
                ring-emerald-50"
-  src={logo_preview || "/images/aitechs.png"}
-  alt={company_name || "Aitechs"}
-  onError={(e) => { e.target.src = "/images/aitechs.png"; }}
+  src={logo_preview || "/images/owitech-logo.png"}
+  alt={company_name || "Owitech"}
+  onError={(e) => { e.target.src = "/images/owitech-logo.png"; }}
 />
             <h2 className="text-3xl font-bold text-white">
               Reset Your Password

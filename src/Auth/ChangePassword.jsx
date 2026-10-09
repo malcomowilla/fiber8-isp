@@ -192,7 +192,9 @@ export default function ChangePassword({ onSuccess }) {
     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
   </div>
         {/* Card */}
-        <div className="cp-card" style={{ width: '100%', maxWidth: 420, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 20, boxShadow: '0 8px 40px rgba(0,0,0,.08)', overflow: 'hidden' }}>
+        <div className="cp-card" style={{ width: '100%', maxWidth: 420,
+           background: '#fff', border: '1px solid #e5e7eb', borderRadius: 20,
+            boxShadow: '0 8px 40px rgba(0,0,0,.08)', overflow: 'hidden' }}>
 
           {/* Header */}
           <div style={{ padding: '28px 32px 20px', borderBottom: '1px solid #f3f4f6', textAlign: 'center' }}>
