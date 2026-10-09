@@ -195,6 +195,16 @@ const CHANNEL_TYPES = [
   { id: 'bank',    label: 'Bank',    icon: Landmark },
 ];
 const EMPTY_FORM = { channel_type: 'paybill', short_code: '', account_number: '', description: '', bank: '' };
+const digitsOnly = (v) => String(v || '').replace(/\D/g, '');
+const validCode = (v) => {
+  const d = digitsOnly(v);
+  return d.length >= 4 && d.length <= 10 ? d : null;
+};
+const channelSub = (c) => {
+  if (c.channel_type === 'till') return `Till ${c.short_code}`;
+  if (c.channel_type === 'bank') return `Account ${c.account_number} · Paybill ${c.short_code}`;
+  return `Paybill ${c.short_code} · Account ${c.account_number}`;
+};
 const DIGITS = /^\d{4,8}$/;
 
 const channelSub = (c) => {
@@ -229,7 +239,9 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
   useEffect(() => { fetchChannels(); }, [fetchChannels]);
 
   const setField = (e) => {
-    const { name, value } = e.target;
+    const { name } = e.target;
+    let { value } = e.target;
+    if (name === 'short_code') value = digitsOnly(value); // paybill/till are digits only
     setForm((prev) => ({ ...prev, [name]: value }));
     setFormError('');
   };
@@ -240,25 +252,29 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
   const selectedBank = BANKS.find((b) => b.name === form.bank);
 
   const buildPayload = () => {
-    const { channel_type: type, account_number, description, short_code } = form;
+    const { channel_type: type, account_number, description } = form;
+    const code = validCode(form.short_code);
+    const codeError = (label) =>
+      `${label} must be 4 to 10 digits${form.short_code ? ` (we read "${form.short_code}")` : ''}`;
+
     if (type === 'paybill') {
-      if (!DIGITS.test(short_code.trim())) return { error: 'Enter a valid paybill number' };
+      if (!code) return { error: codeError('Paybill number') };
       if (!account_number.trim()) return { error: 'Enter the account number for this paybill' };
       if (!description.trim()) return { error: 'Enter the business name' };
-      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: account_number.trim(), description: description.trim() } };
+      return { payload: { channel_type: type, short_code: code, account_number: account_number.trim(), description: description.trim() } };
     }
     if (type === 'till') {
-      if (!DIGITS.test(short_code.trim())) return { error: 'Enter a valid till number' };
+      if (!code) return { error: codeError('Till number') };
       if (!description.trim()) return { error: 'Enter the business name' };
-      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: '', description: description.trim() } };
+      return { payload: { channel_type: type, short_code: code, account_number: '', description: description.trim() } };
     }
     // bank
     if (!form.bank) return { error: 'Choose your bank' };
     if (!account_number.trim()) return { error: 'Enter your bank account number' };
     if (isOtherBank) {
-      if (!DIGITS.test(short_code.trim())) return { error: "Enter your bank's paybill number" };
+      if (!code) return { error: codeError("Bank paybill number") };
       if (!description.trim()) return { error: 'Enter the bank name' };
-      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: account_number.trim(), description: description.trim() } };
+      return { payload: { channel_type: type, short_code: code, account_number: account_number.trim(), description: description.trim() } };
     }
     return { payload: { channel_type: type, short_code: selectedBank.paybill, account_number: account_number.trim(), description: selectedBank.name } };
   };
@@ -335,7 +351,7 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
               const Icon = (CHANNEL_TYPES.find((t) => t.id === c.channel_type) || CHANNEL_TYPES[0]).icon;
               const lastOne = channels.length === 1;
               return (
-                <div key={c.id} className={`flex items-center gap-3 rounded-xl border p-3
+                <div key={c.id} className={`flex flex-wrap items-center gap-3 rounded-xl border p-3
                   ${c.is_default ? 'border-emerald-500/60 bg-emerald-50/50 dark:bg-emerald-500/5' : 'border-slate-100 dark:border-slate-800'}`}>
                   <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                     <Icon size={16} />
@@ -379,7 +395,7 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
                   )}
 
                   {confirmId === c.id && isActive && lastOne && (
-                    <p className="basis-full text-[11px] text-red-500 mt-1">
+                    <p className="basis-full text-[11px] text-red-500">
                       This is your only channel. Removing it stops PayHero payments until you add another.
                     </p>
                   )}
@@ -395,7 +411,7 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
         )}
       </SectionCard>
 
-      <form onSubmit={handleAdd}>
+      <form onSubmit={handleAdd} autoComplete="off">
         <SectionCard title="Add a payment channel">
           <div className="grid grid-cols-3 gap-2">
             {CHANNEL_TYPES.map(({ id, label, icon: Icon }) => (
@@ -411,16 +427,21 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
 
           {form.channel_type === 'paybill' && (
             <>
-              <TextField label="Paybill number" icon={Hash} name="short_code" value={form.short_code} onChange={setField} inputMode="numeric" placeholder="e.g. 323993" />
-              <TextField label="Account number" icon={KeyRound} name="account_number" value={form.account_number} onChange={setField} placeholder="Account customers pay to" />
-              <TextField label="Business name" icon={User} name="description" value={form.description} onChange={setField} placeholder="Name on this paybill" />
+              <TextField label="Paybill number" icon={Hash} name="short_code" value={form.short_code} onChange={setField}
+                inputMode="numeric" autoComplete="off" placeholder="e.g. 4007893" />
+              <TextField label="Account number" icon={KeyRound} name="account_number" value={form.account_number} onChange={setField}
+                autoComplete="off" placeholder="Account customers pay to" />
+              <TextField label="Business name" icon={User} name="description" value={form.description} onChange={setField}
+                autoComplete="off" placeholder="Name on this paybill" />
             </>
           )}
 
           {form.channel_type === 'till' && (
             <>
-              <TextField label="Till number" icon={Hash} name="short_code" value={form.short_code} onChange={setField} inputMode="numeric" placeholder="e.g. 5012345" />
-              <TextField label="Business name" icon={User} name="description" value={form.description} onChange={setField} placeholder="Name on this till" />
+              <TextField label="Till number" icon={Hash} name="short_code" value={form.short_code} onChange={setField}
+                inputMode="numeric" autoComplete="off" placeholder="e.g. 5012345" />
+              <TextField label="Business name" icon={User} name="description" value={form.description} onChange={setField}
+                autoComplete="off" placeholder="Name on this till" />
             </>
           )}
 
@@ -439,11 +460,14 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
               </div>
               {isOtherBank && (
                 <>
-                  <TextField label="Bank name" icon={User} name="description" value={form.description} onChange={setField} placeholder="e.g. Sidian Bank" />
-                  <TextField label="Bank paybill number" icon={Hash} name="short_code" value={form.short_code} onChange={setField} inputMode="numeric" placeholder="The bank's paybill" />
+                  <TextField label="Bank name" icon={User} name="description" value={form.description} onChange={setField}
+                    autoComplete="off" placeholder="e.g. Sidian Bank" />
+                  <TextField label="Bank paybill number" icon={Hash} name="short_code" value={form.short_code} onChange={setField}
+                    inputMode="numeric" autoComplete="off" placeholder="The bank's paybill" />
                 </>
               )}
-              <TextField label="Your account number" icon={KeyRound} name="account_number" value={form.account_number} onChange={setField} placeholder="Where the money should land" />
+              <TextField label="Your account number" icon={KeyRound} name="account_number" value={form.account_number} onChange={setField}
+                autoComplete="off" placeholder="Where the money should land" />
             </>
           )}
 
@@ -455,151 +479,6 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
         </SectionCard>
       </form>
     </div>
-  );
-};
-
-// ═══════════════════════════════════════════════════════════════
-// TUMA PANEL
-// ═══════════════════════════════════════════════════════════════
-const TumaPanel = ({ subdomain, onSaved }) => {
-  const [form, setForm] = useState({ business_email: '', api_key: '', enabled: false });
-  const [apiKeyPresent, setApiKeyPresent] = useState(false);
-  const [apiKeyMasked, setApiKeyMasked] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState(null);
-
-  const fetchSettings = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/tuma_settings', { headers: { 'X-Subdomain': subdomain } });
-      if (res.ok) {
-        const data = await res.json();
-        setForm((prev) => ({ ...prev, business_email: data.business_email || '', enabled: !!data.enabled }));
-        setApiKeyPresent(!!data.api_key_present);
-        setApiKeyMasked(data.api_key_masked);
-      }
-    } catch {
-      toast.error('Could not load Tuma settings');
-    } finally {
-      setLoading(false);
-    }
-  }, [subdomain]);
-
-  useEffect(() => { fetchSettings(); }, [fetchSettings]);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-  };
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    setTestResult(null);
-    try {
-      const payload = { ...form };
-      if (!payload.api_key) delete payload.api_key;
-      const res = await fetch('/api/tuma_settings', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        toast.success('Tuma settings saved');
-        setApiKeyPresent(!!data.api_key_present);
-        setApiKeyMasked(data.api_key_masked);
-        setForm((prev) => ({ ...prev, api_key: '' }));
-        onSaved?.();
-      } else {
-        toast.error(data.errors?.[0] || 'Could not save settings');
-      }
-    } catch {
-      toast.error('Something went wrong. Please try again');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleTestConnection = async () => {
-    setTesting(true);
-    setTestResult(null);
-    try {
-      const res = await fetch('/api/tuma_settings/test_connection', {
-        method: 'POST', headers: { 'X-Subdomain': subdomain },
-      });
-      const data = await res.json();
-      setTestResult(data);
-      data.success ? toast.success('Connected to Tuma') : toast.error(data.message || 'Connection failed');
-    } catch {
-      setTestResult({ success: false, message: 'Network error while testing connection' });
-    } finally {
-      setTesting(false);
-    }
-  };
-
-  if (loading) return <Spinner />;
-
-  return (
-    <form onSubmit={handleSave} className="space-y-5">
-      <div className="flex items-center justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-        <div className="flex items-center gap-3">
-          <ShieldCheck size={18} className="text-slate-400" />
-          <div>
-            <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Enable Tuma integration</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Turn on to use your own Tuma account</p>
-          </div>
-        </div>
-        <Toggle checked={form.enabled} onChange={handleChange} name="enabled" />
-      </div>
-
-      <AnimatePresence initial={false}>
-        {form.enabled && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }}
-            className="overflow-hidden space-y-5"
-          >
-            <SectionCard title="Business credentials">
-              <div>
-                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Business email</label>
-                <div className="relative">
-                  <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input type="email" name="business_email" value={form.business_email} onChange={handleChange}
-                    placeholder="you@yourbusiness.com" className={inputCls} />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
-                  API key {apiKeyPresent && <span className="text-slate-400">— currently set</span>}
-                </label>
-                <div className="relative">
-                  <KeyRound size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input type="password" name="api_key" value={form.api_key} onChange={handleChange}
-                    placeholder={apiKeyMasked || 'tuma_xxxxxxxxxxxxxxxx'} className={inputCls} />
-                </div>
-              </div>
-              <button
-                type="button" onClick={handleTestConnection} disabled={testing || !apiKeyPresent}
-                className="flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-lg
-                  bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300
-                  hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
-              >
-                {testing ? <Loader2 size={13} className="animate-spin" /> : <ShieldCheck size={13} />}
-                {testing ? 'Testing…' : 'Test connection'}
-              </button>
-              <TestResult result={testResult} />
-            </SectionCard>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <button type="submit" disabled={saving} className={primaryBtn}>
-        {saving ? 'Saving…' : 'Save Tuma settings'}
-      </button>
-    </form>
   );
 };
 
