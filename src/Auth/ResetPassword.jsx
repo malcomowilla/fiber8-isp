@@ -1,18 +1,16 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, TextField,CircularProgress } from "@mui/material";
+import {
+  Button,
+  TextField,
+  CircularProgress,
+  InputAdornment,
+} from "@mui/material";
 import { motion } from "framer-motion";
 import { Email, ArrowBack } from "@mui/icons-material";
 import ResetNotification from "../notification/ResetNotification";
 import { useApplicationSettings } from "../settings/ApplicationSettings";
-import {
-
-  InputAdornment,
- 
-} from '@mui/material';
-import toast, { Toaster } from 'react-hot-toast';
-
+import toast, { Toaster } from "react-hot-toast";
 
 function ResetPassword() {
   const [email, setEmail] = useState("");
@@ -23,9 +21,22 @@ function ResetPassword() {
 
   const { companySettings } = useApplicationSettings();
   const { company_name, logo_preview } = companySettings;
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const subdomain = window.location.hostname.split(".")[0];
+
+  // Generated once so the dots don't jump around on every keystroke
+  const particles = useMemo(
+    () =>
+      [...Array(20)].map(() => ({
+        width: `${Math.random() * 10 + 5}px`,
+        height: `${Math.random() * 10 + 5}px`,
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDuration: `${Math.random() * 5 + 3}s`,
+      })),
+    []
+  );
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -47,24 +58,22 @@ function ResetPassword() {
 
       if (response.ok) {
         setEmail("");
-        
-        navigate('/reset-password-email-sent')
-
+        navigate("/reset-password-email-sent");
         setMessage(data.message);
         setError("");
       } else {
         toast.error(data.error, {
           duration: 4000,
-          position: 'top-center',
-        })
+          position: "top-center",
+        });
         setError(data.error);
         setMessage("");
       }
     } catch (error) {
-      toast.error('failed to send reset email server error', {
+      toast.error("failed to send reset email server error", {
         duration: 4000,
-        position: 'top-center',
-      })
+        position: "top-center",
+      });
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -77,8 +86,7 @@ function ResetPassword() {
 
   return (
     <>
-
-    <Toaster />
+      <Toaster />
       <ResetNotification
         handleClose={handleClose}
         open={open}
@@ -90,61 +98,46 @@ function ResetPassword() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className=" min-h-screen
- flex items-center justify-center relative overflow-hidden font-sans
-"
+        className="min-h-screen flex items-center justify-center relative overflow-hidden font-sans"
       >
-        
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/Telecommunications-Aitechs.jpg"
+            alt="Network Background"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        </div>
 
-          <div className="absolute inset-0 z-0">
-    <img
-     src="/images/Telecommunications-Aitechs.jpg"
-      alt="Network Background"
-      className="w-full h-full object-cover"
-    />
-    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-  </div>
-
-
-<div className="absolute inset-0 opacity-20">
-    {[...Array(20)].map((_, i) => (
-      <div 
-        key={i}
-        className="absolute rounded-full bg-green-400 animate-spin"
-        style={{
-          width: `${Math.random() * 10 + 5}px`,
-          height: `${Math.random() * 10 + 5}px`,
-          left: `${Math.random() * 100}%`,
-          top: `${Math.random() * 100}%`,
-          animationDuration: `${Math.random() * 5 + 3}s`
-        }}
-      />
-    ))}
-  </div>
-      
+        <div className="absolute inset-0 opacity-20">
+          {particles.map((style, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full bg-green-400 animate-spin"
+              style={style}
+            />
+          ))}
+        </div>
 
         <motion.section
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="w-full max-w-md  z-10
-          bg-white/10 backdrop-blur-md rounded-xl shadow-2xl p-8 border
-           border-white/20"
+          className="w-full max-w-md z-10 bg-white/10 backdrop-blur-md rounded-xl shadow-2xl p-8 border border-white/20"
         >
           <div className="flex flex-col items-center">
-          <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center p-4
-         bg-green-600/20 rounded-full">
-        
-<img
-className="w-24 h-24 mx-auto rounded-full"
-  src={logo_preview || "/images/owitech-logo.png"}
-  alt={company_name || "Owitech"}
-  onError={(e) => { e.target.src = "/images/owitech-logo.png"; }}
-/>
-        </div>
-        
-      </div>
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center p-4 bg-green-600/20 rounded-full">
+                <img
+                  className="w-24 h-24 mx-auto rounded-full"
+                  src={logo_preview || "/images/owitech-logo.png"}
+                  alt={company_name || "Owitech"}
+                  onError={(e) => {
+                    e.target.src = "/images/owitech-logo.png";
+                  }}
+                />
+              </div>
+            </div>
 
             <form onSubmit={handleSignIn} className="w-full space-y-6">
               <motion.div
@@ -153,7 +146,7 @@ className="w-24 h-24 mx-auto rounded-full"
                 transition={{ delay: 0.6, duration: 0.5 }}
               >
                 <TextField
-                sx={textFieldStyles}
+                  sx={textFieldStyles}
                   fullWidth
                   type="email"
                   placeholder="Enter your email"
@@ -168,9 +161,7 @@ className="w-24 h-24 mx-auto rounded-full"
                       </InputAdornment>
                     ),
                   }}
-                  className="bg-white rounded-lg
-                  myTextField
-                  "
+                  className="bg-white rounded-lg myTextField"
                   required
                 />
               </motion.div>
@@ -179,18 +170,16 @@ className="w-24 h-24 mx-auto rounded-full"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8, duration: 0.5 }}
-                className="flex items-center cursor-pointer  justify-start"
+                className="flex items-center cursor-pointer justify-start"
               >
                 <Link
                   to="/signin"
-                  className="flex items-center relative cursor-pointer
-                   text-green-600 hover:text-green-500 dark:text-green-400"
+                  className="flex items-center relative cursor-pointer text-green-600 hover:text-green-500 dark:text-green-400"
                 >
                   <ArrowBack className="mr-2 text-white" />
-                  <span className='text-white'>Back to Login</span>
+                  <span className="text-white">Back to Login</span>
                 </Link>
               </motion.div>
-
 
               <motion.div
                 initial={{ opacity: 0 }}
@@ -201,18 +190,14 @@ className="w-24 h-24 mx-auto rounded-full"
                 <Button
                   type="submit"
                   variant="contained"
-                    color="success"
-
-                  className="w-full py-3 
-                   text-white 
-                  font-medium rounded-lg transition-all duration-300"
+                  color="success"
+                  className="w-full py-3 text-white font-medium rounded-lg transition-all duration-300"
                   disabled={loading}
                 >
                   {loading ? (
                     <CircularProgress size={24} className="text-white" />
                   ) : (
-                    <p className="font-sans
-">Reset Password </p>
+                    <p className="font-sans">Reset Password</p>
                   )}
                 </Button>
               </motion.div>
@@ -224,19 +209,25 @@ className="w-24 h-24 mx-auto rounded-full"
   );
 }
 
-
-
-const textFieldStyles = { 
-  '& .MuiInputBase-input': { color: 'white' }, 
-  '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' }, 
-  '& label.Mui-focused': { color: '#4ade80', fontSize: "16px", }, // Changed label focus color to green
-  '& .MuiOutlinedInput-root': { 
-    backgroundColor: 'rgba(255,255,255,0.05)', 
-    borderRadius: '10px', 
-    '& fieldset': { borderColor: 'rgba(255,255,255,0.25)' }, 
-    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.4)' }, 
-    '&.Mui-focused fieldset': { borderColor: '#4ade80', borderWidth: '2px' }, // Changed border focus color to green
-  }, 
+const textFieldStyles = {
+  // Typed text: dark so it's readable on the white field background
+  "& .MuiInputBase-input": {
+    color: "#111827",
+    "&::placeholder": { color: "#6b7280", opacity: 1 },
+    // keep browser autofill from turning text/background weird
+    "&:-webkit-autofill": {
+      WebkitTextFillColor: "#111827",
+      WebkitBoxShadow: "0 0 0 100px #ffffff inset",
+    },
+  },
+  "& .MuiInputLabel-root": { color: "rgba(0,0,0,0.6)" },
+  "& label.Mui-focused": { color: "#16a34a", fontSize: "16px" },
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "10px",
+    "& fieldset": { borderColor: "rgba(0,0,0,0.25)" },
+    "&:hover fieldset": { borderColor: "rgba(0,0,0,0.5)" },
+    "&.Mui-focused fieldset": { borderColor: "#4ade80", borderWidth: "2px" },
+  },
 };
 
 export default ResetPassword;
