@@ -6,18 +6,39 @@ import PaymentGatewayOtpGate from '../security/PaymentGatewayOtpGate';
 import {
   Zap, ShieldCheck, Mail, KeyRound, CheckCircle2, XCircle, Loader2,
   Smartphone, Wallet, CreditCard, Plus, X, Globe, Building2, Lock, ArrowLeft, AlertCircle,
+  Landmark, Store, Trash2, Hash, User,
 } from 'lucide-react';
 
 const FONT = "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
 
 const GATEWAYS = [
-  { id: 'mpesa',    name: 'M-Pesa',   icon: Smartphone, meta: 'KES · Kenya · Paybill or Till',   description: 'Direct Daraja STK push with C2B confirmation.',           canActivate: true },
-  { id: 'tuma',     name: 'Tuma',     icon: Zap,        meta: 'KES · Kenya',                     description: 'M-Pesa STK via Tuma, settles straight to you.',          canActivate: true },
-  { id: 'paystack', name: 'Paystack', icon: CreditCard, meta: 'KES / NGN / GHS · Africa',        description: 'Cards, mobile money and bank transfer through Paystack.', canActivate: true },
-  { id: 'sasapay',  name: 'SasaPay',  icon: Wallet,     meta: 'KES · Kenya',                     description: 'Mobile money and bank collection for Kenyan merchants.',  canActivate: false },
+  { id: 'mpesa',    name: 'M-Pesa',   icon: Smartphone, meta: 'KES · Kenya · Paybill or Till',          description: 'Direct Daraja STK push with C2B confirmation.',                         canActivate: true },
+  { id: 'payhero',  name: 'PayHero',  icon: Landmark,   meta: 'KES · Kenya · Paybill, Till or Bank',    description: 'No keys needed. Add where you want to receive money and start collecting.', canActivate: true },
+  { id: 'tuma',     name: 'Tuma',     icon: Zap,        meta: 'KES · Kenya',                            description: 'M-Pesa STK via Tuma, settles straight to you.',                         canActivate: true },
+  { id: 'paystack', name: 'Paystack', icon: CreditCard, meta: 'KES / NGN / GHS · Africa',               description: 'Cards, mobile money and bank transfer through Paystack.',                canActivate: true },
+  { id: 'sasapay',  name: 'SasaPay',  icon: Wallet,     meta: 'KES · Kenya',                            description: 'Mobile money and bank collection for Kenyan merchants.',                 canActivate: false },
 ];
 
 const nameOf = (id) => GATEWAYS.find((g) => g.id === id)?.name || id;
+
+// Bank paybill numbers PayHero collects to. Verify against PayHero's list before shipping.
+const BANKS = [
+  { name: 'KCB Bank',            paybill: '522522' },
+  { name: 'Equity Bank',         paybill: '247247' },
+  { name: 'Co-operative Bank',   paybill: '400200' },
+  { name: 'NCBA Bank',           paybill: '880100' },
+  { name: 'Absa Bank Kenya',     paybill: '303030' },
+  { name: 'Stanbic Bank',        paybill: '600100' },
+  { name: 'I&M Bank',            paybill: '542542' },
+  { name: 'Family Bank',         paybill: '222111' },
+  { name: 'Diamond Trust Bank',  paybill: '516600' },
+  { name: 'Standard Chartered',  paybill: '329329' },
+  { name: 'National Bank',       paybill: '547700' },
+  { name: 'HF Group',            paybill: '100400' },
+  { name: 'Bank of Africa',      paybill: '972900' },
+  { name: 'Prime Bank',          paybill: '982800' },
+];
+const OTHER_BANK = '__other__';
 
 // ═══════════════════════════════════════════════════════════════
 // SHARED UI BITS
@@ -56,6 +77,17 @@ const TestResult = ({ result }) => result && (
                      : 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
     {result.success ? <CheckCircle2 size={14} className="shrink-0 mt-0.5" /> : <XCircle size={14} className="shrink-0 mt-0.5" />}
     <span>{result.message}</span>
+  </div>
+);
+
+const TextField = ({ label, icon: Icon, hint, ...props }) => (
+  <div>
+    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">{label}</label>
+    <div className="relative">
+      <Icon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+      <input {...props} className={inputCls} />
+    </div>
+    {hint && <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">{hint}</p>}
   </div>
 );
 
@@ -149,6 +181,280 @@ const MpesaPanel = ({ subdomain, onSaved }) => {
         {saving ? 'Saving…' : 'Save M-Pesa settings'}
       </button>
     </form>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
+// PAYHERO PANEL
+// Tenants add payment channels (paybill / till / bank). The backend
+// registers each one in the platform's PayHero account.
+// ═══════════════════════════════════════════════════════════════
+const CHANNEL_TYPES = [
+  { id: 'paybill', label: 'Paybill', icon: Building2 },
+  { id: 'till',    label: 'Till',    icon: Store },
+  { id: 'bank',    label: 'Bank',    icon: Landmark },
+];
+const EMPTY_FORM = { channel_type: 'paybill', short_code: '', account_number: '', description: '', bank: '' };
+const DIGITS = /^\d{4,8}$/;
+
+const channelSub = (c) => {
+  if (c.channel_type === 'till') return `Till ${c.short_code}`;
+  if (c.channel_type === 'bank') return `Account ${c.account_number} · Paybill ${c.short_code}`;
+  return `Paybill ${c.short_code} · Account ${c.account_number}`;
+};
+
+const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
+  const [channels, setChannels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [formError, setFormError] = useState('');
+  const [adding, setAdding] = useState(false);
+  const [busyId, setBusyId] = useState(null);
+  const [confirmId, setConfirmId] = useState(null);
+
+  const headers = { 'Content-Type': 'application/json', 'X-Subdomain': subdomain };
+
+  const fetchChannels = useCallback(async () => {
+    try {
+      const res = await fetch('/api/payhero_channels', { headers: { 'X-Subdomain': subdomain } });
+      const data = await res.json();
+      if (res.ok && Array.isArray(data)) setChannels(data);
+    } catch {
+      toast.error('Could not load payment channels');
+    } finally {
+      setLoading(false);
+    }
+  }, [subdomain]);
+
+  useEffect(() => { fetchChannels(); }, [fetchChannels]);
+
+  const setField = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    setFormError('');
+  };
+
+  const pickType = (type) => { setForm({ ...EMPTY_FORM, channel_type: type }); setFormError(''); };
+
+  const isOtherBank = form.bank === OTHER_BANK;
+  const selectedBank = BANKS.find((b) => b.name === form.bank);
+
+  const buildPayload = () => {
+    const { channel_type: type, account_number, description, short_code } = form;
+    if (type === 'paybill') {
+      if (!DIGITS.test(short_code.trim())) return { error: 'Enter a valid paybill number' };
+      if (!account_number.trim()) return { error: 'Enter the account number for this paybill' };
+      if (!description.trim()) return { error: 'Enter the business name' };
+      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: account_number.trim(), description: description.trim() } };
+    }
+    if (type === 'till') {
+      if (!DIGITS.test(short_code.trim())) return { error: 'Enter a valid till number' };
+      if (!description.trim()) return { error: 'Enter the business name' };
+      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: '', description: description.trim() } };
+    }
+    // bank
+    if (!form.bank) return { error: 'Choose your bank' };
+    if (!account_number.trim()) return { error: 'Enter your bank account number' };
+    if (isOtherBank) {
+      if (!DIGITS.test(short_code.trim())) return { error: "Enter your bank's paybill number" };
+      if (!description.trim()) return { error: 'Enter the bank name' };
+      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: account_number.trim(), description: description.trim() } };
+    }
+    return { payload: { channel_type: type, short_code: selectedBank.paybill, account_number: account_number.trim(), description: selectedBank.name } };
+  };
+
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    const { error, payload } = buildPayload();
+    if (error) return setFormError(error);
+
+    setAdding(true);
+    setFormError('');
+    try {
+      const res = await fetch('/api/payhero_channels', {
+        method: 'POST', headers, body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('Payment channel added');
+        setForm((prev) => ({ ...EMPTY_FORM, channel_type: prev.channel_type }));
+        await fetchChannels();
+        onSaved?.();
+      } else {
+        setFormError(data.error || 'Could not add this channel');
+      }
+    } catch {
+      setFormError('Something went wrong. Please try again');
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const makeDefault = async (id) => {
+    setBusyId(id);
+    try {
+      const res = await fetch(`/api/payhero_channels/${id}/set_default`, { method: 'PATCH', headers });
+      if (!res.ok) throw new Error();
+      toast.success('Default channel updated');
+      await fetchChannels();
+    } catch {
+      toast.error('Could not update default channel');
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const removeChannel = async (id) => {
+    setBusyId(id);
+    try {
+      const res = await fetch(`/api/payhero_channels/${id}`, { method: 'DELETE', headers });
+      if (!res.ok) throw new Error();
+      toast.success('Channel removed');
+      setConfirmId(null);
+      await fetchChannels();
+      onSaved?.();
+    } catch {
+      toast.error('Could not remove channel');
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  if (loading) return <Spinner />;
+
+  return (
+    <div className="space-y-5">
+      <SectionCard title="Your payment channels">
+        {channels.length === 0 ? (
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            No channels yet. Add the paybill, till or bank account where you want customer payments to land.
+          </p>
+        ) : (
+          <div className="space-y-2.5">
+            {channels.map((c) => {
+              const Icon = (CHANNEL_TYPES.find((t) => t.id === c.channel_type) || CHANNEL_TYPES[0]).icon;
+              const lastOne = channels.length === 1;
+              return (
+                <div key={c.id} className={`flex items-center gap-3 rounded-xl border p-3
+                  ${c.is_default ? 'border-emerald-500/60 bg-emerald-50/50 dark:bg-emerald-500/5' : 'border-slate-100 dark:border-slate-800'}`}>
+                  <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                    <Icon size={16} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">{c.description}</p>
+                      {c.is_default && (
+                        <span className="text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400 shrink-0">
+                          Receiving
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{channelSub(c)}</p>
+                  </div>
+
+                  {confirmId === c.id ? (
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button type="button" onClick={() => setConfirmId(null)} disabled={busyId === c.id}
+                        className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                        Keep
+                      </button>
+                      <button type="button" onClick={() => removeChannel(c.id)} disabled={busyId === c.id}
+                        className="px-2.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-[11px] font-semibold flex items-center gap-1">
+                        {busyId === c.id && <Loader2 size={11} className="animate-spin" />} Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {!c.is_default && (
+                        <button type="button" onClick={() => makeDefault(c.id)} disabled={busyId === c.id}
+                          className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50">
+                          {busyId === c.id ? <Loader2 size={11} className="animate-spin" /> : 'Receive here'}
+                        </button>
+                      )}
+                      <button type="button" onClick={() => setConfirmId(c.id)} aria-label="Remove channel"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  )}
+
+                  {confirmId === c.id && isActive && lastOne && (
+                    <p className="basis-full text-[11px] text-red-500 mt-1">
+                      This is your only channel. Removing it stops PayHero payments until you add another.
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {channels.length > 1 && (
+          <p className="text-[11px] text-slate-400 dark:text-slate-500">
+            Customer payments go to the channel marked <b>Receiving</b>.
+          </p>
+        )}
+      </SectionCard>
+
+      <form onSubmit={handleAdd}>
+        <SectionCard title="Add a payment channel">
+          <div className="grid grid-cols-3 gap-2">
+            {CHANNEL_TYPES.map(({ id, label, icon: Icon }) => (
+              <button key={id} type="button" onClick={() => pickType(id)}
+                className={`flex items-center justify-center gap-1.5 rounded-xl border py-2.5 text-xs font-semibold transition-all
+                  ${form.channel_type === id
+                    ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+                    : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'}`}>
+                <Icon size={14} /> {label}
+              </button>
+            ))}
+          </div>
+
+          {form.channel_type === 'paybill' && (
+            <>
+              <TextField label="Paybill number" icon={Hash} name="short_code" value={form.short_code} onChange={setField} inputMode="numeric" placeholder="e.g. 323993" />
+              <TextField label="Account number" icon={KeyRound} name="account_number" value={form.account_number} onChange={setField} placeholder="Account customers pay to" />
+              <TextField label="Business name" icon={User} name="description" value={form.description} onChange={setField} placeholder="Name on this paybill" />
+            </>
+          )}
+
+          {form.channel_type === 'till' && (
+            <>
+              <TextField label="Till number" icon={Hash} name="short_code" value={form.short_code} onChange={setField} inputMode="numeric" placeholder="e.g. 5012345" />
+              <TextField label="Business name" icon={User} name="description" value={form.description} onChange={setField} placeholder="Name on this till" />
+            </>
+          )}
+
+          {form.channel_type === 'bank' && (
+            <>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Bank</label>
+                <div className="relative">
+                  <Landmark size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <select name="bank" value={form.bank} onChange={setField} className={inputCls}>
+                    <option value="" disabled>Choose your bank…</option>
+                    {BANKS.map((b) => <option key={b.name} value={b.name}>{b.name}</option>)}
+                    <option value={OTHER_BANK}>Other bank (enter paybill)</option>
+                  </select>
+                </div>
+              </div>
+              {isOtherBank && (
+                <>
+                  <TextField label="Bank name" icon={User} name="description" value={form.description} onChange={setField} placeholder="e.g. Sidian Bank" />
+                  <TextField label="Bank paybill number" icon={Hash} name="short_code" value={form.short_code} onChange={setField} inputMode="numeric" placeholder="The bank's paybill" />
+                </>
+              )}
+              <TextField label="Your account number" icon={KeyRound} name="account_number" value={form.account_number} onChange={setField} placeholder="Where the money should land" />
+            </>
+          )}
+
+          {formError && <p className="text-xs text-red-500">{formError}</p>}
+
+          <button type="submit" disabled={adding} className={`${primaryBtn} flex items-center justify-center gap-2`}>
+            {adding ? <><Loader2 size={14} className="animate-spin" /> Registering…</> : <><Plus size={14} /> Add channel</>}
+          </button>
+        </SectionCard>
+      </form>
+    </div>
   );
 };
 
@@ -544,7 +850,7 @@ const SasaPayPanel = () => {
   );
 };
 
-const PANELS = { mpesa: MpesaPanel, tuma: TumaPanel, paystack: PaystackPanel, sasapay: SasaPayPanel };
+const PANELS = { mpesa: MpesaPanel, payhero: PayheroPanel, tuma: TumaPanel, paystack: PaystackPanel, sasapay: SasaPayPanel };
 
 // ═══════════════════════════════════════════════════════════════
 // STATUS BADGE + GATEWAY CARD
@@ -694,7 +1000,9 @@ const GatewayStatusBar = ({ gateway, isActive, ready, current, onStart }) => {
       <p className="text-xs text-slate-600 dark:text-slate-400">
         {ready
           ? <>{gateway.name} is ready but not active. <b>{nameOf(current)}</b> is collecting payments right now.</>
-          : <>Save your {gateway.name} details below, then start collecting.</>}
+          : gateway.id === 'payhero'
+            ? <>Add at least one payment channel below, then start collecting.</>
+            : <>Save your {gateway.name} details below, then start collecting.</>}
       </p>
       {ready && (
         <button type="button" onClick={() => onStart(gateway.id)}
@@ -736,13 +1044,16 @@ const PaymentGatewaySettings = () => {
         return res.ok ? await res.json() : null;
       } catch { return null; }
     };
-    const [tuma, paystack] = await Promise.all([
+    const [tuma, paystack, payhero] = await Promise.all([
       get('/api/tuma_settings'),
       get('/api/paystack_settings'),
+      get('/api/payhero_channels'),
     ]);
     setReady({
       // M-Pesa always works: tenant keys if saved, platform defaults otherwise
       mpesa: true,
+      // PayHero is ready once at least one channel is registered
+      payhero: Array.isArray(payhero) && payhero.some((c) => c.is_active),
       tuma: !!(tuma && tuma.enabled && tuma.api_key_present),
       paystack: !!(paystack && paystack.enabled && paystack.secret_key_present),
       sasapay: false,
@@ -853,7 +1164,7 @@ const PaymentGatewaySettings = () => {
                 onStart={setPending}
               />
 
-              <ActivePanel subdomain={subdomain} onSaved={loadReady} />
+              <ActivePanel subdomain={subdomain} onSaved={loadReady} isActive={activeGateway === current.id} />
             </motion.div>
           )}
         </AnimatePresence>
