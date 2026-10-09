@@ -5,7 +5,6 @@ export default function NotFound() {
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-green-50 px-6 text-center dark:bg-gray-950">
-      {/* Soft green glow behind the content */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-400/30 blur-3xl dark:bg-green-500/20"

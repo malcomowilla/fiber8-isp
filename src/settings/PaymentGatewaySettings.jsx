@@ -1,24 +1,20 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import PaymentGatewayOtpGate from '../security/PaymentGatewayOtpGate';
 import {
-  Zap, ShieldCheck, Mail, KeyRound, Wifi, Tv, CheckCircle2,
-  XCircle, Loader2, ExternalLink, Smartphone, Wallet, ArrowRight,
-  CreditCard, Plus, X, Globe, Building2, Lock
+  Zap, ShieldCheck, Mail, KeyRound, CheckCircle2, XCircle, Loader2,
+  Smartphone, Wallet, CreditCard, Plus, X, Globe, Building2, Lock, ArrowLeft,
 } from 'lucide-react';
 
-const GATEWAYS = [
-  { id: 'mpesa',    name: 'M-Pesa',    icon: Smartphone, description: 'Direct Daraja STK push' },
-  { id: 'tuma',     name: 'Tuma',      icon: Zap,         description: 'M-Pesa STK via Tuma, settles to you' },
-  { id: 'paystack', name: 'Paystack',  icon: CreditCard,  description: 'Cards, mobile money & bank transfer' },
-  { id: 'sasapay',  name: 'SasaPay',   icon: Wallet,      description: 'M-Pesa & bank payments via SasaPay' },
-];
+const FONT = "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
 
-const USE_CASES = [
-  { id: 'hotspot',  label: 'Hotspot voucher payments',     icon: Wifi },
-  { id: 'tv_plans', label: 'TV plan / device bindings',     icon: Tv },
+const GATEWAYS = [
+  { id: 'mpesa',    name: 'M-Pesa',   icon: Smartphone, meta: 'KES · Kenya · Paybill or Till',          description: 'Direct Daraja STK push with C2B confirmation.',          canActivate: true },
+  { id: 'tuma',     name: 'Tuma',     icon: Zap,        meta: 'KES · Kenya',                            description: 'M-Pesa STK via Tuma, settles straight to you.',         canActivate: true },
+  { id: 'paystack', name: 'Paystack', icon: CreditCard, meta: 'KES / NGN / GHS · Africa',               description: 'Cards, mobile money and bank transfer through Paystack.', canActivate: true },
+  { id: 'sasapay',  name: 'SasaPay',  icon: Wallet,     meta: 'KES · Kenya',                            description: 'Mobile money and bank collection for Kenyan merchants.', canActivate: false },
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -27,9 +23,7 @@ const USE_CASES = [
 const SectionCard = ({ title, children, className = '' }) => (
   <div className={`rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-4 ${className}`}>
     {title && (
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-        {title}
-      </p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">{title}</p>
     )}
     {children}
   </div>
@@ -38,57 +32,35 @@ const SectionCard = ({ title, children, className = '' }) => (
 const Toggle = ({ checked, onChange, name }) => (
   <label className="relative inline-flex items-center cursor-pointer shrink-0">
     <input type="checkbox" name={name} checked={checked} onChange={onChange} className="sr-only peer" />
-    <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 rounded-full peer-checked:bg-indigo-600 transition-colors" />
+    <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 rounded-full peer-checked:bg-emerald-600 transition-colors" />
     <div className="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-5" />
   </label>
 );
 
 const inputCls = "w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 " +
   "bg-slate-50 dark:bg-slate-800/60 text-sm text-slate-900 dark:text-slate-100 " +
-  "placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400";
+  "placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400";
 
-// ═══════════════════════════════════════════════════════════════
-// ACTIVE GATEWAY SELECTOR
-// One choice per use case — selecting a gateway here is what
-// `make_payment` should key off, instead of asking each gateway
-// "are you enabled AND am I flagged for this use case".
-// ═══════════════════════════════════════════════════════════════
-const ActiveGatewaySelector = ({ activeGateways, onChange, saving }) => (
-  <SectionCard title="Active gateway per use case">
-    <p className="text-xs text-slate-500 dark:text-slate-400 -mt-2">
-      Exactly one gateway processes payments for each use case below. Switching here is what your backend should check —
-      not per-gateway toggles.
-    </p>
-    <div className="space-y-3">
-      {USE_CASES.map(({ id, label, icon: Icon }) => (
-        <div key={id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-800 p-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <Icon size={15} className="text-slate-400 shrink-0" />
-            <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">{label}</p>
-          </div>
-          <select
-            value={activeGateways[id] || ''}
-            onChange={(e) => onChange(id, e.target.value)}
-            disabled={saving}
-            className="text-sm font-medium rounded-lg border border-slate-200 dark:border-slate-800
-              bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 px-3 py-1.5
-              focus:outline-none focus:ring-2 focus:ring-indigo-400 disabled:opacity-50"
-          >
-            <option value="" disabled>Choose gateway…</option>
-            {GATEWAYS.map((g) => (
-              <option key={g.id} value={g.id}>{g.name}</option>
-            ))}
-          </select>
-        </div>
-      ))}
-    </div>
-  </SectionCard>
+const primaryBtn = "w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 " +
+  "disabled:opacity-60 text-white text-sm font-semibold transition-colors";
+
+const Spinner = () => (
+  <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>
+);
+
+const TestResult = ({ result }) => result && (
+  <div className={`flex items-start gap-2 rounded-xl p-3 text-xs
+    ${result.success ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
+                     : 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
+    {result.success ? <CheckCircle2 size={14} className="shrink-0 mt-0.5" /> : <XCircle size={14} className="shrink-0 mt-0.5" />}
+    <span>{result.message}</span>
+  </div>
 );
 
 // ═══════════════════════════════════════════════════════════════
-// M-PESA PANEL (wraps your existing hotspot mpesa settings logic)
+// M-PESA PANEL
 // ═══════════════════════════════════════════════════════════════
-const MpesaPanel = ({ subdomain }) => {
+const MpesaPanel = ({ subdomain, onSaved }) => {
   const [form, setForm] = useState({
     short_code: '', consumer_key: '', consumer_secret: '', passkey: '',
     api_initiator_username: '', api_initiator_password: '',
@@ -103,9 +75,7 @@ const MpesaPanel = ({ subdomain }) => {
         headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
       });
       const data = await res.json();
-      if (res.ok && data && !Array.isArray(data)) {
-        setForm((prev) => ({ ...prev, ...data }));
-      }
+      if (res.ok && data && !Array.isArray(data)) setForm((prev) => ({ ...prev, ...data }));
     } catch {
       toast.error('Could not load M-Pesa settings');
     } finally {
@@ -133,6 +103,7 @@ const MpesaPanel = ({ subdomain }) => {
       if (res.ok) {
         toast.success('M-Pesa settings saved');
         setForm((prev) => ({ ...prev, ...data }));
+        onSaved?.();
       } else {
         toast.error(data.error || 'Failed to save M-Pesa settings');
       }
@@ -143,15 +114,13 @@ const MpesaPanel = ({ subdomain }) => {
     }
   };
 
-  if (loading) {
-    return <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>;
-  }
+  if (loading) return <Spinner />;
 
   return (
     <form onSubmit={handleSave} className="space-y-5">
       <SectionCard title="Daraja credentials">
         {[
-        ['short_code', 'Short code', Building2],
+          ['short_code', 'Short code', Building2],
           ['api_initiator_username', 'API initiator username', KeyRound],
           ['consumer_key', 'Consumer key', KeyRound],
           ['consumer_secret', 'Consumer secret', Lock],
@@ -164,19 +133,13 @@ const MpesaPanel = ({ subdomain }) => {
               <Icon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type={name.includes('secret') || name.includes('password') || name === 'passkey' ? 'password' : 'text'}
-                name={name} value={form[name] || ''} onChange={handleChange}
-                className={inputCls}
+                name={name} value={form[name] || ''} onChange={handleChange} className={inputCls}
               />
             </div>
           </div>
         ))}
       </SectionCard>
-
-      <button
-        type="submit" disabled={saving}
-        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700
-          disabled:opacity-60 text-white text-sm font-semibold transition-colors"
-      >
+      <button type="submit" disabled={saving} className={primaryBtn}>
         {saving ? 'Saving…' : 'Save M-Pesa settings'}
       </button>
     </form>
@@ -184,10 +147,9 @@ const MpesaPanel = ({ subdomain }) => {
 };
 
 // ═══════════════════════════════════════════════════════════════
-// TUMA PANEL (your existing TumaSettings, minus the use_for_*
-// checkboxes — that choice now lives in ActiveGatewaySelector)
+// TUMA PANEL
 // ═══════════════════════════════════════════════════════════════
-const TumaPanel = ({ subdomain }) => {
+const TumaPanel = ({ subdomain, onSaved }) => {
   const [form, setForm] = useState({ business_email: '', api_key: '', enabled: false });
   const [apiKeyPresent, setApiKeyPresent] = useState(false);
   const [apiKeyMasked, setApiKeyMasked] = useState(null);
@@ -238,6 +200,7 @@ const TumaPanel = ({ subdomain }) => {
         setApiKeyPresent(!!data.api_key_present);
         setApiKeyMasked(data.api_key_masked);
         setForm((prev) => ({ ...prev, api_key: '' }));
+        onSaved?.();
       } else {
         toast.error(data.errors?.[0] || 'Could not save settings');
       }
@@ -265,9 +228,7 @@ const TumaPanel = ({ subdomain }) => {
     }
   };
 
-  if (loading) {
-    return <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>;
-  }
+  if (loading) return <Spinner />;
 
   return (
     <form onSubmit={handleSave} className="space-y-5">
@@ -317,24 +278,13 @@ const TumaPanel = ({ subdomain }) => {
                 {testing ? <Loader2 size={13} className="animate-spin" /> : <ShieldCheck size={13} />}
                 {testing ? 'Testing…' : 'Test connection'}
               </button>
-              {testResult && (
-                <div className={`flex items-start gap-2 rounded-xl p-3 text-xs
-                  ${testResult.success ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                                       : 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
-                  {testResult.success ? <CheckCircle2 size={14} className="shrink-0 mt-0.5" /> : <XCircle size={14} className="shrink-0 mt-0.5" />}
-                  <span>{testResult.message}</span>
-                </div>
-              )}
+              <TestResult result={testResult} />
             </SectionCard>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <button
-        type="submit" disabled={saving}
-        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700
-          disabled:opacity-60 text-white text-sm font-semibold transition-colors"
-      >
+      <button type="submit" disabled={saving} className={primaryBtn}>
         {saving ? 'Saving…' : 'Save Tuma settings'}
       </button>
     </form>
@@ -342,12 +292,9 @@ const TumaPanel = ({ subdomain }) => {
 };
 
 // ═══════════════════════════════════════════════════════════════
-// PAYSTACK PANEL — frontend only for now, per your instruction.
-// Backend wiring (settings table + controller) comes when you say go.
+// PAYSTACK PANEL
 // ═══════════════════════════════════════════════════════════════
-
-
-const PaystackPanel = ({ subdomain }) => {
+const PaystackPanel = ({ subdomain, onSaved }) => {
   const [form, setForm] = useState({ enabled: false, secret_key: '', public_key: '' });
   const [secretPresent, setSecretPresent] = useState(false);
   const [secretMasked, setSecretMasked] = useState(null);
@@ -416,6 +363,7 @@ const PaystackPanel = ({ subdomain }) => {
         setSecretPresent(!!data.secret_key_present);
         setSecretMasked(data.secret_key_masked);
         setForm((prev) => ({ ...prev, secret_key: '' }));
+        onSaved?.();
       } else {
         toast.error(data.errors?.[0] || 'Could not save settings');
       }
@@ -443,9 +391,7 @@ const PaystackPanel = ({ subdomain }) => {
     }
   };
 
-  if (loading) {
-    return <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>;
-  }
+  if (loading) return <Spinner />;
 
   return (
     <form onSubmit={handleSave} className="space-y-5">
@@ -495,20 +441,11 @@ const PaystackPanel = ({ subdomain }) => {
                 {testing ? <Loader2 size={13} className="animate-spin" /> : <ShieldCheck size={13} />}
                 {testing ? 'Testing…' : 'Test connection'}
               </button>
-              {testResult && (
-                <div className={`flex items-start gap-2 rounded-xl p-3 text-xs
-                  ${testResult.success ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                                       : 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
-                  {testResult.success ? <CheckCircle2 size={14} className="shrink-0 mt-0.5" /> : <XCircle size={14} className="shrink-0 mt-0.5" />}
-                  <span>{testResult.message}</span>
-                </div>
-              )}
+              <TestResult result={testResult} />
             </SectionCard>
 
             <SectionCard title="IP whitelist">
-              <p className="text-xs text-slate-500 dark:text-slate-400 -mt-2">
-                Server IPs Paystack should trust for this account.
-              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 -mt-2">Server IPs Paystack should trust for this account.</p>
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <Globe size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -531,7 +468,7 @@ const PaystackPanel = ({ subdomain }) => {
                 <div className="flex flex-wrap gap-2 pt-1">
                   {ipList.map((ip) => (
                     <span key={ip} className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 dark:bg-slate-800
-                      text-slate-700 dark:text-slate-300 text-xs font-mono px-3 py-1.5">
+                      text-slate-700 dark:text-slate-300 text-xs px-3 py-1.5">
                       {ip}
                       <button type="button" onClick={() => removeIp(ip)} className="hover:text-red-500 transition-colors">
                         <X size={12} />
@@ -547,27 +484,15 @@ const PaystackPanel = ({ subdomain }) => {
         )}
       </AnimatePresence>
 
-      <button type="submit" disabled={saving}
-        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700
-          disabled:opacity-60 text-white text-sm font-semibold transition-colors">
+      <button type="submit" disabled={saving} className={primaryBtn}>
         {saving ? 'Saving…' : 'Save Paystack settings'}
       </button>
     </form>
   );
 };
 
-
-
-
-
-
-
-
-
-
 // ═══════════════════════════════════════════════════════════════
-// SASAPAY PANEL — moved over from MpesaSettings.jsx, still
-// frontend-only per your existing note there.
+// SASAPAY PANEL — frontend only (backend pending)
 // ═══════════════════════════════════════════════════════════════
 const SasaPayPanel = () => {
   const [form, setForm] = useState({ client_id: '', client_secret: '', merchant_code: '' });
@@ -592,128 +517,229 @@ const SasaPayPanel = () => {
   return (
     <form onSubmit={handleSave} className="space-y-5">
       <SectionCard title="SasaPay credentials">
-        <div>
-          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Client ID</label>
-          <div className="relative">
-            <KeyRound size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input type="text" name="client_id" value={form.client_id} onChange={handleChange} className={inputCls} />
+        {[
+          ['client_id', 'Client ID', 'text', KeyRound],
+          ['client_secret', 'Client Secret', 'password', Lock],
+          ['merchant_code', 'Merchant Code', 'text', Building2],
+        ].map(([name, label, type, Icon]) => (
+          <div key={name}>
+            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">{label}</label>
+            <div className="relative">
+              <Icon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input type={type} name={name} value={form[name]} onChange={handleChange} className={inputCls} />
+            </div>
           </div>
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Client Secret</label>
-          <div className="relative">
-            <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input type="password" name="client_secret" value={form.client_secret} onChange={handleChange} className={inputCls} />
-          </div>
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Merchant Code</label>
-          <div className="relative">
-            <Building2 size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input type="text" name="merchant_code" value={form.merchant_code} onChange={handleChange} className={inputCls} />
-          </div>
-        </div>
+        ))}
       </SectionCard>
-
-      <button
-        type="submit" disabled={saving}
-        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700
-          disabled:opacity-60 text-white text-sm font-semibold transition-colors"
-      >
+      <button type="submit" disabled={saving} className={primaryBtn}>
         {saving ? 'Saving…' : 'Save SasaPay settings'}
       </button>
     </form>
   );
 };
 
-// ═══════════════════════════════════════════════════════════════
-// MAIN COMPONENT
-// ═══════════════════════════════════════════════════════════════
 const PANELS = { mpesa: MpesaPanel, tuma: TumaPanel, paystack: PaystackPanel, sasapay: SasaPayPanel };
 
+// ═══════════════════════════════════════════════════════════════
+// GATEWAY CARD
+// ═══════════════════════════════════════════════════════════════
+const Badge = ({ tone, children }) => {
+  const tones = {
+    active: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400',
+    ready:  'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
+    off:    'bg-slate-50 text-slate-400 dark:bg-slate-800/60 dark:text-slate-500',
+  };
+  return (
+    <span className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-1 rounded-full ${tones[tone]}`}>
+      {children}
+    </span>
+  );
+};
+
+const GatewayCard = ({ gateway, isActive, configured, activating, onActivate, onManage }) => {
+  const { name, icon: Icon, meta, description, canActivate } = gateway;
+
+  let badge = <Badge tone="off">Not configured</Badge>;
+  if (isActive) badge = <Badge tone="active">Active</Badge>;
+  else if (!canActivate) badge = <Badge tone="off">Backend pending</Badge>;
+  else if (configured) badge = <Badge tone="ready">Configured</Badge>;
+
+  return (
+    <div
+      className={`flex flex-col rounded-2xl border bg-white dark:bg-slate-900 p-4 transition-all
+        ${isActive
+          ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-sm'
+          : 'border-slate-200 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-700'}`}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0
+          ${isActive ? 'bg-emerald-600 text-white' : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'}`}>
+          <Icon size={18} />
+        </div>
+        {badge}
+      </div>
+
+      <h3 className="mt-3 text-sm font-semibold text-slate-900 dark:text-slate-100">{name}</h3>
+      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{meta}</p>
+      <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 flex-1 leading-relaxed">{description}</p>
+
+      <div className="flex gap-2 mt-4">
+        {isActive ? (
+          <button type="button" disabled
+            className="flex-1 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-semibold flex items-center justify-center gap-1.5">
+            <CheckCircle2 size={13} /> Collecting payments
+          </button>
+        ) : canActivate && configured ? (
+          <button type="button" onClick={() => onActivate(gateway.id)} disabled={activating}
+            className="flex-1 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1.5">
+            {activating && <Loader2 size={13} className="animate-spin" />} Activate
+          </button>
+        ) : null}
+        <button type="button" onClick={() => onManage(gateway.id)}
+          className={`${isActive || (canActivate && configured) ? 'px-3' : 'flex-1'} py-2 rounded-lg border border-slate-200 dark:border-slate-700
+            text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors`}>
+          {configured || isActive ? 'Manage' : 'Set up'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN COMPONENT
+// One active gateway — used for hotspot vouchers AND TV plan devices.
+// ═══════════════════════════════════════════════════════════════
 const PaymentGatewaySettings = () => {
-  const [configTab, setConfigTab] = useState('mpesa');
-  // TODO: once the backend concept exists, fetch this from a single
-  // `payment_gateway_settings` endpoint instead of local state.
-  const [activeGateways, setActiveGateways] = useState({ hotspot: 'mpesa', tv_plans: '' });
+  const [view, setView] = useState(null); // null = grid, else gateway id
+  const [activeGateway, setActiveGateway] = useState('');
+  const [configured, setConfigured] = useState({});
+  const [activating, setActivating] = useState('');
   const subdomain = window.location.hostname.split('.')[0];
 
-  const ActivePanel = useMemo(() => PANELS[configTab], [configTab]);
+  // IBM Plex Mono
+  useEffect(() => {
+    const id = 'ibm-plex-mono-font';
+    if (document.getElementById(id)) return;
+    const link = document.createElement('link');
+    link.id = id;
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap';
+    document.head.appendChild(link);
+  }, []);
 
-
-
-useEffect(() => {
-  fetch('/api/payment_gateway_settings', { headers: { 'X-Subdomain': subdomain } })
-    .then((res) => res.ok ? res.json() : {})
-    .then((data) => setActiveGateways((prev) => ({ ...prev, ...data })))
-    .catch(() => {});
-}, [subdomain]);
-
-
-
-
-
-const handleActiveGatewayChange = async (useCase, gatewayId) => {
-  setActiveGateways((prev) => ({ ...prev, [useCase]: gatewayId }));
-  try {
-    await fetch('/api/payment_gateway_settings', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
-      body: JSON.stringify({ gateways: { [useCase]: gatewayId } }),
+  const loadConfigured = useCallback(async () => {
+    const headers = { 'X-Subdomain': subdomain };
+    const get = async (url) => {
+      try {
+        const res = await fetch(url, { headers });
+        return res.ok ? await res.json() : null;
+      } catch { return null; }
+    };
+    const [mpesa, tuma, paystack] = await Promise.all([
+      get('/api/hotspot_mpesa_settings'),
+      get('/api/tuma_settings'),
+      get('/api/paystack_settings'),
+    ]);
+    setConfigured({
+      mpesa: !!(mpesa && !Array.isArray(mpesa) && mpesa.short_code && mpesa.consumer_key),
+      tuma: !!(tuma && tuma.enabled && tuma.api_key_present),
+      paystack: !!(paystack && paystack.enabled && paystack.secret_key_present),
+      sasapay: false,
     });
-  } catch {
-    toast.error('Could not save active gateway');
-  }
-};
+  }, [subdomain]);
+
+  useEffect(() => {
+    fetch('/api/payment_gateway_settings', { headers: { 'X-Subdomain': subdomain } })
+      .then((res) => (res.ok ? res.json() : {}))
+      .then((data) => setActiveGateway(data.hotspot || 'mpesa'))
+      .catch(() => {});
+    loadConfigured();
+  }, [subdomain, loadConfigured]);
+
+  const handleActivate = async (gatewayId) => {
+    const previous = activeGateway;
+    setActivating(gatewayId);
+    setActiveGateway(gatewayId);
+    try {
+      const res = await fetch('/api/payment_gateway_settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+        body: JSON.stringify({ gateways: { hotspot: gatewayId } }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success(`${GATEWAYS.find((g) => g.id === gatewayId)?.name} is now collecting payments`);
+    } catch {
+      setActiveGateway(previous);
+      toast.error('Could not switch gateway');
+    } finally {
+      setActivating('');
+    }
+  };
+
+  const current = GATEWAYS.find((g) => g.id === view);
+  const ActivePanel = view ? PANELS[view] : null;
 
   return (
     <PaymentGatewayOtpGate title="Payment Gateways">
-      <div className="font-sans p-4 sm:p-6 max-w-3xl">
+      <div className="p-4 sm:p-6 max-w-5xl" style={{ fontFamily: FONT }}>
         <Toaster />
 
-        <div className="flex items-start gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center shrink-0">
-            <Wallet size={19} className="text-indigo-600 dark:text-indigo-400" />
-          </div>
-          <div>
-            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Payment Gateways</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-              Configure every payment provider in one place, and choose which one is live for each use case
-            </p>
-          </div>
-        </div>
-
-        <div className="mb-5">
-          <ActiveGatewaySelector activeGateways={activeGateways} onChange={handleActiveGatewayChange} saving={false} />
-        </div>
-
-        {/* Gateway picker */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
-          {GATEWAYS.map(({ id, name, icon: Icon }) => (
-            <button
-              key={id} type="button" onClick={() => setConfigTab(id)}
-              className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 text-xs font-medium transition-all
-                ${configTab === id
-                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-sm'
-                  : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'}`}
-            >
-              <Icon size={16} />
-              {name}
-              {Object.values(activeGateways).includes(id) && (
-                <span className="text-[9px] uppercase tracking-wide text-emerald-600 dark:text-emerald-400 font-semibold">active</span>
-              )}
-            </button>
-          ))}
-        </div>
-
         <AnimatePresence mode="wait">
-          <motion.div
-            key={configTab}
-            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.15 }}
-          >
-            <ActivePanel subdomain={subdomain} />
-          </motion.div>
+          {!view ? (
+            <motion.div key="grid" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.15 }}>
+              <div className="flex items-start gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center shrink-0">
+                  <Wallet size={19} className="text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div>
+                  <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Payment collection</h2>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                    Choose how customers pay. Set up a provider, then activate it. One provider is live at a time and covers hotspot vouchers and TV plans.
+                  </p>
+                </div>
+              </div>
+
+              {activeGateway && configured[activeGateway] && (
+                <div className="mb-5 flex items-center gap-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-4 py-3 text-xs text-emerald-800 dark:text-emerald-300">
+                  <CheckCircle2 size={14} className="shrink-0" />
+                  {GATEWAYS.find((g) => g.id === activeGateway)?.name} is configured and active for customer payments.
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {GATEWAYS.map((g) => (
+                  <GatewayCard
+                    key={g.id}
+                    gateway={g}
+                    isActive={activeGateway === g.id}
+                    configured={!!configured[g.id]}
+                    activating={activating === g.id}
+                    onActivate={handleActivate}
+                    onManage={setView}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div key={view} className="max-w-3xl" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.15 }}>
+              <button type="button" onClick={() => { setView(null); loadConfigured(); }}
+                className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 mb-4 transition-colors">
+                <ArrowLeft size={14} /> Back to providers
+              </button>
+
+              <div className="flex items-start gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center shrink-0">
+                  <current.icon size={19} className="text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div>
+                  <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">{current.name}</h2>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{current.description}</p>
+                </div>
+              </div>
+
+              <ActivePanel subdomain={subdomain} onSaved={loadConfigured} />
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
     </PaymentGatewayOtpGate>
