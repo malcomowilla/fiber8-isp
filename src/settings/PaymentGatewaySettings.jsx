@@ -205,13 +205,6 @@ const channelSub = (c) => {
   if (c.channel_type === 'bank') return `Account ${c.account_number} · Paybill ${c.short_code}`;
   return `Paybill ${c.short_code} · Account ${c.account_number}`;
 };
-const DIGITS = /^\d{4,8}$/;
-
-const channelSub = (c) => {
-  if (c.channel_type === 'till') return `Till ${c.short_code}`;
-  if (c.channel_type === 'bank') return `Account ${c.account_number} · Paybill ${c.short_code}`;
-  return `Paybill ${c.short_code} · Account ${c.account_number}`;
-};
 
 const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
   const [channels, setChannels] = useState([]);
