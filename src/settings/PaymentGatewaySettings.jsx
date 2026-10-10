@@ -80,22 +80,16 @@ const TestResult = ({ result }) => result && (
   </div>
 );
 
-const TextField = ({ label, icon: Icon, hint, ...props }) => {
-  console.log('Rendering TextField:', props.name, props.value);
-
-  return (
-    <div>
-      <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
-        {label}
-      </label>
-      <div className="relative">
-        <Icon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-        <input {...props} className={inputCls} />
-      </div>
-      {hint && <p className="text-[11px] text-slate-400 mt-1">{hint}</p>}
+const TextField = ({ label, icon: Icon, hint, ...props }) => (
+  <div>
+    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">{label}</label>
+    <div className="relative">
+      <Icon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+      <input {...props} className={inputCls} />
     </div>
-  );
-};
+    {hint && <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">{hint}</p>}
+  </div>
+);
 
 // ═══════════════════════════════════════════════════════════════
 // M-PESA PANEL
@@ -236,8 +230,6 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
 
   const setField = (e) => {
     const { name, value } = e.target;
-      console.log('Field changed:', name, value);
-
     setForm((prev) => ({ ...prev, [name]: value }));
     setFormError('');
   };
@@ -247,83 +239,33 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
   const isOtherBank = form.bank === OTHER_BANK;
   const selectedBank = BANKS.find((b) => b.name === form.bank);
 
-  
-const buildPayload = () => {
-  const {
-    channel_type: type,
-    short_code,
-    account_number,
-    description,
-  } = form;
-
-  if (type === 'paybill') {
-    if (!short_code.trim()) return { error: 'Enter the paybill number' };
-    if (!account_number.trim()) return { error: 'Enter the account number' };
-    if (!description.trim()) return { error: 'Enter the business name' };
-
-    return {
-      payload: {
-        channel_type: type,
-        short_code: short_code.trim(),
-        account_number: account_number.trim(),
-        description: description.trim(),
-      },
-    };
-  }
-
-  if (type === 'till') {
-    if (!short_code.trim()) return { error: 'Enter the till number' };
-    if (!description.trim()) return { error: 'Enter the business name' };
-
-    return {
-      payload: {
-        channel_type: type,
-        short_code: short_code.trim(),
-        account_number: '',
-        description: description.trim(),
-      },
-    };
-  }
-
-  // Bank
-  if (!form.bank) return { error: 'Choose your bank' };
-  if (!account_number.trim()) {
-    return { error: 'Enter your bank account number' };
-  }
-
-  if (isOtherBank) {
-    if (!short_code.trim()) {
-      return { error: 'Enter the bank paybill number' };
+  const buildPayload = () => {
+    const { channel_type: type, account_number, description, short_code } = form;
+    if (type === 'paybill') {
+      if (!DIGITS.test(short_code.trim())) return { error: 'Enter a valid paybill number' };
+      if (!account_number.trim()) return { error: 'Enter the account number for this paybill' };
+      if (!description.trim()) return { error: 'Enter the business name' };
+      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: account_number.trim(), description: description.trim() } };
     }
-    if (!description.trim()) return { error: 'Enter the bank name' };
-
-    return {
-      payload: {
-        channel_type: type,
-        short_code: short_code.trim(),
-        account_number: account_number.trim(),
-        description: description.trim(),
-      },
-    };
-  }
-
-  return {
-    payload: {
-      channel_type: type,
-      short_code: selectedBank.paybill,
-      account_number: account_number.trim(),
-      description: selectedBank.name,
-    },
+    if (type === 'till') {
+      if (!DIGITS.test(short_code.trim())) return { error: 'Enter a valid till number' };
+      if (!description.trim()) return { error: 'Enter the business name' };
+      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: '', description: description.trim() } };
+    }
+    // bank
+    if (!form.bank) return { error: 'Choose your bank' };
+    if (!account_number.trim()) return { error: 'Enter your bank account number' };
+    if (isOtherBank) {
+      if (!DIGITS.test(short_code.trim())) return { error: "Enter your bank's paybill number" };
+      if (!description.trim()) return { error: 'Enter the bank name' };
+      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: account_number.trim(), description: description.trim() } };
+    }
+    return { payload: { channel_type: type, short_code: selectedBank.paybill, account_number: account_number.trim(), description: selectedBank.name } };
   };
-};
 
   const handleAdd = async (e) => {
     e.preventDefault();
-      console.log('Submitted form:', form);
-
     const { error, payload } = buildPayload();
-      console.log('Validation result:', { error, payload });
-
     if (error) return setFormError(error);
 
     setAdding(true);
@@ -467,7 +409,7 @@ const buildPayload = () => {
             ))}
           </div>
 
-        {form.channel_type === 'paybill' && (
+         {form.channel_type === 'paybill' && (
   <>
     <input
       name="short_code" placeholder="Paybill number" inputMode="numeric"
@@ -544,7 +486,6 @@ const buildPayload = () => {
     />
   </>
 )}
-
           {formError && <p className="text-xs text-red-500">{formError}</p>}
 
           <button type="submit" disabled={adding} className={`${primaryBtn} flex items-center justify-center gap-2`}>
@@ -1276,8 +1217,6 @@ const PaymentGatewaySettings = () => {
         />
       </div>
     </PaymentGatewayOtpGate>
-
-
   );
 };
 
