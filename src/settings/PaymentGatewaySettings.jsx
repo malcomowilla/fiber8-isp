@@ -87,7 +87,7 @@ const TextField = ({ label, icon: Icon, hint, ...props }) => (
       <Icon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
       <input {...props} className={inputCls} />
     </div>
-    {hint && <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">{hint}</p>}
+    {hint && <p className="text-[13px] text-black dark:text-white mt-1">{hint}</p>}
   </div>
 );
 
@@ -458,7 +458,7 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
           {form.channel_type === 'paybill' && (
             <>
               <TextField label="Paybill number" icon={Hash} name="short_code" value={form.short_code} onChange={setField}
-                  placeholder="e.g. 4007893" />
+                inputMode="numeric" autoComplete="off" placeholder="e.g. 4007893" />
               <TextField label="Account number" icon={KeyRound} name="account_number" value={form.account_number} onChange={setField}
                 autoComplete="off" placeholder="Account customers pay to" />
               <TextField label="Business name" icon={User} name="description" value={form.description} onChange={setField}
