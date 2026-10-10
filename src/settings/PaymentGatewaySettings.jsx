@@ -467,43 +467,83 @@ const buildPayload = () => {
             ))}
           </div>
 
-          {form.channel_type === 'paybill' && (
-            <>
-              <TextField label="Paybill number" icon={Hash} name="short_code" value={form.short_code} onChange={setField} inputMode="numeric" placeholder="e.g. 323993" />
-              <TextField label="Account number" icon={KeyRound} name="account_number" value={form.account_number} onChange={setField} placeholder="Account customers pay to" />
-              <TextField label="Business name" icon={User} name="description" value={form.description} onChange={setField} placeholder="Name on this paybill" />
-            </>
-          )}
+        {form.channel_type === 'paybill' && (
+  <>
+    <input
+      name="short_code" placeholder="Paybill number" inputMode="numeric"
+      value={form.short_code}
+      onChange={(e) => { console.log('typed short_code:', e.target.value); setForm((p) => ({ ...p, short_code: e.target.value })); }}
+      className={inputCls}
+    />
+    <input
+      name="account_number" placeholder="Account number"
+      value={form.account_number}
+      onChange={(e) => setForm((p) => ({ ...p, account_number: e.target.value }))}
+      className={inputCls}
+    />
+    <input
+      name="description" placeholder="Business name"
+      value={form.description}
+      onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
+      className={inputCls}
+    />
+  </>
+)}
 
-          {form.channel_type === 'till' && (
-            <>
-              <TextField label="Till number" icon={Hash} name="short_code" value={form.short_code} onChange={setField} inputMode="numeric" placeholder="e.g. 5012345" />
-              <TextField label="Business name" icon={User} name="description" value={form.description} onChange={setField} placeholder="Name on this till" />
-            </>
-          )}
+{form.channel_type === 'till' && (
+  <>
+    <input
+      name="short_code" placeholder="Till number" inputMode="numeric"
+      value={form.short_code}
+      onChange={(e) => setForm((p) => ({ ...p, short_code: e.target.value }))}
+      className={inputCls}
+    />
+    <input
+      name="description" placeholder="Business name"
+      value={form.description}
+      onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
+      className={inputCls}
+    />
+  </>
+)}
 
-          {form.channel_type === 'bank' && (
-            <>
-              <div>
-                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Bank</label>
-                <div className="relative">
-                  <Landmark size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <select name="bank" value={form.bank} onChange={setField} className={inputCls}>
-                    <option value="" disabled>Choose your bank…</option>
-                    {BANKS.map((b) => <option key={b.name} value={b.name}>{b.name}</option>)}
-                    <option value={OTHER_BANK}>Other bank (enter paybill)</option>
-                  </select>
-                </div>
-              </div>
-              {isOtherBank && (
-                <>
-                  <TextField label="Bank name" icon={User} name="description" value={form.description} onChange={setField} placeholder="e.g. Sidian Bank" />
-                  <TextField label="Bank paybill number" icon={Hash} name="short_code" value={form.short_code} onChange={setField} inputMode="numeric" placeholder="The bank's paybill" />
-                </>
-              )}
-              <TextField label="Your account number" icon={KeyRound} name="account_number" value={form.account_number} onChange={setField} placeholder="Where the money should land" />
-            </>
-          )}
+{form.channel_type === 'bank' && (
+  <>
+    <select
+      name="bank" value={form.bank}
+      onChange={(e) => setForm((p) => ({ ...p, bank: e.target.value }))}
+      className={inputCls}
+    >
+      <option value="" disabled>Choose your bank…</option>
+      {BANKS.map((b) => <option key={b.name} value={b.name}>{b.name}</option>)}
+      <option value={OTHER_BANK}>Other bank (enter paybill)</option>
+    </select>
+
+    {isOtherBank && (
+      <>
+        <input
+          name="description" placeholder="Bank name"
+          value={form.description}
+          onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
+          className={inputCls}
+        />
+        <input
+          name="short_code" placeholder="Bank paybill number" inputMode="numeric"
+          value={form.short_code}
+          onChange={(e) => setForm((p) => ({ ...p, short_code: e.target.value }))}
+          className={inputCls}
+        />
+      </>
+    )}
+
+    <input
+      name="account_number" placeholder="Your account number"
+      value={form.account_number}
+      onChange={(e) => setForm((p) => ({ ...p, account_number: e.target.value }))}
+      className={inputCls}
+    />
+  </>
+)}
 
           {formError && <p className="text-xs text-red-500">{formError}</p>}
 
