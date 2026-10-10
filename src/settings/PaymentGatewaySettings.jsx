@@ -81,6 +81,8 @@ const TestResult = ({ result }) => result && (
 );
 
 const TextField = ({ label, icon: Icon, hint, ...props }) => (
+    console.log('Rendering TextField:', props.name, props.value);
+
   <div>
     <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">{label}</label>
     <div className="relative">
