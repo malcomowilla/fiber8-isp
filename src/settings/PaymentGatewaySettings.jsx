@@ -239,29 +239,75 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
   const isOtherBank = form.bank === OTHER_BANK;
   const selectedBank = BANKS.find((b) => b.name === form.bank);
 
-  const buildPayload = () => {
-    const { channel_type: type, account_number, description, short_code } = form;
-    if (type === 'paybill') {
-      if (!DIGITS.test(short_code.trim())) return { error: 'Enter a valid paybill number' };
-      if (!account_number.trim()) return { error: 'Enter the account number for this paybill' };
-      if (!description.trim()) return { error: 'Enter the business name' };
-      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: account_number.trim(), description: description.trim() } };
+  
+const buildPayload = () => {
+  const {
+    channel_type: type,
+    short_code,
+    account_number,
+    description,
+  } = form;
+
+  if (type === 'paybill') {
+    if (!short_code.trim()) return { error: 'Enter the paybill number' };
+    if (!account_number.trim()) return { error: 'Enter the account number' };
+    if (!description.trim()) return { error: 'Enter the business name' };
+
+    return {
+      payload: {
+        channel_type: type,
+        short_code: short_code.trim(),
+        account_number: account_number.trim(),
+        description: description.trim(),
+      },
+    };
+  }
+
+  if (type === 'till') {
+    if (!short_code.trim()) return { error: 'Enter the till number' };
+    if (!description.trim()) return { error: 'Enter the business name' };
+
+    return {
+      payload: {
+        channel_type: type,
+        short_code: short_code.trim(),
+        account_number: '',
+        description: description.trim(),
+      },
+    };
+  }
+
+  // Bank
+  if (!form.bank) return { error: 'Choose your bank' };
+  if (!account_number.trim()) {
+    return { error: 'Enter your bank account number' };
+  }
+
+  if (isOtherBank) {
+    if (!short_code.trim()) {
+      return { error: 'Enter the bank paybill number' };
     }
-    if (type === 'till') {
-      if (!DIGITS.test(short_code.trim())) return { error: 'Enter a valid till number' };
-      if (!description.trim()) return { error: 'Enter the business name' };
-      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: '', description: description.trim() } };
-    }
-    // bank
-    if (!form.bank) return { error: 'Choose your bank' };
-    if (!account_number.trim()) return { error: 'Enter your bank account number' };
-    if (isOtherBank) {
-      if (!DIGITS.test(short_code.trim())) return { error: "Enter your bank's paybill number" };
-      if (!description.trim()) return { error: 'Enter the bank name' };
-      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: account_number.trim(), description: description.trim() } };
-    }
-    return { payload: { channel_type: type, short_code: selectedBank.paybill, account_number: account_number.trim(), description: selectedBank.name } };
+    if (!description.trim()) return { error: 'Enter the bank name' };
+
+    return {
+      payload: {
+        channel_type: type,
+        short_code: short_code.trim(),
+        account_number: account_number.trim(),
+        description: description.trim(),
+      },
+    };
+  }
+
+  return {
+    payload: {
+      channel_type: type,
+      short_code: selectedBank.paybill,
+      account_number: account_number.trim(),
+      description: selectedBank.name,
+    },
   };
+};
 
   const handleAdd = async (e) => {
     e.preventDefault();
