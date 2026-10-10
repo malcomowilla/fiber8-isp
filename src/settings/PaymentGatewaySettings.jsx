@@ -230,6 +230,8 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
 
   const setField = (e) => {
     const { name, value } = e.target;
+      console.log('Field changed:', name, value);
+
     setForm((prev) => ({ ...prev, [name]: value }));
     setFormError('');
   };
@@ -1228,6 +1230,8 @@ const PaymentGatewaySettings = () => {
         />
       </div>
     </PaymentGatewayOtpGate>
+
+
   );
 };
 
