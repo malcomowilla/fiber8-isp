@@ -80,18 +80,22 @@ const TestResult = ({ result }) => result && (
   </div>
 );
 
-const TextField = ({ label, icon: Icon, hint, ...props }) => (
-    console.log('Rendering TextField:', props.name, props.value)
+const TextField = ({ label, icon: Icon, hint, ...props }) => {
+  console.log('Rendering TextField:', props.name, props.value);
 
-  <div>
-    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">{label}</label>
-    <div className="relative">
-      <Icon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-      <input {...props} className={inputCls} />
+  return (
+    <div>
+      <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
+        {label}
+      </label>
+      <div className="relative">
+        <Icon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <input {...props} className={inputCls} />
+      </div>
+      {hint && <p className="text-[11px] text-slate-400 mt-1">{hint}</p>}
     </div>
-    {hint && <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">{hint}</p>}
-  </div>
-);
+  );
+};
 
 // ═══════════════════════════════════════════════════════════════
 // M-PESA PANEL
