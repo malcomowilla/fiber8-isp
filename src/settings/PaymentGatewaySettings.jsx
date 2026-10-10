@@ -224,7 +224,8 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
 
   const fetchChannels = useCallback(async () => {
     try {
-      const res = await fetch('/api/payhero_channels', { headers: { 'X-Subdomain': subdomain } });
+      const res = await fetch('/api/payhero_channels', 
+        { headers: { 'X-Subdomain': subdomain } });
       const data = await res.json();
       if (res.ok && Array.isArray(data)) setChannels(data);
     } catch {
@@ -280,7 +281,7 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
   const handleAdd = async (e) => {
     e.preventDefault();
     const { error, payload } = buildPayload();
-    if (error) return setFormError(error);
+    // if (error) return setFormError(error);
 
     setAdding(true);
     setFormError('');
