@@ -249,66 +249,89 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
   const isOtherBank = form.bank === OTHER_BANK;
   const selectedBank = BANKS.find((b) => b.name === form.bank);
 
-  const buildPayload = () => {
-    const { channel_type: type, account_number, description } = form;
-    const code = validCode(form.short_code);
-    const codeError = (label) =>
-      `${label} must be 4 to 10 digits${form.short_code ? ` (we read "${form.short_code}")` : ''}`;
+  const buildPayload = (f) => {
+  const type = f.channel_type;
+  const account_number = String(f.account_number || '').trim();
+  const description = String(f.description || '').trim();
+  const code = validCode(f.short_code);
+  const otherBank = f.bank === OTHER_BANK;
+  const bank = BANKS.find((b) => b.name === f.bank);
 
-    if (type === 'paybill') {
-      if (!code) return { error: codeError('Paybill number') };
-      if (!account_number.trim()) return { error: 'Enter the account number for this paybill' };
-      if (!description.trim()) return { error: 'Enter the business name' };
-      return { payload: { channel_type: type, short_code: code, account_number: account_number.trim(), description: description.trim() } };
-    }
-    if (type === 'till') {
-      if (!code) return { error: codeError('Till number') };
-      if (!description.trim()) return { error: 'Enter the business name' };
-      return { payload: { channel_type: type, short_code: code, account_number: '', description: description.trim() } };
-    }
-    // bank
-    if (!form.bank) return { error: 'Choose your bank' };
-    if (!account_number.trim()) return { error: 'Enter your bank account number' };
-    if (isOtherBank) {
-      if (!code) return { error: codeError("Bank paybill number") };
-      if (!description.trim()) return { error: 'Enter the bank name' };
-      return { payload: { channel_type: type, short_code: code, account_number: account_number.trim(), description: description.trim() } };
-    }
-    return { payload: { channel_type: type, short_code: selectedBank.paybill, account_number: account_number.trim(), description: selectedBank.name } };
-  };
+  const codeError = (label) =>
+    !digitsOnly(f.short_code)
+      ? `Enter the ${label.toLowerCase()}`
+      : `${label} must be 4 to 10 digits (you entered ${digitsOnly(f.short_code).length})`;
+
+  if (type === 'paybill') {
+    if (!code) return { error: codeError('Paybill number') };
+    if (!account_number) return { error: 'Enter the account number for this paybill' };
+    if (!description) return { error: 'Enter the business name' };
+    return { payload: { channel_type: type, short_code: code, account_number, description } };
+  }
+
+  if (type === 'till') {
+    if (!code) return { error: codeError('Till number') };
+    if (!description) return { error: 'Enter the business name' };
+    return { payload: { channel_type: type, short_code: code, account_number: '', description } };
+  }
+
+  // bank
+  if (!f.bank) return { error: 'Choose your bank' };
+  if (!account_number) return { error: 'Enter your bank account number' };
+  if (otherBank) {
+    if (!code) return { error: codeError('Bank paybill number') };
+    if (!description) return { error: 'Enter the bank name' };
+    return { payload: { channel_type: type, short_code: code, account_number, description } };
+  }
+  if (!bank) return { error: 'Choose your bank' };
+  return { payload: { channel_type: type, short_code: bank.paybill, account_number, description: bank.name } };
+};
 
 
-
-  console.log('submit form state:', JSON.stringify(form));
-const { error, payload } = buildPayload();
-console.log('buildPayload ->', { error, payload });
   const handleAdd = async (e) => {
-    e.preventDefault();
-    const { error, payload } = buildPayload();
-    if (error) return setFormError(error);
+  e.preventDefault();
 
-    setAdding(true);
-    setFormError('');
-    try {
-      const res = await fetch('/api/payhero_channels', {
-        method: 'POST', headers, body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        toast.success('Payment channel added');
-        setForm((prev) => ({ ...EMPTY_FORM, channel_type: prev.channel_type }));
-        await fetchChannels();
-        onSaved?.();
-      } else {
-        setFormError(data.error || 'Could not add this channel');
-      }
-    } catch {
-      setFormError('Something went wrong. Please try again');
-    } finally {
-      setAdding(false);
-    }
+  // Read what is actually in the inputs right now. Fall back to state if a field isn't rendered.
+  const fd = new FormData(e.currentTarget);
+  const pick = (name) => {
+    const dom = fd.get(name);
+    return dom !== null && String(dom) !== '' ? String(dom) : String(form[name] || '');
   };
 
+  const live = {
+    channel_type: form.channel_type,
+    bank: pick('bank'),
+    short_code: digitsOnly(pick('short_code')),
+    account_number: pick('account_number'),
+    description: pick('description'),
+  };
+
+  const { error, payload } = buildPayload(live);
+  if (error) return setFormError(error);
+
+  setAdding(true);
+  setFormError('');
+  try {
+    const res = await fetch('/api/payhero_channels', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      toast.success('Payment channel added');
+      setForm((prev) => ({ ...EMPTY_FORM, channel_type: prev.channel_type }));
+      await fetchChannels();
+      onSaved?.();
+    } else {
+      setFormError(data.error || 'Could not add this channel');
+    }
+  } catch {
+    setFormError('Something went wrong. Please try again');
+  } finally {
+    setAdding(false);
+  }
+};
   const makeDefault = async (id) => {
     setBusyId(id);
     try {
