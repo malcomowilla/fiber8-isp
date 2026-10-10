@@ -458,7 +458,7 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
           {form.channel_type === 'paybill' && (
             <>
               <TextField label="Paybill number" icon={Hash} name="short_code" value={form.short_code} onChange={setField}
-                inputMode="numeric" autoComplete="off" placeholder="e.g. 4007893" />
+                inputMode="numeric"  placeholder="e.g. 4007893" />
               <TextField label="Account number" icon={KeyRound} name="account_number" value={form.account_number} onChange={setField}
                 autoComplete="off" placeholder="Account customers pay to" />
               <TextField label="Business name" icon={User} name="description" value={form.description} onChange={setField}
