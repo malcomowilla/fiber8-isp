@@ -87,7 +87,7 @@ const TextField = ({ label, icon: Icon, hint, ...props }) => (
       <Icon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
       <input {...props} className={inputCls} />
     </div>
-    {hint && <p className="text-[13px] text-black dark:text-white mt-1">{hint}</p>}
+    {hint && <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">{hint}</p>}
   </div>
 );
 
@@ -195,14 +195,6 @@ const CHANNEL_TYPES = [
   { id: 'bank',    label: 'Bank',    icon: Landmark },
 ];
 const EMPTY_FORM = { channel_type: 'paybill', short_code: '', account_number: '', description: '', bank: '' };
-const digitsOnly = (v) => String(v || '').replace(/\D/g, '');
-const validCode = (v) => {
-  const d = digitsOnly(v);
-  return d.length >= 4 && d.length <= 10 ? d : null;
-};
-
-
-
 const DIGITS = /^\d{4,8}$/;
 
 const channelSub = (c) => {
@@ -210,9 +202,6 @@ const channelSub = (c) => {
   if (c.channel_type === 'bank') return `Account ${c.account_number} · Paybill ${c.short_code}`;
   return `Paybill ${c.short_code} · Account ${c.account_number}`;
 };
-
-
-
 
 const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
   const [channels, setChannels] = useState([]);
@@ -240,9 +229,7 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
   useEffect(() => { fetchChannels(); }, [fetchChannels]);
 
   const setField = (e) => {
-    const { name } = e.target;
-    let { value } = e.target;
-    if (name === 'short_code') value = digitsOnly(value); // paybill/till are digits only
+    const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     setFormError('');
   };
@@ -252,90 +239,61 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
   const isOtherBank = form.bank === OTHER_BANK;
   const selectedBank = BANKS.find((b) => b.name === form.bank);
 
-  const buildPayload = (f) => {
-  const type = f.channel_type;
-  const account_number = String(f.account_number || '').trim();
-  const description = String(f.description || '').trim();
-  const code = validCode(f.short_code);
-  const otherBank = f.bank === OTHER_BANK;
-  const bank = BANKS.find((b) => b.name === f.bank);
-
-  const codeError = (label) =>
-    !digitsOnly(f.short_code)
-      ? `Enter the ${label.toLowerCase()}`
-      : `${label} must be 4 to 10 digits (you entered ${digitsOnly(f.short_code).length})`;
-
-  if (type === 'paybill') {
-    if (!code) return { error: codeError('Paybill number') };
-    if (!account_number) return { error: 'Enter the account number for this paybill' };
-    if (!description) return { error: 'Enter the business name' };
-    return { payload: { channel_type: type, short_code: code, account_number, description } };
-  }
-
-  if (type === 'till') {
-    if (!code) return { error: codeError('Till number') };
-    if (!description) return { error: 'Enter the business name' };
-    return { payload: { channel_type: type, short_code: code, account_number: '', description } };
-  }
-
-  // bank
-  if (!f.bank) return { error: 'Choose your bank' };
-  if (!account_number) return { error: 'Enter your bank account number' };
-  if (otherBank) {
-    if (!code) return { error: codeError('Bank paybill number') };
-    if (!description) return { error: 'Enter the bank name' };
-    return { payload: { channel_type: type, short_code: code, account_number, description } };
-  }
-  if (!bank) return { error: 'Choose your bank' };
-  return { payload: { channel_type: type, short_code: bank.paybill, account_number, description: bank.name } };
-};
-
+  const buildPayload = () => {
+    const { channel_type: type, account_number, description, short_code } = form;
+    if (type === 'paybill') {
+      if (!DIGITS.test(short_code.trim())) return { error: 'Enter a valid paybill number' };
+      if (!account_number.trim()) return { error: 'Enter the account number for this paybill' };
+      if (!description.trim()) return { error: 'Enter the business name' };
+      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: account_number.trim(), description: description.trim() } };
+    }
+    if (type === 'till') {
+      if (!DIGITS.test(short_code.trim())) return { error: 'Enter a valid till number' };
+      if (!description.trim()) return { error: 'Enter the business name' };
+      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: '', description: description.trim() } };
+    }
+    // bank
+    if (!form.bank) return { error: 'Choose your bank' };
+    if (!account_number.trim()) return { error: 'Enter your bank account number' };
+    if (isOtherBank) {
+      if (!DIGITS.test(short_code.trim())) return { error: "Enter your bank's paybill number" };
+      if (!description.trim()) return { error: 'Enter the bank name' };
+      return { payload: { channel_type: type, short_code: short_code.trim(), account_number: account_number.trim(), description: description.trim() } };
+    }
+    return { payload: { channel_type: type, short_code: selectedBank.paybill, account_number: account_number.trim(), description: selectedBank.name } };
+  };
 
   const handleAdd = async (e) => {
-    console.log('SUBMIT FIRED', e.currentTarget.elements.short_code?.value, form);
-  e.preventDefault();
+    e.preventDefault();
+      console.log('Submitted form:', form);
 
-  // Read what is actually in the inputs right now. Fall back to state if a field isn't rendered.
-  const fd = new FormData(e.currentTarget);
-  const pick = (name) => {
-    const dom = fd.get(name);
-    return dom !== null && String(dom) !== '' ? String(dom) : String(form[name] || '');
-  };
+    const { error, payload } = buildPayload();
+      console.log('Validation result:', { error, payload });
 
-  const live = {
-    channel_type: form.channel_type,
-    bank: pick('bank'),
-    short_code: digitsOnly(pick('short_code')),
-    account_number: pick('account_number'),
-    description: pick('description'),
-  };
+    if (error) return setFormError(error);
 
-  const { error, payload } = buildPayload(live);
-  if (error) return setFormError(error);
-
-  setAdding(true);
-  setFormError('');
-  try {
-    const res = await fetch('/api/payhero_channels', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      toast.success('Payment channel added');
-      setForm((prev) => ({ ...EMPTY_FORM, channel_type: prev.channel_type }));
-      await fetchChannels();
-      onSaved?.();
-    } else {
-      setFormError(data.error || 'Could not add this channel');
+    setAdding(true);
+    setFormError('');
+    try {
+      const res = await fetch('/api/payhero_channels', {
+        method: 'POST', headers, body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('Payment channel added');
+        setForm((prev) => ({ ...EMPTY_FORM, channel_type: prev.channel_type }));
+        await fetchChannels();
+        onSaved?.();
+      } else {
+        setFormError(data.error || 'Could not add this channel');
+      }
+    } catch {
+      setFormError('Something went wrong. Please try again');
+    } finally {
+      setAdding(false);
     }
-  } catch {
-    setFormError('Something went wrong. Please try again');
-  } finally {
-    setAdding(false);
-  }
-};
+  };
+
   const makeDefault = async (id) => {
     setBusyId(id);
     try {
@@ -381,7 +339,7 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
               const Icon = (CHANNEL_TYPES.find((t) => t.id === c.channel_type) || CHANNEL_TYPES[0]).icon;
               const lastOne = channels.length === 1;
               return (
-                <div key={c.id} className={`flex flex-wrap items-center gap-3 rounded-xl border p-3
+                <div key={c.id} className={`flex items-center gap-3 rounded-xl border p-3
                   ${c.is_default ? 'border-emerald-500/60 bg-emerald-50/50 dark:bg-emerald-500/5' : 'border-slate-100 dark:border-slate-800'}`}>
                   <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                     <Icon size={16} />
@@ -425,7 +383,7 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
                   )}
 
                   {confirmId === c.id && isActive && lastOne && (
-                    <p className="basis-full text-[11px] text-red-500">
+                    <p className="basis-full text-[11px] text-red-500 mt-1">
                       This is your only channel. Removing it stops PayHero payments until you add another.
                     </p>
                   )}
@@ -441,7 +399,7 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
         )}
       </SectionCard>
 
-      <form onSubmit={handleAdd} autoComplete="off">
+      <form onSubmit={handleAdd}>
         <SectionCard title="Add a payment channel">
           <div className="grid grid-cols-3 gap-2">
             {CHANNEL_TYPES.map(({ id, label, icon: Icon }) => (
@@ -457,21 +415,16 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
 
           {form.channel_type === 'paybill' && (
             <>
-              <TextField label="Paybill number" icon={Hash} name="short_code" value={form.short_code} onChange={setField}
-                inputMode="numeric" autoComplete="off" placeholder="e.g. 4007893" />
-              <TextField label="Account number" icon={KeyRound} name="account_number" value={form.account_number} onChange={setField}
-                autoComplete="off" placeholder="Account customers pay to" />
-              <TextField label="Business name" icon={User} name="description" value={form.description} onChange={setField}
-                autoComplete="off" placeholder="Name on this paybill" />
+              <TextField label="Paybill number" icon={Hash} name="short_code" value={form.short_code} onChange={setField} inputMode="numeric" placeholder="e.g. 323993" />
+              <TextField label="Account number" icon={KeyRound} name="account_number" value={form.account_number} onChange={setField} placeholder="Account customers pay to" />
+              <TextField label="Business name" icon={User} name="description" value={form.description} onChange={setField} placeholder="Name on this paybill" />
             </>
           )}
 
           {form.channel_type === 'till' && (
             <>
-              <TextField label="Till number" icon={Hash} name="short_code" value={form.short_code} onChange={setField}
-                inputMode="numeric" autoComplete="off" placeholder="e.g. 5012345" />
-              <TextField label="Business name" icon={User} name="description" value={form.description} onChange={setField}
-                autoComplete="off" placeholder="Name on this till" />
+              <TextField label="Till number" icon={Hash} name="short_code" value={form.short_code} onChange={setField} inputMode="numeric" placeholder="e.g. 5012345" />
+              <TextField label="Business name" icon={User} name="description" value={form.description} onChange={setField} placeholder="Name on this till" />
             </>
           )}
 
@@ -490,14 +443,11 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
               </div>
               {isOtherBank && (
                 <>
-                  <TextField label="Bank name" icon={User} name="description" value={form.description} onChange={setField}
-                    autoComplete="off" placeholder="e.g. Sidian Bank" />
-                  <TextField label="Bank paybill number" icon={Hash} name="short_code" value={form.short_code} onChange={setField}
-                    inputMode="numeric" autoComplete="off" placeholder="The bank's paybill" />
+                  <TextField label="Bank name" icon={User} name="description" value={form.description} onChange={setField} placeholder="e.g. Sidian Bank" />
+                  <TextField label="Bank paybill number" icon={Hash} name="short_code" value={form.short_code} onChange={setField} inputMode="numeric" placeholder="The bank's paybill" />
                 </>
               )}
-              <TextField label="Your account number" icon={KeyRound} name="account_number" value={form.account_number} onChange={setField}
-                autoComplete="off" placeholder="Where the money should land" />
+              <TextField label="Your account number" icon={KeyRound} name="account_number" value={form.account_number} onChange={setField} placeholder="Where the money should land" />
             </>
           )}
 
