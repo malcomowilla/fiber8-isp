@@ -211,6 +211,9 @@ const channelSub = (c) => {
   return `Paybill ${c.short_code} · Account ${c.account_number}`;
 };
 
+
+
+
 const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
   const [channels, setChannels] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -221,7 +224,10 @@ const PayheroPanel = ({ subdomain, onSaved, isActive }) => {
   const [confirmId, setConfirmId] = useState(null);
 
   const headers = { 'Content-Type': 'application/json', 'X-Subdomain': subdomain };
-
+ useEffect(() => {
+    console.log('PayheroPanel MOUNTED');
+    return () => console.log('PayheroPanel UNMOUNTED');
+  }, []);
   const fetchChannels = useCallback(async () => {
     try {
       const res = await fetch('/api/payhero_channels', { headers: { 'X-Subdomain': subdomain } });
