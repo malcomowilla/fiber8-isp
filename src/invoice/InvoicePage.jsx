@@ -242,22 +242,6 @@ const InvoicePage = () => {
     }
   }, [fetchHotspotMpesaSettings, selectedAccountTypeHotspot]);
 
-  // -------------------------------------------------------------------------
-  // THE ACTUAL BUG: this was useCallback(..., []) — created once on first
-  // render and permanently closed over whatever `id` existed at that moment.
-  // Since the effect below only re-runs when the `getInvoices` reference
-  // changes, and that reference never changed, navigating between different
-  // invoices without a full remount (e.g. router keeping this route element
-  // alive) kept refetching the SAME stale/missing id forever. Combined with
-  // the empty `catch {}`, a bad request just failed silently and left every
-  // field at its `useState('N/A')` default — exactly the "N/A everywhere,
-  // KES NaN" screen you were seeing.
-  //
-  // Fix: put `id` (and `subdomain`) in the dependency array so the fetcher
-  // is recreated — and therefore actually refetches — whenever the invoice
-  // id changes, guard against a missing id, and surface failures instead of
-  // swallowing them.
-  // -------------------------------------------------------------------------
   const getInvoices = useCallback(async () => {
     if (!id) {
       toast.error('No invoice id found in the URL — cannot load invoice', {
@@ -602,11 +586,11 @@ const InvoicePage = () => {
                 <Box display="flex" alignItems="center" gap={1.5} mb={1}>
                   <Box
                     component="img"
-                    src={logo_preview || '/images/aitechs.png'}
+                    src={logo_preview || '/images/owitech-logo.png'}
                     onError={(e) => {
-                      e.target.src = '/images/aitechs.png';
+                      e.target.src = '/images/owitech-logo.png';
                     }}
-                    alt={company_name || 'Aitechs'}
+                    alt={company_name || 'Owitech'}
                     sx={{ height: 44, width: 44, borderRadius: '50%', objectFit: 'cover' }}
                   />
                   <Typography variant="h6" sx={{ fontWeight: 800, color: INK, letterSpacing: -0.3 }}>
