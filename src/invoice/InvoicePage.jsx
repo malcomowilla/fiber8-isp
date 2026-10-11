@@ -588,6 +588,7 @@ const handleCloseDialog = () => {
               We'll send a prompt to your phone to pay <Code>{currency(invoiceTotal)}</Code>
             </Typography>
             <TextField
+            className='myTextField'
               label="M-Pesa phone number"
               placeholder="0712345678"
               value={phone}
