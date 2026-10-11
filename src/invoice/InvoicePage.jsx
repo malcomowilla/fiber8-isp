@@ -14,11 +14,14 @@ import {
   Avatar,
   Alert,
   Stack,
+
+  Tabs, Tab, TextField, CircularProgress, LinearProgress
 } from '@mui/material';
 import {
   Payment as PaymentIcon,
   Description as DescriptionIcon,
   Print as PrintIcon,
+  ErrorOutline as ErrorOutlineIcon,
   Download as DownloadIcon,
   CheckCircle as CheckCircleIcon,
   Schedule as ScheduleIcon,
@@ -41,6 +44,14 @@ const ACCENT = '#0f9d58'; // brand green, matches the "success" palette already 
 const INK = '#14171a';
 const MUTED = '#6b7280';
 const HAIRLINE = '#e5e7eb';
+
+
+
+const Code = ({ children }) => (
+  <Box component="span" sx={{ bgcolor: 'grey.100', px: 1.5, py: 0.4, borderRadius: 1, fontFamily: 'monospace', fontWeight: 700 }}>
+    {children}
+  </Box>
+);
 
 const currency = (value) =>
   `KES ${parseFloat(value || 0).toLocaleString(undefined, { minimumFractionDigits: 0 })}`;
@@ -289,6 +300,103 @@ const InvoicePage = () => {
     getInvoices();
   }, [getInvoices]);
 
+
+
+
+
+
+const [payTab, setPayTab] = useState(0);
+const [phone, setPhone] = useState('');
+const [payState, setPayState] = useState('idle'); // idle|sending|waiting|paid|partial|failed|timeout
+const [payMessage, setPayMessage] = useState('');
+const [checkoutId, setCheckoutId] = useState(null);
+const [payResult, setPayResult] = useState(null);
+const pollStartRef = useRef(0);
+
+const startWaiting = (cid = null) => {
+  setCheckoutId(cid);
+  pollStartRef.current = Date.now();
+  setPayMessage('');
+  setPayState('waiting');
+};
+
+const sendStkPush = async () => {
+  setPayState('sending');
+  setPayMessage('');
+  try {
+    const res = await fetch('/api/invoice_stk_push', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain },
+      body: JSON.stringify({ id, phone_number: phone }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      startWaiting(data.checkout_request_id);
+    } else {
+      setPayState('failed');
+      setPayMessage(data.error || 'Could not send the M-Pesa prompt');
+    }
+  } catch {
+    setPayState('failed');
+    setPayMessage('Network error, please try again');
+  }
+};
+
+// Poll until paid / failed / partial / 2 min timeout. Keeps running even if
+// the dialog is closed, and a toast fires on success.
+useEffect(() => {
+  if (payState !== 'waiting') return undefined;
+  let cancelled = false;
+
+  const tick = async () => {
+    if (Date.now() - pollStartRef.current > 120000) {
+      setPayState('timeout');
+      return;
+    }
+    try {
+      const qs = new URLSearchParams({ id });
+      if (checkoutId) qs.set('checkout_request_id', checkoutId);
+      const res = await fetch(`/api/invoice_payment_status?${qs}`, {
+        headers: { 'X-Subdomain': subdomain },
+      });
+      const data = await res.json();
+      if (cancelled || !res.ok) return;
+
+      if (data.state === 'paid') {
+        setPayResult(data);
+        setPayState('paid');
+        setStatus('paid');
+        toast.success('Payment received. Thank you!', { duration: 6000 });
+        getInvoices();
+      } else if (data.state === 'partial') {
+        setPayResult(data);
+        setPayState('partial');
+        toast('Partial payment received', { icon: '⚠️' });
+      } else if (data.state === 'failed') {
+        setPayMessage(data.message);
+        setPayState('failed');
+      }
+    } catch {
+      /* transient network error: next tick retries */
+    }
+  };
+
+  const timer = setInterval(tick, 3000);
+  tick();
+  return () => {
+    cancelled = true;
+    clearInterval(timer);
+  };
+}, [payState, checkoutId, id, subdomain, getInvoices]);
+
+const handleCloseDialog = () => {
+  setOpenPaymentInstructions(false);
+  if (['failed', 'timeout', 'partial'].includes(payState)) setPayState('idle');
+};
+
+
+
+
   const componentRef = useRef(null);
   const isPaid = status?.toLowerCase() === 'paid';
 
@@ -368,145 +476,151 @@ const InvoicePage = () => {
     <>
       <Toaster />
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Payment instructions dialog                                        */}
-      {/* ------------------------------------------------------------------ */}
-      <Dialog
-        open={openPaymentInstructions}
-        onClose={() => setOpenPaymentInstructions(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{ sx: { borderRadius: 3 } }}
-      >
-        <DialogTitle sx={{ bgcolor: ACCENT, color: 'white', fontWeight: 700 }}>
-          <Box display="flex" alignItems="center" gap={1}>
-            <PaymentIcon />
-            Pay via M-Pesa
-          </Box>
-        </DialogTitle>
 
-        <DialogContent dividers sx={{ mt: 2 }}>
-          <Typography variant="body1" gutterBottom fontWeight={600}>
-            Follow these steps to complete your payment
-          </Typography>
 
-          <Stack spacing={2} sx={{ mt: 3 }}>
-            {[
-              { label: 'Go to', bold: 'M-Pesa', tail: 'on your phone' },
-              { label: 'Select', bold: 'Lipa Na M-Pesa' },
-            ].map((step, i) => (
-              <Box key={i} display="flex" alignItems="center" gap={2}>
-                <Avatar sx={{ bgcolor: `${ACCENT}22`, color: ACCENT, width: 28, height: 28, fontWeight: 700 }}>
-                  {i + 1}
-                </Avatar>
-                <Typography>
-                  {step.label} <strong>{step.bold}</strong> {step.tail}
-                </Typography>
-              </Box>
-            ))}
 
-            <Box display="flex" alignItems="center" gap={2}>
-              <Avatar sx={{ bgcolor: `${ACCENT}22`, color: ACCENT, width: 28, height: 28, fontWeight: 700 }}>3</Avatar>
-              <Typography>
-                Select <strong>Paybill</strong>, enter Business No.{' '}
-                <Box
-                  component="span"
-                  sx={{
-                    bgcolor: 'grey.100',
-                    px: 1.5,
-                    py: 0.4,
-                    borderRadius: 1,
-                    fontFamily: 'monospace',
-                    fontWeight: 700,
-                  }}
-                >
-                  {short_code || '4007893'}
-                </Box>
-              </Typography>
-            </Box>
+<Dialog
+  open={openPaymentInstructions}
+  onClose={handleCloseDialog}
+  maxWidth="sm"
+  fullWidth
+  PaperProps={{ sx: { borderRadius: 3 } }}
+>
+  <DialogTitle sx={{ bgcolor: ACCENT, color: 'white', fontWeight: 700 }}>
+    <Box display="flex" alignItems="center" gap={1}>
+      <PaymentIcon />
+      Pay invoice {invoiceNumber}
+    </Box>
+  </DialogTitle>
 
-            <Box display="flex" alignItems="center" gap={2}>
-              <Avatar sx={{ bgcolor: `${ACCENT}22`, color: ACCENT, width: 28, height: 28, fontWeight: 700 }}>4</Avatar>
-              <Typography>
-                Enter <strong>Account Number</strong>{' '}
-                <Box
-                  component="span"
-                  sx={{
-                    bgcolor: 'grey.100',
-                    px: 1.5,
-                    py: 0.4,
-                    borderRadius: 1,
-                    fontFamily: 'monospace',
-                    fontWeight: 700,
-                  }}
-                >
-                  {invoiceNumber}
-                </Box>
-              </Typography>
-            </Box>
+  <DialogContent dividers sx={{ mt: 2 }}>
+    {/* ---------- SUCCESS ---------- */}
+    {payState === 'paid' && (
+      <Box textAlign="center" py={3}>
+        <CheckCircleIcon sx={{ fontSize: 72, color: ACCENT }} />
+        <Typography variant="h6" fontWeight={800} mt={1}>Payment successful</Typography>
+        <Typography color="text.secondary" mt={1}>
+          We received {currency(payResult?.amount_paid ?? invoiceTotal)}.
+          {payResult?.reference && <> M-Pesa ref <Code>{payResult.reference}</Code>.</>}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" mt={1}>
+          A confirmation SMS is on its way.
+        </Typography>
+      </Box>
+    )}
 
-            <Box display="flex" alignItems="center" gap={2}>
-              <Avatar sx={{ bgcolor: `${ACCENT}22`, color: ACCENT, width: 28, height: 28, fontWeight: 700 }}>5</Avatar>
-              <Typography>
-                Enter <strong>Amount</strong>{' '}
-                <Box
-                  component="span"
-                  sx={{
-                    bgcolor: 'grey.100',
-                    px: 1.5,
-                    py: 0.4,
-                    borderRadius: 1,
-                    fontFamily: 'monospace',
-                    fontWeight: 700,
-                  }}
-                >
-                  {currency(invoiceTotal)}
-                </Box>
-              </Typography>
-            </Box>
+    {/* ---------- PARTIAL ---------- */}
+    {payState === 'partial' && (
+      <Alert severity="warning" sx={{ borderRadius: 2 }}>
+        We received {currency(payResult?.amount_paid)} (ref {payResult?.reference}), but the invoice total is{' '}
+        {currency(invoiceTotal)}. Balance remaining: <strong>{currency(payResult?.balance)}</strong>.
+        Please pay the balance to complete this invoice.
+      </Alert>
+    )}
 
-            <Box display="flex" alignItems="center" gap={2}>
-              <Avatar sx={{ bgcolor: `${ACCENT}22`, color: ACCENT, width: 28, height: 28, fontWeight: 700 }}>6</Avatar>
-              <Typography>
-                Enter your <strong>M-Pesa PIN</strong> and confirm
-              </Typography>
-            </Box>
-          </Stack>
+    {/* ---------- WAITING ---------- */}
+    {(payState === 'sending' || payState === 'waiting') && (
+      <Box textAlign="center" py={3}>
+        <CircularProgress sx={{ color: ACCENT }} />
+        <Typography fontWeight={700} mt={2}>
+          {payState === 'sending' ? 'Sending M-Pesa prompt…' : 'Waiting for your payment…'}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" mt={1}>
+          {checkoutId
+            ? 'Check your phone and enter your M-Pesa PIN. This page updates automatically.'
+            : 'Checking for your payment. This page updates automatically.'}
+        </Typography>
+        <LinearProgress sx={{ mt: 3, borderRadius: 1, '& .MuiLinearProgress-bar': { bgcolor: ACCENT } }} />
+      </Box>
+    )}
 
-          <Divider sx={{ my: 3 }} />
-
-          <Alert severity="info" sx={{ borderRadius: 2 }} icon={<ScheduleIcon fontSize="inherit" />}>
-            <Typography variant="body2">
-              Once payment is successful, your invoice status updates automatically within{' '}
-              <strong>1–3 minutes</strong>. You'll receive an SMS confirmation.
-            </Typography>
+    {/* ---------- PICK A METHOD ---------- */}
+    {['idle', 'failed', 'timeout'].includes(payState) && (
+      <>
+        {payState === 'failed' && (
+          <Alert severity="error" icon={<ErrorOutlineIcon />} sx={{ mb: 2, borderRadius: 2 }}>
+            {payMessage || 'Payment failed. Please try again.'}
           </Alert>
-        </DialogContent>
+        )}
+        {payState === 'timeout' && (
+          <Alert severity="warning" sx={{ mb: 2, borderRadius: 2 }}>
+            We haven't received a payment yet. If you already paid, it can take a few minutes to
+            reflect. Otherwise, try again.
+          </Alert>
+        )}
 
-        <DialogActions sx={{ p: 3, pt: 2 }}>
-          <Button
-            variant="contained"
-            fullWidth
-            size="large"
-            sx={{ bgcolor: ACCENT, '&:hover': { bgcolor: '#0c7f47' } }}
-            onClick={() => setOpenPaymentInstructions(false)}
-          >
-            I've made the payment
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={() => setOpenPaymentInstructions(false)}
-            sx={{ mt: 1, borderColor: HAIRLINE, color: MUTED }}
-            fullWidth
-          >
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Tabs
+          value={payTab}
+          onChange={(_, v) => setPayTab(v)}
+          variant="fullWidth"
+          sx={{ mb: 3 }}
+          TabIndicatorProps={{ style: { backgroundColor: ACCENT } }}
+        >
+          <Tab label="M-Pesa prompt (STK)" sx={{ textTransform: 'none', fontWeight: 700 }} />
+          <Tab label="Paybill" sx={{ textTransform: 'none', fontWeight: 700 }} />
+        </Tabs>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Page                                                                */}
-      {/* ------------------------------------------------------------------ */}
+        {payTab === 0 ? (
+          <Stack spacing={2}>
+            <Typography>
+              We'll send a prompt to your phone to pay <Code>{currency(invoiceTotal)}</Code>
+            </Typography>
+            <TextField
+              label="M-Pesa phone number"
+              placeholder="0712345678"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              inputProps={{ inputMode: 'tel' }}
+              fullWidth
+            />
+          </Stack>
+        ) : (
+          <Stack spacing={2}>
+            <Typography>1. Go to <strong>M-Pesa</strong> on your phone</Typography>
+            <Typography>2. Select <strong>Lipa Na M-Pesa</strong></Typography>
+            <Typography>3. Select <strong>Paybill</strong>, Business No. <Code>{short_code || '4007893'}</Code></Typography>
+            <Typography>4. Account Number <Code>{invoiceNumber}</Code></Typography>
+            <Typography>5. Amount <Code>{currency(invoiceTotal)}</Code></Typography>
+            <Typography>6. Enter your <strong>M-Pesa PIN</strong> and confirm</Typography>
+            <Alert severity="info" icon={<ScheduleIcon fontSize="inherit" />} sx={{ borderRadius: 2 }}>
+              Your invoice updates automatically within <strong>1–3 minutes</strong> and you'll get an SMS.
+            </Alert>
+          </Stack>
+        )}
+      </>
+    )}
+  </DialogContent>
+
+  <DialogActions sx={{ p: 3, pt: 2, flexDirection: 'column', gap: 1, alignItems: 'stretch' }}>
+    {['idle', 'failed', 'timeout'].includes(payState) && payTab === 0 && (
+      <Button
+        variant="contained"
+        size="large"
+        disabled={phone.replace(/\D/g, '').length < 9}
+        onClick={sendStkPush}
+        sx={{ bgcolor: ACCENT, '&:hover': { bgcolor: '#0c7f47' } }}
+      >
+        {payState === 'idle' ? 'Send M-Pesa prompt' : 'Try again'}
+      </Button>
+    )}
+    {['idle', 'failed', 'timeout'].includes(payState) && payTab === 1 && (
+      <Button
+        variant="contained"
+        size="large"
+        onClick={() => startWaiting(null)}
+        sx={{ bgcolor: ACCENT, '&:hover': { bgcolor: '#0c7f47' } }}
+      >
+        I've made the payment
+      </Button>
+    )}
+    <Button variant="outlined" onClick={handleCloseDialog} sx={{ borderColor: HAIRLINE, color: MUTED }}>
+      {payState === 'paid' ? 'Done' : payState === 'waiting' ? 'Hide (keeps checking)' : 'Close'}
+    </Button>
+  </DialogActions>
+</Dialog>
+
+
+
       <Box sx={{ maxWidth: 800, mx: 'auto', my: 4, px: { xs: 2, sm: 0 } }}>
         {/* Action bar */}
         <Box
