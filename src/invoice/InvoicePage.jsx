@@ -35,20 +35,42 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { parseInvoiceDescription } from '../utils/invoiceParser';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
-// ---------------------------------------------------------------------------
-// Design tokens for the printable invoice. Kept local so the "paper" surface
-// reads consistently whether it's on screen, printed, or exported to PDF.
-// ---------------------------------------------------------------------------
-const ACCENT = '#0f9d58'; // brand green, matches the "success" palette already in use
+
+
+
+
+const ACCENT = '#0f9d58'; 
 const INK = '#14171a';
 const MUTED = '#6b7280';
 const HAIRLINE = '#e5e7eb';
 
 
+const FONT = '"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+
+const theme = createTheme({
+  typography: {
+    fontFamily: FONT,
+    button: { textTransform: 'none', fontWeight: 600, letterSpacing: 0 },
+  },
+  shape: { borderRadius: 10 },
+});
 
 const Code = ({ children }) => (
-  <Box component="span" sx={{ bgcolor: 'grey.100', px: 1.5, py: 0.4, borderRadius: 1, fontFamily: 'monospace', fontWeight: 700 }}>
+  <Box
+    component="span"
+    sx={{
+      bgcolor: 'grey.100',
+      border: `1px solid ${HAIRLINE}`,
+      px: 1.25,
+      py: 0.3,
+      borderRadius: 1,
+      fontWeight: 600,
+      fontSize: '0.9em',
+      fontVariantNumeric: 'tabular-nums',
+    }}
+  >
     {children}
   </Box>
 );
@@ -569,6 +591,15 @@ const handleCloseDialog = () => {
               label="M-Pesa phone number"
               placeholder="0712345678"
               value={phone}
+               sx={{
+                           '& label.Mui-focused': { color: '#10b981' },
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#10b981',
+                  borderWidth: '2px',
+                },
+              },
+                        }}
               onChange={(e) => setPhone(e.target.value)}
               inputProps={{ inputMode: 'tel' }}
               fullWidth
