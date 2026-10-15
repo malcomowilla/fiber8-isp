@@ -291,7 +291,7 @@ function InputOTPWithSeparator() {
     <>
       <Toaster />
 
-      <main className="min-h-screen flex items-center font-sans justify-center
+      <main className="min-h-screen flex items-center justify-center
        relative overflow-hidden">
         {/* thin top progress bar while busy */}
         <AnimatePresence>
@@ -328,7 +328,7 @@ function InputOTPWithSeparator() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-md p-6 z-10 font-sans"
+          className="w-full max-w-md p-6 z-10 "
         >
           <div className="text-center mb-8">
             <div className="flex justify-center mb-5">
@@ -337,10 +337,10 @@ function InputOTPWithSeparator() {
                   d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <p className="text-white text-2xl font-semibold font-sans">
+            <p className="text-white text-2xl font-semibold">
               {company_name || 'Owitech'}
             </p>
-            <p className="text-white/60 mt-1 text-sm font-sans">Secure ISP Management Portal</p>
+            <p className="text-white/60 mt-1 text-sm ">Secure ISP Management Portal</p>
           </div>
 
           <AnimatePresence>
@@ -354,7 +354,7 @@ function InputOTPWithSeparator() {
                   setLoginError(false)
                 }}
                 className="flex items-center justify-between gap-3 p-3 mb-4 text-sm text-red-100
-                  cursor-pointer rounded-lg bg-red-500/15 border border-red-400/30 font-sans"
+                  cursor-pointer rounded-lg bg-red-500/15 border border-red-400/30 "
                 role="alert"
               >
                 <span className="font-medium">{error}</span>
@@ -371,7 +371,7 @@ function InputOTPWithSeparator() {
                 alt={company_name || "Owitech"}
                 onError={(e) => { e.target.src = "/images/owitech-logo.png" }}
               />
-              <h2 className="mt-4 text-lg font-semibold text-white font-sans">
+              <h2 className="mt-4 text-lg font-semibold text-white ">
                 Network Operations Center
               </h2>
             </div>
@@ -389,7 +389,7 @@ function InputOTPWithSeparator() {
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isBusy}
                   className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/20 rounded-lg
-                    text-white placeholder-white/40 text-sm font-sans
+                    text-white placeholder-white/40 text-sm 
                     focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent
                     disabled:opacity-60 transition-all"
                   placeholder="Network Admin Email"
@@ -410,7 +410,7 @@ function InputOTPWithSeparator() {
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isBusy}
                   className="block w-full pl-10 pr-10 py-3 bg-white/5 border border-white/20 rounded-lg
-                    text-white placeholder-white/40 text-sm font-sans
+                    text-white placeholder-white/40 text-sm 
                     focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent
                     disabled:opacity-60 transition-all"
                   placeholder="Access Key"
@@ -438,7 +438,8 @@ function InputOTPWithSeparator() {
               </div>
 
               <div className="flex items-center justify-end">
-                <Link to="/reset-password" className="text-sm text-white/60 hover:text-white transition-colors font-sans">
+                <Link to="/reset-password" className="text-sm
+                 text-white  transition-colors ">
                   Forgot Password?
                 </Link>
               </div>
@@ -447,7 +448,8 @@ function InputOTPWithSeparator() {
                 whileTap={{ scale: isBusy ? 1 : 0.98 }}
                 type="submit"
                 disabled={isBusy}
-                className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl font-sans
+                className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl
+                 
                   text-sm font-medium text-white
                   bg-gradient-to-r from-green-500 to-green-600
                   shadow-lg shadow-blue-900/30
@@ -472,8 +474,8 @@ function InputOTPWithSeparator() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-white/60 font-sans">
-                <Link to='/passkey-signin' className="font-sans">
+              <p className="text-sm text-white/60 ">
+                <Link to='/passkey-signin' className="">
                   Need passwordless access?{' '}
                   <span className="font-semibold text-white">sign in with passkey</span>
                 </Link>
