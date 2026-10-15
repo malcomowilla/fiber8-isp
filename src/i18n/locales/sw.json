@@ -1,0 +1,23 @@
+{
+  "analytics": {
+    "title": "Muhtasari wa Mtandao",
+    "allClients": "Wateja Wote",
+    "clientsOnline": "Wateja Mtandaoni",
+    "outstandingInvoices": "Ankara zinazodaiwa",
+    "viewInvoices": "Tazama ankara",
+    "viewDetails": "Tazama maelezo",
+    "revenueToday": "Mapato ya Leo",
+    "hoverToReveal": "Elea juu kuonyesha",
+    "expiringSoon": "Zinazokaribia kuisha",
+    "nextDays": "Siku {{days}} zijazo",
+    "recentlyExpired": "Zilizoisha hivi karibuni",
+    "lastDays": "Siku {{days}} zilizopita",
+    "customerCount_one": "Mteja {{count}}",
+    "customerCount_other": "Wateja {{count}}",
+    "openTickets": "Tiketi zilizo wazi",
+    "accessPoints": "Access Points"
+  },
+  "common": {
+    "language": "Lugha"
+  }
+}

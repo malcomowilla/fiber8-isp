@@ -1,0 +1,23 @@
+{
+  "analytics": {
+    "title": "Network Overview",
+    "allClients": "All Clients",
+    "clientsOnline": "Clients Online",
+    "outstandingInvoices": "Outstanding invoices",
+    "viewInvoices": "View invoices",
+    "viewDetails": "View details",
+    "revenueToday": "Revenue Today",
+    "hoverToReveal": "Hover to reveal",
+    "expiringSoon": "Expiring soon",
+    "nextDays": "Next {{days}} days",
+    "recentlyExpired": "Recently expired",
+    "lastDays": "Last {{days}} days",
+    "customerCount_one": "{{count}} customer",
+    "customerCount_other": "{{count}} customers",
+    "openTickets": "Open tickets",
+    "accessPoints": "Access Points"
+  },
+  "common": {
+    "language": "Language"
+  }
+}

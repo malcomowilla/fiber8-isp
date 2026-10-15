@@ -19,14 +19,13 @@ import {
   Ticket, UserPlus, Radio, Sun, Moon, CalendarDays,
   AlarmClock, History, BarChart3, AlertTriangle
 } from 'lucide-react';
-
-
 import License from '../layout/License';
 import ChurnRateSection from './ChurnRateSection';
 import NotificationCenter from './NotificationCenter';
 import RecentHotspotPayments from './RecentHotspotPayments';
 const cable = createConsumer(`wss://${window.location.hostname}/cable`);
-
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 // ── Dark-mode detection (drives chart theming; nothing here is dark by default) ─
 function useIsDarkMode() {
   const [isDark, setIsDark] = useState(
@@ -890,6 +889,8 @@ const Analytics = () => {
                   {new Date().toLocaleDateString('en-KE',{ weekday:'long', year:'numeric', month:'long', day:'numeric' })}
                 </p>
               </div>
+              <LanguageSwitcher />
+
               <NotificationCenter />
             </motion.div>
 

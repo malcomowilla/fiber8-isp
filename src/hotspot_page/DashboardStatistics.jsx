@@ -45,12 +45,6 @@ function useIsDarkMode() {
 
   return isDark;
 }
-
-/* ---------------------------------------------------------------------- */
-/*  Small presentational pieces                                           */
-/* ---------------------------------------------------------------------- */
-
-// Online Indicator
 const OnlineIndicator = ({ size = "medium", showLabel = false }) => {
   const sizeClasses = { small: "h-2 w-2", medium: "h-2.5 w-2.5", large: "h-3.5 w-3.5" };
   const labelSizeClasses = { small: "text-xs", medium: "text-sm", large: "text-base" };
@@ -190,18 +184,23 @@ const StatCard = ({ title, value, icon, accent = "sky", trend, index = 0 }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.05 }}
       whileHover={{ y: -2 }}
-      className="group relative overflow-hidden rounded-2xl border border-gray-200/80 bg-white p-5 font-sans shadow-sm transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900"
+      className="group relative overflow-hidden rounded-2xl border
+       border-gray-200/80 bg-white p-5 font-sans shadow-sm 
+       transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="truncate text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          <p className="truncate text-xs font-medium uppercase tracking-wide
+           text-gray-500 dark:text-gray-400">
             {title}
           </p>
-          <p className="mt-2 text-2xl font-semibold tabular-nums text-gray-900 dark:text-gray-50">
+          <p className="mt-2 text-2xl font-semibold tabular-nums text-gray-900
+           dark:text-gray-50">
             {displayValue}
           </p>
         </div>
-        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconWrapStyles[accent]}`}>
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center 
+          rounded-xl ${iconWrapStyles[accent]}`}>
           {icon}
         </div>
       </div>
@@ -730,7 +729,8 @@ const DashboardStatistics = () => {
         fullWidth
         PaperProps={{ className: 'rounded-2xl dark:bg-gray-900' }}
       >
-        <DialogTitle className="flex items-center justify-between font-sans !text-base !font-semibold text-gray-900 dark:text-gray-100">
+        <DialogTitle className="flex items-center justify-between 
+         !text-base !font-semibold text-gray-900 dark:text-gray-100">
           <span>User details</span>
           <IconButton size="small" onClick={() => setModalOpen(false)}>
             <X className="h-4 w-4" />
