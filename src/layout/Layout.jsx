@@ -346,6 +346,11 @@ useEffect(() => {
   return (
     <>
     <MaintenanceBanner />
+    <div className="flex items-center gap-3">
+                <LanguageSwitcher />
+                
+                <NotificationCenter />
+              </div>
     <div onClick={() => {
             setShowMenu1(false)
             setShowMenu2(false)
@@ -364,11 +369,7 @@ useEffect(() => {
     </div>
 
      {/* <NotificationCenter /> */}
-      <div className="flex items-center gap-3">
-                <LanguageSwitcher />
-                
-                <NotificationCenter />
-              </div>
+      
     <div
       className={` flex flex-col  transition-all 
         duration-500 ease-in-out ${
