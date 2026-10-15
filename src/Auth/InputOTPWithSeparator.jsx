@@ -340,7 +340,7 @@ function InputOTPWithSeparator() {
             <p className="text-white text-2xl font-semibold">
               {company_name || 'Owitech'}
             </p>
-            <p className="text-white/60 mt-1 text-sm ">Secure ISP Management Portal</p>
+            <p className="text-white mt-1 text-sm ">Secure ISP Management Portal</p>
           </div>
 
           <AnimatePresence>
