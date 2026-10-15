@@ -1,0 +1,29 @@
+{
+  "analytics": {
+    "title": "نظرة عامة على الشبكة",
+    "allClients": "جميع العملاء",
+    "clientsOnline": "العملاء المتصلون",
+    "outstandingInvoices": "الفواتير المستحقة",
+    "viewInvoices": "عرض الفواتير",
+    "viewDetails": "عرض التفاصيل",
+    "revenueToday": "إيرادات اليوم",
+    "hoverToReveal": "مرّر المؤشر للإظهار",
+    "expiringSoon": "تنتهي قريبًا",
+    "nextDays": "الأيام الـ{{days}} القادمة",
+    "noneExpiring": "لا شيء ينتهي قريبًا — الأيام الـ{{days}} القادمة خالية",
+    "recentlyExpired": "انتهت مؤخرًا",
+    "noneRecentlyExpired": "لا توجد انتهاءات حديثة — لا شيء خلال آخر {{days}} يومًا",
+    "lastDays": "آخر {{days}} يومًا",
+    "customerCount_zero": "لا يوجد عملاء",
+    "customerCount_one": "عميل واحد",
+    "customerCount_two": "عميلان",
+    "customerCount_few": "{{count}} عملاء",
+    "customerCount_many": "{{count}} عميلًا",
+    "customerCount_other": "{{count}} عميل",
+    "openTickets": "التذاكر المفتوحة",
+    "accessPoints": "نقاط الوصول"
+  },
+  "common": {
+    "language": "اللغة"
+  }
+}

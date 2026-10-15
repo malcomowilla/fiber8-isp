@@ -1,0 +1,25 @@
+{
+  "analytics": {
+    "title": "Ũhoro wa Mũtandao",
+    "allClients": "Agũri Othe",
+    "clientsOnline": "Agũri arĩ Mũtandaoni",
+    "outstandingInvoices": "Invoisi itarĩhĩtwo",
+    "viewInvoices": "Rora invoisi",
+    "viewDetails": "Rora ũhoro wothe",
+    "revenueToday": "Mbeca cia Ũmũthĩ",
+    "hoverToReveal": "Ĩtie kũu nĩguo ũone",
+    "expiringSoon": "Irathira narua",
+    "nextDays": "Mĩthenya {{days}} ĩrũkũka",
+    "noneExpiring": "Gũtirĩ kĩrathira narua — mĩthenya {{days}} ĩrũkũka nĩ ĩtarĩ na thĩna",
+    "recentlyExpired": "Ciathirire rũciũ",
+    "noneRecentlyExpired": "Gũtirĩ kĩathira rũciũ — gũtirĩ kĩrĩ mĩthenya {{days}} ĩrĩa ĩhĩtũku",
+    "lastDays": "Mĩthenya {{days}} ĩrĩa ĩhĩtũku",
+    "customerCount_one": "Mũgũri {{count}}",
+    "customerCount_other": "Agũri {{count}}",
+    "openTickets": "Tiketi iigũrĩte",
+    "accessPoints": "Access Points"
+  },
+  "common": {
+    "language": "Rũthiomi"
+  }
+}

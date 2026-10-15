@@ -1,0 +1,25 @@
+{
+  "analytics": {
+    "title": "Ranyisi mar Netwak",
+    "allClients": "Wateja Duto",
+    "clientsOnline": "Wateja manie Mtandao",
+    "outstandingInvoices": "Invoice ma pok ichulo",
+    "viewInvoices": "Non invoice",
+    "viewDetails": "Non weche duto",
+    "revenueToday": "Pesa mosebiro Kawuono",
+    "hoverToReveal": "Ket cursor kae mondo ine",
+    "expiringSoon": "Machiegni agik",
+    "nextDays": "Ndalo {{days}} mabiro",
+    "noneExpiring": "Onge gima ochiegni agik e ndalo {{days}} mabiro",
+    "recentlyExpired": "Mosetieko kinde machiegni",
+    "noneRecentlyExpired": "Onge gima osetieko machiegni e ndalo {{days}} mosekalo",
+    "lastDays": "Ndalo {{days}} mosekalo",
+    "customerCount_one": "Mteja {{count}}",
+    "customerCount_other": "Wateja {{count}}",
+    "openTickets": "Tiket mayawo",
+    "accessPoints": "Access Points"
+  },
+  "common": {
+    "language": "Dho"
+  }
+}
