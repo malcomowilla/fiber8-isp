@@ -1,0 +1,25 @@
+{
+  "analytics": {
+    "title": "Aperçu du réseau",
+    "allClients": "Tous les clients",
+    "clientsOnline": "Clients en ligne",
+    "outstandingInvoices": "Factures impayées",
+    "viewInvoices": "Voir les factures",
+    "viewDetails": "Voir les détails",
+    "revenueToday": "Revenus du jour",
+    "hoverToReveal": "Survolez pour afficher",
+    "expiringSoon": "Expire bientôt",
+    "nextDays": "{{days}} prochains jours",
+    "noneExpiring": "Rien n'expire bientôt — les {{days}} prochains jours sont dégagés",
+    "recentlyExpired": "Récemment expirés",
+    "noneRecentlyExpired": "Aucune expiration récente — rien au cours des {{days}} derniers jours",
+    "lastDays": "{{days}} derniers jours",
+    "customerCount_one": "{{count}} client",
+    "customerCount_other": "{{count}} clients",
+    "openTickets": "Tickets ouverts",
+    "accessPoints": "Points d'accès"
+  },
+  "common": {
+    "language": "Langue"
+  }
+}

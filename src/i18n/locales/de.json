@@ -1,0 +1,25 @@
+{
+  "analytics": {
+    "title": "Netzwerkübersicht",
+    "allClients": "Alle Kunden",
+    "clientsOnline": "Kunden online",
+    "outstandingInvoices": "Offene Rechnungen",
+    "viewInvoices": "Rechnungen ansehen",
+    "viewDetails": "Details ansehen",
+    "revenueToday": "Heutiger Umsatz",
+    "hoverToReveal": "Zum Anzeigen darüberfahren",
+    "expiringSoon": "Läuft bald ab",
+    "nextDays": "Nächste {{days}} Tage",
+    "noneExpiring": "Nichts läuft bald ab – die nächsten {{days}} Tage sind frei",
+    "recentlyExpired": "Kürzlich abgelaufen",
+    "noneRecentlyExpired": "Keine kürzlichen Abläufe – nichts in den letzten {{days}} Tagen",
+    "lastDays": "Letzte {{days}} Tage",
+    "customerCount_one": "{{count}} Kunde",
+    "customerCount_other": "{{count}} Kunden",
+    "openTickets": "Offene Tickets",
+    "accessPoints": "Zugangspunkte"
+  },
+  "common": {
+    "language": "Sprache"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "analytics": {
+    "title": "ネットワーク概要",
+    "allClients": "すべてのクライアント",
+    "clientsOnline": "オンラインのクライアント",
+    "outstandingInvoices": "未払いの請求書",
+    "viewInvoices": "請求書を見る",
+    "viewDetails": "詳細を見る",
+    "revenueToday": "本日の収益",
+    "hoverToReveal": "ホバーして表示",
+    "expiringSoon": "まもなく期限切れ",
+    "nextDays": "今後{{days}}日間",
+    "noneExpiring": "まもなく期限切れになるものはありません（今後{{days}}日間）",
+    "recentlyExpired": "最近期限切れ",
+    "noneRecentlyExpired": "最近期限切れになったものはありません（過去{{days}}日間）",
+    "lastDays": "過去{{days}}日間",
+    "customerCount_other": "{{count}}名のお客様",
+    "openTickets": "未解決のチケット",
+    "accessPoints": "アクセスポイント"
+  },
+  "common": {
+    "language": "言語"
+  }
+}

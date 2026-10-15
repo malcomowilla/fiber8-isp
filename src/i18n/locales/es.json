@@ -1,0 +1,25 @@
+{
+  "analytics": {
+    "title": "Resumen de la red",
+    "allClients": "Todos los clientes",
+    "clientsOnline": "Clientes en línea",
+    "outstandingInvoices": "Facturas pendientes",
+    "viewInvoices": "Ver facturas",
+    "viewDetails": "Ver detalles",
+    "revenueToday": "Ingresos de hoy",
+    "hoverToReveal": "Pasa el cursor para ver",
+    "expiringSoon": "Por vencer pronto",
+    "nextDays": "Próximos {{days}} días",
+    "noneExpiring": "Nada vence pronto: los próximos {{days}} días están libres",
+    "recentlyExpired": "Vencidos recientemente",
+    "noneRecentlyExpired": "Sin vencimientos recientes: nada en los últimos {{days}} días",
+    "lastDays": "Últimos {{days}} días",
+    "customerCount_one": "{{count}} cliente",
+    "customerCount_other": "{{count}} clientes",
+    "openTickets": "Tickets abiertos",
+    "accessPoints": "Puntos de acceso"
+  },
+  "common": {
+    "language": "Idioma"
+  }
+}
