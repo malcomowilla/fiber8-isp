@@ -474,7 +474,7 @@ function InputOTPWithSeparator() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-white/60 ">
+              <p className="text-lg text-white  ">
                 <Link to='/passkey-signin' className="">
                   Need passwordless access?{' '}
                   <span className="font-semibold text-white">sign in with passkey</span>
