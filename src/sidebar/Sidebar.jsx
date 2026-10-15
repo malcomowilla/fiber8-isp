@@ -1,9 +1,934 @@
+// import { useContext, useCallback, useEffect, useState } from 'react'
+// import { ApplicationContext } from '../context/ApplicationContext'
+// import { Link, useLocation, useNavigate } from 'react-router-dom'
+// import { useApplicationSettings } from '../settings/ApplicationSettings'
+// import toast from 'react-hot-toast';
+// import { motion, AnimatePresence } from "framer-motion";
+// import BarChartIcon from '@mui/icons-material/BarChart';
+// import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
+
+// import CellTowerIcon from '@mui/icons-material/CellTower';
+// import PaymentsIcon from '@mui/icons-material/Payments';
+
+// import RouterIcon from '@mui/icons-material/Router';
+// import SensorsIcon from '@mui/icons-material/Sensors';
+// import WifiIcon from '@mui/icons-material/Wifi';
+// import SignalWifi3BarIcon from '@mui/icons-material/SignalWifi3Bar';
+// import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
+// import PaymentIcon from '@mui/icons-material/Payment';
+// import ReceiptIcon from '@mui/icons-material/Receipt';
+// import MailOutlineIcon from '@mui/icons-material/MailOutline';
+// import TextsmsSharpIcon from '@mui/icons-material/TextsmsSharp';
+// import KeyboardArrowUpSharpIcon from '@mui/icons-material/KeyboardArrowUpSharp';
+// import KeyboardArrowDownSharpIcon from '@mui/icons-material/KeyboardArrowDownSharp';
+// import AssessmentIcon from '@mui/icons-material/Assessment';
+// import {
+//   LuUsers,
+//   LuTicketsPlane,
+//   LuLayoutTemplate,
+//   FaUpload,
+//   FcOnlineSupport,
+//   MdSettingsInputAntenna,
+//   CgComponents,
+//   TbCloudNetwork,
+//   IoStatsChartOutline,
+//   SiPaloaltonetworks,
+//   FaHandshake,
+//   FaRegCalendarAlt,
+//   AiOutlineWhatsApp,
+//   PiNetworkSlashLight,
+//   TbLicense,
+//   CiMoneyCheck1,
+//   MdOutlineSecurity,
+//   MdMenuOpen,
+//   MdDevices,
+//   FaPhoneVolume,
+//   RiRouterLine,
+//   ImStatsDots,
+//   GrLicense,
+//   TbHomeStats
+// } from '../icons'; // Create an icons index file
+// import { ImStatsBars } from "react-icons/im";
+// import { CiSettings } from "react-icons/ci";
+// import { APP_VERSION, APP_DESCRIPTION } from '../version';
+// import {
+//   People as PeopleIcon,
+// } from '@mui/icons-material';
+// import { BsRouter } from "react-icons/bs";
+// import { GrTechnology } from "react-icons/gr";
+// import { FaUsersBetweenLines } from "react-icons/fa6";
+
+// import {
+//   Sparkles, Palette, MapPinned, LogOut, AlertTriangle, LifeBuoy,
+//   MessageSquareText, TrendingUp, UserRound, CircleUserRound, Radar,
+//   ShieldCheck, Users as UsersIcon, Stethoscope,
+//    Award,
+//    HelpCircle,
+//    Network
+// } from 'lucide-react'
+// import { LuTv } from "react-icons/lu";
+
+
+
+
+
+
+
+// const Sidebar = () => {
+//   const {
+//     isExpanded,
+//     setIsExpanded,
+//     seeSidebar,
+//     setSeeSideBar,
+//     setCurrentUser
+//   } = useContext(ApplicationContext);
+
+//   const { companySettings, setCompanySettings } = useApplicationSettings();
+//   const { company_name, logo_preview } = companySettings;
+//   const location = useLocation();
+//   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+//   const [loggingOut, setLoggingOut] = useState(false)
+//   const navigate = useNavigate()
+//   const subdomain = window.location.hostname.split('.')[0];
+
+//   // Use a single state for all expanded menus
+//   const [expandedMenus, setExpandedMenus] = useState({
+//     dashboard: false,
+//     pppoe: false,
+//     network: false,
+//     finance: false,
+//     communication: false,
+//     hotspot: false,
+//     support: false,
+//     users: false
+//   });
+
+//   const [hoveredMenu, setHoveredMenu] = useState(null);
+
+//   const handleLogout = async () => {
+//     setLoggingOut(true)
+//     try {
+//       const response = await fetch('/api/logout', {
+//         method: "DELETE",
+//         credentials: 'include',
+//         headers: { 'X-Subdomain': subdomain },
+//       })
+//       const newData = await response.json()
+
+//       if (response.status === 401) {
+//         toast.error(newData.error, { position: "top-center", duration: 4000 })
+//         setTimeout(() => { window.location.href = '/signin' }, 1900)
+//         return
+//       }
+//       if (response.ok) {
+//         setCurrentUser(null)
+//         navigate('/signin')
+//       } else if (response.status === 402) {
+//         setTimeout(() => navigate('/license-expired'), 1800)
+//       }
+//     } catch (error) {
+//       toast.error('Logout failed', { position: "top-center", duration: 4000 })
+//     } finally {
+//       setLoggingOut(false)
+//       setShowLogoutConfirm(false)
+//     }
+//   }
+
+//   // Small helper so every leaf icon renders inside a consistent,
+//   // softly-tinted chip — replaces the old mix of bare icons / raw
+//   // gifs with one visual language sidebar-wide.
+//   const IconChip = ({ children, tint = 'text-teal-600' }) => (
+//     <span className={`flex items-center justify-center w-7 h-7 rounded-lg
+//       bg-gray-100 group-hover:bg-gray-200 transition-colors shrink-0 ${tint}`}>
+//       {children}
+//     </span>
+//   );
+
+//   // Menu items configuration
+//   const menuItems = {
+//     dashboard: {
+//       icon: <BarChartIcon />,
+//       label: "Dashboard",
+//       path: "/admin/admin-dashboard",
+//       subItems: [
+//         {
+//           icon: <IconChip tint="text-sky-600"><ManageAccountsOutlinedIcon style={{ fontSize: 18 }} /></IconChip>,
+//           label: "Activity Logs",
+//           path: "/admin/admin-dashboard"
+//         },
+//         {
+//           // was: <img src="/images/icons8-increase.gif" .../>
+//           icon: <IconChip tint="text-emerald-600"><TrendingUp size={17} /></IconChip>,
+//           label: "Analytics",
+//           path: "/admin/analytics"
+//         },
+//       ]
+//     },
+//     pppoe: {
+//       icon: <WifiIcon />,
+//       label: "PPPoe",
+//       subItems: [
+//         {
+//           icon: <div className="flex items-center justify-center w-7 h-7 rounded-lg
+//             bg-teal-600 text-[9px] font-bold text-white tracking-tight shrink-0">
+//             MBPS
+//           </div>,
+//           label: "PPOE Packages",
+//           path: "/admin/pppoe-packages"
+//         },
+//         {
+//           // was: <img src="/images/icons8-person.gif" .../>
+//           icon: <IconChip tint="text-sky-600"><UserRound size={17} /></IconChip>,
+//           label: "PPOE Subscribers",
+//           path: "/admin/pppoe-subscribers"
+//         },
+
+//         {
+//   icon: <IconChip tint="text-emerald-600"><Network size={17} /></IconChip>,
+//   label: "IP Pools",
+//   path: "/admin/pppoe-ip-pools"
+// },
+//         {
+//           icon: <IconChip tint="text-yellow-600"><AssessmentIcon style={{ fontSize: 17 }} /></IconChip>,
+//           label: "Payment Analytics",
+//           path: "/admin/subscriber-payment-analytics"
+//         },
+//         {
+//           icon: <IconChip tint="text-blue-600"><FaUpload size={15} /></IconChip>,
+//           label: "Upload Subscribers",
+//           path: "/admin/upload-subscriber"
+//         }
+//       ]
+//     },
+//     network: {
+//       icon: <SensorsIcon />,
+//       label: "Network",
+//       subItems: [
+//         {
+//           // was: <img src="/images/icons8-map-pin.gif" .../>
+//           icon: <IconChip tint="text-rose-600"><Radar size={17} /></IconChip>,
+//           label: "Nodes",
+//           path: "/admin/nodes"
+//         },
+//         {
+//           icon: <IconChip tint="text-yellow-600"><MapPinned size={17} /></IconChip>,
+//           label: "Network Map",
+//           path: "/admin/network-map"
+//         },
+//         {
+//           icon: <IconChip tint="text-blue-600"><PiNetworkSlashLight size={17} /></IconChip>,
+//           label: "VPN Tunnel",
+//           path: "/admin/private-network"
+//         },
+//         {
+//           icon: <IconChip><RouterIcon style={{ fontSize: 17 }} /></IconChip>,
+//           label: "Routers",
+//           path: "/admin/nas"
+//         },
+//         {
+//           icon: <IconChip><TbCloudNetwork size={17} /></IconChip>,
+//           label: "Ip Networks",
+//           path: "/admin/ip_networks"
+//         },
+//         {
+//           icon: <IconChip tint="text-orange-600"><RiRouterLine size={17} /></IconChip>,
+//           label: "ONU",
+//           path: "/admin/devices"
+//         },
+//         {
+//           icon: <IconChip><BsRouter size={16} /></IconChip>,
+//           label: "Access Points",
+//           path: "/admin/access-point"
+//         },
+//         {
+//           // was: <img src="/images/wireguard2.png" .../>
+//           icon: <IconChip tint="text-emerald-600"><ShieldCheck size={17} /></IconChip>,
+//           label: "Wireguard",
+//           path: "/admin/networks-wireguard-config"
+//         },
+
+//         {
+//           icon: <IconChip tint="text-red-600"><AlertTriangle size={17} /></IconChip>,
+//           label: "Incidents",
+//           path: "/admin/incidents"
+//         },
+
+
+//         {
+//   icon: <IconChip tint="text-emerald-600"><TrendingUp size={17} /></IconChip>,
+//   label: "Network Uptime",
+//   path: "/admin/stats-uptime"
+// },
+
+        
+//         {
+//   icon: <IconChip tint="text-red-600"><Stethoscope size={17} /></IconChip>,
+//   label: "Troubleshooting",
+//   path: "/admin/network-troubleshooting"
+// }
+//       ]
+//     },
+//     finance: {
+//       icon: <PaymentsIcon />,
+//       label: "Finance",
+//       subItems: [
+//         {
+//           icon: <IconChip><AssessmentIcon style={{ fontSize: 17 }} /></IconChip>,
+//           label: "Finance Dashboard",
+//           path: "/admin/financial-dashboard"
+//         },
+//         {
+//           icon: <IconChip tint="text-emerald-600"><PaymentIcon style={{ fontSize: 17 }} /></IconChip>,
+//           label: "Hotspot Payments",
+//           path: "/admin/hotspot-payments"
+//         },
+//         {
+//           icon: <IconChip tint="text-emerald-600"><PaymentIcon style={{ fontSize: 17 }} /></IconChip>,
+//           label: "PpPoe Payments",
+//           path: "/admin/pppoe-payments"
+//         }
+//       ]
+//     },
+//     communication: {
+//       icon: <CellTowerIcon />,
+//       label: "Communication",
+//       subItems: [
+//         {
+//           icon: <IconChip><MailOutlineIcon style={{ fontSize: 17 }} /></IconChip>,
+//           label: "Email",
+//           path: "/admin/email"
+//         },
+//         {
+//           icon: <IconChip><TextsmsSharpIcon style={{ fontSize: 17 }} /></IconChip>,
+//           label: "SMS",
+//           path: "/admin/send-sms"
+//         },
+//         {
+//           icon: <IconChip><TextsmsSharpIcon style={{ fontSize: 17 }} /></IconChip>,
+//           label: "Bulk",
+//           path: "/admin/bulk-messages"
+//         },
+//         {
+//           icon: <IconChip><TextsmsSharpIcon style={{ fontSize: 17 }} /></IconChip>,
+//           label: "Messages",
+//           path: "/admin/messages"
+//         },
+//         {
+//           icon: <IconChip tint="text-green-600"><AiOutlineWhatsApp size={17} /></IconChip>,
+//           label: "WhatsApp",
+//           path: "/admin/whatsapp"
+//         },
+//         {
+//           icon: <IconChip tint="text-teal-600"><MessageSquareText size={17} /></IconChip>,
+//           label: "SMS Templates",
+//           path: "/admin/hotspot-sms-templates"
+//         }
+//       ]
+//     },
+//     hotspot: {
+//       icon: <SignalWifi3BarIcon />,
+//       label: "Hotspot Bundle",
+//       subItems: [
+//         {
+//           icon: <IconChip><IoStatsChartOutline size={17} /></IconChip>,
+//           label: "Hotspot Dashboard",
+//           path: "/admin/hotspot-dashboard"
+//         },
+//         {
+//           icon: <IconChip><TbHomeStats size={17} /></IconChip>,
+//           label: "Marketing",
+//           path: "/admin/hotspot-marketing-dashboard"
+//         },
+//         {
+//           icon: <IconChip><GrTechnology size={16} /></IconChip>,
+//           label: "Bypass Hotspot",
+//           path: "/admin/hotspot-bypass"
+//         },
+//         {
+//           icon: <IconChip><SiPaloaltonetworks size={16} /></IconChip>,
+//           label: "Hotspot Package",
+//           path: "/admin/hotspot-package"
+//         },
+//         {
+//           icon: <IconChip><LuTv size={17} /></IconChip>,
+//           label: "TV Plans",
+//           path: "/admin/tv-plans"
+//         },
+//         {
+//           icon: <IconChip tint="text-yellow-600"><LuTicketsPlane size={17} /></IconChip>,
+//           label: "Vouchers",
+//           path: "/admin/hotspot-subscriptions"
+//         },
+//         {
+//           icon: <IconChip tint="text-amber-600"><Sparkles size={17} /></IconChip>,
+//           label: "Promotions",
+//           path: "/admin/hotspot-promotions"
+//         },
+//         {
+//           icon: <IconChip><LuLayoutTemplate size={17} /></IconChip>,
+//           label: "Templates",
+//           path: "/admin/hotspot-templates"
+//         },
+//         {
+//           icon: <IconChip tint="text-fuchsia-600"><Palette size={17} /></IconChip>,
+//           label: "Page Designer",
+//           path: "/admin/hotspot-page-designer"
+//         },
+//         {
+//           icon: <IconChip tint="text-yellow-600"><ImStatsBars size={16} /></IconChip>,
+//           label: "Revenue",
+//           path: "/admin/hotspot_revenue_analytics"
+//         },
+
+//         {
+//   icon: <IconChip tint="text-emerald-600"><UserRound size={17} /></IconChip>,
+//   label: "Customers",
+//   path: "/admin/hotspot-customers"
+// },
+        
+//         {
+//           icon: <IconChip tint="text-green-600"><CiSettings size={17} /></IconChip>,
+//           label: "Settings",
+//           path: "/admin/hotspot_settings"
+//         }
+//       ]
+//     },
+//     support: {
+//       icon: <FcOnlineSupport size={20} />,
+//       label: "Support",
+//       subItems: [
+//         {
+//           icon: <IconChip tint="text-yellow-600"><LuTicketsPlane size={17} /></IconChip>,
+//           label: "Tickets",
+//           path: "/admin/customer-tickets"
+//         }
+//       ]
+//     },
+//     users: {
+//       // was: raw inline <svg> path
+//       icon: <UsersIcon size={20} />,
+//       label: "Users",
+//       subItems: [
+//         {
+//           // was: <img src="/images/icons8-male-user.gif" .../>
+//           icon: <IconChip tint="text-sky-600"><CircleUserRound size={17} /></IconChip>,
+//           label: "Users",
+//           path: "/admin/user"
+//         },
+//         {
+//           icon: <IconChip><LuUsers size={17} /></IconChip>,
+//           label: "User Groups",
+//           path: "/admin/user-group"
+//         },
+//         {
+//           icon: <IconChip><FaUsersBetweenLines size={16} /></IconChip>,
+//           label: "Free Trial",
+//           path: "/admin/free-trial-users"
+//         },
+//         {
+//           icon: <IconChip tint="text-green-600"><PeopleIcon style={{ fontSize: 17 }} /></IconChip>,
+//           label: "Partners",
+//           path: "/admin/partners-management"
+//         },
+//       ]
+//     }
+//   };
+
+//   const quickLinks = [
+//     { icon: <ReceiptIcon />, label: "Billing Invoices", path: "/admin/invoice" },
+//     { icon: <FaHandshake size={18} />, label: "Leads", path: "/admin/client-leads" },
+//     { icon: <FaHandshake size={18} />, label: "Referrals", path: "/admin/referrals" },
+//     {
+//   icon: <IconChip tint="text-amber-500"><Award size={17} /></IconChip>,
+//   label: "Loyalty",
+//   path: "/admin/loyalty"
+// },
+//     // { icon: <MdOutlineSecurity size={19} />, label: "DDOS", path: "/admin/prevent-ddos" },
+//     { icon: <MdDevices size={19} />, label: "Equipment", path: "/admin/equipment" },
+//     { icon: <GrLicense size={17} />, label: "License", path: "/admin/license" },
+//     { icon: <PermDataSettingIcon />, label: "Settings", path: "/admin/settings" },
+// { icon: <HelpCircle size={19} />, label: "Help", path: "/admin/support-tickets" },
+//   ];
+
+//   const toggleMenu = (menu) => {
+//     setExpandedMenus(prev => {
+//       const newState = {
+//         dashboard: false,
+//         pppoe: false,
+//         network: false,
+//         finance: false,
+//         communication: false,
+//         hotspot: false,
+//         support: false,
+//         users: false
+//       };
+//       if (!prev[menu]) {
+//         newState[menu] = true;
+//       }
+//       return newState;
+//     });
+//   };
+
+//   const collapseAllMenus = () => {
+//     setExpandedMenus({
+//       dashboard: false,
+//       pppoe: false,
+//       network: false,
+//       finance: false,
+//       communication: false,
+//       hotspot: false,
+//       support: false,
+//       users: false
+//     });
+//   };
+
+//   const isActive = (path) => {
+//     return location.pathname === path;
+//   };
+
+//   useEffect(() => {
+//     const handleResize = () => {
+//       setSeeSideBar(window.innerWidth < 1080);
+//     };
+
+//     handleResize();
+//     window.addEventListener("resize", handleResize);
+
+//     return () => window.removeEventListener("resize", handleResize);
+//   }, [setSeeSideBar]);
+
+//   useEffect(() => {
+//     if (window.innerWidth < 1080 && seeSidebar) {
+//       collapseAllMenus();
+//     }
+//   }, [seeSidebar, location]);
+
+//   const handleGetCompanySettings = useCallback(async () => {
+//     try {
+//       const response = await fetch('/api/allow_get_company_settings', {
+//         method: 'GET',
+//         headers: { 'X-Subdomain': subdomain },
+//       });
+
+//       if (response.ok) {
+//         const newData = await response.json();
+//         setCompanySettings(prev => ({
+//           ...prev,
+//           ...newData,
+//           logo_preview: newData.logo_url
+//         }));
+//       }
+//     } catch (error) {
+//       toast.error('Internal server error while fetching company settings');
+//     }
+//   }, [subdomain, setCompanySettings]);
+
+//   useEffect(() => {
+//     handleGetCompanySettings();
+//   }, [handleGetCompanySettings]);
+
+//   // Render menu item
+//   const renderMenuItem = (menuKey) => {
+//     const menu = menuItems[menuKey];
+//     const isOpen = expandedMenus[menuKey];
+//     const isHovered = hoveredMenu === menuKey;
+//     const active = isActive(menu.path);
+
+//     return (
+//       <li key={menuKey} className="relative font-sans">
+//         {seeSidebar ? (
+//           <div
+//             className={`relative flex items-center p-3 rounded-xl transition-all
+//                duration-200 cursor-pointer group ${
+//               active ? 'bg-gray-100' : 'hover:bg-gray-50'
+//             }`}
+//             onMouseEnter={() => setHoveredMenu(menuKey)}
+//             onMouseLeave={() => setHoveredMenu(null)}
+//             onClick={() => {
+//               if (menu.path) {
+//                 window.innerWidth < 1080 && setSeeSideBar(true);
+//               }
+//             }}
+//           >
+//             {active && (
+//               <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1
+//                 rounded-r-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+//             )}
+//             <div className="flex items-center justify-center w-6 h-6 mx-auto text-gray-600">
+//               {menu.icon}
+//             </div>
+
+//             {/* Hover tooltip for collapsed sidebar */}
+//             <AnimatePresence>
+//               {isHovered && !menu.subItems && (
+//                 <motion.div
+//                   initial={{ opacity: 0, x: 6 }}
+//                   animate={{ opacity: 1, x: 0 }}
+//                   exit={{ opacity: 0, x: 6 }}
+//                   transition={{ duration: 0.15 }}
+//                   className="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-gray-900/95
+//                   backdrop-blur-sm text-white text-sm px-3 py-1.5 rounded-lg shadow-xl
+//                   ring-1 ring-white/10 whitespace-nowrap z-50 font-sans"
+//                 >
+//                   {menu.label}
+//                 </motion.div>
+//               )}
+//             </AnimatePresence>
+
+//             {/* Submenu flyout for collapsed sidebar */}
+//             {menu.subItems && isHovered && (
+//               <motion.div
+//                 initial={{ opacity: 0, x: 6 }}
+//                 animate={{ opacity: 1, x: 0 }}
+//                 exit={{ opacity: 0, x: 6 }}
+//                 transition={{ duration: 0.15 }}
+//                 className="absolute left-full ml-3 top-0 bg-gray-900/95 backdrop-blur-sm
+//                  text-white rounded-xl shadow-2xl ring-1 ring-white/10 py-2 z-40
+//                  min-w-[210px] font-sans"
+//               >
+//                 <div className="px-3.5 py-2 text-xs font-semibold uppercase tracking-wider
+//                   text-white/50 border-b border-white/10 mb-1">
+//                   {menu.label}
+//                 </div>
+//                 {menu.subItems.map((subItem, idx) => (
+//                   <Link
+//                     key={idx}
+//                     to={subItem.path}
+//                     className={`flex items-center gap-2.5 px-3.5 py-2.5 mx-1 rounded-lg
+//                      transition-colors ${
+//                        isActive(subItem.path) ? 'bg-white/10' : 'hover:bg-white/5'
+//                      }`}
+//                     onClick={() => window.innerWidth < 1080 && setSeeSideBar(true)}
+//                   >
+//                     <span className="flex-shrink-0">{subItem.icon}</span>
+//                     <span className="text-sm">{subItem.label}</span>
+//                   </Link>
+//                 ))}
+//               </motion.div>
+//             )}
+//           </div>
+//         ) : (
+//           // Expanded sidebar view
+//           <div className="space-y-1">
+//             <button
+//               onClick={() => menu.subItems ? toggleMenu(menuKey) : null}
+//               className={`relative flex items-center justify-between w-full p-3
+//                  rounded-xl transition-all duration-200 group ${
+//                 active ? 'bg-gray-100' : 'hover:bg-gray-50'
+//               }`}
+//             >
+//               {active && (
+//                 <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1
+//                   rounded-r-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+//               )}
+//               <div className="flex items-center gap-3">
+//                 <span className="flex-shrink-0 text-gray-600">{menu.icon}</span>
+//                 <span className="text-sm font-medium text-gray-800">{menu.label}</span>
+//               </div>
+//               {menu.subItems && (
+//                 <span className="text-gray-400 transition-transform duration-200">
+//                   {isOpen ? <KeyboardArrowUpSharpIcon fontSize="small" /> : <KeyboardArrowDownSharpIcon fontSize="small" />}
+//                 </span>
+//               )}
+//             </button>
+
+//             {/* Submenu for expanded sidebar */}
+//             {menu.subItems && (
+//               <AnimatePresence>
+//                 {isOpen && (
+//                   <motion.div
+//                     initial={{ opacity: 0, height: 0 }}
+//                     animate={{ opacity: 1, height: 'auto' }}
+//                     exit={{ opacity: 0, height: 0 }}
+//                     transition={{ duration: 0.2, ease: "easeInOut" }}
+//                     className="overflow-hidden"
+//                   >
+//                     <div className="ml-5 pl-4 border-l border-gray-200 space-y-0.5 py-1">
+//                       {menu.subItems.map((subItem, idx) => (
+//                         <motion.div
+//                           key={idx}
+//                           initial={{ opacity: 0, x: -8 }}
+//                           animate={{ opacity: 1, x: 0 }}
+//                           transition={{ delay: idx * 0.04 }}
+//                         >
+//                           <Link
+//                             to={subItem.path}
+//                             className={`group flex items-center gap-2.5 py-2 px-2.5 rounded-lg
+//                              transition-colors duration-150 ${
+//                               isActive(subItem.path)
+//                                 ? 'bg-gray-100 text-gray-900'
+//                                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+//                             }`}
+//                             onClick={() => window.innerWidth < 1080 && setSeeSideBar(true)}
+//                           >
+//                             <span className="flex-shrink-0">{subItem.icon}</span>
+//                             <span className="text-sm">{subItem.label}</span>
+//                           </Link>
+//                         </motion.div>
+//                       ))}
+//                     </div>
+//                   </motion.div>
+//                 )}
+//               </AnimatePresence>
+//             )}
+//           </div>
+//         )}
+//       </li>
+//     );
+//   };
+
+//   return (
+//     <>
+//       <motion.aside
+//         id="sidebar"
+//         initial={false}
+//         animate={{
+//           width: seeSidebar ? "68px" : "252px"
+//         }}
+//         transition={{ duration: 0.3, ease: "easeInOut" }}
+//         // font-sans resolves to var(--font-sans) — appearance-settings font
+//         // changes (applyTheme -> --font-sans on <html>) apply here live.
+//         className="fixed top-0 left-0 h-screen bg-white
+//          shadow-xl shadow-black/5 ring-1 ring-gray-200
+//          overflow-hidden flex flex-col text-gray-800 font-sans z-50"
+//       >
+//         {/* Header */}
+//         <div className="p-4 border-b border-gray-200">
+//           <div className="flex items-center justify-between">
+//             {!seeSidebar ? (
+//               <>
+//                 <div className="flex items-center gap-3 min-w-0">
+//                   <motion.img
+//                     initial={{ scale: 0 }}
+//                     animate={{ scale: 1 }}
+//                     className="h-11 w-11 rounded-full border-2 border-gray-200
+//                      ring-2 ring-emerald-500/20 shrink-0 object-cover"
+//                     src={logo_preview || "/images/owitech-logo.png"}
+//                     alt={company_name || "Owitech"}
+//                     onError={(e) => { e.target.src = "/images/owitech-logo.png"; }}
+//                   />
+//                   {/* Brand/company name uses the display font slot (--font-display)
+//                       plus its own italic toggle (--font-style-display). */}
+//                   <motion.span
+//                     initial={{ opacity: 0, x: -10 }}
+//                     animate={{ opacity: 1, x: 0 }}
+//                     className="font-display font-bold text-gray-900 text-base truncate"
+//                     style={{ fontStyle: 'var(--font-style-display)' }}
+//                   >
+//                     {company_name || "Owitech"}
+//                   </motion.span>
+//                 </div>
+//                 <motion.button
+//                   whileHover={{ scale: 1.08 }}
+//                   whileTap={{ scale: 0.92 }}
+//                   onClick={() => {
+//                     setSeeSideBar(!seeSidebar);
+//                     collapseAllMenus();
+//                   }}
+//                   className="p-2 rounded-lg hover:bg-gray-100 transition-colors shrink-0"
+//                 >
+//                   <MdMenuOpen className="w-6 h-6 text-gray-500" />
+//                 </motion.button>
+//               </>
+//             ) : (
+//               <div className="flex flex-col items-center gap-3 w-full">
+//                 <motion.img
+//                   initial={{ scale: 0 }}
+//                   animate={{ scale: 1 }}
+//                   className="h-9 w-9 rounded-full border-2 border-gray-200
+//                    ring-2 ring-emerald-500/20 object-cover"
+//                   src={logo_preview || "/images/owitech-logo.png"}
+//                   alt={company_name || "Aitechs"}
+//                   onError={(e) => { e.target.src = "/images/owitech-logo.png"; }}
+//                 />
+//                 <motion.button
+//                   whileHover={{ scale: 1.08 }}
+//                   whileTap={{ scale: 0.92 }}
+//                   onClick={() => {
+//                     setSeeSideBar(!seeSidebar);
+//                     collapseAllMenus();
+//                   }}
+//                   className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+//                 >
+//                   <MdMenuOpen className="w-6 h-6 text-gray-500 rotate-180" />
+//                 </motion.button>
+//               </div>
+//             )}
+//           </div>
+//         </div>
+
+//         {/* Menu Items */}
+//                 <nav
+//           className="flex-1 overflow-y-auto py-4 px-3
+//             [&::-webkit-scrollbar]:w-2.5
+//             [&::-webkit-scrollbar-track]:bg-gray-100
+//             [&::-webkit-scrollbar-track]:rounded-full
+//             [&::-webkit-scrollbar-track]:my-1
+//             [&::-webkit-scrollbar-thumb]:bg-emerald-500/40
+//             [&::-webkit-scrollbar-thumb]:rounded-full
+//             [&::-webkit-scrollbar-thumb]:border-2
+//             [&::-webkit-scrollbar-thumb]:border-solid
+//             [&::-webkit-scrollbar-thumb]:border-transparent
+//             [&::-webkit-scrollbar-thumb]:bg-clip-padding
+//             hover:[&::-webkit-scrollbar-thumb]:bg-emerald-500/70"
+//           style={{ scrollbarWidth: 'auto', scrollbarColor: 'rgba(16,185,129,0.4) rgba(0,0,0,0.05)' }}
+//         >
+
+
+//           {!seeSidebar && (
+//             <div className="text-xs uppercase text-gray-400 font-semibold
+//               mb-2 tracking-wider px-1">
+//               Menu
+//             </div>
+//           )}
+//           <ul className="space-y-1">
+//             {Object.keys(menuItems).map(renderMenuItem)}
+//           </ul>
+
+//           <div className={`mt-6 ${seeSidebar ? 'px-0' : 'px-0'}`}>
+//             {!seeSidebar && (
+//               <div className="text-xs uppercase text-gray-400
+//               font-semibold mb-2 tracking-wider px-1">
+//                 Quick Links
+//               </div>
+//             )}
+
+//             <ul className="space-y-1">
+//               {quickLinks.map((link, idx) => (
+//                 <li key={idx}>
+//                   <Link
+//                     to={link.path}
+//                     className={`flex items-center gap-3 p-3 rounded-xl
+//                       transition-all duration-200 group ${
+//                       seeSidebar ? 'justify-center' : ''
+//                     } ${
+//                       isActive(link.path) ? 'bg-gray-100' : 'hover:bg-gray-50'
+//                     }`}
+//                     onClick={() => window.innerWidth < 1080 && setSeeSideBar(true)}
+//                   >
+//                     <span className="flex-shrink-0 text-gray-600">{link.icon}</span>
+//                     {!seeSidebar && (
+//                       <motion.span
+//                         initial={{ opacity: 0 }}
+//                         animate={{ opacity: 1 }}
+//                         className="text-sm text-gray-700"
+//                       >
+//                         {link.label}
+//                       </motion.span>
+//                     )}
+//                   </Link>
+//                 </li>
+//               ))}
+//             </ul>
+
+//             {/* Logout */}
+//             <div className="mt-3 pt-3 border-t border-gray-200">
+//               <button
+//                 onClick={() => setShowLogoutConfirm(true)}
+//                 className={`flex items-center gap-3 p-3 rounded-xl w-full transition-all duration-200
+//                   text-red-600 hover:bg-red-50 hover:text-red-700
+//                   ${seeSidebar ? 'justify-center' : ''}`}
+//               >
+//                 <LogOut size={19} className="flex-shrink-0" />
+//                 {!seeSidebar && <span className="text-sm font-medium">Log out</span>}
+//               </button>
+//             </div>
+//           </div>
+//         </nav>
+
+//         {/* Footer */}
+//         {!seeSidebar && (
+//           <motion.div
+//             initial={{ opacity: 0 }}
+//             animate={{ opacity: 1 }}
+//             className="p-4 border-t border-gray-200"
+//           >
+//             <div className="text-xs text-gray-400 text-center">
+//               <p>© {new Date().getFullYear()} {company_name || "Aitechs"}</p>
+//               <p className="mt-1 inline-block px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
+//                 {APP_VERSION}
+//               </p>
+//             </div>
+//           </motion.div>
+//         )}
+//       </motion.aside>
+
+//       {/* Logout confirmation modal */}
+//       <AnimatePresence>
+//         {showLogoutConfirm && (
+//           <motion.div
+//             initial={{ opacity: 0 }}
+//             animate={{ opacity: 1 }}
+//             exit={{ opacity: 0 }}
+//             className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+//             onClick={() => !loggingOut && setShowLogoutConfirm(false)}
+//           >
+//             <motion.div
+//               initial={{ opacity: 0, scale: 0.95, y: 10 }}
+//               animate={{ opacity: 1, scale: 1, y: 0 }}
+//               exit={{ opacity: 0, scale: 0.95, y: 10 }}
+//               onClick={(e) => e.stopPropagation()}
+//               className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-200 dark:border-gray-700 font-sans"
+//             >
+//               <div className="flex items-center gap-3 mb-2">
+//                 <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center shrink-0">
+//                   <AlertTriangle size={20} className="text-red-600 dark:text-red-400" />
+//                 </div>
+//                 <h3 className="text-base font-semibold text-gray-900 dark:text-white">Log out?</h3>
+//               </div>
+//               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+//                 You'll need to sign in again to access the dashboard.
+//               </p>
+//               <div className="flex gap-3">
+//                 <button
+//                   onClick={() => setShowLogoutConfirm(false)}
+//                   disabled={loggingOut}
+//                   className="flex-1 py-2.5 px-4 rounded-lg text-sm font-medium
+//                     text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700
+//                     hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors
+//                     disabled:opacity-50 disabled:cursor-not-allowed"
+//                 >
+//                   Cancel
+//                 </button>
+//                 <button
+//                   onClick={handleLogout}
+//                   disabled={loggingOut}
+//                   className="flex-1 py-2.5 px-4 rounded-lg text-sm font-medium text-white
+//                     bg-red-600 hover:bg-red-700 transition-colors
+//                     disabled:opacity-70 disabled:cursor-not-allowed
+//                     flex items-center justify-center gap-2"
+//                 >
+//                   {loggingOut && (
+//                     <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+//                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+//                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+//                     </svg>
+//                   )}
+//                   {loggingOut ? 'Logging out…' : 'Log out'}
+//                 </button>
+//               </div>
+//             </motion.div>
+//           </motion.div>
+//         )}
+//       </AnimatePresence>
+//     </>
+//   );
+// };
+
+// export default Sidebar;
+
+
+
+
+
+
 import { useContext, useCallback, useEffect, useState } from 'react'
 import { ApplicationContext } from '../context/ApplicationContext'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useApplicationSettings } from '../settings/ApplicationSettings'
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from 'react-i18next';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
 
@@ -69,12 +994,8 @@ import {
 import { LuTv } from "react-icons/lu";
 
 
-
-
-
-
-
 const Sidebar = () => {
+  const { t } = useTranslation();
   const {
     isExpanded,
     setIsExpanded,
@@ -127,7 +1048,7 @@ const Sidebar = () => {
         setTimeout(() => navigate('/license-expired'), 1800)
       }
     } catch (error) {
-      toast.error('Logout failed', { position: "top-center", duration: 4000 })
+      toast.error(t('sidebar.logoutFailed'), { position: "top-center", duration: 4000 })
     } finally {
       setLoggingOut(false)
       setShowLogoutConfirm(false)
@@ -148,286 +1069,272 @@ const Sidebar = () => {
   const menuItems = {
     dashboard: {
       icon: <BarChartIcon />,
-      label: "Dashboard",
+      label: t('sidebar.dashboard'),
       path: "/admin/admin-dashboard",
       subItems: [
         {
           icon: <IconChip tint="text-sky-600"><ManageAccountsOutlinedIcon style={{ fontSize: 18 }} /></IconChip>,
-          label: "Activity Logs",
+          label: t('sidebar.activityLogs'),
           path: "/admin/admin-dashboard"
         },
         {
-          // was: <img src="/images/icons8-increase.gif" .../>
           icon: <IconChip tint="text-emerald-600"><TrendingUp size={17} /></IconChip>,
-          label: "Analytics",
+          label: t('sidebar.analytics'),
           path: "/admin/analytics"
         },
       ]
     },
     pppoe: {
       icon: <WifiIcon />,
-      label: "PPPoe",
+      label: t('sidebar.pppoe'),
       subItems: [
         {
           icon: <div className="flex items-center justify-center w-7 h-7 rounded-lg
             bg-teal-600 text-[9px] font-bold text-white tracking-tight shrink-0">
             MBPS
           </div>,
-          label: "PPOE Packages",
+          label: t('sidebar.pppoePackages'),
           path: "/admin/pppoe-packages"
         },
         {
-          // was: <img src="/images/icons8-person.gif" .../>
           icon: <IconChip tint="text-sky-600"><UserRound size={17} /></IconChip>,
-          label: "PPOE Subscribers",
+          label: t('sidebar.pppoeSubscribers'),
           path: "/admin/pppoe-subscribers"
         },
-
         {
-  icon: <IconChip tint="text-emerald-600"><Network size={17} /></IconChip>,
-  label: "IP Pools",
-  path: "/admin/pppoe-ip-pools"
-},
+          icon: <IconChip tint="text-emerald-600"><Network size={17} /></IconChip>,
+          label: t('sidebar.ipPools'),
+          path: "/admin/pppoe-ip-pools"
+        },
         {
           icon: <IconChip tint="text-yellow-600"><AssessmentIcon style={{ fontSize: 17 }} /></IconChip>,
-          label: "Payment Analytics",
+          label: t('sidebar.paymentAnalytics'),
           path: "/admin/subscriber-payment-analytics"
         },
         {
           icon: <IconChip tint="text-blue-600"><FaUpload size={15} /></IconChip>,
-          label: "Upload Subscribers",
+          label: t('sidebar.uploadSubscribers'),
           path: "/admin/upload-subscriber"
         }
       ]
     },
     network: {
       icon: <SensorsIcon />,
-      label: "Network",
+      label: t('sidebar.network'),
       subItems: [
         {
-          // was: <img src="/images/icons8-map-pin.gif" .../>
           icon: <IconChip tint="text-rose-600"><Radar size={17} /></IconChip>,
-          label: "Nodes",
+          label: t('sidebar.nodes'),
           path: "/admin/nodes"
         },
         {
           icon: <IconChip tint="text-yellow-600"><MapPinned size={17} /></IconChip>,
-          label: "Network Map",
+          label: t('sidebar.networkMap'),
           path: "/admin/network-map"
         },
         {
           icon: <IconChip tint="text-blue-600"><PiNetworkSlashLight size={17} /></IconChip>,
-          label: "VPN Tunnel",
+          label: t('sidebar.vpnTunnel'),
           path: "/admin/private-network"
         },
         {
           icon: <IconChip><RouterIcon style={{ fontSize: 17 }} /></IconChip>,
-          label: "Routers",
+          label: t('sidebar.routers'),
           path: "/admin/nas"
         },
         {
           icon: <IconChip><TbCloudNetwork size={17} /></IconChip>,
-          label: "Ip Networks",
+          label: t('sidebar.ipNetworks'),
           path: "/admin/ip_networks"
         },
         {
           icon: <IconChip tint="text-orange-600"><RiRouterLine size={17} /></IconChip>,
-          label: "ONU",
+          label: t('sidebar.onu'),
           path: "/admin/devices"
         },
         {
           icon: <IconChip><BsRouter size={16} /></IconChip>,
-          label: "Access Points",
+          label: t('sidebar.accessPointsItem'),
           path: "/admin/access-point"
         },
         {
-          // was: <img src="/images/wireguard2.png" .../>
           icon: <IconChip tint="text-emerald-600"><ShieldCheck size={17} /></IconChip>,
-          label: "Wireguard",
+          label: t('sidebar.wireguard'),
           path: "/admin/networks-wireguard-config"
         },
-
         {
           icon: <IconChip tint="text-red-600"><AlertTriangle size={17} /></IconChip>,
-          label: "Incidents",
+          label: t('sidebar.incidents'),
           path: "/admin/incidents"
         },
-
-
         {
-  icon: <IconChip tint="text-emerald-600"><TrendingUp size={17} /></IconChip>,
-  label: "Network Uptime",
-  path: "/admin/stats-uptime"
-},
-
-        
+          icon: <IconChip tint="text-emerald-600"><TrendingUp size={17} /></IconChip>,
+          label: t('sidebar.networkUptime'),
+          path: "/admin/stats-uptime"
+        },
         {
-  icon: <IconChip tint="text-red-600"><Stethoscope size={17} /></IconChip>,
-  label: "Troubleshooting",
-  path: "/admin/network-troubleshooting"
-}
+          icon: <IconChip tint="text-red-600"><Stethoscope size={17} /></IconChip>,
+          label: t('sidebar.troubleshooting'),
+          path: "/admin/network-troubleshooting"
+        }
       ]
     },
     finance: {
       icon: <PaymentsIcon />,
-      label: "Finance",
+      label: t('sidebar.finance'),
       subItems: [
         {
           icon: <IconChip><AssessmentIcon style={{ fontSize: 17 }} /></IconChip>,
-          label: "Finance Dashboard",
+          label: t('sidebar.financeDashboard'),
           path: "/admin/financial-dashboard"
         },
         {
           icon: <IconChip tint="text-emerald-600"><PaymentIcon style={{ fontSize: 17 }} /></IconChip>,
-          label: "Hotspot Payments",
+          label: t('sidebar.hotspotPayments'),
           path: "/admin/hotspot-payments"
         },
         {
           icon: <IconChip tint="text-emerald-600"><PaymentIcon style={{ fontSize: 17 }} /></IconChip>,
-          label: "PpPoe Payments",
+          label: t('sidebar.pppoePayments'),
           path: "/admin/pppoe-payments"
         }
       ]
     },
     communication: {
       icon: <CellTowerIcon />,
-      label: "Communication",
+      label: t('sidebar.communication'),
       subItems: [
         {
           icon: <IconChip><MailOutlineIcon style={{ fontSize: 17 }} /></IconChip>,
-          label: "Email",
+          label: t('sidebar.email'),
           path: "/admin/email"
         },
         {
           icon: <IconChip><TextsmsSharpIcon style={{ fontSize: 17 }} /></IconChip>,
-          label: "SMS",
+          label: t('sidebar.sms'),
           path: "/admin/send-sms"
         },
         {
           icon: <IconChip><TextsmsSharpIcon style={{ fontSize: 17 }} /></IconChip>,
-          label: "Bulk",
+          label: t('sidebar.bulk'),
           path: "/admin/bulk-messages"
         },
         {
           icon: <IconChip><TextsmsSharpIcon style={{ fontSize: 17 }} /></IconChip>,
-          label: "Messages",
+          label: t('sidebar.messages'),
           path: "/admin/messages"
         },
         {
           icon: <IconChip tint="text-green-600"><AiOutlineWhatsApp size={17} /></IconChip>,
-          label: "WhatsApp",
+          label: t('sidebar.whatsapp'),
           path: "/admin/whatsapp"
         },
         {
           icon: <IconChip tint="text-teal-600"><MessageSquareText size={17} /></IconChip>,
-          label: "SMS Templates",
+          label: t('sidebar.smsTemplates'),
           path: "/admin/hotspot-sms-templates"
         }
       ]
     },
     hotspot: {
       icon: <SignalWifi3BarIcon />,
-      label: "Hotspot Bundle",
+      label: t('sidebar.hotspotBundle'),
       subItems: [
         {
           icon: <IconChip><IoStatsChartOutline size={17} /></IconChip>,
-          label: "Hotspot Dashboard",
+          label: t('sidebar.hotspotDashboard'),
           path: "/admin/hotspot-dashboard"
         },
         {
           icon: <IconChip><TbHomeStats size={17} /></IconChip>,
-          label: "Marketing",
+          label: t('sidebar.marketing'),
           path: "/admin/hotspot-marketing-dashboard"
         },
         {
           icon: <IconChip><GrTechnology size={16} /></IconChip>,
-          label: "Bypass Hotspot",
+          label: t('sidebar.bypassHotspot'),
           path: "/admin/hotspot-bypass"
         },
         {
           icon: <IconChip><SiPaloaltonetworks size={16} /></IconChip>,
-          label: "Hotspot Package",
+          label: t('sidebar.hotspotPackage'),
           path: "/admin/hotspot-package"
         },
         {
           icon: <IconChip><LuTv size={17} /></IconChip>,
-          label: "TV Plans",
+          label: t('sidebar.tvPlans'),
           path: "/admin/tv-plans"
         },
         {
           icon: <IconChip tint="text-yellow-600"><LuTicketsPlane size={17} /></IconChip>,
-          label: "Vouchers",
+          label: t('sidebar.vouchers'),
           path: "/admin/hotspot-subscriptions"
         },
         {
           icon: <IconChip tint="text-amber-600"><Sparkles size={17} /></IconChip>,
-          label: "Promotions",
+          label: t('sidebar.promotions'),
           path: "/admin/hotspot-promotions"
         },
         {
           icon: <IconChip><LuLayoutTemplate size={17} /></IconChip>,
-          label: "Templates",
+          label: t('sidebar.templates'),
           path: "/admin/hotspot-templates"
         },
         {
           icon: <IconChip tint="text-fuchsia-600"><Palette size={17} /></IconChip>,
-          label: "Page Designer",
+          label: t('sidebar.pageDesigner'),
           path: "/admin/hotspot-page-designer"
         },
         {
           icon: <IconChip tint="text-yellow-600"><ImStatsBars size={16} /></IconChip>,
-          label: "Revenue",
+          label: t('sidebar.revenue'),
           path: "/admin/hotspot_revenue_analytics"
         },
-
         {
-  icon: <IconChip tint="text-emerald-600"><UserRound size={17} /></IconChip>,
-  label: "Customers",
-  path: "/admin/hotspot-customers"
-},
-        
+          icon: <IconChip tint="text-emerald-600"><UserRound size={17} /></IconChip>,
+          label: t('sidebar.customers'),
+          path: "/admin/hotspot-customers"
+        },
         {
           icon: <IconChip tint="text-green-600"><CiSettings size={17} /></IconChip>,
-          label: "Settings",
+          label: t('sidebar.settings'),
           path: "/admin/hotspot_settings"
         }
       ]
     },
     support: {
       icon: <FcOnlineSupport size={20} />,
-      label: "Support",
+      label: t('sidebar.support'),
       subItems: [
         {
           icon: <IconChip tint="text-yellow-600"><LuTicketsPlane size={17} /></IconChip>,
-          label: "Tickets",
+          label: t('sidebar.tickets'),
           path: "/admin/customer-tickets"
         }
       ]
     },
     users: {
-      // was: raw inline <svg> path
       icon: <UsersIcon size={20} />,
-      label: "Users",
+      label: t('sidebar.users'),
       subItems: [
         {
-          // was: <img src="/images/icons8-male-user.gif" .../>
           icon: <IconChip tint="text-sky-600"><CircleUserRound size={17} /></IconChip>,
-          label: "Users",
+          label: t('sidebar.usersList'),
           path: "/admin/user"
         },
         {
           icon: <IconChip><LuUsers size={17} /></IconChip>,
-          label: "User Groups",
+          label: t('sidebar.userGroups'),
           path: "/admin/user-group"
         },
         {
           icon: <IconChip><FaUsersBetweenLines size={16} /></IconChip>,
-          label: "Free Trial",
+          label: t('sidebar.freeTrial'),
           path: "/admin/free-trial-users"
         },
         {
           icon: <IconChip tint="text-green-600"><PeopleIcon style={{ fontSize: 17 }} /></IconChip>,
-          label: "Partners",
+          label: t('sidebar.partners'),
           path: "/admin/partners-management"
         },
       ]
@@ -435,19 +1342,19 @@ const Sidebar = () => {
   };
 
   const quickLinks = [
-    { icon: <ReceiptIcon />, label: "Billing Invoices", path: "/admin/invoice" },
-    { icon: <FaHandshake size={18} />, label: "Leads", path: "/admin/client-leads" },
-    { icon: <FaHandshake size={18} />, label: "Referrals", path: "/admin/referrals" },
+    { icon: <ReceiptIcon />, label: t('sidebar.billingInvoices'), path: "/admin/invoice" },
+    { icon: <FaHandshake size={18} />, label: t('sidebar.leads'), path: "/admin/client-leads" },
+    { icon: <FaHandshake size={18} />, label: t('sidebar.referrals'), path: "/admin/referrals" },
     {
-  icon: <IconChip tint="text-amber-500"><Award size={17} /></IconChip>,
-  label: "Loyalty",
-  path: "/admin/loyalty"
-},
+      icon: <IconChip tint="text-amber-500"><Award size={17} /></IconChip>,
+      label: t('sidebar.loyalty'),
+      path: "/admin/loyalty"
+    },
     // { icon: <MdOutlineSecurity size={19} />, label: "DDOS", path: "/admin/prevent-ddos" },
-    { icon: <MdDevices size={19} />, label: "Equipment", path: "/admin/equipment" },
-    { icon: <GrLicense size={17} />, label: "License", path: "/admin/license" },
-    { icon: <PermDataSettingIcon />, label: "Settings", path: "/admin/settings" },
-{ icon: <HelpCircle size={19} />, label: "Help", path: "/admin/support-tickets" },
+    { icon: <MdDevices size={19} />, label: t('sidebar.equipment'), path: "/admin/equipment" },
+    { icon: <GrLicense size={17} />, label: t('sidebar.license'), path: "/admin/license" },
+    { icon: <PermDataSettingIcon />, label: t('sidebar.settings'), path: "/admin/settings" },
+    { icon: <HelpCircle size={19} />, label: t('sidebar.help'), path: "/admin/support-tickets" },
   ];
 
   const toggleMenu = (menu) => {
@@ -519,7 +1426,7 @@ const Sidebar = () => {
         }));
       }
     } catch (error) {
-      toast.error('Internal server error while fetching company settings');
+      toast.error(t('sidebar.companySettingsError'));
     }
   }, [subdomain, setCompanySettings]);
 
@@ -758,7 +1665,7 @@ const Sidebar = () => {
         </div>
 
         {/* Menu Items */}
-                <nav
+        <nav
           className="flex-1 overflow-y-auto py-4 px-3
             [&::-webkit-scrollbar]:w-2.5
             [&::-webkit-scrollbar-track]:bg-gray-100
@@ -774,11 +1681,10 @@ const Sidebar = () => {
           style={{ scrollbarWidth: 'auto', scrollbarColor: 'rgba(16,185,129,0.4) rgba(0,0,0,0.05)' }}
         >
 
-
           {!seeSidebar && (
             <div className="text-xs uppercase text-gray-400 font-semibold
               mb-2 tracking-wider px-1">
-              Menu
+              {t('sidebar.menu')}
             </div>
           )}
           <ul className="space-y-1">
@@ -789,7 +1695,7 @@ const Sidebar = () => {
             {!seeSidebar && (
               <div className="text-xs uppercase text-gray-400
               font-semibold mb-2 tracking-wider px-1">
-                Quick Links
+                {t('sidebar.quickLinks')}
               </div>
             )}
 
@@ -830,7 +1736,7 @@ const Sidebar = () => {
                   ${seeSidebar ? 'justify-center' : ''}`}
               >
                 <LogOut size={19} className="flex-shrink-0" />
-                {!seeSidebar && <span className="text-sm font-medium">Log out</span>}
+                {!seeSidebar && <span className="text-sm font-medium">{t('sidebar.logOut')}</span>}
               </button>
             </div>
           </div>
@@ -874,10 +1780,10 @@ const Sidebar = () => {
                 <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center shrink-0">
                   <AlertTriangle size={20} className="text-red-600 dark:text-red-400" />
                 </div>
-                <h3 className="text-base font-semibold text-gray-900 dark:text-white">Log out?</h3>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white">{t('sidebar.logOutQuestion')}</h3>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                You'll need to sign in again to access the dashboard.
+                {t('sidebar.logOutBody')}
               </p>
               <div className="flex gap-3">
                 <button
@@ -888,7 +1794,7 @@ const Sidebar = () => {
                     hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors
                     disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Cancel
+                  {t('sidebar.cancel')}
                 </button>
                 <button
                   onClick={handleLogout}
@@ -904,7 +1810,7 @@ const Sidebar = () => {
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                   )}
-                  {loggingOut ? 'Logging out…' : 'Log out'}
+                  {loggingOut ? t('sidebar.loggingOut') : t('sidebar.logOut')}
                 </button>
               </div>
             </motion.div>

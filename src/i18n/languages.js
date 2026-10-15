@@ -1,3 +1,9 @@
+
+
+
+
+
+
 export const LANGUAGES = [
   { code: 'en',  label: 'English',   name: 'English' },
   { code: 'sw',  label: 'Kiswahili', name: 'Swahili' },
@@ -9,5 +15,9 @@ export const LANGUAGES = [
   { code: 'ja',  label: '日本語',      name: 'Japanese' },
   { code: 'ar',  label: 'العربية',   name: 'Arabic' },
 ];
+
+
+
+
 
 

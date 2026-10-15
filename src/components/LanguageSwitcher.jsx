@@ -7,7 +7,9 @@ export default function LanguageSwitcher({ floating = false }) {
   const current = (i18n.resolvedLanguage || 'en').split('-')[0];
 
   const box = (
-    <div className="flex items-center gap-1.5 font-sans rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 px-2 py-1 shadow-sm">
+    <div className="flex items-center gap-1.5  rounded-lg border
+     border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 
+     text-slate-800 dark:text-slate-100 px-2 py-1 shadow-sm">
       <LanguageIcon fontSize="small" />
       <select
         aria-label="Language"

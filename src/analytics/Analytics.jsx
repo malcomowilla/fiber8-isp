@@ -887,10 +887,11 @@ const Analytics = () => {
                   {new Date().toLocaleDateString(dateLocale, { weekday:'long', year:'numeric', month:'long', day:'numeric' })}
                 </p>
               </div>
-              <div className="flex items-center gap-3">
+              {/* <div className="flex items-center gap-3">
                 <LanguageSwitcher />
+                
                 <NotificationCenter />
-              </div>
+              </div> */}
             </motion.div>
 
             {/* ── Top 4 KPI cards ──────────────────────────────────────────────── */}
@@ -1393,3 +1394,7 @@ const Analytics = () => {
 };
 
 export default Analytics;
+
+
+
+
