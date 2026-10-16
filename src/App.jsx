@@ -611,7 +611,7 @@ const isSubdomainOfRoot = ROOT_DOMAINS.some(domain => hostname.endsWith(`.${doma
   return (
     <main>
 
-<TourGuide />
+{/* <TourGuide /> */}
 
 <InstallPwaBanner delayMs={5000} />
 <div className="fixed top-3 right-3 z-50">
@@ -622,7 +622,7 @@ const isSubdomainOfRoot = ROOT_DOMAINS.some(domain => hostname.endsWith(`.${doma
                 <meta charSet="utf-8" />
 
                 <link rel="icon" type="image/svg+xml" href={logo_preview} 
-                onError={(e) => { e.target.src = "/images/aitechs.png"; }}
+                onError={(e) => { e.target.src = "/images/owitech-logo.png"; }}
                 />
 
             </Helmet>
