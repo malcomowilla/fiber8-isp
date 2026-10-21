@@ -830,7 +830,7 @@ hostname.endsWith('.aitechs.co.ke')
 <Route path='/admin/solved-tickets' element={<SolvedTickets/>}/>
 <Route path='/admin/urgent-tickets' element={<UrgentTickets/>}/>
 <Route path='/admin/equipment' element={<Equipment/>}/>
-<Route path='/admin/call-center' element={<CallCenterInterface/>}/>
+{/* <Route path='/admin/call-center' element={<CallCenterInterface/>}/> */}
 <Route path='/admin/devices' element={<Devices/>}/>
 <Route path='/admin/onu-details' element={<OnuDetails/>}/>
 <Route path='/admin/subscriber-details' element={<EditSubscriber/>}/>
