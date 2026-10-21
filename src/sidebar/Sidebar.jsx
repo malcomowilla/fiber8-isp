@@ -992,6 +992,7 @@ import {
    Network
 } from 'lucide-react'
 import { LuTv } from "react-icons/lu";
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 
 
 const Sidebar = () => {
@@ -1342,6 +1343,7 @@ const Sidebar = () => {
   };
 
   const quickLinks = [
+    { icon: <SupportAgentIcon />, label: t('sidebar.callCenter', 'Call Center'), path: "/admin/call-center" },
     { icon: <ReceiptIcon />, label: t('sidebar.billingInvoices'), path: "/admin/invoice" },
     { icon: <FaHandshake size={18} />, label: t('sidebar.leads'), path: "/admin/client-leads" },
     { icon: <FaHandshake size={18} />, label: t('sidebar.referrals'), path: "/admin/referrals" },

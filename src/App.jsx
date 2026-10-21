@@ -169,6 +169,7 @@ import InstallPwaBanner from './pwa/InstallPwaBanner'
 import InstallPwaButton from './pwa/InstallPwaButton'
 const TermsAndConditions = lazy(() => import("./terms_and_conditions/TermsAndConditions"))
 const HotspotAnalytics = lazy(() => import("./hotspot_page/HotspotAnalytics"))
+import CallCenter from './callcenter/CallCenter';
 
 
 
@@ -609,7 +610,7 @@ const isRootDomain = ROOT_DOMAINS.includes(hostname);
 const isSubdomainOfRoot = ROOT_DOMAINS.some(domain => hostname.endsWith(`.${domain}`));
 
   return (
-    <main>
+    <main> 
 
 {/* <TourGuide /> */}
 
@@ -859,6 +860,7 @@ hostname.endsWith('.aitechs.co.ke')
 
 <Route  path='/admin/pppoe-ip-pools' element={<IpPools/>}/>
 <Route  path='/admin/hotspot_analytics' element={<HotspotAnalytics/>}/>
+<Route path="/admin/call-center" element={<CallCenter />} />
 
 
 
