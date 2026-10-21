@@ -452,6 +452,7 @@ useEffect(() => {
                  location.pathname !== '/admin/loyalty' &&
                  location.pathname !== '/admin/pppoe-ip-pools' &&
                  location.pathname !== '/admin/router-details' &&
+                 location.pathname !== '/admin/call-center' &&
                                       
                                       
 
