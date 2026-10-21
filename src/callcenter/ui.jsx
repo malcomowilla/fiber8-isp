@@ -1,3 +1,6 @@
+import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
+
 export const inputCls =
   'w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm ' +
   'text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-lime-500/50 focus:border-lime-500';
@@ -16,6 +19,7 @@ export const Btn = ({ variant = 'primary', className = '', ...p }) => {
   };
   return (
     <button
+      type="button"
       {...p}
       className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold
         transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${styles[variant]} ${className}`}
@@ -51,14 +55,31 @@ export const Field = ({ label, hint, children }) => (
   </label>
 );
 
-export const Modal = ({ title, onClose, children }) => (
-  <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4" onClick={onClose}>
+// Rendered in a portal on document.body so page-level click handlers and
+// transformed/overflow parents can't interfere. Closes only via Esc or the
+// buttons the caller provides (Cancel / Done), never by clicking the backdrop.
+export const Modal = ({ title, onClose, children }) => {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose?.(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  return createPortal(
     <div
+      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
       onClick={(e) => e.stopPropagation()}
-      className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 font-sans"
+      onMouseDown={(e) => e.stopPropagation()}
     >
-      <h3 className="text-base font-bold text-slate-900 dark:text-white mb-4">{title}</h3>
-      {children}
-    </div>
-  </div>
-);
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 font-sans"
+      >
+        <h3 className="text-base font-bold text-slate-900 dark:text-white mb-4">{title}</h3>
+        {children}
+      </div>
+    </div>,
+    document.body
+  );
+};
