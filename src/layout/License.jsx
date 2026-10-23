@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { ShieldCheck, ShieldAlert, MessageSquareText } from "lucide-react";
 
-const License = ({ expiry2, condition2, status2, calculateTimeRemaining, smsBalance }) => {
+const License = ({ expiry2, condition2, status2, calculateTimeRemaining,
+   smsBalance }) => {
   const isExpired = status2 === 'expired';
   const hasLicense = expiry2 && expiry2 !== 'No license';
 

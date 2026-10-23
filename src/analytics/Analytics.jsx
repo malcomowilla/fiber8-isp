@@ -863,7 +863,8 @@ const Analytics = () => {
   return (
     <>
       <Styles />
-      <div onClick={closeMenus} className="analytics-root font-sans min-h-screen p-5 space-y-5 text-slate-900 dark:text-slate-200"
+      <div onClick={closeMenus} className="analytics-root font-sans 
+      min-h-screen p-5 space-y-5 text-slate-900 dark:text-slate-200"
         style={{ position:'relative', overflow:'hidden' }}>
 
         {/* ── Ambient blobs ──────────────────────────────────────────────────── */}
