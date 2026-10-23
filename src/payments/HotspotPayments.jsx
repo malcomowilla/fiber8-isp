@@ -159,7 +159,7 @@ function AbandonedRow({ session, index }) {
         <div className="flex items-start gap-1.5 text-sm text-gray-700 dark:text-gray-200">
           <AccessTime className="w-3.5 h-3.5 mt-0.5 shrink-0 text-gray-400" />
           <div>
-            <p className="font-sans whitespace-nowrap">{session.started_at || '—'}</p>
+            <p className=" whitespace-nowrap">{session.started_at || '—'}</p>
             <p className="text-xs text-gray-400 dark:text-gray-500">
               {session.minutes_since < 1 ? 'just now' : `${session.minutes_since}m ago`}
             </p>
@@ -170,7 +170,7 @@ function AbandonedRow({ session, index }) {
         {session.paid_at ? (
           <div className="flex items-start gap-1.5">
             <CheckCircle className="w-3.5 h-3.5 mt-0.5 shrink-0 text-gray-400" />
-            <p className="font-sans whitespace-nowrap">{session.paid_at}</p>
+            <p className="whitespace-nowrap">{session.paid_at}</p>
           </div>
         ) : (
           <span className="text-gray-400 dark:text-gray-500">—</span>
@@ -737,7 +737,8 @@ const HotspotPayments = () => {
               className="pl-10 w-full bg-gray-50 border border-gray-300
                 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500
                 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
-                dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 font-sans
+                dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                 
                 transition-colors duration-300"
               placeholder="Search by voucher, reference, name..."
             />
@@ -784,7 +785,7 @@ const HotspotPayments = () => {
               bg-white dark:bg-gray-800 bg-opacity-80 z-[2] transition-colors duration-300">
               <div className="flex flex-col items-center gap-2">
                 <CircularProgress className="text-blue-500" />
-                <p className="text-gray-600 dark:text-gray-300 font-sans transition-colors duration-300">Loading payments...</p>
+                <p className="text-gray-600 dark:text-gray-300  transition-colors duration-300">Loading payments...</p>
               </div>
             </div>
           )}
@@ -798,7 +799,8 @@ const HotspotPayments = () => {
                     <Receipt className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-800 dark:text-white font-sans transition-colors duration-300">
+                    <h2 className="text-xl font-bold text-gray-800
+                     dark:text-white  transition-colors duration-300">
                       Hotspot Payments
                     </h2>
                   </div>
@@ -817,7 +819,7 @@ const HotspotPayments = () => {
                       }}
                     >
                       <AddIcon />
-                      <span className="font-sans text-sm">Add Payment</span>
+                      <span className=" text-sm">Add Payment</span>
                     </button>
                   ),
                   isFreeAction: true,
