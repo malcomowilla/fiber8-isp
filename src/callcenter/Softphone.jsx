@@ -6,6 +6,8 @@ import MicOffIcon from '@mui/icons-material/MicOff';
 import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import BackspaceOutlinedIcon from '@mui/icons-material/BackspaceOutlined';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import { Dot, Btn, inputCls } from './ui';
 import { fmtDur } from './api';
 
@@ -13,7 +15,7 @@ const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
 const REG_LABEL = { registered: 'Online', connecting: 'Connecting…', error: 'Connection error', disconnected: 'Offline' };
 
 export default function Softphone({ phone, myExt, setMyExt, options, onGoOnline }) {
-  const { reg, call, dial, answer, hangup, toggleMute, sendDtmf, disconnect } = phone;
+  const { reg, call, dial, answer, hangup, toggleMute, sendDtmf, disconnect, ringOn, setRingOn, unlockAudio } = phone;
   const [open, setOpen] = useState(true);
   const [num, setNum] = useState('');
 
@@ -39,7 +41,16 @@ export default function Softphone({ phone, myExt, setMyExt, options, onGoOnline 
         <div className="flex items-center gap-2 text-sm font-bold">
           <HeadsetMicIcon fontSize="small" /> Web phone
         </div>
-        <button onClick={() => setOpen(false)} aria-label="Minimize"><ExpandMoreIcon /></button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setRingOn(!ringOn)}
+            aria-label={ringOn ? 'Turn ring sound off' : 'Turn ring sound on'}
+            title={ringOn ? 'Ring sound on' : 'Ring sound off'}
+          >
+            {ringOn ? <NotificationsActiveIcon fontSize="small" /> : <NotificationsOffIcon fontSize="small" />}
+          </button>
+          <button onClick={() => setOpen(false)} aria-label="Minimize"><ExpandMoreIcon /></button>
+        </div>
       </div>
 
       <div className="p-4 space-y-3">
@@ -60,7 +71,13 @@ export default function Softphone({ phone, myExt, setMyExt, options, onGoOnline 
                 <option key={o.extension} value={o.extension}>{o.extension} — {o.name}</option>
               ))}
             </select>
-            <Btn className="w-full" disabled={!myExt || reg === 'connecting'} onClick={onGoOnline}>Go online</Btn>
+            <Btn
+              className="w-full"
+              disabled={!myExt || reg === 'connecting'}
+              onClick={() => { unlockAudio(); onGoOnline(); }}
+            >
+              Go online
+            </Btn>
             {options.length === 0 && (
               <p className="text-xs text-slate-500">Create a Browser (WebRTC) agent first.</p>
             )}
@@ -68,7 +85,7 @@ export default function Softphone({ phone, myExt, setMyExt, options, onGoOnline 
         )}
 
         {reg === 'registered' && incoming && (
-          <div className="rounded-xl bg-lime-50 dark:bg-lime-500/10 border border-lime-300/60 p-3 text-center space-y-2">
+          <div className="rounded-xl bg-lime-50 dark:bg-lime-500/10 border border-lime-300/60 p-3 text-center space-y-2 animate-pulse">
             <p className="text-xs text-slate-500">Incoming call</p>
             <p className="text-lg font-bold text-slate-900 dark:text-white">{call.number}</p>
             <div className="flex gap-2">
