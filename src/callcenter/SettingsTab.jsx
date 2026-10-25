@@ -41,6 +41,11 @@ export default function SettingsTab() {
           </span>
         </div>
 
+        <Field label="Phone number(s) callers dial"
+          hint="Digits only, exactly as your SIP trunk delivers them. Separate several with commas. Hours and greetings apply to calls to these numbers.">
+          <input className={inputCls} placeholder="254700000000" value={s.did_numbers || ''} onChange={(e) => set({ did_numbers: e.target.value })} />
+        </Field>
+
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((p) => (
             <button key={p.label} type="button"
@@ -76,12 +81,16 @@ export default function SettingsTab() {
 
       <Card className="p-5 space-y-4">
         <h2 className="text-base font-bold text-slate-900 dark:text-white">While callers wait</h2>
-        <Field label="Music while ringing (MP3 link, optional)">
+        <Field label="Music while ringing (MP3 link, optional)" hint="Saved, but not played yet.">
           <input className={inputCls} placeholder="https://…/hold.mp3" value={s.hold_music_url || ''} onChange={(e) => set({ hold_music_url: e.target.value })} />
         </Field>
         <Field label="What callers hear while they wait"
-          hint="Spoken once before the hold music: tell callers about your company, offers or opening hours. Empty: “Please hold while we connect you.”">
+          hint="Spoken once before agents are rung: tell callers about your company, offers or opening hours. Empty: “Please hold while we connect you.”">
           <textarea rows={3} className={inputCls} value={s.hold_message || ''} onChange={(e) => set({ hold_message: e.target.value })} />
+        </Field>
+        <Field label="When nobody is available"
+          hint="Played when the agent called is offline or does not answer. Empty: “The person you are calling is currently unreachable. Please try again later.”">
+          <textarea rows={2} className={inputCls} value={s.unreachable_message || ''} onChange={(e) => set({ unreachable_message: e.target.value })} />
         </Field>
       </Card>
 

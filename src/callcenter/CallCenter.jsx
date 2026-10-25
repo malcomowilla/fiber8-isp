@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
@@ -26,20 +26,66 @@ export default function CallCenter() {
   const [myExt, setMyExt] = useState(() => localStorage.getItem('cc_my_ext') || '');
   const phone = useSoftphone();
 
+  // Latest values for timers and callbacks.
+  const phoneRef = useRef(phone);
+  const dataRef = useRef(data);
+  const myExtRef = useRef(myExt);
+  phoneRef.current = phone;
+  dataRef.current = data;
+  myExtRef.current = myExt;
+
+  const wantOnline = useRef(localStorage.getItem('cc_online') !== '0');
+  const connecting = useRef(false);
+
   const load = useCallback(async () => {
     try { setData(await api('extensions')); } catch { /* keep last */ }
   }, []);
   usePoll(load, 8000);
 
-  const chooseExt = (v) => { setMyExt(v); localStorage.setItem('cc_my_ext', v); };
+  const chooseExt = (v) => {
+    setMyExt(v);
+    try { localStorage.setItem('cc_my_ext', v); } catch { /* ignore */ }
+  };
 
-  const goOnline = async () => {
+  const connectNow = useCallback(async (silent) => {
+    const ext = myExtRef.current;
+    if (!ext || connecting.current) return;
+    connecting.current = true;
     try {
-      const cfg = await api(`extensions/${myExt}/softphone`);
-      await phone.connect(cfg);
+      const cfg = await api(`extensions/${ext}/softphone`);
+      await phoneRef.current.connect(cfg);
     } catch (e) {
-      toast.error(e.message || 'Could not connect');
+      if (!silent) toast.error(e.message || 'Could not connect');
+    } finally {
+      connecting.current = false;
     }
+  }, []);
+
+  // Keeps the agent registered: first load, and after any dropped connection.
+  const ensureOnline = useCallback(() => {
+    const p = phoneRef.current;
+    const ok = dataRef.current.extensions.some(
+      (e) => e.extension === myExtRef.current && e.kind === 'webrtc' && e.enabled
+    );
+    if (wantOnline.current && ok && (p.reg === 'disconnected' || p.reg === 'error')) connectNow(true);
+  }, [connectNow]);
+
+  useEffect(() => { ensureOnline(); }, [data, myExt, ensureOnline]);
+  useEffect(() => {
+    const id = setInterval(ensureOnline, 8000);
+    return () => clearInterval(id);
+  }, [ensureOnline]);
+
+  const goOnline = () => {
+    wantOnline.current = true;
+    try { localStorage.setItem('cc_online', '1'); } catch { /* ignore */ }
+    connectNow(false);
+  };
+
+  const goOffline = () => {
+    wantOnline.current = false;
+    try { localStorage.setItem('cc_online', '0'); } catch { /* ignore */ }
+    return phoneRef.current.disconnect();
   };
 
   const browserOptions = data.extensions.filter((e) => e.kind === 'webrtc' && e.enabled);
@@ -57,7 +103,9 @@ export default function CallCenter() {
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-2">
             <Dot on={data.ami_online} pulse />
-            {data.ami_online ? `PBX connected · ${online} of ${data.extensions.length} agents online` : 'PBX unreachable'}
+            {data.ami_online
+              ? `PBX connected · ${online} of ${data.extensions.length} agents online`
+              : `PBX unreachable${data.ami_error ? ` · ${data.ami_error}` : ''}`}
           </p>
         </div>
       </div>
@@ -82,7 +130,13 @@ export default function CallCenter() {
       {tab === 'calls' && <CallsTab />}
       {tab === 'settings' && <SettingsTab />}
 
-      <Softphone phone={phone} myExt={myExt} setMyExt={chooseExt} options={browserOptions} onGoOnline={goOnline} />
+      <Softphone
+        phone={{ ...phone, disconnect: goOffline }}
+        myExt={myExt}
+        setMyExt={chooseExt}
+        options={browserOptions}
+        onGoOnline={goOnline}
+      />
     </div>
   );
 }
