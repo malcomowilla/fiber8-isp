@@ -19,7 +19,7 @@ export const FONT_LIBRARY = {
   merriweather: { label: 'Merriweather',      google: 'Merriweather:wght@400;700;900',                stack: "'Merriweather', serif",            vibe: 'Classic & readable serif' },
   plexMono:     { label: 'IBM Plex Mono',     google: 'IBM+Plex+Mono:wght@400;500;600;700',           stack: "'IBM Plex Mono', monospace",       vibe: 'Technical & monospaced' },
   bricolage: { label: 'Bricolage Grotesque', google: 'Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800', stack: "'Bricolage Grotesque', sans-serif", vibe: 'Quirky & expressive' },
-  
+
 };
 
 export const COLOR_PRESETS = [
@@ -39,8 +39,8 @@ export const DENSITY_PRESETS = { compact: '0.92', comfortable: '1', spacious: '1
 export const DEFAULT_THEME = {
   colorHsl: COLOR_PRESETS[0].hsl,
   colorPresetId: 'teal',
-  fontKey: 'plexMono',
-  displayFontKey: 'plexMono',
+  fontKey: 'bricolage',
+  displayFontKey: 'bricolage',
   fontItalic: false,
   displayFontItalic: false,
   radius: 'balanced',
@@ -127,8 +127,8 @@ export function applyTheme(theme) {
   root.style.setProperty('--ring', t.colorHsl);
   root.style.setProperty('--primary-foreground', '0 0% 100%');
   root.style.setProperty('--primary-muted', t.colorHsl);
-  root.style.setProperty('--font-sans', FONT_LIBRARY[t.fontKey]?.stack || FONT_LIBRARY.plexMono.stack);
-  root.style.setProperty('--font-display', FONT_LIBRARY[t.displayFontKey]?.stack || FONT_LIBRARY.plexMono.stack);
+  root.style.setProperty('--font-sans', FONT_LIBRARY[t.fontKey]?.stack || FONT_LIBRARY.bricolage.stack);
+  root.style.setProperty('--font-display', FONT_LIBRARY[t.displayFontKey]?.stack || FONT_LIBRARY.bricolage.stack);
   root.style.setProperty('--font-style-sans', t.fontItalic ? 'italic' : 'normal');
   root.style.setProperty('--font-style-display', t.displayFontItalic ? 'italic' : 'normal');
   root.style.setProperty('--radius', RADIUS_PRESETS[t.radius] || RADIUS_PRESETS.balanced);
@@ -193,7 +193,7 @@ export async function bootTheme(userId, subdomain) {
       if (d && d.color_hsl) {
         const orgTheme = {
           colorHsl: d.color_hsl, colorPresetId: d.color_preset_id || 'custom',
-          fontKey: d.font_key || 'plexMono', displayFontKey: d.display_font_key || d.font_key || 'plexMono',
+          fontKey: d.font_key || 'bricolage', displayFontKey: d.display_font_key || d.font_key || 'bricolage',
           fontItalic: !!d.font_italic, displayFontItalic: !!d.display_font_italic,
           radius: d.radius || 'balanced', density: d.density || 'comfortable', mode: d.mode || 'system',
         };
