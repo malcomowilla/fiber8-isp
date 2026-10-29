@@ -18,6 +18,8 @@ export const FONT_LIBRARY = {
   playfair:     { label: 'Playfair Display',  google: 'Playfair+Display:wght@400;500;600;700;800',   stack: "'Playfair Display', serif",        vibe: 'High-contrast & elegant' },
   merriweather: { label: 'Merriweather',      google: 'Merriweather:wght@400;700;900',                stack: "'Merriweather', serif",            vibe: 'Classic & readable serif' },
   plexMono:     { label: 'IBM Plex Mono',     google: 'IBM+Plex+Mono:wght@400;500;600;700',           stack: "'IBM Plex Mono', monospace",       vibe: 'Technical & monospaced' },
+  bricolage: { label: 'Bricolage Grotesque', google: 'Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800', stack: "'Bricolage Grotesque', sans-serif", vibe: 'Quirky & expressive' },
+  
 };
 
 export const COLOR_PRESETS = [

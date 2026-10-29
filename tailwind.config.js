@@ -79,10 +79,10 @@ export default {
         darkRed:        "hsl(var(--color-darkRed) / <alpha-value>)",
       },
 
-      // moved out of `colors` — this was nested incorrectly before and
-      // wouldn't have applied as font config
+
       fontFamily: {
-        sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)', '"Bricolage Grotesque"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        
         display: ['var(--font-display)', 'var(--font-sans)', 'sans-serif'],
       },
 
