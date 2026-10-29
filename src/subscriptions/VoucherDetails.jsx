@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   X, Wifi, Clock, Gauge, Users, Phone, LogIn,
   CreditCard, Hash, Banknote, User, Calendar, LogOut, Loader2,
+  History
 } from "lucide-react";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
@@ -36,6 +37,7 @@ function VoucherDetails({
   openVoucherDetails, handleCloseVoucherDetails, voucher, useLimit, speed, phone,
   createdAt, updatedAt, status, expiration, payment_method, reference, amount,
   customer, time_paid, isOnline, loadingLogout, logoutUser, loginBy,
+  lastLoginAt
 }) {
   const [confirmLogout, setConfirmLogout] = useState(false);
 
@@ -93,7 +95,8 @@ function VoucherDetails({
     >
       <div className="font-sans">
         {/* Header */}
-        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 px-6 pt-6 pb-8 relative">
+        <div className="bg-gradient-to-br from-green-500
+         to-green-600 px-6 pt-6 pb-8 relative">
           <button
             onClick={handleCloseVoucherDetails}
             className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
@@ -165,6 +168,10 @@ function VoucherDetails({
           <InfoRow icon={Users} label="Device limit" value={useLimit} />
           <InfoRow icon={Phone} label="Phone" value={phone} />
           <InfoRow icon={LogIn} label="Login method" value={loginBy} />
+          <InfoRow icon={History} label="Last login" value={lastLoginAt} />
+          <InfoRow  />
+        
+
           <InfoRow icon={Calendar} label="Created" value={createdAt} />
           <InfoRow icon={Calendar} label="Updated" value={updatedAt} />
 
@@ -185,7 +192,8 @@ function VoucherDetails({
         <div className="px-6 pb-6">
           <button
             onClick={handleCloseVoucherDetails}
-            className="w-full py-2.5 rounded-xl text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
+            className="w-full py-2.5 rounded-xl text-sm font-medium text-gray-600
+             bg-gray-100 hover:bg-gray-200 transition-colors"
           >
             Close
           </button>

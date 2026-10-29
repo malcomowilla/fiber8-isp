@@ -91,6 +91,9 @@ const [anchorEl, setAnchorEl] = useState(null);
   const [openLoad, setopenLoad] = useState(false)
   const [openDelete, setOpenDelete] = useState(false);
 const [voucher, setVoucher] = useState('')
+const [statusFilter, setStatusFilter] = useState('all');
+const [packageFilter, setPackageFilter] = useState('all');
+
 const [status, setStatus] = useState('')
 const [expiration, setExpiration] = useState('')
 const [useLimit, setUseLimit] = useState('')
@@ -106,7 +109,7 @@ const [amount, setAmount] = useState('')
 const [customer, setCustomer] = useState('')
 const [isOnline, setIsOnline] = useState(false)
 const [loadingLogout, setLoadingLogout] = useState(false)
-
+const [lastLoginAt, setLastLoginAt] = useState('')
 const [openCompensationVoucher, setOpenCompensationVoucher] = useState(false);
 const [openVoucherDetails, setOpenVoucherDetails] = useState(false);
 const [isSpinning, setIsSpinning] = useState(false);
@@ -115,6 +118,35 @@ const [loginBy, setLoginBy] = useState('')
 
 const selectedVoucherIdRef = useRef(id);
 const isDetailsOpenRef = useRef(openVoucherDetails);
+
+
+
+const packageOptions = useMemo(
+  () => [...new Set(vouchers.map(v => v.package).filter(Boolean))].sort(),
+  [vouchers]
+);
+
+// vouchers after the package filter only, so the status counts stay accurate
+const packageFiltered = useMemo(
+  () => packageFilter === 'all'
+    ? vouchers
+    : vouchers.filter(v => v.package === packageFilter),
+  [vouchers, packageFilter]
+);
+
+const statusCounts = useMemo(() => ({
+  all:     packageFiltered.length,
+  active:  packageFiltered.filter(v => v.status === 'active').length,
+  used:    packageFiltered.filter(v => v.status === 'used').length,
+  expired: packageFiltered.filter(v => v.status === 'expired').length,
+}), [packageFiltered]);
+
+const filteredVouchers = useMemo(
+  () => statusFilter === 'all'
+    ? packageFiltered
+    : packageFiltered.filter(v => v.status === statusFilter),
+  [packageFiltered, statusFilter]
+);
 
 useEffect(() => {
   selectedVoucherIdRef.current = id;
@@ -231,6 +263,7 @@ setVoucherForm((prevState) => ({
     setCustomer(rowData.customer)
     setIsOnline(rowData.is_online)
     setLoginBy(rowData.login_by)
+    setLastLoginAt(rowData.last_logged_in)
   }
 
 
@@ -518,21 +551,21 @@ const formatRemainingTime = (expirationDate) => {
         </div>
       )
     },
-    { 
-      title: 'Last Login', 
-      field: 'last_logged_in',  
-      headerClassName: 'dark:text-black',
-      render: (rowData) => (
-        <Tooltip title={rowData.last_logged_in || 'Never logged in'} arrow>
-          <div className="flex items-center gap-1">
-            <Clock className="w-3 h-3 text-gray-500" />
-            <span className="text-xs text-gray-600 dark:text-white">
-              {rowData.last_logged_in}
-            </span>
-          </div>
-        </Tooltip>
-      )
-    },
+    // { 
+    //   title: 'Last Login', 
+    //   field: 'last_logged_in',  
+    //   headerClassName: 'dark:text-black',
+    //   render: (rowData) => (
+    //     <Tooltip title={rowData.last_logged_in || 'Never logged in'} arrow>
+    //       <div className="flex items-center gap-1">
+    //         <Clock className="w-3 h-3 text-gray-500" />
+    //         <span className="text-xs text-gray-600 dark:text-white">
+    //           {rowData.last_logged_in}
+    //         </span>
+    //       </div>
+    //     </Tooltip>
+    //   )
+    // },
 
 
     {
@@ -1327,6 +1360,7 @@ const downloadVoucherCard = (rowData) => {
         customer={customer}
         createdAt={createdAt}
         updatedAt={updatedAt}
+        lastLoginAt={lastLoginAt}
         id={id}
         isOnline={isOnline}
         loadingLogout={loadingLogout}
@@ -1396,7 +1430,7 @@ const downloadVoucherCard = (rowData) => {
                 <div className="absolute inset-y-0 right-0 pr-3
                  flex items-center">
                   <RefreshCw className="animate-spin
-                   text-blue-500 w-4 h-4" />
+                   text-green-500 w-4 h-4" />
                 </div>
               )}
             </div>
@@ -1416,6 +1450,58 @@ const downloadVoucherCard = (rowData) => {
             </button>
           </div> */}
         </div>
+
+<div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-3 mb-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+  <div className="flex flex-wrap gap-2">
+    {[
+      { key: 'all',     label: 'All',     color: '#374151' },
+      { key: 'active',  label: 'Active',  color: '#065f46' },
+      { key: 'used',    label: 'Used',    color: '#92400e' },
+      { key: 'expired', label: 'Expired', color: '#991b1b' },
+    ].map(({ key, label, color }) => {
+      const selected = statusFilter === key;
+      return (
+        <Chip
+          key={key}
+          clickable
+          onClick={() => setStatusFilter(key)}
+          label={`${label} ${statusCounts[key]}`}
+          variant={selected ? 'filled' : 'outlined'}
+          sx={{
+            fontWeight: 600,
+            fontFamily: 'inherit',
+            ...(selected
+              ? { backgroundColor: color, color: '#fff', '&:hover': { backgroundColor: color } }
+              : { borderColor: color, color }),
+          }}
+        />
+      );
+    })}
+  </div>
+
+  <div className="flex items-center gap-2">
+    <select
+      value={packageFilter}
+      onChange={(e) => setPackageFilter(e.target.value)}
+      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white font-sans"
+    >
+      <option value="all">All packages</option>
+      {packageOptions.map(p => (
+        <option key={p} value={p}>{p}</option>
+      ))}
+    </select>
+
+    {(statusFilter !== 'all' || packageFilter !== 'all') && (
+      <button
+        onClick={() => { setStatusFilter('all'); setPackageFilter('all'); }}
+        className="text-sm text-green-600 hover:underline font-sans"
+      >
+        Clear
+      </button>
+    )}
+  </div>
+</div>
+
 
         {/* Table Container */}
        <div className="hotspot-vouchers-table rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
