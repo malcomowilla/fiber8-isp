@@ -1547,7 +1547,7 @@ const downloadVoucherCard = (rowData) => {
         </div>
       }
       onRowClick={handleRowClick}
-      data={vouchers}
+      data={filteredVouchers}
      
 
 actions={[
