@@ -39,7 +39,7 @@ const Stepper = ({ active }) => {
               <span
                 className={`grid place-items-center w-7 h-7 
                     rounded-full text-xs font-bold transition-all
-                ${done ? ' text-emerald-950'
+                ${done ? 'bg-emerald-400 text-emerald-950'
                   : current ? 'bg-white text-emerald-900 ring-4 ring-emerald-400/30'
                   : 'bg-white/10 text-white/40'}`}
               >
@@ -258,7 +258,8 @@ const RenewLicense = () => {
 
   /* ── render ── */
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#04130d] text-white font-sans">
+    <div className="relative min-h-screen overflow-hidden 
+     dark:text-white font-sans text-black">
       {/* ambient background */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-40 -left-32 w-[28rem] h-[28rem] rounded-full bg-emerald-500/25 blur-[120px]" />
