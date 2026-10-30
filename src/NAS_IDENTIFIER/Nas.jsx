@@ -76,7 +76,7 @@ const RouterFormModal = ({ router, onClose, onSaved }) => {
   return (
     <Modal
       title={isEdit ? `Edit ${router.name}` : 'Add router'}
-      onClose={onClose}
+      // onClose={onClose}
       footer={
         <>
           <button type="button" className={btn} onClick={onClose}>Cancel</button>
@@ -202,7 +202,9 @@ const Nas = () => {
           <button
             onClick={() => setFormTarget('new')}
             title="Register a new router on the platform"
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-black px-3 text-xs font-semibold text-white dark:bg-white dark:text-black"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg
+             bg-black px-3 text-xs font-semibold text-white dark:bg-white
+              dark:text-black"
           >
             <AddIcon style={{ width: 16, height: 16 }} /> Add router
           </button>

@@ -28,7 +28,8 @@ const Modal = ({ title, subtitle, onClose, children, footer, size = 'md' }) => {
           <button
             onClick={onClose}
             title="Close"
-            className="rounded-lg p-1 text-gray-500 hover:bg-black/5 dark:text-gray-400 dark:hover:bg-white/10"
+            className="rounded-lg p-1 text-gray-500
+             hover:bg-black/5 dark:text-gray-400 dark:hover:bg-white/10"
           >
             <CloseIcon style={{ width: 18, height: 18 }} />
           </button>
@@ -37,7 +38,8 @@ const Modal = ({ title, subtitle, onClose, children, footer, size = 'md' }) => {
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">{children}</div>
 
         {footer && (
-          <div className="flex items-center justify-end gap-2 border-t border-black/10 px-5 py-3 dark:border-white/10">
+          <div className="flex items-center justify-end gap-2 border-t
+           border-black/10 px-5 py-3 dark:border-white/10">
             {footer}
           </div>
         )}
