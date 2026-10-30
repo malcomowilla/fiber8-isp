@@ -689,7 +689,7 @@ const DashboardStatistics = () => {
     if (GB >= 1) return `${GB.toFixed(1)} GB`;
     if (MB >= 1) return `${MB.toFixed(1)} MB`;
     if (KB >= 1) return `${KB.toFixed(1)} KB`;
-    return `${bytes} B`;
+    return `${bytes} `;
   };
 
   const stats = [
