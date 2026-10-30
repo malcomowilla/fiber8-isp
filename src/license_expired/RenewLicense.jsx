@@ -39,17 +39,27 @@ const Stepper = ({ active }) => {
               <span
                 className={`grid place-items-center w-7 h-7 rounded-full text-xs font-bold transition-all
                 ${done ? 'bg-emerald-400 text-emerald-950'
-                  : current ? 'bg-white text-emerald-900 ring-4 ring-emerald-400/30'
-                  : 'bg-white/10 text-white/40'}`}
+                  : current ? 'bg-emerald-600 text-white ring-4 ring-emerald-500/30 dark:bg-white dark:text-emerald-900 dark:ring-emerald-400/30'
+                  : 'bg-slate-200 text-slate-400 dark:bg-white/10 dark:text-white/40'}`}
               >
                 {done ? <FiCheck /> : n}
               </span>
-              <span className={`text-sm font-medium hidden sm:block ${current || done ? 'text-white' : 'text-white/40'}`}>
+              <span
+                className={`text-sm font-medium hidden sm:block ${
+                  current || done
+                    ? 'text-slate-900 dark:text-white'
+                    : 'text-slate-400 dark:text-white/40'
+                }`}
+              >
                 {label}
               </span>
             </div>
             {i < steps.length - 1 && (
-              <span className={`h-px w-8 sm:w-14 ${n < active ? 'bg-emerald-400' : 'bg-white/15'}`} />
+              <span
+                className={`h-px w-8 sm:w-14 ${
+                  n < active ? 'bg-emerald-400' : 'bg-slate-300 dark:bg-white/15'
+                }`}
+              />
             )}
           </React.Fragment>
         );
@@ -62,18 +72,23 @@ const CopyField = ({ label, value, big, copied, onCopy }) => (
   <button
     type="button"
     onClick={onCopy}
-    className="group w-full text-left rounded-2xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08]
-               hover:border-emerald-400/50 transition-all px-4 py-3.5 flex items-center justify-between gap-3"
+    className="group w-full text-left rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-emerald-500/60
+               dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] dark:hover:border-emerald-400/50
+               transition-all px-4 py-3.5 flex items-center justify-between gap-3"
   >
     <span>
-      <span className="block text-[11px] uppercase tracking-[0.14em] text-emerald-200/60 mb-1">{label}</span>
-      <span className={`block font-mono font-semibold text-white ${big ? 'text-2xl' : 'text-lg'} tabular-nums`}>
+      <span className="block text-[11px] uppercase tracking-[0.14em] text-emerald-700/70 dark:text-emerald-200/60 mb-1">
+        {label}
+      </span>
+      <span className={`block font-mono font-semibold text-slate-900 dark:text-white ${big ? 'text-2xl' : 'text-lg'} tabular-nums`}>
         {value}
       </span>
     </span>
     <span
       className={`shrink-0 grid place-items-center w-9 h-9 rounded-xl text-sm transition-all
-      ${copied ? 'bg-emerald-400 text-emerald-950' : 'bg-white/10 text-white/70 group-hover:bg-emerald-400/20 group-hover:text-emerald-300'}`}
+      ${copied
+        ? 'bg-emerald-400 text-emerald-950'
+        : 'bg-slate-100 text-slate-500 group-hover:bg-emerald-500/15 group-hover:text-emerald-700 dark:bg-white/10 dark:text-white/70 dark:group-hover:bg-emerald-400/20 dark:group-hover:text-emerald-300'}`}
     >
       {copied ? <FiCheck /> : <FiCopy />}
     </span>
@@ -88,13 +103,16 @@ const Ring = ({ seconds }) => {
     <div className="relative w-28 h-28">
       <span className="absolute inset-0 rounded-full bg-emerald-400/20 animate-ping" />
       <svg viewBox="0 0 100 100" className="relative w-28 h-28 -rotate-90">
-        <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(255,255,255,.1)" strokeWidth="6" />
+        <circle
+          cx="50" cy="50" r={r} fill="none" stroke="currentColor" strokeWidth="6"
+          className="text-slate-200 dark:text-white/10"
+        />
         <circle
           cx="50" cy="50" r={r} fill="none" stroke="#34d399" strokeWidth="6" strokeLinecap="round"
           strokeDasharray={c} strokeDashoffset={c * pct} className="transition-all duration-1000 ease-linear"
         />
       </svg>
-      <FiSmartphone className="absolute inset-0 m-auto text-emerald-300 text-3xl" />
+      <FiSmartphone className="absolute inset-0 m-auto text-emerald-600 dark:text-emerald-300 text-3xl" />
     </div>
   );
 };
@@ -257,16 +275,16 @@ const RenewLicense = () => {
 
   /* ── render ── */
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#04130d] text-white font-sans">
+    <div className="relative min-h-screen overflow-hidden bg-slate-50 text-slate-900 dark:bg-[#04130d] dark:text-white font-sans">
       {/* ambient background */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-40 -left-32 w-[28rem] h-[28rem] rounded-full bg-emerald-500/25 blur-[120px]" />
-        <div className="absolute bottom-[-10rem] right-[-8rem] w-[30rem] h-[30rem] rounded-full bg-teal-400/15 blur-[130px]" />
+        <div className="absolute -top-40 -left-32 w-[28rem] h-[28rem] rounded-full bg-emerald-400/20 dark:bg-emerald-500/25 blur-[120px]" />
+        <div className="absolute bottom-[-10rem] right-[-8rem] w-[30rem] h-[30rem] rounded-full bg-teal-300/20 dark:bg-teal-400/15 blur-[130px]" />
         <div
-          className="absolute inset-0 opacity-[0.07]"
+          className="absolute inset-0 text-slate-900 dark:text-white opacity-[0.04] dark:opacity-[0.07]"
           style={{
             backgroundImage:
-              'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
+              'linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)',
             backgroundSize: '44px 44px',
             maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 75%)',
             WebkitMaskImage: 'radial-gradient(ellipse at center, black 30%, transparent 75%)',
@@ -277,19 +295,19 @@ const RenewLicense = () => {
       <div className="relative max-w-5xl mx-auto px-4 py-8 sm:py-12">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors mb-6"
+          className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 dark:text-white/50 dark:hover:text-white transition-colors mb-6"
         >
           <FiArrowLeft /> Back
         </button>
 
         <div className="text-center mb-8">
-          <span className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-emerald-300 bg-emerald-400/10 border border-emerald-400/20 rounded-full px-3 py-1 mb-4">
+          <span className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-400/10 border border-emerald-500/20 dark:border-emerald-400/20 rounded-full px-3 py-1 mb-4">
             <FiShield /> License renewal
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-            Get back online in <span className="text-emerald-300">under a minute</span>
+            Get back online in <span className="text-emerald-600 dark:text-emerald-300">under a minute</span>
           </h1>
-          <p className="text-white/50 mt-2 text-sm sm:text-base">
+          <p className="text-slate-500 dark:text-white/50 mt-2 text-sm sm:text-base">
             Pay the invoice below. Your access is restored automatically once the payment lands.
           </p>
         </div>
@@ -299,25 +317,28 @@ const RenewLicense = () => {
         {/* states: loading / error / nothing to pay */}
         {loading && (
           <div className="grid place-items-center py-24">
-            <div className="w-10 h-10 rounded-full border-2 border-white/15 border-t-emerald-400 animate-spin" />
+            <div className="w-10 h-10 rounded-full border-2 border-slate-300 dark:border-white/15 border-t-emerald-500 dark:border-t-emerald-400 animate-spin" />
           </div>
         )}
 
         {!loading && loadError && (
-          <div className="max-w-md mx-auto text-center rounded-3xl border border-red-400/20 bg-red-400/5 p-8">
-            <FiAlertTriangle className="mx-auto text-3xl text-red-300 mb-3" />
-            <p className="text-white/80 mb-5">{loadError}</p>
-            <button onClick={loadInvoices} className="inline-flex items-center gap-2 rounded-xl bg-white/10 hover:bg-white/15 px-4 py-2 text-sm font-semibold">
+          <div className="max-w-md mx-auto text-center rounded-3xl border border-red-400/30 dark:border-red-400/20 bg-red-50 dark:bg-red-400/5 p-8">
+            <FiAlertTriangle className="mx-auto text-3xl text-red-500 dark:text-red-300 mb-3" />
+            <p className="text-slate-700 dark:text-white/80 mb-5">{loadError}</p>
+            <button
+              onClick={loadInvoices}
+              className="inline-flex items-center gap-2 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/15 px-4 py-2 text-sm font-semibold"
+            >
               <FiRefreshCw /> Try again
             </button>
           </div>
         )}
 
         {!loading && !loadError && !invoice && payState !== 'paid' && (
-          <div className="max-w-md mx-auto text-center rounded-3xl border border-emerald-400/20 bg-emerald-400/5 p-10">
+          <div className="max-w-md mx-auto text-center rounded-3xl border border-emerald-500/25 dark:border-emerald-400/20 bg-emerald-50 dark:bg-emerald-400/5 p-10">
             <div className="mx-auto mb-4 grid place-items-center w-14 h-14 rounded-full bg-emerald-400 text-emerald-950 text-2xl"><FiCheck /></div>
             <h2 className="text-xl font-bold mb-1">Nothing to pay</h2>
-            <p className="text-white/50 text-sm mb-6">There are no unpaid invoices on your account.</p>
+            <p className="text-slate-500 dark:text-white/50 text-sm mb-6">There are no unpaid invoices on your account.</p>
             <button onClick={goToDashboard} className="rounded-xl bg-emerald-400 hover:bg-emerald-300 text-emerald-950 font-bold px-6 py-3 transition-colors">
               Go to dashboard
             </button>
@@ -329,45 +350,47 @@ const RenewLicense = () => {
           <div className="grid lg:grid-cols-5 gap-6 items-start">
             {/* ── LEFT: ticket ── */}
             <div className="lg:col-span-2 relative">
-              <div className="relative rounded-3xl bg-gradient-to-b from-emerald-400/20 to-emerald-400/[0.04] border border-emerald-400/25 backdrop-blur-xl overflow-hidden">
+              <div className="relative rounded-3xl bg-gradient-to-b from-emerald-100 to-white border border-emerald-300/60 shadow-sm
+                              dark:from-emerald-400/20 dark:to-emerald-400/[0.04] dark:border-emerald-400/25 dark:shadow-none
+                              backdrop-blur-xl overflow-hidden">
                 <div className="p-6 pb-5">
                   <div className="flex items-center justify-between mb-5">
-                    <span className="text-[11px] uppercase tracking-[0.18em] text-emerald-200/70">Amount due</span>
-                    <span className="font-mono text-xs bg-black/30 rounded-md px-2 py-1 text-emerald-200">
+                    <span className="text-[11px] uppercase tracking-[0.18em] text-emerald-700/80 dark:text-emerald-200/70">Amount due</span>
+                    <span className="font-mono text-xs bg-emerald-900/10 text-emerald-800 dark:bg-black/30 dark:text-emerald-200 rounded-md px-2 py-1">
                       {invoice?.invoice_number}
                     </span>
                   </div>
                   <p className="text-4xl sm:text-5xl font-extrabold tracking-tight tabular-nums">
                     {kes(invoice?.total)}
                   </p>
-                  <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm text-white/55">
-                    <span>Issued <b className="text-white/85 font-semibold">{invoice?.invoice_date}</b></span>
-                    <span>Due <b className="text-white/85 font-semibold">{invoice?.due_date}</b></span>
+                  <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-500 dark:text-white/55">
+                    <span>Issued <b className="text-slate-800 dark:text-white/85 font-semibold">{invoice?.invoice_date}</b></span>
+                    <span>Due <b className="text-slate-800 dark:text-white/85 font-semibold">{invoice?.due_date}</b></span>
                   </div>
                 </div>
 
-                {/* perforation */}
+                {/* perforation (notch colour must match the page background) */}
                 <div className="relative h-5">
-                  <span className="absolute -left-2.5 top-0 w-5 h-5 rounded-full bg-[#04130d]" />
-                  <span className="absolute -right-2.5 top-0 w-5 h-5 rounded-full bg-[#04130d]" />
-                  <div className="absolute left-4 right-4 top-1/2 border-t border-dashed border-white/20" />
+                  <span className="absolute -left-2.5 top-0 w-5 h-5 rounded-full bg-slate-50 dark:bg-[#04130d]" />
+                  <span className="absolute -right-2.5 top-0 w-5 h-5 rounded-full bg-slate-50 dark:bg-[#04130d]" />
+                  <div className="absolute left-4 right-4 top-1/2 border-t border-dashed border-slate-300 dark:border-white/20" />
                 </div>
 
                 <div className="p-6 pt-4">
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-200/60 mb-3">What you're paying for</p>
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-700/70 dark:text-emerald-200/60 mb-3">What you're paying for</p>
                   <ul className="space-y-3">
                     {items.length > 0 ? items.map((it, i) => (
                       <li key={i} className="flex items-start justify-between gap-3 text-sm">
                         <span>
-                          <span className="block font-medium text-white/90">{it.description}</span>
-                          {it.details && <span className="block text-xs text-white/40 mt-0.5">{it.details}</span>}
+                          <span className="block font-medium text-slate-800 dark:text-white/90">{it.description}</span>
+                          {it.details && <span className="block text-xs text-slate-400 dark:text-white/40 mt-0.5">{it.details}</span>}
                         </span>
-                        <span className="font-mono tabular-nums text-white/80 whitespace-nowrap">
+                        <span className="font-mono tabular-nums text-slate-700 dark:text-white/80 whitespace-nowrap">
                           {Number(it.amount || 0).toLocaleString()}
                         </span>
                       </li>
                     )) : (
-                      <li className="text-sm text-white/50">Platform license fee</li>
+                      <li className="text-sm text-slate-500 dark:text-white/50">Platform license fee</li>
                     )}
                   </ul>
                 </div>
@@ -375,8 +398,8 @@ const RenewLicense = () => {
 
               {/* other unpaid invoices */}
               {unpaid.length > 1 && payState !== 'paid' && (
-                <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                  <p className="text-xs text-white/50 mb-3 flex items-center gap-2">
+                <div className="mt-4 rounded-2xl border border-slate-200 bg-white dark:border-white/10 dark:bg-white/[0.03] p-4">
+                  <p className="text-xs text-slate-500 dark:text-white/50 mb-3 flex items-center gap-2">
                     <FiList /> You have {unpaid.length} unpaid invoices. Pick one:
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -388,7 +411,7 @@ const RenewLicense = () => {
                         className={`font-mono text-xs rounded-lg px-3 py-1.5 border transition-all disabled:opacity-40
                         ${i.id === invoice?.id
                           ? 'bg-emerald-400 text-emerald-950 border-emerald-400 font-bold'
-                          : 'border-white/15 text-white/70 hover:border-emerald-400/60'}`}
+                          : 'border-slate-300 text-slate-600 hover:border-emerald-500 dark:border-white/15 dark:text-white/70 dark:hover:border-emerald-400/60'}`}
                       >
                         {i.invoice_number} · {Number(i.total).toLocaleString()}
                       </button>
@@ -399,7 +422,7 @@ const RenewLicense = () => {
             </div>
 
             {/* ── RIGHT: pay panel ── */}
-            <div className="lg:col-span-3 rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-5 sm:p-7 min-h-[26rem]">
+            <div className="lg:col-span-3 rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none backdrop-blur-xl p-5 sm:p-7 min-h-[26rem]">
               <AnimatePresence mode="wait">
                 {/* PAID */}
                 {payState === 'paid' && (
@@ -411,12 +434,12 @@ const RenewLicense = () => {
                       <FiCheck />
                     </motion.div>
                     <h2 className="text-2xl font-extrabold mb-2">License renewed</h2>
-                    <p className="text-white/60 text-sm mb-1">
+                    <p className="text-slate-600 dark:text-white/60 text-sm mb-1">
                       We received {kes(payResult?.amount_paid ?? invoice?.total)}.
                     </p>
                     {payResult?.reference && (
-                      <p className="text-white/40 text-xs mb-6">
-                        M-Pesa ref <span className="font-mono text-emerald-300">{payResult.reference}</span>
+                      <p className="text-slate-400 dark:text-white/40 text-xs mb-6">
+                        M-Pesa ref <span className="font-mono text-emerald-600 dark:text-emerald-300">{payResult.reference}</span>
                       </p>
                     )}
                     <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
@@ -424,7 +447,10 @@ const RenewLicense = () => {
                         Continue to dashboard
                       </button>
                       {unpaid.filter((i) => i.id !== invoice?.id).length > 0 && (
-                        <button onClick={() => { setSelectedId(null); resetPayment(); }} className="rounded-xl border border-white/15 hover:border-emerald-400/60 px-7 py-3 font-semibold transition-colors">
+                        <button
+                          onClick={() => { setSelectedId(null); resetPayment(); }}
+                          className="rounded-xl border border-slate-300 hover:border-emerald-500 dark:border-white/15 dark:hover:border-emerald-400/60 px-7 py-3 font-semibold transition-colors"
+                        >
                           Pay next invoice
                         </button>
                       )}
@@ -439,12 +465,12 @@ const RenewLicense = () => {
                     <h3 className="text-xl font-bold mt-6">
                       {payState === 'sending' ? 'Sending M-Pesa prompt…' : checkoutId ? 'Check your phone' : 'Looking for your payment…'}
                     </h3>
-                    <p className="text-white/50 text-sm mt-2 max-w-xs">
+                    <p className="text-slate-500 dark:text-white/50 text-sm mt-2 max-w-xs">
                       {checkoutId
                         ? 'Enter your M-Pesa PIN to approve the payment. This page updates by itself.'
                         : 'This usually takes 1 to 3 minutes. This page updates by itself.'}
                     </p>
-                    <p className="font-mono text-xs text-white/30 mt-4">
+                    <p className="font-mono text-xs text-slate-400 dark:text-white/30 mt-4">
                       {Math.max(TIMEOUT_SECONDS - elapsed, 0)}s left
                     </p>
                   </motion.div>
@@ -453,15 +479,15 @@ const RenewLicense = () => {
                 {/* PARTIAL */}
                 {payState === 'partial' && (
                   <motion.div key="partial" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="py-6">
-                    <div className="rounded-2xl border border-amber-300/30 bg-amber-300/10 p-5">
-                      <FiAlertTriangle className="text-amber-300 text-2xl mb-2" />
+                    <div className="rounded-2xl border border-amber-400/40 bg-amber-50 dark:border-amber-300/30 dark:bg-amber-300/10 p-5">
+                      <FiAlertTriangle className="text-amber-600 dark:text-amber-300 text-2xl mb-2" />
                       <p className="font-semibold mb-1">Partial payment received</p>
-                      <p className="text-sm text-white/70">
+                      <p className="text-sm text-slate-600 dark:text-white/70">
                         We got {kes(payResult?.amount_paid)} (ref {payResult?.reference}). Balance remaining:{' '}
-                        <b className="text-amber-200">{kes(payResult?.balance)}</b>.
+                        <b className="text-amber-700 dark:text-amber-200">{kes(payResult?.balance)}</b>.
                       </p>
                     </div>
-                    <button onClick={resetPayment} className="mt-5 w-full rounded-xl bg-white/10 hover:bg-white/15 py-3 font-semibold transition-colors">
+                    <button onClick={resetPayment} className="mt-5 w-full rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/15 py-3 font-semibold transition-colors">
                       Pay the balance
                     </button>
                   </motion.div>
@@ -471,21 +497,21 @@ const RenewLicense = () => {
                 {['idle', 'failed', 'timeout'].includes(payState) && (
                   <motion.div key="choose" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                     {payState === 'failed' && (
-                      <div className="mb-5 flex gap-3 rounded-2xl border border-red-400/25 bg-red-400/10 p-4 text-sm">
-                        <FiAlertTriangle className="text-red-300 text-lg shrink-0 mt-0.5" />
-                        <span className="text-white/80">{payMessage || 'Payment failed. Please try again.'}</span>
+                      <div className="mb-5 flex gap-3 rounded-2xl border border-red-400/30 bg-red-50 dark:border-red-400/25 dark:bg-red-400/10 p-4 text-sm">
+                        <FiAlertTriangle className="text-red-500 dark:text-red-300 text-lg shrink-0 mt-0.5" />
+                        <span className="text-slate-700 dark:text-white/80">{payMessage || 'Payment failed. Please try again.'}</span>
                       </div>
                     )}
                     {payState === 'timeout' && (
-                      <div className="mb-5 flex gap-3 rounded-2xl border border-amber-300/25 bg-amber-300/10 p-4 text-sm">
-                        <FiAlertTriangle className="text-amber-300 text-lg shrink-0 mt-0.5" />
-                        <span className="text-white/80">
+                      <div className="mb-5 flex gap-3 rounded-2xl border border-amber-400/40 bg-amber-50 dark:border-amber-300/25 dark:bg-amber-300/10 p-4 text-sm">
+                        <FiAlertTriangle className="text-amber-600 dark:text-amber-300 text-lg shrink-0 mt-0.5" />
+                        <span className="text-slate-700 dark:text-white/80">
                           No payment yet. If you already paid, it can take a few minutes to show. Otherwise, try again.
                         </span>
                       </div>
                     )}
 
-                    <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-200/60 mb-3">How would you like to pay?</p>
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-700/70 dark:text-emerald-200/60 mb-3">How would you like to pay?</p>
 
                     {/* method tiles */}
                     <div className="grid grid-cols-2 gap-3 mb-6">
@@ -499,12 +525,13 @@ const RenewLicense = () => {
                             key={m.id}
                             onClick={() => setMethod(m.id)}
                             className={`relative text-left rounded-2xl border p-4 transition-all
-                            ${on ? 'border-emerald-400 bg-emerald-400/10 shadow-[0_0_30px_rgba(52,211,153,.15)]'
-                                 : 'border-white/10 bg-white/[0.03] hover:border-white/25'}`}
+                            ${on
+                              ? 'border-emerald-500 bg-emerald-50 shadow-[0_0_30px_rgba(52,211,153,.15)] dark:border-emerald-400 dark:bg-emerald-400/10'
+                              : 'border-slate-200 bg-white hover:border-slate-400 dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/25'}`}
                           >
-                            <m.icon className={`text-xl mb-2 ${on ? 'text-emerald-300' : 'text-white/50'}`} />
+                            <m.icon className={`text-xl mb-2 ${on ? 'text-emerald-600 dark:text-emerald-300' : 'text-slate-400 dark:text-white/50'}`} />
                             <span className="block font-bold text-sm">{m.title}</span>
-                            <span className="block text-xs text-white/45 mt-0.5">{m.sub}</span>
+                            <span className="block text-xs text-slate-500 dark:text-white/45 mt-0.5">{m.sub}</span>
                             {m.id === 'stk' && (
                               <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider bg-emerald-400 text-emerald-950 rounded-full px-2 py-0.5">
                                 Easiest
@@ -517,11 +544,13 @@ const RenewLicense = () => {
 
                     {method === 'stk' ? (
                       <div>
-                        <label className="block text-sm text-white/60 mb-2">
-                          M-Pesa number to charge <span className="text-white font-semibold">{kes(invoice?.total)}</span>
+                        <label className="block text-sm text-slate-600 dark:text-white/60 mb-2">
+                          M-Pesa number to charge <span className="text-slate-900 dark:text-white font-semibold">{kes(invoice?.total)}</span>
                         </label>
-                        <div className="flex items-stretch rounded-2xl border border-white/15 focus-within:border-emerald-400 focus-within:ring-4 focus-within:ring-emerald-400/15 bg-black/30 transition-all overflow-hidden">
-                          <span className="grid place-items-center px-4 text-sm font-mono text-emerald-300 bg-white/[0.04] border-r border-white/10">
+                        <div className="flex items-stretch rounded-2xl border border-slate-300 bg-white dark:border-white/15 dark:bg-black/30
+                                        focus-within:border-emerald-500 dark:focus-within:border-emerald-400 focus-within:ring-4 focus-within:ring-emerald-400/15
+                                        transition-all overflow-hidden">
+                          <span className="grid place-items-center px-4 text-sm font-mono text-emerald-700 dark:text-emerald-300 bg-slate-100 dark:bg-white/[0.04] border-r border-slate-200 dark:border-white/10">
                             🇰🇪 +254
                           </span>
                           <input
@@ -529,7 +558,7 @@ const RenewLicense = () => {
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="712 345 678"
-                            className="flex-1 bg-transparent px-4 py-4 text-lg font-mono tabular-nums outline-none placeholder:text-white/20"
+                            className="flex-1 bg-transparent px-4 py-4 text-lg font-mono tabular-nums outline-none placeholder:text-slate-300 dark:placeholder:text-white/20"
                           />
                         </div>
                         <button
@@ -541,14 +570,14 @@ const RenewLicense = () => {
                         >
                           {payState === 'idle' ? `Send prompt to my phone` : 'Try again'}
                         </button>
-                        <p className="text-center text-xs text-white/35 mt-3">
+                        <p className="text-center text-xs text-slate-400 dark:text-white/35 mt-3">
                           You'll get a pop-up on your phone. Just enter your M-Pesa PIN.
                         </p>
                       </div>
                     ) : (
                       <div>
-                        <p className="text-sm text-white/55 mb-4">
-                          Open M-Pesa → <b className="text-white">Lipa na M-Pesa</b> → <b className="text-white">Paybill</b>, then enter:
+                        <p className="text-sm text-slate-600 dark:text-white/55 mb-4">
+                          Open M-Pesa → <b className="text-slate-900 dark:text-white">Lipa na M-Pesa</b> → <b className="text-slate-900 dark:text-white">Paybill</b>, then enter:
                         </p>
                         <div className="space-y-3">
                           <CopyField label="1 · Business number" value={PLATFORM_PAYBILL} big
@@ -558,7 +587,7 @@ const RenewLicense = () => {
                           <CopyField label="3 · Amount" value={Number(invoice?.total || 0)}
                             copied={copied === 'am'} onCopy={() => copy('am', Number(invoice?.total || 0))} />
                         </div>
-                        <p className="text-xs text-amber-200/80 mt-4">
+                        <p className="text-xs text-amber-700 dark:text-amber-200/80 mt-4">
                           The account number must be exactly <span className="font-mono">{invoice?.invoice_number}</span> so we can match your payment.
                         </p>
                         <button
@@ -580,7 +609,7 @@ const RenewLicense = () => {
         <div className="text-center mt-8">
           <button
             onClick={() => navigate('/admin/invoice')}
-            className="text-sm text-white/40 hover:text-emerald-300 transition-colors underline-offset-4 hover:underline"
+            className="text-sm text-slate-400 hover:text-emerald-600 dark:text-white/40 dark:hover:text-emerald-300 transition-colors underline-offset-4 hover:underline"
           >
             View all invoices
           </button>
