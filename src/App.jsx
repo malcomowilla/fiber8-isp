@@ -170,6 +170,7 @@ import InstallPwaButton from './pwa/InstallPwaButton'
 const TermsAndConditions = lazy(() => import("./terms_and_conditions/TermsAndConditions"))
 const HotspotAnalytics = lazy(() => import("./hotspot_page/HotspotAnalytics"))
 import CallCenter from './callcenter/CallCenter';
+const RenewLicense = lazy(() => import('./license_expired/RenewLicense'))
 
 
 
@@ -860,6 +861,7 @@ hostname.endsWith('.aitechs.co.ke')
 
 <Route  path='/admin/pppoe-ip-pools' element={<IpPools/>}/>
 <Route  path='/admin/hotspot_analytics' element={<HotspotAnalytics/>}/>
+<Route path="/admin/renew-license" element={<RenewLicense />} />
 <Route path="/admin/call-center" element={<CallCenter />} />
 
 

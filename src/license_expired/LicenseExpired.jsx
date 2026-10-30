@@ -154,7 +154,7 @@ let dateExpiryHotspot = new Date(clean2);
 
             <motion.button
             onClick={() => {
-              navigate('/admin/invoice')
+              navigate('/admin/renew-license')
             }}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
