@@ -102,7 +102,7 @@ const RouterLogsModal = ({ routerId, routerName, onClose }) => {
       size="lg"
       title="System logs"
       subtitle={`${routerName} · last ${logs.length} entries`}
-      onClose={onClose}
+      // onClose={onClose}
       footer={<button className={btn} onClick={onClose}>Close</button>}
     >
       <div className="mb-3 flex flex-wrap items-center gap-2">
