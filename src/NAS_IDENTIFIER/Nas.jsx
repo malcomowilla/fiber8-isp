@@ -1,711 +1,310 @@
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import { IconButton,Tooltip, Dialog, DialogTitle, DialogContent, IconButton as MuiIconButton,
- } from '@mui/material';
-import GetAppIcon from '@mui/icons-material/GetApp';
-import ShowChartIcon from '@mui/icons-material/ShowChart';
-import CloseIcon from '@mui/icons-material/Close';
-import {  useState, useEffect, useMemo, useCallback} from 'react'
-import EditNas from '../edit/EditNas' 
-import AddIcon from '@mui/icons-material/Add';
-import MaterialTable from 'material-table'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import DeleteRouter from '../delete/DeleteRouter'
-import {useApplicationSettings} from '../settings/ApplicationSettings'
-import { LuRouter } from "react-icons/lu";
-import { LuChartNetwork } from "react-icons/lu";
-import { FaFulcrum } from "react-icons/fa";
-import { useNavigate } from 'react-router-dom';
-import Loading from './Loading'
-import FreeRadiusLogo from "../../public/images/free_radius.svg";
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { LuMonitorSmartphone } from "react-icons/lu";
-import RemoteWinboxModal from './RemoteWinboxModal'; 
-import RouterReachabilityStats from './RouterReachabilityStats';
+import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import Modal from '../router_details/Modal';
+import RouterDetails from '../router_details/RouterDetails';
+import { apiFetch, readJson } from '../utils/routerApi';
 
+const btn = `inline-flex h-8 items-center gap-1.5 rounded-lg border border-black/10 px-3 text-xs font-medium
+  text-black transition-colors hover:bg-black/5 disabled:opacity-50 dark:border-white/10 dark:text-white dark:hover:bg-white/10`;
+const input = `h-10 w-full rounded-lg border border-black/10 bg-transparent px-3 text-sm text-black outline-none
+  focus:border-black/40 dark:border-white/10 dark:text-white dark:focus:border-white/40`;
 
-
-
-
-
-const Nas = () => {
-
-const navigate = useNavigate()
-  const [open, setOpen] = useState(false);
-  const [editingRouter, setEditingRouter] = useState(false)
-
-const [loading, setloading] = useState(false)
-const [offlineerror, setofflineerror] = useState(false)
-const [openDelete, setOpenDelete] = useState(false);
-const [winboxModalOpen, setWinboxModalOpen] = useState(false);
-const [winboxRouter, setWinboxRouter] = useState(null);
-const [winboxClosing, setWinboxClosing] = useState(false);
-
-// Reachability history modal — independent of the router's live
-// online/offline state, so it stays usable while a router is down.
-const [reachabilityModalOpen, setReachabilityModalOpen] = useState(false);
-const [reachabilityRouter, setReachabilityRouter] = useState(null);
-
-
-
-
-
-
-
-
-const { nasformData, setnasFormData,initialValueNas, setTableData,
-  pingStatus, setPingStatus,
-  showMenu1, setShowMenu1, showMenu2, setShowMenu2, showMenu3, setShowMenu3,
-      showMenu4, setShowMenu4, showMenu5, setShowMenu5, showMenu6, setShowMenu6,
-       showMenu7, setShowMenu7, showMenu8, setShowMenu8, showMenu9, setShowMenu9,
-        showMenu10, setShowMenu10, showMenu11, setShowMenu11, showMenu12, setShowMenu12,
-routerName, setRouterName,openNasTable, setOpenNasTable,
-        openRouterDetails, setOpenRouterDetails
-
- } =  useApplicationSettings() 
-const [selectedRouter, setSelectedRouter] = useState(null);
-const [selectedRouterInfo, setSelectedRouterInfo] = useState(null);
-const [search ,setSearch] = useState('')
-
-
-const [tableDataNas, setTableDataNas] = useState([]); 
-
-
-  const [openLoading, setOpenLoading] = useState(false);
-
-
-const [selectedRouterId, setSelectedRouterId] = useState(() => {
-  const savedRouterId = localStorage.getItem('selectedCheckedRouter');
-  return savedRouterId ? parseInt(savedRouterId, 10) : null;
-});
-
-
-
-
-
-
-function useIsDarkMode() {
-  const [isDark, setIsDark] = useState(
-    () => typeof document !== 'undefined' &&
-      document.documentElement.classList.contains('dark')
+const StatusBadge = ({ reachable }) => {
+  const map = {
+    true: { dot: 'bg-emerald-500', text: 'Reachable' },
+    false: { dot: 'bg-red-500', text: 'Not reachable' },
+    undefined: { dot: 'bg-gray-400', text: 'Checking…' },
+  };
+  const s = map[String(reachable)] || map.undefined;
+  return (
+    <span className="inline-flex items-center gap-2 text-sm text-black dark:text-white">
+      <span className={`h-2 w-2 rounded-full ${s.dot}`} />
+      {s.text}
+    </span>
   );
-
-  useEffect(() => {
-    const root = document.documentElement;
-
-    const update = () => setIsDark(root.classList.contains('dark'));
-    update();
-
-    const observer = new MutationObserver(update);
-    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
-
-    return () => observer.disconnect();
-  }, []);
-
-  return isDark;
-}
-
-
-
-
-
-const isDark = useIsDarkMode();
-
-const tableTheme = useMemo(() => createTheme({
-  palette: {
-    mode: isDark ? 'dark' : 'light',
-    background: {
-      paper: isDark ? '#1e1e1e' : '#ffffff',
-      default: isDark ? '#1e1e1e' : '#ffffff',
-    },
-    text: {
-      primary: isDark ? '#f1f1f1' : '#1a1a1a',
-      secondary: isDark ? '#a3a3a3' : '#6b7280',
-    },
-  },
-}), [isDark]);
-
-
-
-
-
-const handleClickOpenDelete = () => {
-  setOpenDelete(true);
 };
 
-const handleCloseDelete = () => {
-  
-  setOpenDelete(false);
-};
+// ── Add / edit form ──────────────────────────────────────────────────────────
+const RouterFormModal = ({ router, onClose, onSaved }) => {
+  const isEdit = Boolean(router);
+  const [form, setForm] = useState({
+    name: router?.name || '',
+    ip_address: router?.ip_address || '',
+    username: router?.username || '',
+    password: '',
+    location: router?.location || '',
+  });
+  const [saving, setSaving] = useState(false);
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  
-  const handleClickOpen = () => {
-    setOpen(true);
-    setnasFormData(initialValueNas)
-    setEditingRouter(false)
-
-  };
-
-
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-
-
-const subdomain = window.location.hostname.split('.')[0];
-
-
-
-  const deleteRouter = async (id) =>  {
-    setloading(true)
-    const response = await fetch(`/api/delete_router/${id}`, {
-      method: "DELETE",
-      headers: {
-        'X-Subdomain': subdomain,
-      },
-
-
-    })
-    
-    
-    
-    if (response.ok) {
-      toast.success('router deleted successfully', {
-        position: "top-center",
-        duration: 7000,
-      })
-      setTableDataNas((prevData) => prevData.filter((router) => router.id !== id));
-      setloading(false)
-      
-    } else {
-      setloading(false)
-      toast.error('failed to delete router', {
-        position: "top-center",
-        duration: 7000,
-      })
-    }
-  }
-
-
-
-  const handleRowClick = (event, rowData) => {
-    setnasFormData(rowData);
-    console.log('router row data', rowData)
-    setRouterName(rowData.id)
-    setEditingRouter(true)
-  
-    // Add your custom logic here, such as opening a modal or updating state
-  };
-
-
-  const fetchRouters = useMemo(() => async ()=> {
-  
-  try {
-    const response = await fetch('/api/routers',
-      {
-        headers: {
-          'X-Subdomain': subdomain,
-        },
-      }
-  
-  
-  )
-  
-    const newData = await response.json()
-  if (response.ok) {
-   setTableDataNas(newData)
-   const ip_address = newData[0].ip_address
-   const username = newData[0].username
-   const password = newData[0].password
-   setnasFormData({...nasformData,password, username, ip_address })
-
-  } else {
-
-
-if (response.status === 401) {
-  toast.error(newData.error, {
-    position: "top-center",
-    duration: 4000,
-  })
-   setTimeout(() => {
-          window.location.href='/signin'
-         }, 1900);
-}
-toast.error(newData.error,{
-position: 'top-center',
-duration: 5000,
-})
-
-toast.error('failed to fetch routers', {
-position: 'top-center',
-duration: 4000,
-})
-   
-  }
-  
-  } catch (error) {
-    
-  
-  }
-  
-  
-  }, [])
-  
-  useEffect(() => {
-    
-    fetchRouters()
-  }, [fetchRouters]);
-
-
-
-const handleSubmit = async (e)=> {
-
-    e.preventDefault()
-
+  const submit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
     try {
-        setloading(true)
-        const url = nasformData.id ? `/api/update_router/${nasformData.id}` : '/api/create_router';
-        const method = nasformData.id ? 'PATCH' : 'POST';
-        const res = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Subdomain': subdomain,
-                
-            },
-            body: JSON.stringify(nasformData),
-        })
-
-        const newData = await res.json()
-        if (res.ok) {
-          setloading(false)
-         
-          if (nasformData.id) {
-            toast.success('router updated successfully', {
-              position: "top-center",
-              duration: 7000,
-            })
-            setTableDataNas(tableDataNas.map(item => (item.id === nasformData.id ? newData : item)));
-          }else{
-            setTableDataNas((tableData)=>[...tableData, newData])
-            toast.success('router added successfully', {
-              position: "top-center",
-              duration: 7000,
-            })
-          }
-            
-            setloading(false)
-          handleClose()
-
-        } else {
-          toast.error('failed to add router', {
-            position: "top-center",
-            duration: 6000,
-          })
-            setloading(false)
-
-        }
-    } catch (error) {
-      toast.error('failed to add router something went wrong', {
-        position: "top-center",
-        duration: 6000,
-      })
-        setloading(false);
-
+      const payload = { ...form };
+      if (isEdit && !payload.password) delete payload.password;
+      const res = await apiFetch(isEdit ? `/api/update_router/${router.id}` : '/api/create_router', {
+        method: isEdit ? 'PATCH' : 'POST',
+        body: { nas_router: payload },
+      });
+      const data = await readJson(res);
+      if (!res.ok) throw new Error(data.error || 'Request failed');
+      toast.success(isEdit ? 'Router updated' : 'Router added', { position: 'top-center' });
+      onSaved();
+      onClose();
+    } catch (err) {
+      toast.error(err.message, { position: 'top-center' });
+    } finally {
+      setSaving(false);
     }
-
-
-    }
-
-
-    function getRouterInfoById(id) {
-      return tableDataNas.find(router => router.id === id);
-    }
-    useEffect(() => {
-      if (selectedRouterId !== null) {
-        const routerInfo = getRouterInfoById(selectedRouterId);
-        setSelectedRouterInfo(routerInfo);
-      }
-    }, [selectedRouterId]);
-
-
-    const handleCheckboxChange = (event, rowData) => {
-      const newSelectedRouter = rowData.id === selectedRouter ? null : rowData.id;
-      setSelectedRouter(newSelectedRouter);
-      setnasFormData(newSelectedRouter !== null ? rowData : initialValueNas);
-
-    };
-
-
-        const getPingStatus = useCallback(
-          async() => {
-            
-
-            const response = await fetch('/api/router_ping_response',{
-              headers: {
-                'X-Subdomain': subdomain,
-              },
-            })
-            const newData = await response.json()
-            if (response.ok) {
-              setPingStatus(newData)
-            
-            }else{
-              toast.error('failed to get router ping status something went wrong', {
-                position: "top-center",
-                duration: 5000,
-              })
-            }
-          },
-          [],
-        )
-        
-
-
-
-        useEffect(() => {
-          getPingStatus(); // Initial fetch
-        
-           const intervalId = setInterval(() => {
-            getPingStatus();
-          }, 35000); // Fetch every 60 seconds
-          return () => clearInterval(intervalId);
-        
-        }, [getPingStatus]); 
-        
-
-
-const mergedTableData = tableDataNas.map((nasRouter) => {
-  // Find matching ping status for this router
-  const routerPingStatus = pingStatus.find(
-    (status) => status?.ip === nasRouter.ip_address
-  );
-  // Extract ping time if available
-  const response = routerPingStatus?.response || "";
-  const pingTimeMatch = response.match(/time[=<](\d+\.?\d*ms)/i); // More robust regex
-  const pingTime = pingTimeMatch ? pingTimeMatch[1] : "N/A";
-  
-  return {
-    ...nasRouter,
-    ping: pingTime || "N/A",
-    reachable: routerPingStatus?.reachable ? "Reachable" : "Not reachable",
-    ip_adress_router: routerPingStatus?.ip || nasRouter.ip_address || "N/A",
-    last_checked: routerPingStatus?.checked_at || "Never checked",
-    response: response || "N/A"
-  };
-});
-
-
-  // Stops the relay session on the server (deletes the HAProxy conf file
-  // for this port) before closing the modal, so idle sessions don't sit
-  // open for the full 15 minute TTL.
-  const closeWinboxSession = async () => {
-    if (winboxRouter?.id) {
-      setWinboxClosing(true);
-      try {
-        const res = await fetch(`/api/nas_routers/${winboxRouter.id}/winbox_session`, {
-          method: 'DELETE',
-          headers: {
-            'X-Subdomain': subdomain,
-          },
-        });
-        if (res.ok) {
-          toast.success('WinBox session closed', {
-            position: 'top-center', duration: 3000,
-          });
-        } else {
-          const data = await res.json().catch(() => ({}));
-          toast.error(data.error || `Failed to close session (${res.status})`, {
-            position: 'top-center', duration: 6000,
-          });
-        }
-      } catch (error) {
-        toast.error('Failed to close session — network error', {
-          position: 'top-center', duration: 6000,
-        });
-        console.log('failed to stop winbox session', error);
-      } finally {
-        setWinboxClosing(false);
-      }
-    }
-    setWinboxModalOpen(false);
   };
 
-
-  
-
-  const DeleteButton = () => (
-        <IconButton style={{ color: '#8B0000' }}  onClick={handleClickOpenDelete}>
-          <DeleteIcon />
-        </IconButton>
-      );
-
-
-  const EditButton = () => (
-    <IconButton style={{color: 'green'}}   onClick={handleClickOpen}>
-      <EditIcon />
-    </IconButton>
+  const Field = ({ label, children, hint }) => (
+    <label className="block">
+      <span className="mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{label}</span>
+      {children}
+      {hint && <span className="mt-1 block text-xs text-gray-500 dark:text-gray-400">{hint}</span>}
+    </label>
   );
-const columns = [
-    {title: 'name', field: 'name',  },
-
-  {
-    title: 'ping',
-    field: 'response',
-    render: rowData => (
-      <span style={{ 
-        color: rowData.reachable === 'Reachable' ? 'green' : 'red', 
-        fontWeight: 'bold' 
-      }}>
-        {rowData.response?.substring(14, 35) || 'N/A'}
-
-      </span>
-    )
-  },
-  
-  {
-    title: 'Status',
-    field: 'reachable',
-    render: rowData => (
-      <span style={{ 
-        color: rowData.reachable === 'Reachable' ? 'green' : 'red', 
-        fontWeight: 'bold' 
-      }}>
-        {rowData.reachable === 'Reachable' ? 'Reachable' : 'Not Reachable' }
-      </span>
-    )
-  },
-  {title: 'ip_address', field: 'ip_address',
-   },
-
-   {title: 'Location', field: 'location'},
-  {title: 'username', field: 'username', },
-{title: 'Action', field:'Action',
-  render: (rowData) =>  
-    <>
-      <div className='flex flex-wrap gap-2 items-center'>
-        <DeleteButton id={rowData.id} />
-        <EditButton />
-
-        <Tooltip title="Router Details">
-          <IconButton
-            size="small"
-            onClick={() => {
-              setOpenLoading(true);
-              setRouterName(rowData.id);
-              setTimeout(() => {
-                navigate(`/admin/router_details?id=${rowData.id}&status=${rowData.reachable}`);
-              }, 2000);
-            }}
-          >
-            <LuChartNetwork className='text-black' style={{ width: 22, height: 22 }} />
-          </IconButton>
-        </Tooltip>
-
-        <Tooltip title="Reachability History">
-          <IconButton
-            size="small"
-            onClick={() => {
-              setReachabilityRouter(rowData);
-              setReachabilityModalOpen(true);
-            }}
-          >
-            <ShowChartIcon className='text-emerald-600' style={{ width: 22, height: 22 }} />
-          </IconButton>
-        </Tooltip>
-
-
-<Tooltip title="Remote WinBox">
-  <IconButton size="small" onClick={() => {
-    setWinboxRouter(rowData);
-    setWinboxModalOpen(true);
-  }}>
-    <LuMonitorSmartphone className='text-black' style={{ width: 22, height: 22 }} />
-  </IconButton>
-</Tooltip>
-       
-      </div>
-    </>
-}
-
-]
-const handleCloseLoading = () => {
-  setOpenLoading(false);
-};
 
   return (
-    <>
-    <Loading openLoading={openLoading} setOpenLoading={setOpenLoading}
-    handleClose={handleCloseLoading}
-    />
+    <Modal
+      title={isEdit ? `Edit ${router.name}` : 'Add router'}
+      onClose={onClose}
+      footer={
+        <>
+          <button type="button" className={btn} onClick={onClose}>Cancel</button>
+          <button type="submit" form="router-form" disabled={saving}
+            className="inline-flex h-8 items-center rounded-lg bg-black px-4 text-xs font-semibold text-white disabled:opacity-50 dark:bg-white dark:text-black">
+            {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Add router'}
+          </button>
+        </>
+      }
+    >
+      <form id="router-form" onSubmit={submit} className="space-y-4">
+        <Field label="Name"><input required className={input} value={form.name} onChange={set('name')} /></Field>
+        <Field label="IP address"><input required className={`${input} font-mono`} value={form.ip_address} onChange={set('ip_address')} /></Field>
+        <Field label="Location"><input className={input} value={form.location} onChange={set('location')} /></Field>
+        <Field label="API username"><input required className={input} value={form.username} onChange={set('username')} autoComplete="off" /></Field>
+        <Field
+          label="API password"
+          hint={
+            isEdit
+              ? 'Leave blank to keep the saved one. This only updates what the platform uses to connect. To change the password on the router itself, open Details → Router login.'
+              : 'The platform uses this login to talk to the router.'
+          }
+        >
+          <input required={!isEdit} type="password" className={input} value={form.password}
+            onChange={set('password')} autoComplete="new-password" />
+        </Field>
+      </form>
+    </Modal>
+  );
+};
 
+// ── Main table ───────────────────────────────────────────────────────────────
+const Nas = () => {
+  const [routers, setRouters] = useState([]);
+  const [statuses, setStatuses] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [expandedId, setExpandedId] = useState(null);
+  const [formTarget, setFormTarget] = useState(null); // null | 'new' | router
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
+  const loadRouters = useCallback(async () => {
+    try {
+      const res = await apiFetch('/api/routers');
+      if (!res.ok) throw new Error('Failed to load routers');
+      setRouters(await res.json());
+    } catch (err) {
+      toast.error(err.message, { position: 'top-center' });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    <div  
-    onClick={() => {
-      setShowMenu1(false)
-      setShowMenu2(false)
-      setShowMenu3(false)
-      setShowMenu4(false) 
-      setShowMenu5(false)
-      setShowMenu6(false)
-      setShowMenu7(false)
-      setShowMenu8(false)
-      setShowMenu9(false)
-      setShowMenu10(false)
-      setShowMenu11(false)  
-      setShowMenu12(false)
-    }}
-    className=''>
+  const loadStatuses = useCallback(async () => {
+    try {
+      const res = await apiFetch('/api/router_ping_response');
+      if (!res.ok) return;
+      const data = await res.json();
+      const map = {};
+      data.forEach((s) => { map[s.ip] = s.reachable; });
+      setStatuses(map);
+    } catch { /* silent */ }
+  }, []);
+
+  useEffect(() => { loadRouters(); }, [loadRouters]);
+  useEffect(() => {
+    loadStatuses();
+    const t = setInterval(loadStatuses, 15000);
+    return () => clearInterval(t);
+  }, [loadStatuses]);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return routers;
+    return routers.filter((r) =>
+      [r.name, r.ip_address, r.location].some((v) => v?.toLowerCase().includes(q)));
+  }, [routers, search]);
+
+  const confirmDelete = async () => {
+    setDeleting(true);
+    try {
+      const res = await apiFetch(`/api/delete_router/${deleteTarget.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error((await readJson(res)).error || 'Failed to delete router');
+      toast.success('Router deleted', { position: 'top-center' });
+      if (expandedId === deleteTarget.id) setExpandedId(null);
+      setDeleteTarget(null);
+      loadRouters();
+    } catch (err) {
+      toast.error(err.message, { position: 'top-center' });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="font-sans antialiased">
       <Toaster />
-            
-      <div className="flex items-center max-w-sm mx-auto p-3">  
-     
-     <label htmlFor="simple-search" className="sr-only">Search</label>
-     <div className="relative w-full">
-         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-             <LuRouter className='text-black'/>
-             
-         </div>
- 
- 
-         <input type="text" value={search} onChange={(e)=> setSearch(e.target.value)}
-          className="bg-gray-50 border border-gray-300 text-gray-900 
-         text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full ps-10 p-2.5 
-           dark:border-gray-600 dark:placeholder-gray-400 dark:text-black
-           dark:focus:ring-green-500 dark:focus:border-green-500" placeholder="Search for wifi routers..."  />
-     </div>
-     <button type="" className="p-2.5 ms-2 text-sm font-medium text-white bg-green-700 
-     rounded-lg border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
-      focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-         <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-              strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-         </svg>
-         <span className="sr-only">Search</span>
-     </button>
- </div>
-<EditNas open={open} handleClose={handleClose} tableData={tableDataNas} handleSubmit={handleSubmit}   nasformData={nasformData}
- setnasFormData={setnasFormData}  isloading={loading}
- editingRouter={editingRouter} setEditingRouter={setEditingRouter}
- />
 
-
-<DeleteRouter loading={loading}  deleteRouter={deleteRouter} id={nasformData.id} 
- handleCloseDelete ={handleCloseDelete}  openDelete={openDelete}/>
-<RemoteWinboxModal
-  open={winboxModalOpen}
-  onClose={closeWinboxSession}
-  closing={winboxClosing}
-  routerId={winboxRouter?.id}
-  routerName={winboxRouter?.name}
-/>
-
-{/* Reachability history modal — always opens regardless of whether the
-    router currently shows reachable or not, since checking past outages
-    is most useful exactly when the router looks down right now. */}
-<Dialog
-  open={reachabilityModalOpen}
-  onClose={() => setReachabilityModalOpen(false)}
-  maxWidth="md"
-  fullWidth
->
-  <DialogTitle className="flex items-center justify-between !pr-3">
-    <span>{reachabilityRouter?.name || 'Router'} — Reachability</span>
-    <MuiIconButton size="small" onClick={() => setReachabilityModalOpen(false)}>
-      <CloseIcon style={{ width: 20, height: 20 }} />
-    </MuiIconButton>
-  </DialogTitle>
-  <DialogContent className="!p-0">
-    <RouterReachabilityStats routerId={reachabilityRouter?.id} />
-  </DialogContent>
-</Dialog>
-
-
-
-<div className={`rounded-2xl border overflow-hidden shadow-sm ${
-  isDark ? 'border-[#3a3a3a]' : 'border-[#e5e0d5]'
-}`}>
- <ThemeProvider theme={tableTheme}>
-
-      <MaterialTable columns={columns}
-      
-      title= { <p className='
-        
-         font-bold text-2xl font-sans
-'>NAS (Mikrotik Routers 
-         with PPPoE/Hotspot) </p> }
-      
-      
-      data={mergedTableData}
-
-    onRowClick={handleRowClick}
-    actions={[
-        {
-          icon:()=><GetAppIcon/>,
-          tooltip: 'import'
-        },
-        {
-          icon: () => <AddIcon  onClick={handleClickOpen} />,
-          isFreeAction: true, // This makes the action always visible
-          tooltip: 'Add Router'
-        }
-    ]}
-
-
-localization={{
-                body: {
-                  emptyDataSourceMessage: 'No NAS found. Create your first NAS to get started!'
-                },
-               
-              
-              
-              }}
-
- options={{
-      sorting: true,
-      pageSizeOptions: [2, 5, 10, 20],
-      pageSize: 20,
-      paginationPosition: 'bottom',
-      exportButton: true,
-      exportAllData: true,
-      selection: true,
-      search: false,
-      searchAutoFocus: true,
-      showSelectAllCheckbox: false,
-      showTextRowsSelected: false,
-      emptyRowsWhenPaging: false,
-      actionsColumnIndex: -1,
-      headerStyle: {
-        fontFamily: 'monospace',
-        textTransform: 'uppercase',
-        fontWeight: 700,
-        fontSize: '12px',
-        backgroundColor: isDark ? '#2a2a2a' : '#f4f1ea',
-        color: isDark ? '#f1f1f1' : '#1a1a1a',
-        borderBottom: isDark ? '2px solid #3a3a3a' : '2px solid #e5e0d5',
-      },
-      rowStyle: (rowData, index) => ({
-        backgroundColor: isDark
-          ? (index % 2 === 0 ? '#1e1e1e' : '#262626')
-          : (index % 2 === 0 ? '#ffffff' : '#fafaf7'),
-        color: isDark ? '#f1f1f1' : '#1a1a1a',
-        fontFamily: 'monospace',
-      }),
-    }} 
-      
-      
-      />
-
-      </ThemeProvider>
+      {/* Toolbar */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-black dark:text-white">Routers</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {routers.length} router{routers.length === 1 ? '' : 's'} · use “View details” on a row for live info,
+            reachability history and remote access
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" style={{ width: 18, height: 18 }} />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search name, IP or location"
+              className="h-9 w-64 rounded-lg border border-black/10 bg-transparent pl-8 pr-3 text-sm text-black outline-none
+                focus:border-black/40 dark:border-white/10 dark:text-white dark:focus:border-white/40"
+            />
+          </div>
+          <button className={btn} onClick={() => { loadRouters(); loadStatuses(); }} title="Reload the list and statuses">
+            <RefreshIcon style={{ width: 16, height: 16 }} /> Refresh
+          </button>
+          <button
+            onClick={() => setFormTarget('new')}
+            title="Register a new router on the platform"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-black px-3 text-xs font-semibold text-white dark:bg-white dark:text-black"
+          >
+            <AddIcon style={{ width: 16, height: 16 }} /> Add router
+          </button>
+        </div>
       </div>
 
+      {/* Table */}
+      <div className="overflow-x-auto rounded-2xl border border-black/10 dark:border-white/10">
+        <table className="w-full min-w-[760px] text-left">
+          <thead>
+            <tr className="border-b border-black/10 text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:border-white/10 dark:text-gray-400">
+              <th className="px-4 py-3">Router</th>
+              <th className="px-4 py-3">IP address</th>
+              <th className="px-4 py-3">Location</th>
+              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr><td colSpan={5} className="px-4 py-12 text-center text-sm text-gray-500">Loading routers…</td></tr>
+            ) : filtered.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-4 py-12 text-center text-sm text-gray-500">
+                  {routers.length === 0 ? 'No routers yet. Click “Add router” to register one.' : 'No routers match your search.'}
+                </td>
+              </tr>
+            ) : filtered.map((r) => {
+              const open = expandedId === r.id;
+              const reachable = statuses[r.ip_address];
+              return (
+                <Fragment key={r.id}>
+                  <tr className={`border-b border-black/5 last:border-0 dark:border-white/5 ${open ? 'bg-black/[0.03] dark:bg-white/[0.04]' : ''}`}>
+                    <td className="px-4 py-3 text-sm font-medium text-black dark:text-white">{r.name}</td>
+                    <td className="px-4 py-3 font-mono text-sm text-black dark:text-white">{r.ip_address}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{r.location || '—'}</td>
+                    <td className="px-4 py-3"><StatusBadge reachable={reachable} /></td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          className={btn}
+                          aria-expanded={open}
+                          title="Show router info, active sessions, reachability history and remote access"
+                          onClick={() => setExpandedId(open ? null : r.id)}
+                        >
+                          <ExpandMoreIcon style={{ width: 16, height: 16, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
+                          {open ? 'Hide details' : 'View details'}
+                        </button>
+                        <button className={btn} title="Change the name, IP, location or saved API login" onClick={() => setFormTarget(r)}>
+                          <EditOutlinedIcon style={{ width: 16, height: 16 }} /> Edit
+                        </button>
+                        <button className={btn} title="Remove this router from the platform" onClick={() => setDeleteTarget(r)}>
+                          <DeleteOutlineIcon style={{ width: 16, height: 16 }} /> Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
 
+                  {open && (
+                    <tr className="border-b border-black/5 bg-black/[0.02] last:border-0 dark:border-white/5 dark:bg-white/[0.02]">
+                      <td colSpan={5} className="p-4">
+                        <RouterDetails router={r} reachable={reachable} />
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {formTarget && (
+        <RouterFormModal
+          router={formTarget === 'new' ? null : formTarget}
+          onClose={() => setFormTarget(null)}
+          onSaved={loadRouters}
+        />
+      )}
+
+      {deleteTarget && (
+        <Modal
+          title="Delete router?"
+          onClose={() => !deleting && setDeleteTarget(null)}
+          footer={
+            <>
+              <button className={btn} disabled={deleting} onClick={() => setDeleteTarget(null)}>Cancel</button>
+              <button disabled={deleting} onClick={confirmDelete}
+                className="inline-flex h-8 items-center rounded-lg bg-red-600 px-4 text-xs font-semibold text-white disabled:opacity-50">
+                {deleting ? 'Deleting…' : 'Delete router'}
+              </button>
+            </>
+          }
+        >
+          <p className="text-sm text-gray-700 dark:text-gray-300">
+            <span className="font-semibold">{deleteTarget.name}</span> ({deleteTarget.ip_address}) will be removed from the platform.
+            The router itself is not touched.
+          </p>
+        </Modal>
+      )}
     </div>
-    </>
-  )
-}
+  );
+};
 
-export default Nas
+export default Nas;
