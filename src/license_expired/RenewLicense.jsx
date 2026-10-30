@@ -37,8 +37,9 @@ const Stepper = ({ active }) => {
           <React.Fragment key={label}>
             <div className="flex items-center gap-2">
               <span
-                className={`grid place-items-center w-7 h-7 rounded-full text-xs font-bold transition-all
-                ${done ? 'bg-emerald-400 text-emerald-950'
+                className={`grid place-items-center w-7 h-7 
+                    rounded-full text-xs font-bold transition-all
+                ${done ? ' text-emerald-950'
                   : current ? 'bg-white text-emerald-900 ring-4 ring-emerald-400/30'
                   : 'bg-white/10 text-white/40'}`}
               >
