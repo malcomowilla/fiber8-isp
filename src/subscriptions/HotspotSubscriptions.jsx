@@ -1451,7 +1451,8 @@ const downloadVoucherCard = (rowData) => {
           </div> */}
         </div>
 
-<div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-3 mb-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+<div className="flex flex-col md:flex-row md:items-center
+ justify-between gap-3 p-3 mb-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
   <div className="flex flex-wrap gap-2">
     {[
       { key: 'all',     label: 'All',     color: '#374151' },

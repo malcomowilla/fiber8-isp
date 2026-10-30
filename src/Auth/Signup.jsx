@@ -18,9 +18,12 @@ import {
 
 const Styles = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
-    .landing-root { font-family: 'IBM Plex Mono', monospace; }
-    .mono { font-family: 'IBM Plex Mono', monospace; }
+    @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap');
+
+.landing-root { font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif; }
+.mono { font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif; }
+
+
 
     /* ── Theme tokens ─────────────────────────────────────────────────── */
     .landing-root {
