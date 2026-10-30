@@ -128,8 +128,12 @@ let dateExpiryHotspot = new Date(clean2);
                 <p className="text-gray-600 dark:text-gray-400 flex flex-col">
                  
 
-                  {isExpiredHotspot ? (                   
-                    <span className="font-medium"> Hotspot And PPPOE license expired on - <span className='font-bold'>{expiry2} </span> </span>
+                  {isExpiredHotspot ? (    
+                    <>               
+                    <span className="font-medium"> Hotspot And PPPOE
+                     license expired on - <span className='font-bold'>{expiry2} </span> </span>
+                     <span className="text-lg font-bold">After 2 months unpaid all the data with this tenant will be deleted </span>
+                     </>
                   ) : null}
 
                 </p>
@@ -139,7 +143,7 @@ let dateExpiryHotspot = new Date(clean2);
             </div>
 
             <div className="flex items-start gap-4">
-              <FiRefreshCw className="text-blue-500 mt-1 text-xl" />
+              <FiRefreshCw className="text-green-500 mt-1 text-xl" />
               <div>
                 <h3 className="font-semibold text-gray-800 dark:text-gray-200">Renew Now</h3>
                 <p className="text-gray-600 dark:text-gray-400">

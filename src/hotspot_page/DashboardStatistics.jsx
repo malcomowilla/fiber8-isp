@@ -571,6 +571,19 @@ const DashboardStatistics = () => {
       });
       const data = await res.json();
       if (res.ok) applyLiveUpdate(data);
+      if (!res.ok) {
+        if (res.status === 402) {
+    toast.error(data.error, {
+      position: "top-center",
+      duration: 5000,
+    })
+    
+     setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 2000);
+  }
+      }
     } catch {
       /* noop */
     }
@@ -598,8 +611,22 @@ const DashboardStatistics = () => {
 
   const getExpiredVouchers = useCallback(async () => {
     try {
-      const response = await fetch('/api/hotspot_vouchers', { headers: { 'X-Subdomain': subdomain } });
+      const response = await fetch('/api/hotspot_vouchers',
+         { headers: { 'X-Subdomain': subdomain } });
       const newData = await response.json();
+      if (!response.ok) {
+        if (response.status === 402) {
+    toast.error(newData.error, {
+      position: "top-center",
+      duration: 5000,
+    })
+    
+     setTimeout(() => {
+          // navigate('/license-expired')
+          window.location.href='/license-expired'
+         }, 2000);
+  }
+      }
       setExpiredVouchers(response.ok ? newData?.filter((v) => v.status === "expired").length : 0);
     } catch {
       setExpiredVouchers(0);
