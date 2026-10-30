@@ -6,7 +6,7 @@ import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import DownloadIcon from '@mui/icons-material/Download';
 import Modal from './Modal';
 import RemoteAccessPanel from './RemoteAccessPanel';
-import RouterReachabilityStats from './NAS_IDENTIFIER/RouterReachabilityStats';
+import RouterReachabilityStats from '../NAS_IDENTIFIER/RouterReachabilityStats';
 import { apiFetch, readJson } from '../utils/routerApi';
 
 
