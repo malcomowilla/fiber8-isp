@@ -171,6 +171,7 @@ const TermsAndConditions = lazy(() => import("./terms_and_conditions/TermsAndCon
 const HotspotAnalytics = lazy(() => import("./hotspot_page/HotspotAnalytics"))
 import CallCenter from './callcenter/CallCenter';
 const RenewLicense = lazy(() => import('./license_expired/RenewLicense'))
+const ApplyForAccess = lazy(() => import('./Auth/ApplyForAccess'))
 
 
 
@@ -721,6 +722,7 @@ hostname.endsWith('.aitechs.co.ke')
     <Route path='/two-factor-auth' element={<TwoFactorAuthVerification/>}/>
     <Route  path='/pepea' element={<PePeaPreview/>}/>
     <Route path='/contact-us' element={<ContactUs/>}/>
+    <Route path='/apply' element={<ApplyForAccess/>}/>
     
 
 <Route element={<ProtectAuthSystemAdmin  />}>

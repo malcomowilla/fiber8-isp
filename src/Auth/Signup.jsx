@@ -479,6 +479,14 @@ const Signup = () => {
                 className="theme-toggle-btn w-10 h-10 rounded-xl flex items-center justify-center">
                 {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
               </motion.button>
+
+<Link to="/apply" data-cta="true"
+  className="px-5 py-2.5 rounded-2xl text-sm font-bold
+   text-theme-primary transition-all hover:opacity-80"
+  style={{ border: '1px solid var(--border-subtle)', background: 'var(--bg-soft)' }}>
+  Apply for access
+</Link>
+
               <WaBtn text="Get Demo" />
               <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: .97 }}
                 data-cta="true"
@@ -512,6 +520,10 @@ const Signup = () => {
                     <a key={l.label} href={l.href} onClick={() => { setMenuOpen(false); l.onClick?.(); }}
                       className="block text-sm font-medium text-theme-secondary py-2">{l.label}</a>
                   ))}
+                  <Link to="/apply" data-cta="true" onClick={() => setMenuOpen(false)}
+  className="block text-sm font-bold text-theme-primary py-2">
+  Apply for access →
+</Link>
                   <WaBtn text="Get Demo" />
                 </div>
               </motion.div>
@@ -576,6 +588,12 @@ const Signup = () => {
                 style={{ border: '1px solid var(--border-subtle)', background: 'var(--bg-soft)' }}>
                 View Pricing <ArrowRight size={18} />
               </motion.button>
+
+              <Link to="/apply" data-cta="true"
+  className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-bold text-theme-primary transition-all hover:opacity-80"
+  style={{ border: '1px solid var(--border-subtle)', background: 'var(--bg-soft)' }}>
+  Apply for access <ArrowRight size={18} />
+</Link>
             </motion.div>
 
             {/* Social proof */}

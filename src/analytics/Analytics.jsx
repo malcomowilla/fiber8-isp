@@ -25,6 +25,7 @@ import NotificationCenter from './NotificationCenter';
 import RecentHotspotPayments from './RecentHotspotPayments';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import OnboardingChecklist from '../onboarding/OnboardingChecklist';
 
 const cable = createConsumer(`wss://${window.location.hostname}/cable`);
 
@@ -894,6 +895,14 @@ const Analytics = () => {
                 <NotificationCenter />
               </div> */}
             </motion.div>
+
+
+
+ {/* ── First-login setup guide (hides itself when dismissed) ── */}
+            <OnboardingChecklist />
+
+
+
 
             {/* ── Top 4 KPI cards ──────────────────────────────────────────────── */}
             <motion.div variants={container} initial="hidden" animate="visible"

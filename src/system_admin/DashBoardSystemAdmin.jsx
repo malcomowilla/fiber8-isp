@@ -50,6 +50,8 @@ import SmsWalletPurchases from './SmsWalletPurchases';
 import SmsIcon from '@mui/icons-material/Sms';
 import ProxmoxDashboard from './ProxmoxDashboard';
 import CollectorRegistrations from './CollectorRegistrations';
+import AccessApplications from './AccessApplications';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
 
 const NAV_SECTIONS = [
   {
@@ -67,6 +69,7 @@ const NAV_SECTIONS = [
       { value: 15, label: 'Support', Icon: LifeBuoy },
       { value: -1, label: 'Reset client password', Icon: LockResetIcon, action: 'resetPassword' },
       { value: 17, label: 'SMS credit purchases', Icon: SmsIcon },
+      { value: 19, label: 'Access applications', Icon: HowToRegIcon },
     ],
   },
   {
@@ -125,6 +128,7 @@ const PAGE_TITLES = {
   16: 'Announcements',
   17: 'SMS Credit Purchases',
   18: 'TakaPick · Collector Registrations',
+  19: 'Access Applications',
 };
 
 const PlatformSmsBalanceCard = () => {
@@ -476,6 +480,7 @@ const DashboardSytemAdmin = () => {
                       {value === 16 && <SystemAnnouncementsManager />}
                       {value === 17 && <SmsWalletPurchases />}
                       {value === 18 && <CollectorRegistrations />}
+                      {value === 19 && <AccessApplications />}
                     </motion.div>
                   )}
                 </AnimatePresence>
