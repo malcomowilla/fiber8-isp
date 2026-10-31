@@ -892,7 +892,7 @@ const Signup = () => {
 
             <div className="text-center">
               <p className="text-theme-muted text-sm mb-4">
-                All plans include a <strong className="text-theme-primary">free 5-day trial</strong>.
+                All plans include a <strong className="text-theme-primary">free 3-day trial</strong>.
                 No credit card required.
               </p>
               <WaBtn text="Talk to Sales — Get Custom Quote" large />
@@ -997,7 +997,10 @@ const Signup = () => {
     © {new Date().getFullYear()} Owitech. Built for Kenyan ISPs.{" "}
     <Link
       to="/terms-and-conditions"
-      className="font-medium text-blue-600 underline underline-offset-4 decoration-2 transition-colors hover:text-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+      className="font-medium text-blue-600 underline underline-offset-4
+       decoration-2 transition-colors hover:text-blue-800 focus:outline-none 
+       focus-visible:ring-2 focus-visible:ring-blue-500 dark:text-blue-400
+        dark:hover:text-blue-300"
     >
       Terms &amp; Conditions
     </Link>
