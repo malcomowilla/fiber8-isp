@@ -582,7 +582,7 @@ const Signup = () => {
 
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .3 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <WaBtn text="Get Free Demo" large />
+              {/* <WaBtn text="Get Free Demo" large /> */}
               <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: .97 }}
                 onClick={scrollTo}
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-bold text-theme-primary border transition-all"
