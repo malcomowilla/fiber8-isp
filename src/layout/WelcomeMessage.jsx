@@ -160,7 +160,7 @@ const WelcomeMessage = () => {
 
         {/* Greeting name */}
         <p className={`font-black text-2xl leading-tight bg-gradient-to-r text-black dark:text-white bg-clip-text  mb-2`}>
-          {getGreeting()}, {company_name || 'Aitechs'}
+          {getGreeting()}, {company_name || 'Owitech'}
         </p>
 
         {/* Sub message */}
