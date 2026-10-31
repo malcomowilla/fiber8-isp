@@ -610,7 +610,8 @@ const Signup = () => {
           </div>
 
           {/* Screenshot */}
-          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .4, duration: .7 }}
+          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} 
+          transition={{ delay: .4, duration: .7 }}
             className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-3xl px-6 float">
             <img src="/images/isp_landing_page.png" alt="Dashboard Preview"
               className="w-full rounded-t-2xl shadow-2xl opacity-60"

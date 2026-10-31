@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
 import {
   Palette, Type, LayoutTemplate, Image as ImageIcon, ToggleLeft,
-  Upload, X, Wifi, RefreshCw, Save, UploadCloud, Check, Smartphone, Layers
+  Upload, X, Wifi, RefreshCw, Save, UploadCloud, Check, Smartphone, Layers,
+  GripVertical, ChevronUp, ChevronDown
 } from 'lucide-react';
 
 const subdomain = window.location.hostname.split('.')[0];
@@ -75,11 +76,27 @@ const DESIGN_TEMPLATES = {
 const FONT_OPTIONS = ['Plus Jakarta Sans', 'Inter', 'Poppins', 'Roboto', 'Space Grotesk',
    'Manrope', 'sans-serif', 'Helvetica', 'Arial', 'Times New Roman', 'Courier New', 'monospace'];
 
+
+const DEFAULT_SECTION_ORDER = ['packages', 'recover', 'voucher', 'mpesa'];
+
+const SECTION_META = {
+  packages: { label: 'Buy a Package',   hint: 'Package list and payment',     feature: 'show_packages' },
+  recover:  { label: 'Recover Session', hint: 'Reconnect using phone number', feature: null },
+  voucher:  { label: 'Have a Voucher?', hint: 'Enter a voucher code',         feature: 'show_voucher' },
+  mpesa:    { label: 'M-Pesa Code',     hint: 'Paid but not connected',       feature: 'show_mpesa_code' },
+};
+
+const normalizeOrder = (order) => {
+  const saved = (Array.isArray(order) ? order : []).filter((id, i, a) => SECTION_META[id] && a.indexOf(id) === i);
+  return [...saved, ...DEFAULT_SECTION_ORDER.filter(id => !saved.includes(id))];
+};
+
 const DEFAULT_DESIGN = {
   color_scheme: 'ocean',
   theme: { ...COLOR_SCHEMES.ocean.theme },
   typography: { font_family: 'Plus Jakarta Sans', base_size: 14, heading_size: 24, weight_heading: 700 },
-  layout: { card_width: 420, corner_radius: 24 },
+    layout: { card_width: 420, corner_radius: 24, section_order: DEFAULT_SECTION_ORDER },
+
   header: { show_logo: true, show_wifi_icon: true, logo_url: null, network_name: '', tagline: 'Connect to the internet' },
   footer: { support_label: 'Need help?', support_phone: '' },
   features: { show_packages: true, show_voucher: true, show_mpesa_code: true, show_ads: true, show_free_trial: true, show_tv_plans: false },
@@ -106,6 +123,84 @@ function ToggleRow({ label, description, checked, onChange }) {
     </div>
   );
 }
+
+
+
+
+function SectionOrder({ order, features, onChange }) {
+  const [dragIndex, setDragIndex] = useState(null);
+  const [overIndex, setOverIndex] = useState(null);
+
+  const move = (from, to) => {
+    if (from === to || to < 0 || to >= order.length) return;
+    const next = [...order];
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
+    onChange(next);
+  };
+
+  return (
+    <div className="mb-6">
+      <h3 className="text-sm font-semibold mb-1 text-slate-700 dark:text-slate-300">Section Order</h3>
+      <p className="text-xs text-slate-500 mb-3">
+        Drag to rearrange (or use the arrows). The top item appears first on the page.
+        “Buy a Package” is at the top by default so customers see where to pay right away.
+      </p>
+
+      <div className="space-y-2">
+        {order.map((id, i) => {
+          const meta = SECTION_META[id];
+          const hidden = meta.feature && features[meta.feature] === false;
+          return (
+            <div key={id}
+              draggable
+              onDragStart={() => setDragIndex(i)}
+              onDragOver={(e) => { e.preventDefault(); setOverIndex(i); }}
+              onDragLeave={() => setOverIndex(null)}
+              onDrop={() => { move(dragIndex, i); setDragIndex(null); setOverIndex(null); }}
+              onDragEnd={() => { setDragIndex(null); setOverIndex(null); }}
+              className={`flex items-center gap-3 p-3 rounded-xl border bg-white dark:bg-slate-900 cursor-grab active:cursor-grabbing transition-colors ${
+                overIndex === i && dragIndex !== null && dragIndex !== i
+                  ? 'border-green-400 ring-2 ring-green-400/30'
+                  : 'border-slate-200 dark:border-slate-800'
+              } ${dragIndex === i ? 'opacity-50' : ''} ${hidden ? 'opacity-60' : ''}`}>
+              <GripVertical size={16} className="text-slate-400 shrink-0" />
+              <span className="w-5 h-5 shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 text-[11px] font-bold flex items-center justify-center">{i + 1}</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                  {meta.label}
+                  {hidden && <span className="ml-2 text-[10px] uppercase tracking-wide text-amber-600">Hidden</span>}
+                </p>
+                <p className="text-xs text-slate-500">{meta.hint}</p>
+              </div>
+              <div className="flex flex-col shrink-0">
+                <button type="button" onClick={() => move(i, i - 1)} disabled={i === 0}
+                  className="p-0.5 text-slate-500 hover:text-slate-900 dark:hover:text-white disabled:opacity-25" aria-label="Move up">
+                  <ChevronUp size={16} />
+                </button>
+                <button type="button" onClick={() => move(i, i + 1)} disabled={i === order.length - 1}
+                  className="p-0.5 text-slate-500 hover:text-slate-900 dark:hover:text-white disabled:opacity-25" aria-label="Move down">
+                  <ChevronDown size={16} />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <button type="button" onClick={() => onChange(DEFAULT_SECTION_ORDER)}
+        className="mt-3 text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 underline">
+        Reset to default order
+      </button>
+    </div>
+  );
+}
+
+
+
+
+
+
 
 function ColorField({ label, value, onChange }) {
   return (
@@ -172,7 +267,7 @@ export default function HotspotPageDesigner() {
       color_scheme: t.color_scheme,
       theme: { ...t.theme },
       typography: { ...t.typography },
-      layout: { ...t.layout },
+      layout: { ...t.layout, section_order: prev.layout.section_order },
     }));
     toast.success(`Applied "${t.label}" template`);
   };
@@ -196,6 +291,7 @@ export default function HotspotPageDesigner() {
             theme: { ...DEFAULT_DESIGN.theme, ...(data.page_design.theme || {}) },
             header: { ...DEFAULT_DESIGN.header, ...(data.page_design.header || {}) },
             footer: { ...DEFAULT_DESIGN.footer, ...(data.page_design.footer || {}) },
+            layout: { ...DEFAULT_DESIGN.layout, ...(data.page_design.layout || {}) },
           });
           if (data.page_design.header?.logo_url) setLogoPreview(data.page_design.header.logo_url);
         }
@@ -560,6 +656,11 @@ export default function HotspotPageDesigner() {
 
                 {tab === 'sections' && (
                   <div className="max-w-md">
+                                        <SectionOrder
+                      order={normalizeOrder(design.layout.section_order)}
+                      features={design.features}
+                      onChange={(next) => set('layout.section_order', next)}
+                    />
                     <div className="divide-y divide-slate-200 dark:divide-slate-800">
                       <ToggleRow label="Packages" description="Let customers buy a data package" checked={design.features.show_packages}
                         onChange={v => set('features.show_packages', v)} />
