@@ -309,7 +309,8 @@ function SectionLabel({ text }) {
     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4"
       style={{ background: 'green', border: '1px solid rgba(99,102,241,.25)' }}>
       <Sparkles size={12} style={{ color: '#818cf8' }} />
-      <span className="text-xs font-semibold tracking-wider uppercase" style={{ color: '#818cf8' }}>{text}</span>
+      <span className="text-xs font-semibold tracking-wider
+       uppercase" style={{ color: 'white' }}>{text}</span>
     </div>
   );
 }
