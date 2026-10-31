@@ -487,7 +487,7 @@ const Signup = () => {
   Apply for access
 </Link>
 
-              <WaBtn text="Get Demo" />
+              {/* <WaBtn text="Get Demo" /> */}
               <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: .97 }}
                 data-cta="true"
                 onClick={() => window.location.href = '/contact-us'}
@@ -524,7 +524,7 @@ const Signup = () => {
   className="block text-sm font-bold text-theme-primary py-2">
   Apply for access →
 </Link>
-                  <WaBtn text="Get Demo" />
+                  {/* <WaBtn text="Get Demo" /> */}
                 </div>
               </motion.div>
             )}
@@ -800,7 +800,11 @@ const Signup = () => {
             </motion.div>
 
             <div className="text-center">
-              <WaBtn text="Start Free Trial" large />
+              {/* <WaBtn text="Start Free Trial" large /> */}
+              <Link to="/apply" data-cta="true" onClick={() => setMenuOpen(false)}
+  className="block text-sm font-bold text-theme-primary py-2">
+  Apply for access →
+</Link>
               <p className="text-xs text-theme-faint mt-3">No contract · No setup fee · Cancel anytime · KES 1,000/router/month</p>
             </div>
           </div>
@@ -931,12 +935,12 @@ const Signup = () => {
             <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
               Ready to grow your ISP?
             </h2>
-            <p className="text-theme-secondary text-lg mb-8 max-w-xl mx-auto">
-              Join 50+ Kenyan ISPs already using Aitechs. Get a free demo today —
+            <p className="text-white font-medium text-lg mb-8 max-w-xl mx-auto">
+              Join 50+ Kenyan ISPs already using Owitech. Get a free demo today —
               no setup fees, no contracts, cancel anytime.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <WaBtn text="Get Free Demo on WhatsApp" large />
+              {/* <WaBtn text="Get Free Demo on WhatsApp" large /> */}
               <a href="tel:+254791568852" data-cta="true"
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-bold text-white border transition-all hover:opacity-80"
                 style={{ border:'1px solid var(--border-subtle)', background:'rgba(15,23,42,.6)' }}>
@@ -947,12 +951,13 @@ const Signup = () => {
         </section>
 
         {/* ── Contact ─────────────────────────────────────────────────────── */}
-        <section id="contact" className="py-20 px-6" style={{ background:'var(--bg-page)' }}>
+        <section id="contact" className="py-20 px-6"
+         style={{ background:'var(--bg-page)' }}>
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <SectionLabel text="Get in Touch" />
               <h2 className="text-3xl font-black text-theme-primary">We're here to help</h2>
-              <p className="text-theme-muted mt-2">For demos, trials, pricing or technical questions — reach out anytime.</p>
+              <p className="text-theme-muted mt-2">For pricing or technical questions — reach out anytime.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
