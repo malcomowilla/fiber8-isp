@@ -347,7 +347,7 @@ useEffect(() => {
     <>
     <MaintenanceBanner />
     <div className="flex items-center gap-3 justify-center">
-                <LanguageSwitcher />
+                {/* <LanguageSwitcher /> */}
                 
                 <NotificationCenter />
               </div>
