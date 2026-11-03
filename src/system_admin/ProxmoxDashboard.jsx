@@ -56,7 +56,7 @@ const ProxmoxDashboard = () => {
         <div className="flex items-center gap-3">
           <Server size={24} className="text-blue-600" />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Proxmox Monitor
+            System Monitor
           </h1>
         </div>
         <button
