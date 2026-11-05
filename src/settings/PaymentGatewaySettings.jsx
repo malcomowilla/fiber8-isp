@@ -981,8 +981,8 @@ const ConfirmSwitch = ({ target, current, busy, onCancel, onConfirm }) => (
         onClick={busy ? undefined : onCancel}
       >
         <motion.div
-          className="w-full max-w-sm rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-xl"
-          style={{ fontFamily: FONT }}
+          className="w-full max-w-sm rounded-2xl bg-white dark:bg-slate-900
+           border border-slate-200 dark:border-slate-800 p-5 shadow-xl font-sans"
           initial={{ scale: 0.96, y: 8 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 8 }}
           onClick={(e) => e.stopPropagation()}
         >
