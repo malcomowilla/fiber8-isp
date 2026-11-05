@@ -296,8 +296,7 @@ const RenewLicense = () => {
       <div className="relative max-w-5xl mx-auto px-4 py-8 sm:py-12">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-sm text-slate-500
-           hover:text-slate-900 dark:text-white/50 dark:hover:text-white 
+          className="inline-flex items-center gap-2 text-sm text-black dark:text-white
            transition-colors mb-6"
         >
           <FiArrowLeft /> Back
