@@ -571,7 +571,7 @@ const RenewLicense = () => {
                         <button
                           disabled={!phoneOk}
                           onClick={sendStk}
-                          className="mt-5 w-full rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 text-emerald-950 font-extrabold py-4 text-base
+                          className="mt-5 w-full rounded-2xl bg-emerald-500 font-extrabold py-4 text-base
                                      hover:shadow-[0_10px_40px_rgba(52,211,153,.4)] hover:-translate-y-0.5 active:translate-y-0
                                      disabled:opacity-30 disabled:hover:shadow-none disabled:hover:translate-y-0 disabled:cursor-not-allowed transition-all"
                         >
