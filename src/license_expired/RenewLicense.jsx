@@ -357,7 +357,7 @@ const RenewLicense = () => {
           <div className="grid lg:grid-cols-5 gap-6 items-start">
             {/* ── LEFT: ticket ── */}
             <div className="lg:col-span-2 relative">
-              <div className="relative rounded-3xl bg-gradient-to-b from-emerald-100 to-white border border-emerald-300/60 shadow-sm
+              <div className="relative rounded-3xl  border-emerald-300/60 shadow-sm
                               dark:from-emerald-400/20 dark:to-emerald-400/[0.04] dark:border-emerald-400/25 dark:shadow-none
                               backdrop-blur-xl overflow-hidden">
                 <div className="p-6 pb-5">
@@ -518,7 +518,8 @@ const RenewLicense = () => {
                       </div>
                     )}
 
-                    <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-700/70 dark:text-emerald-200/60 mb-3">How would you like to pay?</p>
+                    <p className="text-[15px] uppercase tracking-[0.18em]
+                      mb-3 dark:text-white">How would you like to pay?</p>
 
                     {/* method tiles */}
                     <div className="grid grid-cols-2 gap-3 mb-6">
