@@ -279,8 +279,8 @@ const RenewLicense = () => {
      text-slate-900  dark:text-white font-sans">
       {/* ambient background */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-40 -left-32 w-[28rem] h-[28rem] rounded-full bg-emerald-400/20 dark:bg-emerald-500/25 blur-[120px]" />
-        <div className="absolute bottom-[-10rem] right-[-8rem] w-[30rem] h-[30rem] rounded-full bg-teal-300/20 dark:bg-teal-400/15 blur-[130px]" />
+        <div className="absolute -top-40 -left-32 w-[28rem] h-[28rem] rounded-full  blur-[120px]" />
+        <div className="absolute bottom-[-10rem] right-[-8rem] w-[30rem] h-[30rem] rounded-full  blur-[130px]" />
         <div
           className="absolute inset-0 text-slate-900 dark:text-white opacity-[0.04] dark:opacity-[0.07]"
           style={{
@@ -616,7 +616,9 @@ const RenewLicense = () => {
         <div className="text-center mt-8">
           <button
             onClick={() => navigate('/admin/invoice')}
-            className="text-sm text-slate-400 hover:text-emerald-600 dark:text-white/40 dark:hover:text-emerald-300 transition-colors underline-offset-4 hover:underline"
+            className="text-lg text-black hover:text-emerald-600
+             dark:text-white
+              underline-offset-4 hover:underline"
           >
             View all invoices
           </button>
