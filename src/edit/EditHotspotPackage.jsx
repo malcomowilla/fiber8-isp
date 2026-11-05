@@ -54,6 +54,21 @@ const DEVICE_TYPES = [
   { value: null,      label: 'All Devices',   icon: Globe,      emoji: '🌐' },
 ];
 
+
+const IDLE_UNITS = [
+  { value: 'minutes', label: 'Minutes' },
+  { value: 'hours',   label: 'Hours' },
+];
+
+const IDLE_PRESETS = [
+  { label: '5 min',  value: 5,  unit: 'minutes' },
+  { label: '15 min', value: 15, unit: 'minutes' },
+  { label: '30 min', value: 30, unit: 'minutes' },
+];
+
+
+
+
 // ─── Limits presets ───────────────────────────────────────────────────────────
 const TIME_UNITS = [
   { value: 'minutes', label: 'Minutes' },
@@ -89,6 +104,15 @@ function LimitsSection({ hotspotPackage, setHotspotPackage }) {
 
   const dataValue = String(hotspotPackage.data_limit_value ?? '');
   const dataUnit = hotspotPackage.data_limit_unit || 'GB';
+  const idleValue = String(hotspotPackage.idle_timeout_value ?? '');
+  const idleUnit = hotspotPackage.idle_timeout_unit || 'minutes';
+
+  const setIdle = (value, unit) =>
+    setHotspotPackage((prev) => ({
+      ...prev,
+      idle_timeout_value: value,
+      idle_timeout_unit: unit,
+    }));
 
   const setTime = (value, unit) =>
     setHotspotPackage((prev) => ({
@@ -179,7 +203,8 @@ function LimitsSection({ hotspotPackage, setHotspotPackage }) {
 
         {/* ── Time limit ── */}
         <div>
-          <p className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+          <p className="text-sm font-semibold text-gray-700 mb-2 flex items-center
+           gap-1.5">
             <AccessTimeIcon fontSize="small" />
             Time Limit <span className="text-red-500">*</span>
           </p>
@@ -228,8 +253,73 @@ function LimitsSection({ hotspotPackage, setHotspotPackage }) {
             })}
           </div>
         </div>
+
+
+                {/* ── Idle timeout (optional) ── */}
+        <div className="sm:col-span-2">
+          <p className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+            <AccessTimeIcon fontSize="small" />
+            Idle Timeout
+          </p>
+
+          <div className="flex gap-2">
+            <TextField
+              fullWidth
+              size="small"
+              className="myTextField"
+              placeholder="Leave blank for no idle timeout"
+              value={idleValue}
+              onChange={(e) => setIdle(sanitizeWhole(e.target.value), idleUnit)}
+              inputProps={{ inputMode: 'numeric' }}
+              sx={focusSx}
+            />
+            <Select
+              size="small"
+              value={idleUnit}
+              onChange={(e) => setIdle(idleValue, e.target.value)}
+              sx={{ minWidth: 120 }}
+            >
+              {IDLE_UNITS.map((u) => (
+                <MenuItem key={u.value} value={u.value}>{u.label}</MenuItem>
+              ))}
+            </Select>
+          </div>
+
+          <p className="text-xs text-gray-500 mt-1">
+            Disconnect user after no activity for this period. Blank means no idle timeout (recommended).
+          </p>
+
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            <Chip
+              label="None"
+              size="small"
+              clickable
+              variant={idleValue === '' ? 'filled' : 'outlined'}
+              onClick={() => setIdle('', idleUnit)}
+              sx={{ fontFamily: 'inherit' }}
+            />
+            {IDLE_PRESETS.map((p) => {
+              const selected = idleValue === String(p.value) && idleUnit === p.unit;
+              return (
+                <Chip
+                  key={p.label}
+                  label={p.label}
+                  size="small"
+                  clickable
+                  variant={selected ? 'filled' : 'outlined'}
+                  onClick={() => setIdle(String(p.value), p.unit)}
+                  sx={{ fontFamily: 'inherit' }}
+                />
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
+
+
+
+
   );
 }
 
@@ -787,6 +877,16 @@ const EditHotspotPackage = ({
           return;
         }
       }
+
+
+      const rawIdle = String(hotspotPackage.idle_timeout_value ?? '').trim();
+      if (rawIdle !== '') {
+        const idle = Number(rawIdle);
+        if (!Number.isInteger(idle) || idle <= 0) {
+          toast.error(<p className="font-sans">Idle timeout must be a whole number, or blank for none</p>, { position: 'top-center' });
+          return;
+        }
+      }
     }
 
     createHotspotPackage(e);
@@ -959,30 +1059,6 @@ const EditHotspotPackage = ({
                       margin="normal"
                       helperText={<p className="font-sans">Number of devices that can use this package simultaneously </p>}
                     />
-
-                    {/* Time Pickers */}
-                    <DemoContainer components={["TimePicker", "TimePicker"]} sx={{ mt: 3 }}>
-                      <TimePicker
-                        label={<p className="font-sans"> Valid From </p>}
-                        value={hotspotPackage.valid_from}
-                        onChange={handleChangeTimeFrom}
-                        viewRenderers={{
-                          hours: renderTimeViewClock,
-                          minutes: renderTimeViewClock,
-                          seconds: renderTimeViewClock,
-                        }}
-                      />
-                      <TimePicker
-                        label={<p className="font-sans">Valid Until </p>}
-                        value={hotspotPackage.valid_until}
-                        onChange={handleChangeTimeUntil}
-                        viewRenderers={{
-                          hours: renderTimeViewClock,
-                          minutes: renderTimeViewClock,
-                          seconds: renderTimeViewClock,
-                        }}
-                      />
-                    </DemoContainer>
 
                     {/* Weekdays */}
                     <div className="mt-6">

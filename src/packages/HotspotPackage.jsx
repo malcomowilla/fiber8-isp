@@ -101,7 +101,9 @@ const [hotspotPackage, setHotspotPackage] = useState({
   free_trial_download_limit: '',
   free_trial_upload_limit: '',
   nas_router: '',
-  enabled: true
+  enabled: true,
+  idle_timeout_value: '',
+  idle_timeout_unit: 'minutes',
 
 })
 const [selectedRouter, setSelectedRouter] = useState('')
