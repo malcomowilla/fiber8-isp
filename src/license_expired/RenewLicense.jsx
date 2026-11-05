@@ -275,7 +275,8 @@ const RenewLicense = () => {
 
   /* ── render ── */
   return (
-    <div className="relative min-h-screen overflow-hidden bg-slate-50 text-slate-900 dark:bg-[#04130d] dark:text-white font-sans">
+    <div className="relative min-h-screen overflow-hidden 
+     text-slate-900  dark:text-white font-sans">
       {/* ambient background */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-40 -left-32 w-[28rem] h-[28rem] rounded-full bg-emerald-400/20 dark:bg-emerald-500/25 blur-[120px]" />
@@ -295,13 +296,19 @@ const RenewLicense = () => {
       <div className="relative max-w-5xl mx-auto px-4 py-8 sm:py-12">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 dark:text-white/50 dark:hover:text-white transition-colors mb-6"
+          className="inline-flex items-center gap-2 text-sm text-slate-500
+           hover:text-slate-900 dark:text-white/50 dark:hover:text-white 
+           transition-colors mb-6"
         >
           <FiArrowLeft /> Back
         </button>
 
         <div className="text-center mb-8">
-          <span className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-400/10 border border-emerald-500/20 dark:border-emerald-400/20 rounded-full px-3 py-1 mb-4">
+          <span className="inline-flex items-center gap-2 
+          text-[15px] uppercase tracking-[0.2em] 
+           dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-400/10 
+           border border-emerald-500/20 dark:border-emerald-400/20 rounded-full 
+           px-3 py-1 mb-4 font-semibold">
             <FiShield /> License renewal
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
