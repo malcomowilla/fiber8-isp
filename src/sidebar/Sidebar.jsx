@@ -993,6 +993,7 @@ import {
 } from 'lucide-react'
 import { LuTv } from "react-icons/lu";
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import BlockIcon from '@mui/icons-material/Block';
 
 
 const Sidebar = () => {
@@ -1296,6 +1297,13 @@ const Sidebar = () => {
           label: t('sidebar.customers'),
           path: "/admin/hotspot-customers"
         },
+
+        {
+          icon: <IconChip><BlockIcon style={{ fontSize: 17 }} /></IconChip>,
+          label: t('sidebar.blockedCustomers', 'Blocked Customers'),
+          path: "/admin/hotspot-blocked-customers"
+        },
+
         {
           icon: <IconChip tint="text-green-600"><CiSettings size={17} /></IconChip>,
           label: t('sidebar.settings'),

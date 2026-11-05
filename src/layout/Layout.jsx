@@ -454,6 +454,8 @@ useEffect(() => {
                  location.pathname !== '/admin/call-center' &&
                  location.pathname !== '/admin/router_details' &&
                   location.pathname !== '/admin/renew-license' &&
+                  location.pathname !== '/admin/hotspot-blocked-customers' &&
+                  
                                       
                                       
 
@@ -534,6 +536,7 @@ location.pathname !== '/admin/network-map' &&
  location.pathname !== '/admin/pppoe-ip-pools' &&
  location.pathname !== '/admin/hotspot_analytics' &&
  location.pathname !== '/admin/renew-license' &&
+ location.pathname !== '/admin/hotspot-blocked-customers' &&
 <div
  onClick={() => {
             setShowMenu1(false)
@@ -659,6 +662,7 @@ location.pathname !== '/admin/onu-details' && location.pathname !== '/admin/node
       location.pathname !== '/admin/pppoe-ip-pools' &&
       location.pathname !== '/admin/hotspot_analytics' &&
       location.pathname !== '/admin/renew-license' &&
+      location.pathname !== '/admin/hotspot-blocked-customers' &&
 <div 
  onClick={() => {
             setShowMenu1(false)
@@ -773,6 +777,7 @@ location.pathname !== '/admin/solved-tickets' && location.pathname !== '/admin/u
                      location.pathname !== '/admin/pppoe-ip-pools' &&
                      location.pathname !== '/admin/hotspot_analytics' &&
                      location.pathname !== '/admin/renew-license' &&
+                     location.pathname !== '/admin/hotspot-blocked-customers' &&
            <div
             onClick={() => {
             setShowMenu1(false)

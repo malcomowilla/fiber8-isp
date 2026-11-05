@@ -172,7 +172,7 @@ const HotspotAnalytics = lazy(() => import("./hotspot_page/HotspotAnalytics"))
 import CallCenter from './callcenter/CallCenter';
 const RenewLicense = lazy(() => import('./license_expired/RenewLicense'))
 const ApplyForAccess = lazy(() => import('./Auth/ApplyForAccess'))
-
+const HotspotBlockedNumbers = lazy(() => import('./blocked_numbers/HotspotBlockedNumbers'))
 
 
 const App = ({client}) => {
@@ -865,6 +865,7 @@ hostname.endsWith('.aitechs.co.ke')
 <Route  path='/admin/hotspot_analytics' element={<HotspotAnalytics/>}/>
 <Route path="/admin/renew-license" element={<RenewLicense />} />
 <Route path="/admin/call-center" element={<CallCenter />} />
+<Route path="/admin/hotspot-blocked-customers" element={<HotspotBlockedNumbers />} />
 
 
 
