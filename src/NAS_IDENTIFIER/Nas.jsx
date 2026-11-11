@@ -288,7 +288,7 @@ const Nas = () => {
       {deleteTarget && (
         <Modal
           title="Delete router?"
-          onClose={() => !deleting && setDeleteTarget(null)}
+          // onClose={() => !deleting && setDeleteTarget(null)}
           footer={
             <>
               <button className={btn} disabled={deleting} onClick={() => setDeleteTarget(null)}>Cancel</button>
