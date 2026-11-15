@@ -4,15 +4,38 @@ import toast, { Toaster } from 'react-hot-toast';
 
 const sd = () => window.location.hostname.split('.')[0];
 
+// Works out which router a plan belongs to: by id first, then by name.
+const resolveRouterId = (plan, routers) => {
+  if (!plan) return '';
+  if (plan.nas_router_id !== null && plan.nas_router_id !== undefined && plan.nas_router_id !== '') {
+    return String(plan.nas_router_id);
+  }
+  if (plan.router_name) {
+    const match = routers.find(
+      r => String(r.name).trim().toLowerCase() === String(plan.router_name).trim().toLowerCase()
+    );
+    if (match) return String(match.id);
+  }
+  return '';
+};
+
 function PlanModal({ plan, routers, onClose, onSaved }) {
   const [form, setForm] = useState({
     name: plan?.name || '', price: plan?.price || '',
     validity: plan?.validity || '', validity_period_units: plan?.validity_period_units || 'hours',
     download_limit: plan?.download_limit || '', upload_limit: plan?.upload_limit || '',
     active: plan?.active ?? true,
-    nas_router_id: plan?.nas_router_id || '',
+    nas_router_id: resolveRouterId(plan, routers),
   });
   const [saving, setSaving] = useState(false);
+
+  // If routers arrive after the modal opened, fill the select once.
+  useEffect(() => {
+    if (plan && !form.nas_router_id && routers.length) {
+      const id = resolveRouterId(plan, routers);
+      if (id) setForm(f => ({ ...f, nas_router_id: id }));
+    }
+  }, [routers, plan]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const submit = async (e) => {
     e.preventDefault();
@@ -26,7 +49,7 @@ function PlanModal({ plan, routers, onClose, onSaved }) {
         body: JSON.stringify(form),
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error?.join?.(', ') || 'Failed to save plan'); return; }
+      if (!res.ok) { toast.error(data.error?.join?.(', ') || data.error || 'Failed to save plan'); return; }
       toast.success(plan ? 'Plan updated' : 'Plan created');
       onSaved(data); onClose();
     } catch { toast.error('Network error'); } finally { setSaving(false); }
@@ -42,19 +65,19 @@ function PlanModal({ plan, routers, onClose, onSaved }) {
         </div>
         <form onSubmit={submit} className="space-y-3">
 
-          {/* Router — required, first field */}
+          {/* Router: required, first field */}
           <div>
             <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">
               <Router className="w-3.5 h-3.5" /> Router <span className="text-red-500">*</span>
             </label>
             <select
               className="w-full border rounded-lg p-2.5 dark:bg-gray-700 dark:text-white"
-              value={form.nas_router_id}
+              value={String(form.nas_router_id)}
               onChange={e => setForm({ ...form, nas_router_id: e.target.value })}
               required
             >
               <option value="">— Select router —</option>
-              {routers.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+              {routers.map(r => <option key={r.id} value={String(r.id)}>{r.name}</option>)}
             </select>
             {!form.nas_router_id && (
               <p className="text-xs text-amber-600 mt-1">A router must be selected before this plan can be saved.</p>
@@ -85,8 +108,8 @@ function PlanModal({ plan, routers, onClose, onSaved }) {
             <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} />
             Active (visible to customers)
           </label>
-          <button type="submit" disabled={saving || !form.nas_router_id} 
-          className="w-full py-2.5 bg-green-600 text-white rounded-lg 
+          <button type="submit" disabled={saving || !form.nas_router_id}
+            className="w-full py-2.5 bg-green-600 text-white rounded-lg
           font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
             {saving ? 'Saving…' : 'Save Plan'}
           </button>
@@ -137,11 +160,13 @@ export default function TvPlans() {
       <Toaster />
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold dark:text-white flex items-center gap-2"><Tv className="w-6 h-6 text-green-500" /> TV Plans</h1>
-          <p className="text-sm text-gray-500">Plans customers can buy to connect a TV/console by MAC address.</p>
+          <h1 className="text-2xl font-bold dark:text-white flex items-center
+          gap-2"><Tv className="w-6 h-6 text-green-500" /> TV Plans</h1>
+          <p className="text-sm text-gray-500">Plans customers can buy to connect
+             a TV/console by MAC address.</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={load} className="flex items-center gap-2 border 
+          <button onClick={load} className="flex items-center gap-2 border
           rounded-lg px-3 py-2 text-sm">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
@@ -153,7 +178,7 @@ export default function TvPlans() {
       </div>
 
       {showAdd && <PlanModal routers={routers} onClose={() => setShowAdd(false)} onSaved={p => setPlans(prev => [...prev, p])} />}
-      {editing && <PlanModal plan={editing} routers={routers} onClose={() => setEditing(null)} onSaved={p => setPlans(prev => prev.map(x => x.id === p.id ? p : x))} />}
+      {editing && <PlanModal key={editing.id} plan={editing} routers={routers} onClose={() => setEditing(null)} onSaved={p => setPlans(prev => prev.map(x => x.id === p.id ? p : x))} />}
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl divide-y dark:divide-gray-700 shadow-sm">
         {plans.length === 0 && !loading && <p className="p-6 text-center text-gray-400 text-sm">No TV plans yet — add one to let customers connect TVs.</p>}
@@ -167,7 +192,7 @@ export default function TvPlans() {
               </p>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => setEditing(plan)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg"><Pencil className="w-4 h-4" /></button>
+              <button onClick={() => setEditing(plan)} className="p-2 text-green-500 hover:bg-blue-50 rounded-lg"><Pencil className="w-4 h-4" /></button>
               <button onClick={() => remove(plan)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
             </div>
           </div>
