@@ -56,9 +56,11 @@ function PlanModal({ plan, routers, onClose, onSaved }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4 font-sans"
+    <div className="fixed inset-0 z-[60] bg-black/50 flex items-center 
+    justify-center p-4 font-sans"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md" 
+      onClick={e => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-bold dark:text-white">{plan ? 'Edit' : 'Add'} TV Plan</h3>
           <button onClick={onClose}><X className="w-5 h-5 text-gray-400" /></button>

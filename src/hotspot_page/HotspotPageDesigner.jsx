@@ -4,11 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
 import {
   Palette, Type, LayoutTemplate, Image as ImageIcon, ToggleLeft,
-  Upload, X, Wifi, RefreshCw, Save, UploadCloud, Check, Smartphone, Layers,
-  GripVertical, ChevronUp, ChevronDown
+  Upload, X, RefreshCw, Save, UploadCloud, Check, Smartphone, Tablet, Monitor,
+  Maximize2, Layers, GripVertical, ChevronUp, ChevronDown, Megaphone, Trash2
 } from 'lucide-react';
 
 const subdomain = window.location.hostname.split('.')[0];
+const fullDomain = window.location.hostname;
+const baseHeaders = { 'X-Subdomain': subdomain, 'X-Domain': fullDomain };
+const jsonHeaders = { 'Content-Type': 'application/json', ...baseHeaders };
 
 const COLOR_SCHEMES = {
   ocean:      { label: 'Ocean',      swatch: ['#38bdf8', '#a78bfa'], theme: { primary: '#38bdf8', secondary: '#a78bfa', accent: '#34d399', button_primary: '#38bdf8', button_secondary: '#a78bfa', background: '#020617', surface: '#0f172a', text: '#e2e8f0', muted: '#64748b' } },
@@ -76,7 +79,6 @@ const DESIGN_TEMPLATES = {
 const FONT_OPTIONS = ['Plus Jakarta Sans', 'Inter', 'Poppins', 'Roboto', 'Space Grotesk',
    'Manrope', 'sans-serif', 'Helvetica', 'Arial', 'Times New Roman', 'Courier New', 'monospace'];
 
-
 const DEFAULT_SECTION_ORDER = ['packages', 'recover', 'voucher', 'mpesa'];
 
 const SECTION_META = {
@@ -95,11 +97,44 @@ const DEFAULT_DESIGN = {
   color_scheme: 'ocean',
   theme: { ...COLOR_SCHEMES.ocean.theme },
   typography: { font_family: 'Plus Jakarta Sans', base_size: 14, heading_size: 24, weight_heading: 700 },
-    layout: { card_width: 420, corner_radius: 24, section_order: DEFAULT_SECTION_ORDER },
-
+  layout: { card_width: 420, corner_radius: 24, section_order: DEFAULT_SECTION_ORDER },
   header: { show_logo: true, show_wifi_icon: true, logo_url: null, network_name: '', tagline: 'Connect to the internet' },
   footer: { support_label: 'Need help?', support_phone: '' },
   features: { show_packages: true, show_voucher: true, show_mpesa_code: true, show_ads: true, show_free_trial: true, show_tv_plans: false },
+};
+
+// ── Preview devices ─────────────────────────────────────────────────
+// The iframe is rendered at the real device width (so the page's own
+// responsive CSS kicks in) and then scaled down to fit the pane.
+const DEVICES = {
+  mobile:  { label: 'Mobile',  icon: Smartphone, w: 340,  h: 640,  bw: 8,  frame: 'rounded-[2.5rem]' },
+  tablet:  { label: 'Tablet',  icon: Tablet,     w: 768,  h: 1024, bw: 10, frame: 'rounded-[1.75rem]' },
+  desktop: { label: 'Desktop', icon: Monitor,    w: 1280, h: 800,  bw: 6,  frame: 'rounded-xl' },
+};
+
+// ── Broadcast ───────────────────────────────────────────────────────
+const BROADCAST_MAX = 280;
+const BROADCAST_LEVELS = {
+  info:     { label: 'Info',     hint: 'General notice' },
+  warning:  { label: 'Warning',  hint: 'Slow or degraded service' },
+  critical: { label: 'Critical', hint: 'Outage' },
+};
+const BROADCAST_TEMPLATES = [
+  { label: 'Slow internet', level: 'warning', message: 'Internet may be slow right now. We are fixing network issues and will have things back to normal soon. Thank you for your patience.' },
+  { label: 'Maintenance',   level: 'warning', message: 'Scheduled maintenance is in progress. Internet may drop for a short while. Sorry for the inconvenience.' },
+  { label: 'Outage',        level: 'critical', message: 'We are experiencing a network outage. Our team is working to restore service. Please check back shortly.' },
+  { label: 'Back to normal', level: 'info',   message: 'Internet is back to normal. Thank you for your patience.' },
+];
+const EMPTY_BROADCAST = { enabled: false, message: '', level: 'warning' };
+const normalizeBroadcast = (b) => ({
+  enabled: !!b?.enabled,
+  message: b?.message || '',
+  level: BROADCAST_LEVELS[b?.level] ? b.level : 'warning',
+});
+
+const formatDate = (iso) => {
+  if (!iso) return '';
+  try { return new Date(iso).toLocaleString(); } catch (_) { return iso; }
 };
 
 function ToggleRow({ label, description, checked, onChange }) {
@@ -123,9 +158,6 @@ function ToggleRow({ label, description, checked, onChange }) {
     </div>
   );
 }
-
-
-
 
 function SectionOrder({ order, features, onChange }) {
   const [dragIndex, setDragIndex] = useState(null);
@@ -196,12 +228,6 @@ function SectionOrder({ order, features, onChange }) {
   );
 }
 
-
-
-
-
-
-
 function ColorField({ label, value, onChange }) {
   return (
     <div className="flex items-center justify-between py-2">
@@ -221,13 +247,89 @@ function ColorField({ label, value, onChange }) {
   );
 }
 
+function DeviceToggle({ device, onChange }) {
+  return (
+    <div className="inline-flex rounded-xl border border-slate-200 dark:border-slate-800 p-0.5 bg-white dark:bg-slate-900">
+      {Object.entries(DEVICES).map(([key, d]) => {
+        const Icon = d.icon;
+        const active = device === key;
+        return (
+          <button key={key} type="button" onClick={() => onChange(key)} title={d.label}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              active
+                ? 'bg-slate-100 dark:bg-slate-800 text-green-600 dark:text-green-300'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+            }`}>
+            <Icon size={14} /> {d.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// Renders the page HTML at real device size, scaled to fit its container.
+// fitHeight=false: scale to width only, container scrolls vertically.
+// fitHeight=true:  scale so the whole device is visible (fullscreen / modal).
+function PreviewFrame({ html, device, loading, fitHeight = false }) {
+  const boxRef = useRef(null);
+  const [box, setBox] = useState({ w: 0, h: 0 });
+
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      setBox({ w: entry.contentRect.width, h: entry.contentRect.height });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const d = DEVICES[device];
+  let scale = 1;
+  if (box.w > 0) {
+    scale = Math.min(1, (box.w - 2 * d.bw) / d.w);
+    if (fitHeight && box.h > 0) scale = Math.min(scale, (box.h - 2 * d.bw) / d.h);
+    scale = Math.max(0.1, scale);
+  }
+
+  return (
+    <div ref={boxRef}
+      className={`w-full ${fitHeight ? 'h-full items-center' : 'h-full items-start'} flex justify-center overflow-y-auto`}
+      style={{ scrollbarGutter: 'stable' }}>
+      <div className={`relative shrink-0 border-slate-800 bg-black shadow-2xl overflow-hidden ${d.frame}`}
+        style={{
+          width: d.w * scale + 2 * d.bw,
+          height: d.h * scale + 2 * d.bw,
+          borderWidth: d.bw,
+          borderStyle: 'solid',
+        }}>
+        <iframe
+          title={`preview-${device}`}
+          srcDoc={html}
+          style={{
+            width: d.w, height: d.h, border: 'none',
+            transform: `scale(${scale})`, transformOrigin: 'top left',
+          }}
+        />
+        {loading && (
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px] flex items-center justify-center">
+            <RefreshCw size={20} className="animate-spin text-white/70" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const TABS = [
   { id: 'templates',  label: 'Templates',  icon: Layers },
   { id: 'colors',     label: 'Colors',     icon: Palette },
   { id: 'typography', label: 'Typography', icon: Type },
-  { id: 'layout',      label: 'Layout',     icon: LayoutTemplate },
+  { id: 'layout',     label: 'Layout',     icon: LayoutTemplate },
   { id: 'content',    label: 'Content',    icon: ImageIcon },
   { id: 'sections',   label: 'Sections',   icon: ToggleLeft },
+  { id: 'broadcast',  label: 'Broadcast',  icon: Megaphone },
 ];
 
 export default function HotspotPageDesigner() {
@@ -235,13 +337,31 @@ export default function HotspotPageDesigner() {
   const [tab, setTab] = useState('templates');
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
-  const [previewLoading, setPreviewLoading] = useState(false);
   const [logoPreview, setLogoPreview] = useState(null);
   const [routers, setRouters] = useState([]);
   const [selectedRouter, setSelectedRouter] = useState('');
   const [showPublishConfirm, setShowPublishConfirm] = useState(false);
   const [activeTemplate, setActiveTemplate] = useState(null);
-  const iframeRef = useRef(null);
+
+  // preview state
+  const [device, setDevice] = useState('mobile');
+  const [previewHtml, setPreviewHtml] = useState('');
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewSource, setPreviewSource] = useState('draft'); // 'draft' | router id
+  const [routerHtml, setRouterHtml] = useState('');
+  const [routerLoading, setRouterLoading] = useState(false);
+  const [routerRefreshKey, setRouterRefreshKey] = useState(0);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [modalView, setModalView] = useState('current'); // 'current' | 'new'
+  const [publishedList, setPublishedList] = useState([]);
+
+  // broadcast state
+  const [broadcastDraft, setBroadcastDraft] = useState(EMPTY_BROADCAST);
+  const [broadcastSaved, setBroadcastSaved] = useState(EMPTY_BROADCAST);
+  const [broadcastSaving, setBroadcastSaving] = useState(false);
+
+  const publishedMap = Object.fromEntries(publishedList.map(r => [String(r.router_id), r]));
+  const broadcastDirty = JSON.stringify(broadcastDraft) !== JSON.stringify(broadcastSaved);
 
   const set = (path, value) =>
     setDesign(prev => {
@@ -272,18 +392,9 @@ export default function HotspotPageDesigner() {
     toast.success(`Applied "${t.label}" template`);
   };
 
-  const fullDomain = window.location.hostname;
-
-
   const loadDesign = useCallback(async () => {
     try {
-      const res = await fetch('/api/get_page_design', { headers: { 'X-Subdomain': subdomain,
- 'X-Domain': fullDomain,
-
-
-       }
-      
-      });
+      const res = await fetch('/api/get_page_design', { headers: baseHeaders });
       if (res.ok) {
         const data = await res.json();
         if (data.page_design && Object.keys(data.page_design).length) {
@@ -302,9 +413,7 @@ export default function HotspotPageDesigner() {
 
   const fetchRouters = useCallback(async () => {
     try {
-      const res = await fetch('/api/routers', { headers: { 'X-Subdomain': subdomain,
-         'X-Domain': fullDomain,
-       } });
+      const res = await fetch('/api/routers', { headers: baseHeaders });
       if (res.ok) {
         const data = await res.json();
         setRouters(data);
@@ -314,41 +423,92 @@ export default function HotspotPageDesigner() {
   }, []);
   useEffect(() => { fetchRouters(); }, [fetchRouters]);
 
-  // Debounced live preview
+  const fetchPublished = useCallback(async () => {
+    try {
+      const res = await fetch('/api/published_hotspot_designs', { headers: baseHeaders });
+      if (res.ok) setPublishedList(await res.json());
+    } catch (_) {}
+  }, []);
+  useEffect(() => { fetchPublished(); }, [fetchPublished]);
+
+  const loadBroadcast = useCallback(async () => {
+    try {
+      const res = await fetch('/api/hotspot_broadcast', { headers: baseHeaders });
+      if (res.ok) {
+        const b = normalizeBroadcast(await res.json());
+        setBroadcastDraft(b);
+        setBroadcastSaved(b);
+      }
+    } catch (_) {}
+  }, []);
+  useEffect(() => { loadBroadcast(); }, [loadBroadcast]);
+
+  // Debounced live preview of the DRAFT (design + draft broadcast)
   useEffect(() => {
     setPreviewLoading(true);
     const t = setTimeout(async () => {
       try {
         const res = await fetch('/api/preview_page_design', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain,
-             'X-Domain': fullDomain,
-           },
-          body: JSON.stringify({ page_design: design }),
+          headers: jsonHeaders,
+          body: JSON.stringify({ page_design: design, broadcast: broadcastDraft }),
         });
-        const html = await res.text();
-        if (iframeRef.current) iframeRef.current.srcdoc = html;
+        setPreviewHtml(await res.text());
       } catch (_) {
       } finally {
         setPreviewLoading(false);
       }
     }, 400);
     return () => clearTimeout(t);
-  }, [design]);
+  }, [design, broadcastDraft]);
+
+  // Which router (if any) should we be previewing the PUBLISHED page of?
+  const routerPreviewId = showPublishConfirm
+    ? (modalView === 'current' ? String(selectedRouter || '') : '')
+    : (previewSource !== 'draft' ? String(previewSource) : '');
+
+  useEffect(() => {
+    if (!routerPreviewId) return;
+    let cancelled = false;
+    setRouterLoading(true);
+    setRouterHtml('');
+    (async () => {
+      try {
+        const res = await fetch('/api/preview_page_design', {
+          method: 'POST',
+          headers: jsonHeaders,
+          body: JSON.stringify({ router_id: routerPreviewId }),
+        });
+        if (!res.ok) throw new Error('preview failed');
+        const html = await res.text();
+        if (!cancelled) setRouterHtml(html);
+      } catch (_) {
+        if (!cancelled) setRouterHtml('');
+      } finally {
+        if (!cancelled) setRouterLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [routerPreviewId, routerRefreshKey]);
+
+  const sidebarShowsRouter = !showPublishConfirm && previewSource !== 'draft';
+  const activeHtml = sidebarShowsRouter ? routerHtml : previewHtml;
+  const activeLoading = sidebarShowsRouter ? routerLoading : previewLoading;
+
+  const modalHtml = modalView === 'current' ? routerHtml : previewHtml;
+  const modalLoading = modalView === 'current' ? routerLoading : previewLoading;
 
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setLogoPreview(URL.createObjectURL(file)); // instant feedback
+    setLogoPreview(URL.createObjectURL(file));
 
     const fd = new FormData();
     fd.append('design_logo', file);
     fd.append('page_design', JSON.stringify(design));
     try {
       const res = await fetch('/api/save_page_design', {
-        method: 'POST', headers: { 'X-Subdomain': subdomain,
-           'X-Domain': fullDomain,
-         }, body: fd,
+        method: 'POST', headers: baseHeaders, body: fd,
       });
       if (res.ok) {
         const data = await res.json();
@@ -367,19 +527,24 @@ export default function HotspotPageDesigner() {
     set('header.logo_url', null);
   };
 
-  const saveDesign = async () => {
+  // Returns true on success. silent = no success toast (used before publishing).
+  const saveDesign = async (silent = false) => {
     setSaving(true);
     try {
       const res = await fetch('/api/save_page_design', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain,
-           'X-Domain': fullDomain,
-         },
+        headers: jsonHeaders,
         body: JSON.stringify({ page_design: design }),
       });
-      if (res.ok) toast.success('Design saved'); else toast.error('Failed to save design');
+      if (res.ok) {
+        if (!silent) toast.success('Design saved');
+        return true;
+      }
+      toast.error('Failed to save design');
+      return false;
     } catch (_) {
       toast.error('Network error saving design');
+      return false;
     } finally {
       setSaving(false);
     }
@@ -389,23 +554,68 @@ export default function HotspotPageDesigner() {
     if (!selectedRouter) { toast.error('Select a router first'); return; }
     setPublishing(true);
     try {
+      // Publish always uses the SAVED design, so save the draft first.
+      const saved = await saveDesign(true);
+      if (!saved) return;
+
       const res = await fetch('/api/publish_hotspot_page', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Subdomain': subdomain,
-           'X-Domain': fullDomain,
-         },
+        headers: jsonHeaders,
         body: JSON.stringify({ router_id: selectedRouter }),
       });
       const data = await res.json();
-      if (res.ok) toast.success(data.message || 'Published to router');
-      else toast.error(data.message || 'Publish failed');
+      if (res.ok) {
+        toast.success(data.message || 'Published to router');
+        await fetchPublished();
+        setRouterRefreshKey(k => k + 1);
+        setModalView('current');
+      } else {
+        toast.error(data.message || 'Publish failed');
+      }
     } catch (_) {
       toast.error('Network error publishing');
     } finally {
       setPublishing(false);
-      setShowPublishConfirm(false);
     }
   };
+
+  const saveBroadcast = async (next = broadcastDraft, successMsg = 'Broadcast saved') => {
+    if (next.enabled && !next.message.trim()) {
+      toast.error('Write a message before turning the broadcast on');
+      return;
+    }
+    setBroadcastSaving(true);
+    try {
+      const res = await fetch('/api/hotspot_broadcast', {
+        method: 'POST',
+        headers: jsonHeaders,
+        body: JSON.stringify(next),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const b = normalizeBroadcast(data);
+        setBroadcastDraft(b);
+        setBroadcastSaved(b);
+        toast.success(successMsg);
+      } else {
+        toast.error(data.error || 'Failed to save broadcast');
+      }
+    } catch (_) {
+      toast.error('Network error saving broadcast');
+    } finally {
+      setBroadcastSaving(false);
+    }
+  };
+
+  const removeBroadcast = () =>
+    saveBroadcast({ ...broadcastDraft, enabled: false }, 'Broadcast removed from hotspot pages');
+
+  const openPublishModal = () => {
+    setModalView('current');
+    setShowPublishConfirm(true);
+  };
+
+  const selectedInfo = publishedMap[String(selectedRouter)];
 
   return (
     <>
@@ -418,15 +628,14 @@ export default function HotspotPageDesigner() {
             <p className="text-xs text-slate-500 dark:text-slate-500">Design your captive portal, then publish it straight to a router</p>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={saveDesign} disabled={saving}
+            <button onClick={() => saveDesign()} disabled={saving}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-green-100 dark:bg-green-800
                hover:bg-green-200 dark:hover:bg-green-700 transition-colors">
               {saving ? <RefreshCw size={15} className="animate-spin" /> : <Save size={15} />}
               {saving ? 'Saving…' : 'Save Design'}
             </button>
 
-            
-            <button onClick={() => setShowPublishConfirm(true)}
+            <button onClick={openPublishModal}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white"
               style={{ background: 'green' }}>
               <UploadCloud size={15} /> Publish to Router
@@ -434,7 +643,9 @@ export default function HotspotPageDesigner() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr_420px] gap-0">
+        <div className={`grid grid-cols-1 gap-0 ${
+          device === 'mobile' ? 'lg:grid-cols-[320px_1fr_420px]' : 'lg:grid-cols-[320px_1fr_560px]'
+        }`}>
           {/* Tab rail */}
           <div className="border-r border-slate-200 dark:border-slate-800 p-3 space-y-1">
             {TABS.map(t => {
@@ -446,6 +657,9 @@ export default function HotspotPageDesigner() {
                     active ? 'bg-slate-100 dark:bg-slate-800 text-green-600 dark:text-green-300' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}>
                   <Icon size={16} /> {t.label}
+                  {t.id === 'broadcast' && broadcastSaved.enabled && (
+                    <span className="ml-auto text-[10px] font-bold uppercase tracking-wide">Live</span>
+                  )}
                 </button>
               );
             })}
@@ -656,7 +870,7 @@ export default function HotspotPageDesigner() {
 
                 {tab === 'sections' && (
                   <div className="max-w-md">
-                                        <SectionOrder
+                    <SectionOrder
                       order={normalizeOrder(design.layout.section_order)}
                       features={design.features}
                       onChange={(next) => set('layout.section_order', next)}
@@ -669,16 +883,107 @@ export default function HotspotPageDesigner() {
                       <ToggleRow label="M-Pesa Code" description="Verify an existing M-Pesa transaction" checked={design.features.show_mpesa_code}
                         onChange={v => set('features.show_mpesa_code', v)} />
                       <ToggleRow label="Free Trial" description="Show the free-trial banner for packages marked as free trial in Package settings" checked={design.features.show_free_trial}
-  onChange={v => set('features.show_free_trial', v)} />
+                        onChange={v => set('features.show_free_trial', v)} />
                       <ToggleRow label="Ads" description="Show sponsored ads on the portal" checked={design.features.show_ads}
                         onChange={v => set('features.show_ads', v)} />
-
-                        <ToggleRow label="TV / Device Connect" description="Let customers pay to connect a smart TV or set-top box by MAC address — requires TV Plans to be created first" checked={design.features.show_tv_plans}
-  onChange={v => set('features.show_tv_plans', v)} />
+                      <ToggleRow label="TV / Device Connect" description="Let customers pay to connect a smart TV or set-top box by MAC address — requires TV Plans to be created first" checked={design.features.show_tv_plans}
+                        onChange={v => set('features.show_tv_plans', v)} />
                     </div>
-                   <p className="text-xs text-slate-500 dark:text-slate-500 mt-3">
-  Any ad you've enabled under Hotspot Marketing → Ads will load live in the preview on the right whenever this is on. Free trial cards only appear for packages you've flagged as free-trial-eligible. Views there don't count toward your ad analytics.
-</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-500 mt-3">
+                      Any ad you've enabled under Hotspot Marketing → Ads will load live in the preview on the right whenever this is on. Free trial cards only appear for packages you've flagged as free-trial-eligible. Views there don't count toward your ad analytics.
+                    </p>
+                  </div>
+                )}
+
+                {tab === 'broadcast' && (
+                  <div className="space-y-5 max-w-md">
+                    <div>
+                      <h3 className="text-sm font-semibold mb-1 text-slate-700 dark:text-slate-300">Broadcast Message</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-500">
+                        Shows a notice at the top of the hotspot page, for example "Internet is slow, we're fixing network issues".
+                        It is independent of Save Design and Publish: once saved it appears on every router's page within about a minute, and removing it works the same way.
+                        Routers published before this feature need one republish to pick it up.
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-3 text-sm">
+                      {broadcastSaved.enabled ? (
+                        <p><span className="font-semibold">Live now</span> on all hotspot pages ({BROADCAST_LEVELS[broadcastSaved.level].label}).</p>
+                      ) : (
+                        <p className="text-slate-500 dark:text-slate-400">No broadcast is showing to customers.</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block">Message</label>
+                      <textarea rows={4} maxLength={BROADCAST_MAX}
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:border-sky-400 resize-none"
+                        placeholder="e.g. Internet may be slow right now. We are fixing network issues."
+                        value={broadcastDraft.message}
+                        onChange={e => setBroadcastDraft(prev => ({ ...prev, message: e.target.value }))} />
+                      <p className="text-xs text-slate-500 dark:text-slate-500 mt-1 text-right">
+                        {broadcastDraft.message.length}/{BROADCAST_MAX}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs text-slate-500 dark:text-slate-500 mb-2">Quick messages</p>
+                      <div className="flex flex-wrap gap-2">
+                        {BROADCAST_TEMPLATES.map(t => (
+                          <button key={t.label} type="button"
+                            onClick={() => setBroadcastDraft(prev => ({ ...prev, message: t.message, level: t.level }))}
+                            className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs font-medium hover:border-slate-300 dark:hover:border-slate-700">
+                            {t.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Style</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {Object.entries(BROADCAST_LEVELS).map(([key, l]) => (
+                          <button key={key} type="button"
+                            onClick={() => setBroadcastDraft(prev => ({ ...prev, level: key }))}
+                            className={`p-3 rounded-xl border text-left transition-colors ${
+                              broadcastDraft.level === key
+                                ? 'border-green-400 bg-sky-50 dark:bg-sky-400/10'
+                                : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                            }`}>
+                            <p className="text-sm font-semibold">{l.label}</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{l.hint}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <ToggleRow label="Show broadcast to customers"
+                      description="The preview on the right always shows your draft; this controls what customers see once saved"
+                      checked={broadcastDraft.enabled}
+                      onChange={v => setBroadcastDraft(prev => ({ ...prev, enabled: v }))} />
+
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      <button onClick={() => saveBroadcast()} disabled={broadcastSaving || !broadcastDirty}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-green-100 dark:bg-green-800 hover:bg-green-200 dark:hover:bg-green-700 transition-colors disabled:opacity-50">
+                        {broadcastSaving ? <RefreshCw size={15} className="animate-spin" /> : <Save size={15} />}
+                        {broadcastSaving ? 'Saving…' : broadcastDraft.enabled ? 'Save & go live' : 'Save'}
+                      </button>
+                      {broadcastSaved.enabled && (
+                        <button onClick={removeBroadcast} disabled={broadcastSaving}
+                          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-colors disabled:opacity-50">
+                          <Trash2 size={15} /> Remove from hotspot pages
+                        </button>
+                      )}
+                      {broadcastDraft.message && (
+                        <button type="button" onClick={() => setBroadcastDraft(prev => ({ ...prev, message: '', enabled: false }))}
+                          className="px-3 py-2.5 text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 underline">
+                          Clear text
+                        </button>
+                      )}
+                    </div>
+                    {broadcastDirty && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400/90">You have unsaved broadcast changes. Customers won't see them until you save.</p>
+                    )}
                   </div>
                 )}
               </motion.div>
@@ -686,58 +991,161 @@ export default function HotspotPageDesigner() {
           </div>
 
           {/* Live preview */}
-          <div className="p-6 bg-slate-50 dark:bg-slate-900/40 sticky top-[73px] h-[calc(100vh-73px)] flex flex-col items-center">
-            <div className="flex items-center gap-2 mb-4 text-xs text-slate-500 dark:text-slate-400">
-              <Smartphone size={13} />
-              Live preview
-              {previewLoading && <RefreshCw size={11} className="animate-spin text-green-400" />}
+          <div className="p-6 bg-slate-50 dark:bg-slate-900/40 sticky top-[73px] h-[calc(100vh-73px)] flex flex-col">
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <DeviceToggle device={device} onChange={setDevice} />
+              <button onClick={() => setFullscreen(true)} title="Fullscreen preview"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700">
+                <Maximize2 size={13} /> Fullscreen
+              </button>
             </div>
-            {/* Device frame stays dark — it represents the physical phone bezel, not app theming */}
-            <div className="relative rounded-[2.5rem] border-8 border-slate-800 shadow-2xl bg-black overflow-hidden"
-              style={{ width: 340, height: 640 }}>
-              <iframe ref={iframeRef} title="preview" className="w-full h-full" style={{ border: 'none' }} />
-              {previewLoading && (
-                <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px] flex items-center justify-center">
-                  <RefreshCw size={20} className="animate-spin text-white/70" />
-                </div>
-              )}
+
+            <div className="flex items-center gap-2 mb-3">
+              <select value={previewSource} onChange={e => setPreviewSource(e.target.value)}
+                className="flex-1 min-w-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-2 text-xs">
+                <option value="draft">Current draft (what you're editing)</option>
+                {routers.map(r => {
+                  const info = publishedMap[String(r.id)];
+                  return (
+                    <option key={r.id} value={String(r.id)}>
+                      On router: {r.name}{info?.published ? '' : ' — nothing published'}
+                    </option>
+                  );
+                })}
+              </select>
+              {activeLoading && <RefreshCw size={12} className="animate-spin shrink-0 text-slate-500" />}
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-500 mt-3 text-center max-w-[300px]">
-              This is the same page that gets published to your router — your logo, WiFi icon, package list, and any active ads all render here exactly as customers will see them. A "Preview" badge appears at the top so ad views here are never counted.
+            {sidebarShowsRouter && (
+              <p className="text-[11px] text-slate-500 dark:text-slate-500 mb-2">
+                Showing the design last published to this router
+                {publishedMap[previewSource]?.published_at ? ` (${formatDate(publishedMap[previewSource].published_at)})` : ''}.
+              </p>
+            )}
+
+            <div className="flex-1 min-h-0">
+              <PreviewFrame html={activeHtml} device={device} loading={activeLoading} />
+            </div>
+
+            <p className="text-[11px] text-slate-500 dark:text-slate-500 mt-3 text-center">
+              Same page that gets published to your router. A "Preview" badge keeps ad views here from being counted.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Publish confirm modal */}
+      {/* Fullscreen preview */}
+      <AnimatePresence>
+        {fullscreen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex flex-col bg-black/70 backdrop-blur-sm p-4 md:p-6">
+            <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+              <div className="flex items-center gap-3">
+                <h3 className="font-bold text-white text-sm">
+                  {sidebarShowsRouter
+                    ? `On router: ${routers.find(r => String(r.id) === String(previewSource))?.name || ''}`
+                    : 'Current draft'}
+                </h3>
+                <DeviceToggle device={device} onChange={setDevice} />
+              </div>
+              <button onClick={() => setFullscreen(false)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-medium">
+                <X size={14} /> Close
+              </button>
+            </div>
+            <div className="flex-1 min-h-0 rounded-2xl bg-slate-100 dark:bg-slate-900 p-4">
+              <PreviewFrame html={activeHtml} device={device} loading={activeLoading} fitHeight />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Publish modal */}
       <AnimatePresence>
         {showPublishConfirm && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
             onClick={() => setShowPublishConfirm(false)}>
             <motion.div initial={{ scale: .95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 max-w-sm w-full mx-4"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 max-w-4xl w-full mx-4 max-h-[92vh] overflow-y-auto"
               onClick={e => e.stopPropagation()}>
-              <div className="flex items-center gap-2 mb-4">
-                <UploadCloud className="text-green-500 dark:text-green-400" size={20} />
-                <h3 className="font-bold text-slate-900 dark:text-slate-100">Publish to Router</h3>
+              <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <UploadCloud className="text-green-500 dark:text-green-400" size={20} />
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100">Publish to Router</h3>
+                </div>
+                <DeviceToggle device={device} onChange={setDevice} />
               </div>
-              <label className="text-xs text-slate-500 dark:text-slate-400 mb-1.5 block">Target router</label>
-              <select value={selectedRouter} onChange={e => setSelectedRouter(e.target.value)}
-                className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 text-sm mb-4">
-                {routers.map(r => <option key={r.id} value={r.id}>{r.name} ({r.ip_address})</option>)}
-              </select>
-              <p className="text-xs text-amber-600 dark:text-amber-400/90 mb-5">This overwrites the existing hotspot login page on this router.</p>
-              <div className="flex gap-2">
-                <button onClick={() => setShowPublishConfirm(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-700">
-                  Cancel
-                </button>
-                <button onClick={publishDesign} disabled={publishing}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white"
-                  style={{ background: 'linear-gradient(135deg, #34d399, #059669)' }}>
-                  {publishing ? 'Publishing…' : 'Confirm Publish'}
-                </button>
+
+              <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6">
+                <div>
+                  <label className="text-xs text-slate-500 dark:text-slate-400 mb-1.5 block">Target router</label>
+                  <select value={selectedRouter} onChange={e => setSelectedRouter(e.target.value)}
+                    className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 text-sm mb-4">
+                    {routers.map(r => (
+                      <option key={r.id} value={r.id}>
+                        {r.name} ({r.ip_address}){publishedMap[String(r.id)]?.published ? '' : ' — nothing published'}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-3 mb-4 text-xs space-y-1">
+                    <p className="font-semibold text-sm">Currently on this router</p>
+                    {selectedInfo?.published ? (
+                      <>
+                        <p className="text-slate-500 dark:text-slate-400">Published {formatDate(selectedInfo.published_at)}</p>
+                        <p className="text-slate-500 dark:text-slate-400">
+                          {selectedInfo.design?.color_scheme ? `${selectedInfo.design.color_scheme} scheme` : 'Default design'}
+                          {selectedInfo.design?.font_family ? ` · ${selectedInfo.design.font_family}` : ''}
+                        </p>
+                        {selectedInfo.design?.network_name && (
+                          <p className="text-slate-500 dark:text-slate-400">Heading: {selectedInfo.design.network_name}</p>
+                        )}
+                        {selectedInfo.design?.primary && (
+                          <div className="flex items-center gap-1.5 pt-1">
+                            {[selectedInfo.design.background, selectedInfo.design.primary, selectedInfo.design.secondary].filter(Boolean).map((c, i) => (
+                              <span key={i} className="w-4 h-4 rounded-full border border-slate-300 dark:border-slate-700" style={{ background: c }} />
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-slate-500 dark:text-slate-400">Nothing has been published to this router from the designer yet.</p>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-1.5">Preview</p>
+                  <div className="grid grid-cols-2 gap-1 p-0.5 rounded-xl border border-slate-200 dark:border-slate-800 mb-4">
+                    {[['current', 'On router now'], ['new', 'New (your draft)']].map(([key, label]) => (
+                      <button key={key} type="button" onClick={() => setModalView(key)}
+                        className={`px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                          modalView === key
+                            ? 'bg-slate-100 dark:bg-slate-800 text-green-600 dark:text-green-300'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                        }`}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <p className="text-xs text-amber-600 dark:text-amber-400/90 mb-5">
+                    Your draft is saved first, then this overwrites the existing hotspot login page on this router.
+                  </p>
+                  <div className="flex gap-2">
+                    <button onClick={() => setShowPublishConfirm(false)}
+                      className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-700">
+                      Close
+                    </button>
+                    <button onClick={publishDesign} disabled={publishing}
+                      className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white"
+                      style={{ background: 'linear-gradient(135deg, #34d399, #059669)' }}>
+                      {publishing ? 'Publishing…' : 'Confirm Publish'}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="h-[60vh] rounded-xl bg-slate-50 dark:bg-slate-950/40 p-3">
+                  <PreviewFrame html={modalHtml} device={device} loading={modalLoading} fitHeight />
+                </div>
               </div>
             </motion.div>
           </motion.div>
