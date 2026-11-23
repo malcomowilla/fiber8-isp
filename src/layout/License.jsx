@@ -91,7 +91,8 @@ const License = ({ expiry2, condition2, status2, calculateTimeRemaining,
               <MessageSquareText className="h-4.5 w-4.5 text-gray-400 dark:text-gray-500" />
               <span className="text-sm text-gray-700 dark:text-gray-400">SMS balance</span>
             </div>
-            <span className="text-sm font-medium tabular-nums text-gray-800 dark:text-gray-100">
+            <span className="text-sm font-medium tabular-nums text-gray-800
+             dark:text-gray-100">
               {smsBalance}
             </span>
           </div>

@@ -920,28 +920,6 @@ const Analytics = () => {
                 />
               </motion.div>
 
-              <motion.div variants={item}>
-                <Link to="/admin/unpaid-invoices" className="block h-full">
-                  <motion.div whileHover={{ y:-2, scale:1.005 }}
-                    className="stat-card rounded-2xl p-4 relative overflow-hidden h-full">
-                    <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full pointer-events-none drift2"
-                      style={{ background:'radial-gradient(circle,#fbbf2420,transparent)' }} />
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="w-9 h-9 rounded-lg flex items-center justify-center"
-                        style={{ background:'#fbbf2418', border:'1px solid #fbbf2428' }}>
-                        <CreditCard size={17} style={{ color:'#fbbf24' }} />
-                      </div>
-                      <span className="text-[11px] px-2 py-0.5 rounded-full font-semibold"
-                        style={{ background:'#fbbf2418', color:'#fbbf24' }}>Due</span>
-                    </div>
-                    <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{fmtKsh(totalInvoiceAmount)}</p>
-                    <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">Outstanding invoices</p>
-                    <div className="flex items-center gap-1 mt-3 text-xs font-semibold" style={{ color:'#fbbf24' }}>
-                      View invoices <ChevronRight size={12} className="card-arrow" />
-                    </div>
-                  </motion.div>
-                </Link>
-              </motion.div>
 
               {/* Revenue Today (PPPoE) */}
               <motion.div variants={item}>
