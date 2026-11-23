@@ -19,14 +19,12 @@ import {
   Ticket, UserPlus, Radio, Sun, Moon, CalendarDays,
   AlarmClock, History, BarChart3, AlertTriangle
 } from 'lucide-react';
+
+
 import License from '../layout/License';
 import ChurnRateSection from './ChurnRateSection';
 import NotificationCenter from './NotificationCenter';
 import RecentHotspotPayments from './RecentHotspotPayments';
-import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from '../components/LanguageSwitcher';
-import OnboardingChecklist from '../onboarding/OnboardingChecklist';
-
 const cable = createConsumer(`wss://${window.location.hostname}/cable`);
 
 // ── Dark-mode detection (drives chart theming; nothing here is dark by default) ─
@@ -49,6 +47,8 @@ function useIsDarkMode() {
 }
 
 // ── Inline styles ──────────────────────────────────────────────────────────────
+// Light by default; every dark treatment is scoped under `.dark` so the section
+// follows the app's theme toggle instead of forcing a look.
 const Styles = () => (
   <style>{`
     .analytics-root * { box-sizing: border-box; }
@@ -70,6 +70,7 @@ const Styles = () => (
       50%      { opacity:.35; }
     }
 
+    /* Light mode (default) */
     .skeleton {
       background: linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%);
       background-size: 600px 100%;
@@ -119,6 +120,7 @@ const Styles = () => (
       transition: background .2s, border-color .2s;
     }
 
+    /* Dark mode overrides — only apply under the app's .dark class */
     .dark .skeleton {
       background: linear-gradient(90deg,#1e293b 25%,#334155 50%,#1e293b 75%);
       background-size: 600px 100%;
@@ -163,13 +165,13 @@ const fmtKsh  = (v) => `KSh ${Number(v || 0).toLocaleString('en-KE')}`;
 
 // ── Stat card ──────────────────────────────────────────────────────────────────
 function StatCard({ title, value, icon, accent, pulse, to, tag, loading }) {
-  const { t } = useTranslation();
   const inner = (
     <motion.div
       whileHover={{ y:-2, scale:1.005 }}
       className="stat-card rounded-2xl p-4 relative 
       overflow-hidden cursor-pointer h-full"
     >
+      {/* Glow blob */}
       <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full pointer-events-none drift1"
         style={{ background:`radial-gradient(circle,${accent}20,transparent)` }} />
 
@@ -205,7 +207,7 @@ function StatCard({ title, value, icon, accent, pulse, to, tag, loading }) {
       {to && (
         <div className="flex items-center gap-1 mt-3 text-xs font-semibold"
           style={{ color: accent }}>
-          {t('analytics.viewDetails')}
+          View details
           <ChevronRight size={12} className="card-arrow" />
         </div>
       )}
@@ -227,7 +229,7 @@ function BwCard({ label, value, accent, icon }) {
           style={{ background:`${accent}18` }}>
           <span style={{ color: accent }}>{icon}</span>
         </div>
-        <span className="text-[11px] font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">{label}</span>
+        <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</span>
       </div>
       <p className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{value}</p>
     </motion.div>
@@ -236,7 +238,6 @@ function BwCard({ label, value, accent, icon }) {
 
 // ── Revenue card (blur-to-reveal) ──────────────────────────────────────────────
 function RevenueCard({ label, value, accent, icon, loading, delay = 0 }) {
-  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity:0, y:10 }}
@@ -255,7 +256,7 @@ function RevenueCard({ label, value, accent, icon, loading, delay = 0 }) {
         </div>
         <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider"
           style={{ background:`${accent}18`, color: accent }}>
-          {t('analytics.revenueTag')}
+          revenue
         </span>
       </div>
 
@@ -270,7 +271,7 @@ function RevenueCard({ label, value, accent, icon, loading, delay = 0 }) {
             <span className="blur-amount">{fmtKsh(value)}</span>
           </p>
           <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">{label}</p>
-          <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">{t('analytics.hoverToReveal')}</p>
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">Hover to reveal</p>
         </>
       )}
     </motion.div>
@@ -279,7 +280,6 @@ function RevenueCard({ label, value, accent, icon, loading, delay = 0 }) {
 
 // ── Expiring soon card ──────────────────────────────────────────────────────────
 function ExpiringSoonCard({ count, days = 10, loading }) {
-  const { t } = useTranslation();
   return (
     <motion.div whileHover={{ y:-2 }}
       className="stat-card rounded-2xl p-4 relative overflow-hidden h-full">
@@ -292,7 +292,7 @@ function ExpiringSoonCard({ count, days = 10, loading }) {
         </div>
         <span className="text-[11px] px-2 py-0.5 rounded-full font-semibold"
           style={{ background:'#fbbf2418', color:'#fbbf24' }}>
-          {t('analytics.nextDays', { days })}
+          Next {days} days
         </span>
       </div>
 
@@ -304,11 +304,11 @@ function ExpiringSoonCard({ count, days = 10, loading }) {
       ) : (
         <>
           <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{count}</p>
-          <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">{t('analytics.expiringSoon')}</p>
+          <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">Expiring soon</p>
           <p className="text-[11px] mt-1.5 text-slate-400 dark:text-slate-500">
             {count === 0
-              ? t('analytics.noneExpiring', { days })
-              : t('analytics.customerCount', { count })}
+              ? `Nothing expires soon — next ${days} days are clear`
+              : `${count} customer${count === 1 ? '' : 's'}`}
           </p>
         </>
       )}
@@ -318,7 +318,6 @@ function ExpiringSoonCard({ count, days = 10, loading }) {
 
 // ── Recently expired card ────────────────────────────────────────────────────────
 function RecentlyExpiredCard({ count, days = 20, loading }) {
-  const { t } = useTranslation();
   return (
     <motion.div whileHover={{ y:-2 }}
       className="stat-card rounded-2xl p-4 relative overflow-hidden h-full">
@@ -331,7 +330,7 @@ function RecentlyExpiredCard({ count, days = 20, loading }) {
         </div>
         <span className="text-[11px] px-2 py-0.5 rounded-full font-semibold"
           style={{ background:'#fb718518', color:'#fb7185' }}>
-          {t('analytics.lastDays', { days })}
+          Last {days} days
         </span>
       </div>
 
@@ -343,11 +342,11 @@ function RecentlyExpiredCard({ count, days = 20, loading }) {
       ) : (
         <>
           <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{count}</p>
-          <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">{t('analytics.recentlyExpired')}</p>
+          <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">Recently expired</p>
           <p className="text-[11px] mt-1.5 text-slate-400 dark:text-slate-500">
             {count === 0
-              ? t('analytics.noneRecentlyExpired', { days })
-              : t('analytics.customerCount', { count })}
+              ? `No recent expiries — nothing in the last ${days} days`
+              : `${count} customer${count === 1 ? '' : 's'}`}
           </p>
         </>
       )}
@@ -357,7 +356,6 @@ function RecentlyExpiredCard({ count, days = 20, loading }) {
 
 // ── New customers card ───────────────────────────────────────────────────────────
 function NewCustomersCard({ month, total, recent, loading }) {
-  const { t } = useTranslation();
   return (
     <motion.div whileHover={{ y:-2 }}
       className="stat-card rounded-2xl p-4 relative overflow-hidden h-full">
@@ -371,7 +369,7 @@ function NewCustomersCard({ month, total, recent, loading }) {
         </div>
         <span className="text-[11px] px-2 py-0.5 rounded-full font-semibold"
           style={{ background:'#34d39918', color:'#34d399' }}>
-          {t('analytics.growing')}
+          Growing
         </span>
       </div>
 
@@ -385,10 +383,8 @@ function NewCustomersCard({ month, total, recent, loading }) {
       ) : (
         <>
           <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{total}</p>
-          <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">{t('analytics.newCustomers')}</p>
-          <p className="text-[11px] mt-1 text-slate-400 dark:text-slate-500">
-            {t('analytics.monthJoined', { month, count: total })}
-          </p>
+          <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">New customers</p>
+          <p className="text-[11px] mt-1 text-slate-400 dark:text-slate-500">{month} · {total} joined</p>
 
           {recent && recent.length > 0 && (
             <div className="mt-3 space-y-1.5 pt-2.5" style={{ borderTop:'1px solid rgba(148,163,184,.08)' }}>
@@ -410,7 +406,6 @@ function NewCustomersCard({ month, total, recent, loading }) {
 
 // ── System statistics card ──────────────────────────────────────────────────────
 function SystemStatsCard({ customers, routers, online, loading }) {
-  const { t } = useTranslation();
   return (
     <motion.div whileHover={{ y:-2 }}
       className="stat-card rounded-2xl p-4 relative overflow-hidden h-full flex flex-col justify-between">
@@ -423,7 +418,7 @@ function SystemStatsCard({ customers, routers, online, loading }) {
           <BarChart3 size={17} style={{ color:'#38bdf8' }} />
         </div>
         <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-          {t('analytics.systemStatistics')}
+          System statistics
         </span>
       </div>
 
@@ -435,15 +430,15 @@ function SystemStatsCard({ customers, routers, online, loading }) {
         <div className="grid grid-cols-3 gap-2.5 text-center">
           <div>
             <p className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{customers}</p>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{t('analytics.customers')}</p>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">customers</p>
           </div>
           <div>
             <p className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{routers}</p>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{t('analytics.routers')}</p>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">routers</p>
           </div>
           <div>
             <p className="text-lg font-bold tabular-nums" style={{ color:'#34d399' }}>{online}</p>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{t('analytics.online')}</p>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">online</p>
           </div>
         </div>
       )}
@@ -468,7 +463,6 @@ const Analytics = () => {
     calculateTimeRemaining, smsBalance, setSmsBalance,
   } = useApplicationSettings();
 
-  const { t, i18n } = useTranslation();
   const subdomain = window.location.hostname.split('.')[0];
   const isDark = useIsDarkMode();
 
@@ -554,6 +548,8 @@ const Analytics = () => {
     },
   });
 
+  // Keep the ApexCharts theme (text/grid/tooltip colors) in sync with light/dark —
+  // it must never default to a forced dark theme.
   useEffect(() => {
     const axisColor = isDark ? '#94a3b8' : '#64748b';
     const gridColor = isDark ? 'rgba(148,163,184,.12)' : 'rgba(148,163,184,.25)';
@@ -621,7 +617,13 @@ const Analytics = () => {
     } catch (_) {}
   }, [subdomain]);
 
-  // `/api/todays_revenue` returns a plain number, not an object.
+  // ── Today's revenue ───────────────────────────────────────────────────────
+  // NOTE: `/api/todays_revenue` returns a plain number (see the hotspot dashboard,
+  // which reads it the same way), not an object. Previously this handler treated
+  // the response as `{ revenue_yesterday, new_customers_today, open_tickets, ... }`,
+  // which meant every field silently resolved to 0 — including `revenue_yesterday`,
+  // which then overwrote the correct value set by `fetchYesterdayRevenue` below.
+  // That was the cause of "yesterday's revenue" always showing 0.
   const fetchDashboardStats = useCallback(async () => {
     try {
       const res = await fetch('/api/todays_revenue', { headers: { 'X-Subdomain': subdomain } });
@@ -635,6 +637,7 @@ const Analytics = () => {
     }
   }, [subdomain]);
 
+  // ── Fetch PPPoE revenue this month ──────────────────────────────────────────
   const fetchPPPoERevenueThisMonth = useCallback(async () => {
     try {
       const res = await fetch('/api/pppoe_revenue_this_month', { headers: { 'X-Subdomain': subdomain } });
@@ -678,6 +681,7 @@ const Analytics = () => {
     }
   }, [subdomain]);
 
+  // ── Expiring soon (next 10 days) ──────────────────────────────────────────
   const fetchExpiringSoon = useCallback(async () => {
     try {
       const res = await fetch('/api/expiring_soon?days=10', { headers: { 'X-Subdomain': subdomain } });
@@ -689,6 +693,7 @@ const Analytics = () => {
     } catch (_) {}
   }, [subdomain]);
 
+  // ── Recently expired (last 20 days) ───────────────────────────────────────
   const fetchRecentlyExpired = useCallback(async () => {
     try {
       const res = await fetch('/api/recently_expired?days=20', { headers: { 'X-Subdomain': subdomain } });
@@ -700,6 +705,7 @@ const Analytics = () => {
     } catch (_) {}
   }, [subdomain]);
 
+  // ── New customers this month ──────────────────────────────────────────────
   const fetchNewCustomers = useCallback(async () => {
     try {
       const res = await fetch('/api/new_customers_this_month', { headers: { 'X-Subdomain': subdomain } });
@@ -712,6 +718,7 @@ const Analytics = () => {
     } catch (_) {}
   }, [subdomain]);
 
+  // ── System statistics ─────────────────────────────────────────────────────
   const fetchSystemStatistics = useCallback(async () => {
     try {
       const res = await fetch('/api/system_statistics', { headers: { 'X-Subdomain': subdomain } });
@@ -727,6 +734,7 @@ const Analytics = () => {
     }
   }, [subdomain]);
 
+  // ── Fetch AP analytics ───────────────────────────────────────────────────
   const fetchAccessPointStats = useCallback(async () => {
     try {
       const res = await fetch('/api/access_points/analytics', { headers: { 'X-Subdomain': subdomain } });
@@ -743,7 +751,8 @@ const Analytics = () => {
     finally { setApLoading(false); }
   }, [subdomain]);
 
-  const fetchPaidNotConnected = useCallback(async () => {
+
+    const fetchPaidNotConnected = useCallback(async () => {
     try {
       const res = await fetch('/api/paid_not_connected/summary', { headers: { 'X-Subdomain': subdomain } });
       if (res.ok) {
@@ -779,10 +788,12 @@ const Analytics = () => {
     fetchSystemStatistics, fetchPPPoERevenueThisMonth, fetchHotspotERevenueThisMonth,
     fetchAccessPointStats, fetchPaidNotConnected]);
 
+
+
   // Clock
   useEffect(() => {
-    const tm = setInterval(() => setDate(new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true })), 1000);
-    return () => clearInterval(tm);
+    const t = setInterval(() => setDate(new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true })), 1000);
+    return () => clearInterval(t);
   }, []);
 
   // Radacct WebSocket
@@ -799,7 +810,7 @@ const Analytics = () => {
     return () => sub.unsubscribe();
   }, [subdomain]);
 
-  // Hotspot active users WebSocket
+  // Hotspot active users WebSocket (falls back to REST poll above if absent)
   useEffect(() => {
     const sub = cable.subscriptions.create(
       { channel: 'HotspotChannel', 'X-Subdomain': subdomain },
@@ -848,24 +859,14 @@ const Analytics = () => {
 
   const currentData = dataHistory.current.slice(-1)[0] || { download: 0, upload: 0, total: 0 };
 
+  // ── Stagger variants ─────────────────────────────────────────────────────────
   const container = { hidden:{}, visible:{ transition:{ staggerChildren:.06 } } };
   const item      = { hidden:{ opacity:0, y:14 }, visible:{ opacity:1, y:0, transition:{ duration:.35 } } };
-
-  // Locale for dates (en -> en-KE, sw -> sw-KE, others use their own code)
-  const lang = (i18n.resolvedLanguage || 'en').split('-')[0];
-  const dateLocale = lang === 'en' ? 'en-KE' : lang === 'sw' ? 'sw-KE' : lang;
-
-  // Chart series names follow the active language
-  const translatedSeries = chartData.series.map((s, i) => ({
-    ...s,
-    name: i === 0 ? t('analytics.download') : t('analytics.upload'),
-  }));
 
   return (
     <>
       <Styles />
-      <div onClick={closeMenus} className="analytics-root font-sans 
-      min-h-screen p-5 space-y-5 text-slate-900 dark:text-slate-200"
+      <div onClick={closeMenus} className="analytics-root font-sans min-h-screen p-5 space-y-5 text-slate-900 dark:text-slate-200"
         style={{ position:'relative', overflow:'hidden' }}>
 
         {/* ── Ambient blobs ──────────────────────────────────────────────────── */}
@@ -884,25 +885,13 @@ const Analytics = () => {
             <motion.div initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }}
               className="flex items-center justify-between">
               <div>
-                <h1 className="text-xl font-bold text-slate-900 dark:text-white">{t('analytics.title')}</h1>
+                <h1 className="text-xl font-bold text-slate-900 dark:text-white">Network Overview</h1>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                  {new Date().toLocaleDateString(dateLocale, { weekday:'long', year:'numeric', month:'long', day:'numeric' })}
+                  {new Date().toLocaleDateString('en-KE',{ weekday:'long', year:'numeric', month:'long', day:'numeric' })}
                 </p>
               </div>
-              {/* <div className="flex items-center gap-3">
-                <LanguageSwitcher />
-                
-                <NotificationCenter />
-              </div> */}
+              <NotificationCenter />
             </motion.div>
-
-
-
- {/* ── First-login setup guide (hides itself when dismissed) ── */}
-            <OnboardingChecklist />
-
-
-
 
             {/* ── Top 4 KPI cards ──────────────────────────────────────────────── */}
             <motion.div variants={container} initial="hidden" animate="visible"
@@ -910,7 +899,7 @@ const Analytics = () => {
 
               <motion.div variants={item}>
                 <StatCard
-                  title={t('analytics.allClients')}
+                  title="All Clients"
                   value={totalSubscribers || 0}
                   icon={<LuUsers size={17} />}
                   accent="#a78bfa"
@@ -921,13 +910,13 @@ const Analytics = () => {
 
               <motion.div variants={item}>
                 <StatCard
-                  title={t('analytics.clientsOnline')}
+                  title="Clients Online"
                   value={totalOnlineUsers || 0}
                   icon={<MdOutlineOnlinePrediction size={17} />}
                   accent="#34d399"
                   pulse="online"
                   to="/admin/subscribers-online"
-                  tag={t('analytics.live')}
+                  tag="Live"
                 />
               </motion.div>
 
@@ -943,12 +932,12 @@ const Analytics = () => {
                         <CreditCard size={17} style={{ color:'#fbbf24' }} />
                       </div>
                       <span className="text-[11px] px-2 py-0.5 rounded-full font-semibold"
-                        style={{ background:'#fbbf2418', color:'#fbbf24' }}>{t('analytics.due')}</span>
+                        style={{ background:'#fbbf2418', color:'#fbbf24' }}>Due</span>
                     </div>
                     <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{fmtKsh(totalInvoiceAmount)}</p>
-                    <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">{t('analytics.outstandingInvoices')}</p>
+                    <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">Outstanding invoices</p>
                     <div className="flex items-center gap-1 mt-3 text-xs font-semibold" style={{ color:'#fbbf24' }}>
-                      {t('analytics.viewInvoices')} <ChevronRight size={12} className="card-arrow" />
+                      View invoices <ChevronRight size={12} className="card-arrow" />
                     </div>
                   </motion.div>
                 </Link>
@@ -981,8 +970,8 @@ const Analytics = () => {
                         <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">
                           <span className="blur-amount">{fmtKsh(revenueTodayPPPoE)}</span>
                         </p>
-                        <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">{t('analytics.revenueToday')}</p>
-                        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">{t('analytics.hoverToReveal')}</p>
+                        <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">Revenue Today</p>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">Hover to reveal</p>
                       </>
                     )}
                   </motion.div>
@@ -998,7 +987,9 @@ const Analytics = () => {
               smsBalance={smsBalance}
             />
 
-            {/* ── Access point offline alert ───────────────────────────────────── */}
+            {/* ══════════════════════════════════════════════════════════════════
+                ACCESS POINT OFFLINE ALERT — shows on dashboard when AP is down
+                ══════════════════════════════════════════════════════════════════ */}
             {!apLoading && apStats.offline > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: -8 }}
@@ -1006,6 +997,7 @@ const Analytics = () => {
                 className="rounded-2xl p-4 flex items-start gap-3"
                 style={{ background: 'rgba(239,68,68,.08)', border: '1px solid rgba(239,68,68,.25)' }}
               >
+                {/* Pulsing red dot */}
                 <div className="relative flex-shrink-0 mt-0.5 w-8 h-8">
                   <span className="pulse-offline absolute inset-0 rounded-full" />
                   <div className="relative w-8 h-8 rounded-full flex items-center justify-center z-10"
@@ -1016,7 +1008,7 @@ const Analytics = () => {
 
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold mb-1" style={{ color: '#ef4444' }}>
-                    ⚠️ {t('analytics.apOffline', { count: apStats.offline })}
+                    ⚠️ {apStats.offline} Access Point{apStats.offline > 1 ? 's' : ''} Offline!
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {apStats.offline_list.map(ap => (
@@ -1030,7 +1022,7 @@ const Analytics = () => {
                   </div>
                   {apStats.offline_list[0]?.last_seen_at && (
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
-                      {t('analytics.lastSeen')}: {new Date(apStats.offline_list[0].last_seen_at).toLocaleString(dateLocale)}
+                      Last seen: {new Date(apStats.offline_list[0].last_seen_at).toLocaleString()}
                     </p>
                   )}
                 </div>
@@ -1039,12 +1031,13 @@ const Analytics = () => {
                   <p className="text-lg font-bold tabular-nums" style={{ color: '#ef4444' }}>
                     {apStats.online}/{apStats.total}
                   </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">{t('analytics.online')}</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">online</p>
                 </div>
               </motion.div>
             )}
 
-            {/* ── Paid but not connected ───────────────────────────────────────── */}
+
+            {/* ── Paid but not connected: needs compensation ─────────────────── */}
             {pncStats.count > 0 && (
               <Link to="/admin/incidents#paid-not-connected" className="block">
                 <motion.div
@@ -1059,39 +1052,40 @@ const Analytics = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-slate-900 dark:text-white">
-                      {t('analytics.paidNotConnected', { count: pncStats.count })}
+                      {pncStats.count} customer{pncStats.count === 1 ? '' : 's'} paid but never connected
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {t('analytics.paidNotConnectedDetail', {
-                        amount: fmtKsh(pncStats.amount),
-                        count: pncStats.auto_eligible_count,
-                      })}
+                      {fmtKsh(pncStats.amount)} paid · {pncStats.auto_eligible_count} eligible for quick compensation
                     </p>
                   </div>
                   <span className="flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-200">
-                    {t('analytics.review')} <ChevronRight size={12} className="card-arrow" />
+                    Review <ChevronRight size={12} className="card-arrow" />
                   </span>
                 </motion.div>
               </Link>
             )}
 
-            {/* ── Access Point Summary ─────────────────────────────────────────── */}
+
+
+
+
+            {/* ── Access Point Summary (Total / Online / Offline) ──────────────── */}
             {!apLoading && apStats.total > 0 && (
               <motion.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:.05 }}>
                 <div className="mb-3">
                   <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <GiWifiRouter size={16} style={{ color:'#38bdf8' }} />
-                    {t('analytics.accessPoints')}
+                    Access Points
                   </h2>
                 </div>
                 <motion.div variants={container} initial="hidden" animate="visible"
                   className="grid grid-cols-3 gap-3">
                   {[
-                    { key: 'total',   label: t('analytics.totalAps'), value: apStats.total,   color: '#38bdf8', pulse: null },
-                    { key: 'online',  label: t('analytics.online'),   value: apStats.online,  color: '#34d399', pulse: 'online' },
-                    { key: 'offline', label: t('analytics.offline'),  value: apStats.offline, color: apStats.offline > 0 ? '#ef4444' : '#94a3b8', pulse: apStats.offline > 0 ? 'offline' : null },
+                    { label: 'Total APs',  value: apStats.total,   color: '#38bdf8', pulse: null },
+                    { label: 'Online',     value: apStats.online,  color: '#34d399', pulse: 'online' },
+                    { label: 'Offline',    value: apStats.offline, color: apStats.offline > 0 ? '#ef4444' : '#94a3b8', pulse: apStats.offline > 0 ? 'offline' : null },
                   ].map(s => (
-                    <motion.div key={s.key} variants={item} whileHover={{ y:-2 }}
+                    <motion.div key={s.label} variants={item} whileHover={{ y:-2 }}
                       className="stat-card rounded-2xl p-4 relative overflow-hidden">
                       <div className="absolute -top-6 -right-6 w-16 h-16 rounded-full pointer-events-none drift1"
                         style={{ background:`radial-gradient(circle,${s.color}20,transparent)` }} />
@@ -1118,9 +1112,9 @@ const Analytics = () => {
                       <span className="pulse-online absolute inset-0 rounded-full" />
                       <span className="relative block w-2 h-2 rounded-full bg-emerald-400" />
                     </span>
-                    <span className="text-xs font-semibold text-emerald-500 dark:text-emerald-400 uppercase tracking-wider">{t('analytics.live')}</span>
+                    <span className="text-xs font-semibold text-emerald-500 dark:text-emerald-400 uppercase tracking-wider">Live</span>
                   </div>
-                  <h2 className="text-sm font-bold text-slate-900 dark:text-white">{t('analytics.hotspotPerformance')}</h2>
+                  <h2 className="text-sm font-bold text-slate-900 dark:text-white">Hotspot Performance · Revenue</h2>
                 </div>
               </div>
 
@@ -1129,7 +1123,7 @@ const Analytics = () => {
 
                 <motion.div variants={item} className="lg:col-span-1 col-span-2">
                   <StatCard
-                    title={t('analytics.connectedNow')}
+                    title="Connected now"
                     value={hotspotActiveUsers || 0}
                     icon={<Radio size={17} />}
                     accent="#22d3ee"
@@ -1142,18 +1136,18 @@ const Analytics = () => {
 
                 <motion.div variants={item} className="lg:col-span-1 col-span-2">
                   <StatCard
-                    title={t('analytics.newCustomersToday')}
+                    title="New customers today"
                     value={newCustomersToday || 0}
                     icon={<UserPlus size={17} />}
                     accent="#34d399"
-                    tag={t('analytics.today')}
+                    tag="Today"
                     loading={statsLoading}
                   />
                 </motion.div>
 
                 <motion.div variants={item} className="col-span-1">
                   <RevenueCard
-                    label={t('analytics.todaysRevenue')}
+                    label="Today's revenue"
                     value={revenueToday}
                     accent="#facc15"
                     icon={<Sun size={17} />}
@@ -1164,7 +1158,7 @@ const Analytics = () => {
 
                 <motion.div variants={item} className="col-span-1">
                   <RevenueCard
-                    label={t('analytics.yesterdaysRevenue')}
+                    label="Yesterday's revenue"
                     value={revenueYesterday}
                     accent="#fb923c"
                     icon={<Moon size={17} />}
@@ -1175,7 +1169,7 @@ const Analytics = () => {
 
                 <motion.div variants={item} className="col-span-2 lg:col-span-1">
                   <RevenueCard
-                    label={t('analytics.monthsRevenue')}
+                    label="This Month's revenue"
                     value={revenueThisMonth}
                     accent="#38bdf8"
                     icon={<CalendarDays size={17} />}
@@ -1199,7 +1193,7 @@ const Analytics = () => {
                         {openTickets > 0 && (
                           <span className="ticket-badge text-[11px] px-2 py-0.5 rounded-full font-semibold"
                             style={{ background:'#fb718518', color:'#fb7185' }}>
-                            {t('analytics.openBadge', { count: openTickets > 99 ? '99+' : openTickets })}
+                            {openTickets > 99 ? '99+' : openTickets} open
                           </span>
                         )}
                       </div>
@@ -1212,12 +1206,12 @@ const Analytics = () => {
                       ) : (
                         <>
                           <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{openTickets || 0}</p>
-                          <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">{t('analytics.openTickets')}</p>
+                          <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">Open tickets</p>
                         </>
                       )}
 
                       <div className="flex items-center gap-1 mt-3 text-xs font-semibold" style={{ color:'#fb7185' }}>
-                        {t('analytics.viewTickets')} <ChevronRight size={12} className="card-arrow" />
+                        View tickets <ChevronRight size={12} className="card-arrow" />
                       </div>
                     </motion.div>
                   </Link>
@@ -1225,15 +1219,19 @@ const Analytics = () => {
               </motion.div>
             </motion.div>
 
+
+
             {/* ── Recent Hotspot Payments (live) ──────────────────────────────── */}
-            <motion.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:.09 }}>
-              <RecentHotspotPayments cable={cable} subdomain={subdomain} />
-            </motion.div>
+<motion.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:.09 }}>
+  <RecentHotspotPayments cable={cable} subdomain={subdomain} />
+</motion.div>
+
+
 
             {/* ── Customer Insights ───────────────────────────────────────────── */}
             <motion.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:.1 }}>
               <div className="mb-3">
-                <h2 className="text-sm font-bold text-slate-900 dark:text-white">{t('analytics.customerInsights')}</h2>
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">Customer Insights</h2>
               </div>
 
               <motion.div variants={container} initial="hidden" animate="visible"
@@ -1279,6 +1277,7 @@ const Analytics = () => {
             <motion.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:.12 }}
               className="grid grid-cols-1 lg:grid-cols-3 gap-3">
 
+              {/* Data summary card */}
               <motion.div whileHover={{ y:-2 }}
                 className="stat-card rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between">
                 <div className="absolute -top-5 -right-5 w-20 h-20 rounded-full pointer-events-none drift1"
@@ -1293,17 +1292,17 @@ const Analytics = () => {
                     <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
                       style={{ background:'rgba(56,189,248,.1)', color:'#38bdf8' }}>24h</span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-1">{t('analytics.totalBandwidth')}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-1">Total Bandwidth</p>
                   <p className="text-3xl font-bold text-slate-900 dark:text-white tabular-nums">{totalBandwidth}</p>
                 </div>
 
                 <div className="mt-4 space-y-2 pt-3"
                   style={{ borderTop:'1px solid rgba(148,163,184,.08)' }}>
                   {[
-                    { key:'download', label: t('analytics.download'), value: totalDownload, color:'#38bdf8', Icon: FaArrowDown },
-                    { key:'upload',   label: t('analytics.upload'),   value: totalUpload,   color:'#a78bfa', Icon: FaArrowUp },
+                    { label:'Download', value: totalDownload, color:'#38bdf8', Icon: FaArrowDown },
+                    { label:'Upload',   value: totalUpload,   color:'#a78bfa', Icon: FaArrowUp },
                   ].map(r => (
-                    <div key={r.key} className="flex items-center justify-between">
+                    <div key={r.label} className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <r.Icon size={12} style={{ color: r.color }} />
                         <span className="text-xs text-slate-500 dark:text-slate-400">{r.label}</span>
@@ -1316,29 +1315,30 @@ const Analytics = () => {
                 </div>
               </motion.div>
 
+              {/* Three mini bandwidth cards */}
               <div className="lg:col-span-2 grid 
               grid-cols-1 sm:grid-cols-3 gap-3 ">
 
-                <BwCard label={t('analytics.currentDownload')} value={totalDownload} accent="#38bdf8"
+                <BwCard label={<p className='text-gray-600 dark:text-gray-300'>Current Download </p>} value={totalDownload} accent="#38bdf8"
                   icon={<FaArrowDown size={14} />} />
 
-                <BwCard label={t('analytics.currentUpload')} value={totalUpload} accent="#a78bfa"
+                <BwCard label={<p className='text-gray-600 dark:text-gray-300'>Current Upload </p>}   value={totalUpload}   accent="#a78bfa"
                   icon={<FaArrowUp size={14} />} />
-
-                <BwCard label={t('analytics.totalBandwidth')} value={totalBandwidth || currentData.total} accent="#34d399"
+                <BwCard label={<p className='text-gray-600 dark:text-gray-300'>Total Bandwidth </p>}  value={totalBandwidth || currentData.total} accent="#34d399"
                   icon={<Activity size={14} />} />
 
+                {/* Utilisation bar */}
                 <div className="sm:col-span-3 bandwidth-bar rounded-2xl p-4">
                   <div className="flex items-center justify-between mb-2.5">
-                    <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">{t('analytics.bandwidthSplit')}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Bandwidth split</p>
                     <div className="flex items-center gap-4 text-xs text-slate-400 dark:text-slate-500">
                       <span className="flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full" style={{ background:'#38bdf8' }} />
-                        {t('analytics.download')}
+                        Download
                       </span>
                       <span className="flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full" style={{ background:'#a78bfa' }} />
-                        {t('analytics.upload')}
+                        Upload
                       </span>
                     </div>
                   </div>
@@ -1376,19 +1376,19 @@ const Analytics = () => {
                       <span className="pulse-online absolute inset-0 rounded-full" />
                       <span className="relative block w-2 h-2 rounded-full bg-emerald-400" />
                     </span>
-                    <span className="text-xs font-semibold text-emerald-500 dark:text-emerald-400 uppercase tracking-wider">{t('analytics.realTime')}</span>
+                    <span className="text-xs font-semibold text-emerald-500 dark:text-emerald-400 uppercase tracking-wider">Real-time</span>
                   </div>
-                  <h2 className="text-sm font-bold text-slate-900 dark:text-white">{t('analytics.bandwidthUsage')}</h2>
+                  <h2 className="text-sm font-bold text-slate-900 dark:text-white">Bandwidth Usage</h2>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500 tabular-nums">
                   <Zap size={12} style={{ color:'#fbbf24' }} />
-                  {t('analytics.points', { current: dataHistory.current.length, max: maxDataPoints })}
+                  {dataHistory.current.length}/{maxDataPoints} points
                 </div>
               </div>
 
               <ReactApexChart
                 options={chartData.options}
-                series={translatedSeries}
+                series={chartData.series}
                 type="area"
                 height={280}
               />
@@ -1404,7 +1404,3 @@ const Analytics = () => {
 };
 
 export default Analytics;
-
-
-
-
