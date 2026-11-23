@@ -162,10 +162,7 @@ export default function RecentHotspotPayments({ cable, subdomain, maxItems = 12 
         <div className="flex items-center justify-between mb-3">
           <div>
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="relative inline-flex w-2 h-2">
-                <span className="pulse-online absolute inset-0 rounded-full" />
-                <span className="relative block w-2 h-2 rounded-full bg-emerald-400" />
-              </span>
+             
               <span className="text-xs font-semibold text-emerald-500 dark:text-emerald-400 uppercase tracking-wider">Live</span>
             </div>
             <h2 className="text-sm font-bold text-slate-900 dark:text-white">Recent Hotspot Payments</h2>

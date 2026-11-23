@@ -916,7 +916,7 @@ const Analytics = () => {
                   accent="#34d399"
                   pulse="online"
                   to="/admin/subscribers-online"
-                  tag="Live"
+                  
                 />
               </motion.div>
 
@@ -1112,9 +1112,8 @@ const Analytics = () => {
                       <span className="pulse-online absolute inset-0 rounded-full" />
                       <span className="relative block w-2 h-2 rounded-full bg-emerald-400" />
                     </span>
-                    <span className="text-xs font-semibold text-emerald-500 dark:text-emerald-400 uppercase tracking-wider">Live</span>
                   </div>
-                  <h2 className="text-sm font-bold text-slate-900 dark:text-white">Hotspot Performance · Revenue</h2>
+                  <h2 className="text-sm font-bold text-slate-900 dark:text-white">Hotspot</h2>
                 </div>
               </div>
 
