@@ -68,7 +68,7 @@ const License = ({ expiry2, condition2, status2, calculateTimeRemaining,
               </p>
               <p className="mt-0.5 text-sm text-gray-600 dark:text-gray-500">time remaining</p>
             </div>
-            <p className="text-right text-xs text-gray-400 dark:text-gray-500">
+            <p className="text-right text-sn text-gray-700 dark:text-gray-500">
               {hasLicense ? `Expires ${expiry2}` : 'No active license'}
             </p>
           </div>
