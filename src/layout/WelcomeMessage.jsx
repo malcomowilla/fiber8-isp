@@ -151,7 +151,8 @@ const WelcomeMessage = () => {
        border border-white/10 ">
 
         {/* Ambient orb */}
-        <div className={`absolute -top-8 -right-8 w-48 h-48 rounded-full ${theme.orbStyle} opacity-20 blur-3xl pointer-events-none`} />
+        <div className={`absolute -top-8 -right-8 w-48 h-48 rounded-full  opacity-20 
+          blur-3xl pointer-events-none`} />
 
         {/* Season / time tag */}
         <span className={`inline-flex items-center gap-1.5 text-[12px] 
