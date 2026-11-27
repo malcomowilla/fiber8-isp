@@ -147,7 +147,8 @@ const WelcomeMessage = () => {
 ">
 
       {/* ── Greeting card ── */}
-      <div className="relative rounded-2xl p-6 overflow-hidden border border-white/10 bg-white/[0.03]">
+      <div className="relative rounded-2xl p-6 overflow-hidden
+       border border-white/10 ">
 
         {/* Ambient orb */}
         <div className={`absolute -top-8 -right-8 w-48 h-48 rounded-full ${theme.orbStyle} opacity-20 blur-3xl pointer-events-none`} />
